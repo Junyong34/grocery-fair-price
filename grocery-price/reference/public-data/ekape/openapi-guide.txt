@@ -1,0 +1,2302 @@
+
+
+
+
+
+
+-15875012211200축산물품질평가원
+축산물품질평가원_축산유통정보
+OpenAPI 활용가이드
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+문서 정보
+문서명
+ | 축산물검수정보(유통정보) 서비스 OpenAPI 활용가이드
+ | 
+
+개정 이력
+버 전
+ | 변경일
+ | 변경 사유
+ | 변경 내용
+ | 작성자
+ | 승인
+ | 1.0
+ | 2013-10-30
+ | 최초작성
+ | 최초작성
+ | 박우석
+ | 이우직
+ | 2.1
+ | 2016-04-01
+ | 내용수정
+ | 통합메뉴얼 서브별 매뉴얼로 분리
+ | 권윤길
+ | 정경용
+ | 2.2
+ | 2016-05-26
+ | 내용수정
+ | `16년 상반기 공공데이터 일제정비
+ | 권윤길
+ | 정경용
+ | 2.3
+ | 2017-03-16
+ | 내용수정
+ | `16년 오픈API 품질진단 결과내역 반영
+ | 권윤길
+ | 정경용
+ | 2.4
+ | 2017-09-27
+ | 문서 현행화
+ | 오타 및 요청/응답메세지 수정
+ | 권윤길
+ | 유송원
+ | 2.5
+ | 2018-09-17
+ | 문서 현행화
+ | `18년 오픈API 품질진단 결과내역 반영
+ | 김영준
+ | 김은미
+ | 2.6
+ | 2021-09-27
+ | 신규개방
+ | 닭, 계란, 오리 검수정보 오퍼레이션 추가
+ | 노향래
+ | 김효선
+ | 2.7
+ | 2022-08-30
+ | 신규개방
+ | 소비자가격 정보 오퍼레이션 추가
+ | 노향래
+ | 김효선
+ | 2.8
+ | 2022-12-06
+ | 내용수정
+ | 일자별가격 오퍼레이션에 최고 가격, 지역별 가격 등 데이터 추가개방
+ | 김예윤
+ | 김효선
+ | 2.9
+ | 2023-08-31
+ | 신규개방
+ | 축산물(소, 돼지) 재고량 조사결과 오퍼레이션 추가
+ | 김지영
+ | 권기문
+ | 
+
+
+
+
+
+center-114300목 차
+00목 차
+
+ TOC \o "1-3" \h \z \u 1. 서비스 사용 PAGEREF _Toc113305911 \h 4
+1.1. 서비스 Key 발급 및 활용 PAGEREF _Toc113305912 \h 4
+가. 서비스 Key발급(인증신청 및 발급) PAGEREF _Toc113305913 \h 4
+나. 서비스 인증키 활용 PAGEREF _Toc113305914 \h 5
+2. 서비스 목록 PAGEREF _Toc113305915 \h 6
+3. 서비스 명세 PAGEREF _Toc113305916 \h 6
+3.1. 축산물 검수정보(유통정보) 서비스 PAGEREF _Toc113305917 \h 6
+가. 서비스 개요 PAGEREF _Toc113305918 \h 6
+나. API  목록 PAGEREF _Toc113305919 \h 7
+다. 에러코드 PAGEREF _Toc113305920 \h 34
+
+
+
+서비스 사용
+서비스 Key 발급 및 활용
+서비스 Key발급(인증신청 및 발급)
+공유자원포털(http://data.go.kr) 활용자
+활용신청하고자 하는 API를 검색하여 제목을 클릭한다.
+
+ 서비스정보와 상세기능 확인 후, 활용신청 버튼을 클릭한다.
+
+ 활용신청하고자 하는 내역을 입력하고, 활용할 API를 선택하여 신청 버튼을 클릭한다.
+
+서비스 인증키 활용
+REST 방식의 인증키 활용
+http://data.ekape.or.kr/openapi-data/service/user/grade/poultry/chickenSanji?serviceKey=인증키& startYmd=20200101&endYmd=20200131&type=1&numOfRows=10&pageNo=1
+
+서비스 목록
+순번
+ | 서비스 ID
+ | 서비스명(영문)
+ | 서비스명(국문)
+ | 1
+ | SC-OA-21-02
+ | 축산물유통정보
+ | Confirm, grade
+ | 서비스 명세
+축산물 검수정보(유통정보) 서비스
+서비스 개요
+서비스 정보
+ | 서비스 ID
+ | SC-OA-21-02
+ | 
+ | 서비스명(국문)
+ | 축산물유통정보
+ | 
+ | 서비스명(영문)
+ | confirm, grade
+ | 
+ | 서비스 설명
+ | ①-1확인서발급일자, 확인서발급번호를 통해 검수(소비)일자, 납품업체사업자번호, 납품업체명, 확인서발급일자, 확인서발급번호, 가축코드, 가축명 등를 조회하는 ②소 검수(소비)확인정보와①-2확인서발급일자, 확인서발급번호를 통해 검수(소비)업체사업자번호, 검수(소비)업체명, 검수(소비)일자, 납품업체사업자번호, 납품업체명, 가축코드, 가축명, 부위코드, 부위명, 부위중량 등을 제공하는 ②돼지 검수(소비)확인정보 등을 제공하는 ③축산물유통정보 서비스
+ | 서비스 보안
+ | 서비스 인증/권한
+ | [] 서비스 Key[ ] 인증서 (GPKI)
+[] Basic (ID/PW) [O ] 없음
+ | [ ]WS-Security
+ | 
+ | 메시지 레벨 암호화
+ | [  ] 전자서명[ ] 암호화[O] 없음
+ |  | 
+ | 전송 레벨 암호화
+ | [  ] SSL[O] 없음
+ | 적용 기술 수준
+ | 인터페이스 표준
+ | [  ] SOAP 1.2
+(RPC-Encoded, Document Literal, Document Literal Wrapped)
+[ O ] REST (GET)
+[ ] RSS 1.0 [ ] RSS 2.0 [ ] Atom 1.0 [ ] 기타
+ | 
+ | 교환 데이터 표준
+ | [ O ] XML[ ] JSON[ ] MIME[ ] MTOM
+ | 서비스 URL
+ | 개발환경
+ | http://data.ekape.or.kr/openapi-data/service/user/confirm
+http://data.ekape.or.kr/openapi-data/service/user/grade
+ | 
+ | 운영환경
+ | http://data.ekape.or.kr/openapi-data/service/user/confirm
+http://data.ekape.or.kr/openapi-data/service/user/grade
+ | 서비스 WADL
+ | 개발환경
+ | http://data.ekape.or.kr/openapi-data/service/user/confirm?_wadl&type=xml
+ | 
+ | 운영환경
+ | http://data.ekape.or.kr/openapi-data/service/user/confirm?_wadl&type=xml
+ | 서비스 배포 정보
+ | 서비스 버전
+ | 2.6
+ | 
+ | 유효일자
+ | 2019.9.27
+ | 배포 일자
+ | 2018.9.28.
+ | 
+ | 서비스 이력
+ | 데이터 일제정비
+ | 메시지 교환 유형
+ | [ O ] Request-Response[ ] Publish-Subscribe
+[ ] Fire-and-Forgot[ ] Notification
+ | 메시지 로깅 수준
+ | 성공
+ | [O] Header [ ] Body
+ | 실패
+ | [O] Header [O} Body
+ | 사용 제약 사항 (비고)
+ |  | 서비스 제공자
+ | 김지영 / 공공데이터포털 운영 / 044)410-7103 / jiyeong90@ekape.or.kr
+ | 데이터 갱신주기
+ | 실시간
+ |  
+API  목록
+일련번호
+ | 서비스명(국문)
+ | API 명(영문)
+ | API 명(국문)
+ | 1
+ | 축산물유통정보
+ | cattleCoustomer
+ | 소 검수(소비)확인정보
+ | 2
+ |  | pigCoustomer
+ | 돼지 검수(소비)확인정보
+ | 3
+ |  | fowlCoustomer
+ | 닭 검수(소비)확인정보
+ | 4
+ |  | eggCoustomer
+ | 계란 검수(소비)확인정보
+ | 5
+ |  | duckCoustomer
+ | 오리 검수(소비)확인정보
+ | 6
+ |  | consumerPriceDay
+ | 일자별 축산물소비자가격 정보
+ | 7
+ |  | consumerPriceTenDays
+ | 순별 축산물소비자가격 정보
+ | 8
+ |  | consumerPriceMonth
+ | 월별 축산물소비자가격 정보
+ | 9
+ |  | consumerPriceYear
+ | 연도별 축산물소비자가격 정보
+ | 10
+ |  | LPStock
+ | 축산물재고동향
+ |  
+[소 검수(소비)확인정보 조회] API  명세
+API  정보
+ | API  번호
+ | 1
+ | API 상세기능명(국문)
+ | 소 검수(소비)확인정보 
+ | 
+ | API  유형
+ | 조회
+ | API 명(영문)
+ | cattleCoustomer
+ | 
+ | API 상세기능 설명
+ | 확인서발급일자, 확인서발급번호를 통해 검수(소비)일자, 납품업체사업자번호, 납품업체명, 확인서발급일자, 확인서발급번호, 가축코드, 가축명 등를 조회하는 ②소 검수(소비)확인정보 조회 기능
+ | 
+ | Call Back URL
+ | http://data.ekape.or.kr/openapi-data/service/user/confirm/cattleCoustomer
+ | 
+ | 최대 메시지 사이즈
+ | [ 50000bytes]
+ | 
+ | 평균 응답 시간
+ | [ 200ms]
+ | 초당 최대 트랜잭션
+ | [ 150tps]
+ | 요청 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | serviceKey
+ | 인증키
+ | 100
+ | 1
+ | -
+ | 서비스 인증키
+ | issueDate
+ | 확인서발급일자
+ | 8
+ | 1
+ | 20160519
+ | 검수확인서 발급일자
+ | issueNo
+ | 확인서발급번호
+ | 15
+ | 1
+ | 1005-05190332
+ | 검수확인서 발급번호
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+응답 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | resultCode
+ | 결과코드
+ | 2
+ | 1
+ | 00
+ | 결과코드
+ | resultMsg
+ | 결과메세지
+ | 50
+ | 1
+ | NORMAL SERVICE
+ | 결과메세지
+ | applyRegNo
+ | 검수(소비)업체사업자번호
+ | 10
+ | 1
+ | 6098304067
+ | 검수(소비)업체사업자번호
+ | applyComNm
+ | 검수(소비)업체명
+ | 100
+ | 1
+ | 창원중앙여자고등학교
+ | 검수(소비)업체명
+ | confirmDate
+ | 검수(소비)일자
+ | 10
+ | 1
+ | 2016-05-26
+ | 검수(소비)일자
+ | supplyRegNo
+ | 납품업체사업자번호
+ | 10
+ | 1
+ | 6060528058
+ | 납품업체사업자번호
+ | supplyComNm
+ | 납품업체명
+ | 100
+ | 1
+ | 명성상사
+ | 납품업체명
+ | issueDate
+ | 확인서발급일자
+ | 10
+ | 1
+ | 2016-05-19
+ | 확인서발급일자
+ | issueNo
+ | 확인서발급번호
+ | 15
+ | 1
+ | 1005-05190332
+ | 확인서발급번호
+ | judgeKindCd
+ | 가축코드
+ | 6
+ | 1
+ | 023001
+ | 023001소
+023001돼지
+ | judgeKindNm
+ | 가축명
+ | 200
+ | 1
+ | 소
+ | 가축명
+ | judgeBreedCd
+ | 소의종류코드
+ | 6
+ | 1
+ | 024001
+ | 024001한우
+024002젖소
+024003육우
+024004교잡우
+ | judgeBreedNm
+ | 소의종류
+ | 100
+ | 1
+ | 한우
+ | 소의종류
+ | judgeSexCd
+ | 성별코드
+ | 6
+ | 1
+ | 025001 
+ | 025001암
+025002수
+025003거세
+025004기타(프리마틴등)
+ | judgeSexNm
+ | 성별
+ | 100
+ | 1
+ | 암
+ | 성별
+ | gradeCd
+ | 등급코드
+ | 6
+ | 1
+ | 029008
+ | 0290011++A
+0290021++B
+0290031++C
+0290041+A
+0290051+B
+0290061+C
+0290071A
+0290081B
+0290091C
+0290102A
+0290112B
+0290122C
+0290133A
+0290143B
+0290153C
+029016등외
+0290171++
+0290181+
+0290191
+0290202
+0290213
+029030A
+029031B
+029032C
+029033D
+0290511+A
+0290521+B
+0290531+C
+0290541+D
+0290551A
+0290561B
+0290571C
+0290581D
+0290592A
+0290602B
+0290612C
+0290622D
+0290633A
+0290643B
+0290653C
+0290663D
+029067등외
+0290681+
+0290691
+0290702
+0290713
+029072A
+029073B
+029074C
+029075D
+029076등외
+0291011+등급
+0291021등급
+0291032등급
+0291511+등급
+0291521등급
+0291532등급
+0291543등급
+ | qgradeNm
+ | 육질등급명
+ | 100
+ | 1
+ | 1
+ | 등급명
+ | cutmeatCd
+ | 부위코드
+ | 2
+ | 1
+ | 10
+ | 부위코드
+ | cutmeatNm
+ | 부위명
+ | 100
+ | 1
+ | 양지
+ | 부위명
+ | cutmeatWeight
+ | 부위중량
+ | 8.2
+ | 1
+ | 4
+ | 부위중량
+ | cattleNo
+ | 개체식별번호
+ | 14
+ | 1
+ | 002307192164
+ | 개체식별번호
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+요청 / 응답 메시지 예제
+REST(URI)
+ | http://data.ekape.or.kr/openapi-data/service/user/confirm/cattleCoustomer?issueDate=20160519&issueNo=1005-05190332&ServiceKey=인증키
+ | 응답 메시지
+ | 
+ | [돼지 검수(소비)확인정보] API  명세
+API  정보
+ | API  번호
+ | 2
+ | API 명(국문)
+ | 돼지 검수(소비)확인정보
+ | 
+ | API  유형
+ | 조회
+ | API 명(영문)
+ | pigCoustomer
+ | 
+ | API  설명
+ | 확인서발급일자, 확인서발급번호를 통해 검수(소비)업체사업자번호, 검수(소비)업체명, 검수(소비)일자, 납품업체사업자번호, 납품업체명, 가축코드, 가축명, 부위코드, 부위명, 부위중량 등을 제공하는 ②돼지 검수(소비)확인정보를 조회하는 기능 제공
+ | 
+ | Call Back URL
+ | http://data.ekape.or.kr/openapi-data/service/user/confirm/pigCoustomer
+ | 
+ | 최대 메시지 사이즈
+ | [ 50000bytes]
+ | 
+ | 평균 응답 시간
+ | [ 200ms]
+ | 초당 최대 트랜잭션
+ | [ 150tps]
+ | 요청 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | serviceKey
+ | 인증키
+ | 100
+ | 1
+ | -
+ | 서비스 인증키
+ | issueDate
+ | 확인서발급일자
+ | 10
+ | 1
+ | 2017-09-13
+ | 검수확인서 발급일자
+ | issueNo
+ | 확인서발급번호
+ | 15
+ | 1
+ | 0202-09130696
+ | 검수확인서 발급번호
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+응답 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | resultCode
+ | 결과코드
+ | 2
+ | 1
+ | 00
+ | 결과코드
+ | resultMsg
+ | 결과메세지
+ | 50
+ | 1
+ | NORMAL SERVICE
+ | 결과메세지
+ | applyRegNo
+ | 검수(소비)업체사업자번호
+ | 10
+ | 1
+ | 6208300205
+ | 검수(소비)업체사업자번호
+ | applyComNm
+ | 검수(소비)업체명
+ | 100
+ | 1
+ | 방어진중학교
+ | 검수(소비)업체명
+ | confirmDate
+ | 검수(소비)일자
+ | 10
+ | 1
+ | 2017-09-18
+ | 검수(소비)일자
+ | supplyRegNo
+ | 납품업체사업자번호
+ | 10
+ | 1
+ | 1048700244
+ | 납품업체사업자번호
+ | supplyComNm
+ | 납품업체명
+ | 100
+ | 1
+ | 주식회사 초심축산
+ | 납품업체명
+ | issueDate
+ | 확인서발급일자
+ | 10
+ | 1
+ | 2017-09-13
+ | 확인서발급일자
+ | issueNo
+ | 확인서발급번호
+ | 15
+ | 1
+ | 0202-09130696
+ | 확인서발급번호
+ | judgeKindCd
+ | 가축코드
+ | 6
+ | 1
+ | 023002
+ | 023002 돼지
+ | judgeKindNm
+ | 가축명
+ | 200
+ | 1
+ | 돼지
+ | 가축명
+ | cutmeatCd
+ | 부위코드
+ | 2
+ | 1
+ | 02
+ | 부위코드
+ | cutmeatNm
+ | 부위명
+ | 100
+ | 1
+ | 등심
+ | 부위명
+ | cutmeatWeight
+ | 부위중량
+ | 8.2
+ | 1
+ | 22
+ | 부위중량
+ | pigNo
+ | 돼지이력번호
+ | 15
+ | 0
+ |  | 돼지이력번호
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+
+요청 / 응답 메시지 예제
+REST(URI)
+ | http://data.ekape.or.kr/openapi-data/service/user/confirm/pigCoustomer?issueDate=2017-09-13&issueNo=0202-09130696&ServiceKey=인증키
+ | 응답 메시지
+ | 
+ | [닭 검수(소비)확인정보] API  명세
+API  정보
+ | API  번호
+ | 3
+ | API 명(국문)
+ | 닭 검수(소비)확인정보
+ | 
+ | API  유형
+ | 조회
+ | API 명(영문)
+ | fowlCoustomer
+ | 
+ | API  설명
+ | 확인서발급일자, 확인서발급번호를 통해 검수(소비)업체사업자번호, 검수(소비)업체명, 검수(소비)일자, 납품업체사업자번호, 납품업체명, 가축코드, 가축명, 부위코드, 부위명, 부위중량 등을 제공하는 ②닭 검수(소비)확인정보를 조회하는 기능 제공
+ | 
+ | Call Back URL
+ | http://data.ekape.or.kr/openapi-data/service/user/confirm/fowlCoustomer
+ | 
+ | 최대 메시지 사이즈
+ | [ 50000bytes]
+ | 
+ | 평균 응답 시간
+ | [ 200ms]
+ | 초당 최대 트랜잭션
+ | [ 150tps]
+ | 요청 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | serviceKey
+ | 인증키
+ | 100
+ | 1
+ | -
+ | 서비스 인증키
+ | issueDate
+ | 확인서발급일자
+ | 10
+ | 1
+ | 2021-08-31
+ | 검수확인서 발급일자
+ | issueNo
+ | 확인서발급번호
+ | 15
+ | 1
+ | 0382-08310001
+ | 검수확인서 발급번호
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+응답 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | resultCode
+ | 결과코드
+ | 2
+ | 1
+ | 00
+ | 결과코드
+ | resultMsg
+ | 결과메세지
+ | 50
+ | 1
+ | NORMAL SERVICE
+ | 결과메세지
+ | applyRegNo
+ | 검수(소비)업체사업자번호
+ | 10
+ | 1
+ | 1338204035
+ | 검수(소비)업체사업자번호
+ | applyComNm
+ | 검수(소비)업체명
+ | 100
+ | 1
+ | 한국조리과학고
+ | 검수(소비)업체명
+ | confirmDate
+ | 검수(소비)일자
+ | 10
+ | 1
+ | 2021-09-02
+ | 검수(소비)일자
+ | supplyRegNo
+ | 납품업체사업자번호
+ | 10
+ | 1
+ | 1238164500
+ | 납품업체사업자번호
+ | supplyComNm
+ | 납품업체명
+ | 100
+ | 1
+ | ㈜한라식품
+ | 납품업체명
+ | issueDate
+ | 확인서발급일자
+ | 10
+ | 1
+ | 2021-08-31
+ | 확인서발급일자
+ | issueNo
+ | 확인서발급번호
+ | 15
+ | 1
+ | 0382-08310001
+ | 확인서발급번호
+ | judgeKindCd
+ | 가축코드
+ | 6
+ | 1
+ | 023003
+ | 023003 닭
+
+ | judgeKindNm
+ | 가축명
+ | 200
+ | 1
+ | 닭고기
+ | 가축명
+ | gradeCd
+ | 등급코드
+ | 6
+ | 1
+ | 029102
+ | 등급코드
+ | gradeNm
+ | 등급명
+ | 100
+ | 1
+ | 1
+ | 등급명
+ | cutmeatCd
+ | 부위코드
+ | 2
+ | 1
+ | H
+ | 부위코드
+ | cutmeatNm
+ | 부위명
+ | 100
+ | 1
+ | 가슴살
+ | 부위명
+ | cutmeatWeight
+ | 부위중량
+ | 8.2
+ | 1
+ | 18
+ | 부위중량
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+
+요청 / 응답 메시지 예제
+REST(URI)
+ | http://data.ekape.or.kr/openapi-data/service/user/confirm/fowlCoustomer?issueDate=2021-08-31&issueNo=0382-08310001&serviceKey=인증키
+ | 응답 메시지
+ | <response>
+ <header>
+  <resultCode>00</resultCode>
+  <resultMsg>NORMAL SERVICE.</resultMsg>
+ </header>
+ <notice>
+  <rows/>
+ </notice>
+ <body>
+  <items>
+   <item>
+    <applyComNm>한국조리과학고</applyComNm>
+    <applyRegNo>1338204035</applyRegNo>
+    <confirmDate>2021-09-02</confirmDate>
+    <cutmeatCd>H</cutmeatCd>
+    <cutmeatNm>가슴살</cutmeatNm>
+    <cutmeatWeight>18</cutmeatWeight>
+    <gradeCd>029102</gradeCd>
+<gradeNm>1</gradeNm>
+    <issueDate>2021-08-31</issueDate>
+    <issueNo>0382-08310001 </issueNo>
+    <judgeKindCd>023003</judgeKindCd>
+    <judgeKindNm>닭고기</judgeKindNm>
+    <supplyComNm>(주)한라식품</supplyComNm>
+    <supplyRegNo>1238164500</supplyRegNo>
+   </item>
+  </items>
+ </body>
+</response>
+ | [계란 검수(소비)확인정보] API  명세
+API  정보
+ | API  번호
+ | 4
+ | API 명(국문)
+ | 계란 검수(소비)확인정보
+ | 
+ | API  유형
+ | 조회
+ | API 명(영문)
+ | eggCoustomer
+ | 
+ | API  설명
+ | 확인서발급일자, 확인서발급번호를 통해 검수(소비)업체사업자번호, 검수(소비)업체명, 검수(소비)일자, 납품업체사업자번호, 납품업체명, 가축코드, 가축명, 부위코드, 부위명, 부위중량 등을 제공하는 ②계란 검수(소비)확인정보를 조회하는 기능 제공
+ | 
+ | Call Back URL
+ | http://data.ekape.or.kr/openapi-data/service/user/confirm/eggCoustomer
+ | 
+ | 최대 메시지 사이즈
+ | [ 50000bytes]
+ | 
+ | 평균 응답 시간
+ | [ 200ms]
+ | 초당 최대 트랜잭션
+ | [ 150tps]
+ | 요청 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | serviceKey
+ | 인증키
+ | 100
+ | 1
+ | -
+ | 서비스 인증키
+ | issueDate
+ | 확인서발급일자
+ | 10
+ | 1
+ | 2021-08-16
+ | 검수확인서 발급일자
+ | issueNo
+ | 확인서발급번호
+ | 15
+ | 1
+ | 0383-08160001
+ | 검수확인서 발급번호
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+
+응답 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | resultCode
+ | 결과코드
+ | 2
+ | 1
+ | 00
+ | 결과코드
+ | resultMsg
+ | 결과메세지
+ | 50
+ | 1
+ | NORMAL SERVICE
+ | 결과메세지
+ | applyRegNo
+ | 검수(소비)업체사업자번호
+ | 10
+ | 1
+ | 1328305173
+ | 검수(소비)업체사업자번호
+ | applyComNm
+ | 검수(소비)업체명
+ | 100
+ | 1
+ | 예봉초등학교
+ | 검수(소비)업체명
+ | confirmDate
+ | 검수(소비)일자
+ | 10
+ | 1
+ | 2021-08-19
+ | 검수(소비)일자
+ | supplyRegNo
+ | 납품업체사업자번호
+ | 10
+ | 1
+ | 1268141485
+ | 납품업체사업자번호
+ | supplyComNm
+ | 납품업체명
+ | 100
+ | 1
+ | 다한영농조합법인
+ | 납품업체명
+ | issueDate
+ | 확인서발급일자
+ | 10
+ | 1
+ | 2021-08-16
+ | 확인서발급일자
+ | issueNo
+ | 확인서발급번호
+ | 15
+ | 1
+ | 0383-08160001
+ | 확인서발급번호
+ | judgeKindCd
+ | 가축코드
+ | 6
+ | 1
+ | 023004
+ | 023003 닭
+
+ | judgeKindNm
+ | 가축명
+ | 200
+ | 1
+ | 계란
+ | 가축명
+ | gradeCd
+ | 등급코드
+ | 6
+ | 1
+ | 029152
+ | 등급코드
+ | gradeNm
+ | 등급명
+ | 100
+ | 1
+ | 1+
+ | 등급명
+ | cutmeatCd
+ | 부위코드
+ | 2
+ | 1
+ | 04
+ | 부위코드
+ | cutmeatNm
+ | 부위명
+ | 100
+ | 1
+ | 특란
+ | 부위명
+ | cutmeatWeight
+ | 부위중량
+ | 8.2
+ | 1
+ | 45
+ | 부위중량
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+
+요청 / 응답 메시지 예제
+REST(URI)
+ | http://data.ekape.or.kr/openapi-data/service/user/confirm/eggCoustomer?issueDate=2021-08-16&issueNo=0383-08160001&ServiceKey=인증키
+ | 응답 메시지
+ | <response>
+ <header>
+  <resultCode>00</resultCode>
+  <resultMsg>NORMAL SERVICE.</resultMsg>
+ </header>
+ <notice>
+  <rows/>
+ </notice>
+ <body>
+  <items>
+   <item>
+    <applyComNm>예봉초등학교</applyComNm>
+    <applyRegNo>1328305173</applyRegNo>
+    <confirmDate>2021-08-19</confirmDate>
+    <cutmeatCd>04</cutmeatCd>
+    <cutmeatNm>특란</cutmeatNm>
+    <cutmeatWeight>45</cutmeatWeight>
+    <gradeCd>029152</gradeCd>
+<gradeNm>1+</gradeNm>
+    <issueDate>2021-08-16</issueDate>
+    <issueNo>0383-08160001</issueNo>
+    <judgeKindCd>023004</judgeKindCd>
+    <judgeKindNm>계란</judgeKindNm>
+    <supplyComNm>다한영농조합법인</supplyComNm>
+    <supplyRegNo>121268141485</supplyRegNo>
+   </item>
+  </items>
+ </body>
+</response>
+ | [오리 검수(소비)확인정보] API  명세
+API  정보
+ | API  번호
+ | 5
+ | API 명(국문)
+ | 오리 검수(소비)확인정보
+ | 
+ | API  유형
+ | 조회
+ | API 명(영문)
+ | duckCoustomer
+ | 
+ | API  설명
+ | 확인서발급일자, 확인서발급번호를 통해 검수(소비)업체사업자번호, 검수(소비)업체명, 검수(소비)일자, 납품업체사업자번호, 납품업체명, 가축코드, 가축명, 부위코드, 부위명, 부위중량 등을 제공하는 ②오리 검수(소비)확인정보를 조회하는 기능 제공
+ | 
+ | Call Back URL
+ | http://data.ekape.or.kr/openapi-data/service/user/confirm/duckCoustomer
+ | 
+ | 최대 메시지 사이즈
+ | [ 50000bytes]
+ | 
+ | 평균 응답 시간
+ | [ 200ms]
+ | 초당 최대 트랜잭션
+ | [ 150tps]
+ | 요청 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | serviceKey
+ | 인증키
+ | 100
+ | 1
+ | -
+ | 서비스 인증키
+ | issueDate
+ | 확인서발급일자
+ | 10
+ | 1
+ | 2021-04-09
+ | 검수확인서 발급일자
+ | issueNo
+ | 확인서발급번호
+ | 15
+ | 1
+ | 1056-04090005
+ | 검수확인서 발급번호
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+
+응답 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | resultCode
+ | 결과코드
+ | 2
+ | 1
+ | 00
+ | 결과코드
+ | resultMsg
+ | 결과메세지
+ | 50
+ | 1
+ | NORMAL SERVICE
+ | 결과메세지
+ | applyRegNo
+ | 검수(소비)업체사업자번호
+ | 10
+ | 1
+ | 1358302743
+ | 검수(소비)업체사업자번호
+ | applyComNm
+ | 검수(소비)업체명
+ | 100
+ | 1
+ | 마북초등학교
+ | 검수(소비)업체명
+ | confirmDate
+ | 검수(소비)일자
+ | 10
+ | 1
+ | 2021-04-12
+ | 검수(소비)일자
+ | supplyRegNo
+ | 납품업체사업자번호
+ | 10
+ | 1
+ | 1263021639
+ | 납품업체사업자번호
+ | supplyComNm
+ | 납품업체명
+ | 100
+ | 1
+ | 우리푸드
+ | 납품업체명
+ | issueDate
+ | 확인서발급일자
+ | 10
+ | 1
+ | 2021-04-09
+ | 확인서발급일자
+ | issueNo
+ | 확인서발급번호
+ | 15
+ | 1
+ | 1056-04090005
+ | 확인서발급번호
+ | judgeKindCd
+ | 가축코드
+ | 6
+ | 1
+ | 023009
+ | 023009 오리
+
+ | judgeKindNm
+ | 가축명
+ | 200
+ | 1
+ | 오리고기
+ | 가축명
+ | gradeCd
+ | 등급코드
+ | 6
+ | 1
+ | 029202
+ | 등급코드
+ | gradeNm
+ | 등급명
+ | 100
+ | 1
+ | 1
+ | 등급명
+ | cutmeatCd
+ | 부위코드
+ | 2
+ | 1
+ | 1
+ | 부위코드
+ | cutmeatNm
+ | 부위명
+ | 100
+ | 1
+ | 발골용
+ | 부위명
+ | cutmeatWeight
+ | 부위중량
+ | 8.2
+ | 1
+ | 24
+ | 부위중량
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+
+요청 / 응답 메시지 예제
+REST(URI)
+ | http://data.ekape.or.kr/openapi-data/service/user/confirm/duckCoustomer?issueDate=2021-04-09&issueNo=1056-04090005&serviceKey=인증키
+ | 응답 메시지
+ | <response>
+ <header>
+  <resultCode>00</resultCode>
+  <resultMsg>NORMAL SERVICE.</resultMsg>
+ </header>
+ <notice>
+  <rows/>
+ </notice>
+ <body>
+  <items>
+   <item>
+    <applyComNm>마북초등학교</applyComNm>
+    <applyRegNo>1358302743</applyRegNo>
+    <confirmDate>2021-04-12</confirmDate>
+    <cutmeatCd>1</cutmeatCd>
+    <cutmeatNm>발골용</cutmeatNm>
+    <cutmeatWeight>24</cutmeatWeight>
+    <gradeCd>029202</gradeCd>
+<gradeNm>1</gradeNm>
+    <issueDate>2021-04-09</issueDate>
+    <issueNo>1056-04090005 </issueNo>
+    <judgeKindCd>023009</judgeKindCd>
+    <judgeKindNm>오리고기</judgeKindNm>
+    <supplyComNm>우리푸드 </supplyComNm>
+    <supplyRegNo>1263021639</supplyRegNo>
+   </item>
+  </items>
+ </body>
+</response>
+ | [일자별 축산물소비자가격 정보] API  명세
+API  정보
+ | API  번호
+ | 6
+ | API 명(국문)
+ | 일자별 축산물소비자가격 정보
+ | 
+ | API  유형
+ | 조회
+ | API 명(영문)
+ | CousumerPriceDaily
+ | 
+ | API  설명
+ | 기준일자, 축종코드, 품목코드를 통해 최대가격, 최소가격, 평년가격, 지역별 가격을 조회하는 서비스
+ | 
+ | Call Back URL
+ | http://data.ekape.or.kr/openapi-data/service/user/grade/consumerPriceDaily
+ | 
+ | 최대 메시지 사이즈
+ | [ 50000bytes]
+ | 
+ | 평균 응답 시간
+ | [ 200ms]
+ | 초당 최대 트랜잭션
+ | [ 150tps]
+ | 요청 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | serviceKey
+ | 서비스 인증키
+ | 100
+ | 1
+ | -
+ | 서비스 인증키
+ | standYmd
+ | 기준일자
+ | 8
+ | 1
+ | 20220630
+ | 기준일자
+ | judgeKind
+ | 축종코드
+ | 4
+ | 1
+ | 4301
+ | 축종코드
+4301 소
+4304 돼지
+4401 수입 소고기
+4402 수입 돼지고기
+9901 닭
+9903 계란
+9908 우유
+ | itemCd
+ | 품목코드
+ | 2
+ | 1
+ | 21
+ | [소]
+21 안심
+22 등심
+36 설도
+40 양지
+50 갈비
+
+[돼지]
+25 앞다리
+27 삼겹살
+28 갈비
+68 목살
+
+[수입쇠고기]
+31 갈비(냉동)
+37 갈비살(냉장)
+
+[수입돼지고기]
+27 삼겹살
+[우유]
+01 흰우유
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+
+응답 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | resultCode
+ | 결과코드
+ | 2
+ | 1
+ | 00
+ | 결과코드
+ | resultMsg
+ | 결과메세지
+ | 50
+ | 1
+ | NORMAL SERVICE
+ | 결과메세지
+ | standYmd
+ | 날짜구분(날짜/평년)
+ | 8
+ | 1
+ | 20220630
+ | 날짜구분(날짜/평년)
+ | grdNm
+ | 구분명(등급/원산지)
+ | 100
+ | 1
+ | 1+등급
+ | 구분명(등급/원산지)
+ | judgeKindNm
+ | 축종명
+ | 100
+ | 1
+ | 소
+ | 축종명
+ | judgeKind
+ | 축종코드
+ | 4
+ | 1
+ | 4301
+ | 축종코드
+ | itemNm
+ | 품목명
+ | 100
+ | 1
+ | 안심
+ | 품목명
+ | itemCd
+ | 품목코드
+ | 2
+ | 1
+ | 21
+ | 품목코드
+ | ntslPrc
+ | 평균가격
+ | 8
+ | 1
+ | 16704
+ | 평균가격
+ | maxPrc
+ | 최대가격
+ | 8
+ | 1
+ | 18564
+ | 최대가격
+ | minPrc
+ | 최소가격
+ | 8
+ | 1
+ | 15270
+ | 최소가격
+ | regionPrc1
+ | 서울가격
+ | 8
+ | 1
+ | 18564
+ | 서울가격
+ | regionPrc2
+ | 부산가격
+ | 8
+ | 1
+ | 16626
+ | 부산가격
+ | regionPrc3
+ | 대구가격
+ | 8
+ | 1
+ | 16900
+ | 대구가격
+ | regionPrc4
+ | 인천가격
+ | 8
+ | 1
+ | 17049
+ | 인천가격
+ | regionPrc5
+ | 광주가격
+ | 8
+ | 1
+ | 17332
+ | 광주가격
+ | regionPrc6
+ | 대전가격
+ | 8
+ | 1
+ | 17084
+ | 대전가격
+ | regionPrc7
+ | 울산가격
+ | 8
+ | 1
+ | 15861
+ | 울산가격
+ | regionPrc8
+ | 세종가격
+ | 8
+ | 1
+ | 17394
+ | 세종가격
+ | regionPrc9
+ | 경기가격
+ | 8
+ | 1
+ | 17751
+ | 경기가격
+ | regionPrc10
+ | 강원가격
+ | 8
+ | 1
+ | 16515
+ | 강원가격
+ | regionPrc11
+ | 충북가격
+ | 8
+ | 1
+ | 16558
+ | 충북가격
+ | regionPrc12
+ | 충남가격
+ | 8
+ | 1
+ | 15767
+ | 충남가격
+ | regionPrc13
+ | 전북가격
+ | 8
+ | 1
+ | 15744
+ | 전북가격
+ | regionPrc14
+ | 전남가격
+ | 8
+ | 1
+ | 15270
+ | 전남가격
+ | regionPrc15
+ | 경북가격
+ | 8
+ | 1
+ | 15817
+ | 경북가격
+ | regionPrc16
+ | 경남가격
+ | 8
+ | 1
+ | 16374
+ | 경남가격
+ | regionPrc17
+ | 제주가격
+ | 8
+ | 1
+ | 15451
+ | 제주가격
+ | unit
+ | 단위
+ | 100
+ | 1
+ | 원/100g
+ | 단위
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+
+요청 / 응답 메시지 예제
+REST(URI)
+ | http://data.ekape.or.kr/openapi-data/service/user/grade/consumerPriceDaily?&serviceKey=인증키&standYmd=20220630&judgeKind=4301&itemCd=21
+ | 응답 메시지
+ | 
+
+
+
+ | [순별 소비자가격 정보] API  명세
+API  정보
+ | API  번호
+ | 7
+ | API 명(국문)
+ | 순별 소비자가격 정보
+ | 
+ | API  유형
+ | 조회
+ | API 명(영문)
+ | cousumerPriceTenDays
+ | 
+ | API  설명
+ | 기준일자, 축종코드를 통해 축종코드, 축종명, 품목명, 품목코드, 구분명, 단위, 가격, 평년가격을 조회하는 서비스
+ | 
+ | Call Back URL
+ | http://data.ekape.or.kr/openapi-data/service/user/grade/consumerPriceTenDays
+ | 
+ | 최대 메시지 사이즈
+ | [ 50000bytes]
+ | 
+ | 평균 응답 시간
+ | [ 200ms]
+ | 초당 최대 트랜잭션
+ | [ 150tps]
+ | 요청 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | serviceKey
+ | 인증키
+ | 100
+ | 1
+ | -
+ | 서비스 인증키
+ | standYm
+ | 기준월
+ | 6
+ | 1
+ | 202208
+ | 기준월
+ | judgeKind
+ | 축종코드
+ | 4
+ | 1
+ | 4301
+ | 축종코드
+4301 소
+4304 돼지
+4401 수입 소고기
+4402 수입 돼지고기
+9901 닭
+9903 계란
+9908 우유
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+
+응답 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | resultCode
+ | 결과코드
+ | 2
+ | 1
+ | 00
+ | 결과코드
+ | resultMsg
+ | 결과메세지
+ | 50
+ | 1
+ | NORMAL SERVICE
+ | 결과메세지
+ | judgeKind
+ | 축종코드
+ | 4
+ | 1
+ | 4301
+ | 축종코드
+ | judgeKindNm
+ | 축종명
+ | 100
+ | 1
+ | 소
+ | 축종명
+ | itemNm
+ | 품목명
+ | 100
+ | 1
+ | 안심
+ | 품목명
+ | itemCd
+ | 품목코드
+ | 100
+ | 1
+ | 21
+ | 품목코드
+ | grdNm
+ | 구분명(등급/원산지)
+ | 100
+ | 1
+ | 1+등급
+ | 구분명(등급/원산지)
+ | unit
+ | 단위
+ | 100
+ | 1
+ | 원/100g
+ | 단위
+ | ntslPrc_1
+ | 초순가격
+ | 8 
+ | 1
+ | 16359
+ | 초순가격
+ | ntslPrc_2
+ | 중순가격
+ | 8 
+ | 1
+ | 15904
+ | 중순가격
+ | ntslPrc_3
+ | 하순가격
+ | 8 
+ | 1
+ | 15808
+ | 하순가격
+ | ntslPrc
+ | 월평균가격
+ | 8 
+ | 1
+ | 16031
+ | 월평균가격
+ | avgYearPrc_1
+ | 평년 초순가격
+ | 8 
+ | 1
+ | 14357
+ | 평년 초순가격
+ | avgYearPrc_2
+ | 평년 중순가격
+ | 8 
+ | 1
+ | 14500
+ | 평년 중순가격
+ | avgYearPrc_3
+ | 평년 하순가격
+ | 8 
+ | 1
+ | 14231
+ | 평년 하순가격
+ | avgYearPrc
+ | 평년 월평균가격
+ | 8 
+ | 1
+ | 14354
+ | 평년 월평균가격
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+
+요청 / 응답 메시지 예제
+REST(URI)
+ | http://data.ekape.or.kr/openapi-data/service/user/grade/consumerPriceTenDays?&serviceKey=인증키&standYm=202208&judgeKind=4301
+ | 응답 메시지
+ | <response>
+    <header>
+        <resultCode>00</resultCode>
+        <resultMsg>NORMAL SERVICE.</resultMsg>
+    </header>
+    <notice>
+        <rows/>
+    </notice>
+    <body>
+        <items>
+            <item>
+                <avgYearPrc>14354</avgYearPrc>
+                <avgYearPrc_1>14357</avgYearPrc_1>
+                <avgYearPrc_2>14500</avgYearPrc_2>
+                <avgYearPrc_3>14231</avgYearPrc_3>
+                <grdNm>1+등급</grdNm>
+                <itemCd>21</itemCd>
+                <itemNm>안심</itemNm>
+                <judgeKind>4301</judgeKind>
+                <judgeKindNm>소</judgeKindNm>
+                <ntslPrc>16013</ntslPrc>
+                <ntslPrc_1>16359</ntslPrc_1>
+                <ntslPrc_2>15904</ntslPrc_2>
+                <ntslPrc_3>15798</ntslPrc_3>
+                <unit>원/100g</unit>
+            </item>
+        </items>
+    </body>
+</response>
+ | [월별 소비자가격 정보] API  명세
+API  정보
+ | API  번호
+ | 8
+ | API 명(국문)
+ | 월별 소비자가격 정보
+ | 
+ | API  유형
+ | 조회
+ | API 명(영문)
+ | cousumerPriceMonth
+ | 
+ | API  설명
+ | 기준일자, 축종코드를 통해 축종코드, 축종명, 품목명, 품목코드, 구분명, 단위, 가격, 평년가격을 조회하는 서비스
+ | 
+ | Call Back URL
+ | http://data.ekape.or.kr/openapi-data/service/user/grade/consumerPriceMonth
+ | 
+ | 최대 메시지 사이즈
+ | [ 50000bytes]
+ | 
+ | 평균 응답 시간
+ | [ 200ms]
+ | 초당 최대 트랜잭션
+ | [ 150tps]
+ |   
+요청 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | serviceKey
+ | 인증키
+ | 100
+ | 1
+ | -
+ | 서비스 인증키
+ | standYm
+ | 기준월
+ | 6
+ | 1
+ | 202208
+ | 기준월
+ | judgeKind
+ | 축종코드
+ | 4
+ | 1
+ | 4301
+ | 축종코드
+4301 소
+4304 돼지
+4401 수입 소고기
+4402 수입 돼지고기
+9901 닭
+9903 계란
+9908 우유
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+
+응답 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | resultCode
+ | 결과코드
+ | 2
+ | 1
+ | 00
+ | 결과코드
+ | resultMsg
+ | 결과메세지
+ | 50
+ | 1
+ | NORMAL SERVICE
+ | 결과메세지
+ | judgeKind
+ | 축종코드
+ | 4
+ | 1
+ | 4301
+ | 축종코드
+ | judgeKindNm
+ | 축종명
+ | 100
+ | 1
+ | 소
+ | 축종명
+ | itemNm
+ | 품목명
+ | 100
+ | 1
+ | 안심
+ | 품목명
+ | itemCd
+ | 품목코드
+ | 100
+ | 1
+ | 21
+ | 품목코드
+ | grdNm
+ | 구분명(등급/원산지)
+ | 100
+ | 1
+ | 1+등급
+ | 구분명(등급/원산지)
+ | unit
+ | 단위
+ | 100
+ | 1
+ | 원/100g
+ | 단위
+ | ntslPrc
+ | 가격
+ | 8
+ | 1
+ | 16031
+ | 가격
+ | avgYearPrc
+ | 평년가격
+ | 8
+ | 1
+ | 14354
+ | 평년가격
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+
+요청 / 응답 메시지 예제
+REST(URI)
+ | http://data.ekape.or.kr/openapi-data/service/user/grade/consumerPriceMonth?&serviceKey=인증키&standYm=202208&judgeKind=4301
+ | 응답 메시지
+ | <response>
+    <header>
+        <resultCode>00</resultCode>
+        <resultMsg>NORMAL SERVICE.</resultMsg>
+    </header>
+    <notice>
+        <rows/>
+    </notice>
+    <body>
+        <items>
+            <item>
+                <avgYearPrc>14354</avgYearPrc>
+                <grdNm>1+등급</grdNm>
+                <itemCd>21</itemCd>
+                <itemNm>안심</itemNm>
+                <judgeKind>4301</judgeKind>
+                <judgeKindNm>소</judgeKindNm>
+                <ntslPrc>16013</ntslPrc>
+                <unit>원/100g</unit>
+            </item>
+        </items>
+    </body>
+</response>
+ | [연도별 소비자가격 정보] API  명세
+API  정보
+ | API  번호
+ | 9
+ | API 명(국문)
+ | 연도별 소비자가격 정보
+ | 
+ | API  유형
+ | 조회
+ | API 명(영문)
+ | cousumerPriceYear
+ | 
+ | API  설명
+ | 기준일자, 축종코드를 통해 축종코드, 축종명, 품목명, 품목코드, 구분명, 단위, 가격, 평년가격을 조회하는 서비스
+ | 
+ | Call Back URL
+ | http://data.ekape.or.kr/openapi-data/service/user/grade/consumerPriceYear
+ | 
+ | 최대 메시지 사이즈
+ | [ 50000bytes]
+ | 
+ | 평균 응답 시간
+ | [ 200ms]
+ | 초당 최대 트랜잭션
+ | [ 150tps]
+ |  
+요청 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | serviceKey
+ | 인증키
+ | 100
+ | 1
+ | -
+ | 서비스 인증키
+ | standY
+ | 기준연도
+ | 4
+ | 1
+ | 2022
+ | 기준연도
+ | judgeKind
+ | 축종코드
+ | 4
+ | 1
+ | 4301
+ | 축종코드
+4301 소
+4304 돼지
+4401 수입 소고기
+4402 수입 돼지고기
+9901 닭
+9903 계란
+9908 우유
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+
+응답 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | resultCode
+ | 결과코드
+ | 2
+ | 1
+ | 00
+ | 결과코드
+ | resultMsg
+ | 결과메세지
+ | 50
+ | 1
+ | NORMAL SERVICE
+ | 결과메세지
+ | year
+ | 연도
+ | 4
+ | 1
+ | 2022
+ | 연도
+ | judgeKind
+ | 축종코드
+ | 8
+ | 1
+ | 4301
+ | 축종코드
+ | judgeKindNm
+ | 축종명
+ | 100
+ | 1
+ | 소
+ | 축종명
+ | itemNm
+ | 품목명
+ | 100
+ | 1
+ | 안심
+ | 품목명
+ | itemCd
+ | 품목코드
+ | 100
+ | 1
+ | 21
+ | 품목코드
+ | grdNm
+ | 구분명(등급/원산지)
+ | 100
+ | 1
+ | 1+등급
+ | 구분명(등급/원산지)
+ | unit
+ | 단위
+ | 100
+ | 1
+ | 원/100g
+ | 단위
+ | ntslPrc
+ | 가격
+ | 8
+ | 1
+ | 15897
+ | 가격
+ | maxPrc
+ | 최대가격
+ | 8
+ | 1
+ | 16767
+ | 최대가격
+ | minPrc
+ | 최소가격
+ | 8
+ | 1
+ | 15105
+ | 최소가격
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+요청 / 응답 메시지 예제
+REST(URI)
+ | http://data.ekape.or.kr/openapi-data/service/user/grade/consumerPriceYear?&serviceKey=인증키&standY=2022&judgeKind=4301
+ | 응답 메시지
+ | <response>
+    <header>
+        <resultCode>00</resultCode>
+        <resultMsg>NORMAL SERVICE.</resultMsg>
+    </header>
+    <notice>
+        <rows/>
+    </notice>
+    <body>
+        <items>
+            <item>
+                <grdNm>1+등급</grdNm>
+                <itemCd>21</itemCd>
+                <itemNm>안심</itemNm>
+                <judgeKind>4301</judgeKind>
+                <judgeKindNm>소</judgeKindNm>
+                <maxPrc>16767</maxPrc>
+                <minPrc>15105</minPrc>
+                <ntslPrc>15896</ntslPrc>
+                <unit>원/100g</unit>
+                <year>2022</year>
+            </item>
+        </items>
+    </body>
+</response>
+ | 
+
+
+
+[축산물 재고동향] API  명세
+API  정보
+ | API  번호
+ | 10
+ | API 명(국문)
+ | 축산물 재고동향
+ | 
+ | API  유형
+ | 조회
+ | API 명(영문)
+ | LPStock
+ | 
+ | API  설명
+ | 거래년월, 축종코드를 통해 축종코드, 품목명, 품목코드, 부위명, 부위재고량을 조회하는 서비스
+ | 
+ | Call Back URL
+ | http://data.ekape.or.kr/openapi-data/service/user/grade/LPStock
+ | 
+ | 
+ |  | 
+ | 최대 메시지 사이즈
+ | [ 50000bytes]
+ | 
+ | 평균 응답 시간
+ | [ 200ms]
+ | 초당 최대 트랜잭션
+ | [ 150tps]
+ |  
+요청 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | serviceKey
+ | 인증키
+ | 100
+ | 1
+ | -
+ | 서비스 인증키
+ | standYyyy
+ | 거래연도
+ | 4
+ | 1
+ | 2023
+ | 거래연도
+ | standMm
+ | 거래월
+ | 2
+ | 1
+ | 8
+ | 거래월
+ | judgeKind
+ | 축종코드
+ | 4
+ | 1
+ | 소
+ | 소: 4301
+돼지: 4304
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+
+응답 메시지 명세
+항목명(영문)
+ | 항목명(국문)
+ | 항목
+크기
+ | 항목구분
+ | 샘플데이터
+ | 항목설명
+ | resultCode
+ | 결과코드
+ | 2
+ | 1
+ | 00
+ | 결과코드
+ | resultMsg
+ | 결과메세지
+ | 50
+ | 1
+ | NORMAL SERVICE
+ | 결과메세지
+ | standYm
+ | 날짜구분
+ | 8
+ | 1
+ | 2023년02월
+ | 날짜구분(거래년월)
+ | judgeKindNm
+ | 축종명
+ | 4
+ | 1
+ | 소
+ | 축종명
+ | judgeKind
+ | 축종코드
+ | 4
+ | 1
+ | 4301
+ | 축종코드
+ | livestockPart_1
+ | 소, 돼지안심
+ | 20
+ | 1
+ | 104822
+ | 소, 돼지안심
+ | livestockPart_2
+ | 소, 돼지 등심
+ | 20
+ | 1
+ | 515495
+ | 소, 돼지 등심
+ | livestockPart_3
+ | 소 채끝, 돼지 전지
+ | 20
+ | 1
+ | 162819
+ | 소 채끝, 돼지 전지
+ | livestockPart_4
+ | 소 목심, 돼지 후지
+ | 20
+ | 1
+ | 573142
+ | 소 목심, 돼지 후지
+ | livestockPart_5
+ | 소 앞다리, 돼지 삼겹살
+ | 20
+ | 1
+ | 551348
+ | 소 앞다리, 돼지 삼겹살
+ | livestockPart_6
+ | 소 우둔, 돼지 목심
+ | 20
+ | 1
+ | 367722
+ | 소 우둔, 돼지 목심
+ | livestockPart_7
+ | 소 설도, 돼지 갈비
+ | 20
+ | 1
+ | 845723
+ | 소 설도, 돼지 갈비
+ | livestockPart_8
+ | 소 사태, 돼지 특수부위
+ | 20
+ | 1
+ | 570619
+ | 소 사태, 돼지 특수부위
+ | livestockPart_9
+ | 소 갈비, 돼지 잡육
+ | 20
+ | 1
+ | 1861590
+ | 소 갈비, 돼지 잡육
+ | livestockPart_10
+ | 소 양지
+ | 20
+ | 1
+ | 540876
+ | 소 양지
+ | livestockPart_11
+ | 소 특수부위
+ | 20
+ | 1
+ | 298494
+ | 소 특수부위
+ | livestockPart_12
+ | 소 잡육
+ | 20
+ | 1
+ | 516057
+ | 소 잡육
+ | totStock
+ | 재고량 합계
+ | 20
+ | 1
+ | 6908708
+ | 재고량 합계
+ | unit
+ | 단위
+ | 4
+ | 1
+ | kg
+ | 소: kg, 돼지: ton
+ | ※ 항목구분 : 필수(1), 옵션(0), 1건 이상 복수건(1..n), 0건 또는 복수건(0..n)
+요청 / 응답 메시지 예제
+
+REST(URI)
+ | http://data.ekape.or.kr/openapi-data/service/user/grade/LPStock?&serviceKey=인증키&standYyyy=2023&standMm=2&judgeKind=4301
+ | 응답 메시지
+ | <response>
+    <header>
+        <resultCode>00</resultCode>
+        <resultMsg>NORMAL SERVICE.</resultMsg>
+    </header>
+    <notice>
+        <rows/>
+    </notice>
+    <body>
+        <items>
+            <item>
+                <judgeKind>4301</judgeKind>
+                <judgeKindNm>소</judgeKindNm>
+                <livestockPart_1>109238</livestockPart_1>
+                <livestockPart_10>528761</livestockPart_10>
+                <livestockPart_11>193075</livestockPart_11>
+                <livestockPart_12>440910</livestockPart_12>
+                <livestockPart_2>554207</livestockPart_2>
+                <livestockPart_3>168544</livestockPart_3>
+                <livestockPart_4>582325</livestockPart_4>
+                <livestockPart_5>595786</livestockPart_5>
+                <livestockPart_6>374977</livestockPart_6>
+                <livestockPart_7>795134</livestockPart_7>
+                <livestockPart_8>495861</livestockPart_8>
+                <livestockPart_9>2159088</livestockPart_9>
+                <standYm>2023년01월</standYm>
+                <totStock>6997906</totStock>
+                <unit>kg</unit>
+            </item>
+        </items>
+    </body>
+</response>
+
+ | 
+에러코드
+OpenAPI 에러 코드 정리
+에러메세지
+ | 설명
+ | NORMAL_SERVICE
+ | 정상
+ | APPLICATION_ERROR
+ | 어플리케이션 에러
+ | DB_ERROR
+ | 데이터베이스 에러
+ | NODATA_ERROR
+ | 데이터없음 에러
+ | HTTP_ERROR
+ | HTTP 에러
+ | SERVICETIME_OUT
+ | 서비스 연결실패 에러
+ | INVALID_REQUEST_PARAMETER_ERROR
+ | 잘못된 요청 파라메터 에러
+ | NO_MANDATORY_REQUEST_PARAMETERS_ERROR
+ | 필수요청 파라메터가 없음
+ | NO_OPENAPI_SERVICE_ERROR
+ | 해당 오픈API서비스가 없거나 폐기됨
+ | SERVICE_ACCESS_DENIED_ERROR
+ | 서비스 접근거부
+ | TEMPORARILY_DISABLE_THE_SERVICEKEY_ERROR
+ | 일시적으로 사용할 수 없는 서비스 키
+ | LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR
+ | 서비스 요청제한횟수 초과에러
+ | SERVICE_KEY_IS_NOT_REGISTERED_ERROR
+ | 등록되지 않은 서비스키
+ | DEADLINE_HAS_EXPIRED_ERROR
+ | 활용기간 종료
+ | UNREGISTERED_IP_ERROR
+ | 등록되지 않은 IP
+ | UNSIGNED_CALL_ERROR
+ | 서명되지 않은 호출
+ | UNKNOWN_ERROR
+ | 기타에러
+ | 
