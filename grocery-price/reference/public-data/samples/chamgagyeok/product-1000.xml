@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><response>
+  <result>
+    <item>
+      <goodId>1000</goodId>
+      <goodName>팔도 왕뚜껑(110g)</goodName>
+      <productEntpCode>1819</productEntpCode>
+      <goodUnitDivCode>G</goodUnitDivCode>
+      <goodBaseCnt>100</goodBaseCnt>
+      <goodSmlclsCode>030201024</goodSmlclsCode>
+      <goodTotalCnt>110</goodTotalCnt>
+      <goodTotalDivCode>G</goodTotalDivCode>
+    </item>
+  </result>
+  <resultCode>00</resultCode>
+  <resultMsg>ok</resultMsg>
+</response>

@@ -1,0 +1,2589 @@
+<?xml version="1.0" encoding="UTF-8"?><response>
+  <result>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1000</goodId>
+      <goodPrice>1500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1001</goodId>
+      <goodPrice>1380</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1002</goodId>
+      <goodPrice>1680</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1003</goodId>
+      <goodPrice>1620</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1004</goodId>
+      <goodPrice>6480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1008</goodId>
+      <goodPrice>4310</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1016</goodId>
+      <goodPrice>1300</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1017</goodId>
+      <goodPrice>4680</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1020</goodId>
+      <goodPrice>4500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1030</goodId>
+      <goodPrice>1320</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1031</goodId>
+      <goodPrice>2810</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1032</goodId>
+      <goodPrice>2250</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>104</goodId>
+      <goodPrice>7310</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1049</goodId>
+      <goodPrice>6980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1051</goodId>
+      <goodPrice>7900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1052</goodId>
+      <goodPrice>5810</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1053</goodId>
+      <goodPrice>8400</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1058</goodId>
+      <goodPrice>10740</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1072</goodId>
+      <goodPrice>8980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1073</goodId>
+      <goodPrice>9980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1077</goodId>
+      <goodPrice>1800</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1090</goodId>
+      <goodPrice>10950</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1099</goodId>
+      <goodPrice>7570</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1100</goodId>
+      <goodPrice>4310</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1155</goodId>
+      <goodPrice>8120</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1156</goodId>
+      <goodPrice>7480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1180</goodId>
+      <goodPrice>8080</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1181</goodId>
+      <goodPrice>3950</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1184</goodId>
+      <goodPrice>4780</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1185</goodId>
+      <goodPrice>3230</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1186</goodId>
+      <goodPrice>4750</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1188</goodId>
+      <goodPrice>2350</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1189</goodId>
+      <goodPrice>3490</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1196</goodId>
+      <goodPrice>2450</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1198</goodId>
+      <goodPrice>5940</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1199</goodId>
+      <goodPrice>6570</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>120</goodId>
+      <goodPrice>5980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1200</goodId>
+      <goodPrice>4680</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1206</goodId>
+      <goodPrice>10800</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1207</goodId>
+      <goodPrice>2980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1208</goodId>
+      <goodPrice>3000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1212</goodId>
+      <goodPrice>2080</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1215</goodId>
+      <goodPrice>3850</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1217</goodId>
+      <goodPrice>4150</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1219</goodId>
+      <goodPrice>10280</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1221</goodId>
+      <goodPrice>6770</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1222</goodId>
+      <goodPrice>1850</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1223</goodId>
+      <goodPrice>2980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1224</goodId>
+      <goodPrice>2750</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1225</goodId>
+      <goodPrice>4580</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1226</goodId>
+      <goodPrice>4580</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1227</goodId>
+      <goodPrice>3080</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1228</goodId>
+      <goodPrice>1900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1229</goodId>
+      <goodPrice>2700</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1230</goodId>
+      <goodPrice>2800</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1232</goodId>
+      <goodPrice>15200</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1235</goodId>
+      <goodPrice>11700</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1237</goodId>
+      <goodPrice>4410</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1238</goodId>
+      <goodPrice>3750</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1239</goodId>
+      <goodPrice>3500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1240</goodId>
+      <goodPrice>1970</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1241</goodId>
+      <goodPrice>16130</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1243</goodId>
+      <goodPrice>38100</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1244</goodId>
+      <goodPrice>3120</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1247</goodId>
+      <goodPrice>2480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1248</goodId>
+      <goodPrice>3980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1249</goodId>
+      <goodPrice>3980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1250</goodId>
+      <goodPrice>4000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1251</goodId>
+      <goodPrice>5690</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1255</goodId>
+      <goodPrice>9360</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1256</goodId>
+      <goodPrice>9480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1258</goodId>
+      <goodPrice>3150</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1260</goodId>
+      <goodPrice>6610</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1263</goodId>
+      <goodPrice>4000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1271</goodId>
+      <goodPrice>5420</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1276</goodId>
+      <goodPrice>19600</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1279</goodId>
+      <goodPrice>4900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1280</goodId>
+      <goodPrice>7750</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1281</goodId>
+      <goodPrice>4950</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1283</goodId>
+      <goodPrice>3650</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1284</goodId>
+      <goodPrice>5300</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1291</goodId>
+      <goodPrice>3410</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1296</goodId>
+      <goodPrice>9500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1298</goodId>
+      <goodPrice>20600</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1304</goodId>
+      <goodPrice>11200</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1305</goodId>
+      <goodPrice>11200</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1308</goodId>
+      <goodPrice>12100</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1309</goodId>
+      <goodPrice>7920</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1311</goodId>
+      <goodPrice>6810</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1312</goodId>
+      <goodPrice>4710</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1317</goodId>
+      <goodPrice>6900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1319</goodId>
+      <goodPrice>7810</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1322</goodId>
+      <goodPrice>3980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1323</goodId>
+      <goodPrice>3980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1324</goodId>
+      <goodPrice>3980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1325</goodId>
+      <goodPrice>2900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1327</goodId>
+      <goodPrice>6790</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1328</goodId>
+      <goodPrice>14900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1329</goodId>
+      <goodPrice>8700</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1332</goodId>
+      <goodPrice>4480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1333</goodId>
+      <goodPrice>3880</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1336</goodId>
+      <goodPrice>9970</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1343</goodId>
+      <goodPrice>7080</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1344</goodId>
+      <goodPrice>11400</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1345</goodId>
+      <goodPrice>2160</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1382</goodId>
+      <goodPrice>3850</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1383</goodId>
+      <goodPrice>4310</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1385</goodId>
+      <goodPrice>8100</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1387</goodId>
+      <goodPrice>2040</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1388</goodId>
+      <goodPrice>2980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1389</goodId>
+      <goodPrice>3380</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1392</goodId>
+      <goodPrice>12700</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1394</goodId>
+      <goodPrice>7940</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1395</goodId>
+      <goodPrice>1780</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>14</goodId>
+      <goodPrice>11180</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1400</goodId>
+      <goodPrice>4180</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1401</goodId>
+      <goodPrice>5390</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1402</goodId>
+      <goodPrice>3980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1403</goodId>
+      <goodPrice>4280</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1404</goodId>
+      <goodPrice>6500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1406</goodId>
+      <goodPrice>4880</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1407</goodId>
+      <goodPrice>2100</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1408</goodId>
+      <goodPrice>1650</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>141</goodId>
+      <goodPrice>9980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1410</goodId>
+      <goodPrice>1910</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1420</goodId>
+      <goodPrice>7800</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1421</goodId>
+      <goodPrice>3500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1422</goodId>
+      <goodPrice>5580</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1425</goodId>
+      <goodPrice>900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1426</goodId>
+      <goodPrice>3480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1427</goodId>
+      <goodPrice>3780</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1429</goodId>
+      <goodPrice>5040</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>143</goodId>
+      <goodPrice>4280</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1434</goodId>
+      <goodPrice>3000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1440</goodId>
+      <goodPrice>28980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1441</goodId>
+      <goodPrice>4880</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1442</goodId>
+      <goodPrice>3680</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1453</goodId>
+      <goodPrice>63900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1457</goodId>
+      <goodPrice>6160</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1459</goodId>
+      <goodPrice>6570</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1460</goodId>
+      <goodPrice>3820</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1462</goodId>
+      <goodPrice>6570</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1463</goodId>
+      <goodPrice>3820</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1464</goodId>
+      <goodPrice>4950</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1465</goodId>
+      <goodPrice>6160</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1468</goodId>
+      <goodPrice>5230</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1469</goodId>
+      <goodPrice>5180</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1470</goodId>
+      <goodPrice>5250</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1473</goodId>
+      <goodPrice>5080</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1474</goodId>
+      <goodPrice>5080</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1475</goodId>
+      <goodPrice>2680</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1476</goodId>
+      <goodPrice>5180</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1477</goodId>
+      <goodPrice>2780</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1480</goodId>
+      <goodPrice>14980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1481</goodId>
+      <goodPrice>16080</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1482</goodId>
+      <goodPrice>8210</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1483</goodId>
+      <goodPrice>5210</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1484</goodId>
+      <goodPrice>5480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1485</goodId>
+      <goodPrice>7680</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1486</goodId>
+      <goodPrice>10180</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1487</goodId>
+      <goodPrice>18000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1489</goodId>
+      <goodPrice>2750</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1491</goodId>
+      <goodPrice>3500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1494</goodId>
+      <goodPrice>5500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1495</goodId>
+      <goodPrice>4000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1500</goodId>
+      <goodPrice>1210</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1501</goodId>
+      <goodPrice>1250</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1502</goodId>
+      <goodPrice>12920</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1504</goodId>
+      <goodPrice>10480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1505</goodId>
+      <goodPrice>10100</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1506</goodId>
+      <goodPrice>3880</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1510</goodId>
+      <goodPrice>7700</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1512</goodId>
+      <goodPrice>5100</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1513</goodId>
+      <goodPrice>3790</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1514</goodId>
+      <goodPrice>3150</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1515</goodId>
+      <goodPrice>3300</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1516</goodId>
+      <goodPrice>6980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1517</goodId>
+      <goodPrice>2980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1518</goodId>
+      <goodPrice>4080</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1527</goodId>
+      <goodPrice>6700</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1528</goodId>
+      <goodPrice>10250</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1529</goodId>
+      <goodPrice>10250</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1535</goodId>
+      <goodPrice>4900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1536</goodId>
+      <goodPrice>4900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1537</goodId>
+      <goodPrice>3670</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1538</goodId>
+      <goodPrice>7600</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1542</goodId>
+      <goodPrice>2470</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1543</goodId>
+      <goodPrice>2900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1545</goodId>
+      <goodPrice>15400</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1547</goodId>
+      <goodPrice>19000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1554</goodId>
+      <goodPrice>2500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1564</goodId>
+      <goodPrice>24900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1569</goodId>
+      <goodPrice>48000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1595</goodId>
+      <goodPrice>8980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1596</goodId>
+      <goodPrice>9480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1597</goodId>
+      <goodPrice>10980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1600</goodId>
+      <goodPrice>4000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1604</goodId>
+      <goodPrice>5400</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1605</goodId>
+      <goodPrice>6300</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1608</goodId>
+      <goodPrice>10380</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1610</goodId>
+      <goodPrice>8980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1613</goodId>
+      <goodPrice>11700</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1615</goodId>
+      <goodPrice>11800</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1617</goodId>
+      <goodPrice>11700</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1618</goodId>
+      <goodPrice>8270</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1619</goodId>
+      <goodPrice>7920</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1624</goodId>
+      <goodPrice>10980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1627</goodId>
+      <goodPrice>3000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1628</goodId>
+      <goodPrice>4100</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1629</goodId>
+      <goodPrice>1980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1630</goodId>
+      <goodPrice>6490</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1631</goodId>
+      <goodPrice>4080</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1660</goodId>
+      <goodPrice>12100</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1661</goodId>
+      <goodPrice>6500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1662</goodId>
+      <goodPrice>5040</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1663</goodId>
+      <goodPrice>14500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1682</goodId>
+      <goodPrice>6000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1683</goodId>
+      <goodPrice>4050</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1685</goodId>
+      <goodPrice>29800</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1686</goodId>
+      <goodPrice>3980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1687</goodId>
+      <goodPrice>2980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1688</goodId>
+      <goodPrice>12680</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1689</goodId>
+      <goodPrice>9250</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1692</goodId>
+      <goodPrice>970</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1694</goodId>
+      <goodPrice>6980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1696</goodId>
+      <goodPrice>6660</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1698</goodId>
+      <goodPrice>4510</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1700</goodId>
+      <goodPrice>27900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1705</goodId>
+      <goodPrice>13200</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1706</goodId>
+      <goodPrice>38600</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1708</goodId>
+      <goodPrice>38600</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1709</goodId>
+      <goodPrice>6980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1734</goodId>
+      <goodPrice>4140</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1737</goodId>
+      <goodPrice>2680</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1738</goodId>
+      <goodPrice>6580</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>174</goodId>
+      <goodPrice>9000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1740</goodId>
+      <goodPrice>12100</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1741</goodId>
+      <goodPrice>12100</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1744</goodId>
+      <goodPrice>5500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1748</goodId>
+      <goodPrice>12200</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1749</goodId>
+      <goodPrice>13500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1750</goodId>
+      <goodPrice>14900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1751</goodId>
+      <goodPrice>9900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1754</goodId>
+      <goodPrice>9180</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1755</goodId>
+      <goodPrice>10480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1756</goodId>
+      <goodPrice>11480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1757</goodId>
+      <goodPrice>10120</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1761</goodId>
+      <goodPrice>17990</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1765</goodId>
+      <goodPrice>11000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1766</goodId>
+      <goodPrice>11000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1767</goodId>
+      <goodPrice>12000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1768</goodId>
+      <goodPrice>3410</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1769</goodId>
+      <goodPrice>2180</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1771</goodId>
+      <goodPrice>3830</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1772</goodId>
+      <goodPrice>3280</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1773</goodId>
+      <goodPrice>3690</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1788</goodId>
+      <goodPrice>4180</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1795</goodId>
+      <goodPrice>9980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1796</goodId>
+      <goodPrice>8260</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1798</goodId>
+      <goodPrice>8980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1799</goodId>
+      <goodPrice>9480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1800</goodId>
+      <goodPrice>10130</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1801</goodId>
+      <goodPrice>2200</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1802</goodId>
+      <goodPrice>8980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1803</goodId>
+      <goodPrice>6320</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1804</goodId>
+      <goodPrice>9480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1805</goodId>
+      <goodPrice>6520</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1806</goodId>
+      <goodPrice>8200</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1807</goodId>
+      <goodPrice>8200</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1808</goodId>
+      <goodPrice>5980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1809</goodId>
+      <goodPrice>3840</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1810</goodId>
+      <goodPrice>5980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1811</goodId>
+      <goodPrice>7150</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1813</goodId>
+      <goodPrice>10480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1814</goodId>
+      <goodPrice>10980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1815</goodId>
+      <goodPrice>5500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1816</goodId>
+      <goodPrice>5970</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1817</goodId>
+      <goodPrice>4280</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1818</goodId>
+      <goodPrice>5800</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1820</goodId>
+      <goodPrice>4390</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1821</goodId>
+      <goodPrice>5440</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1822</goodId>
+      <goodPrice>9610</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1823</goodId>
+      <goodPrice>4500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1824</goodId>
+      <goodPrice>1600</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1825</goodId>
+      <goodPrice>1250</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1826</goodId>
+      <goodPrice>4090</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1827</goodId>
+      <goodPrice>1080</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1828</goodId>
+      <goodPrice>2480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1830</goodId>
+      <goodPrice>6480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>201</goodId>
+      <goodPrice>7740</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>217</goodId>
+      <goodPrice>20900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>224</goodId>
+      <goodPrice>3150</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>225</goodId>
+      <goodPrice>12980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>230</goodId>
+      <goodPrice>7280</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>233</goodId>
+      <goodPrice>13200</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>237</goodId>
+      <goodPrice>3790</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>238</goodId>
+      <goodPrice>4280</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>239</goodId>
+      <goodPrice>4480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>243</goodId>
+      <goodPrice>2880</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>253</goodId>
+      <goodPrice>4880</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>254</goodId>
+      <goodPrice>4010</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>257</goodId>
+      <goodPrice>2280</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>265</goodId>
+      <goodPrice>1800</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>266</goodId>
+      <goodPrice>1800</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>270</goodId>
+      <goodPrice>6560</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>272</goodId>
+      <goodPrice>9850</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>280</goodId>
+      <goodPrice>12000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>282</goodId>
+      <goodPrice>7240</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>283</goodId>
+      <goodPrice>7780</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>286</goodId>
+      <goodPrice>3880</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>291</goodId>
+      <goodPrice>2880</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>292</goodId>
+      <goodPrice>2050</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>295</goodId>
+      <goodPrice>3500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>298</goodId>
+      <goodPrice>1940</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>300</goodId>
+      <goodPrice>1620</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>302</goodId>
+      <goodPrice>12700</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>305</goodId>
+      <goodPrice>1940</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>308</goodId>
+      <goodPrice>7250</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>309</goodId>
+      <goodPrice>4500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>332</goodId>
+      <goodPrice>5860</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>333</goodId>
+      <goodPrice>2440</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>334</goodId>
+      <goodPrice>9400</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>422</goodId>
+      <goodPrice>2200</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>423</goodId>
+      <goodPrice>1900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>532</goodId>
+      <goodPrice>1900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>536</goodId>
+      <goodPrice>2360</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>538</goodId>
+      <goodPrice>1890</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>553</goodId>
+      <goodPrice>4900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>562</goodId>
+      <goodPrice>3370</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>570</goodId>
+      <goodPrice>10900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>572</goodId>
+      <goodPrice>3280</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>614</goodId>
+      <goodPrice>3780</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>624</goodId>
+      <goodPrice>1800</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>638</goodId>
+      <goodPrice>12600</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>702</goodId>
+      <goodPrice>6900</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>740</goodId>
+      <goodPrice>830</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>741</goodId>
+      <goodPrice>1660</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>757</goodId>
+      <goodPrice>8470</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>759</goodId>
+      <goodPrice>12000</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>821</goodId>
+      <goodPrice>3590</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>830</goodId>
+      <goodPrice>3360</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>832</goodId>
+      <goodPrice>8530</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>833</goodId>
+      <goodPrice>3680</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>834</goodId>
+      <goodPrice>1800</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>852</goodId>
+      <goodPrice>13730</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>854</goodId>
+      <goodPrice>23400</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>856</goodId>
+      <goodPrice>4980</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>872</goodId>
+      <goodPrice>2800</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>874</goodId>
+      <goodPrice>1180</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>876</goodId>
+      <goodPrice>570</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>878</goodId>
+      <goodPrice>430</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>881</goodId>
+      <goodPrice>2500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>891</goodId>
+      <goodPrice>5370</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>900</goodId>
+      <goodPrice>6120</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>902</goodId>
+      <goodPrice>8910</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>965</goodId>
+      <goodPrice>4550</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>966</goodId>
+      <goodPrice>1490</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>967</goodId>
+      <goodPrice>1490</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>970</goodId>
+      <goodPrice>3360</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>974</goodId>
+      <goodPrice>2480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>975</goodId>
+      <goodPrice>2640</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>976</goodId>
+      <goodPrice>4280</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>977</goodId>
+      <goodPrice>6180</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>984</goodId>
+      <goodPrice>1530</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>991</goodId>
+      <goodPrice>1420</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>993</goodId>
+      <goodPrice>6500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>997</goodId>
+      <goodPrice>2280</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>998</goodId>
+      <goodPrice>1490</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>999</goodId>
+      <goodPrice>1680</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+  </result>
+  <resultCode>00</resultCode>
+  <resultMsg>ok</resultMsg>
+</response>

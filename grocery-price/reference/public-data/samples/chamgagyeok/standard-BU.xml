@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?><response>
+  <result>
+    <iros.openapi.service.vo.stdInfoVO>
+      <code>CS</code>
+      <codeName>편의점</codeName>
+    </iros.openapi.service.vo.stdInfoVO>
+    <iros.openapi.service.vo.stdInfoVO>
+      <code>DP</code>
+      <codeName>백화점</codeName>
+    </iros.openapi.service.vo.stdInfoVO>
+    <iros.openapi.service.vo.stdInfoVO>
+      <code>LM</code>
+      <codeName>대형마트</codeName>
+    </iros.openapi.service.vo.stdInfoVO>
+    <iros.openapi.service.vo.stdInfoVO>
+      <code>MF</code>
+      <codeName>제조사</codeName>
+    </iros.openapi.service.vo.stdInfoVO>
+    <iros.openapi.service.vo.stdInfoVO>
+      <code>SM</code>
+      <codeName>슈퍼마켓</codeName>
+    </iros.openapi.service.vo.stdInfoVO>
+  </result>
+  <resultCode>00</resultCode>
+  <resultMsg>ok</resultMsg>
+</response>

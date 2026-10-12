@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='utf-8'?>
+<response>
+  <result>
+    <iros.openapi.service.vo.entpInfoVO>
+      <entpId>786</entpId>
+      <entpName>이마트연수점</entpName>
+      <entpTypeCode>LM</entpTypeCode>
+      <entpAreaCode>020700000</entpAreaCode>
+      <areaDetailCode>020710000</areaDetailCode>
+      <entpTelno>032-820-1234</entpTelno>
+      <postNo>21975</postNo>
+      <plmkAddrBasic>인천광역시 연수구 동춘동  926-9 이마트</plmkAddrBasic>
+      <plmkAddrDetail>이마트 연수점</plmkAddrDetail>
+      <roadAddrBasic>인천광역시 연수구 경원대로 184</roadAddrBasic>
+      <roadAddrDetail>(동춘동)</roadAddrDetail>
+    </iros.openapi.service.vo.entpInfoVO>
+    <iros.openapi.service.vo.entpInfoVO>
+      <entpId>10</entpId>
+      <entpName>이마트부천점</entpName>
+      <entpTypeCode>LM</entpTypeCode>
+      <entpAreaCode>020900000</entpAreaCode>
+      <areaDetailCode>020917000</areaDetailCode>
+      <entpTelno>032-610-5123</entpTelno>
+      <postNo>14637</postNo>
+      <plmkAddrBasic>경기 부천시 소사구 심곡본동</plmkAddrBasic>
+      <plmkAddrDetail>316-2</plmkAddrDetail>
+      <roadAddrBasic>경기 부천시 부천로 1 부천역사 쇼핑몰</roadAddrBasic>
+      <xMapCoord>37.483872967200625</xMapCoord>
+      <yMapCoord>126.78374805253466</yMapCoord>
+    </iros.openapi.service.vo.entpInfoVO>
+    <iros.openapi.service.vo.entpInfoVO>
+      <entpId>12</entpId>
+      <entpName>이마트울산점</entpName>
+      <entpTypeCode>LM</entpTypeCode>
+      <entpAreaCode>020600000</entpAreaCode>
+      <areaDetailCode>020605000</areaDetailCode>
+      <entpTelno>052-220-1234</entpTelno>
+      <postNo>680815</postNo>
+      <plmkAddrBasic>울산 남구 삼산동</plmkAddrBasic>
+      <plmkAddrDetail>1646번지</plmkAddrDetail>
+      <xMapCoord>35.53804456063634</xMapCoord>
+      <yMapCoord>129.3483923536936</yMapCoord>
+    </iros.openapi.service.vo.entpInfoVO>
+    <iros.openapi.service.vo.entpInfoVO>
+      <entpId>13</entpId>
+      <entpName>신세계백화점광주점</entpName>
+      <entpTypeCode>DP</entpTypeCode>
+      <entpAreaCode>020200000</entpAreaCode>
+      <areaDetailCode>020203000</areaDetailCode>
+      <entpTelno>02-1588-1234</entpTelno>
+      <postNo>502712</postNo>
+      <plmkAddrBasic>광주 서구 광천동 신세계백화점</plmkAddrBasic>
+      <plmkAddrDetail>49-1</plmkAddrDetail>
+      <xMapCoord>35.16067858120567</xMapCoord>
+      <yMapCoord>126.88265534848287</yMapCoord>
+    </iros.openapi.service.vo.entpInfoVO>
+    <iros.openapi.service.vo.entpInfoVO>
+      <entpId>15</entpId>
+      <entpName>이마트해운대점</entpName>
+      <entpTypeCode>LM</entpTypeCode>
+      <entpAreaCode>020500000</entpAreaCode>
+      <areaDetailCode>020504000</areaDetailCode>
+      <entpTelno>051-608-1234</entpTelno>
+      <postNo>612851</postNo>
+      <plmkAddrBasic>부산 해운대구 중1동</plmkAddrBasic>
+      <plmkAddrDetail>1767</plmkAddrDetail>
+      <xMapCoord>35.16601812982536</xMapCoord>
+      <yMapCoord>129.16746248624534</yMapCoord>
+    </iros.openapi.service.vo.entpInfoVO>
+    <!-- 625건 생략 (전체 630건) -->
+  </result>
+  <resultCode>00</resultCode>
+  <resultMsg>ok</resultMsg>
+</response>

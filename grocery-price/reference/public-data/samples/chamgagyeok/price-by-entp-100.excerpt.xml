@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='utf-8'?>
+<response>
+  <result>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1000</goodId>
+      <goodPrice>1500</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1001</goodId>
+      <goodPrice>1380</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1002</goodId>
+      <goodPrice>1680</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1003</goodId>
+      <goodPrice>1620</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <iros.openapi.service.vo.goodPriceVO>
+      <goodInspectDay>20260925</goodInspectDay>
+      <entpId>100</entpId>
+      <goodId>1004</goodId>
+      <goodPrice>6480</goodPrice>
+      <inputDttm>2026-09-23 12:08:15</inputDttm>
+    </iros.openapi.service.vo.goodPriceVO>
+    <!-- 364건 생략 (전체 369건) -->
+  </result>
+  <resultCode>00</resultCode>
+  <resultMsg>ok</resultMsg>
+</response>

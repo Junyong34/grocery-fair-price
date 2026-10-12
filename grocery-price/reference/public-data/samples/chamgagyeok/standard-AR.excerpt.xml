@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<response>
+  <result>
+    <iros.openapi.service.vo.stdInfoVO>
+      <code>020100000</code>
+      <codeName>서울특별시</codeName>
+      <highCode>020000000</highCode>
+    </iros.openapi.service.vo.stdInfoVO>
+    <iros.openapi.service.vo.stdInfoVO>
+      <code>020101000</code>
+      <codeName>도봉구</codeName>
+      <highCode>020100000</highCode>
+    </iros.openapi.service.vo.stdInfoVO>
+    <iros.openapi.service.vo.stdInfoVO>
+      <code>020102000</code>
+      <codeName>노원구</codeName>
+      <highCode>020100000</highCode>
+    </iros.openapi.service.vo.stdInfoVO>
+    <iros.openapi.service.vo.stdInfoVO>
+      <code>020103000</code>
+      <codeName>강북구</codeName>
+      <highCode>020100000</highCode>
+    </iros.openapi.service.vo.stdInfoVO>
+    <iros.openapi.service.vo.stdInfoVO>
+      <code>020104000</code>
+      <codeName>은평구</codeName>
+      <highCode>020100000</highCode>
+    </iros.openapi.service.vo.stdInfoVO>
+    <!-- 306건 생략 (전체 311건) -->
+  </result>
+  <resultCode>00</resultCode>
+  <resultMsg>ok</resultMsg>
+</response>

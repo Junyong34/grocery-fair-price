@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?><response>
+  <resultCode>05</resultCode>
+  <resultMsg>entpId goodId 에 값이 모두 없습니다. 
+ 두 값 중에 하나의 값은 존재 해야 합니다.</resultMsg>
+</response>

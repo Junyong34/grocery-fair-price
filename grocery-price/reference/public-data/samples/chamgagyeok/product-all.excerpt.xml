@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='utf-8'?>
+<response>
+  <result>
+    <item>
+      <goodId>35</goodId>
+      <goodName>해표 꽃소금(1kg)</goodName>
+      <productEntpCode>484</productEntpCode>
+      <goodUnitDivCode>G</goodUnitDivCode>
+      <goodBaseCnt>100</goodBaseCnt>
+      <goodSmlclsCode>030204006</goodSmlclsCode>
+      <goodTotalCnt>1000</goodTotalCnt>
+      <goodTotalDivCode>G</goodTotalDivCode>
+    </item>
+    <item>
+      <goodId>104</goodId>
+      <goodName>도브 센서티브 뷰티바(4개)</goodName>
+      <productEntpCode>466</productEntpCode>
+      <goodUnitDivCode>EA</goodUnitDivCode>
+      <goodBaseCnt>1</goodBaseCnt>
+      <goodSmlclsCode>030301006</goodSmlclsCode>
+      <detailMean>90g*4개</detailMean>
+      <goodTotalCnt>4</goodTotalCnt>
+      <goodTotalDivCode>EA</goodTotalDivCode>
+    </item>
+    <item>
+      <goodId>217</goodId>
+      <goodName>존슨즈 베드타임 로션(500ml)</goodName>
+      <productEntpCode>511</productEntpCode>
+      <goodUnitDivCode>ML</goodUnitDivCode>
+      <goodBaseCnt>100</goodBaseCnt>
+      <goodSmlclsCode>030301001</goodSmlclsCode>
+      <goodTotalCnt>500</goodTotalCnt>
+      <goodTotalDivCode>ML</goodTotalDivCode>
+    </item>
+    <item>
+      <goodId>523</goodId>
+      <goodName>썬 부탄가스(4개)</goodName>
+      <productEntpCode>506</productEntpCode>
+      <goodUnitDivCode>EA</goodUnitDivCode>
+      <goodBaseCnt>1</goodBaseCnt>
+      <goodSmlclsCode>030302015</goodSmlclsCode>
+      <detailMean>220g*4개</detailMean>
+      <goodTotalCnt>4</goodTotalCnt>
+      <goodTotalDivCode>EA</goodTotalDivCode>
+    </item>
+    <item>
+      <goodId>536</goodId>
+      <goodName>청정원 순창 양념듬뿍 쌈장(500g)</goodName>
+      <productEntpCode>519</productEntpCode>
+      <goodUnitDivCode>G</goodUnitDivCode>
+      <goodBaseCnt>100</goodBaseCnt>
+      <goodSmlclsCode>030204016</goodSmlclsCode>
+      <goodTotalCnt>500</goodTotalCnt>
+      <goodTotalDivCode>G</goodTotalDivCode>
+    </item>
+    <!-- 599건 생략 (전체 604건) -->
+  </result>
+  <resultCode>00</resultCode>
+  <resultMsg>ok</resultMsg>
+</response>

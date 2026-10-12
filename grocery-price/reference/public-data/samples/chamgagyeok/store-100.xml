@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><response>
+  <result>
+    <iros.openapi.service.vo.entpInfoVO>
+      <entpId>100</entpId>
+      <entpName>현대백화점미아점</entpName>
+      <entpTypeCode>DP</entpTypeCode>
+      <entpAreaCode>020100000</entpAreaCode>
+      <areaDetailCode>020105000</areaDetailCode>
+      <entpTelno>02-2117-2233</entpTelno>
+      <postNo>136110</postNo>
+      <plmkAddrBasic>서울 성북구 길음동</plmkAddrBasic>
+      <plmkAddrDetail>20-1</plmkAddrDetail>
+      <xMapCoord>37.60828091566437</xMapCoord>
+      <yMapCoord>127.0287188084113</yMapCoord>
+    </iros.openapi.service.vo.entpInfoVO>
+  </result>
+  <resultCode>00</resultCode>
+  <resultMsg>ok</resultMsg>
+</response>

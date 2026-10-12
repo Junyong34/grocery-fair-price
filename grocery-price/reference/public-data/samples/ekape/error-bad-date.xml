@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><response><header><resultCode>99</resultCode><resultMsg>ORA-01841: 년은 영이 아닌 -4713 과 +4713 사이의 값으로 지정해야 합니다.
+ORA-06512: &quot;OPENAPI.PKG_RTSAL&quot;,  138행
+ORA-06512: &quot;OPENAPI.PKG_RTSAL&quot;,  138행
+ORA-06512:  1행
+</resultMsg></header><body/></response>
