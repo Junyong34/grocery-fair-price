@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>공공 가격 API 탐색기</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-2: #f0f2f5;
+  --text: #1b1f24;
+  --muted: #5d6673;
+  --line: #dde1e7;
+  --accent: #1f6feb;
+  --accent-soft: #e3eefe;
+  --accent-text: #0b4ab5;
+  --ref: #9aa6b6;
+  --ok: #1a7f4b;
+  --ok-soft: #e1f4ea;
+  --warn: #8a5a00;
+  --warn-soft: #fdf0d2;
+  --err: #b42318;
+  --err-soft: #fde7e4;
+  --code-bg: #f0f2f5;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151a; --surface: #1b2027; --surface-2: #232a33; --text: #e6e9ee; --muted: #9aa5b3;
+    --line: #2f3742; --accent: #6aa5ff; --accent-soft: #1d3050; --accent-text: #a8cbff; --ref: #5f6b7a;
+    --ok: #55c58a; --ok-soft: #173326; --warn: #f0be5a; --warn-soft: #3a2e12;
+    --err: #ff8a7d; --err-soft: #43201c; --code-bg: #232a33;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151a; --surface: #1b2027; --surface-2: #232a33; --text: #e6e9ee; --muted: #9aa5b3;
+  --line: #2f3742; --accent: #6aa5ff; --accent-soft: #1d3050; --accent-text: #a8cbff; --ref: #5f6b7a;
+  --ok: #55c58a; --ok-soft: #173326; --warn: #f0be5a; --warn-soft: #3a2e12;
+  --err: #ff8a7d; --err-soft: #43201c; --code-bg: #232a33;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+}
+code, pre, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px 64px; }
+header.top { padding: 28px 0 8px; }
+header.top h1 { margin: 0 0 4px; font-size: 24px; letter-spacing: -0.01em; }
+header.top p { margin: 0; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 14px 0 0; font-size: 13px; color: var(--muted); }
+.legend span { white-space: nowrap; }
+
+/* 탭 */
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 18px 0 0; }
+.tab {
+  appearance: none; border: 1px solid var(--line); background: var(--surface); color: var(--text);
+  padding: 8px 14px; border-radius: 10px; cursor: pointer; font: inherit; text-align: left; line-height: 1.3;
+}
+.tab small { display: block; color: var(--muted); font-size: 12px; }
+.tab[aria-selected="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-text); font-weight: 700; box-shadow: inset 0 -3px 0 var(--accent); }
+.tab[aria-selected="true"] small { color: inherit; opacity: .8; }
+.tab:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tabs.sub .tab { padding: 6px 12px; font-size: 14px; border-radius: 999px; }
+
+/* 카드 */
+section.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 18px 20px; margin: 16px 0 0;
+}
+section.card > h2 { margin: 0 0 4px; font-size: 17px; }
+section.card > .hint { margin: 0 0 12px; color: var(--muted); font-size: 13.5px; }
+.num { display: inline-grid; place-items: center; width: 22px; height: 22px; margin-right: 8px; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent-text); font-size: 12px; font-weight: 700; vertical-align: 1px; }
+
+.facts { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px 16px; margin: 12px 0 0; }
+.fact { background: var(--surface-2); border-radius: 10px; padding: 8px 12px; }
+.fact b { display: block; font-size: 12px; color: var(--muted); font-weight: 600; }
+.url { display: block; margin: 10px 0 0; padding: 10px 12px; background: var(--code-bg); border-radius: 10px; overflow-x: auto; white-space: nowrap; }
+.method { display: inline-block; padding: 0 6px; margin-right: 6px; border-radius: 4px; background: var(--ok-soft); color: var(--ok); font-weight: 700; font-size: 12px; }
+
+/* 표 */
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { background: var(--surface-2); font-weight: 600; white-space: nowrap; position: sticky; top: 0; }
+tr:last-child td { border-bottom: 0; }
+td.name { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; white-space: nowrap; }
+td.val { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; word-break: break-all; }
+.dim { color: var(--muted); }
+.empty { color: var(--ref); font-style: italic; }
+tr.sel td { background: var(--accent-soft); }
+tbody tr.click { cursor: pointer; }
+tbody tr.click:hover td { background: var(--surface-2); }
+
+/* 뱃지 */
+.badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; border: 1px solid transparent; }
+.b-req { background: var(--accent); color: #fff; }
+:root[data-theme="dark"] .b-req { color: #0b1220; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .b-req { color: #0b1220; } }
+.b-opt { border-color: var(--line); color: var(--muted); }
+.b-either { border: 1px dashed var(--accent); color: var(--accent-text); }
+.b-ok { background: var(--ok-soft); color: var(--ok); }
+.b-empty { background: var(--warn-soft); color: var(--warn); }
+.b-err { background: var(--err-soft); color: var(--err); }
+.b-mark { background: var(--warn-soft); color: var(--warn); }
+.obs { color: var(--warn); }
+.obs::before { content: "실측 "; font-weight: 700; }
+
+pre.tree { margin: 0; padding: 12px 14px; background: var(--code-bg); border-radius: 10px; overflow-x: auto; line-height: 1.5; font-size: 12.5px; }
+pre.raw { margin: 8px 0 0; padding: 12px 14px; background: var(--code-bg); border-radius: 10px; overflow: auto; max-height: 360px; font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+
+/* 컨트롤 */
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 12px; }
+select, input[type="search"], input[type="number"], input[type="text"] {
+  font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; max-width: 100%;
+}
+button.btn { font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+button.btn:disabled { opacity: .4; cursor: default; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px 8px; margin: 0 0 12px; }
+.chip { background: var(--surface-2); border-radius: 8px; padding: 3px 10px; font-size: 13px; }
+.chip b { color: var(--muted); font-weight: 600; margin-right: 6px; }
+.note { padding: 10px 12px; border-radius: 10px; background: var(--warn-soft); color: var(--warn); font-size: 13.5px; margin: 10px 0 0; }
+.info { padding: 10px 12px; border-radius: 10px; background: var(--accent-soft); color: var(--accent-text); font-size: 13.5px; margin: 10px 0 0; }
+
+/* 막대 차트 */
+.bars { display: grid; gap: 4px; }
+.bar-row { display: grid; grid-template-columns: minmax(120px, 280px) 1fr 120px; gap: 10px; align-items: center; font-size: 13px; }
+.bar-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-label .sub { color: var(--muted); margin-left: 6px; font-size: 12px; }
+.bar-track { background: var(--surface-2); border-radius: 4px; height: 14px; position: relative; overflow: hidden; }
+.bar-fill { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 4px; }
+.bar-fill.ref { background: var(--ref); }
+.bar-fill.thin { height: 6px; top: 4px; bottom: auto; }
+.bar-val { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bar-val .badge { margin-left: 6px; }
+.bar-pair .bar-track { height: 18px; }
+.bar-pair .bar-fill { height: 8px; top: 1px; bottom: auto; }
+.bar-pair .bar-fill.ref { top: 9px; }
+.bar-key { display: flex; gap: 16px; font-size: 13px; color: var(--muted); margin: 0 0 8px; }
+.bar-key i { display: inline-block; width: 18px; height: 8px; border-radius: 3px; background: var(--accent); margin-right: 6px; }
+.bar-key i.ref { background: var(--ref); }
+.big { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 14px; }
+.stat { background: var(--surface-2); border-radius: 12px; padding: 10px 16px; min-width: 150px; }
+.stat b { display: block; font-size: 12px; color: var(--muted); font-weight: 600; }
+.stat span { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stat small { color: var(--muted); }
+svg.chart { width: 100%; height: auto; display: block; }
+svg.chart text { fill: var(--muted); font-size: 11px; }
+svg.chart .grid { stroke: var(--line); stroke-width: 1; }
+svg.chart .band { fill: var(--accent); opacity: .16; }
+svg.chart .line { fill: none; stroke: var(--accent); stroke-width: 2; }
+svg.chart .dot { fill: var(--accent); }
+.form td { vertical-align: middle; }
+td .btn { white-space: nowrap; padding: 3px 10px; font-size: 13px; }
+.form input[type="text"], .form select { width: 100%; min-width: 150px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+.form input.bad { border-color: var(--err); }
+.chk { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; font-size: 13.5px; }
+.chk li { display: grid; grid-template-columns: 22px 1fr; gap: 6px; padding: 6px 10px; border-radius: 8px; }
+.chk li.ok { background: var(--ok-soft); color: var(--ok); }
+.chk li.warn { background: var(--warn-soft); color: var(--warn); }
+.chk li.err { background: var(--err-soft); color: var(--err); }
+.chk li b { text-align: center; }
+pre.cmd { margin: 8px 0 0; padding: 12px 14px; background: var(--code-bg); border-radius: 10px; overflow-x: auto; font-size: 12.5px; line-height: 1.55; white-space: pre; }
+h3 { font-size: 14px; margin: 16px 0 8px; }
+details > summary { cursor: pointer; color: var(--accent-text); }
+footer { margin-top: 28px; color: var(--muted); font-size: 12.5px; }
+
+@media (max-width: 640px) {
+  .bar-row { grid-template-columns: 1fr 90px; }
+  .bar-row .bar-track { grid-column: 1 / -1; order: 3; }
+  .wrap { padding: 0 12px 48px; }
+  section.card { padding: 14px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>공공 가격 API 탐색기</h1>
+    <p>KAMIS · 축평원 · 참가격 — 무엇을 보내고(요청), 무엇이 오고(응답), 실제 값은 어떤지 한 화면에서 봅니다.</p>
+    <div class="legend">
+      <span><span class="badge b-req">필수</span> 보내지 않으면 안 되는 값</span>
+      <span><span class="badge b-opt">선택</span> 생략 가능</span>
+      <span><span class="badge b-either">둘 중 하나</span> 여러 값 중 하나 이상 필요</span>
+      <span><span class="obs"></span>명세와 다르게 호출해서 확인한 동작</span>
+    </div>
+  </header>
+  <div id="app"></div>
+  <footer id="foot"></footer>
+</div>
+
+<script>
+(() => {
+"use strict";
+window.addEventListener("error", e => { document.documentElement.dataset.jsError = e.message; });
+const D = /*__DATA__*/null;
+const S = Object.fromEntries(D.samples.map(s => [s.id, s]));
+
+/* ── 작은 DOM 헬퍼 (값은 모두 textContent 로 들어간다) ── */
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  if (attrs) for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "style") el.style.cssText = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (const kid of kids.flat(Infinity)) {
+    if (kid == null || kid === false) continue;
+    el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  }
+  return el;
+}
+// DOM 을 통째로 바꾼다. null/false 는 걸러서 화면에 "null" 글자가 찍히지 않게 한다. replaceChildren 을 직접 쓰지 않는다.
+function fill(el, ...kids) {
+  el.replaceChildren(...kids.flat(Infinity).filter(k => k != null && k !== false));
+}
+function svg(tag, attrs, ...kids) {
+  const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs || {})) el.setAttribute(k, v);
+  for (const kid of kids.flat()) if (kid != null) el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  return el;
+}
+
+/* ── 값 포맷 ── */
+const nf = new Intl.NumberFormat("ko-KR");
+const fmtDate = s => /^\d{8}$/.test(s) ? `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6)}` : s;
+const won = v => (v === "" || isNaN(Number(v))) ? v : nf.format(Number(v)) + "원";
+const kst = iso => new Date(iso).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", hour12: false });
+const kb = n => n < 1024 ? `${n}B` : `${(n / 1024).toFixed(n < 10240 ? 1 : 0)}KB`;
+const median = a => { const s = [...a].sort((x, y) => x - y); const m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+
+const idx = s => Object.fromEntries(s.cols.map((c, i) => [c, i]));
+const objs = s => s.rows.map(r => Object.fromEntries(s.cols.map((c, i) => [c, r[i]])));
+function codeMap(id) {
+  const s = S[id]; if (!s) return new Map();
+  const o = objs(s); return new Map(o.map(r => [r.code, r.codeName]));
+}
+
+/* ── 상태 ── */
+const st = {
+  group: D.groups[0].id,
+  ep: {}, sample: {}, row: {}, shown: {},
+  kamisCombo: {}, ekSeries: {}, chamSort: "high", chamQuery: "", build: {}, prod: null,
+};
+const epId = g => st.ep[g.id] || g.eps[0].id;
+
+/* ── 공통 부품 ── */
+function table(heads, rows, { cls = "", rowAttrs } = {}) {
+  return h("div", { class: "scroll" }, h("table", { class: cls },
+    h("thead", null, h("tr", null, heads.map(x => h("th", x.title ? { title: x.title } : null, x.text ?? x)))),
+    h("tbody", null, rows.map((r, i) => h("tr", rowAttrs ? rowAttrs(i) : null, r)))));
+}
+function card(n, title, hint, ...body) {
+  return h("section", { class: "card" },
+    h("h2", null, n ? h("span", { class: "num" }, n) : null, title),
+    hint ? h("p", { class: "hint" }, hint) : null, body);
+}
+function bars(items, { fmt = v => nf.format(v), max } = {}) {
+  const m = max ?? Math.max(1, ...items.map(i => i.v));
+  return h("div", { class: "bars" }, items.map(i => h("div", { class: "bar-row" },
+    h("div", { class: "bar-label", title: i.label + (i.sub ? ` ${i.sub}` : "") }, i.label, i.sub ? h("span", { class: "sub" }, i.sub) : null),
+    h("div", { class: "bar-track" }, h("div", { class: "bar-fill", style: `width:${Math.max(0.5, i.v / m * 100)}%` })),
+    h("div", { class: "bar-val" }, fmt(i.v), i.badges || null))));
+}
+function kindBadge(s) {
+  const k = { ok: ["정상", "b-ok"], empty: ["빈 결과", "b-empty"], error: ["오류", "b-err"] }[s.kind];
+  return h("span", { class: "badge " + k[1] }, k[0]);
+}
+function reqBadge(r) {
+  return r === "required" ? h("span", { class: "badge b-req" }, "필수")
+    : r === "either" ? h("span", { class: "badge b-either" }, "둘 중 하나")
+    : h("span", { class: "badge b-opt" }, "선택");
+}
+function reqParams(s) {
+  const q = s.request.split("?").slice(1).join("?");
+  const m = {};
+  for (const p of q.split("&")) { const i = p.indexOf("="); if (i > 0) m[p.slice(0, i)] = p.slice(i + 1); }
+  return m;
+}
+
+/* ── 1. 개요 ── */
+function overview(ep) {
+  return card(null, ep.title, ep.org,
+    h("p", { style: "margin:0" }, ep.role),
+    h("div", { class: "facts" }, ep.facts.map(([k, v]) => h("div", { class: "fact" }, h("b", null, k), v))),
+    h("code", { class: "url" }, h("span", { class: "method" }, "GET"), ep.url));
+}
+
+/* ── 2. 요청 파라미터 ── */
+function paramsCard(ep, s) {
+  const sent = reqParams(s);
+  const rows = ep.params.map(p => {
+    const v = sent[p.name];
+    return [
+      h("td", { class: "name" }, p.name),
+      h("td", null, reqBadge(p.req)),
+      h("td", null, p.desc, p.observed ? h("div", { class: "obs" }, p.observed) : null),
+      h("td", { class: "val" }, p.example || h("span", { class: "dim" }, "—")),
+      h("td", { class: "val" }, v === undefined ? h("span", { class: "empty" }, "(보내지 않음)")
+        : v === "<REDACTED>" ? h("span", { class: "dim" }, "(인증키)") : v),
+    ];
+  });
+  const reqLine = s.request.replace("<REDACTED>", "{인증키}");
+  return card(1, "요청 규격: 보내는 파라미터",
+    "표의 마지막 열은 ‘실제 값’에서 고른 샘플을 호출할 때 실제로 보낸 값입니다. 샘플을 바꾸면 따라 바뀝니다. 값을 직접 골라 요청을 만들어 보려면 바로 아래 카드를 쓰세요.",
+    table(["파라미터", "구분", "의미", "예시", "이 샘플에서 보낸 값"], rows),
+    ep.param_note ? h("div", { class: "info" }, ep.param_note) : null,
+    (ep.tables || []).map(tb => [h("h3", null, tb.title), table(tb.heads, tb.rows.map(r => r.map((c, i) => h("td", { class: i === 0 ? "name" : "" }, c)))), tb.note ? h("div", { class: "note" }, tb.note) : null]),
+    h("h3", null, "이 샘플의 실제 요청"),
+    h("code", { class: "url", style: "white-space:normal; word-break:break-all" }, h("span", { class: "method" }, "GET"), reqLine));
+}
+
+
+/* ── 요청 조립기 ── */
+function builderCard(ep, s) {
+  const keyName = ep.params[0].name;
+  const params = ep.params.slice(1);
+  const spec = ep.build || {};
+  const fromSample = smp => { const m = reqParams(smp); return Object.fromEntries(params.map(p => [p.name, m[p.name] ?? ""])); };
+  if (!st.build[ep.id]) st.build[ep.id] = fromSample(s);
+  const vals = st.build[ep.id];
+  const formDiv = h("div"), resDiv = h("div");
+  const uid = "dl-" + ep.id;
+
+  const optsFor = p => {
+    const f = spec[p.name]; if (!f) return null;
+    if (!f.parents) return f.options;
+    const want = f.parents.map(n => vals[n] || "");
+    if (want.some(x => !x)) return f.options.filter(() => false);
+    return f.options.filter(o => o[2] === want.join("|"));
+  };
+  const labelOf = p => {
+    const v = vals[p.name]; if (!v) return null;
+    const f = spec[p.name]; if (!f) return null;
+    const o = f.options.find(o => o[0] === v && (!f.parents || o[2] === f.parents.map(n => vals[n] || "").join("|")));
+    return o ? o[1].split(" · ").slice(1).join(" · ") || o[1] : null;
+  };
+  const setVal = (name, v) => {
+    vals[name] = v;
+    let deps = false;
+    for (const p of params) {
+      const f = spec[p.name];
+      if (f && f.parents && f.parents.includes(name)) {
+        deps = true;
+        if (f.kind === "select" || vals[p.name]) { const ok = (optsFor(p) || []).some(o => o[0] === vals[p.name]); if (!ok) vals[p.name] = ""; }
+      }
+    }
+    if (deps) drawForm();
+    drawRes();
+  };
+
+  function widget(p) {
+    const f = spec[p.name]; const v = vals[p.name] || "";
+    if (f && f.kind === "select") {
+      const list = optsFor(p) || [];
+      const sel = h("select", { "aria-label": p.name, onchange: e => setVal(p.name, e.target.value) },
+        h("option", { value: "" }, f.parents && !list.length ? "(위 값을 먼저 고르세요)" : p.req === "required" ? "(선택)" : "(보내지 않음)"),
+        list.map(o => h("option", { value: o[0], selected: o[0] === v }, o[1])),
+        v && !list.some(o => o[0] === v) ? h("option", { value: v, selected: true }, `${v} (목록에 없음)`) : null);
+      return sel;
+    }
+    if (f && f.kind === "combo") {
+      const list = (optsFor(p) || []).slice(0, 800);
+      return h("span", null,
+        h("input", { type: "text", list: `${uid}-${p.name}`, value: v, placeholder: "코드 입력 또는 목록에서 선택", "aria-label": p.name,
+          oninput: e => setVal(p.name, e.target.value.trim().split(" · ")[0]) }),
+        h("datalist", { id: `${uid}-${p.name}` }, list.map(o => h("option", { value: o[0] }, o[1]))));
+    }
+    return h("input", { type: "text", value: v, placeholder: p.example || "", "aria-label": p.name, oninput: e => setVal(p.name, e.target.value.trim()) });
+  }
+
+  function drawForm() {
+    const rows = params.map(p => [
+      h("td", { class: "name" }, p.name),
+      h("td", null, reqBadge(p.req)),
+      h("td", null, widget(p)),
+      h("td", { class: "dim", "data-meaning": p.name }, ""),
+    ]);
+    fill(formDiv, table(["파라미터", "구분", "값", "고른 값의 뜻"], rows, { cls: "form" }));
+    drawMeaning();
+  }
+  function drawMeaning() {
+    formDiv.querySelectorAll("[data-meaning]").forEach(td => {
+      const p = params.find(x => x.name === td.dataset.meaning);
+      const lab = labelOf(p), v = vals[p.name] || "";
+      td.textContent = lab ? lab : /^\d{8}$/.test(v) ? fmtDate(v) : "";
+    });
+  }
+
+  const isDate = p => /ymd|Day$|standYmd/i.test(p.name);
+  function check() {
+    const out = [];
+    const note = (lv, text) => out.push({ lv, text });
+    for (const p of params) {
+      const v = vals[p.name] || "";
+      if (p.req === "required" && !v) {
+        note(p.observed ? "warn" : "err", p.observed
+          ? `${p.name}: 비어 있음. 명세상 필수지만 서버는 오류를 내지 않는다 → ${p.observed}`
+          : `${p.name}: 필수 값이 비어 있다. 서버가 오류를 돌려준다`);
+      }
+      if (v && isDate(p) && !/^\d{8}$/.test(v)) note("err", `${p.name}: YYYYMMDD 8자리 숫자여야 한다 (현재 "${v}")`);
+      if (p.name === "numOfRows" && v && (!/^\d+$/.test(v) || +v < 1 || +v > 1000)) note("err", "numOfRows: 1~1000 사이 숫자여야 한다");
+      if (p.name === "pageNo" && v && !/^[1-9]\d*$/.test(v)) note("err", "pageNo: 1 이상의 정수여야 한다");
+    }
+    const eit = params.filter(p => p.req === "either");
+    if (eit.length && !eit.some(p => vals[p.name])) note("err", `${eit.map(p => p.name).join(" / ")} 중 하나는 있어야 한다 (둘 다 없으면 resultCode 05)`);
+    const g = vals["cond[exmn_ymd::GTE]"], l = vals["cond[exmn_ymd::LTE]"];
+    if (/^\d{8}$/.test(g || "") && /^\d{8}$/.test(l || "")) {
+      const d = x => Date.UTC(+x.slice(0, 4), +x.slice(4, 6) - 1, +x.slice(6));
+      if (d(l) < d(g)) note("warn", "조사일 끝이 시작보다 앞선다. 결과는 0건일 것이다");
+      else if ((d(l) - d(g)) / 864e5 > 366) note("warn", "기간이 1년을 넘는다. 호출당 최대 1년이므로 나눠서 호출해야 한다");
+    }
+    if (!out.some(o => o.lv === "err")) note("ok", out.length ? "치명적인 문제는 없다. 위 경고는 서버가 막지 않는 문제다" : "필수 값이 모두 채워졌다");
+    return out;
+  }
+
+  function drawRes() {
+    drawMeaning();
+    const sent = params.filter(p => vals[p.name]);
+    const enc = encodeURIComponent;
+    const pairs = [[keyName, "{인증키}"], ...sent.map(p => [p.name, vals[p.name]])];
+    const readable = ep.url + "?" + pairs.map(([k, v]) => `${k}=${v}`).join("&");
+    const encoded = ep.url + "?" + [[keyName, "{인증키}"], ...sent.map(p => [p.name, vals[p.name]])].map(([k, v]) => `${enc(k)}=${k === keyName ? v : enc(v)}`).join("&");
+    const q = x => '"' + x.replace(/(["$`\\])/g, "\\$1") + '"';
+    const curl = [`curl -G '${ep.url}'`, `  --data-urlencode "${keyName}=$DATA_GO_KR_SERVICE_KEY"`, ...sent.map(p => `  --data-urlencode ${q(p.name + "=" + vals[p.name])}`)].join(" \\\n");
+
+    // 같은 조건의 저장된 샘플 찾기 (날짜·건수·페이지는 비교에서 뺀다)
+    const ignore = p => isDate(p) || ["numOfRows", "pageNo"].includes(p.name);
+    const sig = m => params.filter(p => !ignore(p) && m[p.name]).map(p => `${p.name}=${m[p.name]}`).join("&");
+    const mine = sig(vals);
+    const hit = ep.samples.map(x => S[x[0]]).find(x => x && sig(fromSample(x)) === mine);
+
+    const copy = h("button", { class: "btn", onclick: async e => {
+      try { await navigator.clipboard.writeText(curl); e.target.textContent = "복사됨"; } catch (_) { e.target.textContent = "복사 실패: 직접 선택해서 복사하세요"; }
+    } }, "curl 복사");
+    fill(resDiv, 
+      h("h3", null, "검사 결과"),
+      h("ul", { class: "chk" }, check().map(c => h("li", { class: c.lv }, h("b", null, c.lv === "ok" ? "✓" : c.lv === "warn" ? "!" : "✕"), h("span", null, c.text)))),
+      h("h3", null, "만들어진 요청"),
+      h("code", { class: "url", style: "white-space:normal; word-break:break-all" }, h("span", { class: "method" }, "GET"), readable),
+      h("details", { style: "margin-top:8px" }, h("summary", null, "실제로 전송되는 인코딩 형태 보기"),
+        h("code", { class: "url", style: "white-space:normal; word-break:break-all" }, encoded)),
+      h("h3", null, "터미널에서 호출하려면"),
+      h("div", { class: "controls", style: "margin:0" }, copy, h("span", { class: "dim" }, "인증키는 .env의 DATA_GO_KR_SERVICE_KEY를 환경변수로 불러와 쓰세요 (set -a; . ./.env; set +a)")),
+      h("pre", { class: "cmd" }, curl),
+      hit
+        ? h("div", { class: "info" }, "같은 조건으로 저장해 둔 샘플이 있습니다: ", h("b", null, ep.samples.find(x => x[0] === hit.id)[1]), " ",
+            h("button", { class: "btn", onclick: () => { st.sample[ep.id] = hit.id; render(true, "sample"); } }, "결과 보러 가기 ▼"))
+        : h("div", { class: "note" }, "이 조건과 같은 저장 샘플은 없습니다. 이 화면은 요청을 만들고 검사만 하며, 실제 호출은 하지 않습니다."));
+  }
+
+  const load = h("button", { class: "btn", onclick: () => { Object.assign(vals, fromSample(S[st.sample[ep.id]] || s)); drawForm(); drawRes(); } }, "고른 샘플의 요청 불러오기");
+  const clear = h("button", { class: "btn", onclick: () => { params.forEach(p => vals[p.name] = ""); drawForm(); drawRes(); } }, "모두 비우기");
+  drawForm(); drawRes();
+  const notes = Object.values(spec).map(f => f.note).filter(Boolean);
+  return card(2, "요청 만들어 보기", "값을 고르거나 입력하면 요청 주소와 curl 명령이 만들어지고, 빠뜨린 값과 잘못된 형식을 알려줍니다. 코드 목록은 저장해 둔 코드표에서 왔습니다.",
+    h("div", { class: "controls" }, load, clear, h("span", { class: "dim" }, `인증키(${keyName})는 화면에 넣지 않습니다`)),
+    notes.map(n => h("div", { class: "note", style: "margin:0 0 8px" }, n)),
+    formDiv, resDiv);
+}
+
+/* ── 3. 응답 구조 ── */
+function responseCard(ep) {
+  return card(3, "응답: 구조와 결과 코드", null,
+    h("pre", { class: "tree" }, ep.tree),
+    h("h3", null, "결과 코드"),
+    table(["코드", "의미"], ep.codes.map(([c, m]) => [h("td", { class: "name" }, c), h("td", null, m)])));
+}
+
+/* ── 4. 실제 값 ── */
+function fieldValue(def, v) {
+  if (v === undefined) return h("span", { class: "empty" }, "—");
+  if (v === "") return h("span", { class: "empty" }, "(빈 값)");
+  const out = [v];
+  if (def && def.fmt === "won") out.push(h("span", { class: "dim" }, `  = ${won(v)}`));
+  if (def && def.name === "orgnl_reg_dt") out.push(h("span", { class: "dim" }, `  = ${kst(v)} KST`));
+  if (/^\d{8}$/.test(v) && def && /ymd|Day$/i.test(def.name)) out.push(h("span", { class: "dim" }, `  = ${fmtDate(v)}`));
+  return out;
+}
+function sampleCard(ep, s) {
+  const cur = Math.min(st.row[s.id] || 0, Math.max(0, s.rows.length - 1));
+  const sel = h("select", { "aria-label": "샘플 선택", onchange: e => { st.sample[ep.id] = e.target.value; render(true); } },
+    ep.samples.map(([id, label]) => h("option", { value: id, selected: id === s.id }, label)));
+  const desc = ep.samples.find(x => x[0] === s.id)[2];
+  const chips = [
+    ["HTTP", s.http], ["resultCode", s.resultCode || "—"], ["resultMsg", (s.resultMsg || "—").split("\n")[0]],
+    ["받은 행", s.total != null ? `${s.rows.length}건 (전체 ${nf.format(s.total)}건 중)` : `${nf.format(s.rows.length)}건`],
+    ["크기", kb(s.bytes)], ["호출", kst(s.fetchedAt)],
+  ].map(([k, v]) => h("span", { class: "chip" }, h("b", null, k), String(v)));
+
+  const parts = [
+    h("div", { class: "controls" }, h("label", null, "샘플 ", sel), kindBadge(s), h("span", { class: "dim" }, desc)),
+    h("div", { class: "chips" }, chips),
+  ];
+
+  if (s.rows.length) {
+    const prev = h("button", { class: "btn", disabled: cur === 0, onclick: () => { st.row[s.id] = cur - 1; render(true); } }, "◀ 이전");
+    const next = h("button", { class: "btn", disabled: cur >= s.rows.length - 1, onclick: () => { st.row[s.id] = cur + 1; render(true); } }, "다음 ▶");
+    const num = h("input", { type: "number", min: 1, max: s.rows.length, value: cur + 1, style: "width:80px", "aria-label": "행 번호",
+      onchange: e => { st.row[s.id] = Math.min(s.rows.length, Math.max(1, +e.target.value || 1)) - 1; render(true); } });
+    parts.push(h("div", { class: "controls" }, prev, h("span", null, num, ` / ${nf.format(s.rows.length)}행`), next,
+      h("span", { class: "dim" }, "행을 넘기면 아래 ‘실제 값’이 바뀝니다. 맨 아래 전체 표에서 행을 눌러도 됩니다.")));
+    const ix = idx(s), row = s.rows[cur];
+    const known = new Set(ep.fields.map(f => f.name));
+    const defs = [...ep.fields, ...s.cols.filter(c => !known.has(c)).map(c => ({ name: c, meaning: "(정리되지 않은 필드)", type: "?", note: "", fmt: "" }))];
+    const trs = defs.map(d => [
+      h("td", { class: "name" }, d.name),
+      h("td", null, d.meaning),
+      h("td", { class: "dim" }, d.type),
+      h("td", { class: "val" }, fieldValue(d, ix[d.name] === undefined ? undefined : row[ix[d.name]])),
+      h("td", { class: "dim" }, d.note || ""),
+    ]);
+    parts.push(table(["필드", "의미", "타입", "실제 값", "메모"], trs));
+    parts.push(h("div", { class: "note" }, "공공 API는 숫자도 모두 문자열로 줍니다. ‘타입’의 (숫자)는 숫자로 바꿔 써야 한다는 뜻입니다."));
+  } else {
+    parts.push(h("div", { class: "info" },
+      s.kind === "error" ? "오류 응답이라 데이터 행이 없습니다. 어떤 코드와 문구가 오는지 위 칩과 아래 원문을 보세요."
+        : "결과가 0건입니다. 오류가 아니라 정상 응답으로 비어 있는 경우입니다."));
+    parts.push(table(["필드", "의미", "타입"], ep.fields.map(d => [h("td", { class: "name" }, d.name), h("td", null, d.meaning), h("td", { class: "dim" }, d.type)])));
+  }
+  const c = card(5, "실제 값: 호출해서 받은 데이터", "2026년 10월에 실제로 호출해 저장한 응답입니다 (인증키는 저장되지 않음).", parts);
+  c.id = "sample-card";
+  return c;
+}
+
+/* ── 5. 시각화 ── */
+function vizCard(ep, s) {
+  let body = null, title = "시각화";
+  try {
+    if (ep.viz === "kamis") [title, body] = vizKamis(s);
+    else if (ep.viz === "ekape") [title, body] = vizEkape(s);
+    else if (ep.viz === "cham-price") [title, body] = vizChamPrice(s);
+    else if (ep.viz === "cham-store") [title, body] = vizChamStore(s);
+    else if (ep.viz === "cham-product") [title, body] = vizChamProduct(s);
+  } catch (e) { body = h("div", { class: "note" }, "차트를 그리지 못했습니다: " + e.message); }
+  if (!body) return null;
+  return card(4, title, null, body);
+}
+
+/* KAMIS */
+function vizKamis(s) {
+  if (!s.rows.length) return null;
+  const o = objs(s);
+  if (s.id.endsWith("-14d")) return ["배추 소매 14일: 일별 추이와 시장별 비교", kamis14(o)];
+  const items = o.map(r => ({
+    label: `${r.mrkt_nm}`, sub: `${r.vrty_nm} · ${r.grd_nm} · ${fmtDate(r.exmn_ymd)}`, v: Number(r.exmn_dd_prc),
+  }));
+  const units = [...new Set(o.map(r => `${r.unit_sz}${r.unit}`))];
+  return ["조사 가격 비교", h("div", null,
+    h("p", { class: "hint", style: "margin-top:0" }, `단위: ${units.join(", ")}당 가격 (원). 이 샘플은 5건이라 추이는 ‘배추 소매 14일 전체’ 샘플에서 볼 수 있습니다.`),
+    bars(items, { fmt: v => nf.format(v) + "원" }))];
+}
+function kamis14(o) {
+  const key = r => `${r.vrty_nm} · ${r.grd_nm} · ${r.unit_sz}${r.unit}당`;
+  const cnt = new Map(); o.forEach(r => cnt.set(key(r), (cnt.get(key(r)) || 0) + 1));
+  const combos = [...cnt.entries()].sort((a, b) => b[1] - a[1]);
+  const cur = st.kamisCombo.v && cnt.has(st.kamisCombo.v) ? st.kamisCombo.v : combos[0][0];
+  const rows = o.filter(r => key(r) === cur);
+  const byDate = new Map();
+  rows.forEach(r => { const p = Number(r.exmn_dd_prc); (byDate.get(r.exmn_ymd) || byDate.set(r.exmn_ymd, []).get(r.exmn_ymd)).push(p); });
+  const days = [...byDate.entries()].sort((a, b) => a[0] < b[0] ? -1 : 1)
+    .map(([d, a]) => ({ d, avg: a.reduce((x, y) => x + y, 0) / a.length, min: Math.min(...a), max: Math.max(...a), n: a.length }));
+  const last = days[days.length - 1];
+  const latest = rows.filter(r => r.exmn_ymd === last.d).sort((a, b) => b.exmn_dd_prc - a.exmn_dd_prc);
+
+  const sel = h("select", { "aria-label": "품종·등급·단위", onchange: e => { st.kamisCombo.v = e.target.value; render(true); } },
+    combos.map(([k, n]) => h("option", { value: k, selected: k === cur }, `${k} (${n}건)`)));
+
+  // 라인 차트: 조사일이 있는 날만 균등 간격으로 놓는다
+  const W = 760, H = 230, L = 56, R = 14, T = 12, B = 30;
+  const lo = Math.min(...days.map(x => x.min)), hi = Math.max(...days.map(x => x.max));
+  const pad = (hi - lo) * 0.1 || hi * 0.1 || 1;
+  const y0 = Math.max(0, lo - pad), y1 = hi + pad;
+  const X = i => L + (days.length === 1 ? (W - L - R) / 2 : i * (W - L - R) / (days.length - 1));
+  const Y = v => T + (H - T - B) * (1 - (v - y0) / (y1 - y0));
+  const g = svg("svg", { class: "chart", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "일별 평균가 추이" });
+  [0, 0.5, 1].forEach(t => {
+    const v = y0 + (y1 - y0) * t;
+    g.append(svg("line", { class: "grid", x1: L, x2: W - R, y1: Y(v), y2: Y(v) }), svg("text", { x: L - 8, y: Y(v) + 4, "text-anchor": "end" }, nf.format(Math.round(v))));
+  });
+  if (days.length > 1) {
+    const top = days.map((x, i) => `${X(i)},${Y(x.max)}`), bot = days.map((x, i) => `${X(i)},${Y(x.min)}`).reverse();
+    g.append(svg("polygon", { class: "band", points: [...top, ...bot].join(" ") }),
+      svg("polyline", { class: "line", points: days.map((x, i) => `${X(i)},${Y(x.avg)}`).join(" ") }));
+  }
+  days.forEach((x, i) => g.append(svg("circle", { class: "dot", cx: X(i), cy: Y(x.avg), r: 3.5 },
+    svg("title", {}, `${fmtDate(x.d)}  평균 ${nf.format(Math.round(x.avg))}원 (최저 ${nf.format(x.min)} ~ 최고 ${nf.format(x.max)}, ${x.n}곳)`))));
+  const step = Math.max(1, Math.ceil(days.length / 7));
+  days.forEach((x, i) => { if (i % step === 0 || i === days.length - 1) g.append(svg("text", { x: X(i), y: H - 8, "text-anchor": "middle" }, fmtDate(x.d).slice(5))); });
+
+  return h("div", null,
+    h("div", { class: "controls" }, h("label", null, "품종 · 등급 · 단위 ", sel)),
+    h("div", { class: "big" },
+      h("div", { class: "stat" }, h("b", null, "조사일 수"), h("span", null, `${days.length}일`), h("small", null, ` ${fmtDate(days[0].d)} ~ ${fmtDate(last.d)}`)),
+      h("div", { class: "stat" }, h("b", null, `최신일(${fmtDate(last.d)}) 평균`), h("span", null, nf.format(Math.round(last.avg)) + "원"), h("small", null, ` ${last.n}곳`)),
+      h("div", { class: "stat" }, h("b", null, "최신일 최저 ~ 최고"), h("span", null, `${nf.format(last.min)} ~ ${nf.format(last.max)}`))),
+    h("h3", null, "일별 평균가 (진한 선) 와 시장 간 최저~최고 범위 (옅은 띠)"),
+    g,
+    h("p", { class: "hint" }, "가로축은 조사가 있었던 날만 놓은 것입니다. 주말·공휴일은 건너뜁니다. 점에 마우스를 올리면 값이 보입니다."),
+    h("h3", null, `최신 조사일(${fmtDate(last.d)}) 시장별 가격`),
+    bars(latest.map(r => ({ label: r.mrkt_nm, sub: r.sgg_nm, v: Number(r.exmn_dd_prc) })), { fmt: v => nf.format(v) + "원" }));
+}
+
+/* 축평원 */
+function vizEkape(s) {
+  if (!s.rows.length) return null;
+  const o = objs(s);
+  const series = [...new Map(o.map(r => [`${r.itemNm}|${r.grdNm}`, r])).values()];
+  const keyOf = r => `${r.itemNm}|${r.grdNm}`;
+  const cur = st.ekSeries[s.id] && series.some(r => keyOf(r) === st.ekSeries[s.id]) ? st.ekSeries[s.id] : keyOf(series[0]);
+  const mine = o.filter(r => keyOf(r) === cur);
+  const today = mine.find(r => r.standYmd !== "평년"), norm = mine.find(r => r.standYmd === "평년");
+  const sel = h("select", { "aria-label": "품목·등급", onchange: e => { st.ekSeries[s.id] = e.target.value; render(true); } },
+    series.map(r => h("option", { value: keyOf(r), selected: keyOf(r) === cur }, `${r.judgeKindNm} · ${r.itemNm} · ${r.grdNm}`)));
+  if (!today) return ["시도별 가격", h("div", { class: "controls" }, sel)];
+  const unit = today.unit || "(단위 필드 없음)";
+  const diff = norm ? (Number(today.ntslPrc) - Number(norm.ntslPrc)) / Number(norm.ntslPrc) * 100 : null;
+  const stats = [
+    h("div", { class: "stat" }, h("b", null, `전국 평균 (${fmtDate(today.standYmd)})`), h("span", null, nf.format(Number(today.ntslPrc))), h("small", null, ` ${unit}`)),
+    norm ? h("div", { class: "stat" }, h("b", null, "평년 평균"), h("span", null, nf.format(Number(norm.ntslPrc))), h("small", null, ` ${unit}`)) : null,
+    diff != null ? h("div", { class: "stat" }, h("b", null, "평년 대비"), h("span", null, `${diff > 0 ? "+" : ""}${diff.toFixed(1)}%`)) : null,
+    h("div", { class: "stat" }, h("b", null, "최저 ~ 최고 (전국)"), h("span", null, `${nf.format(+today.minPrc)} ~ ${nf.format(+today.maxPrc)}`)),
+  ];
+  const max = Math.max(...D.regions.flatMap((_, i) => [+today["regionPrc" + (i + 1)] || 0, norm ? +norm["regionPrc" + (i + 1)] || 0 : 0]));
+  const list = D.regions.map((name, i) => {
+    const a = +today["regionPrc" + (i + 1)], b = norm ? +norm["regionPrc" + (i + 1)] : null;
+    return h("div", { class: "bar-row bar-pair" },
+      h("div", { class: "bar-label" }, name),
+      h("div", { class: "bar-track" },
+        h("div", { class: "bar-fill", style: `width:${Math.max(0.5, a / max * 100)}%` }),
+        b != null ? h("div", { class: "bar-fill ref", style: `width:${Math.max(0.5, b / max * 100)}%` }) : null),
+      h("div", { class: "bar-val" }, nf.format(a), b != null ? h("span", { class: "dim" }, ` / ${nf.format(b)}`) : null));
+  });
+  return ["17개 시도별 가격: 기준일 vs 평년", h("div", null,
+    h("div", { class: "controls" }, h("label", null, "품목 · 등급 ", sel)),
+    h("div", { class: "big" }, stats),
+    h("div", { class: "bar-key" }, h("span", null, h("i"), `기준일 ${fmtDate(today.standYmd)}`), norm ? h("span", null, h("i", { class: "ref" }, ""), "평년") : null, h("span", null, `단위: ${unit}`)),
+    h("div", { class: "bars" }, list),
+    h("p", { class: "hint" }, "막대 오른쪽 숫자는 ‘기준일 / 평년’ 순서입니다. 평년이 몇 년 평균인지는 아직 확인하지 못했습니다."))];
+}
+
+/* 참가격 */
+function vizChamPrice(s) {
+  if (!s.rows.length) return null;
+  const o = objs(s);
+  const prods = S["chamgagyeok/product-all"], stores = S["chamgagyeok/store-all"];
+  const pMap = new Map(objs(prods).map(r => [r.goodId, r]));
+  const sMap = new Map(objs(stores).map(r => [r.entpId, r]));
+  const ut = codeMap("chamgagyeok/standard-UT"), bu = codeMap("chamgagyeok/standard-BU");
+  const byEntp = new Set(o.map(r => r.entpId)).size === 1;
+  const lab = r => {
+    if (byEntp) { const p = pMap.get(r.goodId); return p ? { label: p.goodName, sub: `${p.goodTotalCnt}${ut.get(p.goodTotalDivCode) || p.goodTotalDivCode}` } : { label: `상품 ${r.goodId}`, sub: "" }; }
+    const e = sMap.get(r.entpId); return e ? { label: e.entpName, sub: bu.get(e.entpTypeCode) || e.entpTypeCode } : { label: `업체 ${r.entpId}`, sub: "" };
+  };
+  const all = o.map(r => ({ ...lab(r), v: Number(r.goodPrice), dc: r.goodDcYn === "Y", p1: r.plusoneYn === "Y" }));
+  const prices = all.map(x => x.v);
+  const dcN = all.filter(x => x.dc).length, p1N = all.filter(x => x.p1).length;
+
+  const list = h("div");
+  const info = h("p", { class: "hint" });
+  const draw = () => {
+    const q = st.chamQuery.trim();
+    let rows = all.filter(x => !q || (x.label + x.sub).includes(q));
+    rows = rows.sort(st.chamSort === "high" ? (a, b) => b.v - a.v : st.chamSort === "low" ? (a, b) => a.v - b.v : (a, b) => a.label.localeCompare(b.label, "ko"));
+    const top = rows.slice(0, 30);
+    info.textContent = `${nf.format(rows.length)}건 중 ${top.length}건 표시. 아래 ‘전체 행’ 표에서 모두 볼 수 있습니다.`;
+    fill(list, bars(top.map(x => ({ ...x, badges: [x.dc ? h("span", { class: "badge b-mark" }, "할인") : null, x.p1 ? h("span", { class: "badge b-mark" }, "1+1") : null] })),
+      { fmt: v => nf.format(v) + "원", max: Math.max(1, ...rows.map(x => x.v)) }));
+  };
+  const search = h("input", { type: "search", placeholder: byEntp ? "상품명 검색" : "업체명 검색", value: st.chamQuery, "aria-label": "검색", oninput: e => { st.chamQuery = e.target.value; draw(); } });
+  const sort = h("select", { "aria-label": "정렬", onchange: e => { st.chamSort = e.target.value; draw(); } },
+    [["high", "가격 높은 순"], ["low", "가격 낮은 순"], ["name", "이름 순"]].map(([v, t]) => h("option", { value: v, selected: st.chamSort === v }, t)));
+  draw();
+  const e100 = sMap.get(o[0].entpId), p0 = pMap.get(o[0].goodId);
+  return [byEntp ? `${e100 ? e100.entpName : "업체 " + o[0].entpId} 의 상품별 가격` : `${p0 ? p0.goodName : "상품 " + o[0].goodId} 의 업체별 가격`, h("div", null,
+    h("div", { class: "big" },
+      h("div", { class: "stat" }, h("b", null, "건수"), h("span", null, nf.format(all.length))),
+      h("div", { class: "stat" }, h("b", null, "가격 최저 / 중앙 / 최고"), h("span", null, `${nf.format(Math.min(...prices))} / ${nf.format(median(prices))} / ${nf.format(Math.max(...prices))}`)),
+      h("div", { class: "stat" }, h("b", null, "할인 · 1+1 표시"), h("span", null, `${dcN} · ${p1N}건`), h("small", null, dcN + p1N === 0 ? " 이 조사일에는 행사 표시가 없음" : ""))),
+    h("div", { class: "controls" }, search, sort),
+    list, info,
+    h("div", { class: "info" }, "가격 응답에는 상품명·업체명이 없습니다(ID뿐). 이름은 ‘상품 정보’·‘판매점 정보’ 응답을 ID로 연결해서 붙인 것입니다."))];
+}
+function vizChamStore(s) {
+  if (!s.rows.length) return null;
+  const o = objs(s), bu = codeMap("chamgagyeok/standard-BU"), ar = codeMap("chamgagyeok/standard-AR");
+  if (o.length === 1) {
+    const r = o[0];
+    return ["판매점 1곳", table(["항목", "값"], [
+      ["업체", r.entpName], ["업태", `${bu.get(r.entpTypeCode) || "?"} (${r.entpTypeCode})`], ["지역", `${ar.get(r.entpAreaCode) || "?"} > ${ar.get(r.areaDetailCode) || "?"}`],
+      ["지번 주소", `${r.plmkAddrBasic} ${r.plmkAddrDetail}`], ["좌표 (X=위도, Y=경도)", `${r.xMapCoord}, ${r.yMapCoord}`],
+    ].map(([k, v]) => [h("td", { class: "dim" }, k), h("td", { class: "val" }, v)]))];
+  }
+  const count = (key, map) => [...o.reduce((m, r) => m.set(r[key], (m.get(r[key]) || 0) + 1), new Map()).entries()]
+    .map(([c, n]) => ({ label: map.get(c) || c, sub: c, v: n })).sort((a, b) => b.v - a.v);
+  return [`판매점 ${nf.format(o.length)}곳의 분포`, h("div", null,
+    h("h3", { style: "margin-top:0" }, "업태별 (entpTypeCode → 기준정보 BU)"), bars(count("entpTypeCode", bu), { fmt: v => nf.format(v) + "곳" }),
+    h("h3", null, "지역별 (entpAreaCode → 기준정보 AR)"), bars(count("entpAreaCode", ar), { fmt: v => nf.format(v) + "곳" }))];
+}
+function vizChamProduct(s) {
+  if (!s.rows.length) return null;
+  const o = objs(s), al = codeMap("chamgagyeok/standard-AL"), ut = codeMap("chamgagyeok/standard-UT");
+  if (o.length === 1) {
+    const r = o[0];
+    return ["상품 1개", table(["항목", "값"], [
+      ["상품", r.goodName], ["소분류", `${al.get(r.goodSmlclsCode) || "?"} (${r.goodSmlclsCode})`],
+      ["용량", `${r.goodTotalCnt} ${ut.get(r.goodTotalDivCode) || r.goodTotalDivCode}`], ["단위량", `${r.goodBaseCnt} ${ut.get(r.goodUnitDivCode) || r.goodUnitDivCode}`],
+      ["제조사 코드", r.productEntpCode],
+    ].map(([k, v]) => [h("td", { class: "dim" }, k), h("td", { class: "val" }, v)]))];
+  }
+  const alRow = new Map(objs(S["chamgagyeok/standard-AL"]).map(r => [r.code, r]));
+  const topOf = c => { let x = c; while (alRow.has(x) && alRow.get(x).highCode) x = alRow.get(x).highCode; return x; };
+  const grp = new Map();
+  o.forEach(r => { const c = topOf(r.goodSmlclsCode); grp.set(c, (grp.get(c) || 0) + 1); });
+  const items = [...grp.entries()].map(([c, n]) => ({ label: al.get(c) || c, sub: c, v: n })).sort((a, b) => b.v - a.v);
+  const withMean = o.filter(r => r.detailMean).length;
+  return [`상품 ${nf.format(o.length)}개의 분류`, h("div", null,
+    h("h3", { style: "margin-top:0" }, "대분류별 상품 수 (goodSmlclsCode → 기준정보 AL의 상위 코드를 따라 올라간 대분류)"), bars(items, { fmt: v => nf.format(v) + "개" }),
+    h("div", { class: "big", style: "margin-top:14px" },
+      h("div", { class: "stat" }, h("b", null, "상세 내용(detailMean)이 있는 상품"), h("span", null, `${withMean} / ${o.length}`)),
+      h("div", { class: "stat" }, h("b", null, "제조사 코드 종류"), h("span", null, new Set(o.map(r => r.productEntpCode)).size))))];
+}
+
+
+/* ── 참가격 상품 탐색 (상품 정보 탭) ── */
+function productExplorer() {
+  const prodS = S["chamgagyeok/product-all"], alS = S["chamgagyeok/standard-AL"], utS = S["chamgagyeok/standard-UT"];
+  if (!prodS || !alS) return null;
+  const al = new Map(objs(alS).map(r => [r.code, r]));
+  const ut = codeMap("chamgagyeok/standard-UT");
+  const path = c => { const p = []; for (let x = c; x && al.has(x); x = al.get(x).highCode) p.unshift(al.get(x).codeName); return p; };
+  const anc = c => { const a = []; for (let x = c; x && al.has(x); x = al.get(x).highCode) a.push(x); return a; };
+  const all = objs(prodS).map(r => ({
+    ...r, path: path(r.goodSmlclsCode), anc: new Set(anc(r.goodSmlclsCode)),
+    vol: `${r.goodTotalCnt} ${ut.get(r.goodTotalDivCode) || r.goodTotalDivCode}`,
+  })).sort((a, b) => a.path.join(">").localeCompare(b.path.join(">"), "ko") || a.goodName.localeCompare(b.goodName, "ko"));
+  const f = (st.prod = st.prod || { l: "", m: "", s: "", q: new URLSearchParams(location.hash.slice(1)).get("pq") || "", n: 100 });
+  const children = parent => [...al.values()].filter(x => (x.highCode || "") === parent);
+  const cnt = c => all.filter(p => p.anc.has(c)).length;
+
+  const wrap = h("div"), listDiv = h("div"), sels = h("div", { class: "controls" });
+  const mkSel = (label, key, parent) => {
+    const opts = parent === null ? [] : children(parent).map(x => [x.code, `${x.codeName} (${cnt(x.code)})`]);
+    return h("label", null, label + " ", h("select", { "aria-label": label, disabled: parent === null || !opts.length,
+      onchange: e => { f[key] = e.target.value; if (key === "l") { f.m = ""; f.s = ""; } if (key === "m") f.s = ""; f.n = 100; drawSels(); drawList(); } },
+      h("option", { value: "" }, `전체`), opts.map(([v, n]) => h("option", { value: v, selected: v === f[key] }, n))));
+  };
+  const search = h("input", { type: "search", placeholder: "상품명 검색 (예: 라면, 두부)", value: f.q, "aria-label": "상품명 검색", style: "min-width:220px",
+    oninput: e => { f.q = e.target.value; f.n = 100; drawList(); } });
+  const reset = h("button", { class: "btn", onclick: () => { Object.assign(f, { l: "", m: "", s: "", q: "", n: 100 }); search.value = ""; drawSels(); drawList(); } }, "초기화");
+  function drawSels() {
+    fill(sels, mkSel("대분류", "l", ""), mkSel("중분류", "m", f.l || null), mkSel("소분류", "s", f.m || null), search, reset);
+  }
+  function drawList() {
+    const node = f.s || f.m || f.l, q = f.q.trim().toLowerCase();
+    const rows = all.filter(p => (!node || p.anc.has(node)) && (!q || p.goodName.toLowerCase().includes(q) || p.detailMean.toLowerCase().includes(q)));
+    const shown = rows.slice(0, f.n);
+    const byCode = new Map();
+    rows.forEach(p => byCode.set(p.productEntpCode, (byCode.get(p.productEntpCode) || 0) + 1));
+    const trs = shown.map(p => [
+      h("td", { class: "val" }, p.goodId),
+      h("td", null, p.goodName),
+      h("td", { class: "dim" }, p.path.join(" › ")),
+      h("td", { class: "val" }, p.vol),
+      h("td", { class: "val" }, p.productEntpCode),
+      h("td", { class: "dim" }, p.detailMean || ""),
+      h("td", null, h("button", { class: "btn", title: "이 상품 한 개의 업체별 가격을 조회하는 요청을 만든다", onclick: () => {
+        st.build["cham-price"] = { goodInspectDay: "20260925", entpId: "", goodId: p.goodId };
+        st.group = "cham"; st.ep.cham = "cham-price"; render(false);
+      } }, "가격 요청 ▶")),
+    ]);
+    fill(listDiv, ...[
+      h("div", { class: "big" },
+        h("div", { class: "stat" }, h("b", null, "조건에 맞는 상품"), h("span", null, `${nf.format(rows.length)}개`), h("small", null, ` / 전체 ${all.length}개`)),
+        h("div", { class: "stat" }, h("b", null, "제조사 코드 종류"), h("span", null, byCode.size))),
+      rows.length ? table(["goodId", "상품명", "분류 (대 › 중 › 소)", "용량", "제조사 코드", "상세 내용", ""], trs)
+        : h("div", { class: "info" }, "조건에 맞는 상품이 없습니다."),
+      shown.length < rows.length ? h("div", { class: "controls", style: "margin-top:10px" },
+        h("button", { class: "btn", onclick: () => { f.n += 200; drawList(); } }, "200개 더 보기"),
+        h("span", { class: "dim" }, `${nf.format(shown.length)} / ${nf.format(rows.length)}개 표시 중`)) : null].filter(Boolean));
+  }
+  drawSels(); drawList();
+  wrap.append(sels, listDiv);
+  return card(null, "상품 탐색: 참가격이 조사하는 상품 목록",
+    "상품 정보 응답 604개와 기준정보 AL(분류)을 이어 붙인 화면입니다. 분류로 좁히거나 이름으로 찾아보세요. 상품명과 상세 내용에서 검색합니다.", wrap,
+    h("div", { class: "note" }, "대분류에는 신선식품·가공식품 말고 생활용품(휴지, 세제 등)도 있습니다. 식자재 판정과 무관한 상품이 섞여 있습니다."));
+}
+
+/* ── 6. 전체 행 + 원문 ── */
+function rowsCard(ep, s) {
+  const hasRows = s.rows.length > 0;
+  const shown = Math.min(st.shown[s.id] || 50, s.rows.length);
+  const cur = Math.min(st.row[s.id] || 0, Math.max(0, s.rows.length - 1));
+  const defs = Object.fromEntries(ep.fields.map(f => [f.name, f]));
+  const parts = [];
+  if (hasRows) {
+    parts.push(table(["#", ...s.cols.map(c => ({ text: c, title: defs[c] ? defs[c].meaning : "" }))],
+      s.rows.slice(0, shown).map((r, i) => [h("td", { class: "dim" }, i + 1), ...r.map((v, j) => h("td", { class: "val" }, v === "" ? h("span", { class: "empty" }, "·") : v))]),
+      { rowAttrs: i => ({ class: "click" + (i === cur ? " sel" : ""), onclick: () => { st.row[s.id] = i; render(true, "sample"); } }) }));
+    if (shown < s.rows.length) parts.push(h("div", { class: "controls", style: "margin-top:10px" },
+      h("button", { class: "btn", onclick: () => { st.shown[s.id] = shown + 100; render(true); } }, "100행 더 보기"),
+      h("span", { class: "dim" }, `${nf.format(shown)} / ${nf.format(s.rows.length)}행 표시 중`)));
+  }
+  parts.push(h("details", { style: "margin-top:12px" }, h("summary", null, "응답 원문 보기"),
+    s.raw ? h("pre", { class: "raw" }, s.raw) : h("p", { class: "dim" }, `원문이 커서(${kb(s.bytes)}) 여기에는 넣지 않았습니다. 파일: grocery-price/reference/public-data/${s.file}`)));
+  return card(6, "전체 행과 원문", "열 이름에 마우스를 올리면 의미가 보입니다. 행을 누르면 위 ‘실제 값’이 그 행으로 바뀝니다.", parts);
+}
+
+/* ── 전체 ── */
+const app = document.getElementById("app");
+function render(keepScroll, scrollTo) {
+  const y = window.scrollY;
+  const g = D.groups.find(x => x.id === st.group);
+  const ep = g.eps.find(e => e.id === epId(g)) || g.eps[0];
+  const sid = st.sample[ep.id] && S[st.sample[ep.id]] ? st.sample[ep.id] : ep.samples[0][0];
+  st.sample[ep.id] = sid;
+  const s = S[sid];
+
+  const groupTabs = h("div", { class: "tabs", role: "tablist", "aria-label": "API" }, D.groups.map(x =>
+    h("button", { class: "tab", role: "tab", "aria-selected": String(x.id === g.id), onclick: () => { st.group = x.id; render(false); } }, (x.id === g.id ? "✓ " : "") + x.name, h("small", null, x.sub))));
+  const epTabs = g.eps.length > 1 ? h("div", { class: "tabs sub", role: "tablist", "aria-label": "기능" }, g.eps.map(e =>
+    h("button", { class: "tab", role: "tab", "aria-selected": String(e.id === ep.id), onclick: () => { st.ep[g.id] = e.id; render(false); } }, (e.id === ep.id ? "✓ " : "") + e.tab))) : null;
+
+  fill(app, ...[groupTabs, epTabs, overview(ep), paramsCard(ep, s), builderCard(ep, s), responseCard(ep), vizCard(ep, s), ep.id === "cham-product" ? productExplorer() : null, sampleCard(ep, s), rowsCard(ep, s)].filter(Boolean));
+  if (scrollTo === "sample") { const t = document.getElementById("sample-card"); if (t) { t.scrollIntoView({ block: "start" }); return; } }
+  window.scrollTo(0, keepScroll ? y : 0);
+}
+document.getElementById("foot").textContent =
+  `샘플 ${D.samples.length}개 · 마지막 호출 ${kst(D.builtAt)} KST · 다시 만들기: samples/fetch-samples.sh 실행 후 python3 -I samples/viewer/build.py`;
+// 주소 해시로 처음 화면을 고른다: #s=kamis/vegetable-baechu-retail-14d
+try {
+  const want = new URLSearchParams(location.hash.slice(1)).get("s");
+  if (want && S[want]) for (const g of D.groups) for (const e of g.eps)
+    if (e.samples.some(x => x[0] === want)) { st.group = g.id; st.ep[g.id] = e.id; st.sample[e.id] = want; }
+} catch (_) {}
+render(false);
+})();
+</script>
+</body>
+</html>

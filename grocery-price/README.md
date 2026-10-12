@@ -11,7 +11,7 @@
 |---|---|
 | P0 기획·조사 | ✅ 완료 |
 | P1 도메인 모델링 | ✅ 완료 (2026-10-08) |
-| P2 데이터 소스 명세 | 🔄 다음 (API 키 발급 필요) |
+| P2 데이터 소스 명세 | 🔄 진행 중 (API 3종 실호출·응답 샘플 저장 완료, 출처별 문서 작성 중) |
 | P3 표현 가능 값 카탈로그 | ⏳ |
 | P4 어댑터 · 통합 데이터 모델 | ⏳ |
 | P5 표현 설계 | ⏳ |
@@ -40,6 +40,11 @@
 - [public-data-survey.md](docs/10-research/public-data-survey.md): 참가격·KAMIS·축평원·수산물 공공데이터 개요와 배치 초안
 - [images.md](docs/10-research/images.md): 이미지 저작권, 무료 소스, AI 생성 비용
 - [content-and-taxonomy.md](docs/10-research/content-and-taxonomy.md): 레시피·제철 데이터, 분류 체계, 단위가격 표시제, 해외 사례
+
+**API 실측** (P2)
+- [api-spec.md](docs/10-research/api-spec.md): 요청·응답 명세와 실측으로 확인한 명세 불일치. API를 호출하기 전에 읽는다
+- `reference/public-data/samples/`: 실호출 응답 샘플(정상·빈 결과·오류), `fetch-samples.sh`로 다시 만든다
+- `reference/public-data/samples/viewer/api-explorer.html`: 샘플을 브라우저에서 보는 탐색기 (`build.py`로 생성, `smoke.sh`로 검사)
 
 **원본 자료** (`reference/public-data/`)
 - `kamis/code-table.txt`: KAMIS 코드표 (구분·부류·품목·품종·등급·시군구·시장)
