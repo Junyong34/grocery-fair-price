@@ -2,3 +2,5 @@
 .idea
 .env
 .serena
+# Headroom
+.claude/.headroom_*
