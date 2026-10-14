@@ -1,6 +1,6 @@
 # 04. 2a 이달 · 12개월 스크롤 (정적 배치)
 
-Status: ready-for-human
+Status: resolved
 Blocked by: 01, 03
 
 ## 목적
@@ -18,7 +18,7 @@ Blocked by: 01, 03
 - [x] **설정**(⚙): 공휴일 표시, 먹은 품종 표시 스위치. 모바일은 `BottomSheet`, 데스크톱은 상단에서 내려오는 400px 패널이다. 달력 다운로드는 넣지 않는다.
 - [x] **데스크톱 좌측 패널**: `pnpm ui:add https://cojeev.com/ui/r/option-wheel.json`. 영어 문구를 props로 빼고, 라벨은 "10월 · 17가지" 형식으로 쓴다. 스크롤과 휠 선택을 양방향으로 맞추고, 연속 선택은 150ms 디바운스한다.
 - [x] `/examples/option-wheel`: `arc`와 `reel`을 실제 월 데이터로 나란히 보인다.
-- [ ] 사용자가 고른 형태를 `DesktopMonthPanel`의 `presentation`에 반영하고 spec "열린 질문"에서 "결정"으로 옮긴다(지금은 `reel`).
+- [x] 사용자가 `reel`을 골랐다(2026-10-14). `DesktopMonthPanel` 기본값이 `reel`이다.
 - [x] "오늘"은 서울 기준으로 요청 시점에 계산한다(`apps/web/docs/nextjs-16-patterns.md` 5.2).
 
 ## 완료 조건
@@ -29,7 +29,7 @@ Blocked by: 01, 03
 
 ## Answer
 
-2026-10-14 구현. 형태 선택(arc/reel)만 사용자 결정 대기.
+2026-10-14 완료. 휠 형태는 `reel`.
 
 - 시드 배치 `packages/seasonal/src/layout/scatter.ts`(테스트 5개). 명세 알고리즘을 그대로 옮겨서 첫 테스트 뒤의 경계·크기 테스트는 바로 통과했다. 시드의 W는 구간 기준 프레임 폭(모바일 339, 데스크톱 736)이라 구간 id와 같은 역할을 한다.
 - `festivalsInMonth(month, year)` 추가(테스트 2개).
