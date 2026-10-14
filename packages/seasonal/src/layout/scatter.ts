@@ -48,34 +48,26 @@ export function scatterLayout({
 }): ScatterLayout {
   const { width: W, height: H, big } = frame
   const n = ids.length
-  let seed = (month * 7919 + n * 104729 + W) % 233280
-  const rand = () => {
-    seed = (seed * 9301 + 49297) % 233280
-    return seed / 233280
-  }
+  const rand = seededRandom((month * 7919 + n * 104729 + W) % 233280)
+  const label = labelHeight(frame)
+  const base = Math.min(
+    Math.max(
+      Math.sqrt((W * H * 0.5) / Math.max(n, 1)) - label * 0.5,
+      big ? 34 : 24
+    ),
+    big ? 120 : 96
+  )
 
-  const label = big ? 15 : 12
-  const base = Math.min(Math.max(Math.sqrt((W * H * 0.5) / Math.max(n, 1)) - label * 0.5, big ? 34 : 24), big ? 120 : 96)
-
-  const placed: { x: number; y: number; r: number }[] = []
+  const placed: PlacedCircle[] = []
   const items = ids.map((id, i) => {
     const size = Math.round(base * (0.8 + rand() * 0.4))
-    let best = { x: 0, y: 0, gap: -Infinity }
-    for (let c = 0; c < CANDIDATES; c++) {
-      const x = rand() * (W - size)
-      const y = rand() * (H - size - label)
-      const r = size / 2
-      const gap = placed.length
-        ? Math.min(...placed.map((p) => Math.hypot(p.x - (x + r), p.y - (y + r)) - (p.r + r)))
-        : Infinity
-      if (gap > best.gap) best = { x, y, gap }
-    }
-    placed.push({ x: best.x + size / 2, y: best.y + size / 2, r: size / 2 })
+    const spot = findOpenSpot({ placed, size, frame, rand })
+    placed.push(spot)
     const rotate = (rand() - 0.5) * 22
     return {
       id,
-      cx: (best.x + size / 2) / W,
-      cy: (best.y + size / 2) / H,
+      cx: spot.x / W,
+      cy: spot.y / H,
       size: size / W,
       rotate: Math.round(rotate * 10) / 10,
       z: i % 4,
@@ -83,4 +75,49 @@ export function scatterLayout({
   })
 
   return { aspect: W / H, label: label / H, items }
+}
+
+/** 프레임 px 기준 원(그림 중심과 반지름). */
+export type PlacedCircle = { x: number; y: number; r: number }
+
+/** 와이어프레임 scat의 LCG. 같은 시드면 같은 수열이 나온다. */
+export function seededRandom(seed: number): () => number {
+  let s = seed
+  return () => {
+    s = (s * 9301 + 49297) % 233280
+    return s / 233280
+  }
+}
+
+/** 그림 아래 라벨 높이(px). */
+export function labelHeight(frame: ScatterFrame): number {
+  return frame.big ? 15 : 12
+}
+
+/**
+ * 이미 놓인 그림들과 가장 멀리 떨어진 자리를 후보 26개 가운데서 고른다(그림 아래 라벨 자리를 남긴다).
+ * 시드 배치와, 저장된 배치에 새 품종을 넣을 때 같이 쓴다.
+ */
+export function findOpenSpot({
+  placed,
+  size,
+  frame,
+  rand,
+}: {
+  placed: readonly PlacedCircle[]
+  size: number
+  frame: ScatterFrame
+  rand: () => number
+}): PlacedCircle {
+  const r = size / 2
+  let best = { x: r, y: r, gap: -Infinity }
+  for (let c = 0; c < CANDIDATES; c++) {
+    const x = rand() * (frame.width - size) + r
+    const y = rand() * (frame.height - size - labelHeight(frame)) + r
+    const gap = placed.length
+      ? Math.min(...placed.map((p) => Math.hypot(p.x - x, p.y - y) - (p.r + r)))
+      : Infinity
+    if (gap > best.gap) best = { x, y, gap }
+  }
+  return { x: best.x, y: best.y, r }
 }

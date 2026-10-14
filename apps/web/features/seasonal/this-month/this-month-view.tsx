@@ -6,7 +6,6 @@ import { festivalDate, festivalsInMonth } from "@workspace/seasonal/data/festiva
 import { foodsInMonth } from "@workspace/seasonal/data/foods"
 import { MONTHS, type Month } from "@workspace/seasonal/data/months"
 import { seasonOfMonth } from "@workspace/seasonal/data/seasons"
-import { SCATTER_FRAMES } from "@workspace/seasonal/layout/scatter"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { routes } from "@/shared/routes"
@@ -160,8 +159,8 @@ function Scatter({
 }) {
   return (
     <div className={cn(className)}>
-      <ScatterField month={month} foods={foods} year={year} frame={SCATTER_FRAMES.mobile} className="lg:hidden" />
-      <ScatterField month={month} foods={foods} year={year} frame={SCATTER_FRAMES.desktop} className="hidden lg:block" />
+      <ScatterField month={month} foods={foods} year={year} frame="mobile" className="lg:hidden" />
+      <ScatterField month={month} foods={foods} year={year} frame="desktop" className="hidden lg:block" />
     </div>
   )
 }
