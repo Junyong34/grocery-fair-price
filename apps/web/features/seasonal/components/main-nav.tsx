@@ -5,6 +5,7 @@ import { CalendarDays, Leaf, UtensilsCrossed, type LucideIcon } from "lucide-rea
 
 import { cn } from "@workspace/ui/lib/utils"
 
+import { BrandLogo } from "@/shared/brand-logo"
 import { routes } from "@/shared/routes"
 
 import { NavLink, useIsActive } from "./nav-link"
@@ -55,8 +56,12 @@ export function TopNav({ actions }: { actions?: React.ReactNode }) {
   return (
     <header className="sticky top-0 z-(--z-sticky) hidden border-b border-hairline bg-canvas/94 backdrop-blur lg:block">
       <div className="mx-auto flex h-14 max-w-[1080px] items-center gap-8 px-6">
-        <Link href={routes.seasonal.root} className="font-heading text-xl font-bold text-ink no-underline">
-          제철달력
+        <Link
+          href={routes.seasonal.root}
+          aria-label="제철달력 홈"
+          className="inline-flex shrink-0 items-center rounded-sm no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+        >
+          <BrandLogo />
         </Link>
         <nav aria-label="주요 메뉴" className="flex gap-6">
           {ITEMS.map(({ label, href, also, exact }) => (

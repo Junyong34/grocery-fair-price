@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import { BrandLogo } from "@/shared/brand-logo"
 import { routes } from "@/shared/routes"
 
 import { DesktopSettingsButton, MobileSettingsButton } from "../this-month/settings-panel"
@@ -27,8 +28,12 @@ export function SeasonalShell({
         }
       />
       <header className="flex h-14 items-center justify-between px-[18px] lg:hidden">
-        <Link href={routes.seasonal.root} className="font-heading text-xl font-bold text-ink no-underline">
-          제철달력
+        <Link
+          href={routes.seasonal.root}
+          aria-label="제철달력 홈"
+          className="inline-flex shrink-0 items-center rounded-sm no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+        >
+          <BrandLogo />
         </Link>
         <ThisMonthOnly>
           <MobileSettingsButton />
