@@ -4,3 +4,9 @@
 .serena
 # Headroom
 .claude/.headroom_*
+
+.agents
+.claude
+
+# 프로토타입: 기간 동안 커밋하지 않는다 (prototypes/seasonal-food/README.md)
+prototypes
