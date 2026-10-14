@@ -1,0 +1,126 @@
+# 제철달력 MVP 화면 개발
+
+`apps/web`의 제철 화면을 실제 화면으로 만드는 작업이다. 지금은 모든 화면이 `ScreenStub`이다. 화면 명세는 `prototypes/seasonal-food/wireframes/WIREFRAME-SPEC.md`(이하 "명세")이고, 이 문서는 명세와 다르게 정했거나 명세가 비워 둔 결정만 적는다. 두 문서가 다르면 이 문서를 따른다.
+
+결정은 2026-10-14 grilling 세션에서 사용자와 정했다. 용어는 `grocery-price/GLOSSARY.md`를 따른다(품종, 제철, 먹음 기록, 명절, 전통 음식).
+
+## 이슈 목록
+
+| # | 제목 | 상태 | 선행 |
+|---|---|---|---|
+| 01 | 품종·명절 데이터와 문구 초안 | ready-for-agent | — |
+| 02 | 일러스트 동기화 `pnpm foods:sync` | ready-for-agent | 01 |
+| 03 | 제철 셸: 내비·헤더·서체·토큰·`FoodImage`·store | ready-for-agent | 02 |
+| 04 | 2a 이달 · 12개월 스크롤 (정적 배치) | ready-for-agent | 01, 03 |
+| 05 | 1i 품종 상세 | ready-for-agent | 03 |
+| 06 | 2b 월별 제철 타임라인 | ready-for-agent | 03 |
+| 07 | 1h 나의 식탁 | ready-for-agent | 03 |
+| 08 | 3a 계절 히어로 · 계절 상세 | ready-for-agent | 03 |
+| 09 | 1g 명절 | ready-for-agent | 03 |
+| 10 | 전역 품종 검색 | ready-for-agent | 03 |
+| 11 | 흩어진 배치 드래그와 겹침 해소 | ready-for-agent | 04 |
+| 12 | 데스크톱·태블릿 변형 정리 | ready-for-agent | 04–10 |
+
+04 이후는 03만 끝나면 순서를 바꿔도 된다. 11은 2a의 정적 배치가 끝난 뒤에 얹는다.
+
+## 범위
+
+넣는 것: 2a, 2b, 3a(히어로 + 계절 상세), 1g, 1h, 1i, 전역 검색, 2a 설정 시트(표시 설정만), 흩어진 배치 드래그.
+
+빼는 것: 24절기 전부(명세 0절), 달력 다운로드(`.scratch/calendar-print/spec.md`), 로그인, 가격 보기(비활성 자리만), E2E 테스트.
+
+## 작업 방식
+
+- **브랜치**: `main`에서 바로 작업한다. PR은 만들지 않는다. 티켓 하나를 끝내고 검증을 통과하면 커밋하고 `main`에 푸시한다. 메시지 형식은 `feat: …`(한국어)다. 푸시가 HTTP 400으로 실패하면 `git -c http.postBuffer=157286400 push`.
+- **순수 함수**(시드 배치, 겹침 해소, 저장 배치 병합, 달력 칸, 초성 매처)는 `vitest`로 테스트를 먼저 쓴다(`tdd` 스킬). 러너는 01에서 `packages/seasonal`에 처음 넣는다.
+- **화면**은 티켓마다 `next-dev-loop`(`/_next/mcp` + agent-browser)로 폭 375와 1280 스크린샷을 확인하고 마친다. 콘솔 오류와 하이드레이션 경고가 없어야 한다.
+- 컴포넌트를 찾는 순서와 `pnpm ui:add` 규칙은 `AGENTS.md`의 "Web app UI"를 따른다.
+- 제철 화면에서 쓸 cojeev 컴포넌트 후보: `tabs`, `toggle-group`(보기 전환), `switch`, `checkbox`, `toast`, `progress`, `animated-number`, `carousel`, `command`(검색), `sheet`(데스크톱 1i), `option-wheel`(2a 데스크톱).
+
+## 결정
+
+### 데이터 (`packages/seasonal`)
+
+- 노출 품종은 `prototypes/seasonal-food/docs/seasonal-lists/foods.json`에서 `tier: "verified"`인 79개다. `foodnuri`·`mof` 후보는 넣지 않는다.
+- 품종 id는 일러스트 카탈로그(`prototypes/seasonal-food/build/catalog.json`)와 같은 영문 kebab-case다. 카탈로그에 없는 품종은 01에서 id를 새로 정하고, 나중에 일러스트를 그릴 때 그 id를 쓴다. 그림은 있지만 `verified`가 아닌 품종은 화면에 나오지 않는다.
+- 일러스트는 계속 늘어난다. "그림이 있는 id 목록"은 02의 스크립트가 생성하는 파일로 두고, 손으로 고치지 않는다.
+- 명절 날짜는 연도별 표(2026, 2027)로 둔다. 표에 없는 연도면 날짜 문구를 숨긴다. 공휴일은 `@hyunbinseo/holidays-kr`을 쓴다.
+- 화면 문구(달별 한 줄 문구 12, 계절 설명 4, 명절 배경 6, 빈 상태·토스트 등)는 와이어프레임 샘플을 쓰지 않고 **새로 쓴다**. 에이전트가 `verified` 목록에 맞춰 초안을 `packages/seasonal/src/data/copy.ts` 한 파일에 쓰면, 사용자가 고친다. 문구 확정이 화면 작업을 막지는 않는다.
+- 전통 음식(떡국, 송편)은 품종이 아니다. 1i 링크가 없는 정적 카드로 둔다. 나중에 "지역별 특색 음식"이 같은 층에 추가될 수 있으므로, 전통 음식을 품종 타입에 섞지 않는다.
+
+### 일러스트
+
+- 그림체: `watercolor`(윤곽 없는 수채), 변형 `color`, **바닥 그림자 끔**.
+- 1i 큰 일러스트만 `motion` 변형을 쓴다. GSAP은 1i에서 동적 import한다. 메인 번들에 GSAP이 들어가지 않는다.
+- 복사본은 `apps/web/public/foods/<id>/{color,motion}.svg`에 두고 **커밋한다**. 공개 저장소라 누구나 받을 수 있다는 점은 받아들였다. 대신 `apps/web/public/foods/PROVENANCE.md`에 갈래 id·버전·sha·생성일·품종 목록을 남긴다.
+- 교체 지점은 `FoodImage` 컴포넌트 하나다. 그림이 없는 품종은 이름 카드로 대신한다.
+
+### 흩어진 배치와 드래그
+
+- 시드 배치는 명세 3.1의 `scat()`를 옮긴다. 단, 결과는 **0..1 정규화 좌표**이고 영역은 구간별 **고정 비율**이다(모바일 339:240, 데스크톱 736:300, 태블릿은 12에서 정한다). 시드에 픽셀 폭 `W` 대신 구간 id를 넣는다. 폭이 바뀌면 확대·축소만 하고, 구간이 바뀔 때만 다시 배치한다. 서버와 클라이언트가 같은 배치를 내므로 하이드레이션 차이가 없다.
+- 2a 히어로는 그 달 섹션과 **같은 비율 영역**을 쓰고 배치도 공유한다(명세의 히어로 339×300, 736×360과 다르다).
+- 드래그는 2a 히어로와 12개 월 섹션 모두에서 된다. 3a에는 흩어진 배치가 없다.
+- 탭과 드래그는 이동 거리 6px로 나눈다. 6px 미만이면 탭으로 보고 1i를 연다. 모바일은 약 250ms 길게 누른 뒤 드래그가 시작된다(세로 스크롤과 겹치지 않게). 데스크톱은 바로 드래그한다.
+- 겹침 해소는 **밀어내기**다. 끄는 동안 주변 품종이 원끼리 분리하는 완화 반복으로 실시간으로 비켜나고, 놓으면 스프링으로 자리를 잡는다. N ≤ 20이라 매 프레임 O(N²)로 충분하다. `prefers-reduced-motion`이면 스프링 없이 바로 자리를 잡는다.
+- 겹침 해소는 도메인 단어가 없는 기하 계산이라 `packages/seasonal`이 아니라 `packages/ui`(또는 feature)에 둔다. 시드 배치 `scat`은 품종 수와 달에 묶여 있으므로 `packages/seasonal/src/layout/`에 둔다.
+- 옮긴 배치는 **(달, 구간)별로 기기에 저장**한다. 모바일에서 옮긴 배치는 데스크톱에 반영되지 않는다.
+- 저장 뒤 그 달 품종이 바뀌면: 남은 품종의 중심 좌표는 유지하고, 빠진 품종은 지우고, 새 품종은 시드 규칙의 후보 탐색으로 빈자리에 넣는다. 개수가 바뀌어 크기(`base`)가 달라지면 크기만 다시 계산한 뒤 겹침 해소를 한 번 돌린다.
+- 그 달 배치를 한 번이라도 옮겼을 때만 영역 오른쪽 아래에 "원래대로" 버튼을 보인다. 누르면 시드 배치로 스프링 복귀한다.
+- 드래그는 포인터 전용 부가 기능이다. 키보드와 스크린리더에서 각 품종은 1i로 가는 링크로만 동작한다.
+- 흩어진 배치에서는 먹음 기록을 하지 않는다(탭은 1i, 드래그는 이동). 먹음 기록은 1i, 2b, 1h에서 한다.
+
+### 상태
+
+- `zustand`의 `persist`(localStorage) store를 쓴다.
+  - 먹음 기록: 연도별 `Set<품종 id>`(키 `eaten:2026` 식). 앱 전체가 쓸 수 있도록 `apps/web/shared/`에 둔다. 와이어프레임 시드 16개는 넣지 않고 빈 상태로 시작한다.
+  - 흩어진 배치: (달, 구간)별 `{id, x, y}[]`. `apps/web/features/seasonal/`에 둔다.
+  - 설정: 공휴일 표시, 먹은 품종 표시.
+- 서버 HTML에는 기록이 없다. ✓와 개수는 하이드레이션 뒤에 나타난다. `skipHydration`으로 두고 클라이언트에서 다시 불러온다. 렌더 중에 localStorage를 읽지 않는다.
+- ✓ 표현은 명세 2.3의 원형 배지(이미지 오른쪽 위, gold 테두리)다.
+
+### 디자인 토큰과 서체
+
+와이어프레임 토큰은 Oura 토큰으로 바꾼다. 컴포넌트에 hex 값을 쓰지 않는다.
+
+| 와이어프레임 | Oura |
+|---|---|
+| `--color-bg` / `--color-surface` | `canvas` / `surface` |
+| `--color-text` | `ink` |
+| `neutral-300` / `500` / `700` / `900` | `hairline`·`silver` / `ash` / `stone` / `ink-band-soft` |
+| `accent` / `accent-100` / `accent-700` | `gold` / 연한 gold 배경 / `gold-deep` |
+| 계절색 `SCOL` | `season-spring` / `season-summer` / `season-autumn` / `season-winter` |
+| 빨간 날짜(일요일·공휴일) | `clay` |
+
+연한 gold 배경 토큰이 없으면 `packages/ui/src/styles/globals.css`에 `--color-gold-wash` 하나를 추가한다.
+
+서체: 본문은 Pretendard(`next/font/local`), 제목(계절명, 달별 문구 italic)은 명조 계열(예: Gowun Batang, `next/font/google`), 큰 숫자는 cojeev 서체(DM Sans 또는 Bricolage)다. `layout.tsx`의 Roboto를 바꾸고 `--font-sans`·`--font-heading` 변수만 연결한다.
+
+### 모션
+
+- `pop`, `tick`, `fadeIn`, `rise`(명세 2.7)는 CSS 키프레임으로 한다.
+- 드래그, 스프링, 레이아웃 전환은 `motion`(이미 `packages/ui`에 있다)으로 한다.
+- 일러스트 자체의 움직임은 GSAP이며, 1i에서만 쓴다.
+- React `<ViewTransition>`은 세 곳에만 쓴다. 3a 카드에서 계절 상세로 갈 때 계절명 공유 요소 전환, 2b 달 바꾸기 크로스페이드, 계절 상세 이전/다음 슬라이드다. 하단 탭 전환은 즉시 바꾼다.
+- 모든 모션은 `prefers-reduced-motion`에서 즉시 끝난다.
+
+### 화면별
+
+- **내비**: 데스크톱 상단과 모바일 하단 모두 3항목 `이달 · 계절 · 나의 식탁`이다. 데스크톱 상단에는 검색과 ⚙를 더한다. 명세 3.6의 5항목 내비는 쓰지 않는다.
+- **2a 데스크톱 좌측 패널**의 달 이동은 cojeev `option-wheel`이다. 항목은 `지금 · 10월` 하나와 1~12월이다. 라벨에 "10월 · 17가지"처럼 개수를 함께 넣는다(슬롯에 `description`이 보이지 않는다). `arc`와 `reel`은 `/examples/option-wheel`에서 실제 월 데이터로 나란히 보고 사용자가 고른다. 고른 결과를 이 문서에 적는다.
+  - 휠 표시는 바로 따라가고, 본문 이동은 선택이 150ms 멈춘 뒤 한 번만 한다. 클릭과 키보드 선택은 바로 이동한다.
+  - 스크롤로 바뀐 활성 달은 휠의 `selectedIndex`로 되돌려 준다.
+  - 설치본의 영어 문구("Find your direction", "Previous option", "No options available.")는 props로 뺀다. `pnpm ui:add`를 다시 돌리면 이 수정이 덮어써진다.
+- **2a 모바일 월 레일**은 명세대로 둔다. 레일 버튼이 손가락에 작으면 스티키 인디케이터를 누르면 휠이 뜨는 하단 시트로 바꾸는 후속 티켓을 만든다.
+- **"달력에서 보기"**(1g의 "{m}월 달력에서 보기", 2b의 "메인에서 이 달 달력 보기")는 해시 `/seasonal#month-N`으로 간다. `routes.seasonal.rootAt(month)`을 추가한다. 2a는 해시를 읽어 즉시 이동하고 fadeIn한다. `searchParams`는 쓰지 않는다.
+- **1i 품종 상세** 구성(위에서 아래): 큰 일러스트(`motion`), 품종명과 계절 태그, 12칸 제철 막대, "먹었어요 — 나의 식탁에 기록" 토글(+1 pop), 관련 명절 링크, 같은 달 다른 품종(가로 스크롤), "가격 보기"(비활성, '준비 중'). 절기 링크는 없다. 모바일은 하단 시트(이미 있는 가로채기 라우트), 데스크톱은 오른쪽 패널(cojeev `sheet`)이다. 주소로 직접 열면 전체 페이지다.
+- **3a 계절 히어로 카드**: 대표 품종 4개를 크게 겹쳐 놓고, 계절을 표현하는 배경을 깐다. 배경은 cojeev 배경 컴포넌트(`sunwash-background`, `pigment-field`, `sprouts-background`, `grain-dissolve` 등)를 계절색 토큰으로 칠해 쓴다. `/examples/season-backgrounds`에서 후보를 비교하고 사용자가 고른다. 모바일 캐러셀에서는 보이는 카드만 움직인다.
+- **3a 계절 상세**는 `/seasonal/seasons/[season]` 라우트다(이미 있다).
+- **1g 명절**: 전통 음식은 1i 링크가 없는 정적 카드다(실선). 그 무렵 제철 품종은 1i로 간다(점선). 데스크톱은 가운데 단일 열(최대 폭 720)이고, 전통 음식은 3열, 제철 품종은 줄바꿈으로 놓는다.
+- **전역 검색**: 모바일 헤더의 "검색"과 데스크톱 "음식 검색"은 같은 command 오버레이(cojeev `command`)를 연다. 품종 이름과 초성(`es-hangul`)으로 찾는다. 결과를 누르면 1i로 간다. 1h 안의 검색은 기록 목록 필터로 따로 둔다.
+
+## 열린 질문
+
+- `option-wheel` 형태(`arc` / `reel`): 04에서 비교한 뒤 정한다.
+- 3a 계절 배경 컴포넌트: 08에서 비교한 뒤 정한다.
+- 계절별 배경 일러스트(봄 들판 등)를 따로 그릴지: MVP 이후.
+- 문구 최종본: 01 초안을 사용자가 고친다.
