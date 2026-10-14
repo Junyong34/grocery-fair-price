@@ -6,6 +6,7 @@ import { useEffect, useRef } from "react"
 
 import { FESTIVALS } from "@workspace/seasonal/data/festivals"
 import { cn } from "@workspace/ui/lib/utils"
+import { ScrollRow } from "@workspace/ui/components/scroll-row"
 
 import { routes } from "@/shared/routes"
 
@@ -27,9 +28,11 @@ export function FestivalChips() {
 
   return (
     <nav aria-label="명절 고르기" className="mx-auto max-w-[720px]">
-      <div
+      <ScrollRow
         ref={scroller}
-        className="flex gap-1.5 overflow-x-auto px-[18px] py-3 [scrollbar-width:none] lg:flex-wrap lg:justify-center"
+        className="gap-1.5 px-[18px] py-3 lg:flex-wrap lg:justify-center"
+        previousLabel="이전 명절 보기"
+        nextLabel="다음 명절 보기"
       >
         {FESTIVALS.map((festival) => (
           <Link
@@ -45,7 +48,7 @@ export function FestivalChips() {
             {festival.name}
           </Link>
         ))}
-      </div>
+      </ScrollRow>
     </nav>
   )
 }

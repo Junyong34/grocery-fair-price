@@ -5,6 +5,7 @@ import { festivalsWithFood } from "@workspace/seasonal/data/festivals"
 import { foodsInSeasonWith, type Food } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 import { SEASONS, SEASON_MONTHS } from "@workspace/seasonal/data/seasons"
+import { ScrollRow } from "@workspace/ui/components/scroll-row"
 
 import { routes } from "@/shared/routes"
 
@@ -20,8 +21,16 @@ const SAME_SEASON_LIMIT = 12
  * 1i 품종 상세 본문(spec "화면별"). 하단 시트, 데스크톱 오른쪽 패널, 전체 페이지가 같은 본문을 쓴다.
  * 제목(품종명)은 껍데기가 그린다. 시트·패널은 접근성 제목으로, 전체 페이지는 h1로 쓴다.
  */
-export function FoodDetail({ food, title }: { food: Food; title?: React.ReactNode }) {
-  const seasons = SEASONS.filter((season) => food.months.some((month) => SEASON_MONTHS[season].includes(month)))
+export function FoodDetail({
+  food,
+  title,
+}: {
+  food: Food
+  title?: React.ReactNode
+}) {
+  const seasons = SEASONS.filter((season) =>
+    food.months.some((month) => SEASON_MONTHS[season].includes(month))
+  )
   const festivals = festivalsWithFood(food.id)
   const sameSeason = foodsInSeasonWith(food).slice(0, SAME_SEASON_LIMIT)
 
@@ -38,21 +47,33 @@ export function FoodDetail({ food, title }: { food: Food; title?: React.ReactNod
             <SeasonTag key={season} season={season} />
           ))}
         </div>
-        {food.aliases.length > 0 && <p className="text-sm text-stone">다른 이름 {food.aliases.join(", ")}</p>}
+        {food.aliases.length > 0 && (
+          <p className="text-sm text-stone">
+            다른 이름 {food.aliases.join(", ")}
+          </p>
+        )}
         <div className="flex flex-col gap-1.5">
           <SeasonMonthsBar months={food.months} className="[&>span]:h-1.5" />
-          <div aria-hidden className="grid grid-cols-12 text-center text-[10px] text-ash tabular-nums">
+          <div
+            aria-hidden
+            className="grid grid-cols-12 text-center text-[10px] text-ash tabular-nums"
+          >
             {Array.from({ length: 12 }, (_, i) => (
               <span key={i}>{i + 1}</span>
             ))}
           </div>
-          <p className="text-sm text-stone">{formatSeasonMonths(food.months)}</p>
+          <p className="text-sm text-stone">
+            {formatSeasonMonths(food.months)}
+          </p>
         </div>
       </div>
 
       <EatToggle foodId={food.id} />
 
-      <section aria-labelledby="related-festivals" className="flex flex-col gap-2">
+      <section
+        aria-labelledby="related-festivals"
+        className="flex flex-col gap-2"
+      >
         <h3 id="related-festivals" className="text-sm font-semibold text-stone">
           관련 명절
         </h3>
@@ -79,9 +100,17 @@ export function FoodDetail({ food, title }: { food: Food; title?: React.ReactNod
           <h3 id="same-season" className="text-sm font-semibold text-stone">
             같은 때 제철
           </h3>
-          <ul className="-mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-2">
+          <ScrollRow
+            role="list"
+            frameClassName="-mx-1"
+            className="snap-x gap-3 px-1 pb-2"
+          >
             {sameSeason.map((other) => (
-              <li key={other.id} className="w-[72px] shrink-0 snap-start">
+              <div
+                role="listitem"
+                key={other.id}
+                className="w-[72px] shrink-0 snap-start"
+              >
                 <Link
                   href={routes.seasonal.food(other.id)}
                   replace
@@ -91,9 +120,9 @@ export function FoodDetail({ food, title }: { food: Food; title?: React.ReactNod
                   <FoodImage food={other} sizes="72px" showName={false} />
                   <span className="w-full truncate">{other.name}</span>
                 </Link>
-              </li>
+              </div>
             ))}
-          </ul>
+          </ScrollRow>
         </section>
       )}
 

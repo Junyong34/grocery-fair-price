@@ -8,6 +8,7 @@ import { foodsInMonth } from "@workspace/seasonal/data/foods"
 import { MONTHS } from "@workspace/seasonal/data/months"
 import { seasonOfMonth, type Season } from "@workspace/seasonal/data/seasons"
 import { cn } from "@workspace/ui/lib/utils"
+import { ScrollRow } from "@workspace/ui/components/scroll-row"
 
 import { useEatenIds } from "@/shared/eaten-store"
 import { routes } from "@/shared/routes"
@@ -61,9 +62,12 @@ function MobileChips({ selected }: { selected: number }) {
   }, [selected])
 
   return (
-    <div
+    <ScrollRow
       ref={scroller}
-      className="flex gap-1.5 overflow-x-auto px-[18px] py-3 [scrollbar-width:none] lg:hidden"
+      frameClassName="lg:hidden"
+      className="gap-1.5 px-[18px] py-3"
+      previousLabel="이전 달 보기"
+      nextLabel="다음 달 보기"
     >
       {MONTHS.map((month) => (
         <Link
@@ -94,7 +98,7 @@ function MobileChips({ selected }: { selected: number }) {
           </Suspense>
         </Link>
       ))}
-    </div>
+    </ScrollRow>
   )
 }
 
