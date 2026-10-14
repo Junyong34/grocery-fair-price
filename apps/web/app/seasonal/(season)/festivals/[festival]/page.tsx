@@ -3,7 +3,7 @@ import { Suspense } from "react"
 
 import { FESTIVALS, isFestival } from "@workspace/seasonal/data/festivals"
 
-import { ScreenStub } from "@/features/seasonal/components/screen-stub"
+import { FestivalView } from "@/features/seasonal/festivals/festival-view"
 
 type Params = PageProps<"/seasonal/festivals/[festival]">["params"]
 
@@ -11,9 +11,11 @@ export function generateStaticParams() {
   return FESTIVALS.map(({ slug }) => ({ festival: slug }))
 }
 
-export default function Page(props: PageProps<"/seasonal/festivals/[festival]">) {
+export default function Page(
+  props: PageProps<"/seasonal/festivals/[festival]">
+) {
   return (
-    <Suspense fallback={<ScreenStub id="1g" title="명절" />}>
+    <Suspense fallback={<div className="min-h-svh" aria-busy />}>
       <Festival params={props.params} />
     </Suspense>
   )
@@ -22,5 +24,5 @@ export default function Page(props: PageProps<"/seasonal/festivals/[festival]">)
 async function Festival({ params }: { params: Params }) {
   const { festival } = await params
   if (!isFestival(festival)) notFound()
-  return <ScreenStub id="1g" title={`명절 · ${festival}`} />
+  return <FestivalView slug={festival} />
 }
