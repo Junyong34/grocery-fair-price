@@ -13,7 +13,7 @@
 | 03 | 제철 셸: 내비·헤더·서체·토큰·`FoodImage`·store | resolved | 02 |
 | 04 | 2a 이달 · 12개월 스크롤 (정적 배치) | resolved | 01, 03 |
 | 05 | 1i 품종 상세 | resolved | 03 |
-| 06 | 2b 월별 제철 타임라인 | ready-for-agent | 03 |
+| 06 | 2b 월별 제철 타임라인 | resolved | 03 |
 | 07 | 1h 나의 식탁 | ready-for-agent | 03 |
 | 08 | 3a 계절 히어로 · 계절 상세 | ready-for-agent | 03 |
 | 09 | 1g 명절 | ready-for-agent | 03 |

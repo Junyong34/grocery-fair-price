@@ -1,2 +1,17 @@
 @import "@workspace/ui/globals.css";
 @import "@workspace/ui/cojeev.css";
+
+/* 페이지 전환(React <ViewTransition>). apps/web/node_modules/next/dist/docs/01-app/02-guides/view-transitions.md */
+/* 전환 중에도 클릭이 페이지로 가게 한다. */
+::view-transition {
+  pointer-events: none;
+}
+/* 줄인 모션 설정이면 전환 없이 바로 바꾼다. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

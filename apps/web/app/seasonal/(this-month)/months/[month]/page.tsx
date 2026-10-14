@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
-import { isMonth, MONTHS } from "@workspace/seasonal/data/months"
+import { isMonth, MONTHS, type Month } from "@workspace/seasonal/data/months"
 
-import { ScreenStub } from "@/features/seasonal/components/screen-stub"
+import { MonthView } from "@/features/seasonal/month-timeline/month-view"
 
 type Params = PageProps<"/seasonal/months/[month]">["params"]
 
@@ -15,7 +15,7 @@ export function generateStaticParams() {
 // 페이지 틀은 바로 보내고, params를 쓰는 부분만 Suspense 안에 둔다.
 export default function Page(props: PageProps<"/seasonal/months/[month]">) {
   return (
-    <Suspense fallback={<ScreenStub id="2b" title="월별 보기" />}>
+    <Suspense fallback={<div className="min-h-svh" aria-busy />}>
       <Month params={props.params} />
     </Suspense>
   )
@@ -24,5 +24,5 @@ export default function Page(props: PageProps<"/seasonal/months/[month]">) {
 async function Month({ params }: { params: Params }) {
   const { month } = await params
   if (!isMonth(month)) notFound()
-  return <ScreenStub id="2b" title={`${month}월 · 월별 보기`} />
+  return <MonthView month={Number(month) as Month} />
 }

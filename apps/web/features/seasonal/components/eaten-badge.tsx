@@ -1,8 +1,11 @@
 "use client"
 
+import { Suspense } from "react"
+
 import { cn } from "@workspace/ui/lib/utils"
 
 import { useIsEaten } from "@/shared/eaten-store"
+import { useToday } from "@/shared/today-context"
 
 /**
  * 먹음 배지 ✓(명세 2.3). 이미지 오른쪽 위에 겹쳐 놓는다(부모가 relative).
@@ -22,4 +25,18 @@ export function EatenBadge({ year, foodId, className }: { year: number; foodId: 
       ✓
     </span>
   )
+}
+
+/** 올해(서울) 기준 먹음 배지. 오늘은 요청 시점 값이라 Suspense 안에서 읽는다. */
+export function EatenBadgeToday({ foodId, className }: { foodId: string; className?: string }) {
+  return (
+    <Suspense>
+      <BadgeForThisYear foodId={foodId} className={className} />
+    </Suspense>
+  )
+}
+
+function BadgeForThisYear({ foodId, className }: { foodId: string; className?: string }) {
+  const { year } = useToday()
+  return <EatenBadge year={year} foodId={foodId} className={className} />
 }
