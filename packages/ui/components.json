@@ -5,7 +5,7 @@
   "tsx": true,
   "tailwind": {
     "config": "",
-    "css": "src/styles/cojeev.css",
+    "css": "src/styles/.cli-staging.css",
     "baseColor": "neutral",
     "cssVariables": true
   },
