@@ -21,6 +21,7 @@ Naming or classifying foods (카테고리, 품목, 품종, 규격) anywhere in t
 - Viewer changes (`grocery-price/reference/public-data/samples/viewer/`): run `grocery-price/reference/public-data/samples/viewer/smoke.sh --quick` before finishing.
 - Fresh clone: run `git config core.hooksPath .githooks` once. The pre-commit hook runs `scripts/check-no-secrets.sh` and blocks commits that contain a value from `.env`.
 - `prototypes/` is gitignored for now (see `.gitignore`). Don't force-add it.
+- Food illustrations in `apps/web/public/foods/` are generated from `prototypes/seasonal-food`. After drawing or changing one, run `pnpm foods:sync`. Don't edit the SVGs by hand. Food data (`packages/seasonal/src/data/foods.generated.ts`) is regenerated with `pnpm --filter @workspace/seasonal build:foods`.
 
 ## Web app UI (`apps/web`)
 

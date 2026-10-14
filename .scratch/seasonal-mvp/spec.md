@@ -9,7 +9,7 @@
 | # | 제목 | 상태 | 선행 |
 |---|---|---|---|
 | 01 | 품종·명절 데이터와 문구 초안 | resolved | — |
-| 02 | 일러스트 동기화 `pnpm foods:sync` | ready-for-agent | 01 |
+| 02 | 일러스트 동기화 `pnpm foods:sync` | resolved | 01 |
 | 03 | 제철 셸: 내비·헤더·서체·토큰·`FoodImage`·store | ready-for-agent | 02 |
 | 04 | 2a 이달 · 12개월 스크롤 (정적 배치) | ready-for-agent | 01, 03 |
 | 05 | 1i 품종 상세 | ready-for-agent | 03 |
@@ -51,7 +51,7 @@
 ### 일러스트
 
 - 그림체: `watercolor`(윤곽 없는 수채), 변형 `color`, **바닥 그림자 끔**.
-- 1i 큰 일러스트만 `motion` 변형을 쓴다. GSAP은 1i에서 동적 import한다. 메인 번들에 GSAP이 들어가지 않는다.
+- 1i 큰 일러스트만 `motion` 변형을 쓴다. `motion.svg`는 SVG 안의 CSS 키프레임으로 움직이고 `prefers-reduced-motion`도 스스로 처리하므로 `<img>`로 넣으면 된다. GSAP은 쓰지 않는다(02에서 확인).
 - 복사본은 `apps/web/public/foods/<id>/{color,motion}.svg`에 두고 **커밋한다**. 공개 저장소라 누구나 받을 수 있다는 점은 받아들였다. 대신 `apps/web/public/foods/PROVENANCE.md`에 갈래 id·버전·sha·생성일·품종 목록을 남긴다.
 - 교체 지점은 `FoodImage` 컴포넌트 하나다. 그림이 없는 품종은 이름 카드로 대신한다.
 
@@ -99,7 +99,7 @@
 
 - `pop`, `tick`, `fadeIn`, `rise`(명세 2.7)는 CSS 키프레임으로 한다.
 - 드래그, 스프링, 레이아웃 전환은 `motion`(이미 `packages/ui`에 있다)으로 한다.
-- 일러스트 자체의 움직임은 GSAP이며, 1i에서만 쓴다.
+- 일러스트 자체의 움직임은 `motion.svg`에 들어 있는 CSS 키프레임이다. 1i에서만 쓴다.
 - React `<ViewTransition>`은 세 곳에만 쓴다. 3a 카드에서 계절 상세로 갈 때 계절명 공유 요소 전환, 2b 달 바꾸기 크로스페이드, 계절 상세 이전/다음 슬라이드다. 하단 탭 전환은 즉시 바꾼다.
 - 모든 모션은 `prefers-reduced-motion`에서 즉시 끝난다.
 
