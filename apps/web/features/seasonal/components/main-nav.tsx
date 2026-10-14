@@ -22,7 +22,7 @@ export function FloatingNav() {
   return (
     <nav
       aria-label="주요 메뉴"
-      className="fixed inset-x-0 bottom-[max(16px,env(safe-area-inset-bottom))] z-40 mx-auto flex w-fit max-w-[300px] items-center gap-1 rounded-full bg-ink-band-soft p-1.5 shadow-lg lg:hidden"
+      className="fixed inset-x-0 bottom-[max(16px,env(safe-area-inset-bottom))] z-(--z-dock) mx-auto flex w-fit max-w-[300px] items-center gap-1 rounded-full bg-ink-band-soft p-1.5 shadow-lg lg:hidden"
     >
       {ITEMS.map((item) => (
         <FloatingNavItem key={item.href} {...item} />
@@ -53,7 +53,7 @@ function FloatingNavItem({ label, href, also, exact, Icon }: (typeof ITEMS)[numb
 /** 데스크톱 상단 바. actions에 검색 입력과 ⚙가 들어온다. */
 export function TopNav({ actions }: { actions?: React.ReactNode }) {
   return (
-    <header className="sticky top-0 z-40 hidden border-b border-hairline bg-canvas/94 backdrop-blur lg:block">
+    <header className="sticky top-0 z-(--z-sticky) hidden border-b border-hairline bg-canvas/94 backdrop-blur lg:block">
       <div className="mx-auto flex h-14 max-w-[1080px] items-center gap-8 px-6">
         <Link href={routes.seasonal.root} className="font-heading text-xl font-bold text-ink no-underline">
           제철달력

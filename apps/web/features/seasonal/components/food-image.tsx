@@ -14,6 +14,7 @@ export function FoodImage({
   variant = "color",
   sizes = "120px",
   preload = false,
+  showName = true,
   className,
 }: {
   food: Pick<Food, "id" | "name">
@@ -22,14 +23,16 @@ export function FoodImage({
   sizes?: string
   /** 첫 화면 큰 그림(LCP)이면 true. Next 16에서 priority 대신 preload를 쓴다. */
   preload?: boolean
+  /** 그림이 없을 때 이름 카드 안에 이름을 쓸지. 이름 라벨이 따로 있는 곳(흩어진 배치)은 false. */
+  showName?: boolean
   className?: string
 }) {
   if (!isDrawn(food.id)) {
     return (
       // 글자 크기는 카드 폭을 따른다(컨테이너 단위 cqi).
       <div role="img" aria-label={food.name} className={cn("aspect-square w-full @container", className)}>
-        <div className="grid size-full place-items-center rounded-full border border-dashed border-silver bg-surface p-[12%] text-center font-heading leading-tight text-stone [font-size:clamp(9px,20cqi,18px)]">
-          {food.name}
+        <div className="grid size-full place-items-center rounded-full border border-dashed border-silver bg-surface/50 p-[12%] text-center font-heading leading-tight text-stone [font-size:clamp(9px,20cqi,18px)]">
+          {showName && food.name}
         </div>
       </div>
     )

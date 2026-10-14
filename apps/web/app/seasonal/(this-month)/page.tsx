@@ -1,5 +1,18 @@
-import { ScreenStub } from "@/features/seasonal/components/screen-stub"
+import { Suspense } from "react"
 
+import { ThisMonthView } from "@/features/seasonal/this-month/this-month-view"
+import { getSeoulToday } from "@/shared/today"
+
+// 2a는 "오늘"(서울)에 따라 히어로·달력이 달라지므로 요청 시점에 그린다. 셸(헤더·탭·내비)은 정적이다.
 export default function Page() {
-  return <ScreenStub id="2a" title="이달 · 12개월 스크롤" />
+  return (
+    <Suspense fallback={<div className="min-h-svh" aria-busy />}>
+      <ThisMonth />
+    </Suspense>
+  )
+}
+
+async function ThisMonth() {
+  const today = await getSeoulToday()
+  return <ThisMonthView today={today} />
 }

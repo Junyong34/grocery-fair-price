@@ -93,3 +93,8 @@ export function festivalDate(slug: Festival, year: number): CalendarDate | null 
   const [month, day] = monthDay.split("-").map(Number)
   return { year, month: month!, day: day! }
 }
+
+/** 그해 그 달에 드는 명절. 날짜가 없으면(삼복, 표에 없는 연도) 대표 달로 본다. */
+export function festivalsInMonth(month: number, year: number): readonly (typeof FESTIVALS)[number][] {
+  return FESTIVALS.filter((festival) => (festivalDate(festival.slug, year)?.month ?? festival.month) === month)
+}

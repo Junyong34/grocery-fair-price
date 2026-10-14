@@ -9,6 +9,11 @@
 @import "./cojeev/button.css";
 @import "./cojeev/control-appearance.css";
 @import "./cojeev/drawer.css";
+@import "./cojeev/switch.css";
+@import "./cojeev/choice-foundations.css";
+@import "./cojeev/popover.css";
+@import "./cojeev/icon.css";
+@import "./cojeev/option-wheel.css";
 
 /* cojeev UI(https://cojeev.com/ui) 스타일. globals.css(Tailwind 진입점 + Oura 토큰) 다음에 불러온다.
    컴포넌트는 루트에서 `pnpm ui:add <url>`로 추가한다. CLI가 이 파일에 넣는 `@import "@/styles/..."`는

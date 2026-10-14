@@ -45,7 +45,7 @@ When you need a component, effect, or element, look in this order:
 2. **shadcn/ui** — only if cojeev has nothing that fits. Search the shadcn registry and add it.
 3. **Build it yourself** — only if neither has it. A generic piece goes in `packages/ui/src/components/`. A piece for one screen goes in `apps/web/features/<feature>/components/`. Use the existing tokens either way.
 
-Add cojeev or shadcn components from the repo root with `pnpm ui:add <name-or-url>` (for example `pnpm ui:add https://cojeev.com/ui/r/tabs.json`). Don't run `shadcn add` directly. The script installs into `packages/ui`, then runs `packages/ui/scripts/fix-ui-css.mjs`. That step rewrites the `@import "@/styles/..."` lines the CLI writes into `src/styles/cojeev.css`, because Tailwind can't resolve the `@/` alias and the build breaks. It also removes the `dark` variant the CLI adds back each time.
+Add cojeev or shadcn components from the repo root with `pnpm ui:add <name-or-url>` (for example `pnpm ui:add https://cojeev.com/ui/r/tabs.json`). Don't run `shadcn add` directly. The script installs into `packages/ui`, answers "no" to every overwrite prompt (so files we customized, like `bottom-sheet` or `option-wheel`, stay), then runs `packages/ui/scripts/fix-ui-css.mjs`. That step rewrites the `@import "@/styles/..."` lines the CLI writes into `src/styles/cojeev.css`, because Tailwind can't resolve the `@/` alias and the build breaks. It also removes the `dark` variant the CLI adds back each time.
 
 Colors:
 

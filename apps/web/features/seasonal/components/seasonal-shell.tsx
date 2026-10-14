@@ -2,7 +2,9 @@ import Link from "next/link"
 
 import { routes } from "@/shared/routes"
 
+import { DesktopSettingsButton, MobileSettingsButton } from "../this-month/settings-panel"
 import { FloatingNav, TopNav } from "./main-nav"
+import { ThisMonthOnly } from "./this-month-only"
 
 /**
  * 제철 영역 공통 셸. 모바일은 위 헤더 + 하단 Floating Nav, 데스크톱은 상단 바.
@@ -17,11 +19,20 @@ export function SeasonalShell({
 }) {
   return (
     <div className="flex min-h-svh flex-col">
-      <TopNav />
+      <TopNav
+        actions={
+          <ThisMonthOnly>
+            <DesktopSettingsButton />
+          </ThisMonthOnly>
+        }
+      />
       <header className="flex h-14 items-center justify-between px-[18px] lg:hidden">
         <Link href={routes.seasonal.root} className="font-heading text-xl font-bold text-ink no-underline">
           제철달력
         </Link>
+        <ThisMonthOnly>
+          <MobileSettingsButton />
+        </ThisMonthOnly>
       </header>
       <main className="flex-1 pb-28 lg:pb-12">{children}</main>
       <FloatingNav />
