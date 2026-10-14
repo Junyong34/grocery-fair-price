@@ -8,7 +8,8 @@
     "lint": "turbo lint",
     "format": "turbo format",
     "typecheck": "turbo typecheck",
-    "ui:add": "pnpm --filter @workspace/ui ui:add"
+    "ui:add": "pnpm --filter @workspace/ui ui:add",
+    "test": "turbo test"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

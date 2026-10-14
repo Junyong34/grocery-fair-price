@@ -1,6 +1,6 @@
 # 01. 품종·명절 데이터와 문구 초안
 
-Status: ready-for-agent
+Status: resolved
 Blocked by: —
 
 ## 목적
@@ -9,16 +9,33 @@ Blocked by: —
 
 ## 할 일
 
-- [ ] `packages/seasonal`에 `vitest`를 넣고 `test` 스크립트를 추가한다(turbo 작업에도 연결한다).
-- [ ] `src/data/foods.ts`: `foods.json`에서 `tier: "verified"` 79개를 옮긴다. 필드는 id(kebab-case), 이름, 카테고리, 제철 달 배열이다. 카탈로그에 있는 품종은 카탈로그 id를 쓰고, 없는 품종은 같은 규칙으로 새 id를 정한다. 원본에서 다시 만들 수 있도록 생성 스크립트로 만든다. 손으로 옮기지 않는다.
-- [ ] 파생 함수: `foodsInMonth(month)`, `seasonOfMonth(month)`, `foodsInSeason(season)`, 제철 달 표시 문자열("제철 9·10월").
-- [ ] `src/data/festivals.ts` 확장: 명절별 2026·2027 양력 날짜, 기준 달, 전통 음식 목록, 그 무렵 제철 품종 id 목록. 표에 없는 연도면 날짜가 `null`이다. 전통 음식은 품종 타입과 다른 타입으로 둔다.
-- [ ] `src/calendar/`: 달력 칸 계산(명세 5절에서 절기는 뺀다). 앞 빈칸, 7의 배수 맞춤, 일요일, 공휴일(`holidays-kr`), 오늘. 테스트를 먼저 쓴다.
-- [ ] `src/data/copy.ts` **초안**: 달별 한 줄 문구 12, 계절 설명 4, 명절 배경 6, 빈 상태·토스트 문구. 그 달 `verified` 품종에 맞춰 새로 쓴다. 파일 머리에 "초안 — 사용자 검토 전"이라고 적는다.
-- [ ] `packages/seasonal/README.md`의 폴더 표를 갱신한다.
+- [x] `packages/seasonal`에 `vitest`를 넣고 `test` 스크립트를 추가한다(turbo 작업에도 연결한다).
+- [x] `src/data/foods.ts`: `foods.json`에서 `tier: "verified"` 79개를 옮긴다. 필드는 id(kebab-case), 이름, 카테고리, 제철 달 배열이다. 카탈로그에 있는 품종은 카탈로그 id를 쓰고, 없는 품종은 같은 규칙으로 새 id를 정한다. 원본에서 다시 만들 수 있도록 생성 스크립트로 만든다. 손으로 옮기지 않는다.
+- [x] 파생 함수: `foodsInMonth(month)`, `seasonOfMonth(month)`, `foodsInSeason(season)`, 제철 달 표시 문자열("제철 9·10월").
+- [x] `src/data/festivals.ts` 확장: 명절별 2026·2027 양력 날짜, 기준 달, 전통 음식 목록, 그 무렵 제철 품종 id 목록. 표에 없는 연도면 날짜가 `null`이다. 전통 음식은 품종 타입과 다른 타입으로 둔다.
+- [x] `src/calendar/`: 달력 칸 계산(명세 5절에서 절기는 뺀다). 앞 빈칸, 7의 배수 맞춤, 일요일, 공휴일(`holidays-kr`), 오늘. 테스트를 먼저 쓴다.
+- [x] `src/data/copy.ts` **초안**: 달별 한 줄 문구 12, 계절 설명 4, 명절 배경 6, 빈 상태·토스트 문구. 그 달 `verified` 품종에 맞춰 새로 쓴다. 파일 머리에 "초안 — 사용자 검토 전"이라고 적는다.
+- [x] `packages/seasonal/README.md`의 폴더 표를 갱신한다.
 
 ## 완료 조건
 
 - `pnpm --filter @workspace/seasonal test`와 `typecheck`가 통과한다.
 - 달별 품종 수를 표로 남긴다(1월 15 … 11월 20). 흩어진 배치 크기 규칙을 확인할 때 쓴다.
 - 문구 초안을 사용자에게 보여 준다. 검토는 화면 작업을 막지 않는다.
+
+## Answer
+
+2026-10-14 완료.
+
+- `foods.generated.ts`: 검증 품종 79개. 38개는 일러스트 카탈로그 id, 41개는 새 id(`scripts/build-foods.mjs`의 `NEW_IDS`).
+  - 이름이 달라 맞춘 것: 취나물 → `aster-scaber`(카탈로그 "취나물(참취)"), 참돔 → `red-seabream`("도미(참돔)"), 대하 → `shrimp`(새우 일러스트가 대하 기준).
+  - 화면 이름은 괄호를 뺐다(딸기(시설) → 딸기, 광어(넙치) → 광어). 괄호 안 이름은 `aliases`로 검색에 쓴다.
+- 테스트한 경계: `formatSeasonMonths`, `monthCalendar`, `festivalDate`, `foodsInMonth`/`foodsInSeason`.
+- 명절 날짜: 2026·2027(삼복은 하루로 정할 수 없어 비움). 정월대보름은 2027년에 2월 21일이라 대표 월(3월)과 다르다. 화면은 `festivalDate(...)?.month ?? festival.month`를 쓴다.
+- 문구 초안: `src/data/copy.ts`. 사용자 검토 대기.
+
+달별 품종 수(흩어진 배치 크기 규칙 확인용):
+
+| 월 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 품종 | 15 | 14 | 14 | 12 | 10 | 13 | 15 | 15 | 12 | 17 | 20 | 14 |

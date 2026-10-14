@@ -8,7 +8,7 @@
 
 | # | 제목 | 상태 | 선행 |
 |---|---|---|---|
-| 01 | 품종·명절 데이터와 문구 초안 | ready-for-agent | — |
+| 01 | 품종·명절 데이터와 문구 초안 | resolved | — |
 | 02 | 일러스트 동기화 `pnpm foods:sync` | ready-for-agent | 01 |
 | 03 | 제철 셸: 내비·헤더·서체·토큰·`FoodImage`·store | ready-for-agent | 02 |
 | 04 | 2a 이달 · 12개월 스크롤 (정적 배치) | ready-for-agent | 01, 03 |
