@@ -10,7 +10,7 @@
 |---|---|---|---|
 | 01 | 품종·명절 데이터와 문구 초안 | resolved | — |
 | 02 | 일러스트 동기화 `pnpm foods:sync` | resolved | 01 |
-| 03 | 제철 셸: 내비·헤더·서체·토큰·`FoodImage`·store | ready-for-agent | 02 |
+| 03 | 제철 셸: 내비·헤더·서체·토큰·`FoodImage`·store | resolved | 02 |
 | 04 | 2a 이달 · 12개월 스크롤 (정적 배치) | ready-for-agent | 01, 03 |
 | 05 | 1i 품종 상세 | ready-for-agent | 03 |
 | 06 | 2b 월별 제철 타임라인 | ready-for-agent | 03 |
@@ -93,7 +93,7 @@
 
 연한 gold 배경 토큰이 없으면 `packages/ui/src/styles/globals.css`에 `--color-gold-wash` 하나를 추가한다.
 
-서체: 본문은 Pretendard(`next/font/local`), 제목(계절명, 달별 문구 italic)은 명조 계열(예: Gowun Batang, `next/font/google`), 큰 숫자는 cojeev 서체(DM Sans 또는 Bricolage)다. `layout.tsx`의 Roboto를 바꾸고 `--font-sans`·`--font-heading` 변수만 연결한다.
+서체: 본문은 Pretendard(`pretendard` 패키지 동적 서브셋 CSS), 제목(계절명, 달별 문구)은 Gowun Batang(`next/font/google`, 클래스 `font-heading`), 큰 숫자는 Bricolage(`font-number`)다. 한글 명조에는 이탤릭이 없으므로 명세의 italic 문구는 기울이지 않는다.
 
 ### 모션
 

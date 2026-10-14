@@ -39,10 +39,38 @@
     --color-season-summer: var(--color-forest);
     --color-season-autumn: var(--color-gold);
     --color-season-winter: var(--color-stone);
+
+    /* 선택·켜짐 상태의 연한 gold 배경 (와이어프레임 accent-100) */
+    --color-gold-wash: color-mix(in oklab, var(--color-gold-pale) 30%, var(--color-canvas));
+
+    /* 공통 모션(와이어프레임 2.7). 쓰는 곳에서 motion-safe:animate-*로 붙인다. */
+    --animate-pop: pop 1.2s ease-out both;
+    --animate-tick: tick 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    --animate-fade-in: fade-in 0.35s ease-out both;
+    --animate-rise: rise 0.25s ease-out both;
+
+    @keyframes pop {
+        0% { opacity: 0; transform: scale(0.8); }
+        20% { opacity: 1; transform: scale(1.15); }
+        100% { opacity: 0; transform: translateY(-20px) scale(1); }
+    }
+    @keyframes tick {
+        0% { transform: scale(0.4); }
+        60% { transform: scale(1.25); }
+        100% { transform: scale(1); }
+    }
+    @keyframes fade-in {
+        from { opacity: 0; }
+    }
+    @keyframes rise {
+        from { opacity: 0; transform: translateY(8px); }
+    }
 }
 
 @theme inline {
-    --font-heading: var(--font-sans);
+    /* 서체: 본문 Pretendard(cojeev --font-text를 덮어씀), 제목 명조(apps/web layout의 next/font), 큰 숫자 cojeev display */
+    --font-heading: var(--font-serif-ko), serif;
+    --font-number: var(--font-display);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -81,7 +109,7 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
-    --font-sans: var(--font-sans);
+    --font-sans: var(--font-text);
 }
 
 :root {

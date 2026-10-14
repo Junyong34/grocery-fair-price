@@ -52,6 +52,8 @@
   --v-skel-sheen: var(--color-surface);
   --v-disabled-face: var(--color-hairline);
   --v-disabled-fill: var(--color-hairline);
+  /* cojeev 본문 서체(DM Sans)에는 한글이 없다. Pretendard는 apps/web layout에서 불러온다. 숫자·영문 제목은 --font-display(Bricolage) 그대로. */
+  --font-text: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
 
 @theme inline {

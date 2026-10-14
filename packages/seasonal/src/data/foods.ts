@@ -1,3 +1,4 @@
+import { DRAWN_FOOD_IDS } from "./drawn-foods.generated"
 import { FOOD_ROWS } from "./foods.generated"
 import { SEASON_MONTHS, type Season } from "./seasons"
 
@@ -17,4 +18,16 @@ export function foodsInMonth(month: number): readonly Food[] {
 /** 계절의 어느 달이라도 제철인 품종. 한 품종은 한 번만 나온다. */
 export function foodsInSeason(season: Season): readonly Food[] {
   return FOODS.filter((food) => food.months.some((month) => SEASON_MONTHS[season].includes(month)))
+}
+
+/** id로 품종 찾기. 없는 id면 undefined. */
+export function findFood(id: string): Food | undefined {
+  return FOODS.find((food) => food.id === id)
+}
+
+const DRAWN = new Set<string>(DRAWN_FOOD_IDS)
+
+/** 일러스트가 있는 품종인지. 없으면 화면에서 이름 카드로 대신한다. */
+export function isDrawn(id: string): boolean {
+  return DRAWN.has(id)
 }
