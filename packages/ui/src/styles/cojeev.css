@@ -17,6 +17,10 @@
 @import "./cojeev/sheet.css";
 @import "./cojeev/toggle.css";
 @import "./cojeev/toggle-group.css";
+@import "./cojeev/animated-number.css";
+@import "./cojeev/checkbox.css";
+@import "./cojeev/progress.css";
+@import "./cojeev/toast.css";
 
 /* cojeev UI(https://cojeev.com/ui) 스타일. globals.css(Tailwind 진입점 + Oura 토큰) 다음에 불러온다.
    컴포넌트는 루트에서 `pnpm ui:add <url>`로 추가한다. CLI는 이 파일을 고치지 않고(임시 파일에 쓴다),
