@@ -17,7 +17,7 @@
 | 07 | 1h 나의 식탁 | resolved | 03 |
 | 08 | 3a 계절 히어로 · 계절 상세 | resolved | 03 |
 | 09 | 1g 명절 | resolved | 03 |
-| 10 | 전역 품종 검색 | ready-for-agent | 03 |
+| 10 | 전역 품종 검색 | resolved | 03 |
 | 11 | 흩어진 배치 드래그와 겹침 해소 | ready-for-agent | 04 |
 | 12 | 데스크톱·태블릿 변형 정리 | ready-for-agent | 04–10 |
 | 13 | 디자인 다듬기(화면별 어색함·색감 모음) | needs-info | 09, 10, 11 |

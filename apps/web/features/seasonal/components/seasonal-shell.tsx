@@ -3,7 +3,11 @@ import Link from "next/link"
 import { BrandLogo } from "@/shared/brand-logo"
 import { routes } from "@/shared/routes"
 
-import { DesktopSettingsButton, MobileSettingsButton } from "../this-month/settings-panel"
+import { DesktopSearchButton, MobileSearchButton } from "../search/food-search"
+import {
+  DesktopSettingsButton,
+  MobileSettingsButton,
+} from "../this-month/settings-panel"
 import { FloatingNav, TopNav } from "./main-nav"
 import { ThisMonthOnly } from "./this-month-only"
 
@@ -22,9 +26,12 @@ export function SeasonalShell({
     <div className="flex min-h-svh flex-col">
       <TopNav
         actions={
-          <ThisMonthOnly>
-            <DesktopSettingsButton />
-          </ThisMonthOnly>
+          <>
+            <DesktopSearchButton />
+            <ThisMonthOnly>
+              <DesktopSettingsButton />
+            </ThisMonthOnly>
+          </>
         }
       />
       <header className="flex h-14 items-center justify-between px-[18px] lg:hidden">
@@ -35,9 +42,12 @@ export function SeasonalShell({
         >
           <BrandLogo />
         </Link>
-        <ThisMonthOnly>
-          <MobileSettingsButton />
-        </ThisMonthOnly>
+        <div className="flex items-center gap-1">
+          <MobileSearchButton />
+          <ThisMonthOnly>
+            <MobileSettingsButton />
+          </ThisMonthOnly>
+        </div>
       </header>
       <main className="flex-1 pb-28 lg:pb-12">{children}</main>
       <FloatingNav />
