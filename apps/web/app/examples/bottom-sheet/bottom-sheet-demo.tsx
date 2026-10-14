@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { overlay } from "overlay-kit"
 
-import { BottomSheet, openBottomSheet } from "@/components/bottom-sheet"
-import { Button } from "@/components/ui/button"
+import { BottomSheet, openBottomSheet } from "@workspace/ui/components/bottom-sheet"
+import { Button } from "@workspace/ui/components/button"
 
 type Range = "이번 달" | "12개월 전체"
 

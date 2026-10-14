@@ -7,6 +7,9 @@
       ],
       "@workspace/ui/*": [
         "../../packages/ui/src/*"
+      ],
+      "@workspace/seasonal/*": [
+        "../../packages/seasonal/src/*"
       ]
     },
     "plugins": [

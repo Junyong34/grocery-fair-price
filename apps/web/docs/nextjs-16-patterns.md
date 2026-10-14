@@ -9,7 +9,7 @@
 - **기본은 Server Component다.** 정적 데이터(월별 품종, 계절, 명절, 공휴일)는 서버에서 읽어 HTML로 내보낸다. `'use client'`는 상호작용이 있는 말단 컴포넌트(월 레일, 캐러셀, 설정 시트, 먹음 토글, 검색)에만 붙인다. (`docs/01-app/01-getting-started/05-server-and-client-components.md` "Reducing JS bundle size")
 - **`cacheComponents: true`와 `partialPrefetching: true`를 지금 켠다.** 새 앱의 `create-next-app` 기본값이고, 다음 메이저 버전부터는 항상 켜진다. 초기 단계라 옮길 코드도 거의 없다. 켜면 "오늘" 같은 시간 의존 코드를 빌드가 강제로 드러내 준다. (`docs/01-app/01-getting-started/08-caching.md` "Enabling Cache Components") → 3절
 - **"오늘"(Asia/Seoul)은 프리렌더 결과에 굳히지 않는다.** 요청 시점에 `connection()`과 `<Suspense>`로 서버에서 한 번 계산해 ISO 문자열을 props나 Promise로 넘긴다. 클라이언트는 그 값을 그대로 쓰고 `new Date()`를 다시 부르지 않는다. 그러면 하이드레이션 불일치가 생기지 않는다. → 5.2
-- **라우트는 `generateStaticParams`로 정적 경로를 모두 만든다.** `/months/[m]`, `/seasons/[season]`, `/festivals/[slug]`, `/foods/[slug]`에 `dynamicParams = false`를 둔다. 필터·검색·보기 전환은 클라이언트 상태로 둔다. `searchParams`는 요청 시점 API라 정적 셸 밖으로 밀려난다. → 5.1
+- **라우트는 `generateStaticParams`로 정적 경로를 모두 만든다.** `/months/[m]`, `/seasons/[season]`, `/festivals/[slug]`, `/foods/[slug]`를 만든다(실제 경로는 `/seasonal/...` 아래, `apps/web/lib/routes.ts` 참고). **`dynamicParams`는 Cache Components와 함께 쓸 수 없어 빌드 에러가 난다.** 목록 밖 값은 페이지에서 `notFound()`로 막고, `params`는 `<Suspense>` 안에서 읽는다. 필터·검색·보기 전환은 클라이언트 상태로 둔다. `searchParams`는 요청 시점 API라 정적 셸 밖으로 밀려난다. → 5.1
 - **"먹었어요"(`eaten`)는 `useSyncExternalStore` 하나로 묶는다.** localStorage를 외부 저장소로 보고 `getServerSnapshot`은 빈 집합을 반환한다. Provider는 루트 레이아웃의 `{children}`만 감싸게 둔다. → 5.3
 - **흩어진 이미지 배치(`scat`)는 순수 함수로 서버에서 계산한다.** `Math.random()` 대신 명세의 LCG를 쓴다. 클라이언트 JS가 필요 없고, 불일치도 생길 수 없다. → 6절
 - **페이지 전환은 React `<ViewTransition>`과 `<Link transitionTypes>`로 한다.** 설정 없이 동작한다. motion은 페이지 안의 미세 동작(+1 팝, 시트)에만 쓴다. (`docs/01-app/02-guides/view-transitions.md`)
@@ -123,7 +123,7 @@ app/layout.tsx (Server)
 | 화면 | 라우트 제안 | Server | Client | 데이터 |
 |---|---|---|---|---|
 | 2a 이달 · 12개월 | `/` | 12개 월 섹션(숫자, 문구, 흩어진 이미지, 미니 달력 칸) | 월 레일/좌측 내비(스크롤 점프, IntersectionObserver), 스티키 인디케이터, ⚙ 설정, ✓ 배지, "오늘" 동그라미 | 품종 모듈, 2026 공휴일 |
-| 2b 월별 | `/months/[m]` (1~12, `generateStaticParams`, `dynamicParams=false`). `/months`는 오늘 달로 보낸다(5.2) | 계절 띠, 카드 그리드 마크업, 명절 줄 | 타임라인 칩 가로 스크롤 위치, 2·4·6열 보기 전환, 먹었어요 토글(+1 팝) | 같음 |
+| 2b 월별 | `/months/[m]` (1~12, `generateStaticParams`, 범위 밖은 `notFound()`). `/months`는 오늘 달로 보낸다(5.2) | 계절 띠, 카드 그리드 마크업, 명절 줄 | 타임라인 칩 가로 스크롤 위치, 2·4·6열 보기 전환, 먹었어요 토글(+1 팝) | 같음 |
 | 3a 계절 | `/seasons`(4장 히어로), `/seasons/[season]`(spring·summer·autumn·winter) | 카드 내용, 월별 묶음 | 모바일 scroll-snap 캐러셀 점, 데스크톱 hover 확장(CSS로 가능), "지금 계절에서 시작" | 계절 모듈 |
 | 1g 명절 | `/festivals/[slug]`(기본 추석: `/festivals` → `chuseok`) | 전통음식·제철 카드 | 칩 가로 스크롤(선택은 `<Link>`) | 명절 모듈(2026 날짜) |
 | 1h 나의 식탁 | `/table` | 정적 목록 데이터 전달 | 검색(es-hangul 초성), 월/계절 필터, 체크, 진행률, 토스트 | 전체 품종을 줄인 배열 |
@@ -136,14 +136,23 @@ app/layout.tsx (Server)
 - 데이터 파일은 모듈 상수로 두면 끝이다. 공휴일은 `@hyunbinseo/holidays-kr`의 **`/all` 진입점에서 `y2026`을 동기 import**하는 방법이 가장 단순하다(설치본 `dist/all.d.ts`에서 확인). 기본 진입점의 `getHolidayPreset('2026')`는 내부가 `import()`인 Promise다. Server Component에서 `await`해도 module import 성격이라 프리렌더된다고 **추론**한다(`08-caching.md` "Predictable values"의 `await import()` 예). 어느 쪽이든 서버에서만 import하고, 달력에 필요한 `{ 'YYYY-MM-DD': string[] }`만 내려보낸다.
 
 ```tsx
-// app/months/[m]/page.tsx
-export const dynamicParams = false
+// app/seasonal/(this-month)/months/[month]/page.tsx (실제 코드)
 export function generateStaticParams() {
-  return Array.from({ length: 12 }, (_, i) => ({ m: String(i + 1) }))
+  return MONTHS.map((month) => ({ month: String(month) }))
 }
-export default async function Page({ params }: PageProps<'/months/[m]'>) {
-  const { m } = await params
-  return <MonthView month={Number(m)} />   // Server Component
+// params는 URL 데이터다. <Suspense> 밖에서 await하면 instant navigation 검사가 경고한다
+// (node_modules/next/dist/docs/01-app/02-guides/instant-navigation.md).
+export default function Page(props: PageProps<'/seasonal/months/[month]'>) {
+  return (
+    <Suspense fallback={<MonthSkeleton />}>
+      <Month params={props.params} />
+    </Suspense>
+  )
+}
+async function Month({ params }: { params: PageProps<'/seasonal/months/[month]'>['params'] }) {
+  const { month } = await params
+  if (!MONTHS.some((m) => String(m) === month)) notFound()
+  return <MonthView month={Number(month)} />
 }
 ```
 

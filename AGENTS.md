@@ -24,25 +24,42 @@ Naming or classifying foods (카테고리, 품목, 품종, 규격) anywhere in t
 
 ## Web app UI (`apps/web`)
 
-`apps/web` is the 제철 (seasonal food) app. Screen spec: `prototypes/seasonal-food/wireframes/WIREFRAME-SPEC.md`. Color and type reference: `apps/web/DESIGN.md` (Oura).
+`apps/web` is the 제철 (seasonal food) app. The price-comparison screens will join the same app later. Screen spec: `prototypes/seasonal-food/wireframes/WIREFRAME-SPEC.md`. Color and type reference: `apps/web/DESIGN.md` (Oura).
+
+Layers. Each one may import only from the layers below it:
+
+| Layer | Where | What goes there |
+|---|---|---|
+| App routes | `apps/web/app/` | Route files only (`page`, `layout`, `@slot`, route groups). Keep them thin: read params, then render a feature component. |
+| Features | `apps/web/features/<feature>/` | Screen components and hooks for one feature (`seasonal`, later `price`). Features don't import each other. Shared code moves down a layer. |
+| App shared | `apps/web/shared/` | App-wide pieces: `routes.ts`, `providers.tsx`. |
+| Domain | `packages/seasonal` (`@workspace/seasonal`) | Pure TypeScript data and calculations, such as months, seasons, festivals and Seoul "today". No React, Next.js or DOM. The MVP-later print pages reuse it. |
+| Design system | `packages/ui` (`@workspace/ui`) | Oura tokens, cojeev UI, and generic components such as `BottomSheet`. No domain words. |
+
+Import with package paths, such as `@workspace/ui/components/button` and `@workspace/seasonal/data/months`. Inside `apps/web`, use `@/features/...` and `@/shared/...`.
 
 When you need a component, effect, or element, look in this order:
 
 1. **cojeev UI** — https://cojeev.com/ui/docs/ (full list: https://cojeev.com/ui/r/registry.json). If it exists there, use it.
 2. **shadcn/ui** — only if cojeev has nothing that fits. Search the shadcn registry and add it.
-3. **Build it yourself** — only if neither has it. Put it in `apps/web/components/` and use the existing tokens.
+3. **Build it yourself** — only if neither has it. A generic piece goes in `packages/ui/src/components/`. A piece for one screen goes in `apps/web/features/<feature>/components/`. Use the existing tokens either way.
 
-Add cojeev or shadcn components with `pnpm --filter web ui:add <name-or-url>` (for example `https://cojeev.com/ui/r/tabs.json`). Don't run `shadcn add` directly. The script also runs `apps/web/scripts/fix-ui-css.mjs`. That step rewrites the `@import "@/styles/..."` lines the CLI writes, because Tailwind can't resolve the `@/` alias and the build breaks. It also removes the `dark` variant the CLI adds back each time.
-
-Components land in `apps/web/components/ui/` and are imported from `@/components/ui/...`. `packages/ui` only holds the shared theme (`globals.css`). Don't add components there.
+Add cojeev or shadcn components from the repo root with `pnpm ui:add <name-or-url>` (for example `pnpm ui:add https://cojeev.com/ui/r/tabs.json`). Don't run `shadcn add` directly. The script installs into `packages/ui`, then runs `packages/ui/scripts/fix-ui-css.mjs`. That step rewrites the `@import "@/styles/..."` lines the CLI writes into `src/styles/cojeev.css`, because Tailwind can't resolve the `@/` alias and the build breaks. It also removes the `dark` variant the CLI adds back each time.
 
 Colors:
 
 - The only color source is the Oura palette in `packages/ui/src/styles/globals.css` (`--color-canvas`, `--color-stone`, `--color-gold`, ..., `--color-season-*`).
-- cojeev's own palette (`--v-*`) is overridden with Oura values in `apps/web/app/globals.css`. Don't put hex values in components.
-- No dark mode. `<html data-mode="light">` is fixed in `app/layout.tsx`. Don't add dark tokens, a theme toggle, or `dark:` classes.
+- cojeev's own palette (`--v-*`) is overridden with Oura values in `packages/ui/src/styles/cojeev.css`. Don't put hex values in components.
+- No dark mode. `<html data-mode="light">` is fixed in `apps/web/app/layout.tsx`. Don't add dark tokens, a theme toggle, or `dark:` classes.
 
-Sheets and dialogs: open them with `overlay-kit` (`<OverlayProvider>` is in `app/providers.tsx`). For bottom sheets, use `components/bottom-sheet.tsx` (`BottomSheet`, `openBottomSheet`). Example: `/examples/bottom-sheet`.
+Routes:
+
+- The 제철 screens live under `/seasonal`. `/` is reserved for the future price-comparison main. Today `app/page.tsx` redirects to `routes.home`. When the price main ships, replace that page. Don't move the seasonal routes.
+- Build every path with `routes` from `apps/web/shared/routes.ts`. Never hard-code a path string in a component. `proxy.ts` `matcher` is the one exception, because it must be a static literal.
+- Route groups `(this-month)` and `(season)` share the second-level tab bars without changing the URL. `@sheet/(.)foods/[food]` intercepts `/seasonal/foods/[food]` and shows it as a bottom sheet inside the seasonal area. Loading that URL directly renders the full page.
+- With Cache Components, `dynamicParams` is a build error. Validate params with `notFound()` and read `params` inside `<Suspense>`.
+
+Sheets and dialogs: open them with `overlay-kit` (`<OverlayProvider>` is in `apps/web/shared/providers.tsx`). For bottom sheets, use `@workspace/ui/components/bottom-sheet` (`BottomSheet`, `openBottomSheet`). Example: `/examples/bottom-sheet`.
 
 ## Next.js docs
 
