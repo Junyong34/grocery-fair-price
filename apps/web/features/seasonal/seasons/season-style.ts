@@ -18,5 +18,5 @@ export const SEASON_COLOR_VAR: Record<Season, string> = {
   winter: "var(--color-season-winter)",
 }
 
-/** 실제 3a 화면이 쓰는 배경. 비교 페이지에서 사용자가 고른 값으로 바꾼다. */
+/** 실제 3a 화면이 쓰는 배경. 2026-10-14 비교 페이지에서 사용자가 sunwash를 골랐다. */
 export const SEASON_BACKGROUND: SeasonBackgroundVariant = "sunwash"

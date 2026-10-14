@@ -1,6 +1,6 @@
 # 08. 3a 계절 히어로 · 계절 상세
 
-Status: ready-for-human
+Status: resolved
 Blocked by: 03
 
 ## 목적
@@ -21,11 +21,11 @@ Blocked by: 03
 - 카드를 누르면 계절명이 이어지며 상세로 가고, 뒤로 가면 돌아온다.
 - 375와 1280 스크린샷.
 
-- [ ] 사용자가 배경을 고르면 `features/seasonal/seasons/season-style.ts`의 `SEASON_BACKGROUND`를 바꾸고 spec에 적는다(지금은 `sunwash`).
+- [x] 사용자가 `sunwash`를 골랐다(2026-10-14). `SEASON_BACKGROUND` 기본값 그대로.
 
 ## Answer
 
-2026-10-14 구현. 배경 선택만 사용자 결정 대기.
+2026-10-14 완료. 배경은 `sunwash`.
 
 - 배경 후보(`/examples/season-backgrounds`): cojeev `pattern-background`의 sunwash·sprouts·contours(SVG, 가볍다), `pigment-field`(WebGL), plain(CSS 그라데이션). 모두 계절색 토큰으로 칠하고, 아래에서 번지는 계절색 그라데이션을 공통으로 깐다.
   - pigment-field 셰이더는 `--v-pink/blue/yellow`와 `--v-paper`를 읽는다. 카드마다 이 변수를 계절색으로 덮어쓴다. 화면에 보일 때만 WebGL이 돌고(cojeev useMotionVisibility), 캐러셀에서 옆 카드는 멈춰 있다.
