@@ -15,3 +15,41 @@
     animation-delay: 0s !important;
   }
 }
+
+/* 계절 상세 이전/다음: 다음은 왼쪽으로, 이전은 오른쪽으로 미끄러진다. */
+::view-transition-old(.season-next) {
+  animation: 180ms ease-in both season-slide-out-left;
+}
+::view-transition-new(.season-next) {
+  animation: 240ms ease-out both season-slide-in-right;
+}
+::view-transition-old(.season-prev) {
+  animation: 180ms ease-in both season-slide-out-right;
+}
+::view-transition-new(.season-prev) {
+  animation: 240ms ease-out both season-slide-in-left;
+}
+@keyframes season-slide-out-left {
+  to {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+}
+@keyframes season-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
+@keyframes season-slide-out-right {
+  to {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
+@keyframes season-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+}

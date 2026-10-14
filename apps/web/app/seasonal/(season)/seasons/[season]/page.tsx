@@ -3,7 +3,7 @@ import { Suspense } from "react"
 
 import { isSeason, SEASONS } from "@workspace/seasonal/data/seasons"
 
-import { ScreenStub } from "@/features/seasonal/components/screen-stub"
+import { SeasonDetail } from "@/features/seasonal/seasons/season-detail"
 
 type Params = PageProps<"/seasonal/seasons/[season]">["params"]
 
@@ -13,7 +13,7 @@ export function generateStaticParams() {
 
 export default function Page(props: PageProps<"/seasonal/seasons/[season]">) {
   return (
-    <Suspense fallback={<ScreenStub id="3a" title="계절 상세" />}>
+    <Suspense fallback={<div className="min-h-svh" aria-busy />}>
       <Season params={props.params} />
     </Suspense>
   )
@@ -22,5 +22,5 @@ export default function Page(props: PageProps<"/seasonal/seasons/[season]">) {
 async function Season({ params }: { params: Params }) {
   const { season } = await params
   if (!isSeason(season)) notFound()
-  return <ScreenStub id="3a" title={`계절 상세 · ${season}`} />
+  return <SeasonDetail season={season} />
 }

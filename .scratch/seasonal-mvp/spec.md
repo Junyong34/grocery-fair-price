@@ -15,7 +15,7 @@
 | 05 | 1i 품종 상세 | resolved | 03 |
 | 06 | 2b 월별 제철 타임라인 | resolved | 03 |
 | 07 | 1h 나의 식탁 | resolved | 03 |
-| 08 | 3a 계절 히어로 · 계절 상세 | ready-for-agent | 03 |
+| 08 | 3a 계절 히어로 · 계절 상세 | ready-for-human (배경 선택) | 03 |
 | 09 | 1g 명절 | ready-for-agent | 03 |
 | 10 | 전역 품종 검색 | ready-for-agent | 03 |
 | 11 | 흩어진 배치 드래그와 겹침 해소 | ready-for-agent | 04 |

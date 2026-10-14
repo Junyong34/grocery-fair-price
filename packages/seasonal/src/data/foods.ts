@@ -40,3 +40,14 @@ export function foodsInSeasonWith(food: Food): readonly Food[] {
     .sort((a, b) => b.shared - a.shared)
     .map(({ other }) => other)
 }
+
+/**
+ * 계절 대표 품종(3a 계절 카드). 카드에 크게 그리므로 그림이 있는 품종을 먼저, 그 안에서는 그 계절에 제철인 달이 많은 품종부터 고른다.
+ * 그림이 모자라면 그림 없는 품종으로 채운다. 그림 목록이 늘면 결과도 바뀐다.
+ */
+export function seasonHighlights(season: Season, count: number): readonly Food[] {
+  const monthsIn = (food: Food) => food.months.filter((month) => SEASON_MONTHS[season].includes(month)).length
+  return [...foodsInSeason(season)]
+    .sort((a, b) => Number(isDrawn(b.id)) - Number(isDrawn(a.id)) || monthsIn(b) - monthsIn(a))
+    .slice(0, count)
+}
