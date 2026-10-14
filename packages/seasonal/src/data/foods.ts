@@ -31,3 +31,12 @@ const DRAWN = new Set<string>(DRAWN_FOOD_IDS)
 export function isDrawn(id: string): boolean {
   return DRAWN.has(id)
 }
+
+/** 제철 달이 하나라도 겹치는 다른 품종. 겹치는 달이 많은 것부터, 같으면 이름순. */
+export function foodsInSeasonWith(food: Food): readonly Food[] {
+  const overlap = (other: Food) => other.months.filter((month) => (food.months as readonly number[]).includes(month)).length
+  return FOODS.filter((other) => other.id !== food.id && overlap(other) > 0)
+    .map((other) => ({ other, shared: overlap(other) }))
+    .sort((a, b) => b.shared - a.shared)
+    .map(({ other }) => other)
+}

@@ -98,3 +98,8 @@ export function festivalDate(slug: Festival, year: number): CalendarDate | null 
 export function festivalsInMonth(month: number, year: number): readonly (typeof FESTIVALS)[number][] {
   return FESTIVALS.filter((festival) => (festivalDate(festival.slug, year)?.month ?? festival.month) === month)
 }
+
+/** 그 무렵 제철 품종으로 그 품종을 꼽은 명절(품종 상세의 관련 명절). */
+export function festivalsWithFood(foodId: string): readonly (typeof FESTIVALS)[number][] {
+  return FESTIVALS.filter((festival) => (festival.seasonalFoodIds as readonly string[]).includes(foodId))
+}

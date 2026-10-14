@@ -1,26 +1,37 @@
+import Link from "next/link"
+import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
-import { ScreenStub } from "@/features/seasonal/components/screen-stub"
+import { FOODS, findFood } from "@workspace/seasonal/data/foods"
+
+import { FoodDetail } from "@/features/seasonal/food-detail/food-detail"
+import { routes } from "@/shared/routes"
 
 type Params = PageProps<"/seasonal/foods/[food]">["params"]
 
-// 빌드 때 미리 만들 품종 id. 목록 밖 id는 첫 요청 때 렌더된다(Cache Components에서는 dynamicParams를 쓸 수 없다).
-// TODO: 품종 데이터 모듈이 생기면 전체 품종 id로 바꾸고, 없는 id는 notFound()로 막는다.
-//       id는 일러스트 카탈로그(foods/<id>)와 같은 영문 kebab-case다.
+// 모든 품종을 빌드 때 만든다. 목록 밖 id는 notFound()로 막는다(Cache Components에서는 dynamicParams를 쓸 수 없다).
 export function generateStaticParams() {
-  return [{ food: "apple" }, { food: "shrimp" }, { food: "persimmon" }]
+  return FOODS.map((food) => ({ food: food.id }))
 }
 
 // 주소로 직접 열거나 새로고침했을 때 보이는 전체 페이지. 제철 화면 안에서 누르면 @sheet가 가로챈다.
 export default function Page(props: PageProps<"/seasonal/foods/[food]">) {
   return (
-    <Suspense fallback={<ScreenStub id="1i" title="품종 상세" />}>
+    <Suspense fallback={<div className="min-h-svh" aria-busy />}>
       <Food params={props.params} />
     </Suspense>
   )
 }
 
 async function Food({ params }: { params: Params }) {
-  const { food } = await params
-  return <ScreenStub id="1i" title={`품종 상세 · ${food}`} />
+  const food = findFood((await params).food)
+  if (!food) notFound()
+  return (
+    <article className="mx-auto flex max-w-[560px] flex-col gap-4 px-[18px] pt-6 lg:pt-10">
+      <Link href={routes.seasonal.root} className="text-sm text-stone">
+        ‹ 이달의 제철
+      </Link>
+      <FoodDetail food={food} title={<h1 className="font-heading text-[36px] leading-tight font-bold">{food.name}</h1>} />
+    </article>
+  )
 }

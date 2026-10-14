@@ -1,12 +1,15 @@
 import { Suspense } from "react"
 
+import { findFood } from "@workspace/seasonal/data/foods"
+
 import { FoodSheet } from "@/features/seasonal/components/food-sheet"
+import { FoodDetail } from "@/features/seasonal/food-detail/food-detail"
 
 export { generateStaticParams } from "../../../foods/[food]/page"
 
 type Params = PageProps<"/seasonal/foods/[food]">["params"]
 
-// 제철 화면 안에서 /seasonal/foods/[food]로 이동하면 페이지 대신 이 하단 시트가 뜬다(인터셉팅 라우트).
+// 제철 화면 안에서 /seasonal/foods/[food]로 이동하면 페이지 대신 이 시트가 뜬다(인터셉팅 라우트).
 export default function Page(props: PageProps<"/seasonal/foods/[food]">) {
   return (
     <Suspense>
@@ -16,6 +19,12 @@ export default function Page(props: PageProps<"/seasonal/foods/[food]">) {
 }
 
 async function Sheet({ params }: { params: Params }) {
-  const { food } = await params
-  return <FoodSheet id={food} />
+  const food = findFood((await params).food)
+  // 없는 품종이면 시트를 띄우지 않는다. 주소로 직접 열면 전체 페이지가 404를 낸다.
+  if (!food) return null
+  return (
+    <FoodSheet title={food.name}>
+      <FoodDetail food={food} />
+    </FoodSheet>
+  )
 }
