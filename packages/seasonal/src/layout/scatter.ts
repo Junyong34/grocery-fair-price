@@ -56,7 +56,7 @@ export type ScatterLayout = {
 
 const CANDIDATES = 60
 /** 그림이 판 넓이에서 차지하는 비율. 낮을수록 그림이 작고 사이가 넓다. */
-const COVERAGE = 0.35
+const COVERAGE = 0.45
 
 export function scatterLayout({
   month,
