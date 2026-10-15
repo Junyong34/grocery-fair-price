@@ -121,14 +121,15 @@ function useScrolledDown() {
 /**
  * 제철 영역 헤더: 로고 · (데스크톱) 주요 메뉴 · 검색 · 설정. 늘 위에 붙어 있다.
  * 맨 위에서는 화면 폭에 붙은 평평한 줄이고, 내려가면 가장자리에서 떨어진 둥근 바로 떠오른다.
- * 다시 맨 위에 닿으면 탄성 있게 제자리로 붙는다(자석처럼). context는 떠 있을 때만 로고 옆에 보인다.
+ * 다시 맨 위에 닿으면 탄성 있게 제자리로 붙는다(자석처럼).
+ * tabs(2차 탭)는 떠 있을 때만 보인다. 본문 위 2차 탭이 스크롤로 가려져도 헤더에서 바로 옮길 수 있다.
  */
 export function SeasonalHeader({
   actions,
-  context,
+  tabs,
 }: {
   actions?: React.ReactNode
-  context?: React.ReactNode
+  tabs?: React.ReactNode
 }) {
   const stuck = useScrolledDown()
   return (
@@ -154,11 +155,6 @@ export function SeasonalHeader({
               <BrandLogo />
             </span>
           </Link>
-          {context && (
-            <div className="min-w-0 translate-y-1 opacity-0 motion-safe:transition-[opacity,translate] motion-safe:duration-300 group-data-stuck/header:translate-y-0 group-data-stuck/header:opacity-100">
-              {context}
-            </div>
-          )}
           <nav aria-label="주요 메뉴" className="hidden gap-6 lg:flex">
             {ITEMS.map(({ label, href, also, exact }) => (
               <NavLink
@@ -172,6 +168,15 @@ export function SeasonalHeader({
               </NavLink>
             ))}
           </nav>
+          {tabs && (
+            // 맨 위에서는 본문 위 2차 탭이 보이므로 숨기고(inert로 초점도 막는다) 떠 있을 때만 나타난다.
+            <div
+              inert={!stuck}
+              className="min-w-0 translate-y-1 opacity-0 empty:hidden motion-safe:transition-[opacity,translate] motion-safe:duration-300 group-data-stuck/header:translate-y-0 group-data-stuck/header:opacity-100 lg:border-l lg:border-hairline lg:pl-6"
+            >
+              {tabs}
+            </div>
+          )}
           <div className="ml-auto flex items-center gap-1 lg:gap-2">
             {actions}
           </div>

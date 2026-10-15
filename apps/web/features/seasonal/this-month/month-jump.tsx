@@ -5,8 +5,6 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { MONTHS } from "@workspace/seasonal/data/months"
 
-import { useToday } from "@/shared/today-context"
-
 import { jumpToMonth, useActiveMonth } from "./active-month"
 
 /** 그 달 섹션으로 즉시 이동하는 버튼(히어로의 "10월 달력 보기 ↓", "1월부터"). */
@@ -23,17 +21,6 @@ export function JumpButton({
     <Button variant={variant} onClick={() => jumpToMonth(month)}>
       {children}
     </Button>
-  )
-}
-
-/** 모바일 헤더가 떠 있을 때 로고 옆에 보이는 지금 달. 히어로에서는 "지금은 10월", 아래로 내려가면 "11월". */
-export function ActiveMonthLabel() {
-  const { month: thisMonth } = useToday()
-  const active = useActiveMonth((state) => state.active)
-  return (
-    <span aria-hidden className="block truncate font-heading text-[17px] text-ink tabular-nums lg:hidden">
-      {active ? `${active}월` : `지금은 ${thisMonth}월`}
-    </span>
   )
 }
 

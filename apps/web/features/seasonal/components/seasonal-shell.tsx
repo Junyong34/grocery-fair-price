@@ -1,18 +1,15 @@
-import { Suspense } from "react"
-
 import { DesktopSearchButton, MobileSearchButton } from "../search/food-search"
-import { ActiveMonthLabel } from "../this-month/month-jump"
 import {
   DesktopSettingsButton,
   MobileSettingsButton,
 } from "../this-month/settings-panel"
 import { FloatingNav, SeasonalHeader } from "./main-nav"
-import { ShareButton } from "./share-button"
+import { HeaderSubTabs } from "./sub-tabs"
 import { ThisMonthOnly } from "./this-month-only"
 
 /**
- * 제철 영역 공통 셸. 위에 늘 붙은 헤더(로고·검색·공유·설정), 모바일은 하단 Floating Nav, 데스크톱은 헤더 안 주요 메뉴.
- * 2차 탭은 라우트 그룹 레이아웃((this-month), (season))이 헤더 아래에 그린다. sheet는 품종 상세 가로채기 슬롯이다.
+ * 제철 영역 공통 셸. 위에 늘 붙은 헤더(로고·검색·설정), 모바일은 하단 Floating Nav, 데스크톱은 헤더 안 주요 메뉴.
+ * 2차 탭은 라우트 그룹 레이아웃((this-month), (season))이 헤더 아래에 그리고, 헤더가 떠 있을 때는 헤더 안에도 작게 보인다. sheet는 품종 상세 가로채기 슬롯이다.
  */
 export function SeasonalShell({
   children,
@@ -24,25 +21,17 @@ export function SeasonalShell({
   return (
     <div className="flex min-h-svh flex-col">
       <SeasonalHeader
-        context={
-          <ThisMonthOnly>
-            <Suspense>
-              <ActiveMonthLabel />
-            </Suspense>
-          </ThisMonthOnly>
-        }
+        tabs={<HeaderSubTabs />}
         actions={
           <>
             <div className="contents lg:hidden">
               <MobileSearchButton />
-              <ShareButton />
               <ThisMonthOnly>
                 <MobileSettingsButton />
               </ThisMonthOnly>
             </div>
             <div className="hidden lg:contents">
               <DesktopSearchButton />
-              <ShareButton />
               <ThisMonthOnly>
                 <DesktopSettingsButton />
               </ThisMonthOnly>
