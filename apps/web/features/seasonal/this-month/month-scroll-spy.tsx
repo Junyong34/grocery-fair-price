@@ -30,9 +30,14 @@ export function MonthScrollSpy() {
 
     window.addEventListener("scroll", onScroll, { passive: true })
     window.addEventListener("resize", onScroll)
+    // 새로고침 때 브라우저가 되살린 스크롤 위치는 그림·달력이 그려지며 높이가 바뀌는 동안 scroll 이벤트 없이 달라진다.
+    // 본문 높이가 바뀔 때도 다시 재서, 맨 위로 돌아왔는데 마지막 달이 활성으로 남는 일을 막는다.
+    const observer = new ResizeObserver(onScroll)
+    observer.observe(document.body)
     return () => {
       window.removeEventListener("scroll", onScroll)
       window.removeEventListener("resize", onScroll)
+      observer.disconnect()
       cancelAnimationFrame(frame)
     }
   }, [])
