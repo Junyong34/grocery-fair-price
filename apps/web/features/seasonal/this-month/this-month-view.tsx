@@ -61,14 +61,14 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
               duration={600}
               className="mt-1 block font-heading text-lg text-stone lg:text-[22px]"
             />
-            <div className="lg:mt-6 lg:grid lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start lg:gap-6">
+            <div className="lg:mt-6">
               <div>
-                <Scatter month={thisMonth} foods={current.foods} year={year} className="mt-6 lg:mt-0" />
+                <Scatter month={thisMonth} foods={current.foods} year={year} className="mt-6 lg:mt-0" desktopFrame="desktopHero" />
                 <p className="mt-3 text-xs text-ash">
                   {current.foods.length}가지 제철<span className="hidden lg:inline"> · 그림을 끌어 옮겨 보세요</span>
                 </p>
               </div>
-              <div className="lg:flex lg:flex-col lg:gap-3">
+              <div className="lg:mt-5 lg:flex lg:items-center lg:gap-5">
                 <div className="mt-5 flex flex-wrap items-center gap-2 lg:mt-0">
                   <JumpButton month={thisMonth}>{thisMonth}월 달력 보기 ↓</JumpButton>
                   <JumpButton month={1} variant="outline">
@@ -145,47 +145,58 @@ function MonthSection({
         <p className="hidden flex-1 font-heading text-lg text-stone lg:block">{note}</p>
       </div>
       <p className="mt-2 font-heading text-[19px] text-stone lg:hidden">{note}</p>
-      <div className="lg:mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start lg:gap-6">
-        <div>
-          <Scatter month={month} foods={foods} year={today.year} className="mt-5 lg:mt-0" />
-          <p className="mt-3 text-xs text-ash">{foods.length}가지 제철</p>
+      <div className="lg:mt-5">
+        <Scatter
+          month={month}
+          foods={foods}
+          year={today.year}
+          className="mt-5 lg:mt-0"
+          desktopFrame="desktopMonth"
+          desktopCalendar={<SettingsCalendar year={today.year} month={month} today={today} holidays={holidays} />}
+        />
+        <p className="mt-3 text-xs text-ash">
+          {foods.length}가지 제철<span className="hidden lg:inline"> · 그림을 끌어 달력 위에도 놓아 꾸며 보세요</span>
+        </p>
+        <div className="mt-5 lg:hidden">
+          <SettingsCalendar year={today.year} month={month} today={today} holidays={holidays} />
         </div>
-        <div>
-          <div className="mt-5 lg:mt-0">
-            <SettingsCalendar year={today.year} month={month} today={today} holidays={holidays} />
-          </div>
-          <p className="mt-3 text-xs text-stone">
-            {festivals.length
-              ? `명절 ${festivals
-                  .map((festival) => {
-                    const date = festivalDate(festival.slug, today.year)
-                    return date ? `${festival.name} ${date.month}.${date.day}` : festival.name
-                  })
-                  .join(" · ")}`
-              : UI_COPY.noFestivalThisMonth}
-          </p>
-        </div>
+        <p className="mt-3 text-xs text-stone">
+          {festivals.length
+            ? `명절 ${festivals
+                .map((festival) => {
+                  const date = festivalDate(festival.slug, today.year)
+                  return date ? `${festival.name} ${date.month}.${date.day}` : festival.name
+                })
+                .join(" · ")}`
+            : UI_COPY.noFestivalThisMonth}
+        </p>
       </div>
     </section>
   )
 }
 
-/** 모바일·데스크톱 프레임의 배치를 모두 그리고 화면 폭에 따라 하나만 보인다(하이드레이션 차이가 없다). */
+/** 모바일·데스크톱 프레임의 배치를 모두 그리고 화면 폭에 따라 하나만 보인다(하이드레이션 차이가 없다). desktopCalendar가 있으면 데스크톱 판 위에 달력을 얹는다. */
 function Scatter({
   month,
   foods,
   year,
   className,
+  desktopFrame = "desktop",
+  desktopCalendar,
 }: {
   month: number
   foods: ReturnType<typeof foodsInMonth>
   year: number
   className?: string
+  desktopFrame?: "desktop" | "desktopMonth" | "desktopHero"
+  desktopCalendar?: React.ReactNode
 }) {
   return (
     <div className={cn(className)}>
       <ScatterField month={month} foods={foods} year={year} frame="mobile" className="lg:hidden" />
-      <ScatterField month={month} foods={foods} year={year} frame="desktop" className="hidden lg:block" />
+      <ScatterField month={month} foods={foods} year={year} frame={desktopFrame} className="hidden lg:block">
+        {desktopCalendar}
+      </ScatterField>
     </div>
   )
 }
