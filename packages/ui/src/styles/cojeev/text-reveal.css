@@ -13,8 +13,11 @@
 [data-flow="off"] .v-text-reveal [data-reveal-unit],
 .v-text-reveal[data-flow="off"] [data-reveal-unit],
 .v-text-reveal[data-motion-quiet="true"] [data-reveal-unit] { opacity: 1; transform: none; filter:none; }
+/* 우리 앱 수정: 하이드레이션 전에는 글자를 숨겨 두어 "보였다가 다시 나타나는" 깜빡임을 없앤다. 위 quiet 규칙보다 뒤에 둔다. */
+.v-text-reveal[data-reveal-hold="true"] [data-reveal-unit] { opacity: 0; }
 @media (prefers-reduced-motion: reduce) {
-  .v-text-reveal [data-reveal-unit] { opacity: 1; transform: none; filter:none; }
+  .v-text-reveal [data-reveal-unit],
+  .v-text-reveal[data-reveal-hold="true"] [data-reveal-unit] { opacity: 1; transform: none; filter:none; }
 }
 
 }

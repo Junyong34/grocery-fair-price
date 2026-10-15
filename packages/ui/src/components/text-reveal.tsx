@@ -70,6 +70,13 @@ export function TextReveal({ text, as: Tag = "span", replayKey = 0, variant = "r
   const setHost = React.useCallback((element: HTMLElement | null) => { host.current = element; setMountedElement(element); }, []);
   const { enabled, inView } = useMotionVisibility(host, mountedElement);
   const played = React.useRef<string | null>(null);
+  // 우리 앱 수정: 서버 HTML이 먼저 보였다가 하이드레이션 뒤 숨겨져 다시 나타나는 깜빡임을 막는다.
+  // 처음에는 글자를 숨겨 두고, 애니메이션이 첫 프레임을 그린 뒤(또는 800ms 안전장치) 푼다.
+  const [hold, setHold] = React.useState(true);
+  React.useEffect(() => {
+    const timer = setTimeout(() => setHold(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
   const token = JSON.stringify([text, replayKey, variant, split, direction]);
   const lineResult = useTextLines(mountedElement, text, split === "line");
   const segmenter = React.useMemo(() => new Intl.Segmenter(undefined, { granularity: "grapheme" }), []);
@@ -104,6 +111,8 @@ export function TextReveal({ text, as: Tag = "span", replayKey = 0, variant = "r
       "--reveal-scale": { inherit: true, times: variant === "bloom" ? [0, .7, 1] : [0, 1] },
     });
     const stop = trackMotion(controls);
+    // 시작 값(투명)이 먼저 그려진 다음 프레임에 숨김을 푼다.
+    requestAnimationFrame(() => requestAnimationFrame(() => setHold(false)));
     return () => {
       stop();
       // Settle through the same Motion values so its queued render cannot
@@ -112,7 +121,7 @@ export function TextReveal({ text, as: Tag = "span", replayKey = 0, variant = "r
       if (mounted.length) animate(mounted, { "--reveal-opacity": 1, "--reveal-y": "0em", "--reveal-blur": "0px", "--reveal-fold": "0deg", "--reveal-scale": 1 }, { duration: 0 });
     };
   }, [token, enabled, inView, duration, variant, stagger, direction, split, lineResult]);
-  return <Tag {...props} ref={setHost} data-slot="text-reveal" data-reveal-variant={variant} data-reveal-split={split} data-line-state={split === "line" ? !lineResult ? "measuring" : lineResult.lines ? "ready" : "prose" : undefined} data-motion-quiet={!enabled || !inView} className={cn("v-text-reveal", className)}>
+  return <Tag {...props} ref={setHost} data-slot="text-reveal" data-reveal-variant={variant} data-reveal-hold={hold} data-reveal-split={split} data-line-state={split === "line" ? !lineResult ? "measuring" : lineResult.lines ? "ready" : "prose" : undefined} data-motion-quiet={!enabled || !inView} className={cn("v-text-reveal", className)}>
     <span className="v-text-reveal__accessible">{text}</span>
     {split === "line" && <span aria-hidden="true" data-reveal-measure="">{text}</span>}
     <span aria-hidden="true" data-reveal-visual="">{split === "line" ? lineResult?.lines ? lineResult.lines.map(line => <span key={`${line.start}:${line.end}`} data-reveal-unit="" data-reveal-line="">{line.text || "\u200b"}</span>) : text : split === "text" ? text && <span data-reveal-unit="">{text}</span> : text.split(/(\s+)/).map((word, index) => !word || /^\s+$/.test(word) ? word : <span key={index} data-reveal-word="" {...(split === "word" ? { "data-reveal-unit": "" } : {})}>{split === "word" ? word : Array.from(segmenter.segment(word), ({ segment }, i) => <span key={i} data-reveal-unit="">{segment}</span>)}</span>)}</span>
