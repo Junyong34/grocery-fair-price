@@ -4,6 +4,10 @@ import { useEffect, useRef, useState } from "react"
 
 import { OptionWheel, type OptionWheelItem } from "@workspace/ui/components/option-wheel"
 
+import { formatMonthLabel } from "@workspace/seasonal/data/months"
+
+import { useSettingsStore } from "../stores/settings-store"
+
 import { jumpToMonth, useActiveMonth } from "./active-month"
 
 export type PanelMonth = { month: number; note: string; count: number }
@@ -13,7 +17,7 @@ const WHEEL_SETTLE_MS = 150
 
 /**
  * 데스크톱 2a 왼쪽 고정 패널(명세 3.1 데스크톱). 스크롤 중인 달(없으면 이번 달)의 숫자·문구와 달 이동 휠.
- * 휠 항목은 "지금 · 10월"(히어로)과 1~12월이다. 스크롤로 바뀐 활성 달은 휠에 되돌려 준다.
+ * 휠 항목은 "지금 · 10월"(히어로)과 1~12월이다(달 이름 표기는 ⚙에서 고른다). 스크롤로 바뀐 활성 달은 휠에 되돌려 준다.
  */
 export function DesktopMonthPanel({
   thisMonth,
@@ -26,12 +30,13 @@ export function DesktopMonthPanel({
 }) {
   const active = useActiveMonth((state) => state.active)
   const shown = months[(active ?? thisMonth) - 1]!
+  const labelStyle = useSettingsStore((state) => state.monthLabel)
 
   const items: OptionWheelItem[] = [
-    { id: "now", label: `지금 · ${thisMonth}월`, description: "맨 위 이번 달 장면" },
+    { id: "now", label: `지금 · ${formatMonthLabel(thisMonth, labelStyle)}`, description: "맨 위 이번 달 장면" },
     ...months.map(({ month, count }) => ({
       id: String(month),
-      label: `${month}월`,
+      label: formatMonthLabel(month, labelStyle),
       description: `${count}가지 제철`,
     })),
   ]

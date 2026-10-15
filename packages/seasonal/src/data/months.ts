@@ -5,6 +5,19 @@ export function isMonth(value: string): boolean {
   return MONTHS.some((month) => String(month) === value)
 }
 
+/** 달 이름 표기. 숫자만("1"), 한글("1월"), 영어 약자("Jan"). */
+export const MONTH_LABEL_STYLES = ["number", "korean", "english"] as const
+export type MonthLabelStyle = (typeof MONTH_LABEL_STYLES)[number]
+
+const ENGLISH_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const
+
+/** 달 하나를 고른 표기로 적는다. 예: (1, "korean") → "1월" */
+export function formatMonthLabel(month: number, style: MonthLabelStyle): string {
+  if (style === "korean") return `${month}월`
+  if (style === "english") return ENGLISH_MONTHS[month - 1]!
+  return String(month)
+}
+
 /**
  * 제철 달을 화면 문자열로 만든다. 예: [9, 10] → "제철 9·10월"
  * 달을 원으로 보고 빈 달이 가장 긴 곳 다음부터 적으므로, 해를 넘는 제철은 [1, 2, 11, 12] → "제철 11·12·1·2월"이 된다.
