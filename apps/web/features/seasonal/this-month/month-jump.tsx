@@ -30,7 +30,7 @@ export function MonthRail() {
   return (
     <nav
       aria-label="달 이동"
-      className="fixed right-2 bottom-24 z-(--z-sticky) flex flex-col gap-0.5 rounded-full border border-hairline bg-canvas/94 p-1.5 backdrop-blur lg:hidden"
+      className="fixed top-1/2 right-2 z-(--z-sticky) -translate-y-1/2 flex flex-col gap-0.5 rounded-full border border-hairline bg-canvas/94 p-1.5 backdrop-blur lg:hidden"
     >
       {MONTHS.map((month) => (
         <button
