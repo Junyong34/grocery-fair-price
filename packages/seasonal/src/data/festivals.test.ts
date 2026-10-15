@@ -10,8 +10,13 @@ describe("festivalDate", () => {
     expect(festivalDate("seollal", 2027)).toEqual({ year: 2027, month: 2, day: 7 })
   })
 
-  it("날짜 표에 없는 연도는 null이다", () => {
-    expect(festivalDate("chuseok", 2028)).toBeNull()
+  it("표에 없는 먼 연도도 계산한다", () => {
+    expect(festivalDate("chuseok", 2028)).toEqual({ year: 2028, month: 10, day: 3 })
+    expect(festivalDate("dongji", 2029)).toEqual({ year: 2029, month: 12, day: 21 })
+  })
+
+  it("하루로 정할 수 없는 삼복은 null이다", () => {
+    expect(festivalDate("sambok", 2026)).toBeNull()
   })
 })
 
@@ -23,9 +28,9 @@ describe("festivalsInMonth", () => {
     expect(festivalsInMonth(10, 2026)).toEqual([])
   })
 
-  it("날짜를 하루로 정할 수 없는 명절(삼복)과 표에 없는 연도는 대표 달에 둔다", () => {
+  it("날짜를 하루로 정할 수 없는 명절(삼복)은 대표 달에 둔다", () => {
     expect(festivalsInMonth(7, 2026).map((f) => f.slug)).toEqual(["sambok"])
-    expect(festivalsInMonth(9, 2030).map((f) => f.slug)).toEqual(["chuseok"])
+    expect(festivalsInMonth(7, 2030).map((f) => f.slug)).toEqual(["sambok"])
   })
 })
 

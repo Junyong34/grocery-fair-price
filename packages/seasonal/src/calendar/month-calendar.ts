@@ -1,5 +1,7 @@
 import * as holidaysByYear from "@hyunbinseo/holidays-kr/all"
 
+import { daysInMonth as daysIn, weekdayOf } from "./date-utils"
+
 /** 달력의 날짜 하나. weekday는 일요일이 0이다. */
 export type CalendarDay = {
   day: number
@@ -19,8 +21,8 @@ export type CalendarDate = { year: number; month: number; day: number }
  * today는 서울 기준 오늘이다(calendar/today). 순수 함수로 두려고 밖에서 받는다.
  */
 export function monthCalendar({ year, month, today }: { year: number; month: number; today: CalendarDate }): CalendarCell[][] {
-  const firstWeekday = new Date(Date.UTC(year, month - 1, 1)).getUTCDay()
-  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate()
+  const firstWeekday = weekdayOf({ year, month, day: 1 })
+  const daysInMonth = daysIn(year, month)
 
   const cells: CalendarCell[] = Array.from({ length: firstWeekday }, () => null)
   for (let day = 1; day <= daysInMonth; day++) {

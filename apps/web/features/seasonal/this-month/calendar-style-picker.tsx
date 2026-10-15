@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 
+import { seoulToday } from "@workspace/seasonal/calendar/today"
 import { cn } from "@workspace/ui/lib/utils"
 
 import {
@@ -26,11 +27,8 @@ export function CalendarStylePicker({
   value: CalendarVariant
   onChange: (value: CalendarVariant) => void
 }) {
-  // 시트·패널은 열릴 때만 그려지므로(클라이언트) 기기 날짜로 이번 달을 잡는다.
-  const [today] = useState(() => {
-    const now = new Date()
-    return { year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate() }
-  })
+  // 시트·패널은 열릴 때만 그려지므로(클라이언트) 이번 달을 바로 잡는다. 날짜는 서울 기준이다.
+  const [today] = useState(seoulToday)
   const index = CALENDAR_VARIANTS.indexOf(value)
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {

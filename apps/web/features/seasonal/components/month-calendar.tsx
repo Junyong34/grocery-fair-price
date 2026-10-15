@@ -1,9 +1,8 @@
+import { WEEKDAY_NAMES } from "@workspace/seasonal/calendar/date-utils"
 import { monthCalendar, type CalendarDate, type CalendarDay } from "@workspace/seasonal/calendar/month-calendar"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { HolidayName } from "./holiday-name"
-
-const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"]
 
 /** 토요일(6)·일요일(0) */
 const isWeekend = (weekday: number) => weekday === 0 || weekday === 6
@@ -55,7 +54,7 @@ export function MonthCalendar({
       </caption>
       <thead>
         <tr>
-          {WEEKDAYS.map((weekday, i) => (
+          {WEEKDAY_NAMES.map((weekday, i) => (
             <th
               key={weekday}
               scope="col"

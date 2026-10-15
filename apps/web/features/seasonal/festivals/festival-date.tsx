@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { Suspense } from "react"
 
+import { WEEKDAY_NAMES, weekdayOf } from "@workspace/seasonal/calendar/date-utils"
 import {
   festivalDate,
   FESTIVALS,
@@ -13,12 +14,11 @@ import { Button } from "@workspace/ui/components/button"
 import { routes } from "@/shared/routes"
 import { useToday } from "@/shared/today-context"
 
-const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"]
 const find = (slug: Festival) =>
   FESTIVALS.find((festival) => festival.slug === slug)!
 
 /**
- * 올해(서울) 양력 날짜. 날짜 표에 없는 연도이거나 하루로 정할 수 없는 명절(삼복)이면 시기만 보인다.
+ * 올해(서울) 양력 날짜. 하루로 정할 수 없는 명절(삼복)이면 시기만 보인다.
  * 연도는 요청 시점 값이라 Suspense 안에서 읽는다.
  */
 export function FestivalPeriod({ slug }: { slug: Festival }) {
@@ -37,10 +37,7 @@ function ThisYearDate({ slug }: { slug: Festival }) {
   const { year } = useToday()
   const date = festivalDate(slug, year)
   if (!date) return null
-  const weekday =
-    WEEKDAYS[
-      new Date(Date.UTC(date.year, date.month - 1, date.day)).getUTCDay()
-    ]
+  const weekday = WEEKDAY_NAMES[weekdayOf(date)]
   return (
     <>
       {" · "}
