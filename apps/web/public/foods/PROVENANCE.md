@@ -10,7 +10,7 @@
 | kit sha | `6806db565e0538c4` |
 | 변형 | `color`, `motion` |
 | 바닥 그림자 | 끔 |
-| 품종 수 | 40 |
+| 품종 수 | 41 |
 
 | id | 이름 | food.mjs sha |
 |---|---|---|
@@ -52,5 +52,6 @@
 | `strawberry` | 딸기(시설) | `7ce2e60592da75ea` |
 | `sweet-potato` | 고구마 | `e441dcd3f3626d46` |
 | `water-dropwort` | 미나리 | `74abf50400fb0553` |
+| `watermelon` | 수박 | `bf3396b4b1fc6dbd` |
 | `wild-chive` | 달래 | `c46c47dd0189cf8a` |
 | `yellowtail` | 방어 | `8ad190066d2b1275` |

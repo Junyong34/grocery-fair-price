@@ -40,6 +40,7 @@ export const DRAWN_FOOD_IDS = [
   "strawberry",
   "sweet-potato",
   "water-dropwort",
+  "watermelon",
   "wild-chive",
   "yellowtail",
 ] as const
