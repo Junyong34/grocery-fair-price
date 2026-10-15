@@ -110,7 +110,7 @@ export function MyTableView() {
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="음식 이름 검색 (예: 사과, ㅅㄱ)"
+                placeholder={UI_COPY.searchPlaceholder}
                 aria-label="음식 이름 검색"
                 className="h-9 min-w-0 flex-1 rounded-md border border-hairline bg-surface px-3 text-base outline-none placeholder:text-ash focus-visible:border-gold lg:w-[280px] lg:flex-none"
               />

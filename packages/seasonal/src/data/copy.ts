@@ -70,6 +70,8 @@ export const UI_COPY = {
   eatDetailDone: "올해 먹었어요",
   eatDetailHintOff: "기록하면 나의 식탁에 모여요",
   eatDetailHintOn: "나의 식탁에 기록했어요",
+  /** 품종 검색 입력란(헤더 검색, 나의 식탁) */
+  searchPlaceholder: "음식 이름 검색 (예: 사과, ㅅㄱ)",
   emptySearch: (query: string) =>
     `"${query}"에 맞는 제철음식이 없어요. 철자를 바꾸거나 필터를 '전체'로 바꿔 보세요.`,
   noFestivalThisMonth: "이 달의 명절 없음",

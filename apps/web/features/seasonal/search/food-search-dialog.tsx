@@ -2,8 +2,9 @@
 
 import { Search } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
+import { UI_COPY } from "@workspace/seasonal/data/copy"
 import { FOODS } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 import { matchFoods } from "@workspace/seasonal/search/match-foods"
@@ -41,6 +42,16 @@ export function FoodSearchDialog({
   const router = useRouter()
   const [query, setQuery] = useState("")
   const results = matchFoods(FOODS, query)
+  const listRef = useRef<HTMLDivElement>(null)
+
+  // 검색어가 바뀌면 결과 목록을 맨 위부터 보여 준다. cmdk는 결과가 바뀌어도 스크롤을 돌려놓지 않아
+  // 이전 위치가 남는다. 스크롤은 CommandList를 감싼 ScrollArea 뷰포트가 맡는다.
+  const changeQuery = (next: string) => {
+    setQuery(next)
+    listRef.current
+      ?.closest('[data-slot="scroll-area-viewport"]')
+      ?.scrollTo({ top: 0 })
+  }
 
   // 닫힘 애니메이션이 끝나면 overlay-kit에서 지운다.
   useEffect(() => {
@@ -61,11 +72,11 @@ export function FoodSearchDialog({
         <Command shouldFilter={false}>
           <CommandInput
             value={query}
-            onValueChange={setQuery}
-            placeholder="음식 이름 검색 (예: 전어, ㅈㅇ)"
+            onValueChange={changeQuery}
+            placeholder={UI_COPY.searchPlaceholder}
             leading={<Search aria-hidden size={18} strokeWidth={1.6} />}
           />
-          <CommandList className="max-h-[min(420px,60svh)]">
+          <CommandList ref={listRef} className="max-h-[min(420px,60svh)]">
             <CommandEmpty>
               &quot;{query}&quot;에 맞는 제철음식이 없어요.
             </CommandEmpty>
