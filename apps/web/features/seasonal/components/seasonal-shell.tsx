@@ -4,11 +4,12 @@ import {
   MobileSettingsButton,
 } from "../this-month/settings-panel"
 import { FloatingNav, SeasonalHeader } from "./main-nav"
+import { HeaderShareButton } from "./share-button"
 import { HeaderSubTabs } from "./sub-tabs"
 import { ThisMonthOnly } from "./this-month-only"
 
 /**
- * 제철 영역 공통 셸. 위에 늘 붙은 헤더(로고·검색·설정), 모바일은 하단 Floating Nav, 데스크톱은 헤더 안 주요 메뉴.
+ * 제철 영역 공통 셸. 위에 늘 붙은 헤더(로고·검색·공유·설정. 나의 식탁은 공유 없음), 모바일은 하단 Floating Nav, 데스크톱은 헤더 안 주요 메뉴.
  * 2차 탭은 라우트 그룹 레이아웃((this-month), (season))이 헤더 아래에 그리고, 헤더가 떠 있을 때는 헤더 안에도 작게 보인다. sheet는 품종 상세 가로채기 슬롯이다.
  */
 export function SeasonalShell({
@@ -26,12 +27,14 @@ export function SeasonalShell({
           <>
             <div className="contents lg:hidden">
               <MobileSearchButton />
+              <HeaderShareButton />
               <ThisMonthOnly>
                 <MobileSettingsButton />
               </ThisMonthOnly>
             </div>
             <div className="hidden lg:contents">
               <DesktopSearchButton />
+              <HeaderShareButton />
               <ThisMonthOnly>
                 <DesktopSettingsButton />
               </ThisMonthOnly>

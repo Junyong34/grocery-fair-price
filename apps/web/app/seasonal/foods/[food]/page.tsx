@@ -1,10 +1,13 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
 import { FOODS, findFood } from "@workspace/seasonal/data/foods"
+import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 
 import { FoodDetail } from "@/features/seasonal/food-detail/food-detail"
+import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
 
 type Params = PageProps<"/seasonal/foods/[food]">["params"]
@@ -12,6 +15,21 @@ type Params = PageProps<"/seasonal/foods/[food]">["params"]
 // 모든 품종을 빌드 때 만든다. 목록 밖 id는 notFound()로 막는다(Cache Components에서는 dynamicParams를 쓸 수 없다).
 export function generateStaticParams() {
   return FOODS.map((food) => ({ food: food.id }))
+}
+
+export async function generateMetadata(
+  props: PageProps<"/seasonal/foods/[food]">
+): Promise<Metadata> {
+  const food = findFood((await props.params).food)
+  if (!food) return {}
+  // formatSeasonMonths는 "제철 10·11월"처럼 "제철"까지 붙여 준다.
+  const seasonText = formatSeasonMonths(food.months)
+  return createMetadata({
+    title: food.name,
+    description: `${food.name}, ${seasonText}. 같은 때 제철인 음식과 관련 명절도 함께 봐요.`,
+    path: routes.seasonal.food(food.id),
+    ogImage: { title: food.name, subtitle: seasonText, badge: "제철 식재료" },
+  })
 }
 
 // 주소로 직접 열거나 새로고침했을 때 보이는 전체 페이지. 제철 화면 안에서 누르면 @sheet가 가로챈다.
@@ -31,6 +49,7 @@ async function Food({ params }: { params: Params }) {
       <Link href={routes.seasonal.root} className="text-sm text-stone">
         ‹ 이달의 제철
       </Link>
+      {/* 전체 페이지는 헤더에 공유 버튼이 있어 제목 옆에는 두지 않는다(시트는 헤더를 가려 시트 제목 줄에 둔다). */}
       <FoodDetail food={food} title={<h1 className="font-heading text-[36px] leading-tight font-bold">{food.name}</h1>} />
     </article>
   )
