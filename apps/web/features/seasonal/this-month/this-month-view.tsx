@@ -142,7 +142,11 @@ function MonthSection({
     >
       <div className="lg:flex lg:items-baseline lg:gap-4">
         <h2 className="font-number text-[88px] leading-[0.9] tabular-nums lg:font-heading lg:text-[28px] lg:leading-none lg:font-bold">
-          <MonthTitle month={month} suffixClassName="ml-1 font-heading text-[40px] lg:ml-0 lg:text-[28px]" />
+          <MonthTitle
+            month={month}
+            suffixClassName="ml-1 font-heading text-[40px] lg:ml-0 lg:text-[28px]"
+            englishClassName="text-[56px] lg:text-[28px]"
+          />
         </h2>
         <p className="hidden flex-1 font-heading text-lg text-stone lg:block">{note}</p>
       </div>

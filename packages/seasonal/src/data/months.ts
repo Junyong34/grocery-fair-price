@@ -9,12 +9,31 @@ export function isMonth(value: string): boolean {
 export const MONTH_LABEL_STYLES = ["number", "korean", "english"] as const
 export type MonthLabelStyle = (typeof MONTH_LABEL_STYLES)[number]
 
-const ENGLISH_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"] as const
+const ENGLISH_MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+] as const
 
-/** 달 하나를 고른 표기로 적는다. 예: (1, "korean") → "1월" */
-export function formatMonthLabel(month: number, style: MonthLabelStyle): string {
+/**
+ * 달 하나를 고른 표기로 적는다. 예: (1, "korean") → "1월"
+ * 영어는 짧게(short, 달 이동 목록)는 "Jan", 길게(long, 달 제목)는 "January"다. 숫자·한글은 길이와 상관없다.
+ */
+export function formatMonthLabel(month: number, style: MonthLabelStyle, length: "short" | "long" = "short"): string {
   if (style === "korean") return `${month}월`
-  if (style === "english") return ENGLISH_MONTHS[month - 1]!
+  if (style === "english") {
+    const name = ENGLISH_MONTHS[month - 1]!
+    return length === "long" ? name : name.slice(0, 3)
+  }
   return String(month)
 }
 

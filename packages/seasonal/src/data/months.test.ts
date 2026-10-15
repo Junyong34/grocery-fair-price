@@ -29,4 +29,11 @@ describe("formatMonthLabel", () => {
     const labels = Array.from({ length: 12 }, (_, i) => formatMonthLabel(i + 1, "english"))
     expect(labels).toEqual(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"])
   })
+
+  it("long은 영어 전체 이름으로 적고, 숫자·한글은 그대로다", () => {
+    expect(formatMonthLabel(9, "english", "long")).toBe("September")
+    expect(formatMonthLabel(5, "english", "long")).toBe("May")
+    expect(formatMonthLabel(9, "korean", "long")).toBe("9월")
+    expect(formatMonthLabel(9, "number", "long")).toBe("9")
+  })
 })

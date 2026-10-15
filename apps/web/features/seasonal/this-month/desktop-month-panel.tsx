@@ -65,7 +65,7 @@ export function DesktopMonthPanel({
   return (
     <div className="flex flex-col gap-4 py-8 pr-6">
       <p className="font-number text-[110px] leading-none tabular-nums">
-        <MonthTitle month={shown.month} suffixClassName="ml-1 font-heading text-[48px]" />
+        <MonthTitle month={shown.month} suffixClassName="ml-1 font-heading text-[48px]" englishClassName="text-[46px]" />
       </p>
       <p className="min-h-12 font-heading text-lg text-stone">{shown.note}</p>
       <p className="text-xs text-ash">월 이동 · 누르면 바로 바뀌어요</p>
