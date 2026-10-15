@@ -77,6 +77,12 @@ export function TextReveal({ text, as: Tag = "span", replayKey = 0, variant = "r
     const timer = setTimeout(() => setHold(false), 800);
     return () => clearTimeout(timer);
   }, []);
+  // 우리 앱 수정: Cache Components는 떠난 페이지를 <Activity>로 숨겨 두므로 돌아와도 다시 마운트되지 않는다.
+  // 숨겨질 때 "재생함" 기록을 지우고 글자를 다시 숨겨, 돌아오면 처음부터 다시 재생한다.
+  React.useLayoutEffect(() => () => {
+    played.current = null;
+    setHold(true);
+  }, []);
   const token = JSON.stringify([text, replayKey, variant, split, direction]);
   const lineResult = useTextLines(mountedElement, text, split === "line");
   const segmenter = React.useMemo(() => new Intl.Segmenter(undefined, { granularity: "grapheme" }), []);
