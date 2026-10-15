@@ -58,12 +58,8 @@ export function FoodSheet({ title, children }: { title: string; children: React.
     <BottomSheet
       open
       onClose={close}
-      title={
-        <div className="flex items-center justify-between gap-3">
-          <span className="font-heading text-[28px] font-bold">{title}</span>
-          <ShareButton className="shrink-0" />
-        </div>
-      }
+      title={<span className="font-heading text-[28px] font-bold">{title}</span>}
+      action={<ShareButton />}
     >
       <div className="overflow-y-auto pb-4">{children}</div>
     </BottomSheet>
