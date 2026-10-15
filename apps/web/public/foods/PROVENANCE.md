@@ -10,7 +10,7 @@
 | kit sha | `6806db565e0538c4` |
 | 변형 | `color`, `motion` |
 | 바닥 그림자 | 끔 |
-| 품종 수 | 38 |
+| 품종 수 | 40 |
 
 | id | 이름 | food.mjs sha |
 |---|---|---|
@@ -18,8 +18,9 @@
 | `apple` | 사과 | `fa42621dbc0f22a4` |
 | `apricot` | 살구 | `6d89d38d9c6a1119` |
 | `aralia-shoot` | 두릅 | `7cc5cb863b86280e` |
+| `asparagus` | 아스파라거스 | `78907c2804ebdc18` |
 | `aster-scaber` | 취나물(참취) | `b3a88d4def7e729f` |
-| `black-raspberry` | 복분자 | `60822866fae90de7` |
+| `black-raspberry` | 복분자 | `847a02d5ea6a2a63` |
 | `blueberry` | 블루베리 | `146ba612ed8a1d94` |
 | `bomdong` | 봄동 | `1b57b34e08501771` |
 | `burdock` | 우엉 | `cfedeeb0a68dbe54` |
@@ -29,6 +30,7 @@
 | `garlic-chive` | 부추 | `52d0f4e6061a0cf3` |
 | `green-plum` | 매실 | `5831124939add733` |
 | `korean-rockfish` | 우럭(조피볼락) | `78314edd3c2bc2cf` |
+| `korean-zucchini` | 애호박 | `601d149ba21867fa` |
 | `mackerel` | 고등어 | `923d2b276f46c17d` |
 | `mandarin` | 귤 | `41c13780c25f9d15` |
 | `mugwort` | 쑥 | `21b9dad35ff9a09d` |
