@@ -25,6 +25,7 @@ describe("scatterLayout", () => {
     ["mobile", SCATTER_FRAMES.mobile],
     ["desktop", SCATTER_FRAMES.desktop],
     ["desktopMonth", SCATTER_FRAMES.desktopMonth],
+    ["desktopHero", SCATTER_FRAMES.desktopHero],
   ])("그림과 라벨이 %s 프레임 밖으로 나가지 않는다", (_, frame) => {
     for (const n of [1, 10, 20, 35]) {
       const { aspect, label, items } = scatterLayout({

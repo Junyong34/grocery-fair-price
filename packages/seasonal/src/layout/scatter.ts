@@ -17,6 +17,8 @@ export const SCATTER_FRAMES = {
   mobile: { width: 339, height: 200, big: false },
   // 데스크톱은 품종 판(왼쪽)과 달력(오른쪽)이 한 줄에 놓인다. 판의 가로·세로 비는 그 칸 크기를 따른다.
   desktop: { width: 440, height: 300, big: true },
+  // 맨 위 히어로 판: 본문 폭 전체를 쓴다(달력 없음).
+  desktopHero: { width: 752, height: 440, big: true },
   // 달 섹션 판: 판 전체가 끌기 범위이고, 오른쪽 45%에는 달력이 얹힌다. 처음 배치는 달력 자리를 피한다.
   desktopMonth: { width: 752, height: 600, big: true, reserveRight: 340 },
 } as const satisfies Record<string, ScatterFrame>
