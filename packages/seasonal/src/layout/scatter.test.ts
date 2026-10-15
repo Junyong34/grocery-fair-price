@@ -117,3 +117,28 @@ describe("scatterLayout 겹침", () => {
     }
   })
 })
+
+describe("scatterLayout Lloyd 완화", () => {
+  /** 판(달력 자리 제외)에서 가장 가까운 그림 가장자리까지 가장 먼 점의 거리(가장 큰 빈 곳). */
+  function largestEmpty(month: number, n: number, lloydIterations: number): number {
+    const frame = SCATTER_FRAMES.desktopMonth
+    const { items } = scatterLayout({ month, ids: ids(n), frame, lloydIterations })
+    const width = frame.width - frame.reserveRight!
+    let worst = 0
+    for (let y = 0; y <= frame.height; y += 8) {
+      for (let x = 0; x <= width; x += 8) {
+        const nearest = Math.min(
+          ...items.map((item) => Math.hypot(item.cx * frame.width - x, item.cy * frame.height - y) - (item.size * frame.width) / 2)
+        )
+        worst = Math.max(worst, nearest)
+      }
+    }
+    return worst
+  }
+
+  it("Lloyd를 쓰면 가장 큰 빈 곳이 평균적으로 줄어든다", () => {
+    const cases = [1, 3, 5, 7, 9, 11].flatMap((month) => [14, 17, 25].map((n) => [month, n] as const))
+    const mean = (iterations: number) => cases.reduce((sum, [month, n]) => sum + largestEmpty(month, n, iterations), 0) / cases.length
+    expect(mean(6)).toBeLessThan(mean(0))
+  })
+})

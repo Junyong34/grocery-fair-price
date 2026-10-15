@@ -1,4 +1,5 @@
 import { foodScale } from "../data/food-sizes"
+import { lloydRelax } from "../geometry/lloyd"
 import { relaxCircles } from "../geometry/relax-circles"
 
 // 흩어진 이미지 배치(와이어프레임 3.1 scat). 격자 없이 빈 자리를 찾아 촘촘히 흩뿌린다.
@@ -60,6 +61,9 @@ const CANDIDATES_PER_POINT = 10
 /** 시드 배치 직후 겹침을 풀 때 남길 틈(프레임 px). */
 const SEED_GAP = 8
 const SEED_RELAX_ITERATIONS = 24
+/** 후보 선택 뒤 빈 곳을 고르게 메우는 Lloyd 완화 횟수와 한 번에 가는 비율. 0이면 쓰지 않는다. */
+const LLOYD_ITERATIONS = 10
+const LLOYD_STEP = 0.7
 /** 그림이 판 넓이에서 차지하는 비율. 낮을수록 그림이 작고 사이가 넓다. */
 const COVERAGE = 0.45
 
@@ -67,10 +71,13 @@ export function scatterLayout({
   month,
   ids,
   frame,
+  lloydIterations = LLOYD_ITERATIONS,
 }: {
   month: number
   ids: readonly string[]
   frame: ScatterFrame
+  /** Lloyd 완화 횟수. 테스트에서 비교하려고 열어 둔다. */
+  lloydIterations?: number
 }): ScatterLayout {
   const { width: W, height: H, big } = frame
   const n = ids.length
@@ -94,18 +101,21 @@ export function scatterLayout({
     return { id, size, rotate }
   })
 
-  // 후보 선택은 겹침을 보장하지 않으므로, 남은 겹침을 한 번 풀고 최소 틈을 확보한다.
-  const relaxed = relaxCircles(
-    placed.map((spot, i) => ({ id: drafts[i]!.id, x: spot.x, y: spot.y, r: spot.r })),
-    {
-      bounds: {
-        width: W - (frame.reserveRight ?? 0),
-        height: H - (frame.reserveBottom ?? 0) - label,
-      },
-      gap: SEED_GAP,
-      iterations: SEED_RELAX_ITERATIONS,
-    }
-  )
+  // 후보 선택은 모퉁이·가장자리에 빈 곳을 남기고 겹침도 보장하지 않는다.
+  // Lloyd 완화로 빈 곳을 고르게 메운 뒤, 남은 겹침을 풀어 최소 틈을 확보한다.
+  const area = {
+    width: W - (frame.reserveRight ?? 0),
+    height: H - (frame.reserveBottom ?? 0) - label,
+  }
+  const circles = placed.map((spot, i) => ({ id: drafts[i]!.id, x: spot.x, y: spot.y, r: spot.r }))
+  const spread = lloydIterations
+    ? lloydRelax(circles, { bounds: area, iterations: lloydIterations, step: LLOYD_STEP })
+    : circles
+  const relaxed = relaxCircles(spread, {
+    bounds: area,
+    gap: SEED_GAP,
+    iterations: SEED_RELAX_ITERATIONS,
+  })
 
   const items = drafts.map(({ id, size, rotate }, i) => ({
     id,
