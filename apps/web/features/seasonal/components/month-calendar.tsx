@@ -59,7 +59,7 @@ export function MonthCalendar({
               scope="col"
               className={cn(
                 "text-[11px] font-normal text-ash",
-                variant === "plain" && "pb-1.5 text-xs lg:text-[13px]",
+                variant === "plain" && "pb-2 text-[13px] lg:text-sm",
                 variant === "grid" && "border-b border-hairline bg-surface/60 py-1.5",
                 variant === "editorial" && "border-b border-ink pb-2 text-left text-xs font-semibold tracking-wide text-ink",
                 variant === "tiles" && "pb-0.5",
@@ -79,11 +79,11 @@ export function MonthCalendar({
                 key={d}
                 className={cn(
                   "align-top",
-                  variant === "plain" && "h-11 lg:h-16",
-                  variant === "grid" && "h-12 border border-hairline lg:h-16",
+                  variant === "plain" && "h-14 lg:h-20",
+                  variant === "grid" && "h-14 border border-hairline lg:h-20",
                   variant === "grid" && cell?.isToday && "bg-gold-wash",
-                  variant === "editorial" && "h-12 lg:h-16",
-                  variant === "tiles" && "h-10 rounded-md lg:h-14",
+                  variant === "editorial" && "h-14 lg:h-20",
+                  variant === "tiles" && "h-12 rounded-md lg:h-[72px]",
                   variant === "tiles" && cell && tileColor(cell),
                 )}
               >
@@ -116,7 +116,7 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
   if (variant === "grid")
     return (
       <div className="flex h-full flex-col items-start gap-0.5 p-1 text-left lg:p-1.5">
-        <span aria-current={current} className={cn("text-[13px] leading-none font-medium tabular-nums", color, cell.isToday && "font-bold")}>
+        <span aria-current={current} className={cn("text-[15px] leading-none font-medium tabular-nums lg:text-base", color, cell.isToday && "font-bold")}>
           {cell.day}
         </span>
         {holiday && (
@@ -133,10 +133,10 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
         <span
           aria-current={current}
           className={cn(
-            "font-number text-[22px] leading-none font-light tabular-nums lg:text-[28px]",
+            "font-number text-[26px] leading-none font-light tabular-nums lg:text-[34px]",
             color,
             cell.isToday &&
-              "-ml-1 grid size-8 place-items-center rounded-full bg-ink text-[18px] font-normal text-canvas! lg:size-9 lg:text-[22px]",
+              "-ml-1 grid size-9 place-items-center rounded-full bg-ink text-[20px] font-normal text-canvas! lg:size-11 lg:text-[26px]",
           )}
         >
           {cell.day}
@@ -152,7 +152,7 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
   if (variant === "tiles")
     return (
       <div className="flex h-full flex-col items-center justify-center gap-0.5">
-        <span aria-current={current} className={cn("text-sm font-semibold tabular-nums", color, cell.isToday && "text-canvas!")}>
+        <span aria-current={current} className={cn("text-base font-semibold tabular-nums lg:text-lg", color, cell.isToday && "text-canvas!")}>
           {cell.day}
         </span>
         {holiday && (
@@ -168,7 +168,7 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
       <span
         aria-current={current}
         className={cn(
-          "grid size-7 place-items-center rounded-full text-[15px] tabular-nums lg:size-8 lg:text-base",
+          "grid size-8 place-items-center rounded-full text-[17px] tabular-nums lg:size-10 lg:text-lg",
           color,
           cell.isToday && "font-semibold ring-1 ring-ink",
         )}
@@ -177,7 +177,7 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
       </span>
       {holiday && (
         // 좁은 칸에서는 두 줄까지 감싸고(낱말 단위), 넘치면 말줄임한다.
-        <span className="line-clamp-2 w-full px-0.5 text-[10px] leading-tight break-keep text-holiday in-data-[holidays=off]:hidden! lg:line-clamp-1 lg:text-[11px]">
+        <span className="line-clamp-2 w-full px-0.5 text-[11px] leading-tight break-keep text-holiday in-data-[holidays=off]:hidden! lg:line-clamp-1 lg:text-xs">
           {names}
         </span>
       )}

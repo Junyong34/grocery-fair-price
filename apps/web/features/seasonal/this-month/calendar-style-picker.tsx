@@ -67,7 +67,7 @@ export function CalendarStylePicker({
             >
               <span
                 className={cn(
-                  "grid h-[76px] w-full lg:h-[100px] place-items-center overflow-hidden rounded-md border bg-canvas p-1.5 transition-colors",
+                  "grid h-[86px] w-full lg:h-[112px] place-items-center overflow-hidden rounded-md border bg-canvas p-1.5 transition-colors",
                   selected ? "border-gold bg-gold-wash" : "border-hairline group-hover:border-silver"
                 )}
               >
