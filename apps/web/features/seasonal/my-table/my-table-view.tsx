@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { SEASON_COPY, UI_COPY } from "@workspace/seasonal/data/copy"
 import { FOODS, type Food } from "@workspace/seasonal/data/foods"
@@ -12,12 +12,6 @@ import {
 } from "@workspace/seasonal/data/seasons"
 import { matchFoods } from "@workspace/seasonal/search/match-foods"
 import { AnimatedNumber } from "@workspace/ui/components/animated-number"
-import {
-  Toast,
-  ToastProvider,
-  ToastTitle,
-  ToastViewport,
-} from "@workspace/ui/components/toast"
 import { Segmented } from "@workspace/ui/components/segmented"
 import { cn } from "@workspace/ui/lib/utils"
 import { ScrollRow } from "@workspace/ui/components/scroll-row"
@@ -32,7 +26,6 @@ type FilterMode = "month" | "season"
 type FilterValue = 0 | number | Season
 
 const TOTAL = FOODS.length
-const TOAST_MS = 1800
 
 const inSeason = (food: Food, season: Season) =>
   food.months.some((month) => SEASON_MONTHS[season].includes(month))
@@ -49,7 +42,22 @@ export function MyTableView() {
   const [query, setQuery] = useState("")
   const [mode, setMode] = useState<FilterMode>("month")
   const [value, setValue] = useState<FilterValue>(0)
-  const [toast, setToast] = useState<{ key: number; text: string } | null>(null)
+  // 큰 요약이 화면 밖으로 나가면 sticky 영역에 한 줄 요약을 띄운다(모바일).
+  const summaryRef = useRef<HTMLParagraphElement>(null)
+  const [summaryHidden, setSummaryHidden] = useState(false)
+  useEffect(() => {
+    const el = summaryRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) =>
+        setSummaryHidden(
+          !entry!.isIntersecting && entry!.boundingClientRect.top < 0
+        ),
+      { rootMargin: "-56px 0px 0px 0px" }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   const count = FOODS.filter((food) => eaten.has(food.id)).length
 
@@ -62,22 +70,16 @@ export function MyTableView() {
           )
         : list.filter((food) => inSeason(food, value as Season))
   }
-  const eatenInList = list.filter((food) => eaten.has(food.id)).length
 
   const onToggle = (food: Food) => {
-    const willEat = !eaten.has(food.id)
     toggle(year, food.id)
-    if (willEat)
-      setToast({
-        key: Date.now(),
-        text: UI_COPY.eatToast(food.name, count + 1),
-      })
   }
 
   return (
-    <ToastProvider duration={TOAST_MS} swipeDirection="down">
+    <>
       <div className="mx-auto max-w-[900px] px-[18px] pt-6 pb-8 lg:grid lg:grid-cols-[300px_1fr] lg:gap-10 lg:px-6 lg:pt-10">
         <Summary
+          ref={summaryRef}
           year={year}
           thisMonth={thisMonth}
           count={count}
@@ -86,15 +88,32 @@ export function MyTableView() {
 
         <section aria-label="제철 목록" className="mt-6 lg:mt-0">
           <div className="sticky top-14 z-(--z-sticky) -mx-[18px] flex flex-col gap-2.5 bg-canvas/94 px-[18px] py-3 backdrop-blur lg:mx-0 lg:px-0">
-            <input
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="음식 이름 검색 (예: 전어, ㅈㅇ)"
-              aria-label="음식 이름 검색"
-              className="h-11 w-full rounded-md border border-hairline bg-surface px-3 text-base outline-none placeholder:text-ash focus-visible:border-gold lg:w-[280px]"
-            />
-            <div className="flex items-center justify-between gap-3">
+            {summaryHidden && (
+              <div className="flex items-center gap-3 motion-safe:animate-rise lg:hidden">
+                <span className="font-number text-xl leading-none tabular-nums">
+                  <AnimatedNumber
+                    value={count}
+                    format={{ maximumFractionDigits: 0 }}
+                  />
+                  <span className="text-xs text-stone"> / {TOTAL}</span>
+                </span>
+                <span className="h-[5px] flex-1 overflow-hidden rounded-full bg-hairline">
+                  <span
+                    className="block h-full rounded-full bg-gold transition-[width] duration-400"
+                    style={{ width: `${(count / TOTAL) * 100}%` }}
+                  />
+                </span>
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="음식 이름 검색 (예: 사과, ㅅㄱ)"
+                aria-label="음식 이름 검색"
+                className="h-9 min-w-0 flex-1 rounded-md border border-hairline bg-surface px-3 text-base outline-none placeholder:text-ash focus-visible:border-gold lg:w-[280px] lg:flex-none"
+              />
               <Segmented
                 aria-label="필터 방식"
                 options={[
@@ -107,9 +126,6 @@ export function MyTableView() {
                   setValue(0) // 모드를 바꾸면 '전체'로 되돌린다.
                 }}
               />
-              <p className="text-xs text-stone" aria-live="polite">
-                {list.length}개 중 {eatenInList}개 먹음
-              </p>
             </div>
             <ScrollRow
               role="group"
@@ -160,19 +176,7 @@ export function MyTableView() {
           )}
         </section>
       </div>
-
-      {toast && (
-        <Toast
-          key={toast.key}
-          appearance="compact"
-          onOpenChange={(open) => !open && setToast(null)}
-        >
-          <ToastTitle className="font-normal">{toast.text}</ToastTitle>
-        </Toast>
-      )}
-      {/* cojeev 토스트 위치 CSS가 Tailwind보다 뒤 레이어라 위치만 !로 덮어쓴다. 모바일은 하단 내비 위, 데스크톱은 오른쪽 위. */}
-      <ToastViewport className="right-[18px]! bottom-[86px]! left-[18px]! w-auto! lg:top-20! lg:right-6! lg:bottom-auto! lg:left-auto! lg:w-[340px]!" />
-    </ToastProvider>
+    </>
   )
 }
 
@@ -204,11 +208,13 @@ function Chip({
 
 /** 올해 기록 요약: 개수, 진행률, 월별 막대(데스크톱은 계절별 진행 바도). */
 function Summary({
+  ref,
   year,
   thisMonth,
   count,
   eaten,
 }: {
+  ref: React.Ref<HTMLParagraphElement>
   year: number
   thisMonth: number
   count: number
@@ -217,7 +223,7 @@ function Summary({
   return (
     <aside className="flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start">
       <p className="text-sm text-stone">나의 식탁 · {year}</p>
-      <p className="flex items-baseline gap-2">
+      <p ref={ref} className="flex items-baseline gap-2">
         <AnimatedNumber
           value={count}
           // 올라가는 동안에도 정수만 보인다(기본 형식은 소수 셋째 자리까지 그려 폭이 흔들린다).

@@ -22,20 +22,42 @@ export const MONTH_NOTES: Record<Month, string> = {
 }
 
 /** 계절 이름과 한 줄 설명(3a). */
-export const SEASON_COPY: Record<Season, { name: string; english: string; description: string }> = {
-  spring: { name: "봄", english: "SPRING", description: "들나물과 새순, 조개가 살 오르는 계절" },
-  summer: { name: "여름", english: "SUMMER", description: "물 많은 과일과 보양 생선의 계절" },
-  autumn: { name: "가을", english: "AUTUMN", description: "햇곡식과 과일, 살찐 생선을 거두는 계절" },
-  winter: { name: "겨울", english: "WINTER", description: "찬 바다의 생선과 조개가 가장 기름진 계절" },
+export const SEASON_COPY: Record<
+  Season,
+  { name: string; english: string; description: string }
+> = {
+  spring: {
+    name: "봄",
+    english: "SPRING",
+    description: "들나물과 새순, 조개가 살 오르는 계절",
+  },
+  summer: {
+    name: "여름",
+    english: "SUMMER",
+    description: "물 많은 과일과 보양 생선의 계절",
+  },
+  autumn: {
+    name: "가을",
+    english: "AUTUMN",
+    description: "햇곡식과 과일, 살찐 생선을 거두는 계절",
+  },
+  winter: {
+    name: "겨울",
+    english: "WINTER",
+    description: "찬 바다의 생선과 조개가 가장 기름진 계절",
+  },
 }
 
 /** 명절 배경 설명(1g). */
 export const FESTIVAL_BACKGROUNDS: Record<Festival, string> = {
   seollal: "새해 첫날. 흰 떡국을 먹으며 한 살을 더한다.",
-  daeboreum: "새해 첫 보름달이 뜨는 날. 오곡밥과 묵은 나물을 먹고, 부럼을 깨물어 한 해의 부스럼을 막는다고 여겼다.",
+  daeboreum:
+    "새해 첫 보름달이 뜨는 날. 오곡밥과 묵은 나물을 먹고, 부럼을 깨물어 한 해의 부스럼을 막는다고 여겼다.",
   dano: "한 해 중 양기가 가장 센 날. 수리취로 떡을 빚고 매실로 제호탕을 끓였다.",
-  sambok: "여름 가운데 가장 더운 때. 삼계탕과 팥죽으로 몸을 보하며 더위를 났다.",
-  chuseok: "그해 거둔 햅쌀과 햇과일로 차례를 지내는 날. 송편과 토란탕을 먹는다.",
+  sambok:
+    "여름 가운데 가장 더운 때. 삼계탕과 팥죽으로 몸을 보하며 더위를 났다.",
+  chuseok:
+    "그해 거둔 햅쌀과 햇과일로 차례를 지내는 날. 송편과 토란탕을 먹는다.",
   dongji: "밤이 가장 긴 날. 붉은 팥죽으로 나쁜 기운을 막는다고 여겼다.",
 }
 
@@ -45,7 +67,6 @@ export const UI_COPY = {
   eatToggleOn: "✓ 먹었어요",
   eatDetailOff: "먹었어요 — 나의 식탁에 기록",
   eatDetailOn: "✓ 올해 먹었어요 · 나의 식탁에 기록됨",
-  eatToast: (name: string, count: number) => `+1 · ${name} — 올해 ${count}번째 제철음식`,
   emptySearch: (query: string) =>
     `"${query}"에 맞는 제철음식이 없어요. 철자를 바꾸거나 필터를 '전체'로 바꿔 보세요.`,
   noFestivalThisMonth: "이 달의 명절 없음",
@@ -53,3 +74,28 @@ export const UI_COPY = {
   priceComingSoon: "가격 보기 · 준비 중",
   noRelatedFestival: "연결된 명절 없음",
 } as const
+
+/** 나의 식탁 행 라벨. 먹은 품종은 카테고리별 문구 풀에서 고르고, 안 먹은 품종은 EAT_LABEL_OFF다. */
+export const EAT_LABEL_OFF = "아직"
+
+const EAT_LABELS: Record<string, readonly string[]> = {
+  채소: ["아삭!", "건강해져요", "싱싱해", "텃밭 한 줌"],
+  과일: ["상큼!", "달콤해", "과즙 팡", "꿀맛!"],
+  수산: ["싱싱해", "바다 한 입", "고소해", "입에서 살살"],
+  "곡물·견과": ["든든해", "고소해", "톡톡 씹혀요", "배불러요"],
+  버섯: ["쫄깃!", "향긋해", "숲 한 입", "감칠맛 폭발"],
+}
+const EAT_LABELS_DEFAULT = ["냠냠", "꿀맛!", "제철 정복", "올해도 먹었다"]
+
+/** 먹은 품종 라벨. n은 무작위 수(방금 체크) 또는 품종 id 해시(다시 열었을 때)로, 풀 길이로 나눈 나머지를 쓴다. */
+export function eatLabel(category: string, n: number): string {
+  const pool = EAT_LABELS[category] ?? EAT_LABELS_DEFAULT
+  return pool[Math.abs(n) % pool.length]!
+}
+
+/** 문자열 해시(안정적). 새로고침해도 같은 품종은 같은 문구가 나오게 한다. */
+export function hashString(value: string): number {
+  let h = 0
+  for (let i = 0; i < value.length; i++) h = (h * 31 + value.charCodeAt(i)) | 0
+  return Math.abs(h)
+}
