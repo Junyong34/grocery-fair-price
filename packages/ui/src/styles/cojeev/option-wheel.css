@@ -243,10 +243,12 @@
 }
 .v-option-wheel[data-presentation="reel"]
   .v-option-wheel__option[aria-selected="true"] {
-  --mfill: var(--v-blue);
+  /* 우리 앱 수정: 모바일 월 레일과 같은 gold 톤(기본값은 연한 초록 --v-blue). */
+  --mfill: var(--color-gold-soft);
   border-radius: var(--r-md);
-  background: var(--v-blue);
-  box-shadow: 0 5px 0 color-mix(in oklab, var(--v-blue) 28%, transparent);
+  background: var(--color-gold-soft);
+  color: var(--color-gold-deep);
+  box-shadow: 0 5px 0 color-mix(in oklab, var(--color-gold-soft) 28%, transparent);
 }
 .v-option-wheel[data-presentation="compact"] {
   display: grid;
