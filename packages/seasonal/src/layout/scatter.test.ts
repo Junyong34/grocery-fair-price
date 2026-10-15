@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { SCATTER_FRAMES, scatterLayout } from "./scatter"
+import { foodsInMonth } from "../data/foods"
+import { labelHeight, labelWidth, SCATTER_FRAMES, scatterLayout } from "./scatter"
 
 const ids = (n: number) => Array.from({ length: n }, (_, i) => `food-${i}`)
 
@@ -37,10 +38,11 @@ describe("scatterLayout", () => {
       })
       for (const { cx, cy, size } of items) {
         const height = size * aspect // 그림 한 변을 프레임 높이 비율로
-        expect(cx - size / 2).toBeGreaterThanOrEqual(0)
-        expect(cx + size / 2).toBeLessThanOrEqual(1)
-        expect(cy - height / 2).toBeGreaterThanOrEqual(0)
-        expect(cy + height / 2 + label).toBeLessThanOrEqual(1)
+        const EPS = 1e-9 // 부동소수 오차
+        expect(cx - size / 2).toBeGreaterThanOrEqual(-EPS)
+        expect(cx + size / 2).toBeLessThanOrEqual(1 + EPS)
+        expect(cy - height / 2).toBeGreaterThanOrEqual(-EPS)
+        expect(cy + height / 2 + label).toBeLessThanOrEqual(1 + EPS)
       }
     }
   })
@@ -140,5 +142,42 @@ describe("scatterLayout Lloyd 완화", () => {
     const cases = [1, 3, 5, 7, 9, 11].flatMap((month) => [14, 17, 25].map((n) => [month, n] as const))
     const mean = (iterations: number) => cases.reduce((sum, [month, n]) => sum + largestEmpty(month, n, iterations), 0) / cases.length
     expect(mean(6)).toBeLessThan(mean(0))
+  })
+})
+
+describe("scatterLayout 이름표", () => {
+  it("실제 품종으로 그림과 이름표가 서로 겹치지 않는다(원 ↔ 이름표 포함)", () => {
+    for (const frame of [SCATTER_FRAMES.desktopMonth, SCATTER_FRAMES.desktopHero, SCATTER_FRAMES.mobileMonth]) {
+      for (const month of [1, 4, 8, 10]) {
+        const foods = foodsInMonth(month)
+        const { items } = scatterLayout({ month, ids: foods.map((food) => food.id), frame })
+        const parts = items.map((item) => {
+          const r = (item.size * frame.width) / 2
+          const x = item.cx * frame.width
+          const y = item.cy * frame.height
+          const w = labelWidth(foods.find((food) => food.id === item.id)!.name, frame)
+          const h = labelHeight(frame)
+          return { x, y, r, rect: { x0: x - w / 2, x1: x + w / 2, y0: y + r, y1: y + r + h } }
+        })
+        const circleHitsRect = (c: (typeof parts)[number], other: (typeof parts)[number]) => {
+          const nx = Math.min(Math.max(c.x, other.rect.x0), other.rect.x1)
+          const ny = Math.min(Math.max(c.y, other.rect.y0), other.rect.y1)
+          return Math.hypot(nx - c.x, ny - c.y) < c.r - 0.5
+        }
+        for (let i = 0; i < parts.length; i++) {
+          for (let j = i + 1; j < parts.length; j++) {
+            const a = parts[i]!
+            const b = parts[j]!
+            const label = `${month}월 ${foods[i]!.name}-${foods[j]!.name}`
+            expect(Math.hypot(a.x - b.x, a.y - b.y) >= a.r + b.r - 0.5, `${label} 원-원`).toBe(true)
+            expect(circleHitsRect(a, b), `${label} 원-이름표`).toBe(false)
+            expect(circleHitsRect(b, a), `${label} 이름표-원`).toBe(false)
+            const overlapX = Math.min(a.rect.x1, b.rect.x1) - Math.max(a.rect.x0, b.rect.x0)
+            const overlapY = Math.min(a.rect.y1, b.rect.y1) - Math.max(a.rect.y0, b.rect.y0)
+            expect(overlapX > 0.5 && overlapY > 0.5, `${label} 이름표-이름표`).toBe(false)
+          }
+        }
+      }
+    }
   })
 })

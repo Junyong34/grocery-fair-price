@@ -11,6 +11,7 @@ import {
   type SavedSpot,
 } from "@workspace/seasonal/layout/merge-saved"
 import {
+  labelFontPx,
   labelHeight,
   SCATTER_FRAMES,
   type ScatterFrame,
@@ -40,9 +41,6 @@ const TAP_SLOP = 6
 const LONG_PRESS_MS = 250
 /** 그림 사이에 남길 틈(프레임 px). */
 const GAP = 10
-/** 이름표 글자 크기(프레임 기준 px). 모든 품종이 같다. */
-const LABEL_PX_MOBILE = 9.5
-const LABEL_PX_DESKTOP = 14
 /** 이름표와 그림 아래 끝 사이 간격(그림 크기 대비). */
 const LABEL_GAP = 0.06
 /** 그림 아래 끝을 모르는 품종(그림 없음)의 기본값. 이름 카드(원)는 상자를 끝까지 채운다. */
@@ -371,7 +369,7 @@ export function DraggableScatter({
         const dragging = live?.dragging === item.id
         const px = item.size * frame.width
         // 라벨 크기는 그림 크기와 상관없이 같다. 기준 px를 프레임 폭 비율(cqi)로 바꿔 함께 확대·축소한다.
-        const labelPx = frameName === "mobile" ? LABEL_PX_MOBILE : LABEL_PX_DESKTOP
+        const labelPx = labelFontPx(frame)
         return (
           <Link
             key={item.id}

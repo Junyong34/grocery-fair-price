@@ -1,6 +1,7 @@
 import { foodScale } from "../data/food-sizes"
 import { lloydRelax } from "../geometry/lloyd"
-import { relaxCircles } from "../geometry/relax-circles"
+import { relaxShapes } from "../geometry/relax-shapes"
+import { findFood } from "../data/foods"
 
 // 흩어진 이미지 배치(와이어프레임 3.1 scat). 격자 없이 빈 자리를 찾아 촘촘히 흩뿌린다.
 // 같은 달·같은 품종·같은 영역이면 언제나 같은 배치가 나온다(Math.random 대신 시드 LCG).
@@ -60,7 +61,7 @@ export type ScatterLayout = {
 const CANDIDATES_PER_POINT = 10
 /** 시드 배치 직후 겹침을 풀 때 남길 틈(프레임 px). */
 const SEED_GAP = 8
-const SEED_RELAX_ITERATIONS = 24
+const SEED_RELAX_ITERATIONS = 60
 /** 후보 선택 뒤 빈 곳을 고르게 메우는 Lloyd 완화 횟수와 한 번에 가는 비율. 0이면 쓰지 않는다. */
 const LLOYD_ITERATIONS = 10
 const LLOYD_STEP = 0.7
@@ -102,7 +103,7 @@ export function scatterLayout({
   })
 
   // 후보 선택은 모퉁이·가장자리에 빈 곳을 남기고 겹침도 보장하지 않는다.
-  // Lloyd 완화로 빈 곳을 고르게 메운 뒤, 남은 겹침을 풀어 최소 틈을 확보한다.
+  // Lloyd 완화로 빈 곳을 고르게 메운 뒤, 그림과 이름표가 서로 겹치지 않게 풀어 최소 틈을 확보한다.
   const area = {
     width: W - (frame.reserveRight ?? 0),
     height: H - (frame.reserveBottom ?? 0) - label,
@@ -111,11 +112,19 @@ export function scatterLayout({
   const spread = lloydIterations
     ? lloydRelax(circles, { bounds: area, iterations: lloydIterations, step: LLOYD_STEP })
     : circles
-  const relaxed = relaxCircles(spread, {
-    bounds: area,
-    gap: SEED_GAP,
-    iterations: SEED_RELAX_ITERATIONS,
-  })
+  const relaxed = relaxShapes(
+    spread.map((circle) => ({
+      ...circle,
+      labelW: labelWidth(findFood(circle.id)?.name ?? circle.id, frame),
+      labelH: label,
+    })),
+    {
+      // 이름표까지 영역 안에 남도록, 이름표 높이를 포함한 전체 높이를 준다.
+      bounds: { width: area.width, height: area.height + label },
+      gap: SEED_GAP,
+      iterations: SEED_RELAX_ITERATIONS,
+    }
+  )
 
   const items = drafts.map(({ id, size, rotate }, i) => ({
     id,
@@ -141,9 +150,25 @@ export function seededRandom(seed: number): () => number {
   }
 }
 
-/** 그림 아래 라벨 높이(px). */
+/** 이름표 글자 크기(프레임 기준 px). 모든 품종이 같다. 화면(draggable-scatter)과 배치 계산이 같은 값을 쓴다. */
+export function labelFontPx(frame: ScatterFrame): number {
+  return frame.big ? 14 : 9.5
+}
+
+/** 그림 아래 이름표 높이(px). 글자 줄 높이(leading-tight ≈ 1.25)에 맞춘다. */
 export function labelHeight(frame: ScatterFrame): number {
-  return frame.big ? 15 : 12
+  return Math.ceil(labelFontPx(frame) * 1.3)
+}
+
+/**
+ * 이름표 폭(px) 추정. 한글은 글자 하나가 글자 크기만큼 넓고(영문·숫자는 절반쯤), 먹음 표시 ✓ 한 자리를 늘 남겨 둔다.
+ * 먹음 기록은 기기에만 있어 서버가 모르므로, 먹었을 때의 폭으로 잡아 겹침이 생기지 않게 한다.
+ */
+export function labelWidth(name: string, frame: ScatterFrame): number {
+  const fontPx = labelFontPx(frame)
+  let units = 1
+  for (const char of name) units += /[\u3131-\uD79D]/.test(char) ? 1 : 0.55
+  return Math.ceil(units * fontPx * 0.95)
 }
 
 /**
