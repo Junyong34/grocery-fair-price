@@ -24,6 +24,7 @@ describe("scatterLayout", () => {
   it.each([
     ["mobile", SCATTER_FRAMES.mobile],
     ["desktop", SCATTER_FRAMES.desktop],
+    ["desktopMonth", SCATTER_FRAMES.desktopMonth],
   ])("그림과 라벨이 %s 프레임 밖으로 나가지 않는다", (_, frame) => {
     for (const n of [1, 10, 20, 35]) {
       const { aspect, label, items } = scatterLayout({
@@ -65,5 +66,14 @@ describe("scatterLayout", () => {
       frame: SCATTER_FRAMES.mobile,
     })
     expect(november.items).not.toEqual(october.items)
+  })
+})
+
+describe("scatterLayout reserveRight", () => {
+  it("처음 배치는 오른쪽 예약 자리(달력)를 피한다", () => {
+    const frame = SCATTER_FRAMES.desktopMonth
+    const { items } = scatterLayout({ month: 3, ids: ids(17), frame })
+    const limit = (frame.width - frame.reserveRight!) / frame.width
+    for (const item of items) expect(item.cx + item.size / 2).toBeLessThanOrEqual(limit + 1e-9)
   })
 })

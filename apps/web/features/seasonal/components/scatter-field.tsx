@@ -14,12 +14,15 @@ export function ScatterField({
   month,
   foods,
   frame,
+  children,
   year,
   className,
 }: {
   month: number
   foods: readonly Food[]
   frame: keyof typeof SCATTER_FRAMES
+  /** 판 위(그림 아래)에 깔 내용. 데스크톱 달 판의 달력이다. */
+  children?: React.ReactNode
   year: number
   className?: string
 }) {
@@ -36,6 +39,8 @@ export function ScatterField({
       foods={foods}
       year={year}
       className={className}
-    />
+    >
+      {children}
+    </DraggableScatter>
   )
 }

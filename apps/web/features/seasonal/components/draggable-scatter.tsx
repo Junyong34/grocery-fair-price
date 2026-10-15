@@ -51,6 +51,8 @@ type Gesture = {
   from: Map<string, Spot>
   dragging: boolean
   timer?: ReturnType<typeof setTimeout>
+  /** 이 제스처가 window에 건 리스너를 뗀다. 리스너는 렌더마다 새 함수라 건 쪽이 직접 들고 있는다. */
+  detach?: () => void
 }
 
 /**
@@ -62,6 +64,7 @@ type Gesture = {
 export function DraggableScatter({
   month,
   frame: frameName,
+  children,
   seed,
   foods,
   year,
@@ -69,6 +72,8 @@ export function DraggableScatter({
 }: {
   month: number
   frame: keyof typeof SCATTER_FRAMES
+  /** 판 위(그림 아래)에 깔 내용. 오른쪽 45%에 놓인다(desktopMonth의 달력). */
+  children?: React.ReactNode
   seed: ScatterLayout
   foods: readonly Food[]
   year: number
@@ -135,12 +140,15 @@ export function DraggableScatter({
   const frameRequest = useRef(0)
 
   // 끄는 동안 손가락 스크롤을 막는다. touchmove는 passive가 아니어야 preventDefault가 듣는다.
+  // window가 아니라 이 판에만 건다. 막는 리스너가 있는 곳의 스크롤은 메인 스레드를 기다리므로 범위를 좁힌다.
   useEffect(() => {
+    const el = field.current
+    if (!el) return
     const onTouchMove = (event: TouchEvent) => {
       if (gesture.current?.dragging) event.preventDefault()
     }
-    window.addEventListener("touchmove", onTouchMove, { passive: false })
-    return () => window.removeEventListener("touchmove", onTouchMove)
+    el.addEventListener("touchmove", onTouchMove, { passive: false })
+    return () => el.removeEventListener("touchmove", onTouchMove)
   }, [])
 
   const toFrame = (clientX: number, clientY: number) => {
@@ -181,9 +189,7 @@ export function DraggableScatter({
     if (!g) return
     clearTimeout(g.timer)
     cancelAnimationFrame(frameRequest.current)
-    window.removeEventListener("pointermove", onPointerMove)
-    window.removeEventListener("pointerup", onPointerUp)
-    window.removeEventListener("pointercancel", onPointerCancel)
+    g.detach?.()
     if (!g.dragging) return
     setLive((current) => {
       if (commit && current) {
@@ -253,6 +259,11 @@ export function DraggableScatter({
     window.addEventListener("pointermove", onPointerMove)
     window.addEventListener("pointerup", onPointerUp)
     window.addEventListener("pointercancel", onPointerCancel)
+    g.detach = () => {
+      window.removeEventListener("pointermove", onPointerMove)
+      window.removeEventListener("pointerup", onPointerUp)
+      window.removeEventListener("pointercancel", onPointerCancel)
+    }
   }
 
   useEffect(() => () => end(false), []) // eslint-disable-line react-hooks/exhaustive-deps -- 언마운트 정리
@@ -264,19 +275,25 @@ export function DraggableScatter({
       className={cn(
         "@container relative isolate w-full touch-pan-y select-none",
         // 데스크톱은 끌어 놓을 수 있는 범위를 점선 판으로 보여 준다. outline이라 판 크기(= 끌기 범위 좌표)는 그대로다.
-        frameName === "desktop" &&
-          "rounded-xl bg-surface/50 outline outline-1 -outline-offset-1 outline-silver outline-dashed",
+        frameName !== "mobile" &&
+          "rounded-xl bg-surface/20 outline outline-1 -outline-offset-1 outline-silver/60 outline-dashed",
         className
       )}
       style={{ aspectRatio: seed.aspect }}
     >
-      {frameName === "desktop" && (
+      {frameName !== "mobile" && (
         <PatternBackground
           variant="dots"
           spacing={32}
-          opacity={0.35}
+          opacity={0.2}
           className="absolute inset-0 -z-10 rounded-xl"
         />
+      )}
+      {children && (
+        // 달력은 판 위에 얹히고, 그림은 그 위에 스티커처럼 놓인다. 판 전체가 끌기 범위다.
+        <div className="absolute inset-y-0 right-0 z-0 flex w-[45%] items-center p-3">
+          <div className="w-full">{children}</div>
+        </div>
       )}
       {seed.items.map((item) => {
         const food = byId.get(item.id)!
@@ -337,7 +354,11 @@ export function DraggableScatter({
         <button
           type="button"
           onClick={() => reset(key)}
-          className="absolute right-0 bottom-0 z-20 flex items-center gap-1 rounded-full border border-hairline bg-canvas/90 px-2.5 py-1 text-xs text-stone backdrop-blur hover:text-ink"
+          className={cn(
+            "absolute z-20 flex items-center gap-1 rounded-full border border-hairline bg-canvas/90 px-2.5 py-1 text-xs text-stone backdrop-blur hover:text-ink",
+            // 달 판은 오른쪽 아래가 달력 자리라 왼쪽 아래에 둔다.
+            frameName === "desktopMonth" ? "bottom-2 left-2" : "right-0 bottom-0"
+          )}
         >
           <RotateCcw aria-hidden size={12} strokeWidth={1.8} />
           원래대로

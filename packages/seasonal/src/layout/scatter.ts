@@ -5,12 +5,20 @@
 // 화면에서는 실제 폭에 맞춰 확대·축소만 하므로 폭이 바뀌어도 배치가 섞이지 않는다.
 
 /** 배치 기준 프레임. big은 라벨이 큰 넓은 화면이다. */
-export type ScatterFrame = { width: number; height: number; big: boolean }
+export type ScatterFrame = {
+  width: number
+  height: number
+  big: boolean
+  /** 오른쪽에 비워 둘 폭(px). 처음 배치(시드)만 이 밖에 놓고, 끌기 범위는 프레임 전체다. 그 자리에 달력이 얹힌다. */
+  reserveRight?: number
+}
 
 export const SCATTER_FRAMES = {
   mobile: { width: 339, height: 200, big: false },
   // 데스크톱은 품종 판(왼쪽)과 달력(오른쪽)이 한 줄에 놓인다. 판의 가로·세로 비는 그 칸 크기를 따른다.
   desktop: { width: 440, height: 300, big: true },
+  // 달 섹션 판: 판 전체가 끌기 범위이고, 오른쪽 45%에는 달력이 얹힌다. 처음 배치는 달력 자리를 피한다.
+  desktopMonth: { width: 752, height: 400, big: true, reserveRight: 340 },
 } as const satisfies Record<string, ScatterFrame>
 
 /** 배치된 품종 하나. 좌표와 크기는 프레임 대비 비율이다. */
@@ -53,7 +61,7 @@ export function scatterLayout({
   const label = labelHeight(frame)
   const base = Math.min(
     Math.max(
-      Math.sqrt((W * H * 0.5) / Math.max(n, 1)) - label * 0.5,
+      Math.sqrt(((W - (frame.reserveRight ?? 0)) * H * 0.5) / Math.max(n, 1)) - label * 0.5,
       big ? 34 : 24
     ),
     big ? 120 : 96
@@ -113,7 +121,7 @@ export function findOpenSpot({
   const r = size / 2
   let best = { x: r, y: r, gap: -Infinity }
   for (let c = 0; c < CANDIDATES; c++) {
-    const x = rand() * (frame.width - size) + r
+    const x = rand() * (frame.width - (frame.reserveRight ?? 0) - size) + r
     const y = rand() * (frame.height - size - labelHeight(frame)) + r
     const gap = placed.length
       ? Math.min(...placed.map((p) => Math.hypot(p.x - x, p.y - y) - (p.r + r)))
