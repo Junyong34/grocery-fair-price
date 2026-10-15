@@ -7,7 +7,8 @@ export const FOOD_SCALE: Readonly<Record<string, number>> = {
   // 가늘고 길어 작아 보이는 생선·뿌리·나물(처음 값. 화면을 보고 고쳐 가며 조정한다)
   pollock: 1.25,
   "spanish-mackerel": 1.25,
-  saury: 1.25,
+  saury: 1.3,
+  "korean-rockfish": 1.3,
   burdock: 1.2,
   deodeok: 1.2,
   mugwort: 1.2,
