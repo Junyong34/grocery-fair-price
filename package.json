@@ -10,13 +10,15 @@
     "typecheck": "turbo typecheck",
     "ui:add": "pnpm --filter @workspace/ui ui:add",
     "test": "turbo test",
-    "foods:sync": "node scripts/sync-food-images.mjs"
+    "foods:sync": "node scripts/sync-food-images.mjs && node scripts/measure-food-bounds.mjs",
+    "foods:bounds": "node scripts/measure-food-bounds.mjs"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
     "prettier": "^3.9.9",
     "prettier-plugin-tailwindcss": "^0.8.1",
+    "sharp": "0.35.5",
     "turbo": "^2.11.7",
     "typescript": "^5"
   },

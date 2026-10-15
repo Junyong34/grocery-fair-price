@@ -4,6 +4,7 @@ import Link from "next/link"
 import { RotateCcw } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 
+import { FOOD_BOTTOM } from "@workspace/seasonal/data/food-bounds.generated"
 import type { Food } from "@workspace/seasonal/data/foods"
 import {
   mergeSavedLayout,
@@ -38,6 +39,10 @@ const TAP_SLOP = 6
 const LONG_PRESS_MS = 250
 /** 그림 사이에 남길 틈(프레임 px). */
 const GAP = 2
+/** 이름표와 그림 아래 끝 사이 간격(그림 크기 대비). */
+const LABEL_GAP = 0.06
+/** 그림 아래 끝을 모르는 품종(그림 없음)의 기본값. 이름 카드(원)는 상자를 끝까지 채운다. */
+const DEFAULT_BOTTOM = 1
 /** 판 위 달력의 폭(판 폭 대비)과 처음 자리(왼쪽 위, 판 크기 대비). */
 const CALENDAR_WIDTH = 0.45
 const CALENDAR_HOME: CalendarSpot = { x: 0.53, y: 0.04 }
@@ -392,6 +397,7 @@ export function DraggableScatter({
               year={year}
               px={px}
               fontSize={`${(labelPx / frame.width) * 100}cqi`}
+              frameWidth={frame.width}
             />
           </Link>
         )
@@ -415,29 +421,29 @@ export function DraggableScatter({
 }
 
 /**
- * 판 위 그림 하나(그림 + 이름). 먹은 품종은 이름 앞에 ✓가 붙고 그림이 선명하며, 안 먹은 품종은 그림이 살짝 흐리다.
- * ⚙에서 먹음 표시를 끄면 둘 다 보이지 않는다(in-data-[eaten-mark=off]).
+ * 판 위 그림 하나(그림 + 이름). 먹은 품종은 이름 앞에 ✓가 붙는다. ⚙에서 먹음 표시를 끄면 보이지 않는다(in-data-[eaten-mark=off]).
  */
 function FoodTile({
   food,
   year,
   px,
   fontSize,
+  frameWidth,
 }: {
   food: Food
   year: number
   px: number
   fontSize: string
+  frameWidth: number
 }) {
   const eaten = useIsEaten(year, food.id)
+  // 그림은 정사각형 상자 안에서 아래가 비는 정도가 품종마다 달라(생선은 많이 빔) 이름표가 멀어 보인다.
+  // 그림 아래 끝(food-bounds)에서 LABEL_GAP만 띄우도록 이름표를 끌어올린다.
+  const bottom = FOOD_BOTTOM[food.id] ?? DEFAULT_BOTTOM
+  const marginTop = `${(-(1 - bottom - LABEL_GAP) * px * 100) / frameWidth}cqi`
   return (
     <>
-      <span
-        className={cn(
-          "block transition-opacity duration-300",
-          !eaten && "opacity-60 in-data-[eaten-mark=off]:opacity-100"
-        )}
-      >
+      <span className="block">
         <FoodImage
           food={food}
           sizes={`${Math.round(px * 1.5)}px`}
@@ -446,7 +452,7 @@ function FoodTile({
       </span>
       <span
         className="block text-center leading-tight font-semibold whitespace-nowrap"
-        style={{ fontSize }}
+        style={{ fontSize, marginTop }}
       >
         {eaten && (
           <span
