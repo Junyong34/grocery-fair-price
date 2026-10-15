@@ -5,12 +5,10 @@ import { MONTH_NOTES, UI_COPY } from "@workspace/seasonal/data/copy"
 import { FESTIVALS } from "@workspace/seasonal/data/festivals"
 import { foodsInMonth } from "@workspace/seasonal/data/foods"
 import type { Month } from "@workspace/seasonal/data/months"
-import { seasonOfMonth } from "@workspace/seasonal/data/seasons"
 import { Button } from "@workspace/ui/components/button"
 
 import { routes } from "@/shared/routes"
 
-import { SeasonTag } from "../components/season-tag"
 import { EatenInMonth } from "./eaten-summary"
 import { FoodCard } from "./food-card"
 import { FoodGrid, ViewSwitch } from "./food-grid"
@@ -24,7 +22,6 @@ const next = (month: number) => (month === 12 ? 1 : month + 1)
  */
 export function MonthView({ month }: { month: Month }) {
   const foods = foodsInMonth(month)
-  const season = seasonOfMonth(month)
   const note = MONTH_NOTES[month]
   // 명절 줄은 대표 달 기준이다. 연도에 따라 바뀌는 날짜(정월대보름 2·3월)는 2a 달력이 보여 준다.
   const festivals = FESTIVALS.filter((festival) => festival.month === month)
@@ -43,7 +40,6 @@ export function MonthView({ month }: { month: Month }) {
     >
       <div className="mx-auto max-w-[1080px] px-[18px] pt-5 pb-8 lg:grid lg:grid-cols-[260px_1fr] lg:gap-10 lg:px-6 lg:pt-8">
         <aside className="flex flex-col gap-2 lg:sticky lg:top-20 lg:self-start">
-          <SeasonTag season={season} className="self-start" />
           <p
             aria-hidden
             className="hidden font-number text-[110px] leading-none tabular-nums lg:block"
