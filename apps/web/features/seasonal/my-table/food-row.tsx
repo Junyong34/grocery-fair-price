@@ -16,6 +16,8 @@ import { cn } from "@workspace/ui/lib/utils"
 import { FoodImage } from "@/features/seasonal/components/food-image"
 import { routes } from "@/shared/routes"
 
+import { TypedLabel } from "./typed-label"
+
 /** 나의 식탁 목록 한 줄. 체크박스 | 이미지 | 이름·제철 달 | 라벨. 이름을 누르면 품종 상세로 간다. */
 export function FoodRow({
   food,
@@ -102,7 +104,7 @@ export function FoodRow({
           eaten ? "font-semibold text-gold-deep" : "text-ash"
         )}
       >
-        {label}
+        <TypedLabel key={`${eaten}:${label}`} text={label} animate={eaten && fresh !== null} />
       </label>
     </li>
   )
