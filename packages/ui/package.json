@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "ui:add": "sh -c 'echo \"/* shadcn CLI 임시 파일 */\" > src/styles/.cli-staging.css && yes n | pnpm dlx shadcn@latest add -y \"$@\"; status=$?; rm -rf src/scripts; node scripts/fix-ui-css.mjs; exit $status' --",
     "ui:fix-css": "node scripts/fix-ui-css.mjs",
-    "test": "vitest run"
+    "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
