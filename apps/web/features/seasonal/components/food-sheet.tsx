@@ -6,6 +6,8 @@ import { useSyncExternalStore } from "react"
 import { BottomSheet } from "@workspace/ui/components/bottom-sheet"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@workspace/ui/components/sheet"
 
+import { ShareButton } from "./share-button"
+
 const DESKTOP = "(min-width: 1024px)"
 
 function subscribe(onChange: () => void) {
@@ -35,8 +37,9 @@ export function FoodSheet({ title, children }: { title: string; children: React.
     return (
       <Sheet open onOpenChange={(open) => !open && close()}>
         <SheetContent className="w-[min(440px,calc(100%-56px))]" aria-describedby={undefined}>
-          <SheetHeader>
+          <SheetHeader className="flex flex-row items-center justify-between gap-4">
             <SheetTitle className="font-heading text-[32px] font-bold">{title}</SheetTitle>
+            <ShareButton className="shrink-0" />
           </SheetHeader>
           {children}
         </SheetContent>
@@ -44,7 +47,16 @@ export function FoodSheet({ title, children }: { title: string; children: React.
     )
   }
   return (
-    <BottomSheet open onClose={close} title={<span className="font-heading text-[28px] font-bold">{title}</span>}>
+    <BottomSheet
+      open
+      onClose={close}
+      title={
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-heading text-[28px] font-bold">{title}</span>
+          <ShareButton className="shrink-0" />
+        </div>
+      }
+    >
       <div className="overflow-y-auto pb-4">{children}</div>
     </BottomSheet>
   )

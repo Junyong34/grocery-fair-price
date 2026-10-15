@@ -1,6 +1,8 @@
 import { monthCalendar, type CalendarDate, type CalendarDay } from "@workspace/seasonal/calendar/month-calendar"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { HolidayName } from "./holiday-name"
+
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"]
 
 /** 토요일(6)·일요일(0) */
@@ -120,9 +122,7 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
           {cell.day}
         </span>
         {holiday && (
-          <span className="w-full truncate text-[9px] leading-tight text-holiday in-data-[holidays=off]:hidden lg:text-[10px]">
-            {names}
-          </span>
+          <HolidayName names={names} className="w-full truncate text-[9px] leading-tight text-holiday in-data-[holidays=off]:hidden lg:text-[10px]" />
         )}
       </div>
     )
@@ -142,9 +142,7 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
           {cell.day}
         </span>
         {holiday && (
-          <span className="sr-only lg:not-sr-only lg:w-full lg:truncate lg:text-[10px] lg:text-holiday lg:in-data-[holidays=off]:hidden">
-            {names}
-          </span>
+          <HolidayName names={names} className="sr-only lg:not-sr-only lg:w-full lg:truncate lg:text-[10px] lg:text-holiday lg:in-data-[holidays=off]:hidden" />
         )}
       </div>
     )
@@ -156,9 +154,7 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
           {cell.day}
         </span>
         {holiday && (
-          <span className="sr-only lg:not-sr-only lg:w-full lg:truncate lg:px-1 lg:text-[10px] lg:text-holiday lg:in-data-[holidays=off]:hidden">
-            {names}
-          </span>
+          <HolidayName names={names} className="sr-only lg:not-sr-only lg:w-full lg:truncate lg:px-1 lg:text-[10px] lg:text-holiday lg:in-data-[holidays=off]:hidden" />
         )}
       </div>
     )
@@ -177,9 +173,7 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
       </span>
       {holiday && (
         // 좁은 칸에서는 두 줄까지 감싸고(낱말 단위), 넘치면 말줄임한다.
-        <span className="line-clamp-2 w-full px-0.5 text-[11px] leading-tight break-keep text-holiday in-data-[holidays=off]:hidden! lg:line-clamp-1 lg:text-xs">
-          {names}
-        </span>
+        <HolidayName names={names} className="line-clamp-2 w-full px-0.5 text-[11px] leading-tight break-keep text-holiday in-data-[holidays=off]:hidden! lg:line-clamp-1 lg:text-xs" />
       )}
     </div>
   )
