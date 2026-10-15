@@ -23,22 +23,24 @@ export function SeasonalShell({
     <div className="flex min-h-svh flex-col">
       <SeasonalHeader
         tabs={<HeaderSubTabs />}
+        // 검색·⚙는 모바일과 데스크톱 모양이 달라 둘 다 그리고 CSS로 하나만 보인다. 공유는 같은 버튼 하나를 쓴다.
         actions={
           <>
             <div className="contents lg:hidden">
               <MobileSearchButton />
-              <HeaderShareButton />
-              <ThisMonthOnly>
-                <MobileSettingsButton />
-              </ThisMonthOnly>
             </div>
             <div className="hidden lg:contents">
               <DesktopSearchButton />
-              <HeaderShareButton />
-              <ThisMonthOnly>
-                <DesktopSettingsButton />
-              </ThisMonthOnly>
             </div>
+            <HeaderShareButton />
+            <ThisMonthOnly>
+              <div className="contents lg:hidden">
+                <MobileSettingsButton />
+              </div>
+              <div className="hidden lg:contents">
+                <DesktopSettingsButton />
+              </div>
+            </ThisMonthOnly>
           </>
         }
       />

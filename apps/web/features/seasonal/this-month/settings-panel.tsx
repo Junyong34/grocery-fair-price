@@ -2,58 +2,27 @@
 
 import { Settings } from "lucide-react"
 import { overlay } from "overlay-kit"
+import { lazy, Suspense } from "react"
 
 import { BottomSheet } from "@workspace/ui/components/bottom-sheet"
 import { Button } from "@workspace/ui/components/button"
-import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/components/popover"
-import { Switch } from "@workspace/ui/components/switch"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@workspace/ui/components/popover"
 
-import { useSettingsStore } from "../stores/settings-store"
-import { CalendarStylePicker } from "./calendar-style-picker"
+// 설정 내용(달력 모양 미리보기, 스위치, 공휴일 데이터)은 ⚙를 처음 열 때 불러온다. 버튼에 포인터나 초점이 오면 미리 받아 둔다.
+const loadFields = () => import("./settings-fields")
+const LazySettingsFields = lazy(() =>
+  loadFields().then(({ SettingsFields }) => ({ default: SettingsFields }))
+)
 
-/** ⚙ 표시 설정 내용(명세 4절. 24절기 표시와 달력 다운로드는 MVP 밖). */
-function SettingsFields() {
-  const { showHolidays, showEaten, calendarStyle, set } = useSettingsStore()
-  return (
-    <div className="flex flex-col divide-y divide-hairline">
-      <CalendarStylePicker value={calendarStyle} onChange={(value) => set({ calendarStyle: value })} />
-      <SettingRow
-        label="공휴일 표시"
-        hint="달력의 공휴일 이름과 빨간 날짜(토·일은 늘 빨강)"
-        checked={showHolidays}
-        onChange={(value) => set({ showHolidays: value })}
-      />
-      <SettingRow
-        label="먹은 음식 표시"
-        hint="제철 그림의 ✓"
-        checked={showEaten}
-        onChange={(value) => set({ showEaten: value })}
-      />
-    </div>
-  )
-}
-
-function SettingRow({
-  label,
-  hint,
-  checked,
-  onChange,
-}: {
-  label: string
-  hint: string
-  checked: boolean
-  onChange: (value: boolean) => void
-}) {
-  return (
-    <label className="flex items-center justify-between gap-4 py-3">
-      <span className="flex flex-col">
-        <span className="text-[15px] text-ink">{label}</span>
-        <span className="text-xs text-stone">{hint}</span>
-      </span>
-      {/* cojeev 스위치는 64×44로 커서 줄여 쓴다. */}
-      <Switch checked={checked} onCheckedChange={onChange} className="-my-2 -mr-2.5 origin-right scale-[.68]" />
-    </label>
-  )
+/** 손가락은 hover가 없어 누르는 순간(pointerdown)에 받기 시작한다. */
+const preload = {
+  onPointerEnter: () => void loadFields(),
+  onPointerDown: () => void loadFields(),
+  onFocus: () => void loadFields(),
 }
 
 /** 모바일 헤더의 ⚙. 하단 시트로 연다. */
@@ -71,11 +40,20 @@ export function MobileSettingsButton() {
           </Button>
         }
       >
-        <SettingsFields />
+        <Suspense>
+          <LazySettingsFields />
+        </Suspense>
       </BottomSheet>
     ))
   return (
-    <Button variant="ghost" size="sm" aria-label="설정" onClick={open} className="size-10 px-0">
+    <Button
+      variant="ghost"
+      size="sm"
+      aria-label="설정"
+      onClick={open}
+      {...preload}
+      className="size-10 px-0"
+    >
       <Settings aria-hidden size={20} strokeWidth={1.6} />
     </Button>
   )
@@ -86,13 +64,21 @@ export function DesktopSettingsButton() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" aria-label="설정" className="size-10 px-0">
+        <Button
+          variant="ghost"
+          size="sm"
+          aria-label="설정"
+          {...preload}
+          className="size-10 px-0"
+        >
           <Settings aria-hidden size={20} strokeWidth={1.6} />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-[400px] bg-canvas">
         <p className="font-semibold text-ink">표시</p>
-        <SettingsFields />
+        <Suspense>
+          <LazySettingsFields />
+        </Suspense>
       </PopoverContent>
     </Popover>
   )

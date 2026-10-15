@@ -1,3 +1,5 @@
+import { holidaysInMonth } from "@workspace/seasonal/calendar/holidays"
+
 import { CALENDAR_VARIANTS, MonthCalendar, type CalendarVariant } from "@/features/seasonal/components/month-calendar"
 
 export const metadata = { title: "달력 모양 비교" }
@@ -34,11 +36,11 @@ export default function Page() {
             {/* lg: 클래스는 화면 폭 기준이라, 모바일 칸은 좁은 폭에서 볼 때만 모바일 모양이 된다. */}
             <div className="w-[339px] shrink-0">
               <p className="mb-2 font-number text-5xl">9</p>
-              <MonthCalendar year={2026} month={9} today={TODAY} variant={variant} />
+              <MonthCalendar year={2026} month={9} today={TODAY} holidays={holidaysInMonth(2026, 9)} variant={variant} />
             </div>
             <div className="min-w-[339px] flex-1">
               <p className="mb-2 font-number text-5xl">10</p>
-              <MonthCalendar year={2026} month={10} today={TODAY} variant={variant} />
+              <MonthCalendar year={2026} month={10} today={TODAY} holidays={holidaysInMonth(2026, 10)} variant={variant} />
             </div>
           </div>
         </section>

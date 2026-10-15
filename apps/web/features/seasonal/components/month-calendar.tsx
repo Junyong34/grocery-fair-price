@@ -1,4 +1,5 @@
 import { WEEKDAY_NAMES } from "@workspace/seasonal/calendar/date-utils"
+import type { MonthHolidays } from "@workspace/seasonal/calendar/holidays"
 import { monthCalendar, type CalendarDate, type CalendarDay } from "@workspace/seasonal/calendar/month-calendar"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -33,14 +34,17 @@ export function MonthCalendar({
   year,
   month,
   today,
+  holidays,
   variant = "plain",
 }: {
   year: number
   month: number
   today: CalendarDate
+  /** 그 달 공휴일. 서버에서 holidaysInMonth로 구해 넘긴다. */
+  holidays: MonthHolidays
   variant?: CalendarVariant
 }) {
-  const weeks = monthCalendar({ year, month, today })
+  const weeks = monthCalendar({ year, month, today, holidays })
   return (
     <table
       className={cn(

@@ -1,5 +1,6 @@
 "use client"
 
+import type { MonthHolidays } from "@workspace/seasonal/calendar/holidays"
 import type { CalendarDate } from "@workspace/seasonal/calendar/month-calendar"
 
 import { MonthCalendar } from "../components/month-calendar"
@@ -21,7 +22,7 @@ export function SettingsScope({ children }: { children: React.ReactNode }) {
 }
 
 /** ⚙에서 고른 모양으로 그리는 달력. 저장값을 불러오기 전(서버 HTML)에는 기본 plain이다. */
-export function SettingsCalendar(props: { year: number; month: number; today: CalendarDate }) {
+export function SettingsCalendar(props: { year: number; month: number; today: CalendarDate; holidays: MonthHolidays }) {
   const variant = useSettingsStore((state) => state.calendarStyle)
   return <MonthCalendar {...props} variant={variant} />
 }

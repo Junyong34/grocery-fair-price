@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import { holidaysInMonth } from "@workspace/seasonal/calendar/holidays"
 import type { CalendarDate } from "@workspace/seasonal/calendar/month-calendar"
 import { MONTH_NOTES, UI_COPY } from "@workspace/seasonal/data/copy"
 import { festivalDate, festivalsInMonth } from "@workspace/seasonal/data/festivals"
@@ -128,6 +129,7 @@ function MonthSection({
   today: CalendarDate
 }) {
   const festivals = festivalsInMonth(month, today.year)
+  const holidays = holidaysInMonth(today.year, month)
   return (
     <section
       id={monthSectionId(month)}
@@ -150,7 +152,7 @@ function MonthSection({
         </div>
         <div>
           <div className="mt-5 lg:mt-0">
-            <SettingsCalendar year={today.year} month={month} today={today} />
+            <SettingsCalendar year={today.year} month={month} today={today} holidays={holidays} />
           </div>
           <p className="mt-3 text-xs text-stone">
             {festivals.length

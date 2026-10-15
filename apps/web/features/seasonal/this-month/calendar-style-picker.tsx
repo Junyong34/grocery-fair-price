@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 
+import { holidaysInMonth } from "@workspace/seasonal/calendar/holidays"
 import { seoulToday } from "@workspace/seasonal/calendar/today"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -29,6 +30,8 @@ export function CalendarStylePicker({
 }) {
   // 시트·패널은 열릴 때만 그려지므로(클라이언트) 이번 달을 바로 잡는다. 날짜는 서울 기준이다.
   const [today] = useState(seoulToday)
+  // 이 피커는 설정을 열 때 따로 불러오는 묶음(settings-fields)에 있어 공휴일 데이터를 여기서 구해도 첫 화면 번들에 들지 않는다.
+  const [holidays] = useState(() => holidaysInMonth(today.year, today.month))
   const index = CALENDAR_VARIANTS.indexOf(value)
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -70,7 +73,7 @@ export function CalendarStylePicker({
                 )}
               >
                 <span aria-hidden inert style={{ width: PREVIEW_WIDTH, zoom: PREVIEW_ZOOM }}>
-                  <MonthCalendar year={today.year} month={today.month} today={today} variant={variant} />
+                  <MonthCalendar year={today.year} month={today.month} today={today} holidays={holidays} variant={variant} />
                 </span>
               </span>
               {CALENDAR_VARIANT_LABELS[variant]}
