@@ -53,7 +53,8 @@ function FoodSearchDialog({
   return (
     // cojeev CommandDialog는 cmdk 옵션(shouldFilter)을 넘기지 않아, 같은 구성을 직접 짠다.
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
-      <DialogContent className="p-0">
+      {/* 가운데 정렬이면 결과 수에 따라 입력창이 위아래로 움직인다. 위쪽에 고정하고 결과 목록만 아래로 늘고 줄게 한다. */}
+      <DialogContent className="!top-[max(16px,10svh)] !bottom-auto !my-0 p-0">
         <DialogTitle className="sr-only">제철 음식 검색</DialogTitle>
         <DialogDescription className="sr-only">
           이름이나 초성으로 찾아요

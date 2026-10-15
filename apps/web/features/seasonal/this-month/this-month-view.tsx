@@ -5,7 +5,6 @@ import { MONTH_NOTES, UI_COPY } from "@workspace/seasonal/data/copy"
 import { festivalDate, festivalsInMonth } from "@workspace/seasonal/data/festivals"
 import { foodsInMonth } from "@workspace/seasonal/data/foods"
 import { MONTHS, type Month } from "@workspace/seasonal/data/months"
-import { seasonOfMonth } from "@workspace/seasonal/data/seasons"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { routes } from "@/shared/routes"
@@ -13,10 +12,9 @@ import { routes } from "@/shared/routes"
 import { EatenCount } from "../components/eaten-count"
 import { MonthCalendar } from "../components/month-calendar"
 import { ScatterField } from "../components/scatter-field"
-import { SeasonTag } from "../components/season-tag"
 import { HERO_ID, monthSectionId } from "./active-month"
 import { DesktopMonthPanel } from "./desktop-month-panel"
-import { JumpButton, MonthRail, StickyIndicator } from "./month-jump"
+import { JumpButton, MonthRail } from "./month-jump"
 import { MonthScrollSpy } from "./month-scroll-spy"
 import { SettingsScope } from "./settings-scope"
 
@@ -34,7 +32,7 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
       <MonthScrollSpy />
       <div className="mx-auto max-w-[600px] lg:grid lg:max-w-[1080px] lg:grid-cols-[280px_1fr] lg:px-6">
         <aside className="hidden lg:block">
-          <div className="sticky top-14 max-h-[calc(100svh-56px)] overflow-y-auto">
+          <div className="sticky top-16 max-h-[calc(100svh-64px)] overflow-y-auto">
             <DesktopMonthPanel
               thisMonth={thisMonth}
               months={months.map(({ month, foods, note }) => ({ month, note, count: foods.length }))}
@@ -43,15 +41,10 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
         </aside>
 
         <div className="min-w-0">
-          <StickyIndicator thisMonth={thisMonth} />
-
-          <section id={HERO_ID} aria-labelledby="hero-title" className="scroll-mt-11 pr-11 pl-[18px] pt-10 pb-7 lg:scroll-mt-14 lg:px-0 lg:pt-12">
-            <div className="flex items-start justify-between gap-3">
-              <h1 id="hero-title" className="font-heading text-[46px] leading-tight lg:text-[64px]">
-                지금은 {thisMonth}월
-              </h1>
-              <SeasonTag season={seasonOfMonth(thisMonth)} className="mt-3" />
-            </div>
+          <section id={HERO_ID} aria-labelledby="hero-title" className="scroll-mt-16 pr-11 pl-[18px] pt-10 pb-7 lg:scroll-mt-16 lg:px-0 lg:pt-12">
+            <h1 id="hero-title" className="font-heading text-[46px] leading-tight lg:text-[64px]">
+              지금은 {thisMonth}월
+            </h1>
             <p className="mt-1 font-heading text-lg text-stone lg:text-[22px]">{current.note}</p>
             <Scatter month={thisMonth} foods={current.foods} year={year} className="mt-6" />
             <p className="mt-3 text-xs text-ash">{current.foods.length}가지 제철</p>
@@ -118,12 +111,11 @@ function MonthSection({
       id={monthSectionId(month)}
       data-month={month}
       aria-label={`${month}월`}
-      className="scroll-mt-11 border-t border-hairline pr-11 pl-[18px] pt-12 pb-7 lg:scroll-mt-14 lg:px-0 lg:pt-8"
+      className="scroll-mt-16 border-t border-hairline pr-11 pl-[18px] pt-12 pb-7 lg:scroll-mt-16 lg:px-0 lg:pt-8"
     >
-      <div className="flex items-start justify-between gap-3 lg:items-center lg:gap-6">
+      <div className="lg:flex lg:items-center lg:gap-6">
         <h2 className="font-number text-[88px] leading-[0.9] tabular-nums lg:text-[72px]">{month}</h2>
         <p className="hidden flex-1 font-heading text-lg text-stone lg:block">{note}</p>
-        <SeasonTag season={seasonOfMonth(month)} className="mt-2 lg:mt-0" />
       </div>
       <p className="mt-2 font-heading text-[19px] text-stone lg:hidden">{note}</p>
       <Scatter month={month} foods={foods} year={today.year} className="mt-5" />

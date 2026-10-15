@@ -88,7 +88,7 @@ export function MyTableView() {
         />
 
         <section aria-label="제철 목록" className="mt-6 lg:mt-0">
-          <div className="sticky top-0 z-(--z-sticky) -mx-[18px] flex flex-col gap-2.5 bg-canvas/94 px-[18px] py-3 backdrop-blur lg:top-14 lg:mx-0 lg:px-0">
+          <div className="sticky top-14 z-(--z-sticky) -mx-[18px] flex flex-col gap-2.5 bg-canvas/94 px-[18px] py-3 backdrop-blur lg:mx-0 lg:px-0">
             <input
               type="search"
               value={query}

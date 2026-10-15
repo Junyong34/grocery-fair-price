@@ -3,9 +3,9 @@
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { SEASON_COPY } from "@workspace/seasonal/data/copy"
 import { MONTHS } from "@workspace/seasonal/data/months"
-import { seasonOfMonth } from "@workspace/seasonal/data/seasons"
+
+import { useToday } from "@/shared/today-context"
 
 import { jumpToMonth, useActiveMonth } from "./active-month"
 
@@ -26,16 +26,14 @@ export function JumpButton({
   )
 }
 
-/** 모바일 위쪽에 붙는 인디케이터. 히어로에서는 "지금은 10월", 아래로 내려가면 "가을 · 11월". */
-export function StickyIndicator({ thisMonth }: { thisMonth: number }) {
+/** 모바일 헤더가 떠 있을 때 로고 옆에 보이는 지금 달. 히어로에서는 "지금은 10월", 아래로 내려가면 "11월". */
+export function ActiveMonthLabel() {
+  const { month: thisMonth } = useToday()
   const active = useActiveMonth((state) => state.active)
   return (
-    <div
-      aria-hidden
-      className="sticky top-0 z-(--z-sticky) flex h-11 items-center bg-canvas/94 px-[18px] text-sm text-stone backdrop-blur lg:hidden"
-    >
-      {active ? `${SEASON_COPY[seasonOfMonth(active)].name} · ${active}월` : `지금은 ${thisMonth}월`}
-    </div>
+    <span aria-hidden className="block truncate font-heading text-[17px] text-ink tabular-nums lg:hidden">
+      {active ? `${active}월` : `지금은 ${thisMonth}월`}
+    </span>
   )
 }
 

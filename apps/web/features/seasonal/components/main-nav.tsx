@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useEffect, useState } from "react"
 import {
   CalendarDays,
   Leaf,
@@ -16,7 +17,7 @@ import { routes } from "@/shared/routes"
 
 import { matchesPath, NavLink } from "./nav-link"
 
-// 주요 메뉴 3개. 모바일은 하단 떠 있는 내비, 데스크톱(≥1024)은 상단 바로 보인다(명세 2.2, spec "내비").
+// 주요 메뉴 3개. 모바일은 하단 떠 있는 내비, 데스크톱(≥1024)은 헤더 안에 보인다(명세 2.2, spec "내비").
 // 활성 매핑: 월별 보기 → 이달, 명절 → 계절.
 const ITEMS: readonly {
   label: string
@@ -92,32 +93,89 @@ export function FloatingNav() {
   )
 }
 
-/** 데스크톱 상단 바. actions에 검색 입력과 ⚙가 들어온다. */
-export function TopNav({ actions }: { actions?: React.ReactNode }) {
+/** 이만큼(px) 내려가면 헤더가 위에서 떨어져 떠 있는 바가 된다. */
+const STUCK_AT = 8
+
+/** 페이지가 맨 위에서 STUCK_AT보다 내려갔는지. */
+function useScrolledDown() {
+  const [down, setDown] = useState(false)
+  useEffect(() => {
+    let frame = 0
+    const update = () => {
+      frame = 0
+      setDown(window.scrollY > STUCK_AT)
+    }
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update)
+    }
+    update()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+      cancelAnimationFrame(frame)
+    }
+  }, [])
+  return down
+}
+
+/**
+ * 제철 영역 헤더: 로고 · (데스크톱) 주요 메뉴 · 검색 · 설정. 늘 위에 붙어 있다.
+ * 맨 위에서는 화면 폭에 붙은 평평한 줄이고, 내려가면 가장자리에서 떨어진 둥근 바로 떠오른다.
+ * 다시 맨 위에 닿으면 탄성 있게 제자리로 붙는다(자석처럼). context는 떠 있을 때만 로고 옆에 보인다.
+ */
+export function SeasonalHeader({
+  actions,
+  context,
+}: {
+  actions?: React.ReactNode
+  context?: React.ReactNode
+}) {
+  const stuck = useScrolledDown()
   return (
-    <header className="sticky top-0 z-(--z-sticky) hidden border-b border-hairline bg-canvas/94 backdrop-blur lg:block">
-      <div className="mx-auto flex h-14 max-w-[1080px] items-center gap-8 px-6">
-        <Link
-          href={routes.seasonal.root}
-          aria-label="제철달력 홈"
-          className="inline-flex shrink-0 items-center rounded-sm no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-        >
-          <BrandLogo />
-        </Link>
-        <nav aria-label="주요 메뉴" className="flex gap-6">
-          {ITEMS.map(({ label, href, also, exact }) => (
-            <NavLink
-              key={href}
-              href={href}
-              also={also}
-              exact={exact}
-              className="text-[15px] text-stone hover:text-ink aria-[current=page]:font-semibold aria-[current=page]:text-ink"
-            >
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-        <div className="ml-auto flex items-center gap-2">{actions}</div>
+    <header
+      data-stuck={stuck ? "" : undefined}
+      className="group/header sticky top-0 z-(--z-dock) h-14"
+    >
+      <div
+        className={cn(
+          "absolute inset-x-0 top-0 h-14 border border-transparent",
+          "motion-safe:transition-[top,left,right,height,border-radius,background-color,border-color,box-shadow] motion-safe:duration-500 motion-safe:ease-[cubic-bezier(.34,1.45,.64,1)]",
+          "group-data-stuck/header:top-2 group-data-stuck/header:right-[max(10px,calc(50%-548px))] group-data-stuck/header:left-[max(10px,calc(50%-548px))] group-data-stuck/header:h-12",
+          "group-data-stuck/header:rounded-[20px] group-data-stuck/header:border-silver/50 group-data-stuck/header:bg-canvas/90 group-data-stuck/header:shadow-lg group-data-stuck/header:shadow-ink/8 group-data-stuck/header:backdrop-blur-md"
+        )}
+      >
+        <div className="mx-auto flex h-full max-w-[1080px] items-center gap-2 px-[18px] motion-safe:transition-[padding] motion-safe:duration-500 group-data-stuck/header:px-2.5 lg:gap-8 lg:px-6 lg:group-data-stuck/header:px-4">
+          <Link
+            href={routes.seasonal.root}
+            aria-label="제철달력 홈"
+            className="inline-flex shrink-0 items-center rounded-sm no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+          >
+            <span className="inline-flex origin-left motion-safe:transition-transform motion-safe:duration-500 group-data-stuck/header:scale-[.85]">
+              <BrandLogo />
+            </span>
+          </Link>
+          {context && (
+            <div className="min-w-0 translate-y-1 opacity-0 motion-safe:transition-[opacity,translate] motion-safe:duration-300 group-data-stuck/header:translate-y-0 group-data-stuck/header:opacity-100">
+              {context}
+            </div>
+          )}
+          <nav aria-label="주요 메뉴" className="hidden gap-6 lg:flex">
+            {ITEMS.map(({ label, href, also, exact }) => (
+              <NavLink
+                key={href}
+                href={href}
+                also={also}
+                exact={exact}
+                className="text-[15px] text-stone hover:text-ink aria-[current=page]:font-semibold aria-[current=page]:text-ink"
+              >
+                {label}
+              </NavLink>
+            ))}
+          </nav>
+          <div className="ml-auto flex items-center gap-1 lg:gap-2">
+            {actions}
+          </div>
+        </div>
       </div>
     </header>
   )

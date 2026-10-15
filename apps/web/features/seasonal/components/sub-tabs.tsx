@@ -1,22 +1,28 @@
+"use client"
+
+import Link from "next/link"
+
+import { LinkTabs, linkTabProps } from "@workspace/ui/components/link-tabs"
+
 import { routes } from "@/shared/routes"
 
-import { NavLink } from "./nav-link"
+import { useIsActive } from "./nav-link"
 
-// 2차 탭(명세 2.1). 선택 탭은 굵게, 아래 2px 밑줄.
+// 2차 탭(명세 2.1). cojeev 탭(lenses) 모양이고, 선택 표시가 탭 사이를 미끄러진다.
 function SubTabs({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <nav aria-label={label} className="border-b border-hairline">
-      <div className="mx-auto flex max-w-[1080px] gap-5 px-[18px] lg:px-6">{children}</div>
-    </nav>
+    <LinkTabs aria-label={label} className="mx-auto max-w-[1080px] px-[18px] pt-1 pb-2 lg:px-6">
+      {children}
+    </LinkTabs>
   )
 }
 
-function SubTab(props: React.ComponentProps<typeof NavLink>) {
+function SubTab({ href, exact, children }: { href: string; exact?: boolean; children: React.ReactNode }) {
+  const active = useIsActive(href, { exact })
   return (
-    <NavLink
-      {...props}
-      className="py-2.5 text-base text-stone hover:text-ink aria-[current=page]:font-semibold aria-[current=page]:text-ink aria-[current=page]:shadow-[inset_0_-2px_0_var(--color-ink)]"
-    />
+    <Link href={href} aria-current={active ? "page" : undefined} {...linkTabProps}>
+      {children}
+    </Link>
   )
 }
 

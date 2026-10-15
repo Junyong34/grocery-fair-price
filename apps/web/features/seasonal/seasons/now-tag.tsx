@@ -20,7 +20,7 @@ function Tag({ season }: { season: Season }) {
   if (seasonOfMonth(month) !== season) return null
   return (
     <span className="shrink-0 rounded-[3px] border border-gold bg-gold-wash px-2 py-0.5 text-[11px] tracking-normal text-gold-deep">
-      지금<span className="lg:hidden"> 계절</span>
+      지금<span className="hidden @[300px]:inline"> 계절</span>
     </span>
   )
 }

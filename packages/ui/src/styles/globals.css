@@ -40,6 +40,10 @@
     --color-season-autumn: var(--color-gold);
     --color-season-winter: var(--color-stone);
 
+    /* 달력의 토·일·공휴일 숫자(빨간 날). 베이지 바탕에서 튀지 않게 채도를 조금 낮춘 빨강 */
+    --color-holiday: #c43c2a;
+    --color-holiday-wash: color-mix(in oklab, var(--color-holiday) 9%, var(--color-canvas));
+
     /* 선택·켜짐 상태의 연한 gold 배경 (와이어프레임 accent-100) */
     --color-gold-wash: color-mix(in oklab, var(--color-gold-pale) 30%, var(--color-canvas));
 

@@ -4,10 +4,6 @@ import { useEffect, useRef, useState } from "react"
 
 import { OptionWheel, type OptionWheelItem } from "@workspace/ui/components/option-wheel"
 
-import { SEASON_COPY } from "@workspace/seasonal/data/copy"
-import { seasonOfMonth } from "@workspace/seasonal/data/seasons"
-
-import { SeasonTag } from "../components/season-tag"
 import { jumpToMonth, useActiveMonth } from "./active-month"
 
 export type PanelMonth = { month: number; note: string; count: number }
@@ -30,14 +26,13 @@ export function DesktopMonthPanel({
 }) {
   const active = useActiveMonth((state) => state.active)
   const shown = months[(active ?? thisMonth) - 1]!
-  const season = seasonOfMonth(shown.month)
 
   const items: OptionWheelItem[] = [
     { id: "now", label: `지금 · ${thisMonth}월`, description: "맨 위 이번 달 장면" },
     ...months.map(({ month, count }) => ({
       id: String(month),
       label: `${month}월`,
-      description: `${SEASON_COPY[seasonOfMonth(month)].name} · ${count}가지`,
+      description: `${count}가지 제철`,
     })),
   ]
 
@@ -63,7 +58,6 @@ export function DesktopMonthPanel({
 
   return (
     <div className="flex flex-col gap-4 py-8 pr-6">
-      <SeasonTag season={season} className="self-start" />
       <p className="font-number text-[110px] leading-none tabular-nums">{shown.month}</p>
       <p className="min-h-12 font-heading text-lg text-stone">{shown.note}</p>
       <p className="text-xs text-ash">월 이동 · 누르면 바로 바뀌어요</p>
