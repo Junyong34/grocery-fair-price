@@ -10,7 +10,7 @@ packages/eslint-config, packages/typescript-config
 grocery-price/         price-service docs and research
 ```
 
-Layer rules are in "Web app UI" in `AGENTS.md`.
+Layer rules are in "Web app UI" in `AGENTS.md`. Full map of routes, modules, generated files and commands: `docs/project-structure.md`.
 
 ## Adding components
 
