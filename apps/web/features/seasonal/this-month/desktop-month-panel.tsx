@@ -7,6 +7,7 @@ import { OptionWheel, type OptionWheelItem } from "@workspace/ui/components/opti
 import { formatMonthLabel } from "@workspace/seasonal/data/months"
 
 import { useSettingsStore } from "../stores/settings-store"
+import { MonthTitle } from "./month-title"
 
 import { jumpToMonth, useActiveMonth } from "./active-month"
 
@@ -63,7 +64,9 @@ export function DesktopMonthPanel({
 
   return (
     <div className="flex flex-col gap-4 py-8 pr-6">
-      <p className="font-number text-[110px] leading-none tabular-nums">{shown.month}</p>
+      <p className="font-number text-[110px] leading-none tabular-nums">
+        <MonthTitle month={shown.month} suffixClassName="ml-1 font-heading text-[48px]" />
+      </p>
       <p className="min-h-12 font-heading text-lg text-stone">{shown.note}</p>
       <p className="text-xs text-ash">월 이동 · 누르면 바로 바뀌어요</p>
       <div

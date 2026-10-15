@@ -20,7 +20,7 @@ export function SettingsFields() {
       <div className="flex items-center justify-between gap-4 py-3">
         <span className="flex flex-col">
           <span className="text-[15px] text-ink">달 이름</span>
-          <span className="text-xs text-stone">달 이동 목록의 표기</span>
+          <span className="text-xs text-stone">달 제목과 달 이동 목록의 표기</span>
         </span>
         <Segmented
           aria-label="달 이름"

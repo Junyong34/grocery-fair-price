@@ -15,7 +15,7 @@ type SettingsState = {
   showEaten: boolean
   /** 2a 달력 모양. 기본은 plain. */
   calendarStyle: CalendarVariant
-  /** 달 이동(모바일 월 레일, 데스크톱 휠)의 달 이름 표기. 기본은 "1월". */
+  /** 2a 달 제목과 달 이동(모바일 월 레일, 데스크톱 휠)의 달 이름 표기. 기본은 "1월". */
   monthLabel: MonthLabelStyle
   set: (
     patch: Partial<Pick<SettingsState, "showHolidays" | "showEaten" | "calendarStyle" | "monthLabel">>,
