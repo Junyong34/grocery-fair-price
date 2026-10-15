@@ -10,7 +10,7 @@ import { routes } from "@/shared/routes"
 
 import { matchesPath, useIsActive } from "./nav-link"
 
-// 2차 탭(명세 2.1). cojeev 탭(lenses) 모양이고, 선택 표시가 탭 사이를 미끄러진다.
+// 2차 탭(명세 2.1). cojeev 탭(lenses)을 밝은 트레이에 담고, gold 선택 표시가 탭 사이를 미끄러진다.
 // 헤더가 떠 있을 때는 같은 탭을 작게 헤더 안에 접어 넣는다(HeaderSubTabs).
 
 type Tab = { label: string; href: string; exact?: boolean }
@@ -34,10 +34,12 @@ const SEASON_TABS: TabSet = {
 
 function SubTabs({ set, compact = false }: { set: TabSet; compact?: boolean }) {
   return (
+    // 트레이에 담아 한 덩어리로 보이게 하고, 본문과는 아래 여백으로 나눈다(/examples/header-styles C).
     <LinkTabs
       aria-label={set.label}
-      className={compact ? undefined : "mx-auto max-w-[1080px] px-[18px] pt-1 pb-2 lg:px-6"}
-      listClassName={compact ? "gap-0.5!" : undefined}
+      tray
+      className={compact ? undefined : "mx-auto max-w-[1080px] px-[18px] pt-1 pb-4 lg:px-6 lg:pb-5"}
+      listClassName={compact ? "p-0.5" : "w-fit"}
     >
       {set.tabs.map((tab) => (
         <SubTab key={tab.href} {...tab} compact={compact} />
@@ -53,7 +55,7 @@ function SubTab({ href, exact, label, compact }: Tab & { compact: boolean }) {
       href={href}
       aria-current={active ? "page" : undefined}
       {...linkTabProps}
-      className={cn(linkTabProps.className, compact && "h-8! px-3! text-[13px]!")}
+      className={cn(linkTabProps.className, compact ? "h-8! px-3! text-[13px]!" : "h-9! px-4! text-sm!")}
     >
       {label}
     </Link>

@@ -23,8 +23,8 @@ const VARIANTS: readonly { id: Variant; name: string; note: string }[] = [
   },
   {
     id: "tray",
-    name: "C. 트레이에 담은 알약 탭 + 여백",
-    note: "탭을 베이지 트레이에 담아 한 덩어리로(2·4·6열 전환과 같은 모양). 선 대신 아래 여백으로 나눈다.",
+    name: "C. 트레이에 담은 알약 탭 + 여백 (적용)",
+    note: "탭을 밝은 트레이에 담아 한 덩어리로, 선택 칸은 gold(하단 내비와 같은 색). 2·4·6열 전환도 같은 모양. 선 대신 아래 여백으로 나눈다.",
   },
 ]
 
@@ -119,13 +119,13 @@ function Tabs({ variant, pad }: { variant: Variant; pad: string }) {
   if (variant === "tray")
     return (
       <div className={cn("pt-1 pb-2", pad)}>
-        <div className="inline-flex rounded-full border border-silver/50 bg-hairline/60 p-0.5">
+        <div className="inline-flex rounded-full border border-hairline bg-surface/75 p-1 shadow-xs shadow-ink/5">
           {tabs.map((label, i) => (
             <span
               key={label}
               className={cn(
                 "grid h-9 place-items-center rounded-full px-4 text-sm",
-                i === 0 ? "bg-canvas font-semibold text-ink shadow-[inset_0_0_0_1px_var(--color-silver)]" : "text-stone"
+                i === 0 ? "bg-gold-soft font-semibold text-espresso" : "text-stone"
               )}
             >
               {label}
