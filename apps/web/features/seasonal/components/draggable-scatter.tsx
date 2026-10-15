@@ -273,8 +273,8 @@ export function DraggableScatter({
       {frameName === "desktop" && (
         <PatternBackground
           variant="dots"
-          spacing={18}
-          opacity={0.4}
+          spacing={32}
+          opacity={0.35}
           className="absolute inset-0 -z-10 rounded-xl"
         />
       )}
