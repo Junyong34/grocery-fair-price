@@ -31,9 +31,7 @@ export function FoodRow({
   // 방금 체크해서 뽑은 문구. 다시 열면 없고, 그때는 품종 id 해시로 고정한 문구를 쓴다.
   const [fresh, setFresh] = useState<string | null>(null)
   const id = `eat-${food.id}`
-  const label = eaten
-    ? (fresh ?? eatLabel(food.category, hashString(food.id)))
-    : EAT_LABEL_OFF
+  const label = eaten ? (fresh ?? eatLabel(hashString(food.id))) : EAT_LABEL_OFF
   return (
     <li className="grid grid-cols-[24px_40px_1fr_auto] items-center gap-3 border-b border-hairline py-2.5">
       <Checkbox
@@ -45,7 +43,7 @@ export function FoodRow({
             setFresh(null)
           } else {
             setPops((n) => n + 1)
-            setFresh(eatLabel(food.category, Math.floor(Math.random() * 1000)))
+            setFresh(eatLabel(Math.floor(Math.random() * 1000)))
           }
           onToggle()
         }}

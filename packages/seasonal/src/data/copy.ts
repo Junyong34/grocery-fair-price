@@ -75,22 +75,25 @@ export const UI_COPY = {
   noRelatedFestival: "연결된 명절 없음",
 } as const
 
-/** 나의 식탁 행 라벨. 먹은 품종은 카테고리별 문구 풀에서 고르고, 안 먹은 품종은 EAT_LABEL_OFF다. */
+/** 나의 식탁 행 라벨. 먹은 품종은 EAT_LABELS에서 고르고, 안 먹은 품종은 EAT_LABEL_OFF다. 어떤 음식에도 어울리게 중립적으로 쓴다. */
 export const EAT_LABEL_OFF = "아직"
 
-const EAT_LABELS: Record<string, readonly string[]> = {
-  채소: ["아삭!", "건강해져요", "싱싱해", "텃밭 한 줌"],
-  과일: ["상큼!", "달콤해", "과즙 팡", "꿀맛!"],
-  수산: ["싱싱해", "바다 한 입", "고소해", "입에서 살살"],
-  "곡물·견과": ["든든해", "고소해", "톡톡 씹혀요", "배불러요"],
-  버섯: ["쫄깃!", "향긋해", "숲 한 입", "감칠맛 폭발"],
-}
-const EAT_LABELS_DEFAULT = ["냠냠", "꿀맛!", "제철 정복", "올해도 먹었다"]
+const EAT_LABELS = [
+  "냠냠",
+  "꿀맛!",
+  "제철 정복",
+  "올해도 먹었다",
+  "또 하나 클리어",
+  "배불러요",
+  "잘 먹었습니다",
+  "한 접시 완료",
+  "입이 즐거워요",
+  "제철 챙김",
+] as const
 
 /** 먹은 품종 라벨. n은 무작위 수(방금 체크) 또는 품종 id 해시(다시 열었을 때)로, 풀 길이로 나눈 나머지를 쓴다. */
-export function eatLabel(category: string, n: number): string {
-  const pool = EAT_LABELS[category] ?? EAT_LABELS_DEFAULT
-  return pool[Math.abs(n) % pool.length]!
+export function eatLabel(n: number): string {
+  return EAT_LABELS[Math.abs(n) % EAT_LABELS.length]!
 }
 
 /** 문자열 해시(안정적). 새로고침해도 같은 품종은 같은 문구가 나오게 한다. */
