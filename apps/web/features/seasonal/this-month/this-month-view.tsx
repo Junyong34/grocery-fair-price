@@ -1,7 +1,7 @@
 import Link from "next/link"
 
 import { holidaysInMonth } from "@workspace/seasonal/calendar/holidays"
-import type { CalendarDate } from "@workspace/seasonal/calendar/month-calendar"
+import { monthCalendar, type CalendarDate } from "@workspace/seasonal/calendar/month-calendar"
 import { MONTH_NOTES, UI_COPY } from "@workspace/seasonal/data/copy"
 import { festivalDate, festivalsInMonth } from "@workspace/seasonal/data/festivals"
 import { foodsInMonth } from "@workspace/seasonal/data/foods"
@@ -130,6 +130,8 @@ function MonthSection({
 }) {
   const festivals = festivalsInMonth(month, today.year)
   const holidays = holidaysInMonth(today.year, month)
+  // 모바일 판은 달력(고정)이 들어갈 높이가 달의 주 수에 따라 다르다.
+  const weeks = monthCalendar({ year: today.year, month, today, holidays }).length
   return (
     <section
       id={monthSectionId(month)}
@@ -153,7 +155,7 @@ function MonthSection({
           className="mt-5 lg:mt-0"
           desktopFrame="desktopMonth"
           desktopCalendar={<SettingsCalendar year={today.year} month={month} today={today} holidays={holidays} />}
-          mobileFrame="mobileMonth"
+          mobileFrame={weeks >= 6 ? "mobileMonthTall" : "mobileMonth"}
           mobileCalendar={<SettingsCalendar year={today.year} month={month} today={today} holidays={holidays} />}
         />
         <p className="mt-3 text-xs text-ash">
@@ -191,7 +193,7 @@ function Scatter({
   className?: string
   desktopFrame?: "desktop" | "desktopMonth" | "desktopHero"
   desktopCalendar?: React.ReactNode
-  mobileFrame?: "mobile" | "mobileMonth"
+  mobileFrame?: "mobile" | "mobileMonth" | "mobileMonthTall"
   mobileCalendar?: React.ReactNode
 }) {
   return (

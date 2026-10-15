@@ -19,8 +19,10 @@ export type ScatterFrame = {
 
 export const SCATTER_FRAMES = {
   mobile: { width: 339, height: 200, big: false },
-  // 모바일 달 판: 위쪽에 그림, 아래 410px에는 달력이 고정된다(6주짜리 달까지 들어가는 높이). 그림은 달력 위에도 놓을 수 있다.
-  mobileMonth: { width: 339, height: 620, big: false, reserveBottom: 410 },
+  // 모바일 달 판: 위쪽에 그림, 아래 340px에는 달력이 바닥에 붙어 고정된다(6주짜리 달까지 들어가는 높이). 그림은 달력 위에도 놓을 수 있다.
+  mobileMonth: { width: 339, height: 520, big: false, reserveBottom: 340 },
+  // 6주짜리 달은 달력이 한 줄 더 길어 판도 그만큼 길다.
+  mobileMonthTall: { width: 339, height: 600, big: false, reserveBottom: 420 },
   // 데스크톱은 품종 판(왼쪽)과 달력(오른쪽)이 한 줄에 놓인다. 판의 가로·세로 비는 그 칸 크기를 따른다.
   desktop: { width: 440, height: 300, big: true },
   // 맨 위 히어로 판: 본문 폭 전체를 쓴다(달력 없음).

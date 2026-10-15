@@ -342,11 +342,8 @@ export function DraggableScatter({
         className="absolute inset-0 -z-10 rounded-xl"
       />
       {children && frame.reserveBottom && (
-        // 모바일 달 판: 달력은 아래 칸에 고정이고 끌 수 없다. 그림만 그 위에 놓을 수 있다.
-        <div
-          className="absolute inset-x-0 z-0 px-2"
-          style={{ top: `${((frame.height - frame.reserveBottom) / frame.height) * 100}%` }}
-        >
+        // 모바일 달 판: 달력은 판 바닥에 붙어 고정이고 끌 수 없다. 그림만 그 위에 놓을 수 있다.
+        <div className="absolute inset-x-0 bottom-0 z-0 px-2 pb-2">
           {children}
         </div>
       )}
