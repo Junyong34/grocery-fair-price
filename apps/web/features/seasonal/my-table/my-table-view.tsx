@@ -220,6 +220,8 @@ function Summary({
       <p className="flex items-baseline gap-2">
         <AnimatedNumber
           value={count}
+          // 올라가는 동안에도 정수만 보인다(기본 형식은 소수 셋째 자리까지 그려 폭이 흔들린다).
+          format={{ maximumFractionDigits: 0 }}
           className="font-number text-[60px] leading-none tabular-nums lg:text-[84px]"
         />
         <span className="text-sm text-stone">
