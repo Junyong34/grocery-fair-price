@@ -153,13 +153,12 @@ function MonthSection({
           className="mt-5 lg:mt-0"
           desktopFrame="desktopMonth"
           desktopCalendar={<SettingsCalendar year={today.year} month={month} today={today} holidays={holidays} />}
+          mobileFrame="mobileMonth"
+          mobileCalendar={<SettingsCalendar year={today.year} month={month} today={today} holidays={holidays} />}
         />
         <p className="mt-3 text-xs text-ash">
-          {foods.length}가지 제철<span className="hidden lg:inline"> · 그림을 끌어 달력 위에도 놓아 꾸며 보세요</span>
+          {foods.length}가지 제철<span> · 그림을 끌어 달력 위에도 놓아 꾸며 보세요</span>
         </p>
-        <div className="mt-5 lg:hidden">
-          <SettingsCalendar year={today.year} month={month} today={today} holidays={holidays} />
-        </div>
         <p className="mt-3 text-xs text-stone">
           {festivals.length
             ? `명절 ${festivals
@@ -183,6 +182,8 @@ function Scatter({
   className,
   desktopFrame = "desktop",
   desktopCalendar,
+  mobileFrame = "mobile",
+  mobileCalendar,
 }: {
   month: number
   foods: ReturnType<typeof foodsInMonth>
@@ -190,10 +191,14 @@ function Scatter({
   className?: string
   desktopFrame?: "desktop" | "desktopMonth" | "desktopHero"
   desktopCalendar?: React.ReactNode
+  mobileFrame?: "mobile" | "mobileMonth"
+  mobileCalendar?: React.ReactNode
 }) {
   return (
     <div className={cn(className)}>
-      <ScatterField month={month} foods={foods} year={year} frame="mobile" className="lg:hidden" />
+      <ScatterField month={month} foods={foods} year={year} frame={mobileFrame} className="lg:hidden">
+        {mobileCalendar}
+      </ScatterField>
       <ScatterField month={month} foods={foods} year={year} frame={desktopFrame} className="hidden lg:block">
         {desktopCalendar}
       </ScatterField>

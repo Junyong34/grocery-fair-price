@@ -26,6 +26,7 @@ describe("scatterLayout", () => {
     ["desktop", SCATTER_FRAMES.desktop],
     ["desktopMonth", SCATTER_FRAMES.desktopMonth],
     ["desktopHero", SCATTER_FRAMES.desktopHero],
+    ["mobileMonth", SCATTER_FRAMES.mobileMonth],
   ])("그림과 라벨이 %s 프레임 밖으로 나가지 않는다", (_, frame) => {
     for (const n of [1, 10, 20, 35]) {
       const { aspect, label, items } = scatterLayout({
@@ -85,5 +86,14 @@ describe("scatterLayout foodScale", () => {
     const { items } = scatterLayout({ month: 3, ids: ["pollock", "apple"], frame })
     const size = (id: string) => items.find((item) => item.id === id)!.size
     expect(size("pollock")).toBeGreaterThan(size("apple"))
+  })
+})
+
+describe("scatterLayout reserveBottom", () => {
+  it("처음 배치는 아래 예약 자리(달력)를 피한다", () => {
+    const frame = SCATTER_FRAMES.mobileMonth
+    const { items } = scatterLayout({ month: 3, ids: ids(17), frame })
+    const limit = (frame.height - frame.reserveBottom!) / frame.height
+    for (const item of items) expect(item.cy + (item.size * frame.width) / frame.height / 2).toBeLessThanOrEqual(limit + 1e-9)
   })
 })

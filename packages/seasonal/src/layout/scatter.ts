@@ -13,10 +13,14 @@ export type ScatterFrame = {
   big: boolean
   /** 오른쪽에 비워 둘 폭(px). 처음 배치(시드)만 이 밖에 놓고, 끌기 범위는 프레임 전체다. 그 자리에 달력이 얹힌다. */
   reserveRight?: number
+  /** 아래에 비워 둘 높이(px). 모바일 달 판은 그 자리에 달력이 고정된다. 시드만 피하고 끌기 범위는 프레임 전체다. */
+  reserveBottom?: number
 }
 
 export const SCATTER_FRAMES = {
   mobile: { width: 339, height: 200, big: false },
+  // 모바일 달 판: 위쪽에 그림, 아래 410px에는 달력이 고정된다(6주짜리 달까지 들어가는 높이). 그림은 달력 위에도 놓을 수 있다.
+  mobileMonth: { width: 339, height: 620, big: false, reserveBottom: 410 },
   // 데스크톱은 품종 판(왼쪽)과 달력(오른쪽)이 한 줄에 놓인다. 판의 가로·세로 비는 그 칸 크기를 따른다.
   desktop: { width: 440, height: 300, big: true },
   // 맨 위 히어로 판: 본문 폭 전체를 쓴다(달력 없음).
@@ -65,7 +69,7 @@ export function scatterLayout({
   const label = labelHeight(frame)
   const base = Math.min(
     Math.max(
-      Math.sqrt(((W - (frame.reserveRight ?? 0)) * H * 0.5) / Math.max(n, 1)) - label * 0.5,
+      Math.sqrt(((W - (frame.reserveRight ?? 0)) * (H - (frame.reserveBottom ?? 0)) * 0.5) / Math.max(n, 1)) - label * 0.5,
       big ? 34 : 24
     ),
     big ? 120 : 96
@@ -127,7 +131,7 @@ export function findOpenSpot({
   let best = { x: r, y: r, gap: -Infinity }
   for (let c = 0; c < CANDIDATES; c++) {
     const x = rand() * (frame.width - (frame.reserveRight ?? 0) - size) + r
-    const y = rand() * (frame.height - size - labelHeight(frame)) + r
+    const y = rand() * (frame.height - (frame.reserveBottom ?? 0) - size - labelHeight(frame)) + r
     const gap = placed.length
       ? Math.min(...placed.map((p) => Math.hypot(p.x - x, p.y - y) - (p.r + r)))
       : Infinity

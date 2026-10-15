@@ -13,6 +13,7 @@ import {
 import {
   labelHeight,
   SCATTER_FRAMES,
+  type ScatterFrame,
   type ScatterLayout,
 } from "@workspace/seasonal/layout/scatter"
 import {
@@ -39,8 +40,9 @@ const TAP_SLOP = 6
 const LONG_PRESS_MS = 250
 /** 그림 사이에 남길 틈(프레임 px). */
 const GAP = 2
-/** 데스크톱 판의 이름표 글자 배율(모바일은 1). */
-const DESKTOP_LABEL_SCALE = 0.85
+/** 이름표 글자 크기(프레임 기준 px). 모든 품종이 같다. */
+const LABEL_PX_MOBILE = 9.5
+const LABEL_PX_DESKTOP = 14
 /** 이름표와 그림 아래 끝 사이 간격(그림 크기 대비). */
 const LABEL_GAP = 0.06
 /** 그림 아래 끝을 모르는 품종(그림 없음)의 기본값. 이름 카드(원)는 상자를 끝까지 채운다. */
@@ -91,7 +93,7 @@ export function DraggableScatter({
   className?: string
 }) {
   useHydrateScatter()
-  const frame = SCATTER_FRAMES[frameName]
+  const frame: ScatterFrame = SCATTER_FRAMES[frameName]
   const key = scatterKey(month, frameName)
   const saved = useScatterStore((state) => state.layouts[key])
   const save = useScatterStore((state) => state.save)
@@ -327,22 +329,28 @@ export function DraggableScatter({
       // isolate: 그림·"원래대로"의 z-index를 이 안에서만 쓴다(위에 붙는 헤더를 넘지 않게).
       className={cn(
         "@container relative isolate w-full touch-pan-y select-none",
-        // 데스크톱은 끌어 놓을 수 있는 범위를 점선 판으로 보여 준다. outline이라 판 크기(= 끌기 범위 좌표)는 그대로다.
-        frameName !== "mobile" &&
-          "rounded-xl bg-surface/20 outline outline-1 -outline-offset-1 outline-silver/60 outline-dashed",
+        // 끌어 놓을 수 있는 범위를 점선 판으로 보여 준다. outline이라 판 크기(= 끌기 범위 좌표)는 그대로다.
+        "rounded-xl bg-surface/20 outline outline-1 -outline-offset-1 outline-silver/60 outline-dashed",
         className
       )}
       style={{ aspectRatio: seed.aspect }}
     >
-      {frameName !== "mobile" && (
-        <PatternBackground
-          variant="dots"
-          spacing={32}
-          opacity={0.2}
-          className="absolute inset-0 -z-10 rounded-xl"
-        />
+      <PatternBackground
+        variant="dots"
+        spacing={32}
+        opacity={0.2}
+        className="absolute inset-0 -z-10 rounded-xl"
+      />
+      {children && frame.reserveBottom && (
+        // 모바일 달 판: 달력은 아래 칸에 고정이고 끌 수 없다. 그림만 그 위에 놓을 수 있다.
+        <div
+          className="absolute inset-x-0 z-0 px-2"
+          style={{ top: `${((frame.height - frame.reserveBottom) / frame.height) * 100}%` }}
+        >
+          {children}
+        </div>
       )}
-      {children && (
+      {children && !frame.reserveBottom && (
         // 달력은 판 위에 얹히고, 그림은 그 위에 스티커처럼 놓인다. 달력도 끌어 옮길 수 있다.
         <div
           ref={calendarRef}
@@ -365,8 +373,8 @@ export function DraggableScatter({
         const spot = spots.get(item.id)!
         const dragging = live?.dragging === item.id
         const px = item.size * frame.width
-        // 라벨 크기: 그림이 크면 크게(명세 3.1). 기준 px를 프레임 폭 비율(cqi)로 바꿔 함께 확대·축소한다.
-        const labelPx = (px > 90 ? 15 : px > 55 ? 12 : 10) * (frameName === "mobile" ? 1 : DESKTOP_LABEL_SCALE)
+        // 라벨 크기는 그림 크기와 상관없이 같다. 기준 px를 프레임 폭 비율(cqi)로 바꿔 함께 확대·축소한다.
+        const labelPx = frameName === "mobile" ? LABEL_PX_MOBILE : LABEL_PX_DESKTOP
         return (
           <Link
             key={item.id}
@@ -404,14 +412,14 @@ export function DraggableScatter({
           </Link>
         )
       })}
-      {(saved || savedCalendar) && !live && (
+      {(saved || (savedCalendar && !frame.reserveBottom)) && !live && (
         <button
           type="button"
           onClick={() => reset(key)}
           className={cn(
             "absolute z-20 flex items-center gap-1 rounded-full border border-hairline bg-canvas/90 px-2.5 py-1 text-xs text-stone backdrop-blur hover:text-ink",
             // 달 판은 오른쪽 아래가 달력 자리라 왼쪽 아래에 둔다.
-            frameName === "desktopMonth" ? "bottom-2 left-2" : "right-0 bottom-0"
+            frameName === "desktopMonth" ? "bottom-2 left-2" : frameName === "mobileMonth" ? "top-2 right-2" : "right-0 bottom-0"
           )}
         >
           <RotateCcw aria-hidden size={12} strokeWidth={1.8} />
