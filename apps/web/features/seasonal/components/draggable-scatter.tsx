@@ -29,7 +29,7 @@ import {
   useScatterStore,
   type CalendarSpot,
 } from "../stores/scatter-store"
-import { EatenBadge } from "./eaten-badge"
+import { useIsEaten } from "@/shared/eaten-store"
 import { FoodImage } from "./food-image"
 
 /** 이만큼(px) 움직이기 전까지는 탭이다. */
@@ -387,24 +387,12 @@ export function DraggableScatter({
               scale: dragging ? 1.08 : undefined,
             }}
           >
-            <span className="relative block">
-              <FoodImage
-                food={food}
-                sizes={`${Math.round(px * 1.5)}px`}
-                showName={false}
-              />
-              <EatenBadge
-                year={year}
-                foodId={food.id}
-                className="in-data-[eaten-mark=off]:hidden"
-              />
-            </span>
-            <span
-              className="block text-center leading-tight font-semibold whitespace-nowrap"
-              style={{ fontSize: `${(labelPx / frame.width) * 100}cqi` }}
-            >
-              {food.name}
-            </span>
+            <FoodTile
+              food={food}
+              year={year}
+              px={px}
+              fontSize={`${(labelPx / frame.width) * 100}cqi`}
+            />
           </Link>
         )
       })}
@@ -423,5 +411,54 @@ export function DraggableScatter({
         </button>
       )}
     </div>
+  )
+}
+
+/**
+ * 판 위 그림 하나(그림 + 이름). 먹은 품종은 이름 앞에 ✓가 붙고 그림이 선명하며, 안 먹은 품종은 그림이 살짝 흐리다.
+ * ⚙에서 먹음 표시를 끄면 둘 다 보이지 않는다(in-data-[eaten-mark=off]).
+ */
+function FoodTile({
+  food,
+  year,
+  px,
+  fontSize,
+}: {
+  food: Food
+  year: number
+  px: number
+  fontSize: string
+}) {
+  const eaten = useIsEaten(year, food.id)
+  return (
+    <>
+      <span
+        className={cn(
+          "block transition-opacity duration-300",
+          !eaten && "opacity-60 in-data-[eaten-mark=off]:opacity-100"
+        )}
+      >
+        <FoodImage
+          food={food}
+          sizes={`${Math.round(px * 1.5)}px`}
+          showName={false}
+        />
+      </span>
+      <span
+        className="block text-center leading-tight font-semibold whitespace-nowrap"
+        style={{ fontSize }}
+      >
+        {eaten && (
+          <span
+            aria-hidden
+            className="mr-[0.2em] text-gold-deep in-data-[eaten-mark=off]:hidden motion-safe:animate-tick"
+          >
+            ✓
+          </span>
+        )}
+        {food.name}
+        {eaten && <span className="sr-only"> 먹음</span>}
+      </span>
+    </>
   )
 }

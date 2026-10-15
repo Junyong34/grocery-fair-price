@@ -1,3 +1,5 @@
+import { foodScale } from "../data/food-sizes"
+
 // 흩어진 이미지 배치(와이어프레임 3.1 scat). 격자 없이 빈 자리를 찾아 촘촘히 흩뿌린다.
 // 같은 달·같은 품종·같은 영역이면 언제나 같은 배치가 나온다(Math.random 대신 시드 LCG).
 //
@@ -71,7 +73,8 @@ export function scatterLayout({
 
   const placed: PlacedCircle[] = []
   const items = ids.map((id, i) => {
-    const size = Math.round(base * (0.8 + rand() * 0.4))
+    // 기본 크기에 ±10% 변동을 주고, 품종별 배율(data/food-sizes)을 곱한다.
+    const size = Math.round(base * (0.9 + rand() * 0.2) * foodScale(id))
     const spot = findOpenSpot({ placed, size, frame, rand })
     placed.push(spot)
     const rotate = (rand() - 0.5) * 22

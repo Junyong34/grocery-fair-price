@@ -78,3 +78,12 @@ describe("scatterLayout reserveRight", () => {
     for (const item of items) expect(item.cx + item.size / 2).toBeLessThanOrEqual(limit + 1e-9)
   })
 })
+
+describe("scatterLayout foodScale", () => {
+  it("품종별 배율이 있으면 그 품종 그림만 더 크다", () => {
+    const frame = SCATTER_FRAMES.desktopMonth
+    const { items } = scatterLayout({ month: 3, ids: ["pollock", "apple"], frame })
+    const size = (id: string) => items.find((item) => item.id === id)!.size
+    expect(size("pollock")).toBeGreaterThan(size("apple"))
+  })
+})
