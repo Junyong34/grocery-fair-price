@@ -16,11 +16,11 @@ export type LinkTabsProps = React.ComponentProps<"nav"> &
   }
 
 /**
- * 탭·세그먼트를 담는 트레이. 밝은 바탕에 선택 칸은 gold-soft(하단 내비의 지금 메뉴와 같은 색), 글자는 espresso.
+ * 탭·세그먼트를 담는 트레이. 따뜻한 크림 바탕(gold-wash)에 선택 칸은 gold-soft(하단 내비의 지금 메뉴와 같은 색), 글자는 espresso.
  * 미끄러지는 선택 표시(--glide-*)는 cojeev 레이어가 먼저 정하므로 !로 덮는다.
  */
 export const TRAY_CLASS = cn(
-  "gap-0! rounded-full border border-hairline bg-surface/75 p-1 shadow-xs shadow-ink/5",
+  "gap-0! rounded-full border border-gold-pale/45 bg-gold-wash p-1",
   "[--glide-bg:var(--color-gold-soft)]! [--glide-fg:var(--color-espresso)]! [--glide-ring:none]!",
   "[&>*]:text-stone [&>*:hover]:text-ink",
   // 움직임 레이어가 붙기 전(첫 그림)과 모션을 끈 때에도 선택 칸이 보이게 한다.

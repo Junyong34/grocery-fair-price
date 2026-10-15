@@ -24,9 +24,17 @@ const VARIANTS: readonly { id: Variant; name: string; note: string }[] = [
   {
     id: "tray",
     name: "C. 트레이에 담은 알약 탭 + 여백 (적용)",
-    note: "탭을 밝은 트레이에 담아 한 덩어리로, 선택 칸은 gold(하단 내비와 같은 색). 2·4·6열 전환도 같은 모양. 선 대신 아래 여백으로 나눈다.",
+    note: "탭을 크림색 트레이에 담아 한 덩어리로, 선택 칸은 gold(하단 내비와 같은 색). 2·4·6열 전환도 같은 모양. 선 대신 아래 여백으로 나눈다.",
   },
 ]
+
+/** C 트레이 바탕 후보. 선택 칸은 모두 gold-soft. */
+const TRAY_COLORS = [
+  { name: "흰빛 surface (이전)", className: "border-hairline bg-surface/75" },
+  { name: "크림 gold-wash (적용)", className: "border-gold-pale/45 bg-gold-wash" },
+  { name: "베이지 hairline (처음)", className: "border-silver/50 bg-hairline/60" },
+  { name: "바탕과 같게 canvas + 테두리", className: "border-gold-pale bg-canvas" },
+] as const
 
 // 2a 맨 위(스크롤 0) 헤더·2차 탭·본문 구분 후보. 모바일 폭(375)과 데스크톱 폭으로 나란히 본다.
 export default function Page() {
@@ -51,6 +59,29 @@ export default function Page() {
           </section>
         ))}
       </div>
+      <section className="flex flex-col gap-4 border-t border-hairline pt-8">
+        <h2 className="font-semibold">C 트레이 바탕색</h2>
+        <div className="flex flex-wrap gap-8">
+          {TRAY_COLORS.map((tray) => (
+            <div key={tray.name} className="flex flex-col gap-2">
+              <div className={cn("inline-flex w-fit rounded-full border p-1", tray.className)}>
+                {["이달", "월별 보기"].map((label, i) => (
+                  <span
+                    key={label}
+                    className={cn(
+                      "grid h-9 place-items-center rounded-full px-4 text-sm",
+                      i === 0 ? "bg-gold-soft font-semibold text-espresso" : "text-stone"
+                    )}
+                  >
+                    {label}
+                  </span>
+                ))}
+              </div>
+              <p className="text-xs text-stone">{tray.name}</p>
+            </div>
+          ))}
+        </div>
+      </section>
       <section className="flex flex-col gap-6 border-t border-hairline pt-8">
         <h2 className="font-semibold">데스크톱 폭(1080)</h2>
         {VARIANTS.map((variant) => (
@@ -119,7 +150,7 @@ function Tabs({ variant, pad }: { variant: Variant; pad: string }) {
   if (variant === "tray")
     return (
       <div className={cn("pt-1 pb-2", pad)}>
-        <div className="inline-flex rounded-full border border-hairline bg-surface/75 p-1 shadow-xs shadow-ink/5">
+        <div className="inline-flex rounded-full border border-gold-pale/45 bg-gold-wash p-1">
           {tabs.map((label, i) => (
             <span
               key={label}
