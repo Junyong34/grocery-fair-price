@@ -39,6 +39,8 @@ const TAP_SLOP = 6
 const LONG_PRESS_MS = 250
 /** 그림 사이에 남길 틈(프레임 px). */
 const GAP = 2
+/** 데스크톱 판의 이름표 글자 배율(모바일은 1). */
+const DESKTOP_LABEL_SCALE = 0.85
 /** 이름표와 그림 아래 끝 사이 간격(그림 크기 대비). */
 const LABEL_GAP = 0.06
 /** 그림 아래 끝을 모르는 품종(그림 없음)의 기본값. 이름 카드(원)는 상자를 끝까지 채운다. */
@@ -364,7 +366,7 @@ export function DraggableScatter({
         const dragging = live?.dragging === item.id
         const px = item.size * frame.width
         // 라벨 크기: 그림이 크면 크게(명세 3.1). 기준 px를 프레임 폭 비율(cqi)로 바꿔 함께 확대·축소한다.
-        const labelPx = px > 90 ? 15 : px > 55 ? 12 : 10
+        const labelPx = (px > 90 ? 15 : px > 55 ? 12 : 10) * (frameName === "mobile" ? 1 : DESKTOP_LABEL_SCALE)
         return (
           <Link
             key={item.id}
