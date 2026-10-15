@@ -5,6 +5,7 @@ import { festivalsWithFood } from "@workspace/seasonal/data/festivals"
 import { foodsInSeasonWith, type Food } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 import { SEASONS, SEASON_MONTHS } from "@workspace/seasonal/data/seasons"
+import { HeroButton } from "@workspace/ui/components/hero-button"
 import { ScrollRow } from "@workspace/ui/components/scroll-row"
 
 import { routes } from "@/shared/routes"
@@ -81,12 +82,15 @@ export function FoodDetail({
           <ul className="flex flex-wrap gap-2">
             {festivals.map((festival) => (
               <li key={festival.slug}>
-                <Link
-                  href={routes.seasonal.festival(festival.slug)}
-                  className="inline-block rounded-full border border-dashed border-gold px-3 py-1.5 text-sm text-ink no-underline hover:bg-gold-wash hover:text-ink"
-                >
-                  {festival.name} →
-                </Link>
+                {/* cojeev hero-button 종이 접힘(paper-fold): 달력 한 장을 넘기듯 귀퉁이가 접힌 gold 카드. 비교는 /examples/festival-buttons */}
+                <HeroButton asChild appearance="paper-fold" size="sm">
+                  <Link
+                    href={routes.seasonal.festival(festival.slug)}
+                    className="no-underline"
+                  >
+                    {festival.name}
+                  </Link>
+                </HeroButton>
               </li>
             ))}
           </ul>

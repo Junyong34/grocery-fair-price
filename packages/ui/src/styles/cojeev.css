@@ -31,6 +31,7 @@
 @import "./cojeev/command.css";
 @import "./cojeev/tabs.css";
 @import "./cojeev/tooltip.css";
+@import "./cojeev/hero-button.css";
 @import "./cojeev/text-reveal.css";
 
 /* cojeev UI(https://cojeev.com/ui) 스타일. globals.css(Tailwind 진입점 + Oura 토큰) 다음에 불러온다.
