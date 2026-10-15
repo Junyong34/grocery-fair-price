@@ -5,6 +5,7 @@ import { MONTH_NOTES, UI_COPY } from "@workspace/seasonal/data/copy"
 import { festivalDate, festivalsInMonth } from "@workspace/seasonal/data/festivals"
 import { foodsInMonth } from "@workspace/seasonal/data/foods"
 import { MONTHS, type Month } from "@workspace/seasonal/data/months"
+import { TextReveal } from "@workspace/ui/components/text-reveal"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { routes } from "@/shared/routes"
@@ -41,10 +42,24 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
 
         <div className="min-w-0">
           <section id={HERO_ID} aria-labelledby="hero-title" className="scroll-mt-16 pr-11 pl-[18px] pt-10 pb-7 lg:scroll-mt-16 lg:px-0 lg:pt-12">
-            <h1 id="hero-title" className="font-heading text-[46px] leading-tight lg:text-[64px]">
-              지금은 {thisMonth}월
-            </h1>
-            <p className="mt-1 font-heading text-lg text-stone lg:text-[22px]">{current.note}</p>
+            {/* 첫 화면에서 한 번만 부드럽게 나타난다. 제목 다음에 설명이 이어진다. */}
+            <TextReveal
+              as="h1"
+              id="hero-title"
+              text={`지금은 ${thisMonth}월`}
+              variant="soften"
+              split="grapheme"
+              duration={500}
+              className="font-heading text-[46px] leading-tight lg:text-[64px]"
+            />
+            <TextReveal
+              as="p"
+              text={current.note}
+              variant="fade"
+              stagger={40}
+              duration={600}
+              className="mt-1 block font-heading text-lg text-stone lg:text-[22px]"
+            />
             <Scatter month={thisMonth} foods={current.foods} year={year} className="mt-6" />
             <p className="mt-3 text-xs text-ash">{current.foods.length}가지 제철</p>
             <div className="mt-5 flex flex-wrap items-center gap-2">
