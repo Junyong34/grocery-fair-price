@@ -60,17 +60,25 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
               duration={600}
               className="mt-1 block font-heading text-lg text-stone lg:text-[22px]"
             />
-            <Scatter month={thisMonth} foods={current.foods} year={year} className="mt-6" />
-            <p className="mt-3 text-xs text-ash">{current.foods.length}가지 제철</p>
-            <div className="mt-5 flex flex-wrap items-center gap-2">
-              <JumpButton month={thisMonth}>{thisMonth}월 달력 보기 ↓</JumpButton>
-              <JumpButton month={1} variant="outline">
-                1월부터
-              </JumpButton>
+            <div className="lg:mt-6 lg:grid lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start lg:gap-6">
+              <div>
+                <Scatter month={thisMonth} foods={current.foods} year={year} className="mt-6 lg:mt-0" />
+                <p className="mt-3 text-xs text-ash">
+                  {current.foods.length}가지 제철<span className="hidden lg:inline"> · 그림을 끌어 옮겨 보세요</span>
+                </p>
+              </div>
+              <div className="lg:flex lg:flex-col lg:gap-3">
+                <div className="mt-5 flex flex-wrap items-center gap-2 lg:mt-0">
+                  <JumpButton month={thisMonth}>{thisMonth}월 달력 보기 ↓</JumpButton>
+                  <JumpButton month={1} variant="outline">
+                    1월부터
+                  </JumpButton>
+                </div>
+                <Link href={routes.seasonal.month(thisMonth)} className="mt-4 inline-block text-sm text-stone lg:mt-0">
+                  월별 제철 타임라인 →
+                </Link>
+              </div>
             </div>
-            <Link href={routes.seasonal.month(thisMonth)} className="mt-4 inline-block text-sm text-stone">
-              월별 제철 타임라인 →
-            </Link>
           </section>
 
           {months.map(({ month, foods, note }) => (
@@ -127,26 +135,35 @@ function MonthSection({
       aria-label={`${month}월`}
       className="scroll-mt-16 border-t border-hairline pr-11 pl-[18px] pt-12 pb-7 lg:scroll-mt-16 lg:px-0 lg:pt-8"
     >
-      <div className="lg:flex lg:items-center lg:gap-6">
-        <h2 className="font-number text-[88px] leading-[0.9] tabular-nums lg:text-[72px]">{month}</h2>
+      <div className="lg:flex lg:items-baseline lg:gap-4">
+        <h2 className="font-number text-[88px] leading-[0.9] tabular-nums lg:font-heading lg:text-[28px] lg:leading-none lg:font-bold">
+          {month}
+          <span className="hidden lg:inline">월</span>
+        </h2>
         <p className="hidden flex-1 font-heading text-lg text-stone lg:block">{note}</p>
       </div>
       <p className="mt-2 font-heading text-[19px] text-stone lg:hidden">{note}</p>
-      <Scatter month={month} foods={foods} year={today.year} className="mt-5" />
-      <p className="mt-3 text-xs text-ash">{foods.length}가지 제철</p>
-      <div className="mt-5">
-        <SettingsCalendar year={today.year} month={month} today={today} />
+      <div className="lg:mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_280px] lg:items-start lg:gap-6">
+        <div>
+          <Scatter month={month} foods={foods} year={today.year} className="mt-5 lg:mt-0" />
+          <p className="mt-3 text-xs text-ash">{foods.length}가지 제철</p>
+        </div>
+        <div>
+          <div className="mt-5 lg:mt-0">
+            <SettingsCalendar year={today.year} month={month} today={today} />
+          </div>
+          <p className="mt-3 text-xs text-stone">
+            {festivals.length
+              ? `명절 ${festivals
+                  .map((festival) => {
+                    const date = festivalDate(festival.slug, today.year)
+                    return date ? `${festival.name} ${date.month}.${date.day}` : festival.name
+                  })
+                  .join(" · ")}`
+              : UI_COPY.noFestivalThisMonth}
+          </p>
+        </div>
       </div>
-      <p className="mt-3 text-xs text-stone">
-        {festivals.length
-          ? `명절 ${festivals
-              .map((festival) => {
-                const date = festivalDate(festival.slug, today.year)
-                return date ? `${festival.name} ${date.month}.${date.day}` : festival.name
-              })
-              .join(" · ")}`
-          : UI_COPY.noFestivalThisMonth}
-      </p>
     </section>
   )
 }

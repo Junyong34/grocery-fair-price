@@ -18,6 +18,7 @@ import {
   relaxCircles,
   type Circle,
 } from "@workspace/ui/lib/geometry/relax-circles"
+import { PatternBackground } from "@workspace/ui/components/pattern-background"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { routes } from "@/shared/routes"
@@ -262,10 +263,21 @@ export function DraggableScatter({
       // isolate: 그림·"원래대로"의 z-index를 이 안에서만 쓴다(위에 붙는 헤더를 넘지 않게).
       className={cn(
         "@container relative isolate w-full touch-pan-y select-none",
+        // 데스크톱은 끌어 놓을 수 있는 범위를 점선 판으로 보여 준다. outline이라 판 크기(= 끌기 범위 좌표)는 그대로다.
+        frameName === "desktop" &&
+          "rounded-xl bg-surface/50 outline outline-1 -outline-offset-1 outline-silver outline-dashed",
         className
       )}
       style={{ aspectRatio: seed.aspect }}
     >
+      {frameName === "desktop" && (
+        <PatternBackground
+          variant="dots"
+          spacing={18}
+          opacity={0.4}
+          className="absolute inset-0 -z-10 rounded-xl"
+        />
+      )}
       {seed.items.map((item) => {
         const food = byId.get(item.id)!
         const spot = spots.get(item.id)!

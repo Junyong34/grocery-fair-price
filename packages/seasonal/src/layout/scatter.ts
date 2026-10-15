@@ -9,7 +9,8 @@ export type ScatterFrame = { width: number; height: number; big: boolean }
 
 export const SCATTER_FRAMES = {
   mobile: { width: 339, height: 200, big: false },
-  desktop: { width: 736, height: 240, big: true },
+  // 데스크톱은 품종 판(왼쪽)과 달력(오른쪽)이 한 줄에 놓인다. 판의 가로·세로 비는 그 칸 크기를 따른다.
+  desktop: { width: 440, height: 300, big: true },
 } as const satisfies Record<string, ScatterFrame>
 
 /** 배치된 품종 하나. 좌표와 크기는 프레임 대비 비율이다. */
