@@ -12,29 +12,48 @@ import { cn } from "@workspace/ui/lib/utils"
 import { FoodImage } from "../components/food-image"
 import { SEASON_COLOR_VAR } from "./season-style"
 
-/**
- * 대표 품종을 겹쳐 놓는 자리(카드 그림 영역 대비 %, 기울기, 쌓는 순서). 배열 순서 = 대표 품종 순서라 앞 품종일수록 크고 가운데에 둔다.
- * WIDE는 세로 카드(넓은 화면), NARROW는 좁은 폰의 가로 카드(오른쪽 작은 그림 칸)용이다.
- */
-const COLLAGE_WIDE = [
-  { left: 28, top: 30, size: 42, rotate: 2, z: 8 },
-  { left: 2, top: 4, size: 34, rotate: -8, z: 2 },
-  { left: 62, top: 6, size: 34, rotate: 6, z: 3 },
-  { left: 0, top: 38, size: 34, rotate: 5, z: 4 },
-  { left: 64, top: 40, size: 34, rotate: -6, z: 5 },
-  { left: 34, top: 0, size: 30, rotate: -3, z: 1 },
-  { left: 10, top: 66, size: 32, rotate: -5, z: 6 },
-  { left: 54, top: 68, size: 32, rotate: 7, z: 7 },
-] as const
-const COLLAGE_NARROW = [
-  { left: 4, top: 6, size: 46, rotate: -8, z: 1 },
-  { left: 50, top: 0, size: 44, rotate: 7, z: 2 },
-  { left: 26, top: 34, size: 50, rotate: 2, z: 3 },
-  { left: 58, top: 44, size: 40, rotate: -5, z: 4 },
-] as const
+type CollageSpot = {
+  left: number
+  top: number
+  size: number
+  rotate: number
+  z: number
+}
 
-type CollageSpot =
-  (typeof COLLAGE_WIDE)[number] | (typeof COLLAGE_NARROW)[number]
+/**
+ * 대표 품종을 겹쳐 놓는 자리. left·size는 그림 영역 폭 대비 %, top은 높이 대비 %. 기울기와 쌓는 순서(z)도 정한다.
+ * 배열 순서 = 대표 품종 순서라 앞 품종일수록 가운데·앞에 둔다. 그림 없는 품종(이름 동그라미)은 뒤로 밀려 가장자리에 놓인다.
+ * DESKTOP은 세로로 긴 카드(lg, 3/4 영역에 3열 5줄 15개), MOBILE은 2열 카드와 좁은 폰의 가로 카드(5/4 영역에 3·4·3줄 10개)용이다.
+ */
+const COLLAGE_DESKTOP: readonly CollageSpot[] = [
+  { left: 31, top: 36, size: 38, rotate: 2, z: 20 },
+  { left: 3, top: 19, size: 32, rotate: -7, z: 7 },
+  { left: 66, top: 20, size: 32, rotate: 6, z: 8 },
+  { left: 3, top: 57, size: 32, rotate: 5, z: 13 },
+  { left: 66, top: 56, size: 32, rotate: -6, z: 14 },
+  { left: 36, top: 18, size: 32, rotate: -3, z: 6 },
+  { left: 36, top: 58, size: 32, rotate: 4, z: 15 },
+  { left: 0, top: 38, size: 32, rotate: 8, z: 10 },
+  { left: 67, top: 38, size: 32, rotate: -8, z: 11 },
+  { left: 34, top: 2, size: 32, rotate: 5, z: 2 },
+  { left: 34, top: 75, size: 32, rotate: -4, z: 17 },
+  { left: 0, top: 0, size: 32, rotate: -5, z: 1 },
+  { left: 67, top: 0, size: 32, rotate: 7, z: 3 },
+  { left: 0, top: 76, size: 32, rotate: 6, z: 16 },
+  { left: 67, top: 76, size: 32, rotate: -7, z: 18 },
+]
+const COLLAGE_MOBILE: readonly CollageSpot[] = [
+  { left: 24, top: 32, size: 28, rotate: 3, z: 10 },
+  { left: 49, top: 34, size: 28, rotate: -4, z: 9 },
+  { left: 38, top: 0, size: 26, rotate: 5, z: 2 },
+  { left: 38, top: 66, size: 26, rotate: -3, z: 8 },
+  { left: 0, top: 35, size: 25, rotate: -7, z: 4 },
+  { left: 75, top: 33, size: 25, rotate: 7, z: 5 },
+  { left: 10, top: 1, size: 26, rotate: -6, z: 1 },
+  { left: 65, top: 2, size: 26, rotate: 6, z: 3 },
+  { left: 10, top: 67, size: 26, rotate: 6, z: 6 },
+  { left: 64, top: 67, size: 26, rotate: -6, z: 7 },
+]
 
 function Collage({
   foods,
@@ -43,14 +62,12 @@ function Collage({
 }: {
   foods: readonly Food[]
   spots: readonly CollageSpot[]
+  /** 그림 영역 비율(aspect-*)과 보일 화면 폭 */
   className: string
 }) {
   return (
     <div
-      className={cn(
-        "absolute inset-0 m-auto aspect-square max-h-full max-w-full",
-        className
-      )}
+      className={cn("absolute inset-0 m-auto max-h-full max-w-full", className)}
     >
       {spots.map((spot, i) => {
         const food = foods[i]
@@ -123,7 +140,7 @@ export function SeasonCard({
   className?: string
 }) {
   const copy = SEASON_COPY[season]
-  const highlights = seasonHighlights(season, COLLAGE_WIDE.length)
+  const highlights = seasonHighlights(season, COLLAGE_DESKTOP.length)
   return (
     // @container: 2열 모바일이나 데스크톱에서 다른 카드가 넓어지면 이 카드는 좁아진다. 좁을 때는 설명·이름을 숨긴다.
     <div
@@ -165,13 +182,13 @@ export function SeasonCard({
         >
           <Collage
             foods={highlights}
-            spots={COLLAGE_WIDE}
-            className="max-[399px]:hidden"
+            spots={COLLAGE_DESKTOP}
+            className="aspect-[3/4] max-lg:hidden"
           />
           <Collage
             foods={highlights}
-            spots={COLLAGE_NARROW}
-            className="min-[400px]:hidden"
+            spots={COLLAGE_MOBILE}
+            className="aspect-[5/4] lg:hidden"
           />
         </div>
 
