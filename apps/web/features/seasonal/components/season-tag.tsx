@@ -36,12 +36,12 @@ export function SeasonTag({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-0.5 rounded-full border px-2 py-[3px] text-[11px] leading-none font-semibold",
+        "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs leading-none font-semibold",
         SEASON_CLASS[season],
         className
       )}
     >
-      <Icon aria-hidden size={11} strokeWidth={2} />
+      <Icon aria-hidden size={13} strokeWidth={2} />
       {SEASON_COPY[season].name}
     </span>
   )
