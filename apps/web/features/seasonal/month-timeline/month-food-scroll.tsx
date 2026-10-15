@@ -16,12 +16,12 @@ const VISIBLE = { mobile: 2 * 4, wide: 3 * 3 } as const
 /**
  * 접힌 높이. 품종 칸 크기가 카드 폭을 따라 바뀌어 px로 못 박지 않고 컨테이너 폭(cqw)으로 계산한다.
  * 그래서 서버 렌더부터 높이가 맞고, 다음 줄 그림이 반쯤(--peek) 보여 아래에 더 있다는 걸 알린다.
- * 품종 칸 = (폭 - 오른쪽 스크롤 자리 - 열 사이) / 열, 그림 = 칸의 78%, 줄 = 그림 + 사이 + 이름 한 줄.
+ * 품종 칸 = (폭 - 오른쪽 스크롤 자리 - 열 사이) / 열, 그림 = 칸의 84%, 줄 = 그림 + 사이 + 이름 한 줄.
  */
 const COLLAPSED_HEIGHT = cn(
-  "[--cols:2] [--gi:4px] [--gx:6px] [--gy:12px] [--lh:16px] [--peek:0.45] [--rows:4]",
-  "sm:[--cols:3] sm:[--gi:6px] sm:[--gx:8px] sm:[--gy:16px] sm:[--lh:20px] sm:[--rows:3]",
-  "[--img:calc((100cqw-var(--bar)-(var(--cols)-1)*var(--gx))/var(--cols)*0.78)]",
+  "[--cols:2] [--gi:4px] [--gx:6px] [--gy:8px] [--lh:16px] [--peek:0.45] [--rows:4]",
+  "sm:[--cols:3] sm:[--gi:6px] sm:[--gx:8px] sm:[--gy:12px] sm:[--lh:20px] sm:[--rows:3]",
+  "[--img:calc((100cqw-var(--bar)-(var(--cols)-1)*var(--gx))/var(--cols)*0.84)]",
   "[--h:calc(4px+var(--rows)*(var(--img)+var(--gi)+var(--lh)+var(--gy))+var(--peek)*var(--img))]"
 )
 
@@ -126,7 +126,7 @@ export function MonthFoodScroll({
           !overflowsWide && "sm:hidden!"
         )}
       >
-        {expanded ? "접기" : `펼치기 · ${count}가지`}
+        {expanded ? "접기" : "펼치기"}
         {expanded ? (
           <ChevronUp aria-hidden size={16} />
         ) : (

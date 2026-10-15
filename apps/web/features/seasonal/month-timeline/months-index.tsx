@@ -42,9 +42,9 @@ function MonthCard({ month }: { month: Month }) {
         href={routes.seasonal.month(month)}
         className="group/head flex items-center gap-1.5 px-0.5 text-ink no-underline hover:text-ink"
       >
-        <span className="text-lg font-bold">{month}월</span>
-        <span className="text-sm text-ash tabular-nums">{foods.length}</span>
-        <span className="sr-only">가지 제철 모두 보기</span>
+        <span className="text-[22px] leading-none font-bold sm:text-2xl">{month}월</span>
+        <span className="text-[13px] text-ash tabular-nums">{foods.length}가지</span>
+        <span className="sr-only">제철 모두 보기</span>
         <ThisMonthTag month={month} />
         <span
           aria-hidden
@@ -55,7 +55,7 @@ function MonthCard({ month }: { month: Month }) {
       </Link>
       {/* 칸 사이·이름 줄 높이는 MonthFoodScroll의 높이 계산 변수(--gx·--gy·--gi·--lh)와 같게 둔다. */}
       <MonthFoodScroll month={month} count={foods.length}>
-        <ul className="grid grid-cols-2 gap-x-1.5 gap-y-3 sm:grid-cols-3 sm:gap-x-2 sm:gap-y-4">
+        <ul className="grid grid-cols-2 gap-x-1.5 gap-y-2 sm:grid-cols-3 sm:gap-x-2 sm:gap-y-3">
           {foods.map((food) => (
             <li key={food.id}>
               <Link
@@ -63,7 +63,7 @@ function MonthCard({ month }: { month: Month }) {
                 scroll={false}
                 className="group/food flex flex-col items-center gap-1 text-center text-xs leading-4 text-stone no-underline hover:text-ink sm:gap-1.5 sm:text-[13px] sm:leading-5"
               >
-                <span className="block w-[78%] transition-transform duration-200 group-hover/food:-translate-y-0.5">
+                <span className="block w-[84%] transition-transform duration-200 group-hover/food:-translate-y-0.5">
                   <FoodImage food={food} sizes="88px" />
                 </span>
                 <span className="w-full truncate">{food.name}</span>
