@@ -8,7 +8,7 @@ const isWeekend = (weekday: number) => weekday === 0 || weekday === 6
 
 /**
  * 달력 모양(/examples/calendar-styles에서 비교). 화면(2a)은 plain을 쓰고, 나머지는 MVP 이후 PDF 달력의 모양 선택지로 둔다.
- * - plain: 선 없이 작은 숫자, 공휴일은 점(모바일)·이름(데스크톱)
+ * - plain: 선 없이 숫자만, 공휴일 이름을 숫자 아래에
  * - grid: 칸마다 가는 선, 숫자는 칸 왼쪽 위, 공휴일 이름을 칸 안에
  * - editorial: 큰 가는 숫자, 주 사이 가로줄만, 오늘은 먹색 원
  * - tiles: 날마다 둥근 타일, 빨간 날은 옅은 빨강 타일
@@ -168,12 +168,10 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
         {cell.day}
       </span>
       {holiday && (
-        <>
-          <span aria-hidden className="size-1 rounded-full bg-holiday in-data-[holidays=off]:hidden lg:hidden" />
-          <span className="sr-only lg:not-sr-only lg:w-full lg:truncate lg:px-0.5 lg:text-[11px] lg:leading-tight lg:text-holiday lg:in-data-[holidays=off]:hidden">
-            {names}
-          </span>
-        </>
+        // 좁은 칸에서는 두 줄까지 감싸고(낱말 단위), 넘치면 말줄임한다.
+        <span className="line-clamp-2 w-full px-0.5 text-[10px] leading-tight break-keep text-holiday in-data-[holidays=off]:hidden lg:line-clamp-1 lg:text-[11px]">
+          {names}
+        </span>
       )}
     </div>
   )

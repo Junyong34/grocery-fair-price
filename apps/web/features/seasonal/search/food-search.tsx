@@ -144,11 +144,11 @@ export function DesktopSearchButton() {
       type="button"
       onClick={openFoodSearch}
       aria-keyshortcuts="/"
-      className="flex h-9 w-[200px] items-center gap-2 rounded-md border border-hairline bg-surface px-3 text-left text-sm text-ash hover:border-silver"
+      className="flex h-9 w-[200px] items-center gap-2 rounded-full border border-silver/50 bg-hairline/50 px-3.5 text-left text-sm text-stone transition-colors hover:bg-hairline"
     >
       <Search aria-hidden size={16} strokeWidth={1.6} />
       <span className="flex-1">음식 검색</span>
-      <kbd className="rounded border border-hairline px-1.5 font-sans text-[11px] text-stone">
+      <kbd className="rounded border border-silver/70 bg-canvas/70 px-1.5 font-sans text-[11px] text-stone">
         /
       </kbd>
     </button>

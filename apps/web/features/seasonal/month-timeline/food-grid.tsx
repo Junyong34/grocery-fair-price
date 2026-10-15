@@ -1,9 +1,6 @@
 "use client"
 
-import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from "@workspace/ui/components/toggle-group"
+import { Segmented } from "@workspace/ui/components/segmented"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { DESKTOP_COLUMNS, MOBILE_COLUMNS, useMonthView } from "./view-store"
@@ -58,24 +55,12 @@ function Segment({
   // 보이기·숨기기는 바깥 div가 맡는다. cojeev 스타일이 루트의 display를 정하기 때문이다.
   return (
     <div className={className}>
-      <ToggleGroup
-        type="single"
+      <Segmented
         aria-label="보기"
-        value={String(value)}
-        // 이미 고른 칸을 다시 눌러도 선택이 풀리지 않게 빈 값은 무시한다.
-        onValueChange={(next) => next && onChange(Number(next))}
-        className="v-seg flex-nowrap gap-1"
-      >
-        {values.map((columns) => (
-          <ToggleGroupItem
-            key={columns}
-            value={String(columns)}
-            className="h-8 px-3 text-[13px]"
-          >
-            {columns}열
-          </ToggleGroupItem>
-        ))}
-      </ToggleGroup>
+        options={values.map((columns) => ({ value: columns, label: `${columns}열` }))}
+        value={value}
+        onValueChange={onChange}
+      />
     </div>
   )
 }

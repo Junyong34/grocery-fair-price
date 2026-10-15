@@ -18,10 +18,7 @@ import {
   ToastTitle,
   ToastViewport,
 } from "@workspace/ui/components/toast"
-import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from "@workspace/ui/components/toggle-group"
+import { Segmented } from "@workspace/ui/components/segmented"
 import { cn } from "@workspace/ui/lib/utils"
 import { ScrollRow } from "@workspace/ui/components/scroll-row"
 
@@ -98,27 +95,18 @@ export function MyTableView() {
               className="h-11 w-full rounded-md border border-hairline bg-surface px-3 text-base outline-none placeholder:text-ash focus-visible:border-gold lg:w-[280px]"
             />
             <div className="flex items-center justify-between gap-3">
-              <ToggleGroup
-                type="single"
+              <Segmented
                 aria-label="필터 방식"
+                options={[
+                  { value: "month", label: "월별" },
+                  { value: "season", label: "계절별" },
+                ]}
                 value={mode}
-                onValueChange={(next) => {
-                  if (!next) return
-                  setMode(next as FilterMode)
+                onValueChange={(next: FilterMode) => {
+                  setMode(next)
                   setValue(0) // 모드를 바꾸면 '전체'로 되돌린다.
                 }}
-                className="v-seg flex-nowrap gap-1"
-              >
-                <ToggleGroupItem value="month" className="h-8 px-3 text-[13px]">
-                  월별
-                </ToggleGroupItem>
-                <ToggleGroupItem
-                  value="season"
-                  className="h-8 px-3 text-[13px]"
-                >
-                  계절별
-                </ToggleGroupItem>
-              </ToggleGroup>
+              />
               <p className="text-xs text-stone" aria-live="polite">
                 {list.length}개 중 {eatenInList}개 먹음
               </p>
