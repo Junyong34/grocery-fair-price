@@ -54,7 +54,9 @@ export type ScatterLayout = {
   items: ScatterItem[]
 }
 
-const CANDIDATES = 26
+const CANDIDATES = 60
+/** 그림이 판 넓이에서 차지하는 비율. 낮을수록 그림이 작고 사이가 넓다. */
+const COVERAGE = 0.35
 
 export function scatterLayout({
   month,
@@ -71,7 +73,7 @@ export function scatterLayout({
   const label = labelHeight(frame)
   const base = Math.min(
     Math.max(
-      Math.sqrt(((W - (frame.reserveRight ?? 0)) * (H - (frame.reserveBottom ?? 0)) * 0.5) / Math.max(n, 1)) - label * 0.5,
+      Math.sqrt(((W - (frame.reserveRight ?? 0)) * (H - (frame.reserveBottom ?? 0)) * COVERAGE) / Math.max(n, 1)) - label * 0.5,
       big ? 34 : 24
     ),
     big ? 120 : 96

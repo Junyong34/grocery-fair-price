@@ -39,7 +39,7 @@ const TAP_SLOP = 6
 /** 손가락은 이만큼(ms) 누르고 있어야 끌기가 시작된다. 그 전에 움직이면 화면 스크롤이다. */
 const LONG_PRESS_MS = 250
 /** 그림 사이에 남길 틈(프레임 px). */
-const GAP = 2
+const GAP = 10
 /** 이름표 글자 크기(프레임 기준 px). 모든 품종이 같다. */
 const LABEL_PX_MOBILE = 9.5
 const LABEL_PX_DESKTOP = 14
