@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import { PatternBackground } from "@workspace/ui/components/pattern-background"
 import { foodsInMonth } from "@workspace/seasonal/data/foods"
 import { MONTHS, type Month } from "@workspace/seasonal/data/months"
 
@@ -17,16 +18,26 @@ import { ThisMonthTag } from "./this-month-tag"
  */
 export function MonthsIndex() {
   return (
-    <div className="mx-auto max-w-[1080px] px-[18px] pt-2 pb-8 lg:px-6 lg:pt-6">
-      <h1 className="sr-only">열두 달 제철</h1>
-      {/* items-start: 펼친 카드만 길어지고 같은 줄 카드는 늘어나지 않게 */}
-      <ul className="grid grid-cols-2 items-start gap-2.5 lg:grid-cols-3 lg:gap-4">
-        {MONTHS.map((month) => (
-          <li key={month}>
-            <MonthCard month={month} />
-          </li>
-        ))}
-      </ul>
+    // 바탕에 옅은 모눈(cojeev grid). 달력·도감 종이 느낌. 위쪽은 탭과 겹치지 않게 서서히 나타난다.
+    <div className="relative isolate">
+      <PatternBackground
+        variant="grid"
+        spacing={28}
+        color="var(--color-silver)"
+        opacity={0.55}
+        className="[mask-image:linear-gradient(to_bottom,transparent,black_96px)]"
+      />
+      <div className="mx-auto max-w-[1080px] px-[18px] pt-2 pb-8 lg:px-6 lg:pt-6">
+        <h1 className="sr-only">열두 달 제철</h1>
+        {/* items-start: 펼친 카드만 길어지고 같은 줄 카드는 늘어나지 않게 */}
+        <ul className="grid grid-cols-2 items-start gap-2.5 lg:grid-cols-3 lg:gap-4">
+          {MONTHS.map((month) => (
+            <li key={month}>
+              <MonthCard month={month} />
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }
@@ -36,7 +47,7 @@ function MonthCard({ month }: { month: Month }) {
   return (
     <section
       aria-labelledby={`month-card-${month}`}
-      className="@container flex flex-col rounded-lg border border-hairline bg-surface/45 px-2.5 pt-3 pb-4 sm:px-4 sm:pt-3.5 sm:pb-5"
+      className="@container flex flex-col rounded-lg border border-hairline bg-surface/85 px-2.5 pt-3 pb-4 sm:px-4 sm:pt-3.5 sm:pb-5"
     >
       <Link
         id={`month-card-${month}`}
