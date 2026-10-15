@@ -30,7 +30,7 @@ function showShareToast(message: string) {
       >
         <ToastTitle className="font-normal">{message}</ToastTitle>
       </Toast>
-      <ToastViewport className="right-[18px]! bottom-[86px]! left-[18px]! w-auto! lg:right-6! lg:bottom-6! lg:left-auto! lg:w-[340px]!" />
+      <ToastViewport className="right-[18px]! bottom-[78px]! left-[18px]! w-auto! lg:right-6! lg:bottom-6! lg:left-auto! lg:w-[340px]!" />
     </ToastProvider>
   ))
 }

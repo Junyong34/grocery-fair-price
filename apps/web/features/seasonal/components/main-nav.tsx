@@ -43,7 +43,7 @@ const ITEMS: readonly {
 ]
 
 /** 하단 내비 칸 하나의 폭(px). 강조 배경이 칸 단위로 미끄러진다. */
-const CELL = 76
+const CELL = 66
 
 /**
  * 모바일 하단 가운데 떠 있는 내비(cojeev Action Dock 모양을 따랐다).
@@ -57,13 +57,13 @@ export function FloatingNav() {
   return (
     <nav
       aria-label="주요 메뉴"
-      className="fixed inset-x-0 bottom-[max(14px,env(safe-area-inset-bottom))] z-(--z-dock) mx-auto w-fit rounded-[28px] border border-silver/60 bg-hairline/92 p-1.5 shadow-lg shadow-ink/10 backdrop-blur-md lg:hidden"
+      className="fixed inset-x-0 bottom-[max(14px,env(safe-area-inset-bottom))] z-(--z-dock) mx-auto w-fit rounded-[24px] border border-silver/60 bg-hairline/92 p-1 shadow-lg shadow-ink/10 backdrop-blur-md lg:hidden"
     >
       <div className="relative flex">
         {active >= 0 && (
           <span
             aria-hidden
-            className="absolute inset-y-0 rounded-[22px] bg-gold-soft motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-[cubic-bezier(.34,1.3,.64,1)]"
+            className="absolute inset-y-0 rounded-[20px] bg-gold-soft motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-[cubic-bezier(.34,1.3,.64,1)]"
             style={{ width: CELL, transform: `translateX(${active * CELL}px)` }}
           />
         )}
@@ -73,7 +73,7 @@ export function FloatingNav() {
             href={href}
             aria-current={i === active ? "page" : undefined}
             className={cn(
-              "relative flex h-14 flex-col items-center justify-center gap-1 text-[11px] leading-none no-underline transition-colors duration-200",
+              "relative flex h-12 flex-col items-center justify-center gap-1 text-[10px] leading-none no-underline transition-colors duration-200",
               i === active
                 ? "font-semibold text-espresso hover:text-espresso"
                 : "text-stone hover:text-ink"
@@ -82,7 +82,7 @@ export function FloatingNav() {
           >
             <Icon
               aria-hidden
-              size={22}
+              size={19}
               strokeWidth={i === active ? 1.9 : 1.6}
             />
             <span>{label}</span>
