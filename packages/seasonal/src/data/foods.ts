@@ -51,3 +51,13 @@ export function seasonHighlights(season: Season, count: number): readonly Food[]
     .sort((a, b) => Number(isDrawn(b.id)) - Number(isDrawn(a.id)) || monthsIn(b) - monthsIn(a))
     .slice(0, count)
 }
+
+/**
+ * 달 대표 품종(2b 열두 달 카드). 그림이 있는 품종을 먼저, 그 안에서는 제철 달이 적은(그 달다운) 품종부터 고른다.
+ * 그림이 모자라면 그림 없는 품종으로 채운다.
+ */
+export function monthHighlights(month: number, count: number): readonly Food[] {
+  return [...foodsInMonth(month)]
+    .sort((a, b) => Number(isDrawn(b.id)) - Number(isDrawn(a.id)) || a.months.length - b.months.length)
+    .slice(0, count)
+}

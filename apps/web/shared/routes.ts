@@ -16,7 +16,7 @@ export const routes = {
     root: "/seasonal",
     /** 2a의 그 달 섹션. 해시라 정적 셸이 유지되고, 2a가 해시를 읽어 즉시 이동한다. */
     rootAt: (month: number) => `/seasonal#month-${month}`,
-    /** 2b 월별 보기. 접두 경로만 열면 proxy.ts가 이번 달로 보낸다. */
+    /** 2b 월별 보기: 열두 달 카드 목록과 그 달 상세 */
     months: "/seasonal/months",
     month: (month: number) => `/seasonal/months/${month}`,
     /** 3a 계절 히어로 · 계절 상세 */
