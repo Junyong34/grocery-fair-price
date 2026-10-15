@@ -1,4 +1,5 @@
 import { foodScale } from "../data/food-sizes"
+import { relaxCircles } from "../geometry/relax-circles"
 
 // 흩어진 이미지 배치(와이어프레임 3.1 scat). 격자 없이 빈 자리를 찾아 촘촘히 흩뿌린다.
 // 같은 달·같은 품종·같은 영역이면 언제나 같은 배치가 나온다(Math.random 대신 시드 LCG).
@@ -54,7 +55,11 @@ export type ScatterLayout = {
   items: ScatterItem[]
 }
 
-const CANDIDATES = 60
+/** 새 그림 하나를 놓을 때 "이미 놓인 그림 하나당" 보는 후보 수. 후보를 개수에 비례해 늘린다(Mitchell 1991, m·n+1). */
+const CANDIDATES_PER_POINT = 10
+/** 시드 배치 직후 겹침을 풀 때 남길 틈(프레임 px). */
+const SEED_GAP = 8
+const SEED_RELAX_ITERATIONS = 24
 /** 그림이 판 넓이에서 차지하는 비율. 낮을수록 그림이 작고 사이가 넓다. */
 const COVERAGE = 0.45
 
@@ -80,21 +85,36 @@ export function scatterLayout({
   )
 
   const placed: PlacedCircle[] = []
-  const items = ids.map((id, i) => {
+  const drafts = ids.map((id) => {
     // 기본 크기에 ±10% 변동을 주고, 품종별 배율(data/food-sizes)을 곱한다.
     const size = Math.round(base * (0.9 + rand() * 0.2) * foodScale(id))
     const spot = findOpenSpot({ placed, size, frame, rand })
     placed.push(spot)
     const rotate = (rand() - 0.5) * 22
-    return {
-      id,
-      cx: spot.x / W,
-      cy: spot.y / H,
-      size: size / W,
-      rotate: Math.round(rotate * 10) / 10,
-      z: i % 4,
-    }
+    return { id, size, rotate }
   })
+
+  // 후보 선택은 겹침을 보장하지 않으므로, 남은 겹침을 한 번 풀고 최소 틈을 확보한다.
+  const relaxed = relaxCircles(
+    placed.map((spot, i) => ({ id: drafts[i]!.id, x: spot.x, y: spot.y, r: spot.r })),
+    {
+      bounds: {
+        width: W - (frame.reserveRight ?? 0),
+        height: H - (frame.reserveBottom ?? 0) - label,
+      },
+      gap: SEED_GAP,
+      iterations: SEED_RELAX_ITERATIONS,
+    }
+  )
+
+  const items = drafts.map(({ id, size, rotate }, i) => ({
+    id,
+    cx: relaxed[i]!.x / W,
+    cy: relaxed[i]!.y / H,
+    size: size / W,
+    rotate: Math.round(rotate * 10) / 10,
+    z: i % 4,
+  }))
 
   return { aspect: W / H, label: label / H, items }
 }
@@ -117,7 +137,7 @@ export function labelHeight(frame: ScatterFrame): number {
 }
 
 /**
- * 이미 놓인 그림들과 가장 멀리 떨어진 자리를 후보 26개 가운데서 고른다(그림 아래 라벨 자리를 남긴다).
+ * 이미 놓인 그림들과 가장 멀리 떨어진 자리를 후보 가운데서 고른다(그림 아래 라벨 자리를 남긴다). 후보 수는 놓인 그림 수에 비례한다.
  * 시드 배치와, 저장된 배치에 새 품종을 넣을 때 같이 쓴다.
  */
 export function findOpenSpot({
@@ -133,7 +153,8 @@ export function findOpenSpot({
 }): PlacedCircle {
   const r = size / 2
   let best = { x: r, y: r, gap: -Infinity }
-  for (let c = 0; c < CANDIDATES; c++) {
+  const candidates = CANDIDATES_PER_POINT * placed.length + 1
+  for (let c = 0; c < candidates; c++) {
     const x = rand() * (frame.width - (frame.reserveRight ?? 0) - size) + r
     const y = rand() * (frame.height - (frame.reserveBottom ?? 0) - size - labelHeight(frame)) + r
     const gap = placed.length

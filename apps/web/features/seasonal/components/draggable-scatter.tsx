@@ -19,7 +19,7 @@ import {
 import {
   relaxCircles,
   type Circle,
-} from "@workspace/ui/lib/geometry/relax-circles"
+} from "@workspace/seasonal/geometry/relax-circles"
 import { PatternBackground } from "@workspace/ui/components/pattern-background"
 import { cn } from "@workspace/ui/lib/utils"
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { relaxCircles } from "@workspace/ui/lib/geometry/relax-circles"
+import { relaxCircles } from "./relax-circles"
 
 const bounds = { width: 300, height: 200 }
 

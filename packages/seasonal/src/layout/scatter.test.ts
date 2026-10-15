@@ -98,3 +98,22 @@ describe("scatterLayout reserveBottom", () => {
     for (const item of items) expect(item.cy + (item.size * frame.width) / frame.height / 2).toBeLessThanOrEqual(limit + 1e-9)
   })
 })
+
+describe("scatterLayout 겹침", () => {
+  it.each(Object.entries(SCATTER_FRAMES))("%s 프레임에서 시드 배치의 그림이 서로 겹치지 않는다", (_, frame) => {
+    for (const month of [1, 5, 10]) {
+      for (const n of [14, 17, 25]) {
+        const { items } = scatterLayout({ month, ids: ids(n), frame })
+        for (let i = 0; i < items.length; i++) {
+          for (let j = i + 1; j < items.length; j++) {
+            const a = items[i]!
+            const b = items[j]!
+            const distance = Math.hypot((a.cx - b.cx) * frame.width, (a.cy - b.cy) * frame.height)
+            const radii = ((a.size + b.size) * frame.width) / 2
+            expect(distance, `${month}월 ${n}개 ${i}-${j}`).toBeGreaterThanOrEqual(radii - 0.5)
+          }
+        }
+      }
+    }
+  })
+})
