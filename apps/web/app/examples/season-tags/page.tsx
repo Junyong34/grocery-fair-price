@@ -9,8 +9,6 @@ import {
 } from "@workspace/seasonal/data/seasons"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { SeasonTag } from "@/features/seasonal/components/season-tag"
-
 export const metadata = { title: "계절 태그 비교" }
 
 // 품종 상세 제목 옆 계절 태그(봄·여름·가을·겨울) 후보. 딸기(12~4월: 봄·겨울)와 밤(9·10월: 가을)으로 본다.
@@ -50,7 +48,7 @@ const VARIANTS = [
   },
   {
     id: "icon",
-    name: "B. 아이콘 + 계절색 글자",
+    name: "B. 아이콘 + 계절색 글자 (적용)",
     note: "새싹·해·잎·눈송이 아이콘. 글만 읽지 않아도 계절이 보인다.",
   },
   {
@@ -108,8 +106,17 @@ function Tag({
   season: Season
   variant: "now" | "tint" | "icon"
 }) {
-  if (variant === "now") return <SeasonTag season={season} />
   const name = SEASON_COPY[season].name
+  // 이전 모양(적용 전 SeasonTag)
+  if (variant === "now")
+    return (
+      <span
+        className="inline-block rounded-[3px] border border-ink px-2.5 py-[3px] text-xs leading-none tracking-[.1em] text-ink"
+        style={{ boxShadow: `inset 0 -3px 0 ${COLOR[season]}` }}
+      >
+        {name}
+      </span>
+    )
   if (variant === "tint")
     return (
       <span
