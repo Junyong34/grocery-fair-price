@@ -7,7 +7,7 @@ const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"]
 const isWeekend = (weekday: number) => weekday === 0 || weekday === 6
 
 /**
- * 달력 모양 후보(/examples/calendar-styles에서 비교).
+ * 달력 모양(/examples/calendar-styles에서 비교). 화면(2a)은 plain을 쓰고, 나머지는 MVP 이후 PDF 달력의 모양 선택지로 둔다.
  * - plain: 선 없이 작은 숫자, 공휴일은 점(모바일)·이름(데스크톱)
  * - grid: 칸마다 가는 선, 숫자는 칸 왼쪽 위, 공휴일 이름을 칸 안에
  * - editorial: 큰 가는 숫자, 주 사이 가로줄만, 오늘은 먹색 원
@@ -51,7 +51,7 @@ export function MonthCalendar({
               scope="col"
               className={cn(
                 "text-[11px] font-normal text-ash",
-                variant === "plain" && "pb-1",
+                variant === "plain" && "pb-1.5 text-xs lg:text-[13px]",
                 variant === "grid" && "border-b border-hairline bg-surface/60 py-1.5",
                 variant === "editorial" && "border-b border-ink pb-2 text-left text-xs font-semibold tracking-wide text-ink",
                 variant === "tiles" && "pb-0.5",
@@ -71,7 +71,7 @@ export function MonthCalendar({
                 key={d}
                 className={cn(
                   "align-top",
-                  variant === "plain" && "h-9 lg:h-14",
+                  variant === "plain" && "h-11 lg:h-16",
                   variant === "grid" && "h-12 border border-hairline lg:h-16",
                   variant === "grid" && cell?.isToday && "bg-gold-wash",
                   variant === "editorial" && "h-12 lg:h-16",
@@ -160,7 +160,7 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
       <span
         aria-current={current}
         className={cn(
-          "grid size-[22px] place-items-center rounded-full text-[13px] tabular-nums",
+          "grid size-7 place-items-center rounded-full text-[15px] tabular-nums lg:size-8 lg:text-base",
           color,
           cell.isToday && "font-semibold ring-1 ring-ink",
         )}
@@ -170,7 +170,7 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
       {holiday && (
         <>
           <span aria-hidden className="size-1 rounded-full bg-holiday in-data-[holidays=off]:hidden lg:hidden" />
-          <span className="sr-only lg:not-sr-only lg:w-full lg:truncate lg:px-0.5 lg:text-[10px] lg:leading-tight lg:text-holiday lg:in-data-[holidays=off]:hidden">
+          <span className="sr-only lg:not-sr-only lg:w-full lg:truncate lg:px-0.5 lg:text-[11px] lg:leading-tight lg:text-holiday lg:in-data-[holidays=off]:hidden">
             {names}
           </span>
         </>
