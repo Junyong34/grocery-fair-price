@@ -65,8 +65,11 @@ export const FESTIVAL_BACKGROUNDS: Record<Festival, string> = {
 export const UI_COPY = {
   eatToggleOff: "먹었어요",
   eatToggleOn: "✓ 먹었어요",
-  eatDetailOff: "먹었어요 — 나의 식탁에 기록",
-  eatDetailOn: "✓ 올해 먹었어요 · 나의 식탁에 기록됨",
+  /** 품종 상세 먹음 기록 줄: 왼쪽 질문·안내, 오른쪽 작은 버튼(eatToggleOff/On) */
+  eatDetailAsk: "올해 먹어 봤나요?",
+  eatDetailDone: "올해 먹었어요",
+  eatDetailHintOff: "기록하면 나의 식탁에 모여요",
+  eatDetailHintOn: "나의 식탁에 기록했어요",
   emptySearch: (query: string) =>
     `"${query}"에 맞는 제철음식이 없어요. 철자를 바꾸거나 필터를 '전체'로 바꿔 보세요.`,
   noFestivalThisMonth: "이 달의 명절 없음",
