@@ -12,7 +12,7 @@ export const metadata = createMetadata({
   ogImage: {
     title: "이달의 제철",
     subtitle: "지금 가장 맛있는 우리 땅 제철 식재료",
-    badge: "제철달력",
+    badge: "이번 달",
   },
 })
 

@@ -27,6 +27,9 @@ const OG_COLORS = {
   season: { spring: "#849671", summer: "#224228", autumn: "#af751b", winter: "#4a4741" } satisfies Record<Season, string>,
 } as const
 
+/** 로고 옆 문구. 제목이 없을 때는 제목이 된다. */
+const TAGLINE = "언제 뭐가 맛있을까"
+
 /** 쿼리 글자 길이 상한. 넘으면 말줄임한다(아무 글이나 길게 넣어 브랜드 이미지를 만들지 못하게). */
 const OG_LIMITS = { title: 24, subtitle: 60, badge: 12 } as const
 
@@ -70,7 +73,9 @@ function wash(season: Season | null): string {
 
 export function GET(request: Request) {
   const params = new URL(request.url).searchParams
-  const title = clip(params.get("title"), OG_LIMITS.title) ?? SITE_CONFIG.name
+  // 사이트 이름은 그리지 않는다(아직 정식 이름이 아니고, 가격 비교 화면도 같은 이미지를 쓸 예정). 제목이 없으면 문구로 채운다.
+  const pageTitle = clip(params.get("title"), OG_LIMITS.title)
+  const title = pageTitle ?? TAGLINE
   const subtitle = clip(params.get("subtitle"), OG_LIMITS.subtitle) ?? SITE_CONFIG.description
   const badge = clip(params.get("badge"), OG_LIMITS.badge)
   const seasonParam = params.get("season")
@@ -108,9 +113,9 @@ export function GET(request: Request) {
 
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse 안에서는 img만 쓸 수 있다 */}
-          <img src={LOGO} width={56} height={56} alt="" />
-          <span style={{ fontSize: 32, fontWeight: 700 }}>{SITE_CONFIG.name}</span>
-          <span style={{ marginLeft: "auto", fontSize: 22, color: OG_COLORS.ash }}>언제 뭐가 맛있을까</span>
+          <img src={LOGO} width={64} height={64} alt="" />
+          {/* 제목이 문구와 같으면(기본 이미지) 위 오른쪽 문구는 겹쳐서 뺀다. */}
+          {pageTitle && <span style={{ marginLeft: "auto", fontSize: 22, color: OG_COLORS.ash }}>{TAGLINE}</span>}
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
