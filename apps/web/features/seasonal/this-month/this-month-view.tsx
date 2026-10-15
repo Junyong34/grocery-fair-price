@@ -10,13 +10,12 @@ import { cn } from "@workspace/ui/lib/utils"
 import { routes } from "@/shared/routes"
 
 import { EatenCount } from "../components/eaten-count"
-import { MonthCalendar } from "../components/month-calendar"
 import { ScatterField } from "../components/scatter-field"
 import { HERO_ID, monthSectionId } from "./active-month"
 import { DesktopMonthPanel } from "./desktop-month-panel"
 import { JumpButton, MonthRail } from "./month-jump"
 import { MonthScrollSpy } from "./month-scroll-spy"
-import { SettingsScope } from "./settings-scope"
+import { SettingsCalendar, SettingsScope } from "./settings-scope"
 
 /**
  * 2a 이달 · 12개월 스크롤(명세 3.1). 각 달은 "흩어진 제철 그림 → 달력" 순서다.
@@ -121,7 +120,7 @@ function MonthSection({
       <Scatter month={month} foods={foods} year={today.year} className="mt-5" />
       <p className="mt-3 text-xs text-ash">{foods.length}가지 제철</p>
       <div className="mt-5">
-        <MonthCalendar year={today.year} month={month} today={today} />
+        <SettingsCalendar year={today.year} month={month} today={today} />
       </div>
       <p className="mt-3 text-xs text-stone">
         {festivals.length

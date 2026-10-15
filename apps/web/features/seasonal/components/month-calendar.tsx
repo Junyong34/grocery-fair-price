@@ -16,9 +16,17 @@ const isWeekend = (weekday: number) => weekday === 0 || weekday === 6
 export const CALENDAR_VARIANTS = ["plain", "grid", "editorial", "tiles"] as const
 export type CalendarVariant = (typeof CALENDAR_VARIANTS)[number]
 
+/** ⚙ 설정에 보이는 달력 모양 이름 */
+export const CALENDAR_VARIANT_LABELS: Record<CalendarVariant, string> = {
+  plain: "기본",
+  grid: "격자",
+  editorial: "큰 숫자",
+  tiles: "타일",
+}
+
 /**
  * 한 달 달력(명세 5절, 절기 제외). 토·일·공휴일은 빨간 숫자다.
- * 공휴일 표시는 설정(data-holidays=off)으로 끌 수 있다. 꺼도 토·일은 빨간 날짜다.
+ * 공휴일 표시 설정(data-holidays=off)을 끄면 공휴일 이름과 빨간 표시가 함께 사라진다. 토·일은 그대로 빨간 날짜다.
  */
 export function MonthCalendar({
   year,
@@ -169,7 +177,7 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
       </span>
       {holiday && (
         // 좁은 칸에서는 두 줄까지 감싸고(낱말 단위), 넘치면 말줄임한다.
-        <span className="line-clamp-2 w-full px-0.5 text-[10px] leading-tight break-keep text-holiday in-data-[holidays=off]:hidden lg:line-clamp-1 lg:text-[11px]">
+        <span className="line-clamp-2 w-full px-0.5 text-[10px] leading-tight break-keep text-holiday in-data-[holidays=off]:hidden! lg:line-clamp-1 lg:text-[11px]">
           {names}
         </span>
       )}

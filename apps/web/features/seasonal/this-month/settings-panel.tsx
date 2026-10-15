@@ -9,15 +9,17 @@ import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/component
 import { Switch } from "@workspace/ui/components/switch"
 
 import { useSettingsStore } from "../stores/settings-store"
+import { CalendarStylePicker } from "./calendar-style-picker"
 
 /** ⚙ 표시 설정 내용(명세 4절. 24절기 표시와 달력 다운로드는 MVP 밖). */
 function SettingsFields() {
-  const { showHolidays, showEaten, set } = useSettingsStore()
+  const { showHolidays, showEaten, calendarStyle, set } = useSettingsStore()
   return (
     <div className="flex flex-col divide-y divide-hairline">
+      <CalendarStylePicker value={calendarStyle} onChange={(value) => set({ calendarStyle: value })} />
       <SettingRow
         label="공휴일 표시"
-        hint="달력의 공휴일 점·이름과 빨간 날짜"
+        hint="달력의 공휴일 이름과 빨간 날짜(토·일은 늘 빨강)"
         checked={showHolidays}
         onChange={(value) => set({ showHolidays: value })}
       />
@@ -48,7 +50,8 @@ function SettingRow({
         <span className="text-[15px] text-ink">{label}</span>
         <span className="text-xs text-stone">{hint}</span>
       </span>
-      <Switch checked={checked} onCheckedChange={onChange} />
+      {/* cojeev 스위치는 64×44로 커서 줄여 쓴다. */}
+      <Switch checked={checked} onCheckedChange={onChange} className="-my-2 -mr-2.5 origin-right scale-[.68]" />
     </label>
   )
 }
@@ -88,7 +91,7 @@ export function DesktopSettingsButton() {
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-[400px] bg-canvas">
-        <p className="pb-1 font-semibold text-ink">표시</p>
+        <p className="font-semibold text-ink">표시</p>
         <SettingsFields />
       </PopoverContent>
     </Popover>
