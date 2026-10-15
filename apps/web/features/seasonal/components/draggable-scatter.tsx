@@ -27,6 +27,7 @@ import {
   scatterKey,
   useHydrateScatter,
   useScatterStore,
+  type CalendarSpot,
 } from "../stores/scatter-store"
 import { EatenBadge } from "./eaten-badge"
 import { FoodImage } from "./food-image"
@@ -37,6 +38,9 @@ const TAP_SLOP = 6
 const LONG_PRESS_MS = 250
 /** 그림 사이에 남길 틈(프레임 px). */
 const GAP = 2
+/** 판 위 달력의 폭(판 폭 대비)과 처음 자리(왼쪽 위, 판 크기 대비). */
+const CALENDAR_WIDTH = 0.45
+const CALENDAR_HOME: CalendarSpot = { x: 0.53, y: 0.04 }
 
 type Spot = { cx: number; cy: number }
 type Gesture = {
@@ -85,6 +89,8 @@ export function DraggableScatter({
   const saved = useScatterStore((state) => state.layouts[key])
   const save = useScatterStore((state) => state.save)
   const reset = useScatterStore((state) => state.reset)
+  const savedCalendar = useScatterStore((state) => state.calendars?.[key])
+  const saveCalendar = useScatterStore((state) => state.saveCalendar)
 
   const byId = useMemo(
     () => new Map<string, Food>(foods.map((food) => [food.id, food])),
@@ -266,6 +272,46 @@ export function DraggableScatter({
     }
   }
 
+  // 판 위 달력 끌기. 그림과 달리 겹침을 풀지 않고 판 안에만 가둔다. 그림은 항상 달력 위에 놓인다.
+  const calendarRef = useRef<HTMLDivElement>(null)
+  const [calendarLive, setCalendarLive] = useState<CalendarSpot | null>(null)
+  const calendarSpot = calendarLive ?? savedCalendar ?? CALENDAR_HOME
+
+  const clampCalendar = (x: number, y: number): CalendarSpot => {
+    const box = field.current!.getBoundingClientRect()
+    const height = calendarRef.current!.offsetHeight / box.height
+    return {
+      x: Math.min(Math.max(x, 0), 1 - CALENDAR_WIDTH),
+      y: Math.min(Math.max(y, 0), Math.max(0, 1 - height)),
+    }
+  }
+
+  const onCalendarPointerDown = (event: React.PointerEvent) => {
+    if (event.button !== 0 || gesture.current) return
+    const box = field.current!.getBoundingClientRect()
+    const from = calendarSpot
+    const startX = event.clientX
+    const startY = event.clientY
+    let latest = from
+    const move = (e: PointerEvent) => {
+      latest = clampCalendar(
+        from.x + (e.clientX - startX) / box.width,
+        from.y + (e.clientY - startY) / box.height
+      )
+      setCalendarLive(latest)
+    }
+    const up = () => {
+      window.removeEventListener("pointermove", move)
+      window.removeEventListener("pointerup", up)
+      window.removeEventListener("pointercancel", up)
+      saveCalendar(key, latest)
+      setCalendarLive(null)
+    }
+    window.addEventListener("pointermove", move)
+    window.addEventListener("pointerup", up)
+    window.addEventListener("pointercancel", up)
+  }
+
   useEffect(() => () => end(false), []) // eslint-disable-line react-hooks/exhaustive-deps -- 언마운트 정리
 
   return (
@@ -290,9 +336,21 @@ export function DraggableScatter({
         />
       )}
       {children && (
-        // 달력은 판 위에 얹히고, 그림은 그 위에 스티커처럼 놓인다. 판 전체가 끌기 범위다.
-        <div className="absolute inset-y-0 right-0 z-0 flex w-[45%] items-center p-3">
-          <div className="w-full">{children}</div>
+        // 달력은 판 위에 얹히고, 그림은 그 위에 스티커처럼 놓인다. 달력도 끌어 옮길 수 있다.
+        <div
+          ref={calendarRef}
+          onPointerDown={onCalendarPointerDown}
+          className={cn(
+            "absolute z-0 touch-none",
+            calendarLive ? "cursor-grabbing" : "cursor-grab"
+          )}
+          style={{
+            left: `${calendarSpot.x * 100}%`,
+            top: `${calendarSpot.y * 100}%`,
+            width: `${CALENDAR_WIDTH * 100}%`,
+          }}
+        >
+          {children}
         </div>
       )}
       {seed.items.map((item) => {
@@ -350,7 +408,7 @@ export function DraggableScatter({
           </Link>
         )
       })}
-      {saved && !live && (
+      {(saved || savedCalendar) && !live && (
         <button
           type="button"
           onClick={() => reset(key)}
