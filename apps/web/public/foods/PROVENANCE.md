@@ -10,7 +10,7 @@
 | kit sha | `6806db565e0538c4` |
 | 변형 | `color`, `motion` |
 | 바닥 그림자 | 끔 |
-| 품종 수 | 45 |
+| 품종 수 | 49 |
 
 | id | 이름 | food.mjs sha |
 |---|---|---|
@@ -25,7 +25,9 @@
 | `blueberry` | 블루베리 | `146ba612ed8a1d94` |
 | `bomdong` | 봄동 | `1b57b34e08501771` |
 | `burdock` | 우엉 | `cfedeeb0a68dbe54` |
+| `chamnamul` | 참나물 | `f2f299cf8b65f99f` |
 | `cockle` | 꼬막 | `7d46a2b15651594e` |
+| `cucumber` | 오이 | `8ffe0fc9a834e334` |
 | `deodeok` | 더덕 | `d70ec8080bdc66f6` |
 | `eggplant` | 가지 | `a4de725450f76709` |
 | `fig` | 무화과 | `783c52b4e0a75e6e` |
@@ -49,8 +51,10 @@
 | `red-seabream` | 도미(참돔) | `64f78b9f5ff1ecd9` |
 | `saury` | 꽁치 | `abb7e2466042b59b` |
 | `scallop` | 가리비 | `89e88513eb54c80b` |
+| `sea-bass` | 농어 | `e31ae42669090309` |
 | `shepherds-purse` | 냉이 | `d033fdad20eda453` |
 | `shrimp` | 새우 | `4986fb56c9feb43e` |
+| `snow-crab` | 대게 | `4d92b73ed85276df` |
 | `spanish-mackerel` | 삼치 | `230cac8f3b0492c1` |
 | `spinach` | 시금치 | `f8b222f9053ec563` |
 | `strawberry` | 딸기(시설) | `7ce2e60592da75ea` |

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { findFood, foodsInMonth, foodsInSeason, foodsInSeasonWith, seasonHighlights } from "./foods"
+import { findFood, foodsInMonth, foodsInSeason, foodsInSeasonWith, isDrawn, seasonHighlights } from "./foods"
 
 // 예상값은 prototypes/seasonal-food/docs/seasonal-lists/foods.json(검증 품종)에서 셌다.
 describe("foodsInMonth", () => {
@@ -46,7 +46,9 @@ describe("seasonHighlights", () => {
     // 사과(9·10·11월)와 고등어(9·10·11월)는 가을 세 달 내내 제철이고 그림도 있다.
     expect(autumn.map((food) => food.name)).toEqual(expect.arrayContaining(["사과", "고등어"]))
     expect(autumn.every((food) => foodsInSeason("autumn").includes(food))).toBe(true)
-    // 여름은 그림 없는 농어·오이(6~8월 내내)보다 그림 있는 품종이 먼저다.
-    expect(seasonHighlights("summer", 4).map((food) => food.name)).not.toContain("농어")
+    // 그림 있는 품종이 그림 없는 품종보다 먼저다. 일러스트가 늘어도 깨지지 않게 품종 이름 대신 순서로 확인한다.
+    const summer = seasonHighlights("summer", foodsInSeason("summer").length).map((food) => isDrawn(food.id))
+    expect(summer).toEqual([...summer].sort((a, b) => Number(b) - Number(a)))
+    expect(summer).toContain(false)
   })
 })
