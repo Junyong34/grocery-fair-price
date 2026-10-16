@@ -18,6 +18,8 @@
     --color-ink-band: #000000;
     --color-ink-band-soft: #19191c;
     --color-ash: #838280;
+    /* 작은 보조 글자(캡션·플레이스홀더)용. ash는 canvas 위에서 3.4:1이라 12px 글자에는 모자라서, 4.8:1(AA)로 맞춘 한 단계 진한 값 */
+    --color-caption: #6c6a65;
     --color-mute: #a8a5a0;
     --color-stone: #4a4741;
     --color-clay: #6b443d;

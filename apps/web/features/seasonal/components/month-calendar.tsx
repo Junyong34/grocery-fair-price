@@ -63,7 +63,7 @@ export function MonthCalendar({
               key={weekday}
               scope="col"
               className={cn(
-                "text-[11px] font-normal text-ash",
+                "text-[11px] font-normal text-caption",
                 variant === "plain" && "pb-2 text-[13px] lg:text-sm",
                 variant === "grid" && "border-b border-hairline bg-surface/60 py-1.5",
                 variant === "editorial" && "border-b border-ink pb-2 text-left text-xs font-semibold tracking-wide text-ink",

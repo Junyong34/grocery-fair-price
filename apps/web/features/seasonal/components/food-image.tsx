@@ -5,7 +5,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 /**
  * 품종 일러스트 자리. 일러스트를 바꾸거나 늘릴 때 고칠 곳은 이 컴포넌트 하나다.
- * 그림이 있으면 public/foods/<id>/<variant>.svg(pnpm foods:sync), 없으면 이름 카드로 대신한다.
+ * 그림이 있으면 public/foods/<id>/<variant>.svg(pnpm foods:sync), 없으면 이름 카드(옅은 베이지 원)로 대신한다.
  * motion 변형은 SVG 안의 CSS 키프레임으로 움직인다. 줄인 모션 설정도 SVG가 스스로 처리한다.
  * 크기는 부모가 정한다(정사각형으로 채운다).
  */
@@ -31,7 +31,7 @@ export function FoodImage({
     return (
       // 글자 크기는 카드 폭을 따른다(컨테이너 단위 cqi).
       <div role="img" aria-label={food.name} className={cn("aspect-square w-full @container", className)}>
-        <div className="grid size-full place-items-center rounded-full border border-dashed border-silver bg-surface/50 p-[12%] text-center font-heading leading-tight text-stone [font-size:clamp(9px,20cqi,18px)]">
+        <div className="grid size-full place-items-center rounded-full bg-hairline/60 p-[12%] text-center font-heading leading-tight text-stone [font-size:clamp(9px,20cqi,18px)]">
           {showName && food.name}
         </div>
       </div>

@@ -68,7 +68,7 @@ export function DesktopMonthPanel({
         <MonthTitle month={shown.month} suffixClassName="ml-1 font-heading text-[48px]" englishClassName="text-[46px]" />
       </p>
       <p className="min-h-12 font-heading text-lg text-stone">{shown.note}</p>
-      <p className="text-xs text-ash">월 이동 · 누르면 바로 바뀌어요</p>
+      <p className="text-xs text-caption">월 이동 · 누르면 바로 바뀌어요</p>
       <div
         onWheelCapture={() => (lastInput.current = "wheel")}
         onPointerDownCapture={() => (lastInput.current = "other")}

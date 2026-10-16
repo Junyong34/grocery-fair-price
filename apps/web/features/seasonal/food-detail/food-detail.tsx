@@ -57,7 +57,7 @@ export function FoodDetail({
           <SeasonMonthsBar months={food.months} className="[&>span]:h-1.5" />
           <div
             aria-hidden
-            className="grid grid-cols-12 text-center text-[10px] text-ash tabular-nums"
+            className="grid grid-cols-12 text-center text-[11px] text-caption tabular-nums"
           >
             {Array.from({ length: 12 }, (_, i) => (
               <span key={i}>{i + 1}</span>
@@ -90,7 +90,7 @@ export function FoodDetail({
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-ash">{UI_COPY.noRelatedFestival}</p>
+          <p className="text-sm text-caption">{UI_COPY.noRelatedFestival}</p>
         )}
       </section>
 
@@ -128,7 +128,7 @@ export function FoodDetail({
       <button
         type="button"
         disabled
-        className="rounded-md border border-hairline py-3 text-sm text-ash"
+        className="rounded-md border border-hairline py-3 text-sm text-caption"
         aria-describedby="price-coming-soon"
       >
         {UI_COPY.priceComingSoon}

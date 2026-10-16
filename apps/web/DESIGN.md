@@ -374,6 +374,7 @@ Color discipline is the signature move. The whole palette is earth-toned — mus
 - **Ink** (`{colors.ink}` — #1c1b1a): primary heading and body text on cream.
 - **Stone** (`{colors.stone}` — #4a4741): secondary text and editorial emphasis on cream.
 - **Ash** (`{colors.ash}` — #838280): muted grey for meta text, titles-under-names, and utility captions.
+- **Caption** (this app only, `--color-caption` — #6c6a65): Ash is 3.4:1 on canvas, short of AA for 12px text. Small captions and placeholders use this one step darker value (4.8:1) instead. Ash stays for borders and non-text marks.
 - **Mute** (`{colors.mute}` — #a8a5a0): warm grey for the quietest captions and for secondary text on dark bands.
 - **On Dark** (`{colors.on-dark}` — #ffffff): text and icons on the ink and silver worlds.
 

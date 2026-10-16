@@ -33,7 +33,7 @@ export function MonthRail() {
   return (
     <nav
       aria-label="달 이동"
-      className="fixed top-1/2 right-2 z-(--z-sticky) -translate-y-1/2 flex flex-col gap-0.5 rounded-full border border-hairline bg-canvas/94 p-1.5 backdrop-blur lg:hidden"
+      className="fixed top-1/2 right-1 z-(--z-sticky) -translate-y-1/2 flex flex-col gap-0.5 rounded-full border border-hairline bg-canvas/94 p-1 backdrop-blur lg:hidden"
     >
       {MONTHS.map((month) => (
         <button
@@ -43,7 +43,7 @@ export function MonthRail() {
           aria-current={active === month ? "true" : undefined}
           onClick={() => jumpToMonth(month)}
           className={cn(
-            "h-[26px] min-w-8 rounded-full px-1 text-xs leading-none tabular-nums text-stone transition-colors",
+            "h-[26px] min-w-7 rounded-full px-0.5 text-xs leading-none tabular-nums text-stone transition-colors",
             active === month && "bg-gold-soft font-semibold text-gold-deep",
           )}
         >

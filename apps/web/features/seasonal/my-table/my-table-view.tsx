@@ -105,14 +105,14 @@ export function MyTableView() {
                 </span>
               </div>
             )}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <input
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={UI_COPY.searchPlaceholder}
                 aria-label="음식 이름 검색"
-                className="h-9 min-w-0 flex-1 rounded-md border border-hairline bg-surface px-3 text-base outline-none placeholder:text-ash focus-visible:border-gold lg:w-[280px] lg:flex-none"
+                className="h-9 min-w-0 basis-full rounded-md border border-hairline bg-surface px-3 text-base outline-none placeholder:text-caption focus-visible:border-gold min-[480px]:basis-0 min-[480px]:flex-1 lg:w-[280px] lg:basis-auto lg:flex-none"
               />
               <Segmented
                 aria-label="필터 방식"
@@ -287,7 +287,7 @@ function MonthBars({
             </div>
             <span
               className={cn(
-                "text-[10px] text-ash tabular-nums",
+                "text-[11px] text-caption tabular-nums",
                 month === thisMonth && "font-semibold text-ink"
               )}
             >

@@ -57,7 +57,7 @@ function MonthCard({ month }: { month: Month }) {
         <span className="text-[22px] leading-none font-bold sm:text-2xl">
           {month}월
         </span>
-        <span className="text-[13px] text-ash tabular-nums">
+        <span className="text-[13px] text-caption tabular-nums">
           {foods.length}가지
         </span>
         <span className="sr-only">제철 모두 보기</span>
@@ -80,7 +80,7 @@ function MonthCard({ month }: { month: Month }) {
                 className="group/food flex flex-col items-center gap-1 text-center text-xs leading-4 text-stone no-underline hover:text-ink sm:gap-1.5 sm:text-[13px] sm:leading-5"
               >
                 <span className="block w-[84%] transition-transform duration-200 group-hover/food:-translate-y-0.5">
-                  <FoodImage food={food} sizes="88px" />
+                  <FoodImage food={food} sizes="88px" showName={false} />
                 </span>
                 <span className="w-full truncate">{food.name}</span>
               </Link>

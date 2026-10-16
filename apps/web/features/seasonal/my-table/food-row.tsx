@@ -93,7 +93,7 @@ export function FoodRow({
         >
           {food.name}
         </span>
-        <span className="text-xs text-ash">
+        <span className="text-xs text-caption">
           {formatSeasonMonths(food.months)}
         </span>
       </Link>
@@ -101,7 +101,7 @@ export function FoodRow({
         htmlFor={id}
         className={cn(
           "text-xs",
-          eaten ? "font-semibold text-gold-deep" : "text-ash"
+          eaten ? "font-semibold text-gold-deep" : "text-caption"
         )}
       >
         <TypedLabel key={`${eaten}:${label}`} text={label} animate={eaten && fresh !== null} />
