@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { editionFlow, pdfPaths } from "./flow"
+import { editionFlow } from "./flow"
 
 const base = { dirty: false, invalid: false, hasBuild: true, stale: false }
 
@@ -41,12 +41,5 @@ describe("editionFlow", () => {
     const flow = editionFlow({ ...base, dirty: true, stale: true })
     expect(flow.phase).toBe("unsaved")
     expect(flow.hint).toContain("저장")
-  })
-})
-
-describe("pdfPaths", () => {
-  it("용지마다 규칙대로 경로를 만든다. 월간 달력도 묶음 PDF 하나뿐이다", () => {
-    expect(pdfPaths("year-sheet-1", "year-sheet", "A4")).toEqual(["/downloads/year-sheet-1/a4/all.pdf"])
-    expect(pdfPaths("monthly-2", "monthly", "A3")).toEqual(["/downloads/monthly-2/a3/all.pdf"])
   })
 })

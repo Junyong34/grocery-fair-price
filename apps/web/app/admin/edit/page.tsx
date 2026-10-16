@@ -4,8 +4,8 @@ import { Suspense } from "react"
 
 import { Skeleton } from "@workspace/ui/components/skeleton"
 
-import { EditionEditor } from "@/features/admin-print/editor"
-import { readBuilds, readEdition } from "@/features/admin-print/files"
+import { EditionEditor } from "@/features/admin-print/editor/edition-editor"
+import { getEditionEditor } from "@/features/admin-print/server/queries"
 import { routes } from "@/shared/routes"
 
 // 에디션 편집기. ?id=<에디션 id>
@@ -26,8 +26,8 @@ export default function Page(props: PageProps<"/admin/edit">) {
 
 async function Editor({ searchParams }: { searchParams: PageProps<"/admin/edit">["searchParams"] }) {
   const { id } = await searchParams
-  const edition = typeof id === "string" ? await readEdition(id) : undefined
-  if (!edition) notFound()
-  const build = (await readBuilds())[edition.id]
-  return <EditionEditor key={edition.id} saved={edition} build={build} />
+  const data = typeof id === "string" ? await getEditionEditor(id) : undefined
+  if (!data) notFound()
+  // 다른 에디션으로 옮기면 편집 상태를 새로 시작한다.
+  return <EditionEditor key={data.edition.id} saved={data.edition} build={data.build} />
 }

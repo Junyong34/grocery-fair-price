@@ -1,6 +1,3 @@
-import { downloadPath } from "@workspace/seasonal/print/edition"
-import { KIND_PAGES, type Paper, type PrintKind } from "@workspace/seasonal/print/spec"
-
 // 편집기의 작업 순서: ① 옵션 저장 → ② PDF 만들기. 지금 어디까지 왔고 무엇을 해야 하는지만 계산한다.
 // 공개 여부는 단계가 아니다. 관리자는 PDF 파일명 규칙(downloadPath)으로 링크를 건다.
 
@@ -48,9 +45,4 @@ export function editionFlow({ dirty, invalid, hasBuild, stale }: EditionFlowInpu
       hint: "만들어 둔 PDF는 이전 옵션으로 만든 거예요. 다시 만들면 같은 주소의 파일이 새 옵션으로 바뀌어요.",
     }
   return { phase: "done", save: { state: "done" }, pdf: { state: "done" }, hint: "끝났어요. 아래 주소로 링크를 걸면 돼요." }
-}
-
-/** 한 용지의 PDF 주소를 쪽 순서대로. 파일명 규칙은 downloadPath 하나뿐이다. */
-export function pdfPaths(id: string, kind: PrintKind, paper: Paper): string[] {
-  return KIND_PAGES[kind].map((page) => downloadPath(id, paper, page))
 }

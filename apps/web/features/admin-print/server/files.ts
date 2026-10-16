@@ -1,7 +1,9 @@
+import "server-only"
+
 import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises"
 import path from "node:path"
 
-import { buildManifest, parseEdition, type BuildRecord, type Edition } from "@workspace/seasonal/print/edition"
+import { buildManifest, downloadDir, parseEdition, type BuildRecord, type Edition } from "@workspace/seasonal/print/edition"
 
 // 에디션 원본(print-editions/<id>.json)과 생성 기록(<id>.build.json), 다운로드 폴더(public/downloads)를 읽고 쓴다.
 // 개발 서버에서만 부른다. 결과는 관리자가 커밋해 배포한다.
@@ -10,6 +12,9 @@ const ROOT = process.cwd()
 export const EDITIONS_DIR = path.join(ROOT, "print-editions")
 export const PUBLIC_DIR = path.join(ROOT, "public")
 const MANIFEST = path.join(PUBLIC_DIR, "downloads", "manifest.json")
+
+/** 에디션 하나의 PDF가 모이는 폴더(디스크 경로) */
+export const editionDownloadDir = (id: string) => path.join(PUBLIC_DIR, downloadDir(id))
 
 const editionFile = (id: string) => path.join(EDITIONS_DIR, `${id}.json`)
 const buildFile = (id: string) => path.join(EDITIONS_DIR, `${id}.build.json`)
@@ -24,6 +29,11 @@ export async function listEditions(): Promise<Edition[]> {
 
 export async function readEdition(id: string): Promise<Edition | undefined> {
   return (await listEditions()).find((edition) => edition.id === id)
+}
+
+/** 생성 기록 하나. 아직 만든 적이 없으면 undefined */
+export async function readBuild(id: string): Promise<BuildRecord | undefined> {
+  return (await readBuilds())[id]
 }
 
 export async function readBuilds(): Promise<Record<string, BuildRecord>> {
@@ -49,7 +59,7 @@ export async function removeEdition(id: string) {
   await Promise.all([
     rm(editionFile(id), { force: true }),
     rm(buildFile(id), { force: true }),
-    rm(path.join(PUBLIC_DIR, "downloads", id), { recursive: true, force: true }),
+    rm(editionDownloadDir(id), { recursive: true, force: true }),
   ])
 }
 

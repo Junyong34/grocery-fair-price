@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { buildManifest, downloadPath, nextEditionId, parseEdition, type Edition } from "./edition"
-import { DEFAULT_SPECS } from "./spec"
+import { buildManifest, downloadPath, EDITION_LIMITS, isBuildCurrent, nextEditionId, parseEdition, type Edition } from "./edition"
+import { DEFAULT_SPECS, specHash } from "./spec"
 
 const edition = (id: string, status: Edition["status"]): Edition => ({
   id,
@@ -16,6 +16,28 @@ describe("parseEdition", () => {
     expect(parseEdition(edition("monthly-cream", "draft"))).not.toBeInstanceOf(Error)
     expect(parseEdition(edition("../etc", "draft"))).toBeInstanceOf(Error)
     expect(parseEdition(edition("크림", "draft"))).toBeInstanceOf(Error)
+  })
+})
+
+describe("parseEdition 글자 수", () => {
+  it("이름은 1자 이상 EDITION_LIMITS.title자 이하만 받는다", () => {
+    expect(parseEdition({ ...edition("monthly-1", "draft"), title: " " })).toBeInstanceOf(Error)
+    expect(parseEdition({ ...edition("monthly-1", "draft"), title: "가".repeat(EDITION_LIMITS.title) })).not.toBeInstanceOf(Error)
+    expect(parseEdition({ ...edition("monthly-1", "draft"), title: "가".repeat(EDITION_LIMITS.title + 1) })).toBeInstanceOf(Error)
+  })
+})
+
+describe("isBuildCurrent", () => {
+  const spec = DEFAULT_SPECS.monthly
+  const build = { specHash: specHash(spec), generatedAt: "2026-10-16T12:00:00.000Z", bytes: {} }
+
+  it("같은 사양으로 만든 기록만 최신이다", () => {
+    expect(isBuildCurrent(spec, build)).toBe(true)
+    expect(isBuildCurrent({ ...spec, year: spec.year + 1 }, build)).toBe(false)
+  })
+
+  it("기록이 없으면 최신이 아니다", () => {
+    expect(isBuildCurrent(spec, undefined)).toBe(false)
   })
 })
 

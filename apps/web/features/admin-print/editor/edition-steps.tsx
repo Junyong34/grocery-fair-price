@@ -5,13 +5,14 @@ import { Check } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
-import type { EditionFlow, StepState } from "./flow"
+import type { EditionFlow, StepState } from "../lib/flow"
+import type { EditorAction } from "../types"
 
 type Props = {
   flow: EditionFlow
   /** 저장 또는 PDF 생성이 진행 중이다. */
   pending: boolean
-  running: "save" | "generate" | undefined
+  running: EditorAction | undefined
   /** 최신 PDF를 만든 시각("2026-10-16 21:55"). 없으면 undefined */
   generatedAt: string | undefined
   onSave: () => void

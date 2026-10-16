@@ -158,7 +158,20 @@ import 경로:
 | 폴더 | 내용 |
 |---|---|
 | `features/print/` | `/print` 화면. `print-document`(종류 → 컴포넌트 표), 종류별 `monthly`·`year-sheet`·`season-poster`·`month-poster`, `parts/`(시트, 인쇄 달력, 품종 그림 판), `print.css`(A4·A3 `@page`, `--u` 단위) |
-| `features/admin-print/` | 어드민. `files`(에디션 JSON·생성 기록·매니페스트 읽고 쓰기), `generate`(이 컴퓨터의 Chrome으로 PDF 저장, 쪽 크기·수 검사), `actions`(Server Action), `fields`(종류별 옵션 패널 표), `editor` |
+| `features/admin-print/` | 어드민. 아래 표 |
+
+`features/admin-print/`는 한 파일이 한 가지 일만 하도록 나눈다. 아래 칸은 위 칸만 import한다(`server/`는 화면 쪽에서 `actions`·`queries`만 부른다).
+
+| 위치 | 하는 일 |
+|---|---|
+| `types.ts`, `constants.ts` | 화면 사이에 오가는 타입(`ActionResult`, `EditionSummary`, …)과 상수(종류 설명·모양 `KIND_LOOKS`, 상태 이름, 미리보기 폭). 도메인 타입·상수(`Edition`, `EDITION_LIMITS`, `PRINT_KIND_LABELS`)는 `@workspace/seasonal/print` |
+| `lib/` | 순수 함수와 vitest: `flow`(저장 → PDF 단계), `downloads`(PDF 주소·쪽 이름), `summary`(목록 요약·다음 id), `preview`(미리보기 크기), `spec-path`(옵션 경로 읽고 쓰기), `format`(서울 시각) |
+| `hooks/` | `use-copy`(클립보드와 "복사했어요"), `use-element-width` |
+| `server/` | `import "server-only"`. `guard`(개발 서버에서만), `files`(에디션 JSON·생성 기록·매니페스트 읽고 쓰기), `generate`(이 컴퓨터의 Chrome으로 PDF 저장, 쪽 크기·수 검사), `queries`(라우트가 읽는 값), `actions`(Server Action, `ActionResult`를 돌려준다) |
+| `components/` | 목록과 편집기가 함께 쓰는 조각: `kind-mark`, `status`, `edition-id`, `delete-edition-button` |
+| `board/` | `/admin` 목록. 서버 컴포넌트(`admin-board`, `edition-board`, `kind-group`, `edition-row`) |
+| `new-edition/` | 새 에디션 3단계 폼(`new-edition-form`, `kind-picker`, `form-step`) |
+| `editor/` | `/admin/edit`. `use-edition-editor`(편집 상태·저장·생성)와 화면 조각(`editor-header`, `edition-steps`, `generated-files`, `options-panel`·`option-field`·`option-fields`(종류별 옵션 표), `listing-panel`, `preview-panel`·`print-preview`) |
 
 에디션 원본은 `apps/web/print-editions/<id>.json`, 생성 기록은 `<id>.build.json`, 결과 PDF와 매니페스트는 `apps/web/public/downloads/`에 있다. 에디션 JSON·생성 기록·매니페스트는 커밋하고, PDF는 용량이 커서 `.gitignore`로 뺀다. PDF를 둘 곳을 정하기 전까지는 에디션을 공개하지 않는다(매니페스트가 비어 있어야 운영 링크가 깨지지 않는다).
 

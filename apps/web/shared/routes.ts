@@ -3,6 +3,7 @@
 
 import type { Festival } from "@workspace/seasonal/data/festivals"
 import type { Season } from "@workspace/seasonal/data/seasons"
+import { encodeSpec, type PageKey, type Paper, type PrintSpec } from "@workspace/seasonal/print/spec"
 
 export const routes = {
   /**
@@ -38,4 +39,7 @@ export const routes = {
     root: "/admin",
     edition: (id: string) => `/admin/edit?id=${encodeURIComponent(id)}`,
   },
+
+  /** 인쇄 전용 페이지. 어드민 미리보기와 PDF 생성기가 연다. */
+  print: (spec: PrintSpec, paper: Paper, page: PageKey) => `/print?spec=${encodeSpec(spec)}&paper=${paper}&page=${page}`,
 } as const

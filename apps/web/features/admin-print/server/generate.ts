@@ -1,10 +1,14 @@
+import "server-only"
+
 import { mkdir, readdir, readFile, rm } from "node:fs/promises"
 import path from "node:path"
 
-import { downloadPath, type BuildRecord, type Edition } from "@workspace/seasonal/print/edition"
-import { encodeSpec, KIND_PAGES, PAPER_SIZES, PAPERS, pageCount, specHash, type PageKey, type Paper } from "@workspace/seasonal/print/spec"
+import { downloadDir, downloadPath, type BuildRecord, type Edition } from "@workspace/seasonal/print/edition"
+import { KIND_PAGES, PAPER_SIZES, PAPERS, pageCount, specHash, type PageKey, type Paper } from "@workspace/seasonal/print/spec"
 
-import { PUBLIC_DIR } from "./files"
+import { routes } from "@/shared/routes"
+
+import { editionDownloadDir, PUBLIC_DIR } from "./files"
 
 /** PDF 쪽 크기(pt). 1mm = 72/25.4pt */
 const pt = (mm: number) => Math.round((mm * 72) / 25.4)
@@ -21,7 +25,7 @@ export async function generatePdfs(edition: Edition, origin: string): Promise<Bu
     const page = await browser.newPage()
     for (const paper of PAPER_SIZES)
       for (const key of KIND_PAGES[edition.spec.kind] as readonly PageKey[]) {
-        const url = `${origin}/print?spec=${encodeSpec(edition.spec)}&paper=${paper}&page=${key}`
+        const url = `${origin}${routes.print(edition.spec, paper, key)}`
         const response = await page.goto(url, { waitUntil: "networkidle" })
         if (!response?.ok()) throw new Error(`${url} 응답 ${response?.status()}`)
         await page.evaluate(async () => {
@@ -43,9 +47,9 @@ export async function generatePdfs(edition: Edition, origin: string): Promise<Bu
 
 /** 이번에 만들지 않은 옛 PDF(예: 지금은 안 만드는 달별 파일)를 지운다. 다 만든 뒤에만 부르므로 실패하면 옛 파일이 남는다. */
 async function removeUnused(id: string, made: Readonly<Record<string, number>>) {
-  const root = path.join(PUBLIC_DIR, "downloads", id)
+  const root = editionDownloadDir(id)
   const files = await readdir(root, { recursive: true }).catch(() => [])
-  await Promise.all(files.filter((file) => file.endsWith(".pdf") && !(`/downloads/${id}/${file}` in made)).map((file) => rm(path.join(root, file), { force: true })))
+  await Promise.all(files.filter((file) => file.endsWith(".pdf") && !(`${downloadDir(id)}/${file}` in made)).map((file) => rm(path.join(root, file), { force: true })))
 }
 
 /** 쪽 크기·쪽 수를 확인하고 파일 크기를 돌려준다. */
