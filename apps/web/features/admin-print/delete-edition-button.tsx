@@ -1,5 +1,6 @@
 "use client"
 
+import { Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 
@@ -14,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@workspace/ui/components/dialog"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip"
 
 import { routes } from "@/shared/routes"
 
@@ -38,11 +40,34 @@ export function DeleteEditionButton({ id, title, from }: { id: string; title: st
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button type="button" variant="ghost" size="sm" className="text-error">
-          삭제
-        </Button>
-      </DialogTrigger>
+      {from === "list" ? (
+        // 목록 행: 편집하기와 같은 높이의 테두리 아이콘 버튼. 이름은 툴팁과 aria-label로 준다.
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DialogTrigger asChild>
+              <button
+                type="button"
+                aria-label={`“${title}” 삭제`}
+                className="grid size-9 shrink-0 place-items-center rounded-full bg-surface text-error ring-1 ring-silver ring-inset transition-colors hover:bg-error/10 hover:ring-error/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+              >
+                <Trash2 aria-hidden size={16} strokeWidth={1.8} />
+              </button>
+            </DialogTrigger>
+          </TooltipTrigger>
+          <TooltipContent>삭제</TooltipContent>
+        </Tooltip>
+      ) : (
+        // 편집기 머리: 글자만 빨간 링크처럼 보이지 않게, 목록 행과 같은 테두리 버튼으로 둔다.
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-surface px-4 text-sm text-error ring-1 ring-silver ring-inset transition-colors hover:bg-error/10 hover:ring-error/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+          >
+            <Trash2 aria-hidden size={16} strokeWidth={1.8} />
+            삭제
+          </button>
+        </DialogTrigger>
+      )}
       <DialogContent appearance="confirmation" className="bg-canvas">
         <DialogHeader>
           <DialogTitle>“{title}” 에디션을 지울까요?</DialogTitle>
