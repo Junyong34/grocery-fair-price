@@ -152,11 +152,11 @@ import 경로:
 |---|---|
 | `routes.ts` | 앱의 모든 경로 |
 | `providers.tsx` | `TooltipProvider`, `OverlayProvider`(overlay-kit). 마운트 뒤 먹음 기록을 불러온다 |
-| `meta.ts` | `SITE_CONFIG`(사이트 이름 "제철달력"), `siteUrl()`, `createMetadata()`, `ogImagePath()` |
+| `meta.ts` | `SITE_CONFIG`(사이트 이름 "장볼날"), `siteUrl()`, `createMetadata()`, `ogImagePath()` |
 | `today.ts` | `getSeoulToday()`: `server-only`. `connection()` 뒤에 서울 오늘을 계산하고 React `cache`로 요청당 한 번 |
 | `today-context.tsx` | `TodayProvider`, `useToday()`: 서버가 만든 Promise를 클라이언트가 `use()`로 읽는다. `<Suspense>` 안에서만 |
 | `eaten-store.ts` | 먹음 기록: 연도 → 품종 id 목록. localStorage `seasonal:eaten` |
-| `brand-logo.tsx` | 헤더 로고 |
+| `brand-logo.tsx` | 고운돋움 Regular를 패스로 만든 장볼날 가로 로고. 모바일에서 접힌 헤더는 심볼만 보여준다 |
 
 ## 5. 상태와 "오늘"
 
@@ -239,7 +239,7 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 - 일러스트가 없는 품종의 id는 `build-foods.mjs`의 `NEW_IDS`에서 정한다. 그림이 없으면 화면은 이름 카드를 보인다.
 - 그림체는 `watercolor`, 변형은 `color`(모든 화면)와 `motion`(1i 큰 그림, SVG 안 CSS 키프레임), 바닥 그림자는 끈다.
 - 새 일러스트는 프로젝트 스킬 `/seasonal-food-illustrator`로 그린다.
-- 브랜드 파일(`apps/web/public/images/brand/`, `app/favicon.ico`, `app/icon.svg`, `app/apple-icon.png`)은 `prototypes/branding/`에서 손으로 복사한다(`apps/web/docs/brand-assets.md`).
+- 브랜드 파일(`apps/web/public/images/brand/`, `app/favicon.ico`, `app/icon.svg`, `app/apple-icon.png`)은 `prototypes/branding/`에서 손으로 복사한다(`apps/web/docs/brand-assets.md`). `logo-lockup.svg`·`logo-lockup-ivory.svg`는 고운돋움 Regular의 글자 윤곽을 포함한 가로 로고이며, `GowunDodum-OFL.txt`는 서체 라이선스다.
 
 ## 9. 명령어
 

@@ -5,10 +5,10 @@ import type { Season } from "@workspace/seasonal/data/seasons"
 // 사이트 이름·설명. 서버(메타데이터·OG 이미지)와 브라우저(공유 버튼)가 함께 읽는다.
 // 주소는 여기 두지 않는다. 브라우저는 환경 변수를 서버와 똑같이 읽을 수 없어서 siteUrl()(서버)과 location.origin(브라우저)으로 나눈다.
 export const SITE_CONFIG = {
-  name: "제철달력",
-  titleDefault: "제철달력 - 언제 뭐가 맛있을까",
-  titleTemplate: "%s | 제철달력",
-  description: "열두 달과 사계절, 우리 땅에서 가장 맛있는 제철 식재료와 명절 절식을 찾아보세요.",
+  name: "장볼날",
+  titleDefault: "장볼날 - 언제 뭐가 맛있을까",
+  titleTemplate: "%s | 장볼날",
+  description: "장볼날에서 열두 달과 사계절, 우리 땅에서 가장 맛있는 제철 식재료와 명절 절식을 찾아보세요.",
   locale: "ko_KR",
 } as const
 
@@ -33,7 +33,7 @@ export type OgImageText = {
 }
 
 export type CreateMetadataOptions = {
-  /** 페이지 제목. 탭 제목에는 루트 레이아웃이 " | 제철달력"을 붙인다. 없으면 사이트 기본 제목. */
+  /** 페이지 제목. 탭 제목에는 루트 레이아웃이 " | 장볼날"을 붙인다. 없으면 사이트 기본 제목. */
   title?: string
   description?: string
   /** routes로 만든 경로. canonical·og:url이 된다. */
@@ -67,7 +67,7 @@ export function createMetadata(options: CreateMetadataOptions = {}): Metadata {
       : ogImagePath(options.ogImage ?? { title: options.title, subtitle: options.description })
 
   return {
-    // 꼬리(" | 제철달력")는 루트 레이아웃의 title.template이 붙인다. 제목이 없으면 템플릿을 건너뛰는 기본 제목.
+    // 꼬리(" | 장볼날")는 루트 레이아웃의 title.template이 붙인다. 제목이 없으면 템플릿을 건너뛰는 기본 제목.
     title: options.title ?? { absolute: SITE_CONFIG.titleDefault },
     description,
     alternates: options.path ? { canonical: options.path } : undefined,

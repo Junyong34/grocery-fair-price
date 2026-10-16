@@ -8,7 +8,7 @@ import { isSeason, SEASONS, type Season } from "@workspace/seasonal/data/seasons
 import { SITE_CONFIG } from "@/shared/meta"
 
 // 공유 미리보기 이미지(1200×630). 글자는 쿼리로 받는다: title, subtitle, badge, season(spring|summer|autumn|winter).
-// 앱 화면과 같은 모양을 쓴다: canvas 바탕에 계절색 번짐(3a 계절 카드 sunwash), 크림 트레이 배지(2차 탭), 로고 심볼.
+// 앱 화면과 같은 모양을 쓴다: canvas 바탕에 계절색 번짐(3a 계절 카드 sunwash), 크림 트레이 배지(2차 탭), 장볼날 가로 로고.
 
 /**
  * Oura 팔레트(packages/ui/src/styles/globals.css)의 hex 값. 이미지 렌더러는 CSS 변수를 읽지 못해 값을 옮겨 둔다.
@@ -53,7 +53,7 @@ const fonts = [
   },
 ]
 // 로고는 public의 원본 SVG를 그대로 쓴다. 로고를 바꾸면 OG도 따라 바뀐다.
-const LOGO = `data:image/svg+xml;base64,${readFileSync(join(process.cwd(), "public/images/brand/logo-symbol.svg")).toString("base64")}`
+const LOGO = `data:image/svg+xml;base64,${readFileSync(join(process.cwd(), "public/images/brand/logo-lockup.svg")).toString("base64")}`
 
 /** 계절색이 옅게 번지는 바탕(sunwash). 계절이 없으면 네 계절 색을 네 귀퉁이에 둔다. */
 function wash(season: Season | null): string {
@@ -73,7 +73,7 @@ function wash(season: Season | null): string {
 
 export function GET(request: Request) {
   const params = new URL(request.url).searchParams
-  // 사이트 이름은 그리지 않는다(아직 정식 이름이 아니고, 가격 비교 화면도 같은 이미지를 쓸 예정). 제목이 없으면 문구로 채운다.
+  // 장볼날 이름은 상단 가로 로고에 포함한다. 제목이 없으면 제철 영역의 기본 문구로 채운다.
   const pageTitle = clip(params.get("title"), OG_LIMITS.title)
   const title = pageTitle ?? TAGLINE
   const subtitle = clip(params.get("subtitle"), OG_LIMITS.subtitle) ?? SITE_CONFIG.description
@@ -113,7 +113,7 @@ export function GET(request: Request) {
 
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse 안에서는 img만 쓸 수 있다 */}
-          <img src={LOGO} width={64} height={64} alt="" />
+          <img src={LOGO} width={192} height={64} alt={SITE_CONFIG.name} />
           {/* 제목이 문구와 같으면(기본 이미지) 위 오른쪽 문구는 겹쳐서 뺀다. */}
           {pageTitle && <span style={{ marginLeft: "auto", fontSize: 22, color: OG_COLORS.ash }}>{TAGLINE}</span>}
         </div>

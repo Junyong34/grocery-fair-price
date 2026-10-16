@@ -15,9 +15,13 @@
 
 `제철달력`은 전체 브랜드를 대신하는 이름이 아니라 제철 콘텐츠의 이름으로 유지한다. 소개 문구는 제안 단계이며, 영문 이름·약칭은 아직 정하지 않았다.
 
-## 워드마크 서체 검토
+## 워드마크 서체
 
-현재의 두 잎 바구니 심볼 오른쪽에 `장볼날`을 한 줄로 붙이는 가로 조합을 검토한다. 파비콘에는 글자를 넣지 않는다. 브랜드 이름은 확정했으며, 아래 서체와 조합 수치는 비교 시안이다.
+2026-10-16에 **고운돋움 Regular(Gowun Dodum, 400)**를 선택했다. 두 잎 바구니 심볼 오른쪽에 `장볼날`을 한 줄로 붙이는 가로 조합을 사용한다. 파비콘에는 글자를 넣지 않는다.
+
+심볼 40px · 글자 26px · 간격 8px · 자간 -0.03em을 기준으로 SVG를 만들었다. 고운돋움 Regular의 실제 글리프 윤곽을 패스로 변환했으므로 폰트 설치·로딩에 관계없이 같은 모양이다. 로고를 위해 웹폰트나 가짜 Bold를 추가하지 않는다. 본문 Pretendard·제목 고운바탕은 기존대로 유지한다.
+
+다음은 선택 전 비교 기록이다.
 
 | 후보 | 검토 설정 | 어울리는 이유 | 확인할 점 |
 | --- | --- | --- | --- |
@@ -25,13 +29,13 @@
 | Pretendard SemiBold | 600, 자간 -0.035em | 작은 크기에서 또렷하고 가격 정보 화면에도 자연스럽다. 현재 본문 서체를 활용할 수 있다. | 본문·메뉴와 로고의 인상이 충분히 구분되는지 확인한다. |
 | 고운돋움 Regular | 400, 자간 -0.03em | 부드러운 획으로 친근한 장보기 서비스의 인상을 준다. | 두꺼운 바구니 심볼과 비교해 글자가 가볍게 느껴질 수 있다. 400 굵기 그대로 비교하며 가짜 Bold는 쓰지 않는다. |
 
-우선 추천은 **고운바탕 Bold**다. 심볼 40px · 글자 26px · 간격 8px를 시작점으로, 375px 모바일 헤더에서 검색·공유·설정 버튼 및 스크롤 뒤 탭과 함께 확인한 뒤 확정한다. 로고 옆에 작은 설명 문구를 추가하지 않는다.
+최종 선택은 세 번째 후보인 **고운돋움 Regular**다. 로고 옆에 작은 설명 문구를 추가하지 않는다.
 
 실제 폰트로 만든 비교 파일은 `prototypes/branding/seasonal-basket-assets/wordmark-comparison.html`, 검수 이미지는 그 아래 `verification/wordmark-font-comparison.png`다. 세 후보를 같은 심볼·색·크기로 비교하며 실제 26px 헤더 크기와 큰 보기용 크기를 함께 둔다. 외부 네트워크 없이도 비교할 수 있도록 필요한 글자 폰트를 HTML에 포함한다.
 
-서체 원본: [고운바탕](https://github.com/google/fonts/tree/main/ofl/gowunbatang), [Pretendard](https://github.com/orioncactus/pretendard), [고운돋움](https://github.com/google/fonts/tree/main/ofl/gowundodum). 실제 로고를 배포할 때는 확정한 서체의 라이선스와 함께 관리하고, SVG 워드마크는 글자를 패스로 만들어 폰트 로딩과 관계없이 같은 모양으로 제공한다.
+서체 원본: [고운바탕](https://github.com/google/fonts/tree/main/ofl/gowunbatang), [Pretendard](https://github.com/orioncactus/pretendard), [고운돋움](https://github.com/google/fonts/tree/main/ofl/gowundodum). 선택한 고운돋움의 SIL OFL 1.1 안내는 `public/images/brand/GowunDodum-OFL.txt`에 보관한다. 변환에 쓴 글자 서브셋과 라이선스는 브랜드 원본 폴더의 `fonts/`에 있다.
 
-현재 앱 헤더는 아래의 심볼 전용 구현이며, 메타데이터도 `제철달력` 표기를 사용한다. 워드마크 서체를 정한 뒤 헤더·접근성 이름·사이트 메타데이터·공유 이미지의 이름을 함께 갱신한다. 이 문서의 브랜드 이름 결정과 앱의 적용 상태를 구분한다.
+앱 헤더·접근성 이름·사이트 메타데이터·공유 이미지에 `장볼날`을 적용했다. `제철달력`은 콘텐츠 이름으로 유지한다. 공유 버튼도 공통 `SITE_CONFIG`에서 이름·설명을 읽는다.
 
 ## 심볼
 
@@ -41,7 +45,9 @@
 
 ## 화면 로고
 
-모바일·데스크톱 헤더는 `@/shared/brand-logo`의 `BrandLogo`를 사용한다. 심볼 SVG를 정적으로 가져오고 `next/image`에 40×40 크기를 지정한다. SVG는 `unoptimized`로 제공한다. 링크의 목적지는 기존 `routes.seasonal.root`이며 접근성 이름은 `제철달력 홈`이다.
+모바일·데스크톱 헤더는 `@/shared/brand-logo`의 `BrandLogo`를 사용한다. `logo-lockup.svg`를 정적으로 가져오고 `next/image`에 120×40 크기를 지정한다. SVG는 `unoptimized`로 제공한다. 모바일에서 스크롤 후 헤더가 접히면 같은 SVG의 왼쪽 40px 심볼만 보여 2차 탭과 검색·설정 버튼의 공간을 확보한다. 데스크톱에서는 이름을 계속 보여준다. 링크의 목적지는 기존 `routes.seasonal.root`이며 접근성 이름은 `장볼날 홈`이다.
+
+`logo-lockup.svg`의 `viewBox`는 1536×512이며 글자는 모두 패스다. `logo-lockup-ivory.svg`는 어두운 바탕용 단색 버전이다. `/api/og`도 같은 가로 SVG를 192×64로 사용하므로 헤더와 공유 이미지의 로고가 일치한다.
 
 `public/images/brand/`에는 PNG·SVG·무손실 WebP 형식의 로고 심볼과 크림·초록 파비콘이 있다. 로고는 투명 배경이고, `logo-symbol-ivory`는 어두운 배경에서 쓰는 밝은 단색 심볼이다. 파비콘은 16·32·48·64·128·180·192·256·512px 모두 잎 한 장의 같은 축약형이다. `*-compact.svg`는 해당 파비콘 SVG와 같은 내용이며 기존 파일명 호환용으로 유지한다. 기본 `favicon.svg`, `favicon.png`, `favicon.webp`, `favicon.ico`는 초록 버전이다.
 
@@ -65,4 +71,4 @@
 node prototypes/branding/seasonal-basket-assets/build.mjs
 ```
 
-`exports/`의 이미지 파일을 `public/images/brand/`에 복사하고 위 세 메타데이터 파일도 함께 갱신한다. `manifest.json`은 내보내기 목록이므로 앱에 복사하지 않는다. `preview.png`의 실제 16·32px 샘플과 사이트의 40px 헤더 로고를 확인한다. 이전 가로·세로 워드마크는 사용하지 않는다.
+`exports/`의 이미지 파일을 `public/images/brand/`에 복사하고, 서체를 바꾸었다면 `fonts/OFL.txt`도 앱의 서체 라이선스 파일에 복사한다. 파비콘을 변경한 경우에만 위 세 메타데이터 아이콘 파일도 갱신한다. `manifest.json`은 내보내기 목록이므로 앱에 복사하지 않는다. `preview.png`의 실제 16·32px 샘플과 사이트의 가로 로고·모바일에서 접힌 심볼을 확인한다. 과거 시안의 가로·세로 워드마크는 사용하지 않는다.

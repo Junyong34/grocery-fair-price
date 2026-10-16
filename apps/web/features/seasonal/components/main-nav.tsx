@@ -13,6 +13,7 @@ import {
 import { cn } from "@workspace/ui/lib/utils"
 
 import { BrandLogo } from "@/shared/brand-logo"
+import { SITE_CONFIG } from "@/shared/meta"
 import { routes } from "@/shared/routes"
 
 import { matchesPath, NavLink } from "./nav-link"
@@ -148,7 +149,7 @@ export function SeasonalHeader({
         <div className="mx-auto flex h-full max-w-[1080px] items-center gap-2 px-[18px] motion-safe:transition-[padding] motion-safe:duration-500 group-data-stuck/header:px-2.5 lg:gap-8 lg:px-6 lg:group-data-stuck/header:px-4">
           <Link
             href={routes.seasonal.root}
-            aria-label="제철달력 홈"
+            aria-label={`${SITE_CONFIG.name} 홈`}
             className="inline-flex shrink-0 items-center rounded-sm no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
           >
             <span className="inline-flex origin-left motion-safe:transition-transform motion-safe:duration-500 group-data-stuck/header:scale-[.85]">
