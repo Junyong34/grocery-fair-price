@@ -285,7 +285,7 @@ grocery-price/
 | 폴더 | 내용 | 상태 |
 |---|---|---|
 | `seasonal-mvp/` | 제철달력 MVP 화면 13개 티켓 | 01~11 resolved, 12 ready-for-agent(데스크톱·태블릿), 13 needs-info(디자인 다듬기) |
-| `calendar-print/` | 달력 PDF/PNG 다운로드 | MVP 이후, needs-triage |
+| `calendar-print/` | 달력 PDF 어드민(에디션 생성·발행)과 다운로드 | MVP 이후, needs-triage |
 | `seo/` | 검색 색인(SEO) 기반: 레지스트리·sitemap·robots·JSON-LD·색인 스위치 | 01~07 resolved, 08 needs-triage(품종 본문 보강) |
 | `p2-data-source-spec/` | 가격 서비스 P2 데이터 소스 명세 | 진행 중. 01 resolved, 나머지는 ready-for-agent·ready-for-human |
 | `p3-variety-catalog/` | P3 품종 목록 | ready-for-human |
