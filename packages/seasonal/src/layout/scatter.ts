@@ -14,7 +14,7 @@ export type ScatterFrame = {
   width: number
   height: number
   big: boolean
-  /** 오른쪽에 비워 둘 폭(px). 처음 배치(시드)만 이 밖에 놓고, 끌기 범위는 프레임 전체다. 그 자리에 달력이 얹힌다. */
+  /** 오른쪽에 비워 둘 폭(px). 처음 배치(시드)만 이 밖에 놓고, 끌기 범위는 프레임 전체다. 그 자리에 같은 폭의 달력이 얹힌다. */
   reserveRight?: number
   /** 아래에 비워 둘 높이(px). 모바일 달 판은 그 자리에 달력이 고정된다. 시드만 피하고 끌기 범위는 프레임 전체다. */
   reserveBottom?: number
@@ -30,8 +30,8 @@ export const SCATTER_FRAMES = {
   desktop: { width: 440, height: 300, big: true },
   // 맨 위 히어로 판: 본문 폭 전체를 쓴다(달력 없음).
   desktopHero: { width: 752, height: 440, big: true },
-  // 달 섹션 판: 판 전체가 끌기 범위이고, 오른쪽 45%에는 달력이 얹힌다. 처음 배치는 달력 자리를 피한다.
-  desktopMonth: { width: 752, height: 600, big: true, reserveRight: 340 },
+  // 달 섹션 판: 판 전체가 끌기 범위이고, 오른쪽 52%에는 달력이 얹힌다. 처음 배치는 달력 자리를 피한다.
+  desktopMonth: { width: 752, height: 600, big: true, reserveRight: 391 },
 } as const satisfies Record<string, ScatterFrame>
 
 /** 배치된 품종 하나. 좌표와 크기는 프레임 대비 비율이다. */

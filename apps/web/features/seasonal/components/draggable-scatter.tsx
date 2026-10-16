@@ -45,9 +45,8 @@ const GAP = 10
 const LABEL_GAP = 0.06
 /** 그림 아래 끝을 모르는 품종(그림 없음)의 기본값. 이름 카드(원)는 상자를 끝까지 채운다. */
 const DEFAULT_BOTTOM = 1
-/** 판 위 달력의 폭(판 폭 대비)과 처음 자리(왼쪽 위, 판 크기 대비). */
-const CALENDAR_WIDTH = 0.45
-const CALENDAR_HOME: CalendarSpot = { x: 0.53, y: 0.04 }
+/** 판 위 달력의 처음 자리(오른쪽 아래): 오른쪽 끝에서 띄울 폭(판 폭 대비)과 아래 끝에서 띄울 높이(판 높이 대비). */
+const CALENDAR_INSET = { right: 0.02, bottom: 0.03 }
 
 type Spot = { cx: number; cy: number }
 type Gesture = {
@@ -83,7 +82,7 @@ export function DraggableScatter({
 }: {
   month: number
   frame: keyof typeof SCATTER_FRAMES
-  /** 판 위(그림 아래)에 깔 내용. 오른쪽 45%에 놓인다(desktopMonth의 달력). */
+  /** 판 위(그림 아래)에 깔 내용. 오른쪽 reserveRight 자리에 놓인다(desktopMonth의 달력). */
   children?: React.ReactNode
   seed: ScatterLayout
   foods: readonly Food[]
@@ -282,13 +281,19 @@ export function DraggableScatter({
   // 판 위 달력 끌기. 그림과 달리 겹침을 풀지 않고 판 안에만 가둔다. 그림은 항상 달력 위에 놓인다.
   const calendarRef = useRef<HTMLDivElement>(null)
   const [calendarLive, setCalendarLive] = useState<CalendarSpot | null>(null)
-  const calendarSpot = calendarLive ?? savedCalendar ?? CALENDAR_HOME
+  // 달력 폭은 시드가 비워 둔 오른쪽 자리(reserveRight)와 같다.
+  const calendarWidth = (frame.reserveRight ?? 0) / frame.width
+  // 옮긴 적이 없으면 null이고 달력은 판 오른쪽 아래에 붙는다(달마다 주 수가 달라 높이를 미리 모른다).
+  // 달력이 더 좁던 때 저장한 자리는 넓어진 달력이 판 밖으로 나가지 않게 가로로 당긴다.
+  const calendarSpot: CalendarSpot | null =
+    calendarLive ??
+    (savedCalendar ? { ...savedCalendar, x: Math.min(savedCalendar.x, 1 - calendarWidth) } : null)
 
   const clampCalendar = (x: number, y: number): CalendarSpot => {
     const box = field.current!.getBoundingClientRect()
     const height = calendarRef.current!.offsetHeight / box.height
     return {
-      x: Math.min(Math.max(x, 0), 1 - CALENDAR_WIDTH),
+      x: Math.min(Math.max(x, 0), 1 - calendarWidth),
       y: Math.min(Math.max(y, 0), Math.max(0, 1 - height)),
     }
   }
@@ -296,7 +301,12 @@ export function DraggableScatter({
   const onCalendarPointerDown = (event: React.PointerEvent) => {
     if (event.button !== 0 || gesture.current) return
     const box = field.current!.getBoundingClientRect()
-    const from = calendarSpot
+    const rect = calendarRef.current!.getBoundingClientRect()
+    // 처음 자리(오른쪽 아래)에서 끌면 지금 그려진 위치를 왼쪽 위 기준 비율로 바꿔 시작한다.
+    const from = calendarSpot ?? {
+      x: (rect.left - box.left) / box.width,
+      y: (rect.top - box.top) / box.height,
+    }
     const startX = event.clientX
     const startY = event.clientY
     let latest = from
@@ -355,9 +365,10 @@ export function DraggableScatter({
             calendarLive ? "cursor-grabbing" : "cursor-grab"
           )}
           style={{
-            left: `${calendarSpot.x * 100}%`,
-            top: `${calendarSpot.y * 100}%`,
-            width: `${CALENDAR_WIDTH * 100}%`,
+            ...(calendarSpot
+              ? { left: `${calendarSpot.x * 100}%`, top: `${calendarSpot.y * 100}%` }
+              : { right: `${CALENDAR_INSET.right * 100}%`, bottom: `${CALENDAR_INSET.bottom * 100}%` }),
+            width: `${calendarWidth * 100}%`,
           }}
         >
           {children}
