@@ -8,6 +8,8 @@ import { seasonOfMonth } from "@workspace/seasonal/data/seasons"
 import { MonthView } from "@/features/seasonal/month-timeline/month-view"
 import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
+import { breadcrumb, JsonLd } from "@/shared/seo/json-ld"
+import { monthSeo, monthsIndexSeo } from "@/shared/seo/titles"
 
 type Params = PageProps<"/seasonal/months/[month]">["params"]
 
@@ -22,8 +24,7 @@ export async function generateMetadata(
   if (!isMonth(month)) return {}
   const m = Number(month)
   return createMetadata({
-    title: `${m}월의 제철`,
-    description: `${m}월에 가장 맛있고 영양 가득한 우리 땅 제철 식재료를 만나보세요.`,
+    ...monthSeo(m),
     path: routes.seasonal.month(m),
     ogImage: {
       title: `${m}월의 제철`,
@@ -47,5 +48,16 @@ export default function Page(props: PageProps<"/seasonal/months/[month]">) {
 async function Month({ params }: { params: Params }) {
   const { month } = await params
   if (!isMonth(month)) notFound()
-  return <MonthView month={Number(month) as Month} />
+  const m = Number(month) as Month
+  return (
+    <>
+      <JsonLd
+        data={breadcrumb([
+          { name: monthsIndexSeo().title, path: routes.seasonal.months },
+          { name: monthSeo(m).title, path: routes.seasonal.month(m) },
+        ])}
+      />
+      <MonthView month={m} />
+    </>
+  )
 }

@@ -77,6 +77,8 @@ export function MyTableView() {
 
   return (
     <div className="mx-auto max-w-[900px] px-[18px] pt-6 pb-8 lg:grid lg:grid-cols-[300px_1fr] lg:gap-10 lg:px-6 lg:pt-10">
+      {/* 화면에는 요약 카드의 "나의 식탁 · 연도"가 제목 역할을 한다. 문서 제목은 보조기술용으로만 둔다(2b 목록·3a와 같은 방식). sr-only는 absolute라 그리드 칸을 차지하지 않는다. */}
+      <h1 className="sr-only">나의 식탁</h1>
       <ScopeSummary
         ref={summaryRef}
         year={year}

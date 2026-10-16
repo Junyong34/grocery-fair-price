@@ -8,6 +8,8 @@ export const metadata = createMetadata({
   title: "나의 식탁",
   description: "올해 맛본 제철 식재료를 기록하고 풍성한 나만의 제철 식탁을 완성해 보세요.",
   path: routes.seasonal.myTable,
+  // 기기에 저장된 기록으로 채워지는 화면이라 크롤러에게는 빈 상태다. shared/seo/pages.ts NOINDEX_ROUTES와 짝.
+  noIndex: true,
   ogImage: {
     title: "나의 식탁",
     subtitle: "올해 맛본 제철 식재료 기록과 나만의 달력",

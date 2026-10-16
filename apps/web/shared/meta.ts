@@ -2,6 +2,8 @@ import type { Metadata } from "next"
 
 import type { Season } from "@workspace/seasonal/data/seasons"
 
+import { isIndexable } from "./seo/indexing"
+
 // 사이트 이름·설명. 서버(메타데이터·OG 이미지)와 브라우저(공유 버튼)가 함께 읽는다.
 // 주소는 여기 두지 않는다. 브라우저는 환경 변수를 서버와 똑같이 읽을 수 없어서 siteUrl()(서버)과 location.origin(브라우저)으로 나눈다.
 export const SITE_CONFIG = {
@@ -22,6 +24,11 @@ export function siteUrl(): string {
   return `http://localhost:${process.env.PORT ?? 3000}`
 }
 
+/** 상대 경로를 공개 주소 기준 절대 주소로. metadataBase가 닿지 않는 곳(sitemap, robots, JSON-LD)에서 쓴다. 서버 전용. */
+export function absoluteUrl(path: string): string {
+  return new URL(path, siteUrl()).href
+}
+
 /** /api/og가 받는 글자. 길이는 route에서 자른다(OG_LIMITS). */
 export type OgImageText = {
   title?: string
@@ -40,6 +47,7 @@ export type CreateMetadataOptions = {
   path?: string
   /** OG 이미지 글자. 없으면 title·description을 쓴다. 문자열이면 이미지 주소 그대로. */
   ogImage?: OgImageText | string
+  /** 이 페이지를 색인하지 않는다. shared/seo/pages.ts의 NOINDEX_ROUTES에도 등록한다. */
   noIndex?: boolean
 }
 
@@ -55,7 +63,8 @@ export function ogImagePath(text: OgImageText = {}): string {
 }
 
 /**
- * 페이지 메타데이터(제목·설명·canonical·OpenGraph·Twitter 카드). 새 페이지는 이것만 부르면 OG 이미지까지 이어진다.
+ * 페이지 메타데이터(제목·설명·canonical·OpenGraph·Twitter 카드·robots). 새 페이지는 이것만 부르면 OG 이미지까지 이어진다.
+ * 색인 등록(sitemap)은 따로 shared/seo/pages.ts에 한다. 절차: apps/web/docs/seo.md
  * 정적 페이지는 `export const metadata = createMetadata({...})`, 동적 페이지는 generateMetadata에서 돌려준다.
  */
 export function createMetadata(options: CreateMetadataOptions = {}): Metadata {
@@ -86,6 +95,7 @@ export function createMetadata(options: CreateMetadataOptions = {}): Metadata {
       description,
       images: [image],
     },
-    robots: options.noIndex ? { index: false, follow: false } : undefined,
+    // 색인 스위치가 꺼져 있으면(배포 전·프리뷰) 페이지 설정과 상관없이 모두 막는다.
+    robots: options.noIndex || !isIndexable() ? { index: false, follow: false } : undefined,
   }
 }

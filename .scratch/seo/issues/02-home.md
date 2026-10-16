@@ -1,6 +1,6 @@
 # 02. 홈(2a): `WebSite`·`Organization`, 제목
 
-Status: ready-for-agent
+Status: resolved
 Blocked by: 01
 
 ## 목적
@@ -9,11 +9,11 @@ Blocked by: 01
 
 ## 할 일
 
-- [ ] `apps/web/shared/seo/`의 제목 패턴 파일에 홈 제목을 추가한다.
+- [x] `apps/web/shared/seo/`의 제목 패턴 파일에 홈 제목을 추가한다.
   - `<title>` 앞부분: `제철 음식 달력`
   - description은 "이달의 제철 식재료"를 포함해 새로 쓴다.
-- [ ] `app/seasonal/(this-month)/page.tsx`의 `createMetadata()`에 위 값을 넘긴다. OG 이미지 글자는 그대로 둔다.
-- [ ] `<JsonLd data={[website(), organization()]} />`를 넣는다.
+- [x] `app/seasonal/(this-month)/page.tsx`의 `createMetadata()`에 위 값을 넘긴다. OG 이미지 글자는 그대로 둔다.
+- [x] `<JsonLd data={[website(), organization()]} />`를 넣는다.
   - 조건: `routes.home`이 가리키는 페이지에서만 출력한다.
   - 위치: Suspense 밖, 정적 셸 쪽에 둔다. `connection()` 뒤에 그려지지 않게 한다.
   - `website()`의 `url`: `siteUrl()` 루트로 한다. 구글의 사이트 이름은 도메인 루트 기준이다.
@@ -25,3 +25,7 @@ Blocked by: 01
 - Rich Results Test 또는 schema.org validator에 붙여 넣었을 때 오류가 없다. 로컬이라 URL로는 검사할 수 없으니 HTML을 붙여 넣는다.
 - `<title>`이 `제철 음식 달력 | 장볼날`이다.
 - 공통 완료 조건(`AGENTS.md`)을 지킨다.
+
+## Answer
+
+2026-10-16 구현. `<title>`이 `제철 음식 달력 | 장볼날`이다. `WebSite`·`Organization` JSON-LD를 Suspense 밖에 둬서 정적 셸 HTML에 들어간다. 홈이 바뀌면 옮겨야 하는 자리라 `routes.home` 비교 대신 주석과 `seo.md`에 남겼다. 비교식으로 쓰면 홈 값이 바뀌는 순간 TypeScript가 "겹치지 않는 비교" 오류를 낸다. 검사기 붙여 넣기 확인은 하지 않았다. JSON 구조는 `json-ld.test.ts`가 확인한다.

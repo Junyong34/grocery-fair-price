@@ -84,6 +84,8 @@ import 경로:
 | `DESIGN.md` | Oura 디자인 언어 분석(색, 서체, 간격, 컴포넌트) |
 | `docs/nextjs-16-patterns.md` | Next 16 렌더링·캐시 판단 근거(2026-10-14). 화면 개발 전에 쓴 문서라 예시 코드 일부(`lib/` 경로, eaten store 구현)는 실제 코드와 다르다 |
 | `docs/brand-assets.md` | 로고·파비콘 파일과 교체 방법 |
+| `docs/seo.md` | 검색 색인: 새 페이지 연결 체크리스트, 환경 변수, 운영 전환 절차 |
+| `vitest.config.ts` | `shared/` 순수 함수 테스트. tsconfig paths를 따르고 JSX만 여기서 변환한다 |
 
 ### 4.2 라우트
 
@@ -103,7 +105,8 @@ import 경로:
 | `/seasonal/foods/[food]` | 1i 품종 상세 (전체 페이지) | `seasonal/foods/[food]/page.tsx` | `food-detail/food-detail` |
 | (제철 화면 안에서 이동) | 1i 품종 상세 (하단 시트) | `seasonal/@sheet/(.)foods/[food]/page.tsx` | `components/food-sheet` + `food-detail` |
 | `/api/og` | 공유 미리보기 이미지 1200×630 | `app/api/og/route.tsx` | 쿼리 `title`, `subtitle`, `badge`, `season` |
-| `/examples/*` | 디자인 후보 비교 페이지 | `app/examples/<name>/page.tsx` | 아래 표 |
+| `/examples/*` | 디자인 후보 비교 페이지 (noindex, 삭제 예정) | `app/examples/<name>/page.tsx` | 아래 표 |
+| `/sitemap.xml`, `/robots.txt` | 검색 색인 | `app/sitemap.ts`, `app/robots.ts` | `shared/seo/pages.ts` 레지스트리, 색인 스위치 |
 
 표의 화면 컴포넌트 경로는 `apps/web/features/seasonal/` 기준이다. 모든 경로는 `apps/web/shared/routes.ts`의 `routes`로 만든다. 2a의 특정 달은 해시 `routes.seasonal.rootAt(month)`(`/seasonal#month-N`)로 연다.
 
@@ -114,6 +117,7 @@ import 경로:
 - **`@sheet` 병렬 슬롯**: `(.)foods/[food]`가 품종 상세를 가로채 시트로 띄운다. `default.tsx`, `page.tsx`, `[...catchAll]`은 null을 그려 다른 곳으로 이동하면 시트가 닫힌다. 새 제철 라우트를 더해도 `@sheet`는 고칠 것이 없다.
 - **정적 생성**: 동적 라우트는 모두 `generateStaticParams`로 전부 만든다(12달, 4계절, 명절, 품종). Cache Components에서는 `dynamicParams`를 못 쓰므로 목록 밖 값은 `notFound()`로 막고, `params`는 `<Suspense>` 안에서 읽는다.
 - **메타데이터**: 페이지는 `shared/meta.ts`의 `createMetadata()`를 돌려준다. canonical, OpenGraph, Twitter 카드, `/api/og` 이미지가 함께 붙는다. 공개 주소는 `siteUrl()`이 `NEXT_PUBLIC_SITE_URL` → `VERCEL_PROJECT_PRODUCTION_URL` → localhost 순서로 정한다.
+- **검색 색인**: 모든 페이지를 `shared/seo/pages.ts`에 색인·noindex·리디렉션 가운데 하나로 등록한다. 빠뜨리면 가드 테스트가 실패한다. `SITE_INDEXABLE=true`가 아니면 robots가 전체를 막고 모든 페이지가 noindex다. 자세히는 `apps/web/docs/seo.md`.
 
 디자인 비교 페이지(`/examples/*`). 스펙의 결정 기록이 이 페이지를 근거로 인용한다.
 
@@ -152,7 +156,8 @@ import 경로:
 |---|---|
 | `routes.ts` | 앱의 모든 경로 |
 | `providers.tsx` | `TooltipProvider`, `OverlayProvider`(overlay-kit). 마운트 뒤 먹음 기록을 불러온다 |
-| `meta.ts` | `SITE_CONFIG`(사이트 이름 "장볼날"), `siteUrl()`, `createMetadata()`, `ogImagePath()` |
+| `meta.ts` | `SITE_CONFIG`(사이트 이름 "장볼날"), `siteUrl()`, `absoluteUrl()`, `createMetadata()`, `ogImagePath()` |
+| `seo/` | 검색 색인: `pages.ts`(색인 레지스트리)와 가드 테스트, `indexing.ts`(색인 스위치·소유 확인), `json-ld.tsx`(구조화 데이터), `titles.ts`(검색용 제목·설명), `route-pattern.ts` |
 | `today.ts` | `getSeoulToday()`: `server-only`. `connection()` 뒤에 서울 오늘을 계산하고 React `cache`로 요청당 한 번 |
 | `today-context.tsx` | `TodayProvider`, `useToday()`: 서버가 만든 Promise를 클라이언트가 `use()`로 읽는다. `<Suspense>` 안에서만 |
 | `eaten-store.ts` | 먹음 기록: 연도 → 품종 id 목록. localStorage `seasonal:eaten` |
@@ -251,7 +256,7 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `pnpm build` | `next build` |
 | `pnpm typecheck` | 세 패키지 `tsc --noEmit` |
 | `pnpm lint` | ESLint (2026-10-15 기준 0 오류, `packages/ui` 경고 4건) |
-| `pnpm test` | vitest: `packages/seasonal`(36개), `packages/ui`(4개) |
+| `pnpm test` | vitest: `packages/seasonal`, `packages/ui`, `apps/web`(SEO 가드 포함) |
 | `pnpm format` | Prettier |
 | `pnpm ui:add <name-or-url>` | cojeev·shadcn 컴포넌트를 `packages/ui`에 설치 |
 | `pnpm foods:sync` / `pnpm foods:bounds` | 일러스트 동기화 / 그림 아래 끝 재측정 |
@@ -282,7 +287,7 @@ grocery-price/
 |---|---|---|
 | `seasonal-mvp/` | 제철달력 MVP 화면 13개 티켓 | 01~11 resolved, 12 ready-for-agent(데스크톱·태블릿), 13 needs-info(디자인 다듬기) |
 | `calendar-print/` | 달력 PDF/PNG 다운로드 | MVP 이후, needs-triage |
-| `seo/` | 검색 색인(SEO) 기반: 레지스트리·sitemap·robots·JSON-LD·색인 스위치 | 01~07 ready-for-agent, 08 needs-triage(품종 본문 보강) |
+| `seo/` | 검색 색인(SEO) 기반: 레지스트리·sitemap·robots·JSON-LD·색인 스위치 | 01~07 resolved, 08 needs-triage(품종 본문 보강) |
 | `p2-data-source-spec/` | 가격 서비스 P2 데이터 소스 명세 | 진행 중. 01 resolved, 나머지는 ready-for-agent·ready-for-human |
 | `p3-variety-catalog/` | P3 품종 목록 | ready-for-human |
 | `p4-canonical-model/` | P4 통합 데이터 모델 | ready-for-agent·ready-for-human |
@@ -300,6 +305,7 @@ grocery-price/
 | 색·서체 | `apps/web/DESIGN.md`, `packages/ui/src/styles/globals.css` |
 | Next 16 렌더링·캐시 근거 | `apps/web/docs/nextjs-16-patterns.md` |
 | 로고·파비콘 | `apps/web/docs/brand-assets.md` |
+| 새 페이지의 검색 색인 연결 | `apps/web/docs/seo.md` |
 | 도메인 패키지 규칙 | `packages/seasonal/README.md` |
 | 용어 | `grocery-price/GLOSSARY.md` |
 | 가격 서비스 단계 | `grocery-price/docs/00-overview/roadmap.md` |

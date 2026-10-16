@@ -13,13 +13,13 @@
 
 | # | 제목 | 상태 | 선행 |
 |---|---|---|---|
-| 01 | 공통 기반: 레지스트리·sitemap·robots·색인 스위치·소유 확인·가드 테스트 | ready-for-agent | — |
-| 02 | 홈(2a): `WebSite`·`Organization`, 제목 | ready-for-agent | 01 |
-| 03 | 2b 월별: 제목·빵부스러기 | ready-for-agent | 01 |
-| 04 | 3a 계절: 제목·빵부스러기 | ready-for-agent | 01 |
-| 05 | 1g 명절: 제목·빵부스러기 | ready-for-agent | 01 |
-| 06 | 1i 품종: 제목·설명·빵부스러기·sitemap 이미지 | ready-for-agent | 01 |
-| 07 | 1h 나의 식탁: noindex·`h1` | ready-for-agent | 01 |
+| 01 | 공통 기반: 레지스트리·sitemap·robots·색인 스위치·소유 확인·가드 테스트 | resolved | — |
+| 02 | 홈(2a): `WebSite`·`Organization`, 제목 | resolved | 01 |
+| 03 | 2b 월별: 제목·빵부스러기 | resolved | 01 |
+| 04 | 3a 계절: 제목·빵부스러기 | resolved | 01 |
+| 05 | 1g 명절: 제목·빵부스러기 | resolved | 01 |
+| 06 | 1i 품종: 제목·설명·빵부스러기·sitemap 이미지 | resolved | 01 |
+| 07 | 1h 나의 식탁: noindex·`h1` | resolved | 01 |
 | 08 | 품종 페이지 본문 보강 | needs-triage | — |
 
 02~07은 01만 끝나면 순서와 상관없다.

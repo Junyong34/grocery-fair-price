@@ -5,7 +5,8 @@ import { findFood } from "@workspace/seasonal/data/foods"
 import { FoodSheet } from "@/features/seasonal/components/food-sheet"
 import { FoodDetail } from "@/features/seasonal/food-detail/food-detail"
 
-export { generateStaticParams } from "../../../foods/[food]/page"
+// 메타데이터도 전체 페이지와 같다. 없으면 시트를 열었을 때 탭 제목·설명·canonical이 사이트 기본값으로 바뀐다.
+export { generateMetadata, generateStaticParams } from "../../../foods/[food]/page"
 
 type Params = PageProps<"/seasonal/foods/[food]">["params"]
 

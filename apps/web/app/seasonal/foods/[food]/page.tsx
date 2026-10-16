@@ -10,6 +10,8 @@ import { ShareButton } from "@/features/seasonal/components/share-button"
 import { FoodDetail } from "@/features/seasonal/food-detail/food-detail"
 import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
+import { breadcrumb, JsonLd } from "@/shared/seo/json-ld"
+import { foodSeo } from "@/shared/seo/titles"
 
 type Params = PageProps<"/seasonal/foods/[food]">["params"]
 
@@ -26,8 +28,7 @@ export async function generateMetadata(
   // formatSeasonMonths는 "제철 10·11월"처럼 "제철"까지 붙여 준다.
   const seasonText = formatSeasonMonths(food.months)
   return createMetadata({
-    title: food.name,
-    description: `${food.name}, ${seasonText}. 같은 때 제철인 음식과 관련 명절도 함께 봐요.`,
+    ...foodSeo(food),
     path: routes.seasonal.food(food.id),
     ogImage: { title: food.name, subtitle: seasonText, badge: "제철 식재료" },
   })
@@ -47,6 +48,8 @@ async function Food({ params }: { params: Params }) {
   if (!food) notFound()
   return (
     <article className="mx-auto flex max-w-[560px] flex-col gap-4 px-[18px] pt-6 lg:pt-10">
+      {/* 시트(@sheet)에는 넣지 않는다. 크롤러는 주소를 직접 열어 이 전체 페이지를 본다. */}
+      <JsonLd data={breadcrumb([{ name: foodSeo(food).title, path: routes.seasonal.food(food.id) }])} />
       <div className="flex items-center justify-between gap-3">
         <Link href={routes.seasonal.root} className="text-sm text-stone">
           ‹ 이달의 제철

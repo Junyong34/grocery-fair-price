@@ -8,6 +8,8 @@ import { isSeason, SEASONS } from "@workspace/seasonal/data/seasons"
 import { SeasonDetail } from "@/features/seasonal/seasons/season-detail"
 import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
+import { breadcrumb, JsonLd } from "@/shared/seo/json-ld"
+import { seasonSeo, seasonsIndexSeo } from "@/shared/seo/titles"
 
 type Params = PageProps<"/seasonal/seasons/[season]">["params"]
 
@@ -22,8 +24,7 @@ export async function generateMetadata(
   if (!isSeason(season)) return {}
   const info = SEASON_COPY[season]
   return createMetadata({
-    title: `${info.name}의 제철`,
-    description: `${info.name}철 대표 식재료와 음식. ${info.description}`,
+    ...seasonSeo(season),
     path: routes.seasonal.season(season),
     ogImage: {
       title: `${info.name}의 제철`,
@@ -45,5 +46,15 @@ export default function Page(props: PageProps<"/seasonal/seasons/[season]">) {
 async function Season({ params }: { params: Params }) {
   const { season } = await params
   if (!isSeason(season)) notFound()
-  return <SeasonDetail season={season} />
+  return (
+    <>
+      <JsonLd
+        data={breadcrumb([
+          { name: seasonsIndexSeo().title, path: routes.seasonal.seasons },
+          { name: seasonSeo(season).title, path: routes.seasonal.season(season) },
+        ])}
+      />
+      <SeasonDetail season={season} />
+    </>
+  )
 }

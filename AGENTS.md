@@ -92,6 +92,7 @@ Add cojeev or shadcn components from the repo root with `pnpm ui:add <name-or-ur
 - `@sheet/(.)foods/[food]` intercepts `/seasonal/foods/[food]` and shows it as a bottom sheet inside the seasonal area. Loading that URL directly renders the full page. `@sheet/[...catchAll]` and `@sheet/page.tsx` render null so the sheet closes on any other navigation; new `/seasonal` routes need nothing in `@sheet`.
 - Cache Components is on, so `dynamicParams` is a build error. List params with `generateStaticParams` (at least one entry), validate them with `notFound()`, and read `params` inside `<Suspense>`.
 - Page metadata: return `createMetadata({ title, description, path, ogImage })` from `apps/web/shared/meta.ts`. It wires canonical, OpenGraph and the `/api/og` image.
+- Search indexing: register every new page in `apps/web/shared/seo/pages.ts` (indexed, noindex, or redirect); `pnpm test` fails otherwise. Checklist, env vars and go-live steps: `apps/web/docs/seo.md`.
 
 ### Rendering and state
 

@@ -5,6 +5,7 @@ import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css"
 import "./globals.css"
 import { createMetadata, SITE_CONFIG, siteUrl } from "@/shared/meta"
 import { Providers } from "@/shared/providers"
+import { searchVerification } from "@/shared/seo/indexing"
 import { cn } from "@workspace/ui/lib/utils"
 
 // 사이트 기본 메타데이터. 페이지는 createMetadata로 덮어쓰고, 탭 제목 꼬리는 여기 template이 붙인다.
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: { default: SITE_CONFIG.titleDefault, template: SITE_CONFIG.titleTemplate },
   applicationName: SITE_CONFIG.name,
+  verification: searchVerification(),
 }
 
 // 제목(계절명, 달별 문구)용 명조. 한글 글리프가 많아 미리 불러오지 않고 unicode-range로 필요한 조각만 받는다.

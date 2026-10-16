@@ -1,6 +1,6 @@
 # 07. 1h 나의 식탁: noindex·`h1`
 
-Status: ready-for-agent
+Status: resolved
 Blocked by: 01
 
 ## 목적
@@ -9,8 +9,8 @@ Blocked by: 01
 
 ## 할 일
 
-- [ ] `app/seasonal/my-table/page.tsx`의 `createMetadata()`에 `noIndex: true`를 넣는다. 01에서 `NOINDEX_ROUTES`에는 이미 들어 있다.
-- [ ] `apps/web/features/seasonal/my-table/`에 `h1`(나의 식탁)을 하나 넣는다.
+- [x] `app/seasonal/my-table/page.tsx`의 `createMetadata()`에 `noIndex: true`를 넣는다. 01에서 `NOINDEX_ROUTES`에는 이미 들어 있다.
+- [x] `apps/web/features/seasonal/my-table/`에 `h1`(나의 식탁)을 하나 넣는다.
   - 화면에 이미 제목 역할을 하는 글자가 있으면 그 요소를 `h1`로 바꾼다.
   - 그런 글자가 없으면 `sr-only`로 넣는다.
   - 다른 화면(2b 목록, 3a 목록)과 같은 방식으로 맞춘다.
@@ -21,3 +21,7 @@ Blocked by: 01
 - `h1`이 정확히 하나다.
 - `next-dev-loop`으로 폭 375와 1280에서 화면을 확인했을 때 겉모습이 바뀌지 않는다.
 - 공통 완료 조건을 지킨다.
+
+## Answer
+
+2026-10-16 구현. 화면의 "나의 식탁 · 연도"는 요약 카드(`aside`) 안의 작은 글자라 그대로 두고, `sr-only` `h1`을 뷰 맨 위에 넣었다(2b 목록·3a와 같은 방식). 375·1280 스크린샷에서 겉모습이 바뀌지 않음을 확인했다.
