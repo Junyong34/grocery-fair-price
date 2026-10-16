@@ -43,7 +43,7 @@ async function Board() {
     }
   })
   return (
-    <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
+    <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_380px]">
       <section aria-label="에디션 목록" className="min-w-0">
         <EditionBoard editions={summaries} />
       </section>
@@ -56,7 +56,7 @@ async function Board() {
 
 function BoardSkeleton() {
   return (
-    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
+    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_380px]">
       <SkeletonGroup aria-label="에디션 불러오는 중">
         <Skeleton className="h-8 w-80" />
         <Skeleton className="h-20" />
