@@ -4,14 +4,10 @@ import { useState } from "react"
 
 import { holidaysInMonth } from "@workspace/seasonal/calendar/holidays"
 import { seoulToday } from "@workspace/seasonal/calendar/today"
+import { CALENDAR_VARIANT_LABELS, CALENDAR_VARIANTS, type CalendarVariant } from "@workspace/seasonal/calendar/variants"
 import { cn } from "@workspace/ui/lib/utils"
 
-import {
-  CALENDAR_VARIANT_LABELS,
-  CALENDAR_VARIANTS,
-  MonthCalendar,
-  type CalendarVariant,
-} from "../components/month-calendar"
+import { MonthCalendar } from "../components/month-calendar"
 
 /** 미리보기 달력을 그리는 폭(px). zoom으로 칸 폭에 맞게 줄인다. */
 const PREVIEW_WIDTH = 336

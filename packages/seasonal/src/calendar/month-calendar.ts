@@ -19,22 +19,26 @@ export type CalendarDate = { year: number; month: number; day: number }
  * 한 달을 일~토 7칸짜리 주로 나눈다. 첫 주 앞과 마지막 주 뒤는 빈칸으로 채운다.
  * today는 서울 기준 오늘이다(calendar/today). 순수 함수로 두려고 밖에서 받는다.
  * holidays는 그 달 공휴일(calendar/holidays)이다. 공휴일 데이터가 클라이언트 번들에 들지 않도록 밖에서 받는다.
+ * weekStart는 주의 첫 요일이다(0 일요일, 1 월요일). 칸의 weekday는 시작 요일과 상관없이 일요일이 0이다.
  */
 export function monthCalendar({
   year,
   month,
   today,
   holidays,
+  weekStart = 0,
 }: {
   year: number
   month: number
   today: CalendarDate
   holidays: MonthHolidays
+  weekStart?: 0 | 1
 }): CalendarCell[][] {
   const firstWeekday = weekdayOf({ year, month, day: 1 })
+  const leading = (firstWeekday - weekStart + 7) % 7
   const daysInMonth = daysIn(year, month)
 
-  const cells: CalendarCell[] = Array.from({ length: firstWeekday }, () => null)
+  const cells: CalendarCell[] = Array.from({ length: leading }, () => null)
   for (let day = 1; day <= daysInMonth; day++) {
     cells.push({
       day,

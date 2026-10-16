@@ -35,4 +35,19 @@ describe("monthCalendar", () => {
     const lastOctober = monthCalendar({ year: 2025, month: 10, today, holidays: holidaysInMonth(2025, 10) }).flat()
     expect(lastOctober.some((cell) => cell?.isToday)).toBe(false)
   })
+
+  it("월요일 시작이면 앞 빈칸이 하루 줄고 일요일이 주의 끝으로 간다", () => {
+    const weeks = monthCalendar({ year: 2026, month: 10, today, holidays: {}, weekStart: 1 })
+
+    expect(weeks[0]!.slice(0, 3)).toEqual([null, null, null])
+    expect(weeks[0]![3]).toMatchObject({ day: 1, weekday: 4 })
+    expect(weeks[0]![6]).toMatchObject({ day: 4, weekday: 0 })
+    expect(weeks.every((week) => week.length === 7)).toBe(true)
+  })
+
+  it("2026년 2월은 일요일에 시작하므로 월요일 시작이면 앞 빈칸이 6개다", () => {
+    const weeks = monthCalendar({ year: 2026, month: 2, today, holidays: {}, weekStart: 1 })
+    expect(weeks[0]!.slice(0, 6)).toEqual([null, null, null, null, null, null])
+    expect(weeks[0]![6]).toMatchObject({ day: 1, weekday: 0 })
+  })
 })

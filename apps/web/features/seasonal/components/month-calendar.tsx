@@ -1,30 +1,13 @@
 import { WEEKDAY_NAMES } from "@workspace/seasonal/calendar/date-utils"
 import type { MonthHolidays } from "@workspace/seasonal/calendar/holidays"
 import { monthCalendar, type CalendarDate, type CalendarDay } from "@workspace/seasonal/calendar/month-calendar"
+import type { CalendarVariant } from "@workspace/seasonal/calendar/variants"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { HolidayName } from "./holiday-name"
 
 /** 토요일(6)·일요일(0) */
 const isWeekend = (weekday: number) => weekday === 0 || weekday === 6
-
-/**
- * 달력 모양. 비교 페이지 calendar-styles는 2026-10-16에 지웠다(`git show 22520eb:apps/web/app/examples/calendar-styles/page.tsx`). 화면(2a)은 plain을 쓰고, 나머지는 MVP 이후 PDF 달력의 모양 선택지로 둔다.
- * - plain: 선 없이 숫자만, 공휴일 이름을 숫자 아래에
- * - grid: 칸마다 가는 선, 숫자는 칸 왼쪽 위, 공휴일 이름을 칸 안에
- * - editorial: 큰 가는 숫자, 주 사이 가로줄만, 오늘은 먹색 원
- * - tiles: 날마다 둥근 타일, 빨간 날은 옅은 빨강 타일
- */
-export const CALENDAR_VARIANTS = ["plain", "grid", "editorial", "tiles"] as const
-export type CalendarVariant = (typeof CALENDAR_VARIANTS)[number]
-
-/** ⚙ 설정에 보이는 달력 모양 이름 */
-export const CALENDAR_VARIANT_LABELS: Record<CalendarVariant, string> = {
-  plain: "기본",
-  grid: "격자",
-  editorial: "큰 숫자",
-  tiles: "타일",
-}
 
 /**
  * 한 달 달력(명세 5절, 절기 제외). 토·일·공휴일은 빨간 숫자다.
