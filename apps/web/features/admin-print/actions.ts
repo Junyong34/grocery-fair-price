@@ -1,6 +1,7 @@
 "use server"
 
 import { headers } from "next/headers"
+import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
 import { nextEditionId, parseEdition, type BuildRecord, type Edition } from "@workspace/seasonal/print/edition"
@@ -8,7 +9,7 @@ import { DEFAULT_SPECS, PRINT_KINDS, type PrintKind } from "@workspace/seasonal/
 
 import { routes } from "@/shared/routes"
 
-import { listEditions, readEdition, writeBuild, writeEdition, writeManifest } from "./files"
+import { listEditions, readEdition, removeEdition, writeBuild, writeEdition, writeManifest } from "./files"
 import { generatePdfs } from "./generate"
 
 // 어드민 Server Action. 파일을 쓰므로 운영에서는 거절한다.
@@ -56,4 +57,14 @@ export async function generateEdition(id: string): Promise<{ error?: string; bui
   } catch (error) {
     return { error: error instanceof Error ? error.message : String(error) }
   }
+}
+
+/** 에디션과 그 PDF를 지우고 매니페스트를 다시 쓴다. */
+export async function deleteEdition(id: string): Promise<{ error?: string }> {
+  assertDev()
+  if (!(await readEdition(id))) return { error: `없는 에디션: ${id}` }
+  await removeEdition(id)
+  await writeManifest()
+  revalidatePath(routes.admin.root)
+  return {}
 }

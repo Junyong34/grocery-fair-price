@@ -31,6 +31,7 @@ import {
 } from "@workspace/seasonal/print/spec"
 
 import { generateEdition, saveEdition } from "./actions"
+import { DeleteEditionButton } from "./delete-edition-button"
 import { getAt, KIND_SECTIONS, setAt, type Field as FieldSpec } from "./fields"
 
 const CATEGORIES = [...new Set(FOODS.map((food) => food.category))]
@@ -80,11 +81,14 @@ export function EditionEditor({ saved, build: savedBuild }: { saved: Edition; bu
 
   return (
     <div className="flex flex-col gap-8">
-      <header className="flex flex-col gap-3">
+      <header className="flex flex-col gap-3 border-b border-hairline pb-6">
         <div className="flex flex-wrap items-center gap-2">
           <Badge>{PRINT_KIND_LABELS[draft.spec.kind]}</Badge>
           <Badge variant={draft.status === "published" ? "olive" : "default"}>{draft.status === "published" ? "공개" : "초안"}</Badge>
           <Kbd>{draft.id}</Kbd>
+          <span className="ml-auto">
+            <DeleteEditionButton id={base.id} title={base.title} from="editor" />
+          </span>
         </div>
         <Input
           aria-label="에디션 이름"
@@ -98,6 +102,7 @@ export function EditionEditor({ saved, build: savedBuild }: { saved: Edition; bu
       <div className="grid items-start gap-8 lg:grid-cols-[400px_minmax(0,1fr)]">
         <Card className="lg:sticky lg:top-6">
           <CardContent className="flex flex-col gap-5">
+            <h2 className="text-xs font-semibold tracking-wider text-caption">옵션</h2>
             <Tabs defaultValue={sections[0]!.title} variant="underline">
               <TabsList aria-label="옵션 묶음">
                 {sections.map((section) => (
@@ -156,8 +161,11 @@ export function EditionEditor({ saved, build: savedBuild }: { saved: Edition; bu
           </CardContent>
         </Card>
 
-        <section className="flex min-w-0 flex-col gap-4" aria-label="미리보기">
+        <section className="flex min-w-0 flex-col gap-4 rounded-3xl bg-surface-grey/50 p-5" aria-labelledby="preview-title">
           <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 id="preview-title" className="text-xs font-semibold tracking-wider text-caption">
+              미리보기
+            </h2>
             <Segmented aria-label="용지" options={PAPER_SIZES.map((size) => ({ value: size, label: size }))} value={paper} onValueChange={setPaper} />
             {KIND_PAGES[spec.kind].length > 1 && (
               <ToggleGroup type="single" aria-label="쪽" value={String(page)} onValueChange={(value) => value && setPage(value === "all" ? "all" : (Number(value) as PageKey))} className="gap-1">
@@ -186,7 +194,7 @@ function Preview({ src, paper, landscape }: { src: string; paper: Paper; landsca
   const frame = { width: sheet.width * MM_TO_PX + 48, height: sheet.height * MM_TO_PX + 48 }
   const zoom = PREVIEW_WIDTH / frame.width
   return (
-    <div className="relative max-w-full overflow-hidden rounded-2xl bg-surface-grey" style={{ width: PREVIEW_WIDTH, aspectRatio: `${frame.width} / ${frame.height}` }}>
+    <div className="relative max-w-full overflow-hidden rounded-2xl bg-surface-grey shadow-sm" style={{ width: PREVIEW_WIDTH, aspectRatio: `${frame.width} / ${frame.height}` }}>
       {loaded !== src && <Skeleton className="absolute inset-6 rounded-none" />}
       <iframe
         title="인쇄 미리보기"

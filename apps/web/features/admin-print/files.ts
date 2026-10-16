@@ -1,4 +1,4 @@
-import { mkdir, readdir, readFile, writeFile } from "node:fs/promises"
+import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises"
 import path from "node:path"
 
 import { buildManifest, parseEdition, type BuildRecord, type Edition } from "@workspace/seasonal/print/edition"
@@ -42,6 +42,15 @@ export async function writeEdition(edition: Edition) {
 
 export async function writeBuild(id: string, build: BuildRecord) {
   await writeFile(buildFile(id), json(build))
+}
+
+/** 에디션 원본·생성 기록·만든 PDF를 모두 지운다. 없는 파일은 넘어간다. */
+export async function removeEdition(id: string) {
+  await Promise.all([
+    rm(editionFile(id), { force: true }),
+    rm(buildFile(id), { force: true }),
+    rm(path.join(PUBLIC_DIR, "downloads", id), { recursive: true, force: true }),
+  ])
 }
 
 /** 공개된 에디션으로 매니페스트를 다시 쓴다. 저장·생성 뒤마다 부른다. */
