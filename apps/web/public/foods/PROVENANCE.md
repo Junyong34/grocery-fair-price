@@ -10,7 +10,7 @@
 | kit sha | `6806db565e0538c4` |
 | 변형 | `color`, `motion` |
 | 바닥 그림자 | 끔 |
-| 품종 수 | 41 |
+| 품종 수 | 45 |
 
 | id | 이름 | food.mjs sha |
 |---|---|---|
@@ -21,14 +21,17 @@
 | `asparagus` | 아스파라거스 | `78907c2804ebdc18` |
 | `aster-scaber` | 취나물(참취) | `b3a88d4def7e729f` |
 | `black-raspberry` | 복분자 | `847a02d5ea6a2a63` |
+| `blue-crab` | 꽃게 | `f33581691daf827d` |
 | `blueberry` | 블루베리 | `146ba612ed8a1d94` |
 | `bomdong` | 봄동 | `1b57b34e08501771` |
 | `burdock` | 우엉 | `cfedeeb0a68dbe54` |
+| `cockle` | 꼬막 | `7d46a2b15651594e` |
 | `deodeok` | 더덕 | `d70ec8080bdc66f6` |
 | `eggplant` | 가지 | `a4de725450f76709` |
 | `fig` | 무화과 | `783c52b4e0a75e6e` |
 | `garlic-chive` | 부추 | `52d0f4e6061a0cf3` |
 | `green-plum` | 매실 | `5831124939add733` |
+| `gwamegi` | 과메기 | `85b9fb467b0b4cda` |
 | `korean-rockfish` | 우럭(조피볼락) | `78314edd3c2bc2cf` |
 | `korean-zucchini` | 애호박 | `601d149ba21867fa` |
 | `mackerel` | 고등어 | `923d2b276f46c17d` |
@@ -36,6 +39,7 @@
 | `mugwort` | 쑥 | `21b9dad35ff9a09d` |
 | `napa-cabbage` | 배추 | `fcb457d96917dc48` |
 | `olive-flounder` | 광어(넙치) | `698faf02f4207fad` |
+| `oyster` | 굴 | `1dec93cdedca748a` |
 | `peach` | 복숭아 | `d7ba3c77537d863d` |
 | `pear` | 배 | `14bf36bc3a8c478a` |
 | `persimmon` | 감 | `be664e364f9cb373` |
