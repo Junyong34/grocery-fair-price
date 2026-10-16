@@ -17,7 +17,6 @@ import { KindPicker } from "./kind-picker"
 
 const INITIAL_STATE: FormState = {}
 
-/** 새 에디션 만들기. 종류 → 이름 → 확인 순서로 고르고, id는 종류별 번호로 붙는다. */
 export function NewEditionForm({ nextIds }: { nextIds: Record<PrintKind, string> }) {
   const [kind, setKind] = useState<PrintKind>("monthly")
   const [title, setTitle] = useState("")

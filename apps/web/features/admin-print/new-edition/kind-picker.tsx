@@ -7,7 +7,6 @@ import { PRINT_KIND_LABELS, PRINT_KINDS, type PrintKind } from "@workspace/seaso
 import { KindMark } from "../components/kind-mark"
 import { KIND_DESCRIPTIONS, KIND_LOOKS } from "../constants"
 
-/** 종류 고르기: 종류마다 다른 모양의 선택 표시와 큰 모양을 단 카드 네 장 */
 export function KindPicker({ value, onChange, labelledBy }: { value: PrintKind; onChange: (kind: PrintKind) => void; labelledBy: string }) {
   return (
     <RadioGroup aria-labelledby={labelledBy} appearance="card" size="sm" value={value} onValueChange={(next) => onChange(next as PrintKind)} className="gap-2">

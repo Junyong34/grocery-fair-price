@@ -6,7 +6,6 @@ import { PRINT_KIND_LABELS, PRINT_KINDS, type PrintKind } from "@workspace/seaso
 import type { EditionSummary } from "../types"
 import { KindGroup } from "./kind-group"
 
-/** 에디션 목록. 종류 탭으로 거르고, "전체"에서는 에디션이 있는 종류만 묶어 보여 준다. */
 export function EditionBoard({ editions }: { editions: readonly EditionSummary[] }) {
   const byKind = Object.fromEntries(PRINT_KINDS.map((kind) => [kind, editions.filter((edition) => edition.kind === kind)])) as Record<PrintKind, EditionSummary[]>
   return (

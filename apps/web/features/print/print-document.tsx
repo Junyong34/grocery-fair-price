@@ -1,5 +1,7 @@
 import type { PageKey, Paper, PrintKind, PrintSpec } from "@workspace/seasonal/print/spec"
 
+import { PRINT_SCREEN_GUTTER } from "@/shared/print-screen"
+
 import { MonthPoster } from "./month-poster"
 import { MonthlySheets } from "./monthly"
 import { SeasonPoster } from "./season-poster"
@@ -20,7 +22,7 @@ const KIND_COMPONENTS: { [K in PrintKind]: (props: KindProps<K>) => React.ReactN
 export function PrintDocument({ spec, paper, page }: { spec: PrintSpec; paper: Paper; page: PageKey }) {
   const Component = KIND_COMPONENTS[spec.kind] as (props: KindProps<PrintKind>) => React.ReactNode
   return (
-    <main className="print-root" data-print-ready>
+    <main className="print-root" data-print-ready style={{ "--print-gutter": `${PRINT_SCREEN_GUTTER}px` } as React.CSSProperties}>
       <Component spec={spec} paper={paper} page={page} />
     </main>
   )

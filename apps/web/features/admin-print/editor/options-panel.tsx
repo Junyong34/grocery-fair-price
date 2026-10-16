@@ -10,7 +10,6 @@ import { KIND_SECTIONS } from "./option-fields"
 
 type Props = { spec: PrintSpec; error: string | undefined; onChange: (path: readonly string[], value: unknown) => void }
 
-/** 종류별 옵션 묶음을 탭으로 */
 export function OptionsPanel({ spec, error, onChange }: Props) {
   const sections = KIND_SECTIONS[spec.kind]
   return (

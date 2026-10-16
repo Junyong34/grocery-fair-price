@@ -6,7 +6,6 @@ import { EditionBoard } from "./edition-board"
 
 const LAYOUT = "grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_380px]"
 
-/** 목록 화면 본문: 왼쪽 에디션 목록, 오른쪽 새 에디션 폼(넓은 화면에서 따라 내려온다). */
 export function AdminBoard({ editions, nextIds }: EditionBoardData) {
   return (
     <div className={LAYOUT}>

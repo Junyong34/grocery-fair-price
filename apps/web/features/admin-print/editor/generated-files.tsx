@@ -10,7 +10,6 @@ import { useCopy } from "../hooks/use-copy"
 import { downloadPattern, pageLabel, pdfPaths } from "../lib/downloads"
 import { formatBuildTime } from "../lib/format"
 
-/** 만든 PDF의 주소. 주소는 에디션 id·용지·쪽으로 정해져서 다시 만들어도 같다. 관리자는 이 주소로 링크를 건다. */
 export function GeneratedFiles({ edition, build, stale }: { edition: Edition; build: BuildRecord; stale: boolean }) {
   const { copied, copy } = useCopy<Paper>()
   return (

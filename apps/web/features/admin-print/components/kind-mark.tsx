@@ -5,8 +5,7 @@ import type { PrintKind } from "@workspace/seasonal/print/spec"
 
 import { KIND_LOOKS } from "../constants"
 
-/** 종류 표지: 종류별 모양을 그 종류 색으로 칠한다. 이름 옆에 붙는 장식이라 읽지 않는다.
- * ShapeMorph는 부모 크기를 꽉 채우므로(.v-shape-morph 100%) 크기는 감싸는 span에 준다. */
+/** ShapeMorph는 부모 크기를 꽉 채우므로(.v-shape-morph 100%) 크기는 감싸는 span에 준다. */
 export function KindMark({ kind, className }: { kind: PrintKind; className?: string }) {
   const look = KIND_LOOKS[kind]
   return (

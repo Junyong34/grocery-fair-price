@@ -13,7 +13,6 @@ import { OptionsPanel } from "./options-panel"
 import { PreviewPanel } from "./preview-panel"
 import { useEditionEditor } from "./use-edition-editor"
 
-/** 에디션 편집기: 위에 작업 순서(저장 → PDF 만들기), 왼쪽 옵션, 오른쪽 /print 미리보기. 저장해야 생성할 수 있다. */
 export function EditionEditor({ saved, build }: { saved: Edition; build: BuildRecord | undefined }) {
   const editor = useEditionEditor(saved, build)
   return (
@@ -24,14 +23,14 @@ export function EditionEditor({ saved, build }: { saved: Edition; build: BuildRe
           flow={editor.flow}
           pending={editor.pending}
           running={editor.running}
-          generatedAt={editor.build && !editor.stale ? formatBuildTime(editor.build.generatedAt) : undefined}
+          generatedLabel={editor.build && editor.buildState === "current" ? formatBuildTime(editor.build.generatedAt) : undefined}
           onSave={editor.save}
           onGenerate={editor.generate}
         />
         <p role="alert" className="text-sm text-error empty:hidden">
           {editor.error}
         </p>
-        {editor.build && <GeneratedFiles edition={editor.saved} build={editor.build} stale={editor.stale} />}
+        {editor.build && <GeneratedFiles edition={editor.saved} build={editor.build} stale={editor.buildState === "stale"} />}
       </header>
 
       <div className="grid items-start gap-8 lg:grid-cols-[400px_minmax(0,1fr)]">

@@ -8,7 +8,6 @@ import { EditionEditor } from "@/features/admin-print/editor/edition-editor"
 import { getEditionEditor } from "@/features/admin-print/server/queries"
 import { routes } from "@/shared/routes"
 
-// 에디션 편집기. ?id=<에디션 id>
 export default function Page(props: PageProps<"/admin/edit">) {
   return (
     <main className="flex flex-col gap-6">
@@ -28,6 +27,5 @@ async function Editor({ searchParams }: { searchParams: PageProps<"/admin/edit">
   const { id } = await searchParams
   const data = typeof id === "string" ? await getEditionEditor(id) : undefined
   if (!data) notFound()
-  // 다른 에디션으로 옮기면 편집 상태를 새로 시작한다.
   return <EditionEditor key={data.edition.id} saved={data.edition} build={data.build} />
 }

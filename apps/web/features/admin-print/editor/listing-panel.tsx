@@ -13,7 +13,6 @@ type Props = {
   onStatusChange: (status: EditionStatus) => void
 }
 
-/** 사용자 내려받기 화면에 보일 것: 한 줄 설명과 공개 여부 */
 export function ListingPanel({ description, status, onDescriptionChange, onStatusChange }: Props) {
   return (
     <section aria-labelledby="listing-title" className="flex flex-col gap-4">

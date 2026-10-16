@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import { editionFlow } from "./flow"
 
-const base = { dirty: false, invalid: false, hasBuild: true, stale: false }
+const base = { dirty: false, invalid: false, build: "current" } as const
 
 describe("editionFlow", () => {
   it("저장하지 않은 변경이 있으면 저장이 지금 할 일이고 PDF는 잠긴다", () => {
@@ -18,14 +18,14 @@ describe("editionFlow", () => {
   })
 
   it("저장했고 PDF가 없으면 PDF 만들기가 지금 할 일이다", () => {
-    const flow = editionFlow({ ...base, hasBuild: false, stale: true })
+    const flow = editionFlow({ ...base, build: "none" })
     expect(flow.phase).toBe("no-pdf")
     expect(flow.save.state).toBe("done")
     expect(flow.pdf).toEqual({ state: "current", action: "generate" })
   })
 
   it("저장한 옵션이 만든 PDF와 다르면 다시 만들기가 지금 할 일이다", () => {
-    const flow = editionFlow({ ...base, stale: true })
+    const flow = editionFlow({ ...base, build: "stale" })
     expect(flow.phase).toBe("outdated")
     expect(flow.pdf).toEqual({ state: "current", action: "regenerate" })
   })
@@ -38,7 +38,7 @@ describe("editionFlow", () => {
   })
 
   it("이전 PDF가 있어도 저장 전에는 옵션을 바꾸는 중이라고 안내한다", () => {
-    const flow = editionFlow({ ...base, dirty: true, stale: true })
+    const flow = editionFlow({ ...base, dirty: true, build: "stale" })
     expect(flow.phase).toBe("unsaved")
     expect(flow.hint).toContain("저장")
   })

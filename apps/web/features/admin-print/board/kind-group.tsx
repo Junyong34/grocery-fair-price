@@ -6,7 +6,6 @@ import type { EditionSummary } from "../types"
 import { BOARD_COLUMNS } from "./columns"
 import { EditionRow } from "./edition-row"
 
-/** 종류 하나의 묶음: 머리(모양·이름·설명)와 그 종류의 에디션 표 */
 export function KindGroup({ kind, editions }: { kind: PrintKind; editions: readonly EditionSummary[] }) {
   const headingId = `kind-${kind}`
   return (

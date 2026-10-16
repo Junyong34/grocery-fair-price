@@ -17,7 +17,6 @@
   box-shadow: inset 0 0 0 2px var(--color-gold);
   outline: none;
 }
-/* 편집기 맨 위 이름 칸은 제목처럼 보이게 둔다. */
 .admin-ui .v-input.admin-title,
 .admin-ui .v-input.admin-title:hover {
   background-color: transparent;
@@ -26,7 +25,6 @@
 .admin-ui .v-input.admin-title:focus-within {
   box-shadow: inset 0 -2px 0 var(--color-gold);
 }
-/* 고르지 않은 토글(종류 카드, 카테고리)도 같은 흰 바탕으로. 고른 것은 cojeev 기본(먹색)을 둔다. */
 /* cojeev 토글은 box-shadow를 자기 효과에 써서 테두리는 outline으로 그린다. */
 .admin-ui .v-toggle:not([data-state="on"]) {
   background-color: var(--color-surface);

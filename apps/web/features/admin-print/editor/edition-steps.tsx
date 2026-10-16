@@ -10,26 +10,20 @@ import type { EditorAction } from "../types"
 
 type Props = {
   flow: EditionFlow
-  /** 저장 또는 PDF 생성이 진행 중이다. */
   pending: boolean
   running: EditorAction | undefined
-  /** 최신 PDF를 만든 시각("2026-10-16 21:55"). 없으면 undefined */
-  generatedAt: string | undefined
+  generatedLabel: string | undefined
   onSave: () => void
   onGenerate: () => void
 }
 
-/**
- * 편집기 맨 위의 작업 순서: ① 옵션 저장 → ② PDF 만들기.
- * 지금 할 일 하나에만 버튼을 두고, 못 누르는 단계에는 이유를 적는다. 아래 한 줄은 지금 상태를 풀어 쓴다.
- */
-export function EditionSteps({ flow, pending, running, generatedAt, onSave, onGenerate }: Props) {
+export function EditionSteps({ flow, pending, running, generatedLabel, onSave, onGenerate }: Props) {
   const saveNote = flow.save.state === "done" ? "저장됨" : flow.save.state === "current" ? "저장 안 됨" : flow.save.reason
   const pdfNote =
     running === "generate"
       ? "만드는 중이에요. 끝날 때까지 이 창을 두세요"
       : flow.pdf.state === "done"
-      ? `${generatedAt ?? ""} 생성`.trim()
+      ? `${generatedLabel ?? ""} 생성`.trim()
       : flow.pdf.state === "locked"
         ? flow.pdf.reason
         : flow.pdf.action === "regenerate"
@@ -72,7 +66,7 @@ export function EditionSteps({ flow, pending, running, generatedAt, onSave, onGe
           }
         />
       </ol>
-      {/* 끝난 뒤에는 아래 "만든 PDF" 카드가 말해 주므로 안내를 비운다. live 영역은 늘 둔다. */}
+      {/* live 영역은 비어 있어도 늘 둔다. */}
       <p aria-live="polite" className="text-sm text-stone empty:hidden">
         {flow.phase === "done" ? "" : flow.hint}
       </p>

@@ -1,10 +1,14 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+
 import { Badge } from "@workspace/ui/components/badge"
 import { Input } from "@workspace/ui/components/input"
 
 import { EDITION_LIMITS, type Edition } from "@workspace/seasonal/print/edition"
 import { PRINT_KIND_LABELS } from "@workspace/seasonal/print/spec"
+
+import { routes } from "@/shared/routes"
 
 import { DeleteEditionButton } from "../components/delete-edition-button"
 import { EditionId } from "../components/edition-id"
@@ -13,13 +17,12 @@ import { EDITION_STATUS_LABELS } from "../constants"
 
 type Props = {
   draft: Edition
-  /** 삭제 확인 창에는 저장된 이름을 쓴다. */
   savedTitle: string
   onTitleChange: (title: string) => void
 }
 
-/** 편집기 머리: 종류·공개 상태·id, 제목처럼 보이는 이름 칸, 삭제 */
 export function EditorHeader({ draft, savedTitle, onTitleChange }: Props) {
+  const router = useRouter()
   return (
     <>
       <dl className="flex flex-wrap gap-x-8 gap-y-3 self-start rounded-2xl bg-surface px-5 py-3">
@@ -41,13 +44,12 @@ export function EditorHeader({ draft, savedTitle, onTitleChange }: Props) {
           onChange={(event) => onTitleChange(event.target.value)}
           className="admin-title !h-auto min-w-[16rem] flex-1 !rounded-none !px-0 font-heading !text-4xl font-bold tracking-tight"
         />
-        <DeleteEditionButton id={draft.id} title={savedTitle} from="editor" />
+        <DeleteEditionButton id={draft.id} title={savedTitle} trigger="text" onDeleted={() => router.push(routes.admin.root)} />
       </div>
     </>
   )
 }
 
-/** 이름표 붙은 정보 한 칸. 값이 무슨 정보인지 위에 적는다. */
 function Meta({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">

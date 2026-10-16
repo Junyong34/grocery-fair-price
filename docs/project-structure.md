@@ -180,6 +180,7 @@ import 경로:
 | 파일 | 내용 |
 |---|---|
 | `routes.ts` | 앱의 모든 경로 |
+| `print-screen.ts` | `/print` 화면의 용지 둘레 여백(`PRINT_SCREEN_GUTTER`). `print.css`(CSS 변수 `--print-gutter`)와 어드민 미리보기 크기 계산이 함께 쓴다 |
 | `providers.tsx` | `TooltipProvider`, `OverlayProvider`(overlay-kit). 마운트 뒤 먹음 기록을 불러온다 |
 | `meta.ts` | `SITE_CONFIG`(사이트 이름 "장볼날"), `siteUrl()`, `absoluteUrl()`, `createMetadata()`, `ogImagePath()` |
 | `seo/` | 검색 색인: `pages.ts`(색인 레지스트리)와 가드 테스트, `indexing.ts`(색인 스위치·소유 확인), `json-ld.tsx`(구조화 데이터), `titles.ts`(검색용 제목·설명), `route-pattern.ts` |

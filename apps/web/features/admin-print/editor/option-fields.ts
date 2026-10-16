@@ -3,9 +3,6 @@ import { FOODS } from "@workspace/seasonal/data/foods"
 import { formatMonthLabel, MONTH_LABEL_STYLES } from "@workspace/seasonal/data/months"
 import type { PrintKind } from "@workspace/seasonal/print/spec"
 
-// 편집기 옵션 패널의 표. 종류마다 보일 칸과 그 칸이 고치는 사양 경로를 여기서만 정한다.
-
-/** "카테고리" 칸이 보여 줄 선택지. 품종 데이터에 있는 카테고리 그대로다. */
 export const FOOD_CATEGORIES = [...new Set(FOODS.map((food) => food.category))]
 
 export type Option = { value: string | number; label: string }

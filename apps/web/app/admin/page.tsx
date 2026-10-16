@@ -21,7 +21,6 @@ export default function Page() {
 }
 
 async function Board() {
-  // 파일을 고칠 때마다 다시 읽는다.
   await connection()
   return <AdminBoard {...await getEditionBoard()} />
 }

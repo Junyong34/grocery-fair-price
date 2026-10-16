@@ -6,7 +6,6 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { useCopy } from "../hooks/use-copy"
 
-/** id 꼬리표. 누르면 id를 복사한다(폴더·주소에 쓰는 값이라). */
 export function EditionId({ id, className }: { id: string; className?: string }) {
   const { copied, copy } = useCopy()
   return (

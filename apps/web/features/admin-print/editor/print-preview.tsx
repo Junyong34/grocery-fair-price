@@ -10,7 +10,6 @@ import { PREVIEW_MAX_WIDTH } from "../constants"
 import { useElementWidth } from "../hooks/use-element-width"
 import { previewFrame } from "../lib/preview"
 
-/** 실제 인쇄 페이지를 용지 비율 그대로 줄여 보여 준다. 불러오는 동안 같은 크기의 자리표시를 둔다. */
 export function PrintPreview({ src, paper, orientation }: { src: string; paper: Paper; orientation: PrintSpec["orientation"] }) {
   const [loaded, setLoaded] = useState<string>()
   const [box, width] = useElementWidth<HTMLDivElement>(PREVIEW_MAX_WIDTH)

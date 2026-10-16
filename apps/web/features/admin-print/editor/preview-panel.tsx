@@ -14,7 +14,6 @@ import { PrintPreview } from "./print-preview"
 
 const PAPER_OPTIONS = PAPER_SIZES.map((size) => ({ value: size, label: size }))
 
-/** 미리보기 칸: 용지·쪽 고르기와 /print 미리보기 */
 export function PreviewPanel({ spec, dirty }: { spec: PrintSpec; dirty: boolean }) {
   const pages = KIND_PAGES[spec.kind] as readonly PageKey[]
   const [paper, setPaper] = useState<Paper>("A4")

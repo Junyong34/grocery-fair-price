@@ -1,7 +1,6 @@
 "use client"
 
 import { Trash2 } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { useState, useTransition } from "react"
 
 import { Button } from "@workspace/ui/components/button"
@@ -17,20 +16,16 @@ import {
 } from "@workspace/ui/components/dialog"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip"
 
-import { routes } from "@/shared/routes"
-
 import { deleteEdition } from "../server/actions"
 
 type Props = {
   id: string
   title: string
-  /** list: 목록 행의 아이콘 버튼(지우면 목록이 새로 그려진다) · editor: 편집기의 글자 버튼(지우면 목록으로 간다) */
-  from: "list" | "editor"
+  trigger: "icon" | "text"
+  onDeleted?: () => void
 }
 
-/** 에디션 삭제. 확인 창을 거친다. */
-export function DeleteEditionButton({ id, title, from }: Props) {
-  const router = useRouter()
+export function DeleteEditionButton({ id, title, trigger, onDeleted }: Props) {
   const [open, setOpen] = useState(false)
   const [error, setError] = useState<string>()
   const [pending, startTransition] = useTransition()
@@ -40,12 +35,12 @@ export function DeleteEditionButton({ id, title, from }: Props) {
       const result = await deleteEdition(id)
       if (!result.ok) return setError(result.error)
       setOpen(false)
-      if (from === "editor") router.push(routes.admin.root)
+      onDeleted?.()
     })
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {from === "list" ? <IconTrigger title={title} /> : <TextTrigger />}
+      {trigger === "icon" ? <IconTrigger title={title} /> : <TextTrigger />}
       <DialogContent appearance="confirmation" className="bg-canvas">
         <DialogHeader>
           <DialogTitle>“{title}” 에디션을 지울까요?</DialogTitle>
@@ -71,7 +66,6 @@ export function DeleteEditionButton({ id, title, from }: Props) {
   )
 }
 
-/** 목록 행: 편집하기와 같은 높이의 테두리 아이콘 버튼. 이름은 툴팁과 aria-label로 준다. */
 function IconTrigger({ title }: { title: string }) {
   return (
     <Tooltip>

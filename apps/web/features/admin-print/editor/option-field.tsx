@@ -9,12 +9,10 @@ import { ToggleGroup, ToggleGroupItem } from "@workspace/ui/components/toggle-gr
 
 import { FOOD_CATEGORIES, type OptionFieldSpec } from "./option-fields"
 
-/** 짧은 글자 칸(포스터 제목 등)의 최대 길이 */
 const TEXT_MAX = 40
 
 type Props = { field: OptionFieldSpec; value: unknown; onChange: (value: unknown) => void }
 
-/** 옵션 표(option-fields)의 칸 하나를 그 종류에 맞는 입력으로 그린다. */
 export function OptionField({ field, value, onChange }: Props) {
   if (field.type === "toggle")
     return (
