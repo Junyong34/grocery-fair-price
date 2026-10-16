@@ -75,7 +75,11 @@ export const UI_COPY = {
   emptySearch: (query: string) =>
     `"${query}"에 맞는 제철음식이 없어요. 철자를 바꾸거나 필터를 '전체'로 바꿔 보세요.`,
   noFestivalThisMonth: "이 달의 명절 없음",
-  yearEnd: "한 해를 다 보셨어요",
+  /** 2a 이달 맨 아래: 열두 달 스크롤이 끝났을 때 */
+  yearEndTitle: "열두 달을 다 둘러봤어요",
+  yearEndMyTableHint: "먹은 제철을 기록하면 나의 식탁에 모여요",
+  yearEndMyTableAction: "나의 식탁 보기",
+  yearEndMoreTitle: "다른 방법으로 둘러보기",
   priceComingSoon: "가격 보기 · 준비 중",
   noRelatedFestival: "연결된 명절 없음",
 } as const

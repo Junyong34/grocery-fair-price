@@ -11,7 +11,6 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { routes } from "@/shared/routes"
 
-import { EatenCount } from "../components/eaten-count"
 import { ScatterField } from "../components/scatter-field"
 import { HERO_ID, monthSectionId } from "./active-month"
 import { DesktopMonthPanel } from "./desktop-month-panel"
@@ -19,6 +18,7 @@ import { JumpButton, MonthRail } from "./month-jump"
 import { MonthScrollSpy } from "./month-scroll-spy"
 import { MonthTitle } from "./month-title"
 import { SettingsCalendar, SettingsScope } from "./settings-scope"
+import { YearEnd } from "./year-end"
 
 /**
  * 2a 이달 · 12개월 스크롤(명세 3.1). 각 달은 "흩어진 제철 그림 → 달력" 순서다.
@@ -65,7 +65,7 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
             <div className="lg:mt-6">
               <div>
                 <Scatter month={thisMonth} foods={current.foods} year={year} className="mt-6 lg:mt-0" desktopFrame="desktopHero" />
-                <p className="mt-3 text-xs text-ash">
+                <p className="mt-3 text-xs text-caption">
                   {current.foods.length}가지 제철<span className="hidden lg:inline"> · 그림을 끌어 옮겨 보세요</span>
                 </p>
               </div>
@@ -87,30 +87,7 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
             <MonthSection key={month} month={month} foods={foods} note={note} today={today} />
           ))}
 
-          <footer className="flex flex-col gap-4 border-t border-hairline pr-12 pl-[18px] pt-12 pb-10 lg:px-0">
-            <p className="font-heading text-2xl">{UI_COPY.yearEnd}</p>
-            <Link
-              href={routes.seasonal.myTable}
-              className="rounded-md border border-gold px-4 py-3 text-ink no-underline hover:bg-gold-wash hover:text-ink"
-            >
-              나의 식탁 · 올해 <EatenCount year={year} />가지 →
-            </Link>
-            <nav aria-label="다른 화면" className="grid grid-cols-3 gap-2 text-center text-sm">
-              {[
-                ["월별", routes.seasonal.month(thisMonth)],
-                ["계절", routes.seasonal.seasons],
-                ["명절", routes.seasonal.festivals],
-              ].map(([label, href]) => (
-                <Link
-                  key={href}
-                  href={href!}
-                  className="rounded-md border border-hairline py-2.5 text-ink no-underline hover:bg-surface hover:text-ink"
-                >
-                  {label}
-                </Link>
-              ))}
-            </nav>
-          </footer>
+          <YearEnd year={year} thisMonth={thisMonth} />
         </div>
       </div>
       <MonthRail />
@@ -162,7 +139,7 @@ function MonthSection({
           mobileFrame={weeks >= 6 ? "mobileMonthTall" : "mobileMonth"}
           mobileCalendar={<SettingsCalendar year={today.year} month={month} today={today} holidays={holidays} />}
         />
-        <p className="mt-3 text-xs text-ash">
+        <p className="mt-3 text-xs text-caption">
           {foods.length}가지 제철<span> · 그림을 끌어 달력 위에도 놓아 꾸며 보세요</span>
         </p>
         <p className="mt-3 text-xs text-stone">
