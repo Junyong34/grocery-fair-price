@@ -43,11 +43,11 @@ const ITEMS: readonly {
 ]
 
 /** 하단 내비 칸 하나의 폭(px). 강조 배경이 칸 단위로 미끄러진다. */
-const CELL = 66
+const CELL = 72
 
 /**
  * 모바일 하단 가운데 떠 있는 내비(cojeev Action Dock 모양을 따랐다).
- * 베이지 트레이에 아이콘·라벨을 세로로 놓고, 지금 메뉴 뒤에 둥근 강조 배경이 깔린다. 메뉴를 바꾸면 배경이 옆 칸으로 미끄러진다.
+ * 2차 탭과 같은 크림(gold-wash) 트레이에 아이콘·라벨을 세로로 놓고, 지금 메뉴 뒤에 둥근 강조 배경이 깔린다. 메뉴를 바꾸면 배경이 옆 칸으로 미끄러진다.
  */
 export function FloatingNav() {
   const pathname = usePathname()
@@ -57,7 +57,7 @@ export function FloatingNav() {
   return (
     <nav
       aria-label="주요 메뉴"
-      className="fixed inset-x-0 bottom-[max(14px,env(safe-area-inset-bottom))] z-(--z-dock) mx-auto w-fit rounded-[24px] border border-silver/60 bg-hairline/92 p-1 shadow-lg shadow-ink/10 backdrop-blur-md lg:hidden"
+      className="fixed inset-x-0 bottom-[max(14px,env(safe-area-inset-bottom))] z-(--z-dock) mx-auto w-fit rounded-[24px] border border-gold-pale/45 bg-gold-wash/92 p-1 shadow-lg shadow-ink/10 backdrop-blur-md lg:hidden"
     >
       <div className="relative flex">
         {active >= 0 && (
@@ -73,7 +73,7 @@ export function FloatingNav() {
             href={href}
             aria-current={i === active ? "page" : undefined}
             className={cn(
-              "relative flex h-12 flex-col items-center justify-center gap-1 text-[10px] leading-none no-underline transition-colors duration-200",
+              "relative flex h-12 flex-col items-center justify-center gap-1 text-[11px] leading-none no-underline transition-colors duration-200",
               i === active
                 ? "font-semibold text-espresso hover:text-espresso"
                 : "text-stone hover:text-ink"
