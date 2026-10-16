@@ -4,9 +4,7 @@ import Link from "next/link"
 
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@workspace/ui/components/card"
 import { Empty, EmptyDescription, EmptyTitle } from "@workspace/ui/components/empty"
-import { Kbd } from "@workspace/ui/components/kbd"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/components/tabs"
 
 import { PRINT_KIND_LABELS, PRINT_KINDS, type PrintKind } from "@workspace/seasonal/print/spec"
@@ -30,7 +28,7 @@ export function EditionBoard({ editions }: { editions: readonly EditionSummary[]
   const byKind = (kind: PrintKind) => editions.filter((edition) => edition.kind === kind)
   return (
     <Tabs defaultValue="all" variant="underline" className="flex flex-col gap-6">
-      <TabsList aria-label="종류" className="overflow-x-auto">
+      <TabsList aria-label="종류" className="flex-wrap gap-y-1">
         <TabsTrigger value="all">전체 {editions.length}</TabsTrigger>
         {PRINT_KINDS.map((kind) => (
           <TabsTrigger key={kind} value={kind}>
@@ -38,11 +36,11 @@ export function EditionBoard({ editions }: { editions: readonly EditionSummary[]
           </TabsTrigger>
         ))}
       </TabsList>
-      <TabsContent value="all" className="flex flex-col gap-10">
+      <TabsContent value="all" className="flex flex-col gap-12">
         {editions.length === 0 ? (
-          <Empty className="rounded-2xl bg-surface">
+          <Empty className="rounded-2xl bg-hairline/50">
             <EmptyTitle>아직 에디션이 없어요</EmptyTitle>
-            <EmptyDescription>왼쪽에서 종류를 고르고 이름을 붙이면 첫 에디션이 생겨요.</EmptyDescription>
+            <EmptyDescription>“새 에디션”에서 종류를 고르고 이름을 붙이면 첫 에디션이 생겨요.</EmptyDescription>
           </Empty>
         ) : (
           PRINT_KINDS.filter((kind) => byKind(kind).length > 0).map((kind) => <KindGroup key={kind} kind={kind} editions={byKind(kind)} />)
@@ -60,19 +58,19 @@ export function EditionBoard({ editions }: { editions: readonly EditionSummary[]
 function KindGroup({ kind, editions }: { kind: PrintKind; editions: readonly EditionSummary[] }) {
   return (
     <section aria-labelledby={`kind-${kind}`} className="flex flex-col gap-4">
-      <header className="flex items-baseline justify-between gap-4 border-b border-hairline pb-2">
+      <header className="flex flex-col gap-1">
         <h2 id={`kind-${kind}`} className="font-heading text-xl font-bold text-ink">
-          {PRINT_KIND_LABELS[kind]} <span className="text-base font-normal text-caption tabular-nums">{editions.length}</span>
+          {PRINT_KIND_LABELS[kind]} <span className="font-sans text-base font-normal text-caption tabular-nums">{editions.length}</span>
         </h2>
-        <p className="hidden text-xs text-stone sm:block">{KIND_DESCRIPTIONS[kind]}</p>
+        <p className="text-sm text-stone">{KIND_DESCRIPTIONS[kind]}</p>
       </header>
       {editions.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-hairline px-4 py-6 text-center text-sm text-caption">이 종류의 에디션이 없어요.</p>
+        <p className="rounded-2xl bg-hairline/50 px-5 py-4 text-sm text-stone">이 종류의 에디션이 없어요. “새 에디션”에서 만들 수 있어요.</p>
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="flex flex-col gap-2">
           {editions.map((edition) => (
             <li key={edition.id}>
-              <EditionCard edition={edition} />
+              <EditionRow edition={edition} />
             </li>
           ))}
         </ul>
@@ -81,32 +79,27 @@ function KindGroup({ kind, editions }: { kind: PrintKind; editions: readonly Edi
   )
 }
 
-function EditionCard({ edition }: { edition: EditionSummary }) {
+/** 에디션 한 줄: 이름과 상태, 오른쪽에 삭제·편집. */
+function EditionRow({ edition }: { edition: EditionSummary }) {
   const href = routes.admin.edition(edition.id)
   return (
-    <Card lift className="flex h-full flex-col">
-      <CardHeader className="flex flex-col gap-2">
-        <div className="flex flex-wrap items-center gap-1.5">
+    <div className="flex flex-col gap-3 rounded-2xl bg-surface px-5 py-4 sm:flex-row sm:items-center sm:gap-6">
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <Link href={href} className="truncate font-heading text-lg font-bold text-ink no-underline underline-offset-4 hover:underline">
+          {edition.title}
+        </Link>
+        <div className="flex flex-wrap items-center gap-2 text-sm text-caption">
           <Badge variant={edition.published ? "olive" : "default"}>{edition.published ? "공개" : "초안"}</Badge>
-          <Badge variant={edition.generatedAt ? "default" : "dashed"}>{edition.generatedAt ? `${edition.generatedAt} 생성` : "PDF 생성 필요"}</Badge>
+          <Badge variant={edition.generatedAt ? "olive-soft" : "yellow"}>{edition.generatedAt ? `${edition.generatedAt} 생성` : "PDF 생성 필요"}</Badge>
+          <span className="tabular-nums">id {edition.id}</span>
         </div>
-        <CardTitle className="font-heading text-lg">
-          <Link href={href} className="hover:underline hover:underline-offset-4">
-            {edition.title}
-          </Link>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1">
-        <span className="text-xs text-caption">
-          id <Kbd className="!inline">{edition.id}</Kbd>
-        </span>
-      </CardContent>
-      <CardFooter className="flex items-center justify-between gap-2">
-        <Button asChild size="sm">
-          <Link href={href}>편집하기 →</Link>
-        </Button>
+      </div>
+      <div className="flex items-center justify-end gap-2">
         <DeleteEditionButton id={edition.id} title={edition.title} from="list" />
-      </CardFooter>
-    </Card>
+        <Button asChild size="sm">
+          <Link href={href}>편집하기</Link>
+        </Button>
+      </div>
+    </div>
   )
 }

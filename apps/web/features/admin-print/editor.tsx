@@ -1,13 +1,12 @@
 "use client"
 
-import { useMemo, useState, useTransition } from "react"
+import { useEffect, useMemo, useRef, useState, useTransition } from "react"
 
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { Field, FieldControl, FieldDescription, FieldLabel } from "@workspace/ui/components/field"
 import { Input } from "@workspace/ui/components/input"
-import { Kbd } from "@workspace/ui/components/kbd"
 import { NativeSelect, NativeSelectOption } from "@workspace/ui/components/native-select"
 import { NumberInput } from "@workspace/ui/components/number-input"
 import { Segmented } from "@workspace/ui/components/segmented"
@@ -36,8 +35,8 @@ import { getAt, KIND_SECTIONS, setAt, type Field as FieldSpec } from "./fields"
 
 const CATEGORIES = [...new Set(FOODS.map((food) => food.category))]
 const MM_TO_PX = 96 / 25.4
-/** 미리보기 용지를 그리는 폭(px). iframe을 이 폭에 맞춰 줄인다. */
-const PREVIEW_WIDTH = 620
+/** 미리보기 용지를 그리는 최대 폭(px). iframe을 들어갈 칸 폭에 맞춰 줄인다. */
+const PREVIEW_MAX_WIDTH = 680
 
 const pageLabel = (page: PageKey) => (page === "all" ? "전체" : `${page}월`)
 
@@ -81,46 +80,72 @@ export function EditionEditor({ saved, build: savedBuild }: { saved: Edition; bu
 
   return (
     <div className="flex flex-col gap-8">
-      <header className="flex flex-col gap-3 border-b border-hairline pb-6">
-        <div className="flex flex-wrap items-center gap-2">
+      <header className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-caption">
           <Badge>{PRINT_KIND_LABELS[draft.spec.kind]}</Badge>
           <Badge variant={draft.status === "published" ? "olive" : "default"}>{draft.status === "published" ? "공개" : "초안"}</Badge>
-          <Kbd>{draft.id}</Kbd>
-          <span className="ml-auto">
-            <DeleteEditionButton id={base.id} title={base.title} from="editor" />
-          </span>
+          <Badge variant={dirty ? "pending" : stale ? "yellow" : "olive-soft"}>
+            {dirty ? "저장 안 됨" : stale ? "PDF 생성 필요" : `${build!.generatedAt.slice(0, 16).replace("T", " ")} 생성`}
+          </Badge>
+          <span className="tabular-nums">id {draft.id}</span>
         </div>
-        <Input
-          aria-label="에디션 이름"
-          value={draft.title}
-          maxLength={40}
-          onChange={(event) => setDraft({ ...draft, title: event.target.value })}
-          className="admin-title !h-auto !rounded-none !px-0 font-heading !text-3xl font-bold tracking-tight"
-        />
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+          <Input
+            aria-label="에디션 이름"
+            value={draft.title}
+            maxLength={40}
+            onChange={(event) => setDraft({ ...draft, title: event.target.value })}
+            className="admin-title !h-auto min-w-[16rem] flex-1 !rounded-none !px-0 font-heading !text-4xl font-bold tracking-tight"
+          />
+          <div className="flex flex-wrap items-center gap-2">
+            <DeleteEditionButton id={base.id} title={base.title} from="editor" />
+            <Button type="button" variant="outline" onClick={generate} disabled={pending || dirty}>
+              {pending && action === "generate" ? "PDF 만드는 중…" : "PDF 생성"}
+            </Button>
+            <Button type="button" onClick={save} disabled={pending || !dirty || checked instanceof Error}>
+              {pending && action === "save" ? "저장하는 중…" : "저장"}
+            </Button>
+          </div>
+        </div>
+        <p aria-live="polite" className={message?.tone === "error" ? "text-sm text-error empty:hidden" : "text-sm text-stone empty:hidden"}>
+          {message?.text}
+        </p>
       </header>
 
       <div className="grid items-start gap-8 lg:grid-cols-[400px_minmax(0,1fr)]">
         <Card className="lg:sticky lg:top-6">
-          <CardContent className="flex flex-col gap-5">
-            <h2 className="text-xs font-semibold tracking-wider text-caption">옵션</h2>
-            <Tabs defaultValue={sections[0]!.title} variant="underline">
-              <TabsList aria-label="옵션 묶음">
-                {sections.map((section) => (
-                  <TabsTrigger key={section.title} value={section.title}>
-                    {section.title}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              {sections.map((section) => (
-                <TabsContent key={section.title} value={section.title} className="flex flex-col gap-4 pt-4">
-                  {section.fields.map((field) => (
-                    <OptionField key={field.path.join(".")} field={field} value={getAt(draft.spec, field.path)} onChange={(value) => change(field.path, value)} />
+          <CardContent className="flex flex-col gap-8">
+            <section aria-labelledby="options-title" className="flex flex-col gap-3">
+              <h2 id="options-title" className="font-heading text-lg font-bold text-ink">
+                옵션
+              </h2>
+              <Tabs defaultValue={sections[0]!.title} variant="underline">
+                <TabsList aria-label="옵션 묶음">
+                  {sections.map((section) => (
+                    <TabsTrigger key={section.title} value={section.title}>
+                      {section.title}
+                    </TabsTrigger>
                   ))}
-                </TabsContent>
-              ))}
-            </Tabs>
+                </TabsList>
+                {sections.map((section) => (
+                  <TabsContent key={section.title} value={section.title} className="flex flex-col gap-4 pt-4">
+                    {section.fields.map((field) => (
+                      <OptionField key={field.path.join(".")} field={field} value={getAt(draft.spec, field.path)} onChange={(value) => change(field.path, value)} />
+                    ))}
+                  </TabsContent>
+                ))}
+              </Tabs>
+              {checked instanceof Error && (
+                <p role="alert" className="text-sm text-error">
+                  {checked.message}
+                </p>
+              )}
+            </section>
 
-            <div className="flex flex-col gap-4 border-t border-hairline pt-4">
+            <section aria-labelledby="listing-title" className="flex flex-col gap-4">
+              <h2 id="listing-title" className="font-heading text-lg font-bold text-ink">
+                내려받기 화면
+              </h2>
               <Field>
                 <FieldLabel>설명</FieldLabel>
                 <FieldControl>
@@ -128,42 +153,19 @@ export function EditionEditor({ saved, build: savedBuild }: { saved: Edition; bu
                 </FieldControl>
               </Field>
               <label className="flex items-center justify-between gap-4 text-sm">
-                <span className="flex flex-col">
+                <span className="flex flex-col gap-0.5">
                   <span className="text-ink">사용자에게 공개</span>
-                  <span className="text-xs text-stone">PDF 저장 위치를 정하기 전에는 끄세요</span>
+                  <span className="text-[13px] text-stone">PDF 저장 위치를 정하기 전에는 끄세요</span>
                 </span>
                 <Switch checked={draft.status === "published"} onCheckedChange={(on) => setDraft({ ...draft, status: on ? "published" : "draft" })} />
               </label>
-            </div>
-
-            {checked instanceof Error && (
-              <p role="alert" className="text-sm text-error">
-                {checked.message}
-              </p>
-            )}
-
-            <div className="flex flex-col gap-3 border-t border-hairline pt-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <Button type="button" onClick={save} disabled={pending || !dirty || checked instanceof Error}>
-                  {pending && action === "save" ? "저장하는 중…" : "저장"}
-                </Button>
-                <Button type="button" variant="outline" onClick={generate} disabled={pending || dirty}>
-                  {pending && action === "generate" ? "PDF 만드는 중…" : "PDF 생성"}
-                </Button>
-                <Badge variant={dirty ? "pending" : stale ? "dashed" : "olive"}>
-                  {dirty ? "저장 안 됨" : stale ? "생성 필요" : `${build!.generatedAt.slice(0, 16).replace("T", " ")} 생성`}
-                </Badge>
-              </div>
-              <p aria-live="polite" className={message?.tone === "error" ? "text-sm text-error" : "text-sm text-stone"}>
-                {message?.text}
-              </p>
-            </div>
+            </section>
           </CardContent>
         </Card>
 
-        <section className="flex min-w-0 flex-col gap-4 rounded-3xl bg-surface-grey/50 p-5" aria-labelledby="preview-title">
+        <section className="flex min-w-0 flex-col gap-4 rounded-3xl bg-hairline/50 p-5" aria-labelledby="preview-title">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 id="preview-title" className="text-xs font-semibold tracking-wider text-caption">
+            <h2 id="preview-title" className="font-heading text-lg font-bold text-ink">
               미리보기
             </h2>
             <Segmented aria-label="용지" options={PAPER_SIZES.map((size) => ({ value: size, label: size }))} value={paper} onValueChange={setPaper} />
@@ -188,19 +190,27 @@ export function EditionEditor({ saved, build: savedBuild }: { saved: Edition; bu
 /** 실제 인쇄 페이지를 용지 비율 그대로 줄여 보여 준다. 불러오는 동안 같은 크기의 자리표시를 둔다. */
 function Preview({ src, paper, landscape }: { src: string; paper: Paper; landscape: boolean }) {
   const [loaded, setLoaded] = useState<string>()
-  const { width, height } = PAPERS[paper]
-  const sheet = landscape ? { width: height, height: width } : { width, height }
+  const box = useRef<HTMLDivElement>(null)
+  const [width, setWidth] = useState(PREVIEW_MAX_WIDTH)
+  useEffect(() => {
+    const node = box.current
+    if (!node) return
+    const observer = new ResizeObserver(([entry]) => entry && setWidth(entry.contentRect.width))
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+  const size = PAPERS[paper]
+  const sheet = landscape ? { width: size.height, height: size.width } : size
   // /print는 화면에서 용지 둘레에 24px 여백을 둔다.
   const frame = { width: sheet.width * MM_TO_PX + 48, height: sheet.height * MM_TO_PX + 48 }
-  const zoom = PREVIEW_WIDTH / frame.width
   return (
-    <div className="relative max-w-full overflow-hidden rounded-2xl bg-surface-grey shadow-sm" style={{ width: PREVIEW_WIDTH, aspectRatio: `${frame.width} / ${frame.height}` }}>
+    <div ref={box} className="relative w-full overflow-hidden rounded-2xl bg-hairline" style={{ maxWidth: PREVIEW_MAX_WIDTH, aspectRatio: `${frame.width} / ${frame.height}` }}>
       {loaded !== src && <Skeleton className="absolute inset-6 rounded-none" />}
       <iframe
         title="인쇄 미리보기"
         src={src}
         onLoad={() => setLoaded(src)}
-        style={{ width: frame.width, height: frame.height, zoom }}
+        style={{ width: frame.width, height: frame.height, zoom: width / frame.width }}
         className="border-0"
       />
     </div>
@@ -211,7 +221,7 @@ function GeneratedFiles({ edition }: { edition: Edition }) {
   return (
     <Card>
       <CardContent className="flex flex-col gap-3 text-sm">
-        <span className="font-medium text-ink">만든 PDF</span>
+        <h3 className="font-heading text-base font-bold text-ink">만든 PDF</h3>
         {PAPER_SIZES.map((size) => (
           <div key={size} className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <Badge>{size}</Badge>

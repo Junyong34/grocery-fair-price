@@ -74,7 +74,7 @@
 
 /* 브라우저 화면(미리보기)에서는 회색 바탕 위에 용지를 띄운다. 인쇄에는 영향이 없다. */
 @media screen {
-  .print-root { min-height: 100vh; padding: 24px 0; background: var(--color-surface-grey); }
+  .print-root { min-height: 100vh; padding: 24px 0; background: var(--color-hairline); }
   .print-sheet { margin: 0 auto 24px; box-shadow: 0 1px 8px rgb(0 0 0 / 0.15); }
 }
 @media print {
