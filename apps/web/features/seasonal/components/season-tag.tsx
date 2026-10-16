@@ -32,7 +32,7 @@ export const SEASON_ICON: Record<Season, LucideIcon> = {
   winter: Snowflake,
 }
 
-/** 계절 태그(명세 2.4). 계절 아이콘(새싹·해·잎·눈송이)과 계절색 글자의 알약. 시안 비교는 /examples/season-tags */
+/** 계절 태그(명세 2.4). 계절 아이콘(새싹·해·잎·눈송이)과 계절색 글자의 알약. 시안 비교 페이지 season-tags는 2026-10-16에 지웠다(`git show 22520eb:apps/web/app/examples/season-tags/page.tsx`) */
 export function SeasonTag({
   season,
   className,

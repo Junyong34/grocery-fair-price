@@ -1,6 +1,6 @@
 import type { Season } from "@workspace/seasonal/data/seasons"
 
-/** 3a 계절 카드 배경 후보. /examples/season-backgrounds에서 비교해 하나로 정한다. */
+/** 3a 계절 카드 배경 후보. 비교 페이지 season-backgrounds(2026-10-16 지움)에서 sunwash로 정했다. 화면은 SEASON_BACKGROUND 하나만 쓴다. */
 export const SEASON_BACKGROUNDS = [
   "sunwash",
   "sprouts",

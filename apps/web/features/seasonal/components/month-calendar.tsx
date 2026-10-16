@@ -9,7 +9,7 @@ import { HolidayName } from "./holiday-name"
 const isWeekend = (weekday: number) => weekday === 0 || weekday === 6
 
 /**
- * 달력 모양(/examples/calendar-styles에서 비교). 화면(2a)은 plain을 쓰고, 나머지는 MVP 이후 PDF 달력의 모양 선택지로 둔다.
+ * 달력 모양. 비교 페이지 calendar-styles는 2026-10-16에 지웠다(`git show 22520eb:apps/web/app/examples/calendar-styles/page.tsx`). 화면(2a)은 plain을 쓰고, 나머지는 MVP 이후 PDF 달력의 모양 선택지로 둔다.
  * - plain: 선 없이 숫자만, 공휴일 이름을 숫자 아래에
  * - grid: 칸마다 가는 선, 숫자는 칸 왼쪽 위, 공휴일 이름을 칸 안에
  * - editorial: 큰 가는 숫자, 주 사이 가로줄만, 오늘은 먹색 원

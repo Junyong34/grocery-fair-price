@@ -82,11 +82,11 @@
 | 1g `/seasonal/festivals/[festival]` | O | O | `BreadcrumbList` |
 | 1i `/seasonal/foods/[food]` 79개 | O | O (그림 있는 품종은 `images`) | `BreadcrumbList` |
 | 1h `/seasonal/my-table` | noindex | X | — |
-| `/examples/*` | noindex (삭제 예정) | X | — |
+| `/examples/*` | 2026-10-16 삭제 | — | — |
 | `/` (307 → `routes.home`), `/seasonal/festivals` (proxy 리디렉션), `/api/og` | 해당 없음 | X | — |
 
 - **1h는 noindex로 둔다.** 기기에 저장된 기록으로 채워지는 화면이라 크롤러에게는 빈 상태만 보인다.
-- **`/examples`는 robots `Disallow`로 막지 않고 noindex로만 막는다.** Disallow로 막으면 크롤러가 noindex를 읽지 못해 색인에 남을 수 있다. 사용자가 삭제할 예정이다. 그 전까지는 `app/examples/layout.tsx`의 noindex로 버틴다.
+- **`/examples`는 robots `Disallow`로 막지 않고 noindex로만 막는다.** Disallow로 막으면 크롤러가 noindex를 읽지 못해 색인에 남을 수 있다. 2026-10-16에 페이지를 지우면서 `app/examples/layout.tsx`와 `NOINDEX_ROUTES`의 `/examples`도 함께 지웠다.
 - **`/`는 307을 유지한다.** 가격 비교 메인이 올 자리라 301로 바꾸지 않는다.
 - **`WebSite`·`Organization`은 `routes.home`이 가리키는 페이지가 출력한다.** 구글은 사이트 이름 마크업을 홈에서만 읽는다. 홈이 `/`로 바뀌면 마크업도 따라 옮겨 간다.
 

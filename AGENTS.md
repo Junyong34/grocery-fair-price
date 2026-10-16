@@ -56,7 +56,7 @@ Layers. Each one may import only from the layers below it:
 
 | Layer | Where | What goes there |
 |---|---|---|
-| App routes | `apps/web/app/` | Route files only (`page`, `layout`, `@slot`, route groups), plus `api/og` (share image) and `examples/*` (design comparison pages the spec cites as decision records). Keep routes thin: validate params, set metadata, render a feature component. |
+| App routes | `apps/web/app/` | Route files only (`page`, `layout`, `@slot`, route groups), plus `api/og` (share image), `sitemap.ts` and `robots.ts`. The `/examples/*` design comparison pages the specs cite were deleted on 2026-10-16; read them in git history (`git show 22520eb:apps/web/app/examples/<name>/page.tsx`). Keep routes thin: validate params, set metadata, render a feature component. |
 | Features | `apps/web/features/<feature>/` | One folder per screen (`seasonal/this-month`, `month-timeline`, `seasons`, `festivals`, `my-table`, `food-detail`, `search`). `components/` holds parts several screens share (shell, nav, `FoodImage`, scatter); `stores/` holds the feature's zustand stores. Features don't import each other; shared code moves down a layer. |
 | App shared | `apps/web/shared/` | App-wide pieces: `routes.ts`, `providers.tsx`, `meta.ts`, `today.ts` + `today-context.tsx`, `eaten-store.ts`, `brand-logo.tsx`. |
 | Domain | `packages/seasonal` (`@workspace/seasonal`) | Pure TypeScript: `data/` (품종, months, seasons, festivals, copy), `calendar/` (calendar cells, holidays, lunar, Seoul today), `layout/` (seeded scatter), `search/` (초성 match). No React, Next.js or DOM. The MVP-later print pages reuse it. |
@@ -100,7 +100,7 @@ Add cojeev or shadcn components from the repo root with `pnpm ui:add <name-or-ur
 - "Today" is Seoul time computed once per request on the server: `getSeoulToday()` (`shared/today.ts`) → `TodayProvider` in `app/seasonal/layout.tsx` → `useToday()` inside `<Suspense>`. Rendering code takes today from there instead of calling `new Date()`.
 - Device-saved state is a zustand `persist` store with `skipHydration: true` and a `seasonal:<name>` key, rehydrated after mount (`Providers` for `eaten-store`, `useHydrate*` hooks for the feature stores). Server HTML and the first client render use the defaults; read localStorage only through the store.
 - Motion: CSS keyframes for small effects, `motion` for drag, spring and layout animation, React `<ViewTransition>` only for the three spec'd transitions (CSS in `apps/web/app/globals.css`). Every animation ends instantly under `prefers-reduced-motion`.
-- Sheets and dialogs: open them with `overlay-kit` (`<OverlayProvider>` is in `apps/web/shared/providers.tsx`). For bottom sheets, use `@workspace/ui/components/bottom-sheet` (`BottomSheet`, `openBottomSheet`). Example: `/examples/bottom-sheet`.
+- Sheets and dialogs: open them with `overlay-kit` (`<OverlayProvider>` is in `apps/web/shared/providers.tsx`). For bottom sheets, use `@workspace/ui/components/bottom-sheet` (`BottomSheet`, `openBottomSheet`). Examples: `features/seasonal/components/food-sheet.tsx`, `features/seasonal/this-month/settings-panel.tsx`.
 
 ## Next.js docs
 

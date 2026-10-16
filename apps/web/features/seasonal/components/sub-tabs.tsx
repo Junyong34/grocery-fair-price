@@ -72,7 +72,7 @@ function SubTabs({ set, compact = false }: { set: TabSet; compact?: boolean }) {
   // 헤더 안 작은 탭(compact)은 헤더가 다루므로 본문 탭에만 붙인다.
   const fadeRef = useFadeUnderHeader()
   return (
-    // 트레이에 담아 한 덩어리로 보이게 하고, 본문과는 아래 여백으로 나눈다(/examples/header-styles C).
+    // 트레이에 담아 한 덩어리로 보이게 하고, 본문과는 아래 여백으로 나눈다(header-styles 비교의 C안, 2026-10-16 지운 비교 페이지).
     <LinkTabs
       ref={compact ? undefined : fadeRef}
       aria-label={set.label}

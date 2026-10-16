@@ -105,7 +105,6 @@ import 경로:
 | `/seasonal/foods/[food]` | 1i 품종 상세 (전체 페이지) | `seasonal/foods/[food]/page.tsx` | `food-detail/food-detail` |
 | (제철 화면 안에서 이동) | 1i 품종 상세 (하단 시트) | `seasonal/@sheet/(.)foods/[food]/page.tsx` | `components/food-sheet` + `food-detail` |
 | `/api/og` | 공유 미리보기 이미지 1200×630 | `app/api/og/route.tsx` | 쿼리 `title`, `subtitle`, `badge`, `season` |
-| `/examples/*` | 디자인 후보 비교 페이지 (noindex, 삭제 예정) | `app/examples/<name>/page.tsx` | 아래 표 |
 | `/sitemap.xml`, `/robots.txt` | 검색 색인 | `app/sitemap.ts`, `app/robots.ts` | `shared/seo/pages.ts` 레지스트리, 색인 스위치 |
 
 표의 화면 컴포넌트 경로는 `apps/web/features/seasonal/` 기준이다. 모든 경로는 `apps/web/shared/routes.ts`의 `routes`로 만든다. 2a의 특정 달은 해시 `routes.seasonal.rootAt(month)`(`/seasonal#month-N`)로 연다.
@@ -119,7 +118,7 @@ import 경로:
 - **메타데이터**: 페이지는 `shared/meta.ts`의 `createMetadata()`를 돌려준다. canonical, OpenGraph, Twitter 카드, `/api/og` 이미지가 함께 붙는다. 공개 주소는 `siteUrl()`이 `NEXT_PUBLIC_SITE_URL` → `VERCEL_PROJECT_PRODUCTION_URL` → localhost 순서로 정한다.
 - **검색 색인**: 모든 페이지를 `shared/seo/pages.ts`에 색인·noindex·리디렉션 가운데 하나로 등록한다. 빠뜨리면 가드 테스트가 실패한다. `SITE_INDEXABLE=true`가 아니면 robots가 전체를 막고 모든 페이지가 noindex다. 자세히는 `apps/web/docs/seo.md`.
 
-디자인 비교 페이지(`/examples/*`). 스펙의 결정 기록이 이 페이지를 근거로 인용한다.
+디자인 비교 페이지(`/examples/*`)는 2026-10-16에 지웠다. 스펙의 결정 기록이 아래 페이지를 근거로 인용하므로, 다시 보려면 `git show 22520eb:apps/web/app/examples/<페이지>/page.tsx`로 꺼낸다.
 
 | 페이지 | 비교한 것 |
 |---|---|
