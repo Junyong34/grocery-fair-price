@@ -1,15 +1,21 @@
 "use client"
 
+import { ChevronRight } from "lucide-react"
+import Link from "next/link"
+
 import { Segmented } from "@workspace/ui/components/segmented"
 import { Switch } from "@workspace/ui/components/switch"
 
+import { DOWNLOADS_COPY } from "@workspace/seasonal/data/copy"
 import { formatMonthLabel, MONTH_LABEL_STYLES } from "@workspace/seasonal/data/months"
+
+import { routes } from "@/shared/routes"
 
 import { useSettingsStore } from "../stores/settings-store"
 import { CalendarStylePicker } from "./calendar-style-picker"
 
-/** ⚙ 표시 설정 내용(명세 4절. 24절기 표시와 달력 다운로드는 MVP 밖). */
-export function SettingsFields() {
+/** ⚙ 표시 설정 내용(명세 4절. 24절기 표시는 MVP 밖). 맨 아래에 PDF 내려받기 화면으로 가는 링크가 있다. */
+export function SettingsFields({ onNavigate }: { onNavigate?: () => void }) {
   const { showHolidays, showEaten, calendarStyle, monthLabel, set } = useSettingsStore()
   return (
     <div className="flex flex-col divide-y divide-hairline">
@@ -41,6 +47,10 @@ export function SettingsFields() {
         checked={showEaten}
         onChange={(value) => set({ showEaten: value })}
       />
+      <Link href={routes.seasonal.downloads} onClick={onNavigate} className="flex items-center justify-between gap-4 py-3 text-[15px] text-ink">
+        {DOWNLOADS_COPY.settingsLink}
+        <ChevronRight aria-hidden size={18} strokeWidth={1.6} className="text-stone" />
+      </Link>
     </div>
   )
 }

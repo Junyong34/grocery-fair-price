@@ -1,7 +1,7 @@
 # 달력 PDF 어드민 · 다운로드 스펙
 
-Status: needs-triage
-Phase: **MVP 이후**. MVP(제철달력 화면) 개발이 끝난 뒤에 착수한다.
+Status: ready-for-agent (1차 구현 2026-10-16, 남은 일은 아래 "1차 구현에서 달라진 점과 남은 일")
+Phase: MVP 이후.
 작성일: 2026-10-14, 어드민 기준으로 다시 씀: 2026-10-16
 
 ## 목표
@@ -355,6 +355,27 @@ AGENTS.md "Generated files" 표에 `public/downloads/**`와 명령 `pnpm prints:
 6. `/admin` 목록과 편집기(옵션 폼 + iframe 미리보기), 저장·생성 버튼.
 7. 배치 편집(월간 달력).
 8. `/seasonal/downloads`와 설정 시트 링크.
+
+## 1차 구현에서 달라진 점과 남은 일 (2026-10-16)
+
+구현: `packages/seasonal/src/print/`(spec·edition·foods), `apps/web/features/print/`, `apps/web/features/admin-print/`, `/print`, `/admin`, `/seasonal/downloads`. 실제 사양 타입은 `print/spec.ts`가 기준이다. 위 "데이터 모양"은 설계 당시의 안이다.
+
+달라진 점:
+
+- `pnpm prints:build` 명령은 만들지 않았다. 생성기(`features/admin-print/generate.ts`)는 Next 안의 TypeScript라 어드민 "PDF 생성" 버튼(Server Action)으로만 돈다. 저장소에 TS를 바로 돌릴 도구(tsx)가 없다.
+- 품종 이름의 `korean-english`는 뺐다. 품종 데이터에 영어 이름이 없다.
+- `foods.seed`는 뺐다. 흩뿌림 배치는 달·품종·판 크기로 정해진다(화면 2a와 같다).
+- 월간 달력의 `foodLayout`은 `scatter | grid | none`이다(`hero`, `strip` 없음).
+- 연간 한 장은 달력 모양(`variant`)을 고르지 않는다. 칸이 작아 plain만 쓴다.
+- 숫자 display 서체는 라이선스 확인 전이라 고를 수 없다.
+- 그림이 없는 품종은 인쇄물에 넣지 않는다.
+
+남은 일:
+
+1. **용량.** 처음 잰 값: 월간 에디션 하나(PDF 26개)가 34MB, A4 12개월 묶음 6.6MB, A3 묶음 11.8MB. A3가 A4보다 큰 것은 일러스트 SVG의 필터 효과가 래스터로 들어가기 때문으로 추정한다(확인 전). 포스터·연간 한 장은 한 파일 0.6~2.2MB. 월간 에디션 서너 개면 "100MB 넘으면 스토리지로" 기준에 닿는다. 다운로드 폴더를 git에 둘지 R2·Blob으로 옮길지 정해야 한다.
+2. 배치 끌어 옮기기(`placements`, 월간 달력).
+3. 월간 달력의 명절(공휴일이 아닌 것)·음력 표시.
+4. 실제 프린터로 A4·A3 한 장씩 뽑아 안전 여백과 연간 한 장의 작은 글자 확인.
 
 ## 정해야 할 것
 

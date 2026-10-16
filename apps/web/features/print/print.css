@@ -76,6 +76,8 @@
   .print-sheet { margin: 0 auto 24px; box-shadow: 0 1px 8px rgb(0 0 0 / 0.15); }
 }
 @media print {
+  /* 개발 서버의 Next 표시(배지·오류 창)가 PDF에 찍히지 않게 한다. PDF는 개발 서버에서만 만든다. */
+  nextjs-portal { display: none !important; }
   .print-root { padding: 0; background: none; }
   .print-sheet { margin: 0; box-shadow: none; }
 }

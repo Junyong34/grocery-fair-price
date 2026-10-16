@@ -26,6 +26,7 @@ export const SEO_PAGES: Readonly<Record<string, () => readonly SitemapEntry[]>> 
   "/seasonal/months": () => [{ path: routes.seasonal.months }],
   "/seasonal/months/[month]": () => MONTHS.map((month) => ({ path: routes.seasonal.month(month) })),
   "/seasonal/seasons": () => [{ path: routes.seasonal.seasons }],
+  "/seasonal/downloads": () => [{ path: routes.seasonal.downloads }],
   "/seasonal/seasons/[season]": () => SEASONS.map((season) => ({ path: routes.seasonal.season(season) })),
   "/seasonal/festivals/[festival]": () => FESTIVALS.map(({ slug }) => ({ path: routes.seasonal.festival(slug) })),
   // 그림이 있는 품종은 일러스트를 이미지 sitemap으로 알린다(FoodImage가 그리는 그 파일).
@@ -45,6 +46,8 @@ export const NOINDEX_ROUTES: readonly string[] = [
   "/seasonal/my-table",
   // PDF 인쇄 페이지. 개발 서버에서만 열리고 운영에서는 404다(.scratch/calendar-print/spec.md).
   "/print",
+  // 인쇄물 어드민. 개발 서버에서만 열린다.
+  "/admin",
 ]
 
 /** 다른 페이지로 보내기만 하는 라우트. sitemap에 넣지 않는다. */

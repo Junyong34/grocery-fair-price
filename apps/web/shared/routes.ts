@@ -29,5 +29,13 @@ export const routes = {
     myTable: "/seasonal/my-table",
     /** 1i 품종 상세. 제철 화면 안에서 누르면 하단 시트로, 주소로 직접 열면 전체 페이지로 뜬다. */
     food: (id: string) => `/seasonal/foods/${id}`,
+    /** 달력·포스터 PDF 내려받기 */
+    downloads: "/seasonal/downloads",
+  },
+
+  /** 인쇄물 어드민. 개발 서버에서만 열린다(.scratch/calendar-print/spec.md). */
+  admin: {
+    root: "/admin",
+    edition: (id: string) => `/admin/edit?id=${encodeURIComponent(id)}`,
   },
 } as const

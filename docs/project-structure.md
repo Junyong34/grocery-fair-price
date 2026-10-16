@@ -103,6 +103,9 @@ import 경로:
 | `/seasonal/festivals/[festival]` | 1g 명절 | `seasonal/(season)/festivals/[festival]/page.tsx` | `festivals/festival-view`, 레이아웃에 `festival-chips` |
 | `/seasonal/my-table` | 1h 나의 식탁 | `seasonal/my-table/page.tsx` | `my-table/my-table-view` |
 | `/seasonal/foods/[food]` | 1i 품종 상세 (전체 페이지) | `seasonal/foods/[food]/page.tsx` | `food-detail/food-detail` |
+| `/seasonal/downloads` | 달력·포스터 PDF 내려받기 | `seasonal/downloads/page.tsx` | `downloads/downloads-view`. `public/downloads/manifest.json`을 빌드 때 읽는다 |
+| `/admin`, `/admin/edit?id=` | 인쇄물 어드민 (개발 서버 전용, 운영 404) | `app/admin/` | `features/admin-print/` |
+| `/print?spec=&paper=&page=` | 인쇄 전용 페이지 (개발 서버 전용, 운영 404) | `app/print/page.tsx` | `features/print/print-document` |
 | (제철 화면 안에서 이동) | 1i 품종 상세 (하단 시트) | `seasonal/@sheet/(.)foods/[food]/page.tsx` | `components/food-sheet` + `food-detail` |
 | `/api/og` | 공유 미리보기 이미지 1200×630 | `app/api/og/route.tsx` | 쿼리 `title`, `subtitle`, `badge`, `season` |
 | `/sitemap.xml`, `/robots.txt` | 검색 색인 | `app/sitemap.ts`, `app/robots.ts` | `shared/seo/pages.ts` 레지스트리, 색인 스위치 |
@@ -145,9 +148,19 @@ import 경로:
 | `food-detail/` | 1i | `food-detail`, `eat-toggle`, `festival-link` |
 | `search/` | 전역 검색 | `food-search`(헤더 버튼), `food-search-dialog`(cojeev command, 초성 검색) |
 | `components/` | 공통 | `seasonal-shell`, `main-nav`, `nav-link`, `sub-tabs`, `food-image`(그림 없으면 이름 카드), `food-sheet`, `scatter-field`·`draggable-scatter`(흩어진 배치와 드래그), `month-calendar`, `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-count`, `share-button`, `holiday-name`, `this-month-only`, `screen-stub` |
-| `stores/` | 공통 | `settings-store`(⚙ 설정), `scatter-store`(옮긴 배치와 달력 자리) |
+| `downloads/` | PDF 내려받기 | `downloads-view`, `edition-downloads`(용지 고르기, 기기에 저장) |
+| `stores/` | 공통 | `settings-store`(⚙ 설정, 내려받기 용지), `scatter-store`(옮긴 배치와 달력 자리) |
 
 `components/seasonal-shell`은 헤더에 넣으려고 `search/`와 `this-month/settings-panel`을 import한다. 같은 feature 안이라 허용된다.
+
+인쇄물(`.scratch/calendar-print/spec.md`)은 feature 둘로 나뉜다.
+
+| 폴더 | 내용 |
+|---|---|
+| `features/print/` | `/print` 화면. `print-document`(종류 → 컴포넌트 표), 종류별 `monthly`·`year-sheet`·`season-poster`·`month-poster`, `parts/`(시트, 인쇄 달력, 품종 그림 판), `print.css`(A4·A3 `@page`, `--u` 단위) |
+| `features/admin-print/` | 어드민. `files`(에디션 JSON·생성 기록·매니페스트 읽고 쓰기), `generate`(이 컴퓨터의 Chrome으로 PDF 저장, 쪽 크기·수 검사), `actions`(Server Action), `fields`(종류별 옵션 패널 표), `editor` |
+
+에디션 원본은 `apps/web/print-editions/<id>.json`, 생성 기록은 `<id>.build.json`, 결과 PDF와 매니페스트는 `apps/web/public/downloads/`에 있다. 모두 커밋한다.
 
 ### 4.4 shared
 
@@ -178,7 +191,7 @@ import 경로:
 
 ## 6. packages/seasonal
 
-제철달력의 도메인. React, Next.js, DOM을 모른다. MVP 이후 달력 인쇄 페이지(`.scratch/calendar-print/spec.md`)도 이 코드를 쓴다. 의존성: `date-fns`, `@date-fns/tz`, `@hyunbinseo/holidays-kr`, `es-hangul`.
+제철달력의 도메인. React, Next.js, DOM을 모른다. 인쇄 페이지(`.scratch/calendar-print/spec.md`)도 이 코드를 쓴다. 의존성: `date-fns`, `@date-fns/tz`, `@hyunbinseo/holidays-kr`, `es-hangul`, `zod`(인쇄 사양 파서).
 
 | 모듈 | 내용 |
 |---|---|
@@ -187,18 +200,22 @@ import 경로:
 | `data/drawn-foods.generated.ts` | 생성 파일. 일러스트가 있는 품종 id |
 | `data/food-bounds.generated.ts` | 생성 파일. 그림이 상자 안에서 아래로 어디까지 그려지는지 (이름표 위치) |
 | `data/food-sizes.ts` | `FOOD_SCALE`: 작아 보이는 품종의 그림 배율. 손으로 조정 |
-| `data/months.ts` | `MONTHS`, `isMonth`, `formatSeasonMonths` |
+| `data/months.ts` | `MONTHS`, `isMonth`, `formatSeasonMonths`, `orderSeasonMonths` |
 | `data/seasons.ts` | `SEASONS`, `SEASON_MONTHS`, `isSeason`, `seasonOfMonth` |
 | `data/festivals.ts` | `FESTIVALS`(전통 음식 포함), 연도별 날짜, `upcomingFestival`, `festivalsInMonth`, `festivalsWithFood` |
 | `data/copy.ts` | 화면 문구: 달별 문구, 계절 설명, 명절 배경, UI 문구, 먹음 라벨 |
 | `calendar/today.ts` | `TIME_ZONE`(Asia/Seoul), `seoulNow`, `seoulToday`, `currentMonth` |
-| `calendar/month-calendar.ts` | 달력 칸 계산, `CalendarDate` |
+| `calendar/month-calendar.ts` | 달력 칸 계산(일·월요일 시작), `CalendarDate` |
+| `calendar/variants.ts` | 달력 모양 4가지(`CALENDAR_VARIANTS`)와 이름. 화면 ⚙와 인쇄물이 같이 쓴다 |
 | `calendar/holidays.ts` | 그 달 공휴일 |
 | `calendar/lunar.ts` | 음력 → 양력, 동지 |
 | `calendar/date-utils.ts` | 요일 이름, 달의 날 수 |
 | `layout/scatter.ts` | 흩어진 배치. 시드 난수(LCG)로 같은 입력이면 같은 결과, 0..1 정규화 좌표, 화면 구간(`SCATTER_FRAMES`)별 고정 비율 |
 | `layout/merge-saved.ts` | 저장된 배치와 바뀐 품종 목록 병합 |
 | `search/match-foods.ts` | 이름·별칭·초성 검색 |
+| `print/spec.ts` | 인쇄 사양 `PrintSpec`(종류별 유니언, zod 파서), `PAPERS`, `KIND_PAGES`, 종류별 기본값, URL 인코딩, 해시 |
+| `print/edition.ts` | 에디션, 다운로드 경로, 매니페스트 |
+| `print/foods.ts` | 인쇄물 칸(달·계절)에 넣을 품종 고르기 |
 
 테스트는 `*.test.ts`가 옆에 있다(vitest, 8개 파일). `packages/seasonal/README.md`도 참고한다.
 
@@ -285,7 +302,7 @@ grocery-price/
 | 폴더 | 내용 | 상태 |
 |---|---|---|
 | `seasonal-mvp/` | 제철달력 MVP 화면 13개 티켓 | 01~11 resolved, 12 ready-for-agent(데스크톱·태블릿), 13 needs-info(디자인 다듬기) |
-| `calendar-print/` | 달력 PDF 어드민(에디션 생성·발행)과 다운로드 | MVP 이후, needs-triage |
+| `calendar-print/` | 달력 PDF 어드민(에디션 생성·공개)과 다운로드 | 1차 구현됨(인쇄물 4종, 어드민, 내려받기). 배치 끌어 옮기기·명절·음력 옵션은 남음 |
 | `seo/` | 검색 색인(SEO) 기반: 레지스트리·sitemap·robots·JSON-LD·색인 스위치 | 01~07 resolved, 08 needs-triage(품종 본문 보강) |
 | `p2-data-source-spec/` | 가격 서비스 P2 데이터 소스 명세 | 진행 중. 01 resolved, 나머지는 ready-for-agent·ready-for-human |
 | `p3-variety-catalog/` | P3 품종 목록 | ready-for-human |

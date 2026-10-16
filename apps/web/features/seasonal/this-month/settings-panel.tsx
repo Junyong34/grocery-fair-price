@@ -2,7 +2,7 @@
 
 import { Settings } from "lucide-react"
 import { overlay } from "overlay-kit"
-import { lazy, Suspense } from "react"
+import { lazy, Suspense, useState } from "react"
 
 import { BottomSheet } from "@workspace/ui/components/bottom-sheet"
 import { Button } from "@workspace/ui/components/button"
@@ -41,7 +41,7 @@ export function MobileSettingsButton() {
         }
       >
         <Suspense>
-          <LazySettingsFields />
+          <LazySettingsFields onNavigate={close} />
         </Suspense>
       </BottomSheet>
     ))
@@ -61,8 +61,9 @@ export function MobileSettingsButton() {
 
 /** 데스크톱 상단 바의 ⚙. 헤더에서 내려오는 패널로 연다. */
 export function DesktopSettingsButton() {
+  const [open, setOpen] = useState(false)
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
@@ -77,7 +78,7 @@ export function DesktopSettingsButton() {
       <PopoverContent align="end" className="w-[400px] bg-canvas">
         <p className="font-semibold text-ink">표시</p>
         <Suspense>
-          <LazySettingsFields />
+          <LazySettingsFields onNavigate={() => setOpen(false)} />
         </Suspense>
       </PopoverContent>
     </Popover>
