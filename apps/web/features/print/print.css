@@ -17,7 +17,7 @@
 
 .print-sheet {
   /* 가정용 프린터가 못 찍는 가장자리. 글자와 선은 이 안에만 둔다. */
-  --safe: max(8mm, calc(var(--u) * 12));
+  --safe: calc(var(--u) * 12);
   /* 0.25mm보다 가는 선은 인쇄에서 사라진다. */
   --line: max(0.25mm, calc(var(--u) * 0.2));
   position: relative;
@@ -35,6 +35,8 @@
   -webkit-print-color-adjust: exact;
 }
 .print-sheet:last-child { break-after: auto; }
+/* 여백 없이 용지 끝까지 채운다. 가정용 프린터는 가장자리 몇 mm가 잘릴 수 있다. */
+.print-sheet[data-margin="none"] { --safe: 0px; }
 
 .print-sheet *,
 .print-sheet *::before,

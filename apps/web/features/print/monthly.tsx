@@ -6,15 +6,11 @@ import type { MonthlySpec, PageKey, Paper } from "@workspace/seasonal/print/spec
 import { FoodArea } from "./parts/food-area"
 import { PrintCalendar } from "./parts/print-calendar"
 import { Sheet } from "./parts/sheet"
-import { monthSeason, surfaceColor, t, u } from "./parts/units"
+import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
 
 // 월간 달력: 한 장에 한 달(위 그림, 아래 달력). 12개월 묶음은 표지 + 열두 장이다.
-// 치수는 A4 기준 용지 단위. 안쪽(여백 12를 뺀) 크기는 세로 186×273, 가로 273×186이다.
+// 치수는 A4 기준 용지 단위(innerSize).
 
-const INNER = {
-  portrait: { width: 186, height: 273 },
-  landscape: { width: 273, height: 186 },
-} as const
 const HEADER = 26
 const MEMO = 34
 
@@ -31,7 +27,7 @@ export function MonthlySheets({ spec, paper, page }: { spec: MonthlySpec; paper:
 }
 
 function MonthSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; month: Month }) {
-  const inner = INNER[spec.orientation]
+  const inner = innerSize(spec)
   const portrait = spec.orientation === "portrait"
   const foods = spec.foodLayout === "none" ? [] : monthFoods(month, { max: spec.foods.max, categories: [] })
   const showFoods = spec.foodLayout !== "none"
@@ -120,7 +116,7 @@ function Memo({ kind, month, height }: { kind: "lines" | "eaten-check"; month: M
 }
 
 function Cover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
-  const inner = INNER[spec.orientation]
+  const inner = innerSize(spec)
   const picks = MONTHS.flatMap((month) => monthFoods(month, { max: 1, categories: [] }))
   return (
     <Sheet spec={spec} paper={paper} background={surfaceColor(spec.surface === "season" ? "cream" : spec.surface)}>

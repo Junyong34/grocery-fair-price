@@ -30,7 +30,7 @@ export function Sheet({
     background,
   } as React.CSSProperties
   return (
-    <section className={`print-sheet ${className ?? ""}`} data-paper={paper} data-orientation={spec.orientation} style={style}>
+    <section className={`print-sheet ${className ?? ""}`} data-paper={paper} data-orientation={spec.orientation} data-margin={spec.margin} style={style}>
       {children}
     </section>
   )

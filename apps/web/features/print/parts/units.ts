@@ -21,3 +21,12 @@ export function surfaceColor(surface: PrintSpec["surface"], season?: Season): st
 }
 
 export const monthSeason = (month: Month) => seasonOfMonth(month)
+
+/** 바깥 여백(용지 단위). CSS의 --safe와 같은 값이다. */
+const MARGIN = { safe: 12, none: 0 } as const
+
+/** 여백 안쪽 크기(A4 기준 용지 단위). 종류별 레이아웃은 이 크기 안에 칸을 나눈다. */
+export function innerSize(spec: PrintSpec): { width: number; height: number } {
+  const margin = MARGIN[spec.margin] * 2
+  return spec.orientation === "portrait" ? { width: 210 - margin, height: 297 - margin } : { width: 297 - margin, height: 210 - margin }
+}

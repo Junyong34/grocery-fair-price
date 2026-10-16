@@ -5,20 +5,16 @@ import type { MonthPosterSpec, Paper } from "@workspace/seasonal/print/spec"
 import { FoodArea, flowSize } from "./parts/food-area"
 import { gridSize } from "./parts/grid"
 import { Sheet } from "./parts/sheet"
-import { monthSeason, surfaceColor, t, u } from "./parts/units"
+import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
 
 // 월별 제철 포스터: 열두 칸에 그 달 품종을 놓는다. 날짜가 없어 해가 바뀌어도 그대로 쓴다.
 
-const INNER = {
-  portrait: { width: 186, height: 273 },
-  landscape: { width: 273, height: 186 },
-} as const
 const HEADER = 22
 const CELL_LABEL = 7
 const GAP = 3
 
 export function MonthPoster({ spec, paper }: { spec: MonthPosterSpec; paper: Paper }) {
-  const inner = INNER[spec.orientation]
+  const inner = innerSize(spec)
   const { columns, rows } = gridSize(spec.grid)
   const cell = {
     width: (inner.width - GAP * (columns - 1)) / columns,

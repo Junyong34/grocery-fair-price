@@ -369,6 +369,9 @@ AGENTS.md "Generated files" 표에 `public/downloads/**`와 명령 `pnpm prints:
 - 연간 한 장은 달력 모양(`variant`)을 고르지 않는다. 칸이 작아 plain만 쓴다.
 - 숫자 display 서체는 라이선스 확인 전이라 고를 수 없다.
 - 그림이 없는 품종은 인쇄물에 넣지 않는다.
+- 에디션 id는 관리자가 적지 않는다. `nextEditionId`가 "종류-번호"(`monthly-3`)로 붙이고, 관리자는 종류와 이름만 고른다.
+- 모든 종류에 `margin: "safe" | "none"`이 있다. none은 여백 없이 용지 끝까지 채운다(집 프린터는 가장자리가 잘릴 수 있다). 이 값이 없는 예전 에디션은 safe로 읽는다.
+- 어드민 화면은 cojeev 컴포넌트(article-headings 목록, card, field, input, native-select, number-input, toggle-group, tabs, switch, badge, kbd, empty, skeleton)로 짰다.
 
 남은 일:
 

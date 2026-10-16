@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { buildManifest, downloadPath, parseEdition, type Edition } from "./edition"
+import { buildManifest, downloadPath, nextEditionId, parseEdition, type Edition } from "./edition"
 import { DEFAULT_SPECS } from "./spec"
 
 const edition = (id: string, status: Edition["status"]): Edition => ({
@@ -16,6 +16,18 @@ describe("parseEdition", () => {
     expect(parseEdition(edition("monthly-cream", "draft"))).not.toBeInstanceOf(Error)
     expect(parseEdition(edition("../etc", "draft"))).toBeInstanceOf(Error)
     expect(parseEdition(edition("크림", "draft"))).toBeInstanceOf(Error)
+  })
+})
+
+describe("nextEditionId", () => {
+  it("종류 이름 뒤에 그 종류에서 가장 큰 번호 + 1을 붙인다", () => {
+    expect(nextEditionId("monthly", [])).toBe("monthly-1")
+    expect(nextEditionId("monthly", ["monthly-1", "monthly-4", "year-sheet-9", "aa"])).toBe("monthly-5")
+    expect(nextEditionId("year-sheet", ["monthly-1"])).toBe("year-sheet-1")
+  })
+
+  it("중간의 빈 번호를 채우지 않고 최댓값을 잇는다", () => {
+    expect(nextEditionId("month-poster", ["month-poster-2"])).toBe("month-poster-3")
   })
 })
 

@@ -6,20 +6,16 @@ import { FoodArea } from "./parts/food-area"
 import { gridSize } from "./parts/grid"
 import { PrintCalendar } from "./parts/print-calendar"
 import { Sheet } from "./parts/sheet"
-import { monthSeason, surfaceColor, t, u } from "./parts/units"
+import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
 
 // 연간 달력 한 장: 달마다 그림 칸과 작은 달력이 한 쌍이다.
 // 2x6은 한 줄에 두 달이고 그림·달력을 좌우로, 줄마다 순서를 바꿔 체크무늬로 놓는다. 3x4·4x3은 그림 위, 달력 아래.
 
-const INNER = {
-  portrait: { width: 186, height: 273 },
-  landscape: { width: 273, height: 186 },
-} as const
 const HEADER = 18
 const GAP = 3
 
 export function YearSheet({ spec, paper }: { spec: YearSheetSpec; paper: Paper }) {
-  const inner = INNER[spec.orientation]
+  const inner = innerSize(spec)
   const { columns, rows } = gridSize(spec.grid)
   const cell = {
     width: (inner.width - GAP * (columns - 1)) / columns,

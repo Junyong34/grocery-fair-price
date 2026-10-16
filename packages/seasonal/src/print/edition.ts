@@ -30,6 +30,13 @@ export function parseEdition(value: unknown): Edition | Error {
   return spec instanceof Error ? spec : { ...result.data, spec }
 }
 
+/** 새 에디션 id. "종류-번호"이고 번호는 그 종류에서 가장 큰 번호 + 1이다. 관리자는 이름만 정한다. */
+export function nextEditionId(kind: PrintKind, existingIds: readonly string[]): string {
+  const pattern = new RegExp(`^${kind}-(\\d+)$`)
+  const numbers = existingIds.map((id) => Number(pattern.exec(id)?.[1] ?? 0))
+  return `${kind}-${Math.max(0, ...numbers) + 1}`
+}
+
 /** public 기준 다운로드 경로. 해시가 없어 다시 만들어도 사용자 링크가 그대로다. */
 export function downloadPath(editionId: string, paper: Paper, page: PageKey): string {
   return `/downloads/${editionId}/${paper.toLowerCase()}/${page}.pdf`

@@ -4,14 +4,10 @@ import type { Paper, SeasonPosterSpec } from "@workspace/seasonal/print/spec"
 
 import { FoodArea, flowSize } from "./parts/food-area"
 import { Sheet } from "./parts/sheet"
-import { surfaceColor, t, u } from "./parts/units"
+import { innerSize, surfaceColor, t, u } from "./parts/units"
 
 // 계절 제철 포스터: 봄·여름·가을·겨울 네 띠에 그 계절에 제철이 시작하는 품종을 놓는다. 달력이 없다.
 
-const INNER = {
-  portrait: { width: 186, height: 273 },
-  landscape: { width: 273, height: 186 },
-} as const
 const HEADER = 22
 const BAND_LABEL = 9
 const GAP = 3
@@ -24,7 +20,7 @@ const SEASON_NAMES: Record<Season, { korean: string; english: string }> = {
 }
 
 export function SeasonPoster({ spec, paper }: { spec: SeasonPosterSpec; paper: Paper }) {
-  const inner = INNER[spec.orientation]
+  const inner = innerSize(spec)
   const band = (inner.height - HEADER - GAP * 3) / 4
   const nameSize = spec.foods.names === "korean" ? 2.8 : 0
   const foods = SEASONS.map((season) => seasonFoods(season, { max: spec.foods.max, categories: spec.categories }))

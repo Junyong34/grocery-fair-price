@@ -24,6 +24,11 @@ describe("parsePrintSpec", () => {
     for (const kind of PRINT_KINDS) expect(parsePrintSpec(DEFAULT_SPECS[kind])).toEqual(DEFAULT_SPECS[kind])
   })
 
+  it("여백 옵션이 없는 예전 사양은 기본 여백으로 읽는다", () => {
+    const { margin: _margin, ...legacy } = DEFAULT_SPECS.monthly
+    expect(parsePrintSpec(legacy)).toEqual({ ...DEFAULT_SPECS.monthly, margin: "safe" })
+  })
+
   it("모르는 종류, 없는 선택지는 오류다", () => {
     expect(parsePrintSpec({ ...DEFAULT_SPECS.monthly, kind: "poster" })).toBeInstanceOf(Error)
     expect(parsePrintSpec({ ...DEFAULT_SPECS.monthly, orientation: "square" })).toBeInstanceOf(Error)

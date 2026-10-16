@@ -33,6 +33,18 @@
 @import "./cojeev/tooltip.css";
 @import "./cojeev/hero-button.css";
 @import "./cojeev/text-reveal.css";
+@import "./cojeev/article-headings.css";
+@import "./cojeev/input.css";
+@import "./cojeev/badge.css";
+@import "./cojeev/native-select.css";
+@import "./cojeev/separator.css";
+@import "./cojeev/kbd.css";
+@import "./cojeev/label.css";
+@import "./cojeev/field.css";
+@import "./cojeev/card.css";
+@import "./cojeev/number-input.css";
+@import "./cojeev/empty.css";
+@import "./cojeev/skeleton.css";
 
 /* cojeev UI(https://cojeev.com/ui) 스타일. globals.css(Tailwind 진입점 + Oura 토큰) 다음에 불러온다.
    컴포넌트는 루트에서 `pnpm ui:add <url>`로 추가한다. CLI는 이 파일을 고치지 않고(임시 파일에 쓴다),

@@ -6,18 +6,26 @@ import type { PrintKind } from "@workspace/seasonal/print/spec"
 
 type Option = { value: string | number; label: string }
 
-export type Field =
+export type Field = (
   | { type: "select"; label: string; path: readonly string[]; options: readonly Option[] }
   | { type: "toggle"; label: string; path: readonly string[] }
   | { type: "number"; label: string; path: readonly string[]; min: number; max: number }
   | { type: "text"; label: string; path: readonly string[] }
   | { type: "categories"; label: string; path: readonly string[] }
+) & { hint?: string }
 
 export type Section = { title: string; fields: readonly Field[] }
 
 const options = (entries: Record<string, string>): Option[] => Object.entries(entries).map(([value, label]) => ({ value, label }))
 
 const orientation: Field = { type: "select", label: "방향", path: ["orientation"], options: options({ portrait: "세로", landscape: "가로" }) }
+const margin: Field = {
+  type: "select",
+  label: "여백",
+  path: ["margin"],
+  options: options({ safe: "기본 여백", none: "여백 없이 꽉 채우기" }),
+  hint: "꽉 채우면 집 프린터에서 가장자리 3~5mm가 잘릴 수 있어요. 인쇄할 때 '여백 없음'을 고르세요.",
+}
 const year: Field = { type: "number", label: "연도", path: ["year"], min: 2020, max: 2100 }
 const title: Field = { type: "text", label: "제목", path: ["title"] }
 const monthLabel: Field = {
@@ -54,9 +62,17 @@ const look: Section = {
   ],
 }
 
+/** 새 에디션을 고를 때 종류 옆에 적는 한 줄 설명 */
+export const KIND_DESCRIPTIONS: Record<PrintKind, string> = {
+  monthly: "한 장에 한 달. 달별 PDF와 표지 포함 12개월 묶음",
+  "year-sheet": "한 장에 열두 달. 그림과 작은 달력이 짝을 이룬다",
+  "season-poster": "봄·여름·가을·겨울 네 띠에 제철 품종",
+  "month-poster": "열두 칸에 달마다 제철 품종. 날짜가 없다",
+}
+
 export const KIND_SECTIONS: Record<PrintKind, readonly Section[]> = {
   monthly: [
-    { title: "용지", fields: [orientation, year, { type: "toggle", label: "12개월 묶음에 표지", path: ["cover"] }] },
+    { title: "용지", fields: [orientation, margin, year, { type: "toggle", label: "12개월 묶음에 표지", path: ["cover"] }] },
     {
       title: "달력",
       fields: [
@@ -72,7 +88,7 @@ export const KIND_SECTIONS: Record<PrintKind, readonly Section[]> = {
     look,
   ],
   "year-sheet": [
-    { title: "용지", fields: [orientation, year, grid] },
+    { title: "용지", fields: [orientation, margin, year, grid] },
     {
       title: "달력",
       fields: [
@@ -86,12 +102,12 @@ export const KIND_SECTIONS: Record<PrintKind, readonly Section[]> = {
     look,
   ],
   "season-poster": [
-    { title: "용지", fields: [orientation, title, { type: "select", label: "계절 표기", path: ["seasonLabel"], options: options({ "english-korean": "Spring · 봄", korean: "봄" }) }] },
+    { title: "용지", fields: [orientation, margin, title, { type: "select", label: "계절 표기", path: ["seasonLabel"], options: options({ "english-korean": "Spring · 봄", korean: "봄" }) }] },
     { ...foods(30), fields: [...foods(30).fields, categories] },
     look,
   ],
   "month-poster": [
-    { title: "용지", fields: [orientation, title, grid, monthLabel] },
+    { title: "용지", fields: [orientation, margin, title, grid, monthLabel] },
     { ...foods(12), fields: [...foods(12).fields, categories] },
     look,
   ],
