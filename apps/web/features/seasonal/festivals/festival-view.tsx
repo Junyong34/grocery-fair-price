@@ -9,6 +9,7 @@ import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 import { routes } from "@/shared/routes"
 
 import { FoodImage } from "../components/food-image"
+import { ShareButton } from "../components/share-button"
 import { CalendarLink, FestivalPeriod } from "./festival-date"
 
 /**
@@ -24,9 +25,12 @@ export function FestivalView({ slug }: { slug: Festival }) {
   return (
     <article className="mx-auto flex max-w-[720px] flex-col gap-6 px-[18px] pt-4 pb-8 lg:pt-8">
       <header className="flex flex-col gap-2">
-        <h1 className="font-heading text-[46px] leading-tight font-bold">
-          {festival.name}
-        </h1>
+        <div className="flex items-start justify-between gap-3">
+          <h1 className="font-heading text-[46px] leading-tight font-bold">
+            {festival.name}
+          </h1>
+          <ShareButton className="-mr-2.5 shrink-0" />
+        </div>
         <FestivalPeriod slug={slug} />
       </header>
 

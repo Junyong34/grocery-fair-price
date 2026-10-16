@@ -8,10 +8,7 @@ import { Button } from "@workspace/ui/components/button"
 import { Toast, ToastProvider, ToastTitle, ToastViewport } from "@workspace/ui/components/toast"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { routes } from "@/shared/routes"
 import { SITE_CONFIG } from "@/shared/meta"
-
-import { useIsActive } from "./nav-link"
 
 /** 복사됨 표시(✓)와 토스트가 머무는 시간 */
 const FEEDBACK_MS = 2200
@@ -36,7 +33,8 @@ function showShareToast(message: string) {
 }
 
 /**
- * 공유 버튼. 지금 보는 화면의 맨 위 오른쪽에 둔다(일반 화면은 헤더, 품종 상세 시트는 시트 제목 줄).
+ * 공유 버튼. 공유할 대상이 뚜렷한 화면의 제목 줄 오른쪽에 둔다(월별·계절·명절 상세, 품종 상세 시트).
+ * 이달(모바일)은 제목 줄이 없어 월 레일 아래에 둔다(MonthRail). 월별·계절 목록과 나의 식탁(먹음 기록은 기기에만 있어 링크를 받은 사람은 빈 식탁을 본다)에는 두지 않는다.
  * 공유 시트(Web Share API)가 있으면 그것을, 없으면 주소를 복사하고 토스트로 알린다.
  */
 export function ShareButton({ className }: { className?: string }) {
@@ -80,12 +78,4 @@ export function ShareButton({ className }: { className?: string }) {
       {copied ? <Check aria-hidden size={20} strokeWidth={2} /> : <Share2 aria-hidden size={20} strokeWidth={1.6} />}
     </Button>
   )
-}
-
-/**
- * 헤더의 공유 버튼. 나의 식탁에서는 숨긴다: 먹음 기록은 기기에만 있어 링크를 받은 사람은 자기 빈 식탁을 보게 된다.
- */
-export function HeaderShareButton() {
-  const onMyTable = useIsActive(routes.seasonal.myTable)
-  return onMyTable ? null : <ShareButton />
 }

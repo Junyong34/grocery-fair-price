@@ -6,6 +6,7 @@ import { Suspense } from "react"
 import { FOODS, findFood } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 
+import { ShareButton } from "@/features/seasonal/components/share-button"
 import { FoodDetail } from "@/features/seasonal/food-detail/food-detail"
 import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
@@ -46,10 +47,13 @@ async function Food({ params }: { params: Params }) {
   if (!food) notFound()
   return (
     <article className="mx-auto flex max-w-[560px] flex-col gap-4 px-[18px] pt-6 lg:pt-10">
-      <Link href={routes.seasonal.root} className="text-sm text-stone">
-        ‹ 이달의 제철
-      </Link>
-      {/* 전체 페이지는 헤더에 공유 버튼이 있어 제목 옆에는 두지 않는다(시트는 헤더를 가려 시트 제목 줄에 둔다). */}
+      <div className="flex items-center justify-between gap-3">
+        <Link href={routes.seasonal.root} className="text-sm text-stone">
+          ‹ 이달의 제철
+        </Link>
+        {/* 시트는 시트 제목 줄에 공유가 있다. 전체 페이지는 맨 위 줄 오른쪽에 둔다. */}
+        <ShareButton className="-mr-2.5 shrink-0" />
+      </div>
       <FoodDetail food={food} title={<h1 className="font-heading text-[36px] leading-tight font-bold">{food.name}</h1>} />
     </article>
   )

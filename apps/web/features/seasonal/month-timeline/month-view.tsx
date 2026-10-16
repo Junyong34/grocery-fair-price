@@ -9,6 +9,7 @@ import { Button } from "@workspace/ui/components/button"
 
 import { routes } from "@/shared/routes"
 
+import { ShareButton } from "../components/share-button"
 import { EatenInMonth } from "./eaten-summary"
 import { FoodCard } from "./food-card"
 import { FoodGrid, ViewSwitch } from "./food-grid"
@@ -46,10 +47,14 @@ export function MonthView({ month }: { month: Month }) {
           >
             {month}
           </p>
-          <h1 className="font-heading text-[34px] leading-tight lg:text-xl lg:text-stone">
-            <span className="lg:sr-only">{month}월 — </span>
-            {note}
-          </h1>
+          {/* 모바일은 제목 오른쪽. 데스크톱은 래퍼를 풀어(contents) 공유 버튼만 패널 오른쪽 위, 큰 숫자와 같은 높이에 둔다. */}
+          <div className="flex items-start justify-between gap-3 lg:contents">
+            <h1 className="font-heading text-[34px] leading-tight break-keep lg:text-xl lg:text-stone">
+              <span className="lg:sr-only">{month}월 — </span>
+              {note}
+            </h1>
+            <ShareButton className="-mr-2.5 shrink-0 lg:absolute lg:top-3 lg:right-0 lg:mr-0" />
+          </div>
           <p className="text-sm text-stone">
             {foods.length}가지 제철 · 먹은{" "}
             <EatenInMonth ids={foods.map((food) => food.id)} />

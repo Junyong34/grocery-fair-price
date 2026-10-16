@@ -14,6 +14,7 @@ import { routes } from "@/shared/routes"
 
 import { EatenBadgeToday } from "../components/eaten-badge"
 import { FoodImage } from "../components/food-image"
+import { ShareButton } from "../components/share-button"
 import { SeasonTitle } from "./season-card"
 import { SEASON_COLOR_VAR } from "./season-style"
 
@@ -48,12 +49,12 @@ export function SeasonDetail({ season }: { season: Season }) {
     >
       <div className="mx-auto max-w-[1080px] px-[18px] pt-4 pb-8 lg:grid lg:grid-cols-[300px_1fr] lg:gap-10 lg:px-6 lg:pt-8">
         <aside className="flex flex-col gap-3 lg:sticky lg:top-20 lg:self-start">
-          <Link
-            href={routes.seasonal.seasons}
-            className="self-start text-sm text-stone"
-          >
-            ‹ 네 계절<span className="hidden lg:inline">로</span>
-          </Link>
+          <div className="flex items-center justify-between gap-3">
+            <Link href={routes.seasonal.seasons} className="text-sm text-stone">
+              ‹ 네 계절<span className="hidden lg:inline">로</span>
+            </Link>
+            <ShareButton className="-mr-2.5 shrink-0" />
+          </div>
           <span
             aria-hidden
             className="h-[3px] w-12"

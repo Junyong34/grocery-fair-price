@@ -5,6 +5,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { formatMonthLabel, MONTHS } from "@workspace/seasonal/data/months"
 
+import { ShareButton } from "../components/share-button"
 import { useSettingsStore } from "../stores/settings-store"
 
 import { jumpToMonth, useActiveMonth } from "./active-month"
@@ -26,30 +27,38 @@ export function JumpButton({
   )
 }
 
-/** 모바일 오른쪽 아래 월 레일. 누르면 그 달로 즉시 이동한다(명세 3.1 ②). 달 이름 표기는 ⚙에서 고른다. */
+/**
+ * 모바일 오른쪽 가운데 월 레일. 누르면 그 달로 즉시 이동한다(명세 3.1 ②). 달 이름 표기는 ⚙에서 고른다.
+ * 레일 바로 아래에 공유 버튼을 매단다(이달 화면은 공유할 대상이 한 장면이 아니라 헤더에 두지 않았다). 레일 위치는 그대로다.
+ */
 export function MonthRail() {
   const active = useActiveMonth((state) => state.active)
   const labelStyle = useSettingsStore((state) => state.monthLabel)
   return (
-    <nav
-      aria-label="달 이동"
-      className="fixed top-1/2 right-1 z-(--z-sticky) -translate-y-1/2 flex flex-col gap-0.5 rounded-full border border-hairline bg-canvas/94 p-1 backdrop-blur lg:hidden"
-    >
-      {MONTHS.map((month) => (
-        <button
-          key={month}
-          type="button"
-          aria-label={`${month}월로 이동`}
-          aria-current={active === month ? "true" : undefined}
-          onClick={() => jumpToMonth(month)}
-          className={cn(
-            "h-[26px] min-w-7 rounded-full px-0.5 text-xs leading-none tabular-nums text-stone transition-colors",
-            active === month && "bg-gold-soft font-semibold text-gold-deep",
-          )}
-        >
-          {formatMonthLabel(month, labelStyle)}
-        </button>
-      ))}
-    </nav>
+    <div className="fixed top-1/2 right-1 z-(--z-sticky) -translate-y-1/2 lg:hidden">
+      <nav
+        aria-label="달 이동"
+        className="flex flex-col gap-0.5 rounded-full border border-hairline bg-canvas/94 p-1 backdrop-blur"
+      >
+        {MONTHS.map((month) => (
+          <button
+            key={month}
+            type="button"
+            aria-label={`${month}월로 이동`}
+            aria-current={active === month ? "true" : undefined}
+            onClick={() => jumpToMonth(month)}
+            className={cn(
+              "h-[26px] min-w-7 rounded-full px-0.5 text-xs leading-none tabular-nums text-stone transition-colors",
+              active === month && "bg-gold-soft font-semibold text-gold-deep",
+            )}
+          >
+            {formatMonthLabel(month, labelStyle)}
+          </button>
+        ))}
+      </nav>
+      <div className="absolute inset-x-0 top-full mt-2 flex justify-center">
+        <ShareButton className="size-9 rounded-full border border-hairline bg-canvas/94 backdrop-blur" />
+      </div>
+    </div>
   )
 }
