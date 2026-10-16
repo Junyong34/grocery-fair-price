@@ -42,6 +42,11 @@ export function formatMonthLabel(month: number, style: MonthLabelStyle, length: 
  * 달을 원으로 보고 빈 달이 가장 긴 곳 다음부터 적으므로, 해를 넘는 제철은 [1, 2, 11, 12] → "제철 11·12·1·2월"이 된다.
  */
 export function formatSeasonMonths(months: readonly number[]): string {
+  return `제철 ${orderSeasonMonths(months).join("·")}월`
+}
+
+/** 제철 달을 제철이 시작하는 달부터 차례로 늘어놓는다. 예: [1, 2, 11, 12] → [11, 12, 1, 2] */
+export function orderSeasonMonths(months: readonly number[]): number[] {
   const sorted = [...new Set(months)].sort((a, b) => a - b)
   let start = 0
   let widestGap = -1
@@ -53,6 +58,5 @@ export function formatSeasonMonths(months: readonly number[]): string {
       start = i
     }
   })
-  const ordered = [...sorted.slice(start), ...sorted.slice(0, start)]
-  return `제철 ${ordered.join("·")}월`
+  return [...sorted.slice(start), ...sorted.slice(0, start)]
 }
