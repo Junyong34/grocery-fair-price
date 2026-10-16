@@ -8,6 +8,7 @@ import { PRINT_KINDS, specHash, type PrintKind } from "@workspace/seasonal/print
 
 import { EditionBoard } from "@/features/admin-print/edition-board"
 import { listEditions, readBuilds } from "@/features/admin-print/files"
+import { formatBuildDate } from "@/features/admin-print/format"
 import { NewEditionForm } from "@/features/admin-print/new-edition-form"
 
 export default function Page() {
@@ -39,7 +40,7 @@ async function Board() {
       kind: edition.spec.kind,
       title: edition.title,
       published: edition.status === "published",
-      generatedAt: build && build.specHash === specHash(edition.spec) ? build.generatedAt.slice(0, 10) : null,
+      generatedAt: build && build.specHash === specHash(edition.spec) ? formatBuildDate(build.generatedAt) : null,
     }
   })
   return (

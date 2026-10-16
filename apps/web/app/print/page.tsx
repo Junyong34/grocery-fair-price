@@ -8,7 +8,7 @@ import { createMetadata } from "@/shared/meta"
 
 export const metadata = createMetadata({ title: "인쇄", noIndex: true })
 
-// 인쇄 전용 페이지. ?spec=<base64url>&paper=<A4|A3>&page=<1..12|all>
+// 인쇄 전용 페이지. ?spec=<base64url>&paper=<A4|A3>&page=all
 // 어드민과 PDF 생성기만 쓰므로 개발 서버에서만 열린다(.scratch/calendar-print/spec.md).
 export default function Page(props: PageProps<"/print">) {
   if (process.env.NODE_ENV === "production") notFound()

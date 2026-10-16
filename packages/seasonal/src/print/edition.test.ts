@@ -45,7 +45,7 @@ describe("buildManifest", () => {
       { a: { specHash: "aa", generatedAt: "2026-10-16", bytes: {} }, b: { specHash: "bb", generatedAt: "2026-10-15", bytes: {} } },
     )
     expect(manifest.editions.map((entry) => entry.id)).toEqual(["a", "b"])
-    expect(Object.keys(manifest.editions[0]!.files.A4)).toHaveLength(13)
+    expect(Object.keys(manifest.editions[0]!.files.A4)).toEqual(["all"])
     expect(manifest.editions[0]!.specHash).toBe("aa")
   })
 })

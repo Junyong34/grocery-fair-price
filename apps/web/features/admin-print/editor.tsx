@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState, useTransition } from "react"
 
 import { Badge } from "@workspace/ui/components/badge"
-import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { Field, FieldControl, FieldDescription, FieldLabel } from "@workspace/ui/components/field"
 import { Input } from "@workspace/ui/components/input"
@@ -16,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/componen
 import { ToggleGroup, ToggleGroupItem } from "@workspace/ui/components/toggle-group"
 
 import { FOODS } from "@workspace/seasonal/data/foods"
-import { downloadPath, type BuildRecord, type Edition } from "@workspace/seasonal/print/edition"
+import type { BuildRecord, Edition } from "@workspace/seasonal/print/edition"
 import {
   encodeSpec,
   KIND_PAGES,
@@ -31,7 +30,10 @@ import {
 
 import { generateEdition, saveEdition } from "./actions"
 import { DeleteEditionButton } from "./delete-edition-button"
+import { EditionSteps } from "./edition-steps"
 import { getAt, KIND_SECTIONS, setAt, type Field as FieldSpec } from "./fields"
+import { editionFlow, pdfPaths } from "./flow"
+import { formatBuildTime } from "./format"
 
 const CATEGORIES = [...new Set(FOODS.map((food) => food.category))]
 const MM_TO_PX = 96 / 25.4
@@ -40,14 +42,14 @@ const PREVIEW_MAX_WIDTH = 680
 
 const pageLabel = (page: PageKey) => (page === "all" ? "전체" : `${page}월`)
 
-/** 에디션 편집기: 왼쪽 옵션(탭), 오른쪽 /print 미리보기. 저장해야 생성할 수 있다. */
+/** 에디션 편집기: 위에 작업 순서(저장 → PDF 만들기), 왼쪽 옵션(탭), 오른쪽 /print 미리보기. 저장해야 생성할 수 있다. */
 export function EditionEditor({ saved, build: savedBuild }: { saved: Edition; build?: BuildRecord }) {
   const [draft, setDraft] = useState(saved)
   const [base, setBase] = useState(saved)
   const [build, setBuild] = useState(savedBuild)
   const [paper, setPaper] = useState<Paper>("A4")
   const [page, setPage] = useState<PageKey>(KIND_PAGES[saved.spec.kind][0]!)
-  const [message, setMessage] = useState<{ tone: "ok" | "error"; text: string }>()
+  const [message, setMessage] = useState<{ tone: "error"; text: string }>()
   const [action, setAction] = useState<"save" | "generate">()
   const [pending, startTransition] = useTransition()
 
@@ -56,6 +58,7 @@ export function EditionEditor({ saved, build: savedBuild }: { saved: Edition; bu
   const stale = !build || build.specHash !== specHash(base.spec)
   const spec = checked instanceof Error ? base.spec : checked
   const sections = KIND_SECTIONS[draft.spec.kind]
+  const flow = editionFlow({ dirty, invalid: checked instanceof Error, hasBuild: Boolean(build), stale })
 
   const change = (path: readonly string[], value: unknown) => setDraft((current) => ({ ...current, spec: setAt(current.spec, path, value) }))
 
@@ -63,7 +66,8 @@ export function EditionEditor({ saved, build: savedBuild }: { saved: Edition; bu
     setAction("save")
     startTransition(async () => {
       const result = await saveEdition(draft)
-      setMessage(result.error ? { tone: "error", text: result.error } : { tone: "ok", text: "저장했어요." })
+      // 성공은 작업 순서 표시가 알려 주므로 오류만 메시지로 띄운다.
+      setMessage(result.error ? { tone: "error", text: result.error } : undefined)
       if (!result.error) setBase(draft)
     })
   }
@@ -73,7 +77,7 @@ export function EditionEditor({ saved, build: savedBuild }: { saved: Edition; bu
     setMessage(undefined)
     startTransition(async () => {
       const result = await generateEdition(base.id)
-      setMessage(result.error ? { tone: "error", text: result.error } : { tone: "ok", text: `PDF ${Object.keys(result.build!.bytes).length}개를 만들었어요.` })
+      setMessage(result.error ? { tone: "error", text: result.error } : undefined)
       if (result.build) setBuild(result.build)
     })
   }
@@ -81,14 +85,17 @@ export function EditionEditor({ saved, build: savedBuild }: { saved: Edition; bu
   return (
     <div className="flex flex-col gap-8">
       <header className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center gap-2 text-sm text-caption">
-          <Badge>{PRINT_KIND_LABELS[draft.spec.kind]}</Badge>
-          <Badge variant={draft.status === "published" ? "olive" : "default"}>{draft.status === "published" ? "공개" : "초안"}</Badge>
-          <Badge variant={dirty ? "pending" : stale ? "yellow" : "olive-soft"}>
-            {dirty ? "저장 안 됨" : stale ? "PDF 생성 필요" : `${build!.generatedAt.slice(0, 16).replace("T", " ")} 생성`}
-          </Badge>
-          <span className="tabular-nums">id {draft.id}</span>
-        </div>
+        <dl className="flex flex-wrap gap-x-8 gap-y-3 self-start rounded-2xl bg-surface px-5 py-3">
+          <Meta label="종류">
+            <Badge>{PRINT_KIND_LABELS[draft.spec.kind]}</Badge>
+          </Meta>
+          <Meta label="공개 상태">
+            <Badge variant={draft.status === "published" ? "olive" : "default"}>{draft.status === "published" ? "공개" : "초안"}</Badge>
+          </Meta>
+          <Meta label="id · 다운로드 주소에 쓰여요">
+            <span className="font-mono text-sm tabular-nums text-ink">{draft.id}</span>
+          </Meta>
+        </dl>
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
           <Input
             aria-label="에디션 이름"
@@ -99,17 +106,20 @@ export function EditionEditor({ saved, build: savedBuild }: { saved: Edition; bu
           />
           <div className="flex flex-wrap items-center gap-2">
             <DeleteEditionButton id={base.id} title={base.title} from="editor" />
-            <Button type="button" variant="outline" onClick={generate} disabled={pending || dirty}>
-              {pending && action === "generate" ? "PDF 만드는 중…" : "PDF 생성"}
-            </Button>
-            <Button type="button" onClick={save} disabled={pending || !dirty || checked instanceof Error}>
-              {pending && action === "save" ? "저장하는 중…" : "저장"}
-            </Button>
           </div>
         </div>
-        <p aria-live="polite" className={message?.tone === "error" ? "text-sm text-error empty:hidden" : "text-sm text-stone empty:hidden"}>
+        <EditionSteps
+          flow={flow}
+          pending={pending}
+          running={pending ? action : undefined}
+          generatedAt={build && !stale ? formatBuildTime(build.generatedAt) : undefined}
+          onSave={save}
+          onGenerate={generate}
+        />
+        <p role="alert" className="text-sm text-error empty:hidden">
           {message?.text}
         </p>
+        {build && <GeneratedFiles edition={base} build={build} stale={stale} />}
       </header>
 
       <div className="grid items-start gap-8 lg:grid-cols-[400px_minmax(0,1fr)]">
@@ -179,10 +189,22 @@ export function EditionEditor({ saved, build: savedBuild }: { saved: Edition; bu
               </ToggleGroup>
             )}
           </div>
+          <p className="text-sm text-stone">
+            {dirty ? "저장하지 않은 옵션이 반영된 모습이에요. PDF는 저장한 옵션으로 만들어요." : "저장한 옵션 그대로의 모습이에요."}
+          </p>
           <Preview src={`/print?spec=${encodeSpec(spec)}&paper=${paper}&page=${page}`} paper={paper} landscape={spec.orientation === "landscape"} />
-          {build && !stale && <GeneratedFiles edition={base} />}
         </section>
       </div>
+    </div>
+  )
+}
+
+/** 머리의 이름표 붙은 정보 한 칸. 값이 무슨 정보인지 위에 적는다. */
+function Meta({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <dt className="text-xs text-caption">{label}</dt>
+      <dd className="flex min-h-7 items-center">{children}</dd>
     </div>
   )
 }
@@ -217,21 +239,44 @@ function Preview({ src, paper, landscape }: { src: string; paper: Paper; landsca
   )
 }
 
-function GeneratedFiles({ edition }: { edition: Edition }) {
+/** 만든 PDF의 주소. 주소는 에디션 id·용지·쪽으로 정해져서 다시 만들어도 같다. 관리자는 이 주소로 링크를 건다. */
+function GeneratedFiles({ edition, build, stale }: { edition: Edition; build: BuildRecord; stale: boolean }) {
+  const [copied, setCopied] = useState<Paper>()
+  const copy = async (size: Paper) => {
+    try {
+      await navigator.clipboard.writeText(pdfPaths(edition.id, edition.spec.kind, size).join("\n"))
+      setCopied(size)
+    } catch {
+      setCopied(undefined)
+    }
+  }
   return (
-    <Card>
-      <CardContent className="flex flex-col gap-3 text-sm">
-        <h3 className="font-heading text-base font-bold text-ink">만든 PDF</h3>
-        {PAPER_SIZES.map((size) => (
-          <div key={size} className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <Badge>{size}</Badge>
-            {KIND_PAGES[edition.spec.kind].map((key) => (
-              <a key={key} className="text-stone underline-offset-4 hover:text-ink hover:underline" href={downloadPath(edition.id, size, key)} target="_blank" rel="noreferrer">
-                {pageLabel(key)}
-              </a>
-            ))}
-          </div>
-        ))}
+    <Card className="!p-4">
+      <CardContent className="gap-2 text-sm">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <h3 className="font-heading text-base font-bold text-ink">만든 PDF</h3>
+          <Badge variant={stale ? "yellow" : "olive-soft"}>{stale ? "옛 옵션" : "최신"}</Badge>
+          <span className="text-caption tabular-nums">{formatBuildTime(build.generatedAt)} 생성</span>
+          <span className="text-stone">
+            · 주소 <code className="rounded bg-hairline/60 px-1.5 py-0.5 text-[13px] text-ink">{`/downloads/${edition.id}/{a4|a3}/{쪽}.pdf`}</code>
+            {stale ? " · 이전 옵션으로 만든 파일이고, 다시 만들어도 주소는 그대로예요" : " · 다시 만들어도 주소는 그대로예요"}
+          </span>
+        </div>
+        <div className="flex flex-wrap gap-x-8 gap-y-1.5">
+          {PAPER_SIZES.map((size) => (
+            <div key={size} className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <Badge>{size}</Badge>
+              {KIND_PAGES[edition.spec.kind].map((key, index) => (
+                <a key={key} className="text-stone underline-offset-4 hover:text-ink hover:underline" href={pdfPaths(edition.id, edition.spec.kind, size)[index]} target="_blank" rel="noreferrer">
+                  {pageLabel(key)}
+                </a>
+              ))}
+              <button type="button" onClick={() => copy(size)} className="text-caption underline-offset-4 hover:text-ink hover:underline">
+                {copied === size ? "복사했어요" : "주소 복사"}
+              </button>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   )

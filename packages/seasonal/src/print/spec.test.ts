@@ -75,8 +75,8 @@ describe("specHash", () => {
 })
 
 describe("쪽", () => {
-  it("월간 달력은 달별 12개와 묶음 하나, 나머지는 한 장이다", () => {
-    expect(KIND_PAGES.monthly).toHaveLength(13)
+  it("월간 달력도 다른 종류처럼 묶음 PDF 하나만 만든다", () => {
+    expect(KIND_PAGES.monthly).toEqual(["all"])
     expect(KIND_PAGES["year-sheet"]).toEqual(["all"])
   })
 

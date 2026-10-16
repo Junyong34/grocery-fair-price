@@ -188,7 +188,8 @@ export type PageKey = Month | "all"
 
 /** 종류마다 만들 결과 파일. 생성기·미리보기 탭·다운로드 버튼이 모두 이 표를 읽는다. */
 export const KIND_PAGES = {
-  monthly: [...MONTHS, "all"],
+  // 월간 달력은 12개월(표지 선택)을 담은 PDF 하나만 만든다. 달별 파일은 만들지 않는다.
+  monthly: ["all"],
   "year-sheet": ["all"],
   "season-poster": ["all"],
   "month-poster": ["all"],

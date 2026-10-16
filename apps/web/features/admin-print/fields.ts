@@ -64,7 +64,7 @@ const look: Section = {
 
 /** 새 에디션을 고를 때 종류 옆에 적는 한 줄 설명 */
 export const KIND_DESCRIPTIONS: Record<PrintKind, string> = {
-  monthly: "한 장에 한 달. 달별 PDF와 표지 포함 12개월 묶음",
+  monthly: "한 장에 한 달. 12개월을 담은 PDF 하나(표지는 고를 수 있어요)",
   "year-sheet": "한 장에 열두 달. 그림과 작은 달력이 짝을 이룬다",
   "season-poster": "봄·여름·가을·겨울 네 띠에 제철 품종",
   "month-poster": "열두 칸에 달마다 제철 품종. 날짜가 없다",

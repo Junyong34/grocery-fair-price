@@ -1,4 +1,4 @@
-import { mkdir, readFile } from "node:fs/promises"
+import { mkdir, readdir, readFile, rm } from "node:fs/promises"
 import path from "node:path"
 
 import { downloadPath, type BuildRecord, type Edition } from "@workspace/seasonal/print/edition"
@@ -37,7 +37,15 @@ export async function generatePdfs(edition: Edition, origin: string): Promise<Bu
   } finally {
     await browser.close()
   }
+  await removeUnused(edition.id, bytes)
   return { specHash: specHash(edition.spec), generatedAt: new Date().toISOString(), bytes }
+}
+
+/** 이번에 만들지 않은 옛 PDF(예: 지금은 안 만드는 달별 파일)를 지운다. 다 만든 뒤에만 부르므로 실패하면 옛 파일이 남는다. */
+async function removeUnused(id: string, made: Readonly<Record<string, number>>) {
+  const root = path.join(PUBLIC_DIR, "downloads", id)
+  const files = await readdir(root, { recursive: true }).catch(() => [])
+  await Promise.all(files.filter((file) => file.endsWith(".pdf") && !(`/downloads/${id}/${file}` in made)).map((file) => rm(path.join(root, file), { force: true })))
 }
 
 /** 쪽 크기·쪽 수를 확인하고 파일 크기를 돌려준다. */
