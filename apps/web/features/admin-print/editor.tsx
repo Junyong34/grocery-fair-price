@@ -95,7 +95,7 @@ export function EditionEditor({ saved, build: savedBuild }: { saved: Edition; bu
           value={draft.title}
           maxLength={40}
           onChange={(event) => setDraft({ ...draft, title: event.target.value })}
-          className="!h-auto !rounded-none !bg-transparent !px-0 font-heading !text-3xl font-bold tracking-tight ![box-shadow:none] focus-visible:![box-shadow:inset_0_-2px_0_var(--color-gold)]"
+          className="admin-title !h-auto !rounded-none !px-0 font-heading !text-3xl font-bold tracking-tight"
         />
       </header>
 
