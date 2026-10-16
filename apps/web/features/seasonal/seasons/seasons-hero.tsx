@@ -8,7 +8,6 @@ import { routes } from "@/shared/routes"
 import { NowTag } from "./now-tag"
 import { SeasonBackground } from "./season-background"
 import { SeasonCard } from "./season-card"
-import { SEASON_BACKGROUND } from "./season-style"
 
 /**
  * 3a 네 계절 히어로(명세 3.3 ①). 카드 전체가 계절 상세로 가는 링크다. 네 장이 한 화면을 채운다(cojeev bento-grid의 둥근 카드 격자를 참고).
@@ -30,7 +29,7 @@ export function SeasonsHero() {
               season={season}
               nowTag={<NowTag season={season} />}
               background={
-                <SeasonBackground season={season} variant={SEASON_BACKGROUND} />
+                <SeasonBackground season={season} />
               }
               className="transition-colors duration-350 lg:group-hover/card:bg-surface/60"
             />
