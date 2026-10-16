@@ -82,6 +82,19 @@ export const UI_COPY = {
   yearEndMoreTitle: "다른 방법으로 둘러보기",
   priceComingSoon: "가격 보기 · 준비 중",
   noRelatedFestival: "연결된 명절 없음",
+  /** 나의 식탁 요약의 범위 제목(전체·달·계절 이름을 받는다) */
+  scopeTitle: (name: string | null) =>
+    name ? `${name} 제철 중 맛본 것` : "올해 맛본 제철",
+  /** 나의 식탁 목록 위, 검색 중일 때만 */
+  searchResult: (query: string, count: number, eaten: number) =>
+    `"${query}" 검색 결과 ${count}가지 · ${eaten}가지 먹음`,
+  /** 나의 식탁 요약의 큰 숫자 아래 한 줄 */
+  scopeProgress: (eaten: number, total: number) =>
+    eaten === 0
+      ? `${total}가지 모두 기다리고 있어요`
+      : eaten === total
+        ? "모두 맛봤어요"
+        : `${total - eaten}가지 남았어요`,
 } as const
 
 /** 나의 식탁 행 라벨. 먹은 품종은 EAT_LABELS에서 고르고, 안 먹은 품종은 EAT_LABEL_OFF다. 어떤 음식에도 어울리게 중립적으로 쓴다. */
