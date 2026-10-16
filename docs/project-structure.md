@@ -282,6 +282,7 @@ grocery-price/
 |---|---|---|
 | `seasonal-mvp/` | 제철달력 MVP 화면 13개 티켓 | 01~11 resolved, 12 ready-for-agent(데스크톱·태블릿), 13 needs-info(디자인 다듬기) |
 | `calendar-print/` | 달력 PDF/PNG 다운로드 | MVP 이후, needs-triage |
+| `seo/` | 검색 색인(SEO) 기반: 레지스트리·sitemap·robots·JSON-LD·색인 스위치 | 01~07 ready-for-agent, 08 needs-triage(품종 본문 보강) |
 | `p2-data-source-spec/` | 가격 서비스 P2 데이터 소스 명세 | 진행 중. 01 resolved, 나머지는 ready-for-agent·ready-for-human |
 | `p3-variety-catalog/` | P3 품종 목록 | ready-for-human |
 | `p4-canonical-model/` | P4 통합 데이터 모델 | ready-for-agent·ready-for-human |
@@ -295,6 +296,7 @@ grocery-price/
 | 에이전트 규칙 | `AGENTS.md` |
 | 제철 화면 명세 | `prototypes/seasonal-food/wireframes/WIREFRAME-SPEC.md` (Git 밖) |
 | 명세와 다르게 정한 것, MVP 결정 | `.scratch/seasonal-mvp/spec.md` |
+| SEO 결정(색인 정책, 구조화 데이터, 제목 패턴) | `.scratch/seo/spec.md` |
 | 색·서체 | `apps/web/DESIGN.md`, `packages/ui/src/styles/globals.css` |
 | Next 16 렌더링·캐시 근거 | `apps/web/docs/nextjs-16-patterns.md` |
 | 로고·파비콘 | `apps/web/docs/brand-assets.md` |
