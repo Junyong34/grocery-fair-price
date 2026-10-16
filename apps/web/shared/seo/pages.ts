@@ -43,6 +43,8 @@ export const SEO_PAGES: Readonly<Record<string, () => readonly SitemapEntry[]>> 
 export const NOINDEX_ROUTES: readonly string[] = [
   // 1h 나의 식탁: 기기에 저장된 기록으로 채워져 크롤러에게는 빈 화면이다.
   "/seasonal/my-table",
+  // PDF 인쇄 페이지. 개발 서버에서만 열리고 운영에서는 404다(.scratch/calendar-print/spec.md).
+  "/print",
 ]
 
 /** 다른 페이지로 보내기만 하는 라우트. sitemap에 넣지 않는다. */

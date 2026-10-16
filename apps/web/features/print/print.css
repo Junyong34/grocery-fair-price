@@ -1,0 +1,81 @@
+/* 인쇄 페이지(/print). 용지가 기준인 페이지라 크기는 모두 --u(A4 1mm, A3 √2mm)로 쓰고 화면 폭에 반응하지 않는다.
+   근거: .scratch/calendar-print/spec.md "인쇄 CSS" */
+
+/* @page 크기는 CSS 변수로 바꿀 수 없어 용지×방향마다 이름 붙은 페이지를 둔다. */
+@page a4-portrait { size: A4 portrait; margin: 0; }
+@page a4-landscape { size: A4 landscape; margin: 0; }
+@page a3-portrait { size: A3 portrait; margin: 0; }
+@page a3-landscape { size: A3 landscape; margin: 0; }
+
+.print-sheet[data-paper="A4"][data-orientation="portrait"] { page: a4-portrait; }
+.print-sheet[data-paper="A4"][data-orientation="landscape"] { page: a4-landscape; }
+.print-sheet[data-paper="A3"][data-orientation="portrait"] { page: a3-portrait; }
+.print-sheet[data-paper="A3"][data-orientation="landscape"] { page: a3-landscape; }
+
+.print-sheet[data-paper="A4"] { --u: 1mm; }
+.print-sheet[data-paper="A3"] { --u: calc(1mm * 1.41421); }
+
+.print-sheet {
+  /* 가정용 프린터가 못 찍는 가장자리. 글자와 선은 이 안에만 둔다. */
+  --safe: max(8mm, calc(var(--u) * 12));
+  /* 0.25mm보다 가는 선은 인쇄에서 사라진다. */
+  --line: max(0.25mm, calc(var(--u) * 0.2));
+  position: relative;
+  box-sizing: border-box;
+  width: var(--sheet-w);
+  height: var(--sheet-h);
+  padding: var(--safe);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  break-after: page;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+.print-sheet:last-child { break-after: auto; }
+
+.print-sheet *,
+.print-sheet *::before,
+.print-sheet *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+.print-heading { font-family: var(--print-heading); }
+.print-number { font-family: var(--print-number); font-variant-numeric: tabular-nums; }
+
+/* 칸이 화면 글자 크기(16px)의 줄 높이를 물려받으면 작은 달력이 칸보다 커진다. 글자 크기는 안쪽 요소마다 따로 준다. */
+.print-calendar { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: center; font-size: 0; line-height: 1; }
+.print-calendar .day { display: block; }
+.print-calendar th { font-weight: 500; color: var(--color-caption); }
+.print-calendar td { vertical-align: top; }
+.print-calendar .is-red { color: var(--color-holiday); }
+.print-calendar .holiday-name { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--color-holiday); }
+.print-calendar[data-variant="grid"] { border: var(--line) solid var(--color-hairline); }
+.print-calendar[data-variant="grid"] th { border-bottom: var(--line) solid var(--color-hairline); }
+.print-calendar[data-variant="grid"] td { border: var(--line) solid var(--color-hairline); text-align: left; }
+.print-calendar[data-variant="editorial"] th { border-bottom: var(--line) solid var(--color-ink); text-align: left; color: var(--color-ink); font-weight: 600; }
+.print-calendar[data-variant="editorial"] tr + tr { border-bottom: var(--line) solid var(--color-hairline); }
+.print-calendar[data-variant="editorial"] td { text-align: left; }
+.print-calendar[data-variant="editorial"] .day { font-weight: 300; }
+.print-calendar[data-variant="tiles"] { border-collapse: separate; border-spacing: calc(var(--u) * 0.8); }
+.print-calendar[data-variant="tiles"] td.has-day { background: color-mix(in oklab, var(--color-surface) 70%, transparent); border-radius: calc(var(--u) * 1.2); }
+.print-calendar[data-variant="tiles"] td.has-day.is-red-cell { background: var(--color-holiday-wash); }
+
+.print-food { position: absolute; display: flex; flex-direction: column; align-items: center; }
+.print-food img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; }
+.print-food-name { white-space: nowrap; color: var(--color-stone); line-height: 1.25; }
+.print-flow { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; }
+.print-flow .print-food { position: static; }
+
+/* 브라우저 화면(미리보기)에서는 회색 바탕 위에 용지를 띄운다. 인쇄에는 영향이 없다. */
+@media screen {
+  .print-root { min-height: 100vh; padding: 24px 0; background: var(--color-surface-grey); }
+  .print-sheet { margin: 0 auto 24px; box-shadow: 0 1px 8px rgb(0 0 0 / 0.15); }
+}
+@media print {
+  .print-root { padding: 0; background: none; }
+  .print-sheet { margin: 0; box-shadow: none; }
+}

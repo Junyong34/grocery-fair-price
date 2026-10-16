@@ -163,7 +163,7 @@ export const DEFAULT_SPECS: { [K in PrintKind]: Extract<PrintSpec, { kind: K }> 
     ...common,
     surface: "white",
     kind: "season-poster",
-    title: "제철 과일과 채소",
+    title: "계절별 제철 음식",
     seasonLabel: "english-korean",
     foods: { names: "korean", max: 24 },
     categories: [],
