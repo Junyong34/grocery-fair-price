@@ -31,7 +31,7 @@
 | `fig` | 무화과 | `783c52b4e0a75e6e` |
 | `garlic-chive` | 부추 | `52d0f4e6061a0cf3` |
 | `green-plum` | 매실 | `5831124939add733` |
-| `gwamegi` | 과메기 | `85b9fb467b0b4cda` |
+| `gwamegi` | 과메기 | `7913c3bd8a478c93` |
 | `korean-rockfish` | 우럭(조피볼락) | `78314edd3c2bc2cf` |
 | `korean-zucchini` | 애호박 | `601d149ba21867fa` |
 | `mackerel` | 고등어 | `923d2b276f46c17d` |
@@ -39,7 +39,7 @@
 | `mugwort` | 쑥 | `21b9dad35ff9a09d` |
 | `napa-cabbage` | 배추 | `fcb457d96917dc48` |
 | `olive-flounder` | 광어(넙치) | `698faf02f4207fad` |
-| `oyster` | 굴 | `1dec93cdedca748a` |
+| `oyster` | 굴 | `e1c4e89a4d262d52` |
 | `peach` | 복숭아 | `d7ba3c77537d863d` |
 | `pear` | 배 | `14bf36bc3a8c478a` |
 | `persimmon` | 감 | `be664e364f9cb373` |
