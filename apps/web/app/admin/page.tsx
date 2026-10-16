@@ -16,7 +16,7 @@ export default function Page() {
       <header className="flex flex-col gap-1">
         <h1 className="font-heading text-2xl">인쇄물 에디션</h1>
         <p className="text-sm text-stone">
-          만든 PDF는 public/downloads에 저장된다. 확인한 뒤 print-editions와 함께 커밋하면 사용자 다운로드 화면에 나온다.
+          만든 PDF는 public/downloads에 저장되고 git에는 올라가지 않는다(용량). 저장 위치를 정하기 전까지는 에디션을 공개하지 않는다. 공개하면 운영의 내려받기 링크가 깨진다.
         </p>
       </header>
       <form action={createEdition} className="flex flex-wrap items-end gap-3 rounded-lg border border-hairline p-4 text-sm">

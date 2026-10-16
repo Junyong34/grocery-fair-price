@@ -160,7 +160,7 @@ import 경로:
 | `features/print/` | `/print` 화면. `print-document`(종류 → 컴포넌트 표), 종류별 `monthly`·`year-sheet`·`season-poster`·`month-poster`, `parts/`(시트, 인쇄 달력, 품종 그림 판), `print.css`(A4·A3 `@page`, `--u` 단위) |
 | `features/admin-print/` | 어드민. `files`(에디션 JSON·생성 기록·매니페스트 읽고 쓰기), `generate`(이 컴퓨터의 Chrome으로 PDF 저장, 쪽 크기·수 검사), `actions`(Server Action), `fields`(종류별 옵션 패널 표), `editor` |
 
-에디션 원본은 `apps/web/print-editions/<id>.json`, 생성 기록은 `<id>.build.json`, 결과 PDF와 매니페스트는 `apps/web/public/downloads/`에 있다. 모두 커밋한다.
+에디션 원본은 `apps/web/print-editions/<id>.json`, 생성 기록은 `<id>.build.json`, 결과 PDF와 매니페스트는 `apps/web/public/downloads/`에 있다. 에디션 JSON·생성 기록·매니페스트는 커밋하고, PDF는 용량이 커서 `.gitignore`로 뺀다. PDF를 둘 곳을 정하기 전까지는 에디션을 공개하지 않는다(매니페스트가 비어 있어야 운영 링크가 깨지지 않는다).
 
 ### 4.4 shared
 

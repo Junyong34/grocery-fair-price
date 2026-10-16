@@ -40,7 +40,7 @@ Regenerate these with their command and commit the output. Hand edits are overwr
 | `packages/seasonal/src/data/foods.generated.ts` | `pnpm --filter @workspace/seasonal build:foods` | the 품종 list in `prototypes/` changes. A 품종 without an illustration gets its id in `NEW_IDS` in `packages/seasonal/scripts/build-foods.mjs`. |
 | `apps/web/public/foods/<id>/{color,motion}.svg`, `PROVENANCE.md`, `drawn-foods.generated.ts`, `food-bounds.generated.ts` | `pnpm foods:sync` | an illustration is drawn or changed (`/seasonal-food-illustrator`). |
 | `food-bounds.generated.ts` alone | `pnpm foods:bounds` | the SVGs changed without a sync. Needs no `prototypes/`. |
-| `apps/web/public/downloads/**` (PDFs, `manifest.json`), `apps/web/print-editions/<id>.build.json` | the admin's "PDF 생성" button at `/admin` (`pnpm dev`, uses the local Google Chrome) | an edition's spec changes, or anything a print page draws changes (foods, illustrations, holidays). Saving an edition rewrites `manifest.json`. |
+| `apps/web/public/downloads/**` (PDFs, `manifest.json`), `apps/web/print-editions/<id>.build.json` | the admin's "PDF 생성" button at `/admin` (`pnpm dev`, uses the local Google Chrome) | an edition's spec changes, or anything a print page draws changes (foods, illustrations, holidays). Saving an edition rewrites `manifest.json`. Exception to the commit rule: the PDFs are gitignored (too large) until a storage location is chosen, so keep editions unpublished and `manifest.json` empty until then. |
 
 The first two read `prototypes/`, so they run only on a machine that has it. Per-품종 drawing scale (`FOOD_SCALE` in `packages/seasonal/src/data/food-sizes.ts`) is hand-tuned. Brand files are copied by hand: `apps/web/docs/brand-assets.md`.
 

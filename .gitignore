@@ -11,6 +11,9 @@
 # 프로토타입: 기간 동안 커밋하지 않는다 (prototypes/seasonal-food/README.md)
 prototypes
 
+# 인쇄물 PDF: 용량이 커서 커밋하지 않는다. 저장 위치(R2·Blob 등)를 정하기 전까지 관리자 컴퓨터에만 둔다 (.scratch/calendar-print/spec.md)
+apps/web/public/downloads/**/*.pdf
+
 # ── Next.js 모노레포 (shadcn init) ──
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
