@@ -1,6 +1,6 @@
 import { foodsInMonth } from "@workspace/seasonal/data/foods"
 import { formatMonthLabel, MONTHS, type Month } from "@workspace/seasonal/data/months"
-import { monthFoods } from "@workspace/seasonal/print/foods"
+import { monthFoods, yearFoods } from "@workspace/seasonal/print/foods"
 import type { MonthlySpec, PageKey, Paper } from "@workspace/seasonal/print/spec"
 
 import { FoodArea } from "./parts/food-area"
@@ -117,7 +117,7 @@ function Memo({ kind, month, height }: { kind: "lines" | "eaten-check"; month: M
 
 function Cover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
   const inner = innerSize(spec)
-  const picks = MONTHS.flatMap((month) => monthFoods(month, { max: 1, categories: [] }))
+  const picks = yearFoods({ max: 1, categories: [] })
   return (
     <Sheet spec={spec} paper={paper} background={surfaceColor(spec.surface === "season" ? "cream" : spec.surface)}>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: u(10) }}>

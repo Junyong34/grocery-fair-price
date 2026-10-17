@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest"
 
 import { findFood, isDrawn } from "../data/foods"
 import { SEASONS } from "../data/seasons"
-import { monthFoods, seasonFoods, startSeason } from "./foods"
+import { MONTHS } from "../data/months"
+import { monthFoods, seasonFoods, startSeason, yearFoods } from "./foods"
 
 describe("startSeason", () => {
   it("해를 넘는 제철은 시작하는 달의 계절이다", () => {
@@ -25,6 +26,20 @@ describe("monthFoods", () => {
     const foods = monthFoods(10, { max: 30, categories: ["수산"] })
     expect(foods.length).toBeGreaterThan(0)
     expect(foods.every((food) => food.category === "수산")).toBe(true)
+  })
+})
+
+describe("yearFoods", () => {
+  it("열두 달에서 서로 다른 품종을 한 달에 하나씩 고른다", () => {
+    const foods = yearFoods({ max: 1, categories: [] })
+    const ids = foods.map((food) => food.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    expect(ids.length).toBe(MONTHS.length)
+  })
+
+  it("고른 품종은 모두 그 달의 제철 품종이다", () => {
+    const foods = yearFoods({ max: 1, categories: [] })
+    foods.forEach((food, index) => expect(food.months as readonly number[]).toContain(MONTHS[index]))
   })
 })
 
