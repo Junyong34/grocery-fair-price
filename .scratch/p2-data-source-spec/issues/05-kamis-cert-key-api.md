@@ -1,6 +1,6 @@
 # 05. KAMIS 자체 API(평년·전년·전월 가격) 확인
 
-Status: ready-for-human
+Status: wontfix
 Type: research
 Blocked by: -
 
@@ -25,3 +25,7 @@ Blocked by: -
 ## 완료 기준
 
 - 평년·전년·전월 가격을 **받을 수 있는지 없는지**가 실호출로 확인되어 있다.
+
+## Answer
+
+**wontfix** (2026-10-19). KAMIS 자체 API 키(`cert_key`)를 받지 않는다. 사용자가 쓰는 키는 data.go.kr 개발계정 3개뿐이다. 평년은 data.go.kr판 `perDay/price`로 최근 5년 소매 이력을 백필해 직접 계산한다 (`ingest-foundation/04`, pipeline.md 5-4).

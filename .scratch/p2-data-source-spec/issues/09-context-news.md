@@ -4,6 +4,8 @@ Status: ready-for-agent
 Type: research
 Blocked by: -
 
+> 후순위 (2026-10-19): 가격 이슈·제철 보조 출처는 확장 단계 E4로 미뤘다. MVP 1순위(판정)에 직접 필요하지 않다. P2 마무리(11)의 선행이 아니다.
+
 ## 목적
 
 뉴스 키워드 급증을 **이슈 신호**로 쓸 수 있는지, 쓴다면 어떤 경로로 합법적으로 수집할지 정한다. `domain-model.md` 10장이 P2로 넘긴 질문이다. 산출물은 `sources/context.md`의 해당 절이다.

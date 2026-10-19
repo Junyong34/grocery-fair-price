@@ -4,6 +4,8 @@ Status: ready-for-agent
 Type: research
 Blocked by: -
 
+> 후순위 (2026-10-19): 가격 이슈·제철 보조 출처는 확장 단계 E4로 미뤘다. MVP 1순위(판정)에 직접 필요하지 않다. P2 마무리(11)의 선행이 아니다.
+
 ## 목적
 
 **제철** 정보(월별 제철 품종)를 얻을 공공 출처를 확정한다. 산출물은 `sources/context.md`의 해당 절이다.

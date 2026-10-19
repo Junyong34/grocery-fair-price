@@ -1,10 +1,10 @@
 # P2. 데이터 소스 명세 — 작업 분해
 
-로드맵 P2의 목표와 완료 기준은 [roadmap.md](../../grocery-price/docs/00-overview/roadmap.md)에 있다. 이 문서는 그 단계를 이슈 단위로 나눈 것이다.
+로드맵 ① 수집 기반의 요청·응답 분석 부분이다(이전 번호 P2, 2026-10-19 로드맵 재편). 목표와 완료 기준은 [roadmap.md](../../grocery-price/docs/00-overview/roadmap.md)에 있다. 수집·적재 작업은 `.scratch/ingest-foundation/`에 있다.
 
 ## 목표
 
-주 출처 3개(KAMIS, 참가격, 축평원)의 모든 응답 필드를 도메인 개념에 연결하거나 "미사용"으로 표시한다. 보조 출처(가격 이슈, 제철)의 수집 경로와 약관을 조사한다.
+주 출처 3개(KAMIS, 참가격, 축평원)의 모든 응답 필드를 도메인 개념에 연결하거나 "미사용"으로 표시한다. 보조 출처(가격 이슈, 제철) 조사는 확장 단계 E4로 미뤘다 (08~10).
 
 ## 현재 상태
 
@@ -15,37 +15,38 @@
 
 | # | 제목 | 유형 | 상태 | 선행 |
 |---|---|---|---|---|
-| 01 | 실호출 응답 샘플 저장 | task | ready-for-agent | - |
+| 01 | 실호출 응답 샘플 저장 | task | resolved | - |
 | 02 | KAMIS 출처 문서 | task | ready-for-agent | 01 |
 | 03 | 축평원 출처 문서 | task | ready-for-agent | 01 |
 | 04 | 참가격 출처 문서 | task | ready-for-agent | 01 |
-| 05 | KAMIS 자체 API(평년·전년·전월 가격) 확인 | research | ready-for-human | - |
+| 05 | KAMIS 자체 API(평년·전년·전월 가격) 확인 | research | wontfix (키 없음, 5년 이력으로 계산) | - |
 | 06 | 참가격 제조사 코드 처리 방침 결정 | grilling | ready-for-human | 04 |
 | 07 | 라이선스·출처 표기 확인 | research | ready-for-agent | - |
-| 08 | 보조 출처: 기상·가축 질병 | research | ready-for-agent | - |
-| 09 | 보조 출처: 뉴스 수집 경로와 약관 | research | ready-for-agent | - |
-| 10 | 보조 출처: 제철 | research | ready-for-agent | - |
-| 11 | P2 마무리 점검 | task | ready-for-agent | 02~10, 13, sfv/03 |
-| 12 | API 호출 모듈과 계약 테스트 | task | ready-for-agent | 01 |
+| 08 | 보조 출처: 기상·가축 질병 | research | ready-for-agent (후순위, E4) | - |
+| 09 | 보조 출처: 뉴스 수집 경로와 약관 | research | ready-for-agent (후순위, E4) | - |
+| 10 | 보조 출처: 제철 | research | ready-for-agent (후순위, E4) | - |
+| 11 | P2 마무리 점검 | task | ready-for-agent | 02, 03, 04, 06, 07, 13 |
+| 12 | API 호출 모듈과 계약 테스트 (→ 수집 패키지) | task | ready-for-agent | 01 |
 | 13 | 출처별 제공 품목 전수 목록 | research | ready-for-agent | - |
 | [sfv/03](../search-first-view/issues/03-local-gov-price-survey.md) | 지자체 물가조사(15109061) 실측과 출처 문서 | research | resolved (제외) | - |
 
-12는 P2 완료 조건이 아니다. 출처 검증 도구이며 11과 병행한다. 13은 품종 목록(`p3-variety-catalog/01`)의 입력이라 P2 안에 둔다.
+12는 P2 완료 조건이 아니다. 수집 패키지(`ingest-foundation/03`)의 첫 부분이며 11과 병행한다. 13은 품종 목록(`p3-variety-catalog/01`)의 입력이라 P2 안에 둔다.
 
-연결된 작업 폴더: `.scratch/p3-variety-catalog/`(품종 목록, 목록 밖 수집 방안), `.scratch/p4-canonical-model/`(통합 스키마, 저장소, 어댑터).
+연결된 작업 폴더: `.scratch/ingest-foundation/`(Supabase, 수집, 장애 처리), `.scratch/p3-variety-catalog/`(품종 목록, 목록 밖 수집 방안), `.scratch/p4-canonical-model/`(통합 스키마, 어댑터).
 
 ## 진행 순서
 
 ```
 01 ──┬─ 02 ┐
-     ├─ 03 ├─ (05, 07 결과 반영) ─┐
-     └─ 04 ┴─ 06                   ├─ 11
-05, 07, 08, 09, 10 (병행 가능) ─────┘
+     ├─ 03 ├─ (07 결과 반영) ─┐
+     └─ 04 ┴─ 06               ├─ 11
+07, 13 (병행 가능) ─────────────┘
+08, 09, 10: 후순위 (확장 단계 E4)
 ```
 
 - 01이 먼저다. 02~04는 같은 샘플을 근거로 쓴다.
-- 05, 07~10은 서로 독립이라 언제든 시작할 수 있다.
-- 05는 평소가 계산식(P5)에 영향을 주므로 가능한 한 일찍 한다.
+- 07, 13은 서로 독립이라 언제든 시작할 수 있다.
+- 05는 wontfix다. KAMIS 자체 API 키가 없어, 평년은 perDay 5년 이력으로 직접 계산한다 (`ingest-foundation/04`, 2026-10-19).
 
 ## 결정된 것
 
@@ -69,4 +70,4 @@
 
 ## 이후 단계
 
-P3~P5는 P2 결과를 입력으로 받는다. P2가 끝나면 같은 방식으로 `.scratch/p3-display-catalog/` 등을 만든다.
+로드맵 ② 판정 설계(품종 목록, 계산식)가 P2 결과를 입력으로 받는다.

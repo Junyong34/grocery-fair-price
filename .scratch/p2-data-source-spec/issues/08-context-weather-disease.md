@@ -4,6 +4,8 @@ Status: ready-for-agent
 Type: research
 Blocked by: -
 
+> 후순위 (2026-10-19): 가격 이슈·제철 보조 출처는 확장 단계 E4로 미뤘다. MVP 1순위(판정)에 직접 필요하지 않다. P2 마무리(11)의 선행이 아니다.
+
 ## 목적
 
 **가격 이슈**(장마, 한파, 조류독감, 아프리카돼지열병)의 **이슈 신호**를 자동으로 얻을 수 있는 공공 API를 조사한다. 산출물은 `grocery-price/docs/30-data/sources/context.md`의 해당 절이다.

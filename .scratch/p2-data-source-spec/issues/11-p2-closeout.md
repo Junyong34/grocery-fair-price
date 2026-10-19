@@ -2,7 +2,7 @@
 
 Status: ready-for-agent
 Type: task
-Blocked by: 02, 03, 04, 05, 06, 07, 08, 09, 10, 13, search-first-view/03
+Blocked by: 02, 03, 04, 06, 07, 13
 
 ## 할 일
 
@@ -12,7 +12,7 @@ Blocked by: 02, 03, 04, 05, 06, 07, 08, 09, 10, 13, search-first-view/03
 - [ ] `api-spec.md` 처리 (spec.md "결정이 필요한 것" 참조)
 - [ ] `domain-model.md` 10장에서 P2가 답한 질문 갱신 (MVP 품종 후보는 P3로 넘김, 뉴스 수집 경로는 해소)
 - [ ] 문서 간 용어 점검: GLOSSARY.md의 "Avoid" 용어가 쓰이지 않았는지
-- [ ] `grocery-price/README.md` 진행표와 문서 지도 갱신, `roadmap.md`에 변경 사유 기록
+- [ ] `grocery-price/README.md` 진행표와 문서 지도 갱신
 - [ ] P3 이슈 분해 시작에 필요한 입력 목록 정리 (소스별로 "그대로 표시 / 계산해서 표시 / 표시 불가"를 판정할 근거)
 
 ## 완료 기준
