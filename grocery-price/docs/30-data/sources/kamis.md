@@ -41,7 +41,7 @@
 | `cond[exmn_ymd::GTE]` | 필수 | 필수 | 조사일 시작 `YYYYMMDD`. 빼면 1996년부터 온다 |
 | `cond[exmn_ymd::LTE]` | 필수 | 필수 | 조사일 끝 `YYYYMMDD`. 빼면 0건 |
 | `cond[ctgry_cd::EQ]` | 필수 | 필수 | 원천 부류 코드. 빼면 0건 |
-| `cond[item_cd::EQ]` | 필수 | 필수 | 원천 품목 코드. 빼면 0건. **품목을 빼고 부류 전체를 받는 호출은 안 된다** |
+| `cond[item_cd::EQ]` | 필수 | 필수 | 원천 품목 코드. 빼면 0건. 다만 명세에 없는 범위 조건 `cond[item_cd::GTE]=0&cond[item_cd::LTE]=9999`를 쓰면 부류 하루치를 한 번에 받는다 ([item-inventory.md](item-inventory.md) 호출 수 절) |
 | `cond[se_cd::EQ]` | 옵션 | **필수** | 구분 코드. 빼면 구분이 섞여 오고 구분마다 단위가 달라서 항상 `01`을 준다 |
 | `cond[vrty_cd::EQ]`, `cond[grd_cd::EQ]`, `cond[sgg_cd::EQ]`, `cond[mrkt_cd::EQ]` | 옵션 | 쓰지 않음 | 품목 단위로 받아서 버리지 않고 모두 저장한다. 탐색용으로만 쓴다 |
 | `selectable` | 옵션 | 쓰지 않음 | 받을 컬럼 지정. 원본은 모든 필드를 남겨야 해서 쓰지 않는다 |
@@ -365,7 +365,7 @@ response.body:   dataType, numOfRows, pageNo, totalCount, items.item[]
 - **값이 바뀐 시각을 알 수 없다.** `orgnl_reg_dt`는 마지막 재등록 시각뿐이고 값이 바뀌지 않아도 바뀐다 (6-2).
 - **축산의 시장별 값이 없다.** 시도 평균만 온다.
 - **행사(할인, 1+1) 정보가 없다.**
-- **부류 전체를 한 번에 받을 수 없다.** 품목마다 따로 불러야 한다.
+- **품목 조건을 빼면 0건이다.** 부류 전체는 명세에 없는 품목코드 범위 조건(`cond[item_cd::GTE]`·`::LTE`)으로만 받는다. 명세 밖 동작이라 계약 테스트(p2/12)로 감시하고, 막히면 품목별 호출로 돌아간다.
 
 ---
 
