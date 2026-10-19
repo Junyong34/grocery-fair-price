@@ -20,12 +20,12 @@ Full map (every route, module, generated file, command, and doc): `docs/project-
 
 - `apps/web`: the Next.js app, 제철달력 (seasonal food calendar). The price-comparison screens will join it later.
 - `packages/seasonal`, `packages/ui`: domain and design-system layers of the app (see "Web app UI").
-- `grocery-price/`: planning docs and public price API research for the price service. No app code yet.
+- `grocery-price/`: design docs and public price API research for the price service. Collection code (Supabase + GitHub Actions) starts in stage ① of the roadmap; screens join `apps/web` in stage ④.
 - `prototypes/`: illustration source, wireframes, brand originals. Gitignored, so a fresh clone lacks it. Keep it out of commits (no force-add).
 
 ## Workflow
 
-- Current work: `.scratch/*/spec.md`. The app's spec is `.scratch/seasonal-mvp/spec.md`. Price-service phases and completion criteria: `grocery-price/docs/00-overview/roadmap.md`.
+- Current work: `.scratch/*/spec.md`. The app's spec is `.scratch/seasonal-mvp/spec.md`. Price-service stages (① 수집 기반 → ② 판정 설계 → ③ 화면 설계 → ④ 구현) and completion criteria: `grocery-price/docs/00-overview/roadmap.md`.
 - Commit each verified ticket straight to `main`, no PR. Message: `feat: …` in Korean. Code comments and docs are Korean too.
 - A change is done when `pnpm typecheck`, `pnpm lint` (0 errors) and `pnpm test` pass at the repo root. A screen change is done when `next-dev-loop` (dev server MCP in `.mcp.json` + browser) shows it at widths 375 and 1280 with no console errors or hydration warnings.
 - Pure functions (layout, calendar, search, geometry): write the vitest test first, as `*.test.ts` beside the code.
@@ -46,7 +46,7 @@ The first two read `prototypes/`, so they run only on a machine that has it. Per
 
 ## Public price APIs
 
-- Before calling a public price API (KAMIS, 축평원, 참가격), read `grocery-price/docs/10-research/api-spec.md`. It records measured behavior the official specs omit. Saved responses and the browser viewer: `grocery-price/reference/public-data/samples/`.
+- Before calling a public price API (KAMIS, 축평원, 참가격) or writing collection/schema code for it, read that source's doc in `grocery-price/docs/30-data/sources/` (`kamis.md`, `ekape.md`, `chamgagyeok.md`). They record measured behavior the official specs omit. `grocery-price/docs/10-research/api-spec.md` is the summary and maps each data.go.kr dataset ID to its endpoint; check it before treating a data.go.kr dataset as a new source. Schema and collection design: `grocery-price/docs/30-data/pipeline.md`. Saved responses and the browser viewer: `grocery-price/reference/public-data/samples/`.
 - Viewer changes (`grocery-price/reference/public-data/samples/viewer/`): run `grocery-price/reference/public-data/samples/viewer/smoke.sh --quick` before finishing.
 
 ## Web app UI (`apps/web`)

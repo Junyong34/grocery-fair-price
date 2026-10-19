@@ -13,11 +13,17 @@
 - 축평원 오류는 `resultMsg`에 DB 내부 오류 문구(`ORA-…`, 패키지명)가 섞여 온다. 로그나 화면에 그대로 내보내지 않는다.
 - 아래 실측의 근거 응답은 모두 `reference/public-data/samples/`에 있고, `samples/viewer/api-explorer.html`에서 볼 수 있다.
 
-| 소스 | 주소 | 형식 | 개발계정 한도 |
-|---|---|---|---|
-| KAMIS 일별 | `https://apis.data.go.kr/B552845/perDay/price` | JSON/XML | 10,000건/일 |
-| 축평원 | `http://data.ekape.or.kr/openapi-data/service/user/grade/…` (https 아님) | XML | 1,000건/일 |
-| 참가격 | `https://apis.data.go.kr/B551919/ProductPriceInfoService/…` | XML | 2,000건/일 |
+쓰는 출처는 아래 3개뿐이다. 모두 `DATA_GO_KR_SERVICE_KEY` 하나로 부른다. data.go.kr에서 새 데이터셋을 찾으면 먼저 이 표의 ID와 대조한다 (예: 15158701 "생필품 가격 정보_GW"는 새 출처가 아니라 지금 쓰는 참가격이다).
+
+| 출처 | data.go.kr ID · 신청 이름 | 주소 | 형식 | 개발계정 한도 | 출처 문서 |
+|---|---|---|---|---|---|
+| KAMIS 일별 | [15156057](https://www.data.go.kr/data/15156057/openapi.do) 한국농수산식품유통공사_일별 도,소매 가격정보 조회 | `https://apis.data.go.kr/B552845/perDay/price` | JSON/XML | 10,000건/일 | [kamis.md](../30-data/sources/kamis.md) |
+| 축평원 | [15000577](https://www.data.go.kr/data/15000577/openapi.do) 축산물품질평가원_축산물유통정보 | `http://data.ekape.or.kr/openapi-data/service/user/grade/…` (https 아님) | XML | 1,000건/일 | [ekape.md](../30-data/sources/ekape.md) |
+| 참가격 | [15158701](https://www.data.go.kr/data/15158701/openapi.do) 한국소비자원_생필품 가격 정보_GW | `https://apis.data.go.kr/B551919/ProductPriceInfoService/…` | XML | 2,000건/일 | [chamgagyeok.md](../30-data/sources/chamgagyeok.md) |
+
+품목별로 실제 데이터가 오는 범위는 [item-inventory.md](../30-data/sources/item-inventory.md)에 있다. 예를 들어 KAMIS 소매의 조사 시장 이름(`mrkt_nm`)에는 실명 전통시장과 익명 대형유통("X-유통")이 함께 온다.
+
+이 작업 환경에서 알려진 접근 문제: KAMIS 이력을 동시에 여러 개 조회하면 HTTP 504가 난다(하나씩, 연 단위로). 제외한 출처의 농식품 공공데이터포털 API(`211.237.50.150:7080`)는 샌드박스 curl로 닿지 않았고 wigolo fetch로는 됐다 ([gov-price-sites.md 2-1](gov-price-sites.md)).
 
 ---
 

@@ -16,7 +16,7 @@ SE_NM = {"01": "소매", "02": "중도매", "03": "친환경농산물", "07": "�
 def write(path, header, rows):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="") as f:
-        w = csv.writer(f)
+        w = csv.writer(f, lineterminator="\n")
         w.writerow(header)
         w.writerows(rows)
     print("  wrote", os.path.relpath(path), len(rows), "rows")
