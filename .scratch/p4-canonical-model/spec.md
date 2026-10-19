@@ -26,7 +26,7 @@
 
 | # | 제목 | 유형 | 상태 | 선행 |
 |---|---|---|---|---|
-| 01 | 통합 스키마 설계 | task | ready-for-agent | p2/02, 03, 04 |
+| 01 | 통합 스키마 설계 | task | resolved (pipeline.md 3장) | p2/02, 03, 04 |
 | 02 | 저장소 결정 | grilling | resolved (ADR 0002) | - |
 | 03 | 어댑터 구현과 일관성 테스트 | task | ready-for-agent | 01, p2/12 |
 
