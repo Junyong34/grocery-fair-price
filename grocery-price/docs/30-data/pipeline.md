@@ -264,7 +264,6 @@ store
   place_id int pk fk obs_place,
   name text not null,                     -- entpName
   channel text not null check (channel in ('large_mart','department','ssm','convenience')),  -- BU LM·DP·SM·CS
-  seller_id int null fk seller,           -- 점포 → 판매처. 운영자 매핑 (참가격 2단 평균, 판매처 단위 누락·행사)
   region_scope text not null check (region_scope in ('local','national_only')),  -- 편의점 본사 4곳 = national_only
   area_code_raw text, area_detail_code_raw text,   -- AR 원천값 (entpAreaCode, areaDetailCode)
   region_code text null fk region,        -- 우리 시군구 코드 (옛 광주·전남 코드는 새 코드로)
@@ -279,11 +278,17 @@ store_link                                          -- 점포 이력 연결 (재
   reason text not null check (reason in ('re_registered','duplicate')),
   evidence jsonb not null,                          -- 이름(띄어쓰기 무시)·도로명 주소 일치 등
   linked_on date not null, linked_by text not null  -- 'auto' | 운영자
+
+store_seller                                        -- 점포 → 판매처. 운영자 매핑, 기간 있음 (참가격 2단 평균, 판매처 단위 누락·행사)
+  place_id int fk store, seller_id int fk seller,
+  valid_from date not null, valid_to date null,     -- null = 지금까지
+  primary key (place_id, valid_from),
+  exclude using gist (place_id with =, daterange(valid_from, valid_to, '[)') with &&)  -- 같은 점포의 기간 겹침 거부
 ```
 
-- 인덱스: `store(seller_id)`, `store(lineage_id)`, `store(region_code)`, `store_link(new_place_id)`.
+- 인덱스: `store_seller(seller_id)`, `store(lineage_id)`, `store(region_code)`, `store_link(new_place_id)`.
 - **점포 재등록.** 광주·전남 15곳이 새 `entpId`(2220~2235)와 새 지역 코드로 다시 등록되었다 (예: 신세계백화점광주점 `13` → `2228`, [chamgagyeok.md 7-1](sources/chamgagyeok.md)). 새 점포는 새 `obs_place`·`store` 행이 되고, `store_link(13 → 2228, re_registered)`를 남긴 뒤 새 점포의 `lineage_id`를 옛 점포의 `lineage_id`로 바꾼다. 옛 점포는 `superseded`다. 이름·주소가 같은 동시 등록(GS더프레시 3쌍)은 `duplicate`로 잇는다.
-- **판매처 매핑.** `entpName` 앞부분으로 자동 제안하고 운영자가 확정한다. 업태와 함께 정한다 (이마트24(본사)가 이마트로 잘못 묶이지 않게, [chamgagyeok.md 11장](sources/chamgagyeok.md)). 매핑 변경은 드물어서 기간을 두지 않고 `source_master_change`에 남긴다.
+- **판매처 매핑.** `entpName` 앞부분으로 자동 제안하고 운영자가 확정한다. 업태와 함께 정한다 (이마트24(본사)가 이마트로 잘못 묶이지 않게, [chamgagyeok.md 11장](sources/chamgagyeok.md)). **유효 기간을 둔다** (2026-10-20 결정). 판매처가 바뀌면 이전 기간을 닫고 새 기간을 연다. 집계는 조사일이 속한 기간의 판매처로 센다. 그래서 과거 평균은 당시 판매처 기준으로 남는다. 변경은 `source_master_change`에도 남긴다.
 - **활동 여부**는 마스터가 아니라 가격 응답의 `obs_place.first_seen_on`·`last_seen_on`과 `missing_streak`로 정한다. 마스터에 있어도 가격이 오지 않는 점포가 184곳이다.
 
 ```sql
@@ -1023,7 +1028,7 @@ docs.railway.com/pricing/plans (2026-10-08 확인) 기준이다.
 
 ## 6-1. 정한 것 (2026-10-20)
 
-`p4/01`의 추천 중 사용자가 정한 것. 7장 표에서 옮겼다.
+`p4/01`의 추천 중 사용자가 정한 것 (2026-10-20). 7장 표에서 옮겼다.
 
 | 결정 | 내용 |
 |---|---|
@@ -1031,6 +1036,15 @@ docs.railway.com/pricing/plans (2026-10-08 확인) 기준이다.
 | KAMIS 시장별 관측값 | 최근 **90일**만 관측값으로 둔다. 시장 유형별·품종별 집계(`daily_quote`)는 영구. 그래서 시장 하나(예: 경동시장)의 추이는 최근 90일까지, 전통시장 대 대형유통 추이는 전 기간 볼 수 있다. 5년 백필은 넣고 집계를 만든 뒤 90일 밖 행을 지운다. 평년은 집계의 5년 값으로 계산한다 |
 | 참가격 점포별 관측값 | 최근 **8 조사일**(약 16주). 상품별 집계(`product_daily_summary`)는 영구 |
 | 원본 파일(Storage) 보존 | KAMIS·축평원은 1년 지난 원본을 지운다(다시 받을 수 있음). 참가격은 지우지 않는다 |
+| 지역 코드 | 법정동 코드 앞자리(시도 2자리, 시군구 5자리), 전국 `00`. 표준 코드를 아직 확인하지 못한 지역(전남광주통합특별시)은 확인 전까지 임시 코드 |
+| 시도별 집계 | MVP에서는 만들지 않는다. 원본에서 나중에 만든다 |
+| 원본 파일 단위 | 실행 × 기능 × 대상 날짜마다 파일 하나. 직전과 해시가 같은 다시 받기는 올리지 않고 `duplicate`로 기록 (3-7) |
+| 파티셔닝 | 처음에는 하지 않는다. PK에 `obs_date`가 있어 나중에 월 단위로 바꿀 수 있다 |
+| ID | 우리가 발급하는 ID(품종·상품·점포 등)는 `integer` identity, 계속 쌓이는 기록 표만 `bigint`. **출처는 ID에 넣지 않고** `source` 열과 읽을 수 있는 출처 키(`kamis:01-200-224-01-04`, `chamga:1000`)로 표시한다. 품종 하나에 여러 출처가 붙기 때문이다 |
+| 기간 겹침 방지 | 기간이 있는 연결표(`source_code_map`, `product_source_key`, `product_variety_map`, `store_seller`)는 같은 키의 기간이 겹치면 DB가 거부한다 (`btree_gist` exclusion). 예: 참가격 1000번이 왕뚜껑 110g(~2026-12)과 120g(2027-01~)을 시기별로 가리키면, 두 상품은 서로 다른 상품 ID이고 기간이 겹치는 입력은 저장되지 않는다 |
+| 새 상품 판별 | DB에 없는 출처 번호는 새 상품. 용량·원산지가 다르면 다른 상품(원산지는 품종에서 갈림), 등급은 같은 품종의 다른 규격. 브랜드 상품("○○사 삼겹살")은 일반 상품과 합치지 않고 같은 품종에 연결해 함께 검색된다. 같은 물건인데 출처 번호·이름이 바뀐 경우 운영자가 두 상품을 하나로 합칠 수 있고 과거 가격이 이어진다 (3-6) |
+| 점포 → 판매처 매핑 | **유효 기간을 둔다.** 점포의 판매처가 바뀌면(예: 홈플러스 → 롯데슈퍼) 이전 기간을 닫고 새 기간을 연다. 과거 평균은 당시 판매처로, 이후는 새 판매처로 계산된다. 참가격이 새 `entpId`로 재등록하면 `store_link`로 잇는다 |
+| 행사 구분 | 참가격 플래그로 가른다. `goodDcYn`(할인, 기간 포함)·`plusoneYn`(1+1)이 Y면 행사, N이면 일반, 값이 없으면 모름(null). 판매가는 할인 반영가라 평소가 계산에서 행사·모름은 뺀다. `plusoneYn=Y`는 아직 나온 적이 없어, 처음 나온 날 판매가가 1개 값인지 묶음 값인지 확인하고 그 전에는 기준 단위 가격을 비운다 (3-12 #13) |
 
 ## 7. 열린 질문
 
@@ -1038,15 +1052,6 @@ docs.railway.com/pricing/plans (2026-10-08 확인) 기준이다.
 
 | 질문 | 추천 | 다룰 곳 |
 |---|---|---|
-| 우리 지역 코드 체계 (`region.code`) | 법정동 코드 앞자리(시도 2자리, 시군구 5자리), 전국 `00`. 전남광주통합특별시처럼 아직 표준 코드를 확인하지 못한 것은 확인 후 넣고 그 전에는 임시 코드를 쓴다. 참가격 AR 코드를 그대로 쓰는 것은 한 출처에 묶여서 권하지 않는다 | ① `ingest-foundation/02` |
-| `daily_quote`·`product_daily_summary`에 시도 범위를 둘지 | MVP에서는 두지 않는다. 지역 판정이 범위 밖이고 축산만으로 연 20만 행이 는다. 원본에서 나중에 만들 수 있다 | ① `ingest-foundation/02` (지역 화면은 ③) |
-| 원본 파일 단위와 중복 원본 | 실행 × 기능 × 대상 날짜 묶음마다 파일 하나. 직전 파일과 해시가 같은 다시 받기는 올리지 않고 `duplicate`로 기록 (3-7) | ① `ingest-foundation/03` |
-| 관측값 파티셔닝 | 처음에는 하지 않는다. PK에 `obs_date`가 있어 나중에 월 단위 range 파티션으로 바꿀 수 있다 | ① `ingest-foundation/02` |
-| 마스터 ID 타입 | `integer` identity (관측값 FK 폭을 줄인다). 기록 표만 `bigint` | ① `ingest-foundation/02` |
-| 기간 겹침 방지 (`source_code_map`, `product_source_key`, `product_variety_map`) | `btree_gist` exclusion 제약. Supabase에서 켤 수 없거나 옮길 곳에서 문제가 되면 수집 패키지 테스트로 막는다 | ① `ingest-foundation/02` |
-| 참가격 새 `goodId`가 새 상품인지, 기존 상품의 이름·용량 변경인지 가르는 기준 | 월 1회 마스터 비교를 몇 달 쌓은 뒤 정한다. 그 전에는 새 키 = 새 상품, 운영자가 합친다 (3-6) | ① 마스터 비교 누적 후 |
-| 점포 → 판매처 매핑에 유효 기간을 둘지 | 두지 않는다. 바뀌면 `source_master_change`에 남기고 지난 집계를 다시 계산한다 | `search-first-view/05` |
-| `plusoneYn = Y`일 때 `goodPrice`의 뜻 (1개 값인지 묶음 값인지) | 처음 나온 날 운영자가 확인. 그 전에는 저장하되 기준 단위 가격을 비운다 (3-12 #13) | 처음 나오는 날 |
 | 상품 화면의 점포별 가격을 익명 키로 읽게 할지 (관측값은 비공개) | 웹앱이 서버 전용 읽기 롤로 읽으면 관측값을 열지 않아도 된다. supabase-js + anon이면 최근 조사일 점포별 가격을 담는 공개 요약 표를 따로 둔다 | ① `ingest-foundation/06` |
 | KAMIS 친환경·중도매를 저장할지 (도매는 MVP 이후, E3) | | 확장 E3 |
 | 평소가 계산식 (KAMIS 5년 평년, 축평원 평년, 최근 N주 중앙값을 섞는 방식) | | ② |
