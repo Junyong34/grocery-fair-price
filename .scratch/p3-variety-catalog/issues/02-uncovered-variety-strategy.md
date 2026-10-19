@@ -14,7 +14,7 @@ Blocked by: 01
 |---|---|---|
 | 사용자 제보 | 제보 가격만으로 판정. 표본이 적어 신뢰도가 낮음 | domain-model.md (제보, 이상 제보) |
 | 공공 파일데이터 | 참가격 XLS 등 과거 파일 | api-spec.md 4장 |
-| 다른 공공 API | 지자체 물가조사(data.go.kr 15109062), 농정원 통합 가격 등 | public-data-survey.md 보조 소스 |
+| 다른 공공 API | 지자체 물가조사(data.go.kr 15109061), 농정원 유통단계별 가격(15109062) 등 | public-data-survey.md 보조 소스, gov-price-sites.md |
 | 온라인몰 제휴·공식 API | 확장 단계 E1 | roadmap.md E1, ADR 0001 |
 | 지원하지 않음 | "시세 정보 없음"으로 표시하고 미등록 검색어로만 기록 | GLOSSARY.md 미등록 검색어 |
 

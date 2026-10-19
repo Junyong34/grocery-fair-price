@@ -2,7 +2,7 @@
 
 Status: ready-for-agent
 Type: task
-Blocked by: 02, 03, 04, 05, 06, 07, 08, 09, 10, 13
+Blocked by: 02, 03, 04, 05, 06, 07, 08, 09, 10, 13, search-first-view/03
 
 ## 할 일
 

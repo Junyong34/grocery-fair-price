@@ -25,9 +25,10 @@
 | 08 | 보조 출처: 기상·가축 질병 | research | ready-for-agent | - |
 | 09 | 보조 출처: 뉴스 수집 경로와 약관 | research | ready-for-agent | - |
 | 10 | 보조 출처: 제철 | research | ready-for-agent | - |
-| 11 | P2 마무리 점검 | task | ready-for-agent | 02~10, 13 |
+| 11 | P2 마무리 점검 | task | ready-for-agent | 02~10, 13, sfv/03 |
 | 12 | API 호출 모듈과 계약 테스트 | task | ready-for-agent | 01 |
 | 13 | 출처별 제공 품목 전수 목록 | research | ready-for-agent | - |
+| [sfv/03](../search-first-view/issues/03-local-gov-price-survey.md) | 지자체 물가조사(15109061) 실측과 출처 문서 | research | ready-for-agent | - |
 
 12는 P2 완료 조건이 아니다. 출처 검증 도구이며 11과 병행한다. 13은 품종 목록(`p3-variety-catalog/01`)의 입력이라 P2 안에 둔다.
 
