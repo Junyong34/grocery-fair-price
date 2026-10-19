@@ -47,6 +47,9 @@
 - `reference/public-data/samples/`: 실호출 응답 샘플(정상·빈 결과·오류), `fetch-samples.sh`로 다시 만든다
 - `reference/public-data/samples/viewer/api-explorer.html`: 샘플을 브라우저에서 보는 탐색기 (`build.py`로 생성, `smoke.sh`로 검사)
 
+**기술 아키텍처 (P6)**
+- [supabase-skills.md](docs/10-research/supabase-skills.md): DB를 Supabase로 정할 때 쓸 에이전트 스킬 비교와 추천 조합
+
 **원본 자료** (`reference/public-data/`)
 - `kamis/code-table.txt`: KAMIS 코드표 (구분·부류·품목·품종·등급·시군구·시장)
 - `kamis/perDay-api-spec.txt`: 공공데이터포털 KAMIS 일별 도·소매 가격 API 명세
