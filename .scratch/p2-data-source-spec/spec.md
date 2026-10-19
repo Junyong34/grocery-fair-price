@@ -16,9 +16,9 @@
 | # | 제목 | 유형 | 상태 | 선행 |
 |---|---|---|---|---|
 | 01 | 실호출 응답 샘플 저장 | task | resolved | - |
-| 02 | KAMIS 출처 문서 | task | ready-for-agent | 01 |
-| 03 | 축평원 출처 문서 | task | ready-for-agent | 01 |
-| 04 | 참가격 출처 문서 | task | ready-for-agent | 01 |
+| 02 | KAMIS 출처 문서 | task | resolved | 01 |
+| 03 | 축평원 출처 문서 | task | ready-for-agent (갱신 시각만 남음) | 01 |
+| 04 | 참가격 출처 문서 | task | resolved | 01 |
 | 05 | KAMIS 자체 API(평년·전년·전월 가격) 확인 | research | wontfix (키 없음, 5년 이력으로 계산) | - |
 | 06 | 참가격 제조사 코드 처리 방침 결정 | grilling | ready-for-human | 04 |
 | 07 | 라이선스·출처 표기 확인 | research | ready-for-agent | - |
@@ -27,7 +27,7 @@
 | 10 | 보조 출처: 제철 | research | ready-for-agent (후순위, E4) | - |
 | 11 | P2 마무리 점검 | task | ready-for-agent | 02, 03, 04, 06, 07, 13 |
 | 12 | API 호출 모듈과 계약 테스트 (→ 수집 패키지) | task | ready-for-agent | 01 |
-| 13 | 출처별 제공 품목 전수 목록 | research | ready-for-agent | - |
+| 13 | 출처별 제공 품목 전수 목록 | research | resolved | - |
 | [sfv/03](../search-first-view/issues/03-local-gov-price-survey.md) | 지자체 물가조사(15109061) 실측과 출처 문서 | research | resolved (제외) | - |
 
 12는 P2 완료 조건이 아니다. 수집 패키지(`ingest-foundation/03`)의 첫 부분이며 11과 병행한다. 13은 품종 목록(`p3-variety-catalog/01`)의 입력이라 P2 안에 둔다.

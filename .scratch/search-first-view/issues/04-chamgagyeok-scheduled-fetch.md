@@ -10,10 +10,10 @@ Blocked by: ingest-foundation/01, ingest-foundation/02
 
 ## 할 일
 
-- [ ] 조사일 판별: 금요일마다 호출해 빈 `<result/>`가 아닌 날을 조사일로 본다.
-- [ ] 받을 범위: 식품 상품 전체 × 전 점포. 상품별 호출(`goodId`, 약 114KB)과 점포별 호출(`entpId`, 약 100KB) 중 호출 수가 적은 쪽을 고른다. 호출 한도 2,000건/일 안에 들어가는지 계산한다.
-- [ ] 받는 때: 매일 상품 3개로 새 조사일을 확인(pipeline.md 5-1). 찾은 조사일은 그 다음 날과 그다음 주 월요일에 전체를 받고, 행 수가 늘었으면 다시 적재한다(10-09 등록 지연 사례).
-- [ ] 06-12부터 지금까지 빠진 조사일을 한 번에 채운다.
+- [ ] 조사일 판별: [chamgagyeok.md 5-4](../../../grocery-price/docs/30-data/sources/chamgagyeok.md)의 감지 규칙을 따른다 (최근 금요일 2개 × 상품 3개).
+- [ ] 받을 범위: 식품 457개를 상품 기준(`goodId`)으로 부른다. 조사일당 457회 ([chamgagyeok.md 8장](../../../grocery-price/docs/30-data/sources/chamgagyeok.md)).
+- [ ] 받는 때: 감지·완료 규칙은 chamgagyeok.md 5-4를 따른다 (행 수가 두 번 연속 같고 마지막 `inputDttm`이 하루 넘게 지날 때까지 매일 다시 받기 + 다음 주 월요일, 10일 뒤에도 비면 빈 조사일로 닫기).
+- [ ] 06-12부터 지금까지 빠진 조사일을 채운다. 9개 조사일 약 4,113회라 3일로 나눈다.
 - [ ] 저장 형식: 원본은 조사일·호출 단위로 Storage에(`ingest-foundation/03`의 경로 규칙), 용량 추정. 정제 결과는 관측값 테이블에 upsert
 - [ ] GitHub Actions 일정, 실패 알림
 - [ ] `.env` 키가 커밋되지 않는지 확인 (`scripts/check-no-secrets.sh`)
