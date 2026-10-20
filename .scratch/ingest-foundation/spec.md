@@ -8,7 +8,7 @@
 - 저장: 정제 데이터는 Supabase Postgres, 원본 응답은 gzip으로 Supabase Storage.
 - 스키마·권한 (2026-10-20, pipeline.md 3-0·6-1): 표는 Data API로 노출하지 않는 스키마 `price`. 소유자는 `postgres`(마이그레이션), 앱은 롤 `ingest_writer`(수집, Supavisor 세션 모드 5432)와 `web_reader`(웹앱 서버 전용 읽기)로만 접속한다. RLS는 모든 표에 켜는 이중 장치이고 접근은 GRANT가 정한다.
 - 키: Supabase 비밀 키(`sb_secret_…`)는 Actions의 Storage 업로드에만. 웹앱에는 Supabase 키가 없다. `anon`·`service_role` 키는 쓰지 않는다.
-- 적재: 원본 파일 하나 = 트랜잭션 하나, 바뀐 행만 고쳐 쓰는 upsert, 출처별 advisory lock + Actions `concurrency`. KAMIS 5년 백필은 `UNLOGGED` 임시 표를 거쳐 집계만 남긴다.
+- 적재: 원본 파일 하나 = 트랜잭션 하나, 바뀐 행만 고쳐 쓰는 upsert, 출처별 advisory lock + Actions `concurrency`. KAMIS 5년 백필은 세션 임시 표(`create temp table`, RLS 표에는 `COPY` 불가)를 거쳐 집계와 최근 90일 관측값만 남긴다 (2026-10-21).
 - 백업(`pg_dump`)은 추후, 정식 서비스 전. 그동안 운영자 매핑은 원본으로 되살릴 수 없다는 위험을 받아들인다.
 - 수집: GitHub Actions 정기 실행. 출처마다 시각이 다르다 (pipeline.md 5-1).
 - 수집 코드는 스키마가 정해지면 바로 만든다. 화면 코드는 로드맵 ④에서만 쓴다.

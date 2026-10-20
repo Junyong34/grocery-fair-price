@@ -51,8 +51,8 @@ API ──▶ ① 원본 보관 (raw) ──▶ ② 정제 관측값 (observatio
 
 ②를 모두 DB에 넣으면 **1년 안에 500MB를 넘는다.** 그래서 이렇게 나눈다 (6-1에서 정함).
 - 참가격 점포별 관측값은 **최근 8회 조사(16주)만** DB에 둔다. 그보다 오래된 것은 ③ 집계로만 남기고, 원본은 ① 파일에 있다.
-- KAMIS 시장별 관측값은 **최근 90일만** DB에 둔다. 5년 백필은 관측값 표를 거치지 않고 임시 적재 표에서 ③을 만든다 (3-9). 평년은 ③의 5년 값으로 계산한다.
-- 이렇게 하면 DB는 1년차에 약 **350~490MB**, 그 뒤 연 55~70MB씩 는다. 무료 500MB에 가깝다. 상단에 가까우면 참가격 보관을 6 조사일로 줄이고(약 −30~55MB), 그래도 부족하면 유료 플랜을 본다 (7장). 500MB를 넘으면 Supabase가 DB를 읽기 전용으로 바꾼다 ([database-size](https://supabase.com/docs/guides/platform/database-size)). ① 원본 파일은 gzip 기준 1년차 약 250~330MB(백필 포함), 그 뒤 연 130~200MB로 추정되어 Storage 1GB로 약 4~5년을 쓸 수 있다.
+- KAMIS 시장별 관측값은 **최근 90일만** DB에 둔다. 5년 백필은 관측값 표를 거치지 않고 세션 임시 표(`create temp table`)에서 ③을 만든다 (3-9). 평년은 ③의 5년 값으로 계산한다.
+- 이렇게 하면 DB는 1년차에 약 **365~515MB**, 그 뒤 연 70~95MB씩 는다 (2026-10-21에 `usual_price`를 따로 셈, 3-9). 무료 500MB에 가깝다. 상단에 가까우면 참가격 보관을 6 조사일로 줄이고(약 −30~55MB), 그래도 부족하면 유료 플랜을 본다 (7장). 500MB를 넘으면 Supabase가 DB를 읽기 전용으로 바꾼다 ([database-size](https://supabase.com/docs/guides/platform/database-size)). ① 원본 파일은 gzip 기준 1년차 약 250~330MB(백필 포함), 그 뒤 연 130~200MB로 추정되어 Storage 1GB로 약 4~5년을 쓸 수 있다.
 
 ---
 
@@ -103,14 +103,14 @@ API ──▶ ① 원본 보관 (raw) ──▶ ② 정제 관측값 (observatio
 | `first_seen_at` | 우리가 그 키를 처음 받은 시각 (첫 등록 시각의 대용) | 고정 |
 | `last_seen_at` | 마지막으로 받은 응답에서 그 키를 본 시각 | **관측값·평년 행에는 두지 않는다** (2026-10-20). 행마다 두면 값이 같아도 다시 받을 때마다 모든 행을 고쳐 써야 한다 (KAMIS는 같은 날을 세 번 받는다). 다시 받은 시각은 날짜 단위로 `source_day.last_checked_at`, 파일 단위로 `raw_object.fetched_at`에 있다 |
 
-조사일 단위로 세는 마스터(상품, 점포, 원천 키)는 같은 뜻을 날짜로 `first_seen_on`·`last_seen_on`에 둔다. 상품의 "최초 확인일·마지막 확인일"이 이것이다. 날짜 단위라 하루 한 번만 바뀌고, 바뀔 때만 고친다 (`where last_seen_on < excluded.last_seen_on`).
+조사일 단위로 세는 마스터(관측 위치, 원천 키, 코드표)는 같은 뜻을 날짜로 `first_seen_on`·`last_seen_on`에 둔다. 날짜 단위라 하루 한 번만 바뀌고, 바뀔 때만 고친다 (`where last_seen_on < excluded.last_seen_on`). 상품은 "등록된 날"과 "가격이 관측된 날"이 달라 열을 나눴다 (`registered_on`, `first_price_on`·`last_price_on`, 3-6, 2026-10-21).
 
 **키와 인덱스.**
 - 원천 자연키는 PK 또는 unique로 둔다. 적재는 `insert … on conflict (자연키) do update … where (바뀌는 열) is distinct from (excluded의 같은 열)`로 한다. 같은 날 다시 받아도 행이 늘지 않고, **값이 같으면 행을 고쳐 쓰지 않는다** (죽은 행과 WAL이 생기지 않는다). 관측값의 비교 열은 3-3에 있다.
 - 관측값·집계는 자연키를 PK로 쓰고 대리키를 두지 않는다. 행당 대리키 8B와 PK 인덱스 약 20B를 아낀다.
 - **복합 PK·인덱스의 열 순서는 같음(`=`) 조건 열을 앞에, 날짜 범위 열을 맨 뒤에** 둔다. 화면은 "이 품종·규격·범위의 최근 90일"처럼 묻기 때문이다. 날짜가 가운데 있으면 뒤 열의 같음 조건이 인덱스 범위를 좁히지 못한다.
 - FK 열은 인덱스를 둔다. 생략할 때는 이유를 적는다 (대개 "그 행은 지우지 않는다"). 생략 목록은 이 절 끝에 모았다.
-- 삽입 순서와 같이 커지는 열(`obs_date`, `raw_object_id`)은 BRIN 인덱스로 둔다. 몇 KB로 날짜·파일 단위 정리를 받친다. 다만 늦게 오는 행(KAMIS 재등록, `reloaded`, 백필)이 섞이면 물리 순서와 값의 상관이 떨어져 BRIN이 넓은 범위를 읽는다. 주 1회 보존 정리처럼 느려도 되는 작업에만 쓰고, 화면·재계산 질의는 BRIN에 기대지 않는다.
+- 삽입 순서와 같이 커지는 열(`obs_date`, `raw_object_id`)은 BRIN 인덱스로 둔다. 몇 KB로 날짜·파일 단위 정리를 받친다. 다만 늦게 오는 행(KAMIS 재등록, 백필)이 섞이면 물리 순서와 값의 상관이 떨어져 BRIN이 넓은 범위를 읽는다. 주 1회 보존 정리처럼 느려도 되는 작업에만 쓰고, 화면·재계산 질의는 BRIN에 기대지 않는다.
 - 기간이 겹치면 안 되는 매핑(`valid_from`~`valid_to`)은 `btree_gist` 확장의 exclusion 제약으로 막는다. 표준 Postgres contrib 확장이라 Supabase 전용이 아니다. 첫 마이그레이션에서 `create extension if not exists btree_gist with schema extensions;`로 켠다. 버전은 적지 않는다 (Supabase는 확장 버전 지정을 무시한다, [changelog](https://supabase.com/changelog/extension-version-pinning-ignored)).
 - 유효 기간은 `[valid_from, valid_to)`이다. `valid_to`가 `null`이면 현재 유효하다. 기간이 있는 표는 모두 `check (valid_to is null or valid_to > valid_from)`를 둔다 (아래 스케치에서는 줄여 "기간 check"로 적는다).
 - 품종과 규격을 함께 드는 표는 **규격이 그 품종의 것인지 DB가 확인한다.** `spec`에 `unique (variety_id, id)`를 두고, `(variety_id, spec_id)`를 `spec(variety_id, id)`에 복합 FK로 잇는다 (`observation`, `daily_quote`, `source_code_map`, `product_variety_map`, `al_variety_rule`, `judgment_snapshot`, `reference_price`, `usual_price`). `spec.variety_id`가 이미 `variety`를 가리키므로 품종 FK는 따로 두지 않는다. 두 열 중 하나가 `null`이면 FK는 검사하지 않으므로, `null`이 될 수 있는 표에는 `check ((variety_id is null) = (spec_id is null))`를 둔다.
@@ -127,15 +127,33 @@ alter default privileges for role postgres in schema price
   revoke all on tables    from public, anon, authenticated;
 alter default privileges for role postgres in schema price
   revoke all on sequences from public, anon, authenticated;
-alter default privileges for role postgres in schema price
-  revoke all on functions from public, anon, authenticated;
+-- 함수는 위 방식으로 막지 못한다 (아래)
+create function price.some_fn(…) …;
+revoke execute on function price.some_fn(…) from public, anon, authenticated;
+grant  execute on function price.some_fn(…) to ingest_writer;   -- 필요한 롤에만
+```
+
+**기본 권한의 한계 (2026-10-21 코드 리뷰).** 스키마를 지정한 `alter default privileges … in schema … revoke`는 전역 기본 권한을 걷지 못한다. 스키마별 기본 권한은 전역 기본 권한에 더해질 뿐이다 ([ALTER DEFAULT PRIVILEGES](https://www.postgresql.org/docs/current/sql-alterdefaultprivileges.html)). 함수는 Postgres 기본값으로 `PUBLIC`에 `EXECUTE`가 전역으로 주어지므로, 예전 스케치의 `revoke all on functions` 줄은 효과가 없어 뺐다. 대신 규칙: **`price`에 함수를 만드는 마이그레이션은 같은 파일에서 바로 `revoke execute on function … from public, anon, authenticated`를 하고 필요한 롤에만 `grant execute`한다.** 표·시퀀스 줄은 남기되, 전역 기본값이 프로젝트마다 다를 수 있어 아래 테스트로 확인한다.
+
+```sql
+-- 테스트: 결과가 0행이어야 한다
+select p.oid::regprocedure, r.rolname                          -- PUBLIC·anon·authenticated가 실행할 수 있는 price 함수
+from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+cross join (values ('public'), ('anon'), ('authenticated')) r(rolname)
+where n.nspname = 'price' and has_function_privilege(r.rolname, p.oid, 'execute');
+
+select c.oid::regclass, r.rolname                              -- 같은 롤이 권한을 가진 price 표·뷰
+from pg_class c join pg_namespace n on n.oid = c.relnamespace
+cross join (values ('public'), ('anon'), ('authenticated')) r(rolname)
+where n.nspname = 'price' and c.relkind in ('r','p','v','m')
+  and has_table_privilege(r.rolname, c.oid, 'select, insert, update, delete, truncate, references, trigger');
 ```
 
 **역할 (2026-10-20 결정).** 표의 소유자는 마이그레이션을 돌리는 `postgres`다. 앱은 소유자로 접속하지 않고, 마이그레이션이 만드는 전용 로그인 롤 둘로만 접속한다. 둘 다 `nosuperuser nocreatedb nocreaterole noinherit`이고 표를 소유하지 않는다. 마이그레이션은 롤만 만들고 비밀번호는 넣지 않는다. 사람이 SQL 편집기에서 `alter role … password`로 정하고 접속 주소를 환경변수에 넣는다 (`ingest-foundation/01`).
 
 | 롤 | 누가 | 권한 |
 |---|---|---|
-| `ingest_writer` | GitHub Actions 수집·재계산·백필 (`INGEST_DATABASE_URL`) | `usage on schema price`. 운영자가 정하는 표(`category`, `item`, `variety`, `spec`, `alias`, `variety_seasonal_map`, `unit_rule`, `al_variety_rule`, `seller`, `calc_param`)는 `select`만. 그 밖의 표는 `select, insert, update, delete`, 시퀀스 `usage`. 백필 임시 적재 표(3-9)는 `truncate`도. `statement_timeout`·`idle_in_transaction_session_timeout`을 롤에 건다 |
+| `ingest_writer` | GitHub Actions 수집·재계산·백필 (`INGEST_DATABASE_URL`) | `usage on schema price`. 운영자가 정하는 표(`category`, `item`, `variety`, `spec`, `alias`, `variety_seasonal_map`, `unit_rule`, `al_variety_rule`, `seller`, `calc_param`)는 `select`만. 그 밖의 표는 `select, insert, update, delete`, 시퀀스 `usage`. 적재·백필의 세션 임시 표를 만들 DB `temporary` 권한 (기본값으로 `PUBLIC`에 있다. 걷었다면 이 롤에 다시 준다). `statement_timeout`·`idle_in_transaction_session_timeout`을 롤에 건다 |
 | `web_reader` | Vercel `apps/web` 서버 컴포넌트 (`WEB_DATABASE_URL`) | `usage on schema price`와 아래 읽기 표의 `select`만. `alter role web_reader set default_transaction_read_only = on`, `statement_timeout = '5s'` |
 
 `web_reader`가 읽는 표 (화면이 쓰는 것만):
@@ -156,7 +174,9 @@ create policy ingest_rw  on price.<표> for all    to ingest_writer using (true)
 create policy web_select on price.<표> for select to web_reader    using (true);   -- 읽기 표에만
 ```
 
-`anon`·`authenticated` 정책은 만들지 않는다. 마이그레이션 테스트는 (1) `web_reader`로 읽기 표마다 행이 보이는지, (2) `web_reader`로 관측값·수집 상태를 읽으면 `42501`(권한 없음)인지, (3) `anon`으로 `price`의 어느 표도 못 읽는지를 확인한다. 정책 누락은 "빈 결과"로만 드러나므로 (1)을 빼면 안 된다.
+`anon`·`authenticated` 정책은 만들지 않는다. 마이그레이션 테스트는 (1) `web_reader`로 읽기 표마다 행이 보이는지, (2) `web_reader`로 관측값·수집 상태를 읽으면 `42501`(권한 없음)인지, (3) `anon`으로 `price`의 어느 표도 못 읽는지, (4) 위 "기본 권한의 한계"의 두 질의가 0행인지를 확인한다. 정책 누락은 "빈 결과"로만 드러나므로 (1)을 빼면 안 된다.
+
+**RLS 표에는 `COPY FROM`을 못 한다.** Postgres는 RLS가 켜진 표에 `COPY FROM`을 지원하지 않는다 (RLS를 우회하는 소유자·`BYPASSRLS` 롤만 된다, [COPY](https://www.postgresql.org/docs/current/sql-copy.html)). `ingest_writer`는 둘 다 아니다. 그래서 정기 적재와 백필 모두 **세션 임시 표에 `COPY`하고 영구 표에는 `insert … select`로 넣는다.** 임시 표에는 RLS가 없다. 영구 표를 `COPY` 대상으로 두는 설계는 쓰지 않는다 (2026-10-21, 예전의 `kamis_backfill_stage`를 뺐다).
 
 **키 (2026-10-20 결정).** Supabase의 새 API 키(`sb_publishable_…`, `sb_secret_…`)를 쓰고 옛 `anon`·`service_role` JWT 키는 쓰지 않는다. DB 쓰기는 키가 아니라 위 Postgres 롤로 한다. 비밀 키 `sb_secret_…`(`SUPABASE_SECRET_KEY`)는 **Actions의 Storage 업로드에만** 쓴다. 웹앱에는 Supabase 키가 하나도 없다. 원본 버킷 `raw`는 비공개이고 Storage 정책을 두지 않아 비밀 키로만 읽고 쓴다. Actions에서 Supabase CLI를 써야 하면(마이그레이션 적용 등) 프로젝트 하나로 범위를 좁힌 개인 액세스 토큰을 쓴다 ([changelog](https://supabase.com/changelog/scoped-personal-access-tokens-ga)). 지금은 마이그레이션을 로컬에서 적용하므로 필요 없다.
 
@@ -178,6 +198,7 @@ create policy web_select on price.<표> for select to web_reader    using (true)
 | `region.successor_code` | 지역은 수백 행이고 지우지 않는다 |
 | `judgment_snapshot (variety_id, spec_id)` | 규격 행은 지우지 않는다. 판정은 묶음(`batch_id`, PK 앞 열)으로만 읽고 지운다 |
 | `judgment_current.batch_id` | 한 줄짜리 표다 |
+| `product.merged_into` | 상품은 지우지 않고 수백 행이다. 병합 대상을 찾는 질의는 운영자 작업뿐이다 |
 | `reference_observation.place_id` | 축평원 전국 한 곳이고 지우지 않는다 |
 | `store`·`market`의 `(place_id, kind)` | PK `place_id`가 덮는다 |
 
@@ -206,11 +227,10 @@ create policy web_select on price.<표> for select to web_reader    using (true)
 | 3-4 | `judgment_batch`, `judgment_current`, `judgment_snapshot`, 뷰 `current_judgment` | 판정 스냅샷 묶음 / 현재 묶음 포인터 / 품종·규격별 판정 / 현재 묶음의 판정 | ○ (`judgment_batch` 제외) |
 | 3-4 | `calc_param` | 계산 상수 (정해진 값과 ②에서 정할 자리) | |
 | 3-5 | `ingest_run`, `source_day`, `source_day_part`, `backfill_task` | 수집 실행 / 출처 × 대상 날짜 상태 / 부분 누락 단위 / 백필 진행 | |
-| 3-9 | `kamis_backfill_stage` | KAMIS 백필 임시 적재 (UNLOGGED, 묶음마다 비움) | |
 | 3-6 | `product`, `product_source_key`, `product_attr_history`, `product_variety_map`, `al_variety_rule` | 상품 / 출처 키 → 상품 / 상품 속성 이력 / 상품 → 품종 / AL 소분류 → 품종 기본값 | ○ (`product`, `product_attr_history`) |
 | 3-7 | `raw_object` | Storage에 올린 원본 파일 하나 | |
 
-**만드는 순서.** FK가 가리키는 표를 먼저 만든다. 절 번호 순서와 다르다: 확장(`btree_gist`)·스키마·롤 → `region` → `category`·`item`·`variety`·`spec` → `unit_rule`·`source_code_table`·`source_item` → `ingest_run` → `raw_object` → `seller`·`obs_place`·`store`·`market`·`store_seller`·`store_link`·`region_code_map`·`source_master_change` → `product`·`product_source_key`·`product_attr_history`·`al_variety_rule`·`product_variety_map`·`source_code_map`·`alias`·`variety_seasonal_map` → `observation`·`observation_revision`·`reference_observation` → 집계·판정 → `judgment_batch` → `judgment_current`·`judgment_snapshot` → 뷰 → GRANT·RLS 정책. 자기 참조(`store.lineage_id`, `region.parent_code`·`successor_code`, `raw_object.duplicate_of`)는 표를 만들 때 같이 둔다.
+**만드는 순서.** FK가 가리키는 표를 먼저 만든다. 절 번호 순서와 다르다: 확장(`btree_gist`)·스키마·롤 → `region` → `category`·`item`·`variety`·`spec` → `unit_rule`·`source_code_table`·`source_item` → `ingest_run` → `raw_object` (`source_day` → `source_day_part`, `backfill_task`도 이때) → `seller`·`obs_place`·`store`·`market`·`store_seller`·`store_link`·`region_code_map`·`source_master_change` → `product`·`product_source_key`·`product_attr_history`·`al_variety_rule`·`product_variety_map`·`source_code_map`·`alias`·`variety_seasonal_map` → `observation`·`observation_revision`·`reference_observation` → 집계·판정 → `judgment_batch` → `judgment_current`·`judgment_snapshot` → 뷰 → GRANT·RLS 정책. 자기 참조(`store.lineage_id`, `region.parent_code`·`successor_code`, `raw_object.duplicate_of`)는 표를 만들 때 같이 둔다.
 
 ### 3-1. 분류와 매핑 (운영자가 관리)
 
@@ -239,6 +259,14 @@ variety_seasonal_map  variety_id int not null fk variety, seasonal_food_id text 
 인덱스: `item(category_id)`, `variety(item_id)`, `alias(item_id)`, `alias(variety_id)`, `alias(lower(text))`, `variety_seasonal_map(seasonal_food_id)`. `spec(variety_id)`는 unique가 덮는다. 부분 unique는 표 제약으로 쓸 수 없어 `create unique index … where`로 만든다.
 
 **규격이 비지 않게 한다.** 매핑을 `mapped`로 확정할 때는 규격을 반드시 고른다. 원천이 규격을 가르지 않으면(축평원 `구분없음`, 참가격 상품 대부분) 그 품종의 기본 규격(`is_default`)을 넣는다. 그래서 집계 PK의 `spec_id`는 `null`이 아니다.
+
+**기본 규격이 꼭 하나 있게 한다 (2026-10-21).** 부분 unique `spec_one_default`는 "많아야 하나"만 보장하고 "하나는 있다"는 보장하지 않는다. 지연 제약 트리거 대신 가장 단순한 검사 질의를 둔다. 운영자 표는 로컬 소유자 접속으로만 고치므로 트리거보다 고친 직후 검사가 맞다. 아래 질의가 1행이라도 내면 실패다. 실행하는 곳: 마이그레이션 테스트(시드 뒤, `ingest-foundation/02`), 시드 스크립트의 끝, 운영자가 분류 표를 고친 뒤, `recompute` 시작 때(실패하면 멈추고 경보).
+
+```sql
+select v.id, v.slug from price.variety v           -- 기본 규격이 없는 활성 품종
+where v.status = 'active'
+  and not exists (select 1 from price.spec s where s.variety_id = v.id and s.is_default);
+```
 
 **코드표.** 출처가 준 코드 목록을 종류와 함께 저장한다. 같은 글자가 종류마다 다르기 때문이다 (참가격 `UT:CS` 캡슐과 `BU:CS` 편의점, 축평원 `itemCd 68`은 돼지 목심이면서 수입 소고기 척아이롤).
 
@@ -329,7 +357,7 @@ obs_place
   unique (id, kind),                 -- 하위 표 복합 FK의 대상
   check ((kind = 'store') = (scope = 'store') and (kind = 'market') = (scope = 'market')),
   region_code text null fk region,   -- region_code_map으로 붙인 우리 지역 (매핑 전 null)
-  first_seen_on date not null, last_seen_on date not null
+  first_seen_on date null, last_seen_on date null   -- 가격 응답에서 처음·마지막으로 본 조사일. 마스터로만 아는 점포는 null (2026-10-21)
 ```
 
 인덱스: `(region_code)`. 관측값의 범위(`scope`)와 지역은 위치마다 고정이라 관측값 행에 복사하지 않고 여기에만 둔다 (3-3).
@@ -436,8 +464,9 @@ source_master_change
   source_key text not null,           -- goodId / entpId / 'AR:021800000'
   change_kind text not null check (change_kind in ('added','removed','changed')),
   field text null, old_value text null, new_value text null,
-  detected_on date not null, raw_object_id bigint not null fk raw_object,
-  action text not null check (action in ('recorded','mapping_reset','linked','attr_versioned'))
+  detected_on date not null, raw_object_id bigint null fk raw_object,
+  action text not null check (action in ('recorded','mapping_reset','linked','attr_versioned','merged')),
+  check (action = 'merged' or raw_object_id is not null)   -- 상품 병합(3-6)은 운영자 작업이라 원본 파일이 없다
 ```
 
 인덱스: `(source, entity, source_key)`, `(raw_object_id)`.
@@ -472,7 +501,7 @@ observation
   promo_discount      boolean null,               -- 행사(할인): 참가격 goodDcYn Y=true, N=false, 필드 없음=null(모름)
   promo_one_plus_one  boolean null,               -- 행사(1+1): plusoneYn 같은 규칙
   promo_from date null, promo_to date null,       -- goodDcStartDay·EndDay. 표시용 (조사일과 어긋날 수 있다)
-  flags           text[] null,                    -- 'carried_over' 'outlier' 'duplicate_of_ekape' 'reloaded' 'unit_mismatch' 'one_plus_one_unverified'
+  flags           text[] null,                    -- 'carried_over' 'outlier' 'duplicate_of_ekape' 'unit_mismatch' 'one_plus_one_unverified'
 
   source_registered_at timestamptz null,          -- 3-0
   first_seen_at   timestamptz not null,           -- last_seen_at은 두지 않는다 (3-0)
@@ -509,28 +538,34 @@ observation
 | 참가격 | (`goodInspectDay`, `entpId`, `goodId`) | `chamga:{goodId}` | `goodInspectDay` | `store` / `entpId` |
 
 **적재와 정정.**
-- 원본 파일 하나를 트랜잭션 하나로 적재한다 (3-0 "접속"). 파일의 행을 임시 표에 `COPY`한 뒤, (1) PK가 같고 `price_raw` 또는 행사 열이 다른 행을 `observation_revision`에 옮겨 적고, (2) **바뀐 행만** 덮는다. 값이 바뀌면 `revision + 1`, `source_day.status = 'corrected'`, 그 날짜의 ③을 다시 계산한다.
+- 원본 파일 하나를 트랜잭션 하나로 적재한다 (3-0 "접속"). 파일의 행을 임시 표에 `COPY`한 뒤, (1) PK가 같고 `price_raw` 또는 행사 열이 다른 행을 `observation_revision`에 옮겨 적고, (2) **바뀐 행만** 덮는다. 가격·행사가 바뀌면 `revision + 1`, 그날 `source_day`의 `corrected_at = now()`·`correction_count + 1`(상태는 그대로, 3-5), 그 날짜의 ③을 다시 계산한다. 상품 연결(`product_id`)만 바뀐 행도 덮고, 그날 `product_daily_summary`를 다시 계산한다 (정정은 아니라 `revision`은 그대로).
 
 ```sql
 insert into price.observation as o (…)
 select … from pg_temp.obs_load
 on conflict (source_item_id, obs_date, place_id) do update
   set price_raw = excluded.price_raw, promo_discount = excluded.promo_discount, …,
+      product_id = excluded.product_id, variety_id = excluded.variety_id, spec_id = excluded.spec_id,
       source_registered_at = excluded.source_registered_at, raw_object_id = excluded.raw_object_id,
       revision = o.revision + case when (o.price_raw, o.promo_discount, o.promo_one_plus_one, o.promo_from, o.promo_to)
                                      is distinct from (excluded.price_raw, excluded.promo_discount,
                                                        excluded.promo_one_plus_one, excluded.promo_from, excluded.promo_to)
                                    then 1 else 0 end
-  where (o.price_raw, o.qty_raw, o.unit_raw, o.price_per_base, o.unit_rule_id, o.variety_id, o.spec_id,
+  where (o.price_raw, o.qty_raw, o.unit_raw, o.price_per_base, o.unit_rule_id, o.product_id, o.variety_id, o.spec_id,
          o.promo_discount, o.promo_one_plus_one, o.promo_from, o.promo_to, o.flags, o.source_registered_at)
         is distinct from
         (excluded.price_raw, excluded.qty_raw, excluded.unit_raw, excluded.price_per_base, excluded.unit_rule_id,
-         excluded.variety_id, excluded.spec_id, excluded.promo_discount, excluded.promo_one_plus_one,
+         excluded.product_id, excluded.variety_id, excluded.spec_id, excluded.promo_discount, excluded.promo_one_plus_one,
          excluded.promo_from, excluded.promo_to, excluded.flags, excluded.source_registered_at);
 ```
 
 - **등록 시각만 바뀐 것은 정정이 아니다.** KAMIS는 값이 같아도 `orgnl_reg_dt`가 바뀐다 (10/06~10/08분 141행, [kamis.md 6-2](sources/kamis.md)). 이때는 `source_registered_at`·`raw_object_id`만 바뀌고 `revision`은 그대로다. 모든 열이 같으면 행을 건드리지 않는다. `first_seen_at`은 `set`에 넣지 않는다.
-- **보존 기간이 지난 행이 다시 등록되어 오면** (KAMIS 재등록은 최대 249일 뒤) 비교할 관측값이 없다. 관측값에 다시 넣고 `flags += 'reloaded'`, 그 날짜의 `daily_quote`를 다시 계산한다. 집계값이 바뀌면 그날 `source_day`를 `corrected`로 한다. 다시 넣은 행은 다음 보존 정리 때 지운다.
+- **보존 기간이 지난 행이 다시 등록되어 오면** (KAMIS 재등록은 최대 249일 뒤, 2026-10-21 변경) 비교할 관측값이 없다. 다시 온 행 하나로 그날 `daily_quote`를 다시 계산하면 표본이 그 행 하나가 되어 집계가 망가진다. 그래서:
+  1. 다시 온 행은 **관측값에 넣지 않는다.** 원본 파일은 정기 수집처럼 Storage에 먼저 올라가 있다.
+  2. 그 행의 원천 키가 그날 집계에 들어가는지 본다 (`source_code_map`이 `mapped`이고 `role = 'primary'`). 아니면 집계에 영향이 없으므로 3·4를 건너뛰고 기록만 한다 (5).
+  3. **원본에서 표본 전체를 다시 만든다.** 그 출처·조사일을 담은 모든 원본 파일(`raw_object.source`가 같고 `target_from ≤ 조사일 ≤ target_to`, 백필·정기·재등록 감시 파일 모두)을 받은 순서로 읽어, 원천 자연키마다 마지막 값을 취한다. 그날 관측값이 DB에 남아 있는 출처(축평원)는 관측값에서 읽는다. 결과를 세션 임시 표에 넣고 정기 수집과 같은 집계 함수로 (품종, 규격, 조사일)의 모든 범위(`scope_key`)를 계산한다.
+  4. **완전할 때만 바꾼다.** 필요한 파일 중 하나라도 `purged_at`이 있거나 Storage에서 읽지 못했거나, 복원한 표본 수가 지금 집계의 `n`보다 적으면 불완전이다. 완전하면 한 트랜잭션(`recompute` lock)에서 그 (품종, 규격, 단계, 기준, 조사일)의 `daily_quote` 행을 지우고 새로 넣는다. 값이 바뀌었으면 그날 `source_day.corrected_at`·`correction_count`를 올린다. 불완전하면 기존 집계를 그대로 둔다.
+  5. 어느 경우든 `observation_revision`에 한 줄 남기고(`rebuild_result` = `rebuilt` | `kept` | `not_aggregated`, 이전 값은 복원한 원본의 값, 모르면 `null`), `kept`이면 경보를 남긴다 (5-3). KAMIS 원본은 1년 두므로(3-9 보관 5) 249일 안의 재등록은 대개 복원된다.
 
 ```sql
 observation_revision                -- 정정 이력. 바뀌기 전 값을 남긴다
@@ -541,6 +576,8 @@ observation_revision                -- 정정 이력. 바뀌기 전 값을 남�
   old_price_raw integer, new_price_raw integer,
   old_promo jsonb null, new_promo jsonb null,      -- {"discount":true,"one_plus_one":null,"from":…,"to":…}
   old_source_registered_at timestamptz, new_source_registered_at timestamptz,
+  rebuild_result text null check (rebuild_result in ('rebuilt','kept','not_aggregated')),
+                                    -- 보존 기간 밖 재등록일 때만 (위): 원본 전체로 집계 교체 / 원본 불완전이라 유지 / 집계 대상 아님
   detected_at timestamptz not null, raw_object_id bigint not null fk raw_object
 ```
 
@@ -700,7 +737,9 @@ ingest_run
 source_day                              -- 출처 × 대상 날짜(조사일)마다 한 줄
   source text not null, target_date date not null, primary key (source, target_date),
   status text not null check (status in
-    ('pending','ok','partial','empty_expected','empty_unexpected','failed','corrected')),
+    ('pending','ok','partial','empty_expected','empty_unexpected','failed')),   -- 수집이 얼마나 됐나만 뜻한다
+  corrected_at timestamptz null,        -- 받은 뒤 값이 마지막으로 바뀐 시각 (정정, 3-3)
+  correction_count int not null default 0,
   expected_rows int null,               -- 기준 행 수 (KAMIS 최근 4주 같은 요일 중앙값, 참가격 최근 4 조사일 중앙값)
   row_count int not null default 0, item_count int null, place_count int null,
   attempts smallint not null default 0,
@@ -716,6 +755,7 @@ source_day_part                         -- 부분 누락을 판정하는 단위
   part_kind text not null check (part_kind in ('item','seller','store','fresh_panel')),
   part_key text not null,               -- KAMIS item_cd / seller_id / entpId / 'chamga-fresh-9'
   primary key (source, target_date, part_kind, part_key),   -- 날짜 단위로 읽어 날짜가 둘째다
+  foreign key (source, target_date) references source_day (source, target_date),   -- PK 앞 두 열이 FK 인덱스를 덮는다
   row_count int not null, baseline int null,
   status text not null check (status in ('ok','partial','missing'))
 
@@ -727,7 +767,8 @@ backfill_task                           -- 과거분 채우기 진행 (중간에
 ```
 
 - `source_day`는 출처 × 날짜마다 한 줄이다. 배치는 매번 이 표를 보고 **비어 있거나 실패한 날짜를 다시 채운다.** 마지막으로 성공한 날짜 하나만 기억하는 방식은 쓰지 않는다. 중간에 빠진 날을 놓치기 때문이다.
-- 상태의 뜻: `pending` 아직 안 옴 | `ok` | `partial` 일부 누락 | `empty_expected` 휴일·격주 비는 날·확인된 조사 없음 | `empty_unexpected` 와야 하는데 없음 | `failed` 호출 실패 | `corrected` 받은 뒤 값이 바뀜. 판정 기준은 5-2.
+- 상태의 뜻: `pending` 아직 안 옴 | `ok` | `partial` 일부 누락 | `empty_expected` 휴일·격주 비는 날·확인된 조사 없음 | `empty_unexpected` 와야 하는데 없음 | `failed` 호출 실패. 판정 기준은 5-2. 상태는 수집 완결성만 뜻한다. **받은 뒤 값이 바뀐 것(정정)은 상태가 아니라 `corrected_at`·`correction_count`로 남긴다** (2026-10-21). 예전의 `corrected` 상태는 `partial`인 날이 정정되면 "일부 누락"을 덮어 지웠다.
+- `source_day_part`는 `source_day` 행에 FK로 매달린다. 적재는 그날 `source_day` 행(없으면 `pending`)을 먼저 만든다.
 - `source_day_part`의 `store` 행이 `partial`인 조사일은 상품 사라짐 횟수(`product.missing_streak`)에 세지 않는다. `fresh_panel`은 일반 신선식품 9개 점포 표본이다 ([chamgagyeok.md 9장](sources/chamgagyeok.md)).
 - 인덱스: `ingest_run(source, started_at)`, `source_day(status) where status not in ('ok','empty_expected')`.
 - `source_day_part`의 기준값(최근 4주 같은 부분) 계산은 `(source, part_kind, part_key, target_date)`가 더 맞지만, 표가 연 수만 행이라 PK 하나로 둔다. 느리면 그때 인덱스를 더한다.
@@ -740,11 +781,15 @@ backfill_task                           -- 과거분 채우기 진행 (중간에
 product                            -- 우리가 발급하는 상품 ID
   id int pk,                       -- identity. 재사용하지 않는다. 지우지 않는다
   name text not null,              -- 현재 이름 (속성 이력의 최신 값을 복사)
-  status text not null check (status in ('surveyed','not_surveyed')),   -- 조사 중 / 조사 안 됨
-  first_seen_on date not null,     -- 최초 확인일 (처음 가격이 관측된 조사일)
-  last_seen_on date null,          -- 마지막 확인일
+  status text not null check (status in ('surveyed','not_surveyed','merged')),   -- 조사 중 / 조사 안 됨 / 다른 상품에 병합됨
+  registered_on date not null,     -- 등록일: 마스터나 가격 응답에서 이 상품을 처음 본 날 (2026-10-21 나눔)
+  first_price_on date null,        -- 최초 확인일: 처음 가격이 관측된 조사일. 첫 관측 전 null
+  last_price_on date null,         -- 마지막 확인일: 마지막으로 가격이 관측된 조사일
   missing_streak smallint not null default 0,   -- 연속 결측 조사일 수 (partial 조사일은 세지 않음)
-  status_changed_on date null
+  status_changed_on date null,
+  merged_into int null fk product, -- 병합된 상품이면 이어받은 상품 (아래 "상품 병합")
+  check ((first_price_on is null) = (last_price_on is null) and first_price_on <= last_price_on),
+  check ((status = 'merged') = (merged_into is not null) and merged_into <> id)
 
 product_source_key                 -- (출처, 출처 키, 유효 시작일, 유효 종료일) → 상품
   source_item_id int not null fk source_item,   -- 'chamga:<goodId>'
@@ -789,9 +834,16 @@ al_variety_rule                    -- AL 소분류 → 품종 기본값 (search-
 - 인덱스: `product_source_key(product_id)`, `product_attr_history(raw_object_id)`, `product_variety_map(variety_id, spec_id)`, `al_variety_rule(variety_id, spec_id)` (복합 FK). 나머지 FK는 3-0 생략 목록.
 - 가격 관측·요약·URL은 **상품 내부 ID만 참조**한다. 출처 키(`goodId`)를 URL에 노출하지 않는다. 바깥 ID 형식은 로드맵 ③④에서 정한다.
 - 상품 → 품종은 소분류 규칙(`al_variety_rule`)으로 먼저 채우고(`origin = 'al_rule'`) 맞지 않는 상품만 운영자가 고친다(`operator`). 가공식품의 품종 단위는 `p3-variety-catalog/01`이 정한다. 그 전에는 `pending`이고 관측값의 `variety_id`는 `null`이다.
-- **새 출처 키가 나타나면** 새 `product`와 `product_source_key`를 만든다. "기존 상품의 이름·용량 변경"인지 가르는 기준은 마스터 변경 사례를 몇 달 쌓은 뒤 정한다 (7장). 그 전에는 운영자가 두 상품을 하나로 보기로 하면 `product_source_key`의 `product_id`를 기존 상품으로 바꾼다.
+- **새 출처 키가 나타나면** 새 `product`와 `product_source_key`를 만든다. "기존 상품의 이름·용량 변경"인지 가르는 기준은 마스터 변경 사례를 몇 달 쌓은 뒤 정한다 (7장). 그 전에는 운영자가 두 상품을 하나로 보기로 하면 아래 "상품 병합"을 돌린다. `product_source_key`의 `product_id`만 바꾸면 과거 관측값·요약이 옛 상품에 남아 추이가 끊기므로 그렇게 하지 않는다.
+- **상품 병합 (2026-10-21).** 상품 A를 B로 합치는 운영자 작업이다. 수집과 따로 도는 CLI 명령(`merge-product --from A --into B`)이고, 한 트랜잭션에서 `ingest:chamga`·`recompute` advisory lock을 잡고 한다.
+  1. `product_source_key`: A를 가리키는 모든 기간 행의 `product_id`를 B로 바꾼다. 기간은 그대로라 원천 키별 exclusion 제약에 걸리지 않는다. A와 B가 같은 원천 키의 다른 기간을 가졌어도 기간이 원래 겹치지 않으므로 그대로 된다.
+  2. `observation`: 보존 기간 안(참가격 8 조사일)의 `product_id = A` 행을 B로 바꾼다. PK에 `product_id`가 없어 충돌하지 않는다. B의 품종 매핑이 A와 다르면 `variety_id`·`spec_id`도 B의 매핑으로 바꾸고 그 날짜의 `daily_quote`(판매가 기준)를 다시 계산한다.
+  3. `product_daily_summary`: A·B 중 하나라도 행이 있는 모든 날짜를 B로 다시 계산하고 A의 행을 지운다. 보존 기간 안은 관측값에서, 밖은 참가격 원본(지우지 않는다, 3-9 보관 5)에서 계산한다. 같은 조사일·점포에 두 원천 키가 다 있으면 점포 하나로 센다. 어떤 날짜의 원본을 읽지 못하면 그 날짜는 A의 요약 행을 지우지 않고 남기며, 화면은 B의 추이를 그릴 때 `merged_into = B`인 상품의 행을 함께 읽는다 (같은 날짜에 둘 다 있으면 B가 우선).
+  4. A: `status = 'merged'`, `merged_into = B`, `status_changed_on`. 열린 `product_attr_history`·`product_variety_map` 기간을 병합일로 닫는다 (행은 남긴다). B의 `registered_on`·`first_price_on`은 둘 중 이른 값, `last_price_on`은 늦은 값으로. 이미 A로 병합된 상품(`merged_into = A`)도 B로 바꿔 사슬이 한 단계를 넘지 않게 한다.
+  5. `source_master_change`: 바꾼 원천 키마다 한 줄 (`entity = 'product'`, `change_kind = 'changed'`, `field = 'product_id'`, 옛 값 A, 새 값 B, `action = 'merged'`, `raw_object_id = null`).
+  A의 URL·조회는 `merged_into`를 따라가 B를 보인다. 상품 ID는 재사용하지 않으므로 A의 행은 지우지 않는다.
 - **`goodId` 재사용 의심**(소분류가 바뀌거나 이름과 용량이 함께 바뀜)이면 그 키의 현재 `product_source_key`에 `valid_to`를 넣어 끊고, 운영자가 새 상품인지 정한다. 이름만 조금 바뀐 것은 `product_attr_history`에 새 행을 넣고 상품은 그대로다. 그래서 이름이 바뀌어도 과거 가격이 같은 상품으로 이어진다.
-- **사라짐·추가.** 사라진 상품은 지우지 않고 `not_surveyed`와 마지막 확인일로 표시하며 과거 추이를 계속 보인다. 판정은 보수적으로 한다. 조사일마다 그 상품을 낸 점포가 0곳이면 `missing_streak + 1`, 하나라도 있으면 0으로 되돌리고 `surveyed`. `missing_streak`가 `calc_param chamga.disappear_streak`(=3)에 닿으면 `not_surveyed`. 조사일 전체가 `partial`이거나 그 상품을 내던 점포가 `partial`인 날은 세지 않는다 (점포 100의 2026-08-07 상품 258개 누락이 이런 날이다). 새 상품은 `first_seen_on`을 넣고, 가격이 쌓이기 전에는 화면이 "가격을 모으는 중"으로 보인다.
+- **사라짐·추가.** 사라진 상품은 지우지 않고 `not_surveyed`와 마지막 확인일로 표시하며 과거 추이를 계속 보인다. 판정은 보수적으로 한다. 조사일마다 그 상품을 낸 점포가 0곳이면 `missing_streak + 1`, 하나라도 있으면 0으로 되돌리고 `surveyed`. `missing_streak`가 `calc_param chamga.disappear_streak`(=3)에 닿으면 `not_surveyed`. 조사일 전체가 `partial`이거나 그 상품을 내던 점포가 `partial`인 날은 세지 않는다 (점포 100의 2026-08-07 상품 258개 누락이 이런 날이다). 새 상품은 `registered_on`을 넣고 `first_price_on`·`last_price_on`은 첫 가격이 관측될 때 채운다 (`last_price_on`은 `where last_price_on is null or last_price_on < 조사일`일 때만 고친다). 가격이 쌓이기 전에는 화면이 "가격을 모으는 중"으로 보인다. 병합된 상품(`merged`)은 사라짐 판정에서 뺀다.
 
 ### 3-7. ① 원본 보관 레코드
 
@@ -854,12 +906,14 @@ raw_object
 | `daily_quote` | 5년 약 75만 (+15만/년) | 약 120~150B | **약 90~110MB** (+18~23MB/년) | 영구. 범위는 `national` + 시장 유형 2개 + 업태(판매가). 시도 범위를 더하면 축산만으로 연 +20만 행 |
 | `product_daily_summary` | 연 약 10만 (상품 457 × 범위 약 8 × 26) | 약 120~150B | 약 12~15MB/년 | 영구 |
 | `reference_price` | 연 약 16만 (품종·규격 약 220 × 365 × 2종) | 약 120~150B | 약 19~24MB/년 | 영구. 화면에 필요한 날짜만 두면 더 준다 (7장) |
-| `usual_price`, `judgment_*` | 판정 묶음 3개 × 약 220행, payload 약 3KB (압축) | | 약 3MB | 묶음 3개 |
+| `usual_price` | 연 약 8만 (품종·규격 약 220 × 365) | 약 200~300B (`components` jsonb 100B 안팎 포함) | 약 16~24MB/년 | 영구. 화면에 필요한 날짜만 두면 더 준다 (7장) |
+| `judgment_*` | 판정 묶음 3개 × 약 220행, payload 약 3KB (압축) | | 약 3MB | 묶음 3개 |
 | `observation_revision` | 드묾 (10-19까지 가격 정정 0건) | 약 120B | 1MB 미만 | 영구 |
 | 마스터 (`source_item` 약 1,400, `obs_place` 약 900, `product` 604, 코드표 약 1,600, 지역 약 400 …) | 수천 | | 5MB 미만 | 영구 |
 | 수집 상태 (`source_day`, `source_day_part`, `ingest_run`, `raw_object`) | 연 약 4만 | 약 100B | 약 4MB/년 | 영구 (2년 넘은 `source_day_part`는 지워도 된다). `raw_object`는 파일을 지워도 행은 남긴다 (3-7) |
-| `kamis_backfill_stage` | 묶음 하나 (최대 약 9만 행) | 약 150B | 0 (백필 중 최대 약 15MB) | 묶음마다 `truncate` |
-| **합계 (1년차)** | | | **약 350~490MB** | 이후 연 +55~70MB. 상단은 무료 500MB(시스템 몫 포함)를 넘는다 (7장) |
+| **합계 (1년차)** | | | **약 365~515MB** | 이후 연 +70~95MB. 상단은 무료 500MB(시스템 몫 포함)를 넘는다 (7장). 백필 중 세션 임시 표는 묶음 하나(최대 약 9만 행, 약 15MB)만큼 잠깐 잡히고 세션이 끝나면 사라진다 |
+
+`ingest-foundation/02`의 실측 때 관측값만이 아니라 **집계 표도 잰다** (`daily_quote`, `product_daily_summary`, `reference_price`, `usual_price`). 집계 행당 크기(120~150B)와 `usual_price`의 `components` 크기도 어림이기 때문이다.
 
 원본 파일 (Storage 1GB). 저장 샘플을 gzip으로 재 보니 행당 KAMIS 약 12B(배추 14일 381행 151KB → 4.7KB), 참가격 약 7~8B(419행 114KB → 3.3KB)였다. 다른 품목이 섞이면 압축률이 조금 낮아질 것으로 보고 KAMIS 15B, 참가격 10B로 어림한다.
 
@@ -875,13 +929,13 @@ raw_object
 1GB로 약 4~5년이다. 2장의 "연 200~300MB, 약 3년" 추정보다 여유가 있다.
 
 **보관·집계 (1~5는 6-1에서 정함).**
-1. KAMIS 시장·축산 관측값은 DB에 **최근 90일**만 둔다. 평년은 `daily_quote`의 5년 전국·시장 유형 값으로 계산한다. **5년 백필은 관측값 표를 거치지 않는다** (2026-10-20 변경). 관측값에 650만 행을 넣었다 지우면 그동안 표가 1GB를 넘어 무료 500MB에서 DB가 읽기 전용이 되고, `delete`한 자리는 autovacuum 뒤에도 운영체제로 돌아가지 않아 크기가 높은 자리에 머문다 ([database-size](https://supabase.com/docs/guides/platform/database-size)). 대신 묶음(품목 × 연도)마다:
+1. KAMIS 시장·축산 관측값은 DB에 **최근 90일**만 둔다. 평년은 `daily_quote`의 5년 전국·시장 유형 값으로 계산한다. **5년 백필은 관측값 표를 거치지 않는다** (2026-10-20 변경). 관측값에 650만 행을 넣었다 지우면 그동안 표가 1GB를 넘어 무료 500MB에서 DB가 읽기 전용이 되고, `delete`한 자리는 autovacuum 뒤에도 운영체제로 돌아가지 않아 크기가 높은 자리에 머문다 ([database-size](https://supabase.com/docs/guides/platform/database-size)). 대신 묶음(품목 × 연도)마다 **정기 적재와 같은 길**로 한다 (2026-10-21 변경. 예전의 고정 `UNLOGGED` 표 `kamis_backfill_stage`는 RLS가 켜져 `ingest_writer`가 `COPY`할 수 없어 뺐다, 3-0):
    1. 원본을 Storage에 올린다 (정기 수집과 같다).
-   2. `UNLOGGED` 임시 적재 표 `kamis_backfill_stage`(관측값과 같은 열, 인덱스는 집계에 필요한 `(variety_id, spec_id, obs_date)` 하나)에 `COPY`한다. WAL을 쓰지 않아 빠르고, 장애가 나면 비워지지만 묶음을 처음부터 다시 하면 된다 (`backfill_task`).
-   3. 그 묶음의 날짜 범위로 `daily_quote`를 만든다. 한 품종이 여러 품목 코드에서 오면(참다래 `419` → 키위 `437`) 같은 묶음으로 받는다.
-   4. 최근 90일에 드는 행만 `observation`으로 옮긴다.
-   5. `truncate kamis_backfill_stage`. `truncate`는 공간을 바로 돌려준다.
-   묶음을 시작하기 전에 `pg_database_size`를 보고 400MB를 넘으면 멈추고 알린다. 집계 코드는 정기 수집과 같은 함수를 쓰고 읽는 표만 다르다.
+   2. 한 세션·한 트랜잭션에서 `create temp table … on commit drop`(관측값과 같은 열, 집계에 필요한 `(variety_id, spec_id, obs_date)` 인덱스 하나)을 만들고 `COPY`한다. 임시 표는 RLS가 없고 WAL도 쓰지 않는다.
+   3. 그 임시 표에서 묶음의 날짜 범위로 `daily_quote`를 만든다. 한 품종이 여러 품목 코드에서 오면(참다래 `419` → 키위 `437`) 같은 묶음으로 받는다.
+   4. 최근 90일에 드는 행만 `insert … select`(정기 적재와 같은 병합)로 `observation`에 넣는다.
+   5. `commit`하면 임시 표가 파일째 사라진다. 실패하면 묶음 전체가 되돌아가고 처음부터 다시 하면 된다 (`backfill_task`).
+   임시 표는 영구 표의 죽은 행·부풀림을 남기지 않는다. 다만 있는 동안에는 DB 크기에 잡히므로(최대 약 15MB) 묶음을 시작하기 전에 `pg_database_size`를 보고 400MB를 넘으면 멈추고 알린다. 집계 코드는 정기 수집과 같은 함수를 쓰고 읽는 표만 다르다.
 2. 참가격 점포별 관측값은 DB에 **최근 8 조사일**만 둔다. 사라짐 판정(N=3)과 판매처 누락 판정(최근 4 조사일 중앙값)에 필요한 것보다 넉넉하고, 상품 화면의 "최근 몇 회 점포별 가격"을 받친다. 그보다 오래된 것은 `product_daily_summary`·`daily_quote`로만 남는다. 실측 용량이 크면 6회로 줄인다.
 3. 축평원 관측값과 평년 행은 영구 보관한다.
 4. 집계(`daily_quote`, `product_daily_summary`)는 영구 보관하되 `region:` 범위는 MVP에서 만들지 않는다.
@@ -989,7 +1043,7 @@ raw_object
 | 22 | KAMIS 축산과 축평원이 같은 값 (출처 중복) | 둘 다 | 둘 다 저장하고 `role`로 대표를 정해 집계는 한 번만 센다. 대표 출처는 7장 |
 | 23 | 같은 것이 출처마다 다른 이름 (특란30구 = `XL30구`, 목살 = `목심`) | 둘 다 | 출처 간 대조에 이름을 쓰지 않는다. 코드로만 |
 | 24 | 등록 시각만 바뀌고 값은 같음 (KAMIS 재등록) | KAMIS | 정정이 아니다. `source_registered_at`만 갱신 (3-3) |
-| 25 | 보존 기간이 지난 날짜의 재등록 | KAMIS | 관측값에 다시 넣고(`reloaded`) 그날 `daily_quote`를 다시 계산. 바뀌면 `corrected` (3-3) |
+| 25 | 보존 기간이 지난 날짜의 재등록 | KAMIS | 관측값에 넣지 않는다. 그날 원본 파일 전체로 표본을 복원해 `daily_quote`를 바꾼다. 원본이 불완전하면 집계를 그대로 두고 `observation_revision`(`rebuild_result = kept`)과 경보만 (3-3) |
 | 26 | 형식 위반 행 (필수 필드 없음, 타입 다름, 요청 범위 밖 날짜) | 모두 | ②로 넘기지 않고 원본에만. `raw_object.rejected_rows`에 세고 운영자 알림 (5-2 "응답 형식이 바뀜") |
 
 ---
@@ -1101,7 +1155,7 @@ KAMIS `orgnl_reg_dt`는 재등록 때 덮어쓰이므로, 처음 받은 시각�
 | **일부만 옴** | 품목별 건수가 최근 4주 같은 요일 평균의 50% 미만 → `partial`. 참가격은 [chamgagyeok.md 9장](sources/chamgagyeok.md) 기준을 따른다 (조사일 전체 80%, 판매처 50%, 사라짐 확정은 N=3 연속 결측) | 해당 품목만 다시 받음 | 해당 품종만 지연으로 표시 |
 | **호출 실패** (시간 초과, 게이트웨이 오류) | HTTP 오류, `OpenAPI_ServiceResponse` | 2s/4s/8s 간격으로 3번 재시도. 실패하면 `failed`로 남기고 다음 실행에서 다시 받음 | 서비스는 ③ 집계를 읽으므로 영향 없음 |
 | **한도 초과** | 게이트웨이의 한도 오류 메시지 | 그날은 멈추고 다음 날 이어서 받음. 실행마다 호출 예산을 둔다 (참가격 1,500 / 축평원 800 / KAMIS 8,000) | 영향 없음 |
-| **받은 뒤 값이 바뀜** (정정) | upsert 때 가격이 다름 → `revision++`, `source_day.status = corrected` | 해당 날짜의 ③을 다시 계산 | 판정이 바뀔 수 있음 (조용히 갱신) |
+| **받은 뒤 값이 바뀜** (정정) | upsert 때 가격이 다름 → `revision++`, `source_day.corrected_at`·`correction_count++` (상태는 그대로) | 해당 날짜의 ③을 다시 계산 | 판정이 바뀔 수 있음 (조용히 갱신) |
 | **전일가를 이어 씀** (KAMIS 품절) | 같은 품종·시장 가격이 3일 이상 똑같음 → `flags += carried_over` | 평소가 계산에서는 첫날 값만 1번 센다. 기준 일수는 판정 설계(②)에서 다시 정한다 ([kamis.md 6-4](sources/kamis.md)) | "갱신 지연" 표시, 신뢰도 낮춤 |
 | **이상치** | 전날 대비 ±50% 이상이거나, 같은 날 다른 시장 중앙값의 3배 이상 → `outlier` | 집계에서 빼고 원본은 남김 | 표시하지 않음 |
 | **출처 중복** | KAMIS 축산 소매 = 축평원 같은 날 같은 값 → `duplicate_of_ekape` | 집계에서 한 번만 센다 | `also_reported_by` |
@@ -1181,7 +1235,7 @@ docs.railway.com/pricing/plans (2026-10-08 확인) 기준이다.
 | 결정 | 내용 |
 |---|---|
 | 축산 대표 출처 | 조합(원천 키) 단위. 두 출처에 다 있는 조합은 축평원이 대표, KAMIS에만 있는 조합(한우 1++, 계란 규격, 닭 호수)은 KAMIS가 대표. 둘 다 관측값에 넣고 집계는 대표만 센다 |
-| KAMIS 시장별 관측값 | 최근 **90일**만 관측값으로 둔다. 시장 유형별·품종별 집계(`daily_quote`)는 영구. 그래서 시장 하나(예: 경동시장)의 추이는 최근 90일까지, 전통시장 대 대형유통 추이는 전 기간 볼 수 있다. 5년 백필은 넣고 집계를 만든 뒤 90일 밖 행을 지운다. 평년은 집계의 5년 값으로 계산한다 |
+| KAMIS 시장별 관측값 | 최근 **90일**만 관측값으로 둔다. 시장 유형별·품종별 집계(`daily_quote`)는 영구. 그래서 시장 하나(예: 경동시장)의 추이는 최근 90일까지, 전통시장 대 대형유통 추이는 전 기간 볼 수 있다. 5년 백필은 관측값 표를 거치지 않고 집계를 만든 뒤 최근 90일만 넣는다 (아래 "KAMIS 5년 백필"). 평년은 집계의 5년 값으로 계산한다 |
 | 참가격 점포별 관측값 | 최근 **8 조사일**(약 16주). 상품별 집계(`product_daily_summary`)는 영구 |
 | 원본 파일(Storage) 보존 | KAMIS·축평원은 1년 지난 원본을 지운다(다시 받을 수 있음). 참가격은 지우지 않는다 |
 | 지역 코드 | 법정동 코드 앞자리(시도 2자리, 시군구 5자리), 전국 `00`. 표준 코드를 아직 확인하지 못한 지역(전남광주통합특별시)은 확인 전까지 임시 코드 |
@@ -1198,9 +1252,20 @@ docs.railway.com/pricing/plans (2026-10-08 확인) 기준이다.
 | 롤 | 소유자는 `postgres`(마이그레이션). 앱은 `ingest_writer`(수집, 쓰기)와 `web_reader`(화면, 읽기 표의 `select`만)로만 접속한다. 롤은 `ingest-foundation/02`의 마이그레이션이 만들고 사람은 비밀번호와 접속 주소만 넣는다 |
 | 키 | 새 키 체계. `sb_secret_…`(`SUPABASE_SECRET_KEY`)는 Actions의 Storage 업로드에만 쓴다. DB 쓰기는 키가 아니라 롤로 한다. 웹앱에는 Supabase 키가 없다. `anon`·`service_role` 키는 쓰지 않는다 |
 | 접속·적재 | Actions는 Supavisor 세션 모드(5432). 원본 파일 하나 = 트랜잭션 하나 (`COPY` → 임시 표 → 병합). 값이 바뀐 행만 고쳐 쓴다. 출처별 advisory lock + Actions `concurrency`. 웹앱은 트랜잭션 모드(6543) |
-| KAMIS 5년 백필 | 관측값 표를 거치지 않는다. 묶음마다 `UNLOGGED` 임시 표 → `daily_quote` → 최근 90일만 `observation` → `truncate` (3-9) |
+| KAMIS 5년 백필 | 관측값 표를 거치지 않는다. 묶음마다 세션 임시 표(`create temp table`)에 `COPY` → `daily_quote` → 최근 90일만 `observation`에 `insert … select` → 트랜잭션 끝에 임시 표 사라짐 (3-9, 2026-10-21 변경) |
 | 원본 삭제 | Storage 파일만 지우고 `raw_object` 행은 `purged_at`을 채워 남긴다 (FK가 가리킨다) |
 | 백업 | **추후 (정식 서비스 전).** 계획은 주 1회 `pg_dump`(Actions 아티팩트로 최근분, 달마다 한 벌을 비공개 Storage 버킷에). 시제품인 지금은 하지 않는다. 위험: 운영자 매핑(`source_code_map`, `store_seller`, `product_variety_map`, `store_link`, `calc_param`, `market.type_source`)은 원본으로 되살릴 수 없다 |
+
+**코드 리뷰 반영 (2026-10-21).** 논리 스키마 코드 리뷰에서 확인된 것을 고쳤다. 세부는 각 절에 있다.
+- 백필: RLS 표에는 `COPY FROM`을 못 해 고정 `UNLOGGED` 표 `kamis_backfill_stage`를 뺐다. 정기 적재처럼 세션 임시 표 → `insert … select` (3-0, 3-9).
+- 보존 기간 밖 재등록: 다시 온 행 하나로 집계를 다시 내지 않는다. 원본 전체로 표본을 복원해 집계를 바꾸고, 원본이 불완전하면 집계를 두고 기록만 (3-3).
+- 상품 병합: 별도 운영자 작업으로 정의. `product.merged_into`, 상태 `merged`, `source_master_change.action = 'merged'`. upsert 비교·`set`에 `product_id` 추가 (3-3, 3-6).
+- `source_day`: `corrected` 상태를 빼고 `corrected_at`·`correction_count`. 상태는 수집 완결성만 (3-5).
+- `source_day_part` → `source_day` 복합 FK. `schema-map.html`의 ERD PK·선택 관계·논리 연결을 바로잡음.
+- 상품 날짜: `registered_on`과 `first_price_on`·`last_price_on`을 나눔. `obs_place.first_seen_on`·`last_seen_on`은 `null` 허용 (3-2, 3-6).
+- 기본 규격: 활성 품종에 기본 규격이 있는지 검사 질의를 테스트·시드·운영자 수정 뒤·`recompute` 시작 때 돌린다 (3-1).
+- 용량: `usual_price`를 따로 셈(연 약 8만 행, 16~24MB). 1년차 합계 365~515MB, 이후 연 +70~95MB (3-9).
+- 함수 권한: 스키마별 기본 권한으로는 함수의 전역 `PUBLIC` `EXECUTE`를 못 걷는다. 함수마다 같은 마이그레이션에서 `revoke`, 권한 테스트 질의 추가 (3-0).
 
 ## 7. 열린 질문
 
@@ -1208,7 +1273,7 @@ docs.railway.com/pricing/plans (2026-10-08 확인) 기준이다.
 
 | 질문 | 추천 | 다룰 곳 |
 |---|---|---|
-| DB 용량이 무료 500MB에 가깝다 (1년차 추정 350~490MB, 이후 연 +55~70MB, 3-9) | `ingest-foundation/02`에서 1만 행으로 실측한 뒤 정한다. 넘을 것 같으면 순서대로: 참가격 6 조사일, `reference_price`를 화면이 쓰는 날짜만, Pro 플랜 | ① `ingest-foundation/02`·`05` |
+| DB 용량이 무료 500MB에 가깝다 (1년차 추정 365~515MB, 이후 연 +70~95MB, 3-9) | `ingest-foundation/02`에서 1만 행(과 집계 표)으로 실측한 뒤 정한다. 넘을 것 같으면 순서대로: 참가격 6 조사일, `reference_price`·`usual_price`를 화면이 쓰는 날짜만, Pro 플랜 | ① `ingest-foundation/02`·`05` |
 | 백업을 언제 시작할지 (6-1 "백업": 추후) | 정식 서비스 전, 늦어도 운영자 매핑을 손으로 많이 고치기 시작할 때. 그 전까지는 매핑을 고친 뒤 SQL로 내보내 두는 것만으로도 위험이 준다 | ④ 선행 |
 | KAMIS 친환경·중도매를 저장할지 (도매는 MVP 이후, E3) | | 확장 E3 |
 | 평소가 계산식 (KAMIS 5년 평년, 축평원 평년, 최근 N주 중앙값을 섞는 방식) | | ② |
