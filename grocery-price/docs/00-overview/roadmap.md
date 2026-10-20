@@ -42,7 +42,7 @@ P0 기획·조사 ✅ ── P1 도메인 모델링 ✅
   - 요청·응답 실측: [api-spec.md](../10-research/api-spec.md), 응답 샘플 `reference/public-data/samples/`
   - 파이프라인 설계: [pipeline.md](../30-data/pipeline.md) (저장 구조, 테이블, 수집 일정, 장애 처리)
   - 실행 환경 결정: [ADR 0002](../adr/0002-supabase-and-github-actions.md)
-  - Postgres 스키마·마이그레이션·RLS (`supabase/migrations/`)
+  - Postgres 스키마·마이그레이션·롤·권한 (`supabase/migrations/`). 표는 노출하지 않는 스키마 `price`, 수집은 `ingest_writer` 롤, 웹앱은 `web_reader` 롤로 서버에서만 읽는다 (2026-10-20, [pipeline.md](../30-data/pipeline.md) 3-0)
   - 수집 패키지(API 클라이언트, 계약 테스트, 변환, 적재)와 GitHub Actions 워크플로
   - KAMIS 5년 이력 백필 (평년 계산 입력)
 - **완료 기준**
@@ -81,10 +81,11 @@ P0 기획·조사 ✅ ── P1 도메인 모델링 ✅
 - **목표**: `apps/web`에 가격 화면을 만들고 배포한다.
 - **할 일**
   - `packages/ui`에 판정·차트 색 토큰 추가 (Oura 팔레트 안에서, 라이트 모드 전용)
-  - 웹앱이 Supabase를 읽는 경로 (`ingest-foundation/06`)
+  - 웹앱이 DB를 읽는 경로: 접속은 정해졌다(서버 컴포넌트 + `web_reader`, `WEB_DATABASE_URL`). 캐시 단위와 갱신 신호는 여기서 정한다 (`ingest-foundation/06`)
   - 가격 페이지를 `apps/web/shared/seo/pages.ts`에 등록, 메타데이터는 `createMetadata`
   - `/` 가격 메인으로 교체 (`app/page.tsx`의 리다이렉트를 대체, 제철 경로는 그대로)
 - **선행 작업 (사용자)**: 운영계정 전환 신청(개발계정 활용기간 만료 전), 도메인, Search Console
+- **정식 서비스 전에 할 것**: DB 백업 시작. 주 1회 `pg_dump`(Actions 아티팩트로 최근분, 달마다 한 벌을 비공개 Storage 버킷에). 시제품 단계라 미뤘다 (2026-10-20). 운영자가 정한 매핑은 원본으로 되살릴 수 없으므로 출시 전에 꼭 켠다 ([pipeline.md](../30-data/pipeline.md) 6-1)
 - **완료 기준**: 운영 배포, 375·1280 폭에서 콘솔 오류 없음, sitemap 제출
 
 ## 이전 단계와의 대응 (2026-10-19 재편)

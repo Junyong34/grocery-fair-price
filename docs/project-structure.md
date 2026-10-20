@@ -319,7 +319,7 @@ grocery-price/
 | `seasonal-mvp/` | 제철달력 MVP 화면 13개 티켓 | 01~11 resolved, 12 ready-for-agent(데스크톱·태블릿), 13 needs-info(디자인 다듬기) |
 | `calendar-print/` | 달력 PDF 어드민(에디션 생성·공개)과 다운로드 | 1차 구현됨(인쇄물 4종, 어드민, 내려받기). 배치 끌어 옮기기·명절·음력 옵션은 남음 |
 | `seo/` | 검색 색인(SEO) 기반: 레지스트리·sitemap·robots·JSON-LD·색인 스위치 | 01~07 resolved, 08 needs-triage(품종 본문 보강) |
-| `ingest-foundation/` | 가격 서비스 ① 수집 기반: Supabase 설정, 스키마, 수집 패키지·Actions, 백필, 장애 처리, 웹앱 읽기 | 01 ready-for-human(Supabase 계정), 02~06 ready-for-agent |
+| `ingest-foundation/` | 가격 서비스 ① 수집 기반: Supabase 설정, 스키마, 수집 패키지·Actions, 백필, 장애 처리, 웹앱 읽기 | 01 ready-for-human(Supabase 계정), 02~05 ready-for-agent, 06 resolved (서버 전용 읽기) |
 | `p2-data-source-spec/` | 가격 서비스 ① 요청·응답 분석 (이전 번호 P2) | 진행 중. 01 resolved, 05 wontfix, 08~10 후순위 |
 | `p3-variety-catalog/` | ② 품종 목록, 점포 데이터가 없는 품종의 대응 (이전 번호 P3) | ready-for-human |
 | `p4-canonical-model/` | ① 통합 스키마·어댑터 (이전 번호 P4) | 01·03 ready-for-agent, 02 resolved (ADR 0002) |

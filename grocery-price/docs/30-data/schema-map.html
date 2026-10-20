@@ -1,0 +1,795 @@
+<title>적정가 데이터 지도</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* 레이아웃: 좁은 본문 단 하나 + 넓게 펼치는 도표·표 블록. 출처 3색(KAMIS 잎, 축평원 정육, 참가격 영수증 잉크)이 페이지 전체의 색 언어다. */
+:root {
+  --paper: #f6f7f4;
+  --surface: #ffffff;
+  --ink: #1d2420;
+  --muted: #5d6862;
+  --line: #d9ded8;
+  --accent: #2f6b4f;
+  --kamis: #3d7a3a;
+  --kamis-bg: #e8f1e4;
+  --ekape: #a2463a;
+  --ekape-bg: #f6e6e2;
+  --chamga: #2f5d8a;
+  --chamga-bg: #e3ecf5;
+  --warn: #8a5a12;
+  --warn-bg: #f6ecd8;
+  --display: "Gowun Batang", "Nanum Myeongjo", serif;
+  --body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "JetBrains Mono", "SFMono-Regular", Menlo, monospace;
+  --step-0: 0.95rem;
+  --step-1: 1.15rem;
+  --step-2: 1.5rem;
+  --step-3: 2.2rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #141816;
+    --surface: #1c211e;
+    --ink: #e6ebe7;
+    --muted: #9aa69f;
+    --line: #333b36;
+    --accent: #7cc19c;
+    --kamis: #8fcb84;
+    --kamis-bg: #1f2d1d;
+    --ekape: #e39486;
+    --ekape-bg: #33201c;
+    --chamga: #8ab4e0;
+    --chamga-bg: #1a2633;
+    --warn: #e2b36a;
+    --warn-bg: #2f2615;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #141816;
+  --surface: #1c211e;
+  --ink: #e6ebe7;
+  --muted: #9aa69f;
+  --line: #333b36;
+  --accent: #7cc19c;
+  --kamis: #8fcb84;
+  --kamis-bg: #1f2d1d;
+  --ekape: #e39486;
+  --ekape-bg: #33201c;
+  --chamga: #8ab4e0;
+  --chamga-bg: #1a2633;
+  --warn: #e2b36a;
+  --warn-bg: #2f2615;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: var(--step-0);
+  line-height: 1.7;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 1120px; margin: 0 auto; padding-block: 48px 96px; display: flex; flex-direction: column; gap: 64px; }
+.prose { max-width: 68ch; }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; text-wrap: balance; line-height: 1.3; margin: 0; }
+h1 { font-size: var(--step-3); }
+h2 { font-size: var(--step-2); }
+h3 { font-size: var(--step-1); }
+p { margin: 0; }
+code, .mono { font-family: var(--mono); font-size: 0.86em; }
+.eyebrow { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+section { display: flex; flex-direction: column; gap: 20px; }
+.lede { color: var(--muted); font-size: var(--step-1); max-width: 62ch; }
+
+/* 머리 */
+header.top { display: flex; flex-direction: column; gap: 16px; border-bottom: 1px solid var(--line); padding-bottom: 32px; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 24px; color: var(--muted); font-size: 0.9rem; }
+.facts b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px; }
+.src { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+.src::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.src.k { color: var(--kamis); background: var(--kamis-bg); }
+.src.e { color: var(--ekape); background: var(--ekape-bg); }
+.src.c { color: var(--chamga); background: var(--chamga-bg); }
+
+/* 3층 */
+.layers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.layer { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+.layer .num { font-family: var(--display); font-size: 1.6rem; color: var(--accent); line-height: 1; }
+.layer dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 0.88rem; }
+.layer dt { color: var(--muted); }
+.layer dd { margin: 0; }
+@media (max-width: 760px) { .layers { grid-template-columns: 1fr; } }
+
+/* 도표 */
+.figure { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; overflow-x: auto; }
+.figure pre.mermaid { margin: 0; min-width: 640px; background: transparent; }
+.caption { color: var(--muted); font-size: 0.86rem; }
+
+/* 표 */
+.table-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.86rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+thead th { font-weight: 600; background: var(--paper); position: sticky; top: 0; }
+tbody tr:last-child td { border-bottom: 0; }
+td.col { font-family: var(--mono); font-size: 0.82rem; white-space: nowrap; color: var(--muted); }
+th.k { color: var(--kamis); } th.e { color: var(--ekape); } th.c { color: var(--chamga); }
+td.dim { color: var(--muted); }
+
+/* ERD 묶음 */
+.groups { display: flex; flex-direction: column; gap: 40px; }
+.group { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 24px; align-items: start; }
+.group .note { display: flex; flex-direction: column; gap: 10px; }
+.group ul { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 4px; color: var(--muted); font-size: 0.9rem; }
+.group ul b { color: var(--ink); font-weight: 600; }
+@media (max-width: 860px) { .group { grid-template-columns: 1fr; } }
+
+/* 확인 목록 */
+.checks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.check { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: flex; gap: 12px; }
+.check input { margin-top: 5px; width: 16px; height: 16px; accent-color: var(--accent); flex: none; }
+.check label { display: flex; flex-direction: column; gap: 4px; cursor: pointer; }
+.check label span { color: var(--muted); font-size: 0.88rem; }
+.check.open { background: var(--warn-bg); border-color: transparent; }
+.check.open strong { color: var(--warn); }
+@media (max-width: 760px) { .checks { grid-template-columns: 1fr; } }
+input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 20px; }
+</style>
+
+<div class="page">
+
+<header class="top">
+  <span class="eyebrow">장바구니 적정가 · ① 수집 기반 · 2026-10-20 기준</span>
+  <h1>적정가 데이터 지도</h1>
+  <p class="lede">공공 API 3개의 응답이 Supabase의 어느 테이블에 어떤 모양으로 들어가는지, 테이블끼리 어떻게 이어지는지 한 장에 모았습니다. 마이그레이션을 쓰기 전에 마지막으로 확인하는 용도입니다.</p>
+  <div class="legend">
+    <span class="src k">KAMIS 일별 도·소매</span>
+    <span class="src e">축평원 축산물유통정보</span>
+    <span class="src c">참가격 생필품 가격</span>
+  </div>
+  <div class="facts">
+    <span>스키마 <code>price</code> · 테이블 <b>41</b>개 + 뷰 <b>1</b> · 묶음 <b>6</b>개</span>
+    <span>1년차 DB 추정 <b>350~490MB</b> / 무료 500MB</span>
+    <span>1년차 원본 파일 추정 <b>250~330MB</b> / 무료 1GB</span>
+    <span>근거 문서 <code>grocery-price/docs/30-data/pipeline.md</code> 3장</span>
+  </div>
+</header>
+
+<section>
+  <span class="eyebrow">큰 그림</span>
+  <h2>데이터는 세 층으로 쌓입니다</h2>
+  <p class="prose">API가 준 응답은 손대지 않고 파일로 먼저 남깁니다. 그다음 세 출처를 같은 모양으로 바꾼 관측값을 만들고, 화면은 관측값을 묶은 집계와 판정만 읽습니다. 변환 규칙이 바뀌면 원본에서 다시 계산할 수 있습니다.</p>
+  <div class="layers">
+    <div class="layer">
+      <span class="num">①</span>
+      <h3>원본</h3>
+      <p>응답의 모든 필드를 그대로, 줄 단위 JSON으로 gzip 압축</p>
+      <dl>
+        <dt>어디</dt><dd>Supabase Storage <code>raw</code> 버킷 (비공개)</dd>
+        <dt>기록</dt><dd><code>raw_object</code> (파일을 지워도 행은 남기고 <code>purged_at</code>)</dd>
+        <dt>보관</dt><dd>KAMIS·축평원 1년, 참가격 영구</dd>
+        <dt>쓰기</dt><dd>Actions의 비밀 키 <code>sb_secret_…</code>만</dd>
+      </dl>
+    </div>
+    <div class="layer">
+      <span class="num">②</span>
+      <h3>관측값</h3>
+      <p>가격 한 건 = 한 줄. 단위 환산, 품종 매핑, 행사 표시를 마친 값</p>
+      <dl>
+        <dt>어디</dt><dd>Postgres 스키마 <code>price</code>의 <code>observation</code></dd>
+        <dt>보관</dt><dd>KAMIS 90일, 참가격 8 조사일, 축평원 영구</dd>
+        <dt>공개</dt><dd>웹앱도 읽지 않음. 쓰기는 <code>ingest_writer</code> 롤만</dd>
+      </dl>
+    </div>
+    <div class="layer">
+      <span class="num">③</span>
+      <h3>집계·판정</h3>
+      <p>품종 × 규격 × 날짜 × 범위별 대표값, 평소가, 판정</p>
+      <dl>
+        <dt>어디</dt><dd>Postgres 스키마 <code>price</code>의 <code>daily_quote</code>, <code>judgment_snapshot</code> 등</dd>
+        <dt>보관</dt><dd>영구</dd>
+        <dt>공개</dt><dd><code>web_reader</code> 서버 전용 읽기 (화면이 쓰는 표만). 브라우저 키 없음, Data API 노출 없음</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">흐름</span>
+  <h2>출처 3개가 테이블로 흘러가는 길</h2>
+  <p class="prose">세 출처는 같은 관측값 테이블로 모이지만 들어가는 길이 다릅니다. KAMIS와 축평원은 품종·규격 단위의 시세라서 원천 코드 매핑으로 품종에 바로 이어집니다. 참가격은 실제로 파는 상품의 판매가라서 우리 상품 ID를 한 번 거친 뒤 품종에 이어집니다.</p>
+  <div class="figure">
+<pre class="mermaid">
+flowchart LR
+  subgraph SRC["공공 API"]
+    K["KAMIS<br/>perDay/price"]
+    E["축평원<br/>consumerPriceDaily"]
+    C["참가격<br/>ProductPriceInfoService"]
+  end
+  subgraph RAW["① 원본"]
+    RO["raw_object<br/>+ Storage 파일"]
+  end
+  subgraph MASTER["원천 키와 위치"]
+    SI["source_item<br/>출처 키 등록부"]
+    SCM["source_code_map<br/>원천 키 → 품종·규격"]
+    OP["obs_place<br/>관측 위치"]
+    MK["market<br/>조사 시장"]
+    ST["store<br/>점포"]
+    PR["product<br/>우리 상품 ID"]
+    PVM["product_variety_map<br/>상품 → 품종"]
+  end
+  subgraph OBS["② 관측값"]
+    OB["observation"]
+    RF["reference_observation<br/>평년 행"]
+  end
+  subgraph AGG["③ 집계·판정"]
+    DQ["daily_quote<br/>품종별 일자 요약"]
+    PDS["product_daily_summary<br/>상품별 일자 요약"]
+    UP["reference_price · usual_price"]
+    JS["judgment_snapshot<br/>판정"]
+  end
+  K --> RO
+  E --> RO
+  C --> RO
+  RO --> SI
+  RO --> OP
+  SI --> SCM
+  OP --> MK
+  OP --> ST
+  SI -->|"참가격 goodId"| PR
+  PR --> PVM
+  SCM --> OB
+  PVM --> OB
+  OP --> OB
+  RO -->|"축평원 평년"| RF
+  OB --> DQ
+  OB --> PDS
+  RF --> UP
+  DQ --> UP
+  UP --> JS
+  DQ --> JS
+  classDef k fill:#e8f1e4,stroke:#3d7a3a,color:#1d2420
+  classDef e fill:#f6e6e2,stroke:#a2463a,color:#1d2420
+  classDef c fill:#e3ecf5,stroke:#2f5d8a,color:#1d2420
+  class K,MK k
+  class E,RF e
+  class C,ST,PR,PVM,PDS c
+</pre>
+  </div>
+  <p class="caption">초록은 KAMIS에만, 붉은색은 축평원에만, 파랑은 참가격에만 쓰이는 길입니다. 흰 상자는 세 출처가 함께 씁니다.</p>
+</section>
+
+<section>
+  <span class="eyebrow">쪼개지는 방식</span>
+  <h2>응답 한 행은 이렇게 나뉩니다</h2>
+  <p class="prose">실제 저장 샘플에서 출처마다 한 행씩 가져와 넣어 본 결과입니다 (<code>pipeline.md</code> 3-10). 내부 ID 숫자와 품종 이름은 예시입니다.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>어디로</th><th class="k">KAMIS · 애호박, 경동시장</th><th class="e">축평원 · 돼지 삼겹살, 전국</th><th class="c">참가격 · 팔도 왕뚜껑, 센텀시티점</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="col">원천 행</td><td>2026-09-28, 구분 01 소매, 호박/애호박/상품, 서울 경동, 1개 1,830원</td><td>2026-10-11, 4304 돼지, 27 삼겹살, 구분없음, 100g 2,985원 + 평년 행 2,721원</td><td>2026-09-25, 점포 682, 상품 1000, 1,500원, 할인 N, 1+1 N</td></tr>
+        <tr><td class="col">source_item</td><td><code>kamis:01-200-224-01-04</code></td><td><code>ekape:4304-27-구분없음</code></td><td><code>chamga:1000</code></td></tr>
+        <tr><td class="col">품종 연결</td><td><code>source_code_map</code> → 애호박 / 규격 상품</td><td><code>source_code_map</code> → 국산 삼겹살 / 기본 규격</td><td><code>product</code> #1 → <code>product_variety_map</code> (컵라면 품종이 아직 없어 대기)</td></tr>
+        <tr><td class="col">obs_place</td><td>조사 시장 → <code>market</code> 경동, 전통시장</td><td>지역 평균, 전국</td><td>점포 → <code>store</code> 신세계백화점센텀시티점, 백화점, 판매처 신세계백화점</td></tr>
+        <tr><td class="col">obs_kind / scope</td><td>시세 표본 / 시장</td><td>집계 시세 / 전국</td><td>판매가 / 점포</td></tr>
+        <tr><td class="col">price_raw</td><td>1830</td><td>2985</td><td>1500</td></tr>
+        <tr><td class="col">price_per_base</td><td>1830.00 (1개당)</td><td>2985.00 (100g당)</td><td>매핑 후 1363.64 (100g당, 110g 상품)</td></tr>
+        <tr><td class="col">행사</td><td class="dim">null (출처에 없음)</td><td class="dim">null</td><td>할인 false, 1+1 false</td></tr>
+        <tr><td class="col">source_registered_at</td><td>원천 재등록 시각</td><td class="dim">null (출처에 없음)</td><td><code>inputDttm</code> (서울 시간)</td></tr>
+        <tr><td class="col">first_seen_at</td><td colspan="3">우리가 처음 받은 시각. 세 출처 모두 기록</td></tr>
+        <tr><td class="col">reference_observation</td><td class="dim">없음</td><td>평년 행 2,721원 (관측값과 분리)</td><td class="dim">없음</td></tr>
+        <tr><td class="col">원본에만 남는 필드</td><td>품목·시장 이름(이름은 마스터로), kg 환산가</td><td>최고·최저가, 시도별 가격 17개</td><td>표시용 기준 수량, 단위 코드 중복분</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">출처별 요약</span>
+  <h2>출처마다 다른 점</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th></th><th class="k">KAMIS</th><th class="e">축평원</th><th class="c">참가격</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="col">자연키</td><td>조사일, 구분, 부류, 품목, 품종, 등급, 시군구, 시장</td><td>축종, 품목코드, 구분명, 기준일</td><td>조사일, 점포, 상품</td></tr>
+        <tr><td class="col">관측 단위</td><td>조사 시장 48곳 (실명 전통시장 16, 대형유통 32). 축산은 시도·전국만</td><td>전국 평균 (시도 17개는 원본에만)</td><td>점포 약 450곳</td></tr>
+        <tr><td class="col">주기</td><td>평일. 축산은 매일</td><td>매일, 주말 포함</td><td>격주 금요일, 등록은 2일 전~7일 뒤</td></tr>
+        <tr><td class="col">DB 보관</td><td>관측값 90일, 집계 영구</td><td>영구</td><td>점포별 8 조사일, 상품 집계 영구</td></tr>
+        <tr><td class="col">특이점</td><td>과거 행이 나중에 다시 등록됨 → <code>observation_revision</code></td><td>KAMIS 축산과 같은 값. 겹치는 조합은 축평원이 대표</td><td>점포 ID가 바뀌기도 함 → <code>store_link</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">관계도</span>
+  <h2>테이블 연결 관계</h2>
+  <p class="prose">41개를 한 그림에 넣으면 읽을 수 없어서 역할별 6개 묶음으로 나눴습니다. 각 그림에는 키와 연결에 필요한 열만 넣었습니다. 전체 열은 <code>pipeline.md</code> 3장에 있습니다.</p>
+
+  <div class="groups">
+
+    <div class="group">
+      <div class="note">
+        <h3>1. 분류와 원천 코드</h3>
+        <ul>
+          <li><b>품종이 중심입니다.</b> 카테고리 → 품목 → 품종 → 규격 순으로 내려갑니다.</li>
+          <li>출처의 코드 조합 하나가 <code>source_item</code> 한 행입니다.</li>
+          <li><code>source_code_map</code>이 원천 키를 품종·규격에 잇습니다. 기간이 겹치면 DB가 거부합니다.</li>
+          <li>품종과 규격은 <code>(variety_id, spec_id)</code> 복합 FK로 함께 잇습니다. 다른 품종의 규격은 들어가지 않습니다.</li>
+          <li>가격 품종과 제철달력 품종은 <code>variety_seasonal_map</code>으로만 이어집니다.</li>
+        </ul>
+      </div>
+      <div class="figure">
+<pre class="mermaid">
+erDiagram
+  category ||--o{ item : "품목"
+  item ||--o{ variety : "품종"
+  variety ||--o{ spec : "규격"
+  item ||--o{ alias : "별칭"
+  variety ||--o{ alias : "별칭"
+  variety ||--o{ variety_seasonal_map : "제철 연결"
+  source_item ||--o{ source_code_map : "기간별 매핑"
+  variety ||--o{ source_code_map : ""
+  spec ||--o{ source_code_map : ""
+  unit_rule ||--o{ source_code_map : "환산 규칙"
+  category {
+    int id PK
+    text slug UK
+  }
+  item {
+    int id PK
+    int category_id FK
+  }
+  variety {
+    int id PK
+    int item_id FK
+    text base_unit "g ml ea"
+  }
+  spec {
+    int id PK
+    int variety_id FK "unique (variety_id, id)"
+    bool is_default "품종마다 하나"
+  }
+  alias {
+    int id PK
+    text text
+  }
+  variety_seasonal_map {
+    int variety_id PK
+    text seasonal_food_id PK
+  }
+  source_item {
+    int id PK
+    text source "kamis ekape chamga"
+    text source_key UK
+  }
+  source_code_map {
+    int source_item_id FK
+    date valid_from
+    date valid_to
+    int variety_id FK
+    int spec_id FK "mapped면 not null"
+    text role "primary secondary"
+  }
+  unit_rule {
+    int id PK
+    text rule_code
+    int version
+  }
+  source_code_table {
+    text source PK
+    text code_class PK
+    text code PK
+  }
+</pre>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="note">
+        <h3>2. 위치: 점포, 조사 시장, 지역</h3>
+        <ul>
+          <li><code>obs_place</code>는 가격이 관측된 곳입니다. 점포, 조사 시장, 지역 평균 중 하나입니다.</li>
+          <li>점포는 <code>store_seller</code>로 기간별 판매처에 이어집니다. 과거 평균은 당시 판매처로 계산됩니다.</li>
+          <li>재등록된 점포는 <code>store_link</code>와 <code>lineage_id</code>로 옛 점포와 이어집니다.</li>
+          <li>출처마다 다른 지역 코드는 <code>region_code_map</code>이 법정동 코드로 바꿉니다.</li>
+          <li>범위(<code>scope</code>)와 지역은 위치마다 고정이라 관측값이 아니라 <code>obs_place</code>에 한 번만 둡니다. <code>store</code>·<code>market</code>은 상수 <code>kind</code>로 위치 종류가 맞는지 DB가 확인합니다.</li>
+        </ul>
+      </div>
+      <div class="figure">
+<pre class="mermaid">
+erDiagram
+  obs_place ||--o| store : "점포"
+  obs_place ||--o| market : "조사 시장"
+  region ||--o{ obs_place : ""
+  store ||--o{ store_seller : "기간별"
+  seller ||--o{ store_seller : ""
+  store ||--o{ store_link : "재등록"
+  region ||--o{ region_code_map : ""
+  region ||--o{ region : "상위 지역"
+  obs_place {
+    int id PK
+    text source
+    text kind "store market region_avg"
+    text scope "store market sido national 등"
+    text source_place_code UK
+    text region_code FK
+  }
+  store {
+    int place_id PK
+    text kind "store 고정"
+    text channel "업태"
+    int lineage_id FK
+    text status
+  }
+  market {
+    int place_id PK
+    text kind "market 고정"
+    text market_type "전통시장 대형유통 등"
+  }
+  seller {
+    int id PK
+    text name UK
+  }
+  store_seller {
+    int place_id PK
+    date valid_from PK
+    int seller_id FK
+    date valid_to
+  }
+  store_link {
+    int old_place_id PK
+    int new_place_id PK
+    text reason
+  }
+  region {
+    text code PK
+    text level "nation sido sigungu"
+  }
+  region_code_map {
+    text source PK
+    text source_region_code PK
+    text region_code FK
+  }
+</pre>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="note">
+        <h3>3. 관측값</h3>
+        <ul>
+          <li><b>키는 (원천 키, 조사일, 관측 위치)</b>입니다. 같은 행을 다시 받으면 비교해서 값이 바뀐 행만 고쳐 씁니다.</li>
+          <li>출처·범위·지역은 조인으로 얻으므로 관측값 행에 두지 않습니다. 행당 약 200~250B로 봅니다.</li>
+          <li>값이 바뀌면 <code>observation_revision</code>에 이전 값을 남기고 <code>revision</code>을 올립니다.</li>
+          <li>축평원 평년 행은 관측값이 아니라 <code>reference_observation</code>에 들어갑니다.</li>
+          <li>모든 행은 자기를 만든 원본 파일(<code>raw_object</code>)을 가리킵니다.</li>
+        </ul>
+      </div>
+      <div class="figure">
+<pre class="mermaid">
+erDiagram
+  source_item ||--o{ observation : ""
+  obs_place ||--o{ observation : ""
+  variety ||--o{ observation : "매핑 후"
+  product ||--o{ observation : "참가격만"
+  raw_object ||--o{ observation : "출처 파일"
+  observation ||--o{ observation_revision : "정정 이력"
+  source_item ||--o{ reference_observation : ""
+  raw_object ||--o{ reference_observation : ""
+  observation {
+    int source_item_id PK
+    date obs_date PK
+    int place_id PK
+    text obs_kind "시세 표본 집계 판매가"
+    int variety_id FK
+    int spec_id FK "품종과 복합 FK"
+    int price_raw
+    numeric price_per_base
+    bool promo_discount "null 모름"
+    timestamptz first_seen_at
+    int revision
+  }
+  observation_revision {
+    bigint id PK
+    int old_price_raw
+    int new_price_raw
+  }
+  reference_observation {
+    int source_item_id PK
+    int place_id PK
+    text ref_type PK "normal_year"
+    date ref_date PK
+    int value_raw
+  }
+  raw_object {
+    bigint id PK
+    text storage_path UK
+    timestamptz purged_at "파일 삭제 시각"
+  }
+  product {
+    int id PK
+  }
+  variety {
+    int id PK
+  }
+  source_item {
+    int id PK
+  }
+  obs_place {
+    int id PK
+  }
+</pre>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="note">
+        <h3>4. 상품 (참가격)</h3>
+        <ul>
+          <li>참가격 상품 번호 대신 <b>우리 상품 ID</b>를 씁니다. 재사용하거나 지우지 않습니다.</li>
+          <li><code>product_source_key</code>가 출처 번호를 기간별로 상품에 잇습니다. 110g과 120g은 다른 상품입니다.</li>
+          <li>이름·용량이 바뀌면 <code>product_attr_history</code>에 새 기간이 생깁니다.</li>
+          <li>상품은 소분류 규칙(<code>al_variety_rule</code>)으로 품종에 묶고, 예외만 손으로 고칩니다.</li>
+        </ul>
+      </div>
+      <div class="figure">
+<pre class="mermaid">
+erDiagram
+  source_item ||--o{ product_source_key : "chamga 키"
+  product ||--o{ product_source_key : "기간별"
+  product ||--o{ product_attr_history : "속성 이력"
+  product ||--o{ product_variety_map : "품종 연결"
+  variety ||--o{ product_variety_map : ""
+  variety ||--o{ al_variety_rule : "소분류 기본값"
+  product {
+    int id PK
+    text status "조사 중 조사 안 됨"
+    int missing_streak "3이면 조사 안 됨"
+  }
+  product_source_key {
+    int source_item_id PK
+    date valid_from PK
+    int product_id FK
+  }
+  product_attr_history {
+    int product_id PK
+    date valid_from PK
+    numeric total_qty
+    text al_code
+  }
+  product_variety_map {
+    int product_id PK
+    date valid_from PK
+    int variety_id FK
+    text origin "al_rule operator"
+  }
+  al_variety_rule {
+    text al_code PK
+    int variety_id FK
+  }
+  variety {
+    int id PK
+  }
+  source_item {
+    int id PK
+  }
+</pre>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="note">
+        <h3>5. 집계와 판정</h3>
+        <ul>
+          <li>화면은 이 묶음만 읽습니다. 관측값에서 언제든 다시 계산할 수 있습니다.</li>
+          <li><code>daily_quote</code>는 품종·규격별, <code>product_daily_summary</code>는 상품별 일자 요약입니다.</li>
+          <li>판정은 묶음(<code>judgment_batch</code>)을 다 만든 뒤 <code>judgment_current</code>의 포인터만 바꿉니다. 계산이 실패해도 직전 판정이 그대로 보입니다.</li>
+          <li>화면은 뷰 <code>current_judgment</code>(<code>security_invoker</code>)로 지금 묶음의 판정을 읽습니다.</li>
+          <li>복합 키는 같음 조건 열을 앞에, 날짜를 맨 뒤에 둡니다.</li>
+          <li>최소 표본 수 같은 기준은 <code>calc_param</code>에 자리만 있고, ② 판정 설계에서 정합니다.</li>
+        </ul>
+      </div>
+      <div class="figure">
+<pre class="mermaid">
+erDiagram
+  variety ||--o{ daily_quote : ""
+  product ||--o{ product_daily_summary : ""
+  variety ||--o{ reference_price : ""
+  variety ||--o{ usual_price : ""
+  judgment_batch ||--o{ judgment_snapshot : "묶음"
+  judgment_current }o--|| judgment_batch : "지금 보이는 묶음"
+  variety ||--o{ judgment_snapshot : ""
+  daily_quote {
+    int variety_id PK
+    int spec_id PK
+    text scope_key PK "전국 시장유형 업태"
+    date obs_date PK "키의 맨 뒤"
+    numeric value
+    int n
+  }
+  product_daily_summary {
+    int product_id PK
+    text scope_key PK
+    date obs_date PK "키의 맨 뒤"
+    numeric median_excl_promo
+    numeric seller_avg "판매처 2단 평균"
+  }
+  reference_price {
+    int variety_id PK
+    int spec_id PK
+    text ref_type PK "평년 1년전 1달전"
+    date ref_date PK
+  }
+  usual_price {
+    int variety_id PK
+    date as_of PK
+    numeric value
+  }
+  judgment_batch {
+    bigint id PK
+    text status "building ready failed"
+  }
+  judgment_current {
+    bool singleton PK
+    bigint batch_id FK
+  }
+  judgment_snapshot {
+    bigint batch_id PK
+    int variety_id PK
+    text verdict "cheap normal expensive"
+    numeric diff_pct
+  }
+  calc_param {
+    text key PK
+    text status "decided placeholder"
+  }
+  variety {
+    int id PK
+  }
+  product {
+    int id PK
+  }
+</pre>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="note">
+        <h3>6. 수집 상태와 원본</h3>
+        <ul>
+          <li>GitHub Actions 한 번 실행이 <code>ingest_run</code> 한 행입니다. 호출 수와 예산을 함께 남깁니다.</li>
+          <li><code>source_day</code>는 출처 × 날짜별 상태입니다: 대기, 정상, 일부, 휴일, 예상 밖 빈 날, 실패, 정정.</li>
+          <li><code>source_day_part</code>는 품목·판매처 단위의 누락을 잡습니다.</li>
+          <li>원본 파일은 내용 해시가 같으면 다시 올리지 않고 <code>duplicate</code>로 기록합니다.</li>
+          <li>보존 기간이 지난 원본은 Storage 파일만 지우고 <code>raw_object</code> 행은 <code>purged_at</code>을 채워 남깁니다. 관측값이 이 행을 가리키기 때문입니다.</li>
+        </ul>
+      </div>
+      <div class="figure">
+<pre class="mermaid">
+erDiagram
+  ingest_run ||--o{ raw_object : "올린 파일"
+  raw_object ||--o{ source_master_change : "마스터 변경"
+  source_day ||--o{ source_day_part : "부분 상태"
+  ingest_run {
+    bigint id PK
+    text job "daily recheck backfill 등"
+    text status
+    int calls_used
+    int call_budget
+  }
+  raw_object {
+    bigint id PK
+    text storage_path UK
+    text content_sha256
+    text load_status "loaded duplicate 등"
+    timestamptz purged_at "행은 남김"
+  }
+  source_day {
+    text source PK
+    date target_date PK
+    text status "7종"
+    int row_count
+    int stable_checks
+  }
+  source_day_part {
+    text source PK
+    date target_date PK
+    text part_kind PK
+    text part_key PK
+  }
+  backfill_task {
+    text source PK
+    text task_key PK
+    text status
+  }
+  source_master_change {
+    bigint id PK
+    text entity "product store code"
+    text change_kind
+  }
+</pre>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <span class="eyebrow">보관과 용량</span>
+  <h2>무엇을 얼마나 오래 두는가</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>데이터</th><th>DB에 두는 기간</th><th>용량 (추정)</th><th>그 뒤에는</th></tr></thead>
+      <tbody>
+        <tr><td><span class="src k">KAMIS</span> 시장별 관측값</td><td>최근 90일</td><td>약 70~85MB</td><td>시장 유형별·품종별 집계로 영구. 시장 하나의 추이는 90일까지. 5년 백필은 임시 표를 거쳐 집계만 남김</td></tr>
+        <tr><td><span class="src c">참가격</span> 점포별 관측값</td><td>최근 8 조사일 (약 16주)</td><td>약 130~225MB</td><td>상품별 집계로 영구</td></tr>
+        <tr><td><span class="src e">축평원</span> 관측값·평년</td><td>영구</td><td>약 15~18MB (5년)</td><td>-</td></tr>
+        <tr><td>집계 (<code>daily_quote</code> 등)</td><td>영구</td><td>약 90~110MB (5년) + 연 50~60MB (평년·상품 집계 포함)</td><td>-</td></tr>
+        <tr><td>원본 파일</td><td>Storage</td><td>1년차 250~330MB, 이후 연 130~200MB</td><td>KAMIS·축평원은 1년 뒤 파일 삭제(기록 행은 남김), 참가격은 영구</td></tr>
+        <tr><td><b>DB 합계 (1년차)</b></td><td></td><td><b>약 350~490MB</b></td><td>이후 연 55~70MB 증가. 무료 500MB에 가까움</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="caption">행당 크기를 어림한 값입니다 (2026-10-20에 관측값 200~250B, 집계 120~150B로 올림). 마이그레이션 단계에서 관측값 1만 행을 넣어 <code>pg_total_relation_size</code>로 먼저 잽니다.</p>
+</section>
+
+<section>
+  <span class="eyebrow">마지막 검증</span>
+  <h2>다음 작업 전에 확인할 것</h2>
+  <p class="prose">체크 표시는 이 브라우저에만 남습니다. 다른 의견이 있는 항목은 대화로 알려 주세요.</p>
+  <div class="checks">
+    <div class="check"><input type="checkbox" id="c1"><label for="c1"><strong>세 층 구조</strong><span>원본은 Storage, 관측값과 집계는 Postgres, 화면은 집계만 읽음</span></label></div>
+    <div class="check"><input type="checkbox" id="c2"><label for="c2"><strong>품종 중심 연결</strong><span>KAMIS·축평원은 원천 코드로, 참가격은 상품 ID를 거쳐 품종에 이어짐</span></label></div>
+    <div class="check"><input type="checkbox" id="c3"><label for="c3"><strong>축산 대표 출처</strong><span>겹치는 조합은 축평원, KAMIS에만 있는 조합(1++, 계란 규격, 닭 호수)은 KAMIS</span></label></div>
+    <div class="check"><input type="checkbox" id="c4"><label for="c4"><strong>보관 기간</strong><span>KAMIS 90일, 참가격 8 조사일, 축평원·집계 영구, 참가격 원본 영구</span></label></div>
+    <div class="check"><input type="checkbox" id="c5"><label for="c5"><strong>기간이 있는 연결표</strong><span>상품 번호, 원천 코드 매핑, 점포 → 판매처는 기간별로 저장하고 겹침은 DB가 거부</span></label></div>
+    <div class="check"><input type="checkbox" id="c6"><label for="c6"><strong>행사 3상태</strong><span>Y 행사, N 일반, 값 없음은 모름. 평소가에는 일반 가격만 사용</span></label></div>
+    <div class="check"><input type="checkbox" id="c7"><label for="c7"><strong>판정 교체 방식</strong><span>새 판정을 다 만든 뒤 한 번에 교체. 실패하면 직전 판정 유지</span></label></div>
+    <div class="check"><input type="checkbox" id="c11"><label for="c11"><strong>서버 전용 읽기</strong><span>표는 노출하지 않는 스키마 price. 웹앱 서버 컴포넌트가 web_reader 롤로 읽고, 수집은 ingest_writer 롤로 씀. 브라우저에는 Supabase 키 없음</span></label></div>
+    <div class="check open"><input type="checkbox" id="c9"><label for="c9"><strong>아직 열림: 백업 추후</strong><span>주 1회 pg_dump는 정식 서비스 전으로 미룸. 그동안 운영자가 정한 매핑(원천 코드 매핑, 점포 → 판매처, 상품 → 품종 등)은 원본으로 되살릴 수 없음</span></label></div>
+    <div class="check open"><input type="checkbox" id="c10"><label for="c10"><strong>아직 열림: DB 용량</strong><span>1년차 추정 350~490MB로 무료 500MB에 가까움. 1만 행 실측 뒤 참가격 6 조사일 등으로 줄일지 정함</span></label></div>
+  </div>
+</section>
+
+<footer>
+  근거: <code>grocery-price/docs/30-data/pipeline.md</code> 3장(테이블), 3-9(용량), 3-10(샘플 예시), 6-1(결정). 출처별 실측: <code>grocery-price/docs/30-data/sources/</code>. 이 페이지는 설계 문서를 옮겨 그린 것이라, 둘이 다르면 <code>pipeline.md</code>가 기준입니다.
+</footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+if (window.mermaid) {
+  var dark = document.documentElement.getAttribute("data-theme") === "dark" ||
+    (!document.documentElement.getAttribute("data-theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  window.mermaid.initialize({ startOnLoad: true, theme: dark ? "dark" : "neutral", securityLevel: "strict",
+    er: { useMaxWidth: true }, flowchart: { useMaxWidth: true, htmlLabels: true } });
+}
+</script>
+<script>
+(function () {
+  var ids = ["c1","c2","c3","c4","c5","c6","c7","c9","c10","c11"];
+  var store = null;
+  try { store = window.localStorage; } catch (e) { store = null; }
+  ids.forEach(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    try { if (store && store.getItem("schema-map:" + id) === "1") el.checked = true; } catch (e) {}
+    el.addEventListener("change", function () {
+      try { if (store) store.setItem("schema-map:" + id, el.checked ? "1" : "0"); } catch (e) {}
+    });
+  });
+})();
+</script>
