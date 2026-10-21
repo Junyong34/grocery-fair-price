@@ -1,6 +1,6 @@
 import { DRAWN_FOOD_IDS } from "./drawn-foods.generated"
 import { FOOD_ROWS } from "./foods.generated"
-import { SEASON_MONTHS, type Season } from "./seasons"
+import { SEASON_MONTHS, SEASONS, type Season } from "./seasons"
 
 /** 품종 하나. id는 일러스트 카탈로그와 같은 영문 kebab-case다. aliases는 검색에 쓰는 다른 이름이다. */
 export type Food = (typeof FOOD_ROWS)[number]
@@ -39,6 +39,20 @@ export function foodsInSeasonWith(food: Food): readonly Food[] {
     .map((other) => ({ other, shared: overlap(other) }))
     .sort((a, b) => b.shared - a.shared)
     .map(({ other }) => other)
+}
+
+/** 품종이 제철인 계절. 제철 달이 하나라도 걸치면 그 계절이다. 봄·여름·가을·겨울 순. */
+export function seasonsOf(food: Food): readonly Season[] {
+  return SEASONS.filter((season) => food.months.some((month) => SEASON_MONTHS[season].includes(month)))
+}
+
+// 대표 품종 고르기 규칙은 쓰는 곳마다 조금씩 다르다. 화면·검색 설명용은 여기, 인쇄물용(그림 있는 품종만)은 print/foods.ts에 있다.
+
+/** 그 달을 대표하는 품종(검색 설명). 그림이 있는 것, 그 달에만 가까운(제철 달이 적은) 것 순. */
+export function monthHighlights(month: number, count: number): readonly Food[] {
+  return [...foodsInMonth(month)]
+    .sort((a, b) => Number(isDrawn(b.id)) - Number(isDrawn(a.id)) || a.months.length - b.months.length)
+    .slice(0, count)
 }
 
 /**

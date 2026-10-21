@@ -3,8 +3,8 @@
 // 설명은 페이지마다 달라야 하므로 그 페이지에만 있는 품종·음식 이름을 넣는다. 근거: .scratch/seo/spec.md "검색어에 맞춘 제목"
 
 import { SEASON_COPY } from "@workspace/seasonal/data/copy"
-import { FESTIVALS, type Festival, festivalsWithFood } from "@workspace/seasonal/data/festivals"
-import { type Food, foodsInMonth, foodsInSeasonWith, isDrawn, seasonHighlights } from "@workspace/seasonal/data/foods"
+import { type Festival, festivalOf, festivalsWithFood } from "@workspace/seasonal/data/festivals"
+import { type Food, foodsInSeasonWith, monthHighlights, seasonHighlights } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 import type { Season } from "@workspace/seasonal/data/seasons"
 
@@ -13,13 +13,6 @@ export type PageSeo = { title: string; description: string }
 /** 설명에 넣을 품종 이름 목록. "냉이·달래·주꾸미" */
 function names(foods: readonly Food[]): string {
   return foods.map((food) => food.name).join("·")
-}
-
-/** 그 달을 대표하는 품종. 그림이 있는 것, 그 달에만 가까운(제철 달이 적은) 것, 이름순. */
-function monthHighlights(month: number, count: number): readonly Food[] {
-  return [...foodsInMonth(month)]
-    .sort((a, b) => Number(isDrawn(b.id)) - Number(isDrawn(a.id)) || a.months.length - b.months.length)
-    .slice(0, count)
 }
 
 export function homeSeo(): PageSeo {
@@ -59,7 +52,7 @@ export function seasonSeo(season: Season): PageSeo {
 }
 
 export function festivalSeo(slug: Festival): PageSeo {
-  const { name, period, traditionalDishes } = FESTIVALS.find((festival) => festival.slug === slug)!
+  const { name, period, traditionalDishes } = festivalOf(slug)
   return {
     title: `${name} 음식`,
     description: `${name}(${period})에 먹는 전통 음식 ${traditionalDishes.join("·")}, 그리고 ${name} 무렵 제철 식재료를 소개해요.`,

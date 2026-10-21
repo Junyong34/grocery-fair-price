@@ -159,7 +159,7 @@ import 경로:
 
 | 폴더 | 내용 |
 |---|---|
-| `features/print/` | `/print` 화면. `print-document`(종류 → 컴포넌트 표), 종류별 `monthly`·`year-sheet`·`season-poster`·`month-poster`, `parts/`(시트, 인쇄 달력, 품종 그림 판), `print.css`(A4·A3 `@page`, `--u` 단위) |
+| `features/print/` | `/print` 화면. `print-document`(종류 → 컴포넌트 표), 종류별 `monthly`·`year-sheet`·`season-poster`·`month-poster`, `parts/`(시트, 인쇄 달력, 품종 그림 판), `print.css`(A4·A3 `@page`. 용지 단위 `--u`는 `Sheet`가 `PAPERS` 배율로 넣는다) |
 | `features/admin-print/` | 어드민. 아래 표 |
 
 `features/admin-print/`는 한 파일이 한 가지 일만 하도록 나눈다. 아래 칸은 위 칸만 import한다(`server/`는 화면 쪽에서 `actions`·`queries`만 부른다).
@@ -167,13 +167,13 @@ import 경로:
 | 위치 | 하는 일 |
 |---|---|
 | `types.ts`, `constants.ts` | 화면 사이에 오가는 타입(`ActionResult`, `EditionSummary`, …)과 상수(종류 설명·모양 `KIND_LOOKS`, 상태 이름, 미리보기 폭). 도메인 타입·상수(`Edition`, `EDITION_LIMITS`, `PRINT_KIND_LABELS`)는 `@workspace/seasonal/print` |
-| `lib/` | 순수 함수와 vitest: `flow`(저장 → PDF 단계), `downloads`(PDF 주소·쪽 이름), `summary`(목록 요약·다음 id), `preview`(미리보기 크기), `spec-path`(옵션 경로 읽고 쓰기), `format`(서울 시각) |
+| `lib/` | 순수 함수와 vitest: `flow`(편집 상태 `editionDraft`, 저장 → PDF 단계, 단계 문구), `downloads`(PDF 주소·쪽 이름), `summary`(목록 요약·다음 id), `preview`(미리보기 크기), `spec-path`(옵션 경로 읽고 쓰기), `format`(서울 시각) |
 | `hooks/` | `use-copy`(클립보드와 "복사했어요"), `use-element-width` |
 | `server/` | `import "server-only"`. `guard`(개발 서버에서만), `files`(에디션 JSON·생성 기록·매니페스트 읽고 쓰기), `generate`(이 컴퓨터의 Chrome으로 PDF 저장, 쪽 크기·수 검사), `queries`(라우트가 읽는 값), `actions`(Server Action, `ActionResult`를 돌려준다) |
 | `components/` | 목록과 편집기가 함께 쓰는 조각: `kind-mark`, `status`, `edition-id`, `delete-edition-button` |
 | `board/` | `/admin` 목록. 서버 컴포넌트(`admin-board`, `edition-board`, `kind-group`, `edition-row`) |
 | `new-edition/` | 새 에디션 3단계 폼(`new-edition-form`, `kind-picker`, `form-step`) |
-| `editor/` | `/admin/edit`. `use-edition-editor`(편집 상태·저장·생성)와 화면 조각(`editor-header`, `edition-steps`, `generated-files`, `options-panel`·`option-field`·`option-fields`(종류별 옵션 표), `listing-panel`, `preview-panel`·`print-preview`) |
+| `editor/` | `/admin/edit`. `use-edition-editor`(편집본·저장·생성을 들고 있고, 판단은 `lib/flow`의 `editionDraft`)와 화면 조각(`editor-header`, `edition-steps`, `generated-files`, `options-panel`·`option-field`·`option-fields`(종류별 옵션 표. `option-fields.test`가 표의 값이 사양 스키마와 맞는지 본다), `listing-panel`, `preview-panel`·`print-preview`) |
 
 에디션 원본은 `apps/web/print-editions/<id>.json`, 생성 기록은 `<id>.build.json`, 결과 PDF와 매니페스트는 `apps/web/public/downloads/`에 있다. 에디션 JSON·생성 기록·매니페스트는 커밋하고, PDF는 용량이 커서 `.gitignore`로 뺀다. PDF를 둘 곳을 정하기 전까지는 에디션을 공개하지 않는다(매니페스트가 비어 있어야 운영 링크가 깨지지 않는다).
 
@@ -211,14 +211,14 @@ import 경로:
 
 | 모듈 | 내용 |
 |---|---|
-| `data/foods.ts` | `Food` 타입, `FOODS`(검증 품종 전체, 가나다순), `foodsInMonth`, `foodsInSeason`, `findFood`, `isDrawn`, `seasonHighlights` |
+| `data/foods.ts` | `Food` 타입, `FOODS`(검증 품종 전체, 가나다순), `foodsInMonth`, `foodsInSeason`, `findFood`, `isDrawn`, `seasonsOf`, 대표 품종 `monthHighlights`·`seasonHighlights`(인쇄물용 고르기는 `print/foods.ts`) |
 | `data/foods.generated.ts` | 생성 파일. 품종 행 (`id`, `name`, `aliases`, `category`, `months`) |
 | `data/drawn-foods.generated.ts` | 생성 파일. 일러스트가 있는 품종 id |
 | `data/food-bounds.generated.ts` | 생성 파일. 그림이 상자 안에서 아래로 어디까지 그려지는지 (이름표 위치) |
 | `data/food-sizes.ts` | `FOOD_SCALE`: 작아 보이는 품종의 그림 배율. 손으로 조정 |
 | `data/months.ts` | `MONTHS`, `isMonth`, `formatSeasonMonths`, `orderSeasonMonths` |
 | `data/seasons.ts` | `SEASONS`, `SEASON_MONTHS`, `isSeason`, `seasonOfMonth` |
-| `data/festivals.ts` | `FESTIVALS`(전통 음식 포함), 연도별 날짜, `upcomingFestival`, `festivalsInMonth`, `festivalsWithFood` |
+| `data/festivals.ts` | `FESTIVALS`(전통 음식 포함), `festivalOf`(slug로 찾기), 연도별 날짜, `upcomingFestival`, `festivalsInMonth`, `festivalsWithFood` |
 | `data/copy.ts` | 화면 문구: 달별 문구, 계절 설명, 명절 배경, UI 문구, 먹음 라벨 |
 | `calendar/today.ts` | `TIME_ZONE`(Asia/Seoul), `seoulNow`, `seoulToday`, `currentMonth` |
 | `calendar/month-calendar.ts` | 달력 칸 계산(일·월요일 시작), `CalendarDate` |
@@ -229,7 +229,7 @@ import 경로:
 | `layout/scatter.ts` | 흩어진 배치. 시드 난수(LCG)로 같은 입력이면 같은 결과, 0..1 정규화 좌표, 화면 구간(`SCATTER_FRAMES`)별 고정 비율 |
 | `layout/arrangement.ts` | 시드 뒤의 판 위 자리: 저장된 배치 병합(`restingSpots`), 끄는 동안(`moveSpot`)·놓은 뒤(`settleSpots`) 겹침 풀기, 판 위 달력 가두기. 시드와 같은 그림+이름표 겹침 규칙 |
 | `search/match-foods.ts` | 이름·별칭·초성 검색 |
-| `print/spec.ts` | 인쇄 사양 `PrintSpec`(종류별 유니언, zod 파서), `PAPERS`, `pageCount`(결과 PDF 쪽 수, 사양·용지마다 파일 하나), 종류별 기본값, URL 인코딩, 해시 |
+| `print/spec.ts` | 인쇄 사양 `PrintSpec`(종류별 유니언, zod 파서), `PAPERS`, `sheetSize`(방향 반영 용지 mm), `pageCount`(결과 PDF 쪽 수, 사양·용지마다 파일 하나), 종류별 기본값, URL 인코딩, 해시 |
 | `print/edition.ts` | 에디션, 다운로드 경로, 매니페스트 |
 | `print/foods.ts` | 인쇄물 칸(달·계절)에 넣을 품종 고르기 |
 

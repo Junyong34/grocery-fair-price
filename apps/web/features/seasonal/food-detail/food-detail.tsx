@@ -2,9 +2,8 @@ import Link from "next/link"
 
 import { UI_COPY } from "@workspace/seasonal/data/copy"
 import { festivalsWithFood } from "@workspace/seasonal/data/festivals"
-import { foodsInSeasonWith, type Food } from "@workspace/seasonal/data/foods"
+import { foodsInSeasonWith, seasonsOf, type Food } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
-import { SEASONS, SEASON_MONTHS } from "@workspace/seasonal/data/seasons"
 import { ScrollRow } from "@workspace/ui/components/scroll-row"
 
 import { routes } from "@/shared/routes"
@@ -29,9 +28,7 @@ export function FoodDetail({
   food: Food
   title?: React.ReactNode
 }) {
-  const seasons = SEASONS.filter((season) =>
-    food.months.some((month) => SEASON_MONTHS[season].includes(month))
-  )
+  const seasons = seasonsOf(food)
   const festivals = festivalsWithFood(food.id)
   const sameSeason = foodsInSeasonWith(food).slice(0, SAME_SEASON_LIMIT)
 

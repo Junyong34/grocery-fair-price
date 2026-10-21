@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { findFood, foodsInMonth, foodsInSeason, foodsInSeasonWith, isDrawn, seasonHighlights } from "./foods"
+import { findFood, foodsInMonth, foodsInSeason, foodsInSeasonWith, isDrawn, monthHighlights, seasonHighlights, seasonsOf } from "./foods"
 
 // 예상값은 prototypes/seasonal-food/docs/seasonal-lists/foods.json(검증 품종)에서 셌다.
 describe("foodsInMonth", () => {
@@ -35,6 +35,26 @@ describe("foodsInSeasonWith", () => {
     expect(names).toContain("감")
     expect(names).not.toContain("수박")
     expect(names.indexOf("고구마")).toBeLessThan(names.indexOf("감"))
+  })
+})
+
+describe("seasonsOf", () => {
+  it("제철 달이 걸치는 계절을 봄부터 차례로 돌려준다", () => {
+    // 사과는 9·10·11월이다.
+    expect(seasonsOf(findFood("apple")!)).toEqual(["autumn"])
+    for (const food of foodsInMonth(12)) expect(seasonsOf(food)).toContain("winter")
+  })
+})
+
+describe("monthHighlights", () => {
+  it("그 달 품종 가운데 그림 있는 것을 먼저, 제철이 짧은 것부터 고른다", () => {
+    const all = monthHighlights(5, foodsInMonth(5).length)
+    expect(all.every((food) => foodsInMonth(5).includes(food))).toBe(true)
+    const drawn = all.map((food) => isDrawn(food.id))
+    expect(drawn).toEqual([...drawn].sort((a, b) => Number(b) - Number(a)))
+    const lengths = all.filter((food) => isDrawn(food.id)).map((food) => food.months.length)
+    expect(lengths).toEqual([...lengths].sort((a, b) => a - b))
+    expect(monthHighlights(5, 3)).toHaveLength(3)
   })
 })
 
