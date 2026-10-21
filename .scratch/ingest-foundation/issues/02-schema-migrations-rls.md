@@ -67,3 +67,7 @@ pipeline.md 3장의 테이블을 Postgres DDL로 만들고 마이그레이션으
 - 로컬 Supabase 포트는 5532x대 (54322가 이 기계에서 이미 쓰이고 있었다).
 - Supabase에서 `postgres`는 superuser가 아니라 `alter role … nosuperuser`를 못 한다. 롤 속성은 `create role`에서만 정한다.
 - `web_reader`의 쓰기는 세션 기본값 때문에 먼저 `25006`(읽기 전용 트랜잭션)으로 막힌다. 테스트는 `set transaction read write`로 풀어도 `42501`인지 따로 본다.
+
+## Comments
+
+- 2026-10-21: DB 주석을 더했다 (`20261021000500_price_comments.sql`). 표·뷰 41개, 열 360개, 함수 1개 모두 `comment on`으로 뜻, 단위·형식, null의 뜻, 원천 필드명, 근거 절을 적었다. `test/comments.db.test.ts`가 주석이 빠진 표·열·함수가 있으면 실패한다.
