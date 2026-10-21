@@ -18,6 +18,7 @@ Blocked by: 03
 - [ ] Supabase Free 일시정지 기준 확인
 - 백업(주 1회 `pg_dump`)은 **추후, 정식 서비스 전** (2026-10-20, pipeline.md 6-1). 이 이슈에서 만들지 않는다. 그 전까지 운영자 매핑은 원본으로 되살릴 수 없다는 위험을 받아들인다
 - [ ] DB 크기 감시: `pg_database_size`·표별 `pg_total_relation_size`를 수집 상태에 남기고 400MB를 넘으면 알림 (무료 500MB를 넘으면 읽기 전용)
+  - 실측 방법은 02에서 정했다 (2026-10-21): 행당 크기는 `pnpm --filter @workspace/price-db measure`(같은 정의의 임시 표에 샘플 모양 행을 넣어 `pg_total_relation_size`), 운영 DB는 `price` 표마다 `pg_total_relation_size(oid)`와 행 수를 날마다 남긴다. 실측 1년차 465~525MB라 상단이 500MB를 넘는다. 넘을 기세면 pipeline.md 7장 "DB 용량"의 남은 순서(평년·평소가 날짜 줄이기, `daily_quote.sources` 정리, Pro)를 꺼낸다
 - [ ] 수집 상태 화면: 출처별 마지막 정상 날짜, `source_day` 상태, 최근 실패. 기존 `/admin` 활용 검토
 - [ ] 정할 것: 판정 재계산 주기 (하루 1번 vs 수집 직후마다)
 

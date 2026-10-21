@@ -20,6 +20,7 @@ Full map (every route, module, generated file, command, and doc): `docs/project-
 
 - `apps/web`: the Next.js app, 제철달력 (seasonal food calendar). The price-comparison screens will join it later.
 - `packages/seasonal`, `packages/ui`: domain and design-system layers of the app (see "Web app UI").
+- `supabase/`, `packages/price-db`: the price DB. Migrations (schema `price`, roles `ingest_writer`·`web_reader`, RLS) are the source of truth for table definitions; `packages/price-db` holds the DB tests, sample test data and the ERD generator.
 - `grocery-price/`: design docs and public price API research for the price service. Collection code (Supabase + GitHub Actions) starts in stage ① of the roadmap; screens join `apps/web` in stage ④.
 - `prototypes/`: illustration source, wireframes, brand originals. Gitignored, so a fresh clone lacks it. Keep it out of commits (no force-add).
 
@@ -39,6 +40,7 @@ Regenerate these with their command and commit the output. Hand edits are overwr
 |---|---|---|
 | `packages/seasonal/src/data/foods.generated.ts` | `pnpm --filter @workspace/seasonal build:foods` | the 품종 list in `prototypes/` changes. A 품종 without an illustration gets its id in `NEW_IDS` in `packages/seasonal/scripts/build-foods.mjs`. |
 | `apps/web/public/foods/<id>/{color,motion}.svg`, `PROVENANCE.md`, `drawn-foods.generated.ts`, `food-bounds.generated.ts` | `pnpm foods:sync` | an illustration is drawn or changed (`/seasonal-food-illustrator`). |
+| ERD blocks in `grocery-price/docs/30-data/schema-map.html` | `pnpm db:erd` (local DB up, migrations applied) | a migration changes tables, keys or checks. `pnpm db:test` fails while they differ. |
 | `food-bounds.generated.ts` alone | `pnpm foods:bounds` | the SVGs changed without a sync. Needs no `prototypes/`. |
 | `apps/web/public/downloads/**` (PDFs, `manifest.json`), `apps/web/print-editions/<id>.build.json` | the admin's "PDF 생성" button at `/admin` (`pnpm dev`, uses the local Google Chrome) | an edition's spec changes, or anything a print page draws changes (foods, illustrations, holidays). Saving an edition rewrites `manifest.json`. Exception to the commit rule: the PDFs are gitignored (too large) until a storage location is chosen, so keep editions unpublished and `manifest.json` empty until then. |
 
@@ -47,6 +49,7 @@ The first two read `prototypes/`, so they run only on a machine that has it. Per
 ## Public price APIs
 
 - Before calling a public price API (KAMIS, 축평원, 참가격) or writing collection/schema code for it, read that source's doc in `grocery-price/docs/30-data/sources/` (`kamis.md`, `ekape.md`, `chamgagyeok.md`). They record measured behavior the official specs omit. `grocery-price/docs/10-research/api-spec.md` is the summary and maps each data.go.kr dataset ID to its endpoint; check it before treating a data.go.kr dataset as a new source. Schema and collection design: `grocery-price/docs/30-data/pipeline.md`. Saved responses and the browser viewer: `grocery-price/reference/public-data/samples/`.
+- DB changes go in a new file in `supabase/migrations/` (never edit an applied one). Verify locally: `pnpm db:start` once, then `pnpm db:test` must pass. A new `price` table needs its RLS policies, a group in `packages/price-db/scripts/build-erd.ts`, and the lists in `packages/price-db/test/helpers.ts`. A new `price` function needs `revoke execute … from public, anon, authenticated` in the same file.
 - Viewer changes (`grocery-price/reference/public-data/samples/viewer/`): run `grocery-price/reference/public-data/samples/viewer/smoke.sh --quick` before finishing.
 
 ## Web app UI (`apps/web`)

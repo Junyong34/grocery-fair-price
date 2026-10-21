@@ -1,0 +1,26 @@
+{
+  "name": "@workspace/price-db",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test:db": "vitest run --config vitest.db.config.ts",
+    "erd": "node scripts/build-erd.ts",
+    "load:samples": "node scripts/load-samples.ts",
+    "measure": "node scripts/measure-size.ts"
+  },
+  "dependencies": {
+    "fast-xml-parser": "5.11.2",
+    "postgres": "3.4.9"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "@workspace/eslint-config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
+    "eslint": "^10.12.0",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.4"
+  }
+}

@@ -148,15 +148,15 @@ footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--li
 <header class="top">
   <span class="eyebrow">장바구니 적정가 · ① 수집 기반 · 2026-10-21 기준</span>
   <h1>적정가 데이터 지도</h1>
-  <p class="lede">공공 API 3개의 응답이 Supabase의 어느 테이블에 어떤 모양으로 들어가는지, 테이블끼리 어떻게 이어지는지 한 장에 모았습니다. 마이그레이션을 쓰기 전에 마지막으로 확인하는 용도입니다.</p>
+  <p class="lede">공공 API 3개의 응답이 Supabase의 어느 테이블에 어떤 모양으로 들어가는지, 테이블끼리 어떻게 이어지는지 한 장에 모았습니다. 관계도는 <code>supabase/migrations/</code>를 적용한 DB에서 만듭니다.</p>
   <div class="legend">
     <span class="src k">KAMIS 일별 도·소매</span>
     <span class="src e">축평원 축산물유통정보</span>
     <span class="src c">참가격 생필품 가격</span>
   </div>
   <div class="facts">
-    <span>스키마 <code>price</code> · 테이블 <b>40</b>개 + 뷰 <b>1</b> · 묶음 <b>6</b>개</span>
-    <span>1년차 DB 추정 <b>365~515MB</b> / 무료 500MB</span>
+    <span><!-- erd:counts -->스키마 <code>price</code> · 테이블 <b>40</b>개 + 뷰 <b>1</b> · 묶음 <b>6</b>개<!-- /erd:counts --></span>
+    <span>1년차 DB 실측 기반 <b>465~525MB</b> / 무료 500MB</span>
     <span>1년차 원본 파일 추정 <b>250~330MB</b> / 무료 1GB</span>
     <span>근거 문서 <code>grocery-price/docs/30-data/pipeline.md</code> 3장</span>
   </div>
@@ -184,7 +184,7 @@ footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--li
       <p>가격 한 건 = 한 줄. 단위 환산, 품종 매핑, 행사 표시를 마친 값</p>
       <dl>
         <dt>어디</dt><dd>Postgres 스키마 <code>price</code>의 <code>observation</code></dd>
-        <dt>보관</dt><dd>KAMIS 90일, 참가격 8 조사일, 축평원 영구</dd>
+        <dt>보관</dt><dd>KAMIS 90일, 참가격 6 조사일, 축평원 영구</dd>
         <dt>공개</dt><dd>웹앱도 읽지 않음. 쓰기는 <code>ingest_writer</code> 롤만</dd>
       </dl>
     </div>
@@ -305,7 +305,7 @@ flowchart LR
         <tr><td class="col">자연키</td><td>조사일, 구분, 부류, 품목, 품종, 등급, 시군구, 시장</td><td>축종, 품목코드, 구분명, 기준일</td><td>조사일, 점포, 상품</td></tr>
         <tr><td class="col">관측 단위</td><td>조사 시장 48곳 (실명 전통시장 16, 대형유통 32). 축산은 시도·전국만</td><td>전국 평균 (시도 17개는 원본에만)</td><td>점포 약 450곳</td></tr>
         <tr><td class="col">주기</td><td>평일. 축산은 매일</td><td>매일, 주말 포함</td><td>격주 금요일, 등록은 2일 전~7일 뒤</td></tr>
-        <tr><td class="col">DB 보관</td><td>관측값 90일, 집계 영구</td><td>영구</td><td>점포별 8 조사일, 상품 집계 영구</td></tr>
+        <tr><td class="col">DB 보관</td><td>관측값 90일, 집계 영구</td><td>영구</td><td>점포별 6 조사일, 상품 집계 영구</td></tr>
         <tr><td class="col">특이점</td><td>과거 행이 나중에 다시 등록됨 → <code>observation_revision</code></td><td>KAMIS 축산과 같은 값. 겹치는 조합은 축평원이 대표</td><td>점포 ID가 바뀌기도 함 → <code>store_link</code></td></tr>
       </tbody>
     </table>
@@ -315,7 +315,7 @@ flowchart LR
 <section>
   <span class="eyebrow">관계도</span>
   <h2>테이블 연결 관계</h2>
-  <p class="prose">40개를 한 그림에 넣으면 읽을 수 없어서 역할별 6개 묶음으로 나눴습니다. 각 그림에는 키와 연결에 필요한 열만 넣었습니다. 전체 열은 <code>pipeline.md</code> 3장에 있습니다. 부모 쪽 <code>|o</code>는 FK 열이 비어 있을 수 있는(null 허용) 연결, 점선은 FK가 없는 논리 연결입니다. 품종·규격은 <code>(variety_id, spec_id)</code> 복합 FK로 <code>spec</code>을 가리키므로 3~5 묶음에는 <code>spec</code>을 그렸습니다.</p>
+  <p class="prose">40개를 한 그림에 넣으면 읽을 수 없어서 역할별 6개 묶음으로 나눴습니다. 각 그림에는 키와 연결에 필요한 열(PK·FK·unique·기간 겹침 제약·check 값 목록)만 넣었습니다. 그림은 마이그레이션을 적용한 로컬 DB의 카탈로그에서 <code>pnpm --filter @workspace/price-db erd</code>가 만듭니다 (손으로 고치지 않습니다). 전체 열은 <code>supabase/migrations/</code>에 있습니다. 부모 쪽 <code>|o</code>는 FK 열이 비어 있을 수 있는(null 허용) 연결, 점선은 FK가 없는 논리 연결입니다. 품종·규격은 <code>(variety_id, spec_id)</code> 복합 FK로 <code>spec</code>을 가리키므로 3~5 묶음에는 <code>spec</code>을 그렸습니다.</p>
 
   <div class="groups">
 
@@ -331,17 +331,18 @@ flowchart LR
         </ul>
       </div>
       <div class="figure">
+<!-- erd:group-1 -->
 <pre class="mermaid">
 erDiagram
-  category ||--o{ item : "품목"
-  item ||--o{ variety : "품종"
-  variety ||--o{ spec : "규격"
-  item |o--o{ alias : "별칭"
-  variety |o--o{ alias : "별칭"
-  variety ||--o{ variety_seasonal_map : "제철 연결"
-  source_item ||--o{ source_code_map : "기간별 매핑"
+  category ||--o{ item : ""
+  item ||--o{ variety : ""
+  variety ||--o{ spec : ""
+  item |o--o{ alias : ""
+  variety |o--o{ alias : ""
+  variety ||--o{ variety_seasonal_map : ""
+  source_item ||--o{ source_code_map : ""
+  unit_rule |o--o{ source_code_map : ""
   spec |o--o{ source_code_map : "(variety_id, spec_id)"
-  unit_rule |o--o{ source_code_map : "환산 규칙"
   category {
     int id PK
     text slug UK
@@ -349,52 +350,55 @@ erDiagram
   item {
     int id PK
     int category_id FK
+    text slug UK
   }
   variety {
     int id PK
     int item_id FK
+    text slug UK
     text base_unit "g ml ea"
+    text status "active hidden"
   }
   spec {
     int id PK
-    int variety_id FK "unique (variety_id, id)"
-    bool is_default "품종마다 하나 (검사 질의)"
+    int variety_id FK "unique (variety_id, id), unique (variety_id, slug), where is_default 하나"
   }
   alias {
     int id PK
-    text text
-    int item_id FK "둘 중 하나"
-    int variety_id FK "둘 중 하나"
+    int item_id FK
+    int variety_id FK
   }
   variety_seasonal_map {
-    int variety_id PK "FK"
+    int variety_id PK, FK
     text seasonal_food_id PK
   }
   source_item {
     int id PK
-    text source "kamis ekape chamga"
-    text source_key UK
+    text source "kamis ekape chamga, unique (source, source_key)"
   }
   source_code_map {
     int id PK
     int source_item_id FK
     date valid_from "기간 겹침 거부"
-    date valid_to
+    text status "pending mapped ignored"
     int variety_id FK
-    int spec_id FK "mapped면 not null"
+    int spec_id FK
+    int unit_rule_id FK
     text role "primary secondary"
   }
   unit_rule {
     int id PK
-    text rule_code
-    int version
+    text rule_code "unique (rule_code, version)"
+    text price_tier "retail wholesale"
+    text kind "same_unit weight_to_ea ea_to_weight"
   }
   source_code_table {
-    text source PK
+    text source PK "kamis ekape chamga"
     text code_class PK
     text code PK
   }
 </pre>
+<!-- /erd:group-1 -->
       </div>
     </div>
 
@@ -410,68 +414,73 @@ erDiagram
         </ul>
       </div>
       <div class="figure">
+<!-- erd:group-2 -->
 <pre class="mermaid">
 erDiagram
-  obs_place ||--o| store : "점포"
-  obs_place ||--o| market : "조사 시장"
-  region |o--o{ obs_place : ""
-  region |o--o{ store : ""
-  store ||--o{ store : "lineage"
-  store ||--o{ store_seller : "기간별"
+  region |o--o{ obs_place : "region_code"
+  store ||--o{ store : "lineage_id"
+  obs_place ||--o{ store : "(place_id, kind)"
+  region |o--o{ store : "region_code"
+  obs_place ||--o{ market : "(place_id, kind)"
+  region |o--o{ region : "parent_code"
+  region |o--o{ region : "successor_code"
+  region |o--o{ region_code_map : "region_code"
+  store ||--o{ store_seller : "place_id"
   seller ||--o{ store_seller : ""
-  store ||--o{ store_link : "old"
-  store ||--o{ store_link : "new"
-  region |o--o{ region_code_map : ""
-  region |o--o{ region : "상위 지역"
+  store ||--o{ store_link : "new_place_id"
+  store ||--o{ store_link : "old_place_id"
   obs_place {
-    int id PK
-    text source
+    int id PK "unique (id, kind)"
+    text source "kamis ekape chamga, unique (source, kind, source_place_code)"
     text kind "store market region_avg"
-    text scope "store market sido national 등"
-    text source_place_code "unique (source, kind, code)"
+    text scope "store market sigungu sido national"
     text region_code FK
   }
   store {
-    int place_id PK "FK (place_id, kind)"
-    text kind "store 고정"
-    text channel "업태"
+    int place_id PK, FK
+    text kind FK "store"
+    text channel "large_mart department ssm convenience"
+    text region_scope "local national_only"
     text region_code FK
+    text status "active inactive superseded"
     int lineage_id FK
-    text status
   }
   market {
-    int place_id PK "FK (place_id, kind)"
-    text kind "market 고정"
-    text market_type "전통시장 대형유통 등"
-  }
-  seller {
-    int id PK
-    text name UK
-  }
-  store_seller {
-    int place_id PK "FK"
-    date valid_from PK
-    int seller_id FK
-    date valid_to
-  }
-  store_link {
-    int old_place_id PK "FK"
-    int new_place_id PK "FK"
-    text reason
+    int place_id PK, FK
+    text kind FK "market"
+    text market_type "traditional large_retail wholesale eco_channel online other"
+    text type_source "name_rule operator"
   }
   region {
     text code PK
     text level "nation sido sigungu"
     text parent_code FK
+    text successor_code FK
   }
   region_code_map {
-    text source PK
+    text source PK "kamis ekape chamga"
     text code_class PK
     text source_region_code PK
-    date valid_from PK
+    date valid_from PK "기간 겹침 거부"
     text region_code FK
   }
+  store_seller {
+    int place_id PK, FK
+    int seller_id FK
+    date valid_from PK "기간 겹침 거부"
+  }
+  seller {
+    int id PK
+    text name UK
+    text channel "large_mart department ssm convenience traditional_market online_mall"
+  }
+  store_link {
+    int old_place_id PK, FK
+    int new_place_id PK, FK
+    text reason "re_registered duplicate"
+  }
 </pre>
+<!-- /erd:group-2 -->
       </div>
     </div>
 
@@ -480,7 +489,7 @@ erDiagram
         <h3>3. 관측값</h3>
         <ul>
           <li><b>키는 (원천 키, 조사일, 관측 위치)</b>입니다. 같은 행을 다시 받으면 비교해서 값이 바뀐 행만 고쳐 씁니다.</li>
-          <li>출처·범위·지역은 조인으로 얻으므로 관측값 행에 두지 않습니다. 행당 약 200~250B로 봅니다.</li>
+          <li>출처·범위·지역은 조인으로 얻으므로 관측값 행에 두지 않습니다. 행당 약 185~220B입니다 (2026-10-21 실측).</li>
           <li>값이 바뀌면 <code>observation_revision</code>에 이전 값을 남기고 <code>revision</code>을 올립니다. 이력은 관측값이 지워져도 남도록 FK 없이 키만 들고 있습니다 (점선).</li>
           <li>보존 기간이 지난 날짜가 다시 등록되어 오면 관측값에 넣지 않고, 원본 파일 전체로 그날 표본을 복원해 집계를 바꿉니다. 원본이 불완전하면 집계를 그대로 둡니다.</li>
           <li>축평원 평년 행은 관측값이 아니라 <code>reference_observation</code>에 들어갑니다.</li>
@@ -488,70 +497,48 @@ erDiagram
         </ul>
       </div>
       <div class="figure">
+<!-- erd:group-3 -->
 <pre class="mermaid">
 erDiagram
+  obs_place ||--o{ observation : "place_id"
+  product |o--o{ observation : ""
+  raw_object ||--o{ observation : ""
   source_item ||--o{ observation : ""
-  obs_place ||--o{ observation : ""
-  spec |o--o{ observation : "(variety_id, spec_id) 매핑 후"
-  product |o--o{ observation : "참가격만"
-  raw_object ||--o{ observation : "출처 파일"
-  observation |o..o{ observation_revision : "논리 연결 (FK 없음)"
+  spec |o--o{ observation : "(variety_id, spec_id)"
   raw_object ||--o{ observation_revision : ""
-  source_item ||--o{ reference_observation : ""
-  obs_place ||--o{ reference_observation : ""
+  obs_place ||--o{ reference_observation : "place_id"
   raw_object ||--o{ reference_observation : ""
+  source_item ||--o{ reference_observation : ""
+  observation |o..o{ observation_revision : "관측값 PK (FK 없음)"
   observation {
-    int source_item_id PK "FK"
+    int source_item_id PK, FK
     date obs_date PK
-    int place_id PK "FK"
-    text obs_kind "시세 표본 집계 판매가"
+    int place_id PK, FK
+    text price_tier "retail wholesale"
+    text obs_kind "quote_sample quote_aggregate shelf_price"
     int product_id FK
     int variety_id FK
-    int spec_id FK "품종과 복합 FK"
-    int price_raw
-    numeric price_per_base
-    bool promo_discount "null 모름"
-    timestamptz first_seen_at
-    int revision
+    int spec_id FK
+    int unit_rule_id FK
     bigint raw_object_id FK
   }
   observation_revision {
     bigint id PK
-    int source_item_id "관측값 PK, FK 없음"
+    int source_item_id
     date obs_date
     int place_id
-    int old_price_raw
-    int new_price_raw
     text rebuild_result "rebuilt kept not_aggregated"
     bigint raw_object_id FK
   }
   reference_observation {
-    int source_item_id PK "FK"
-    int place_id PK "FK"
+    int source_item_id PK, FK
+    int place_id PK, FK
     text ref_type PK "normal_year"
     date ref_date PK
-    int value_raw
     bigint raw_object_id FK
   }
-  raw_object {
-    bigint id PK
-    text storage_path UK
-    timestamptz purged_at "파일 삭제 시각"
-  }
-  product {
-    int id PK
-  }
-  spec {
-    int variety_id "unique (variety_id, id)"
-    int id PK
-  }
-  source_item {
-    int id PK
-  }
-  obs_place {
-    int id PK
-  }
 </pre>
+<!-- /erd:group-3 -->
       </div>
     </div>
 
@@ -568,55 +555,48 @@ erDiagram
         </ul>
       </div>
       <div class="figure">
+<!-- erd:group-4 -->
 <pre class="mermaid">
 erDiagram
-  source_item ||--o{ product_source_key : "chamga 키"
-  product ||--o{ product_source_key : "기간별"
-  product ||--o{ product_attr_history : "속성 이력"
-  product ||--o{ product_variety_map : "품종 연결"
-  product |o--o{ product : "병합 merged_into"
+  product |o--o{ product : "merged_into"
+  product ||--o{ product_source_key : ""
+  source_item ||--o{ product_source_key : ""
+  product ||--o{ product_attr_history : ""
+  product ||--o{ product_variety_map : ""
   spec |o--o{ product_variety_map : "(variety_id, spec_id)"
-  spec ||--o{ al_variety_rule : "소분류 기본값"
+  spec ||--o{ al_variety_rule : "(variety_id, spec_id)"
   product {
     int id PK
-    text status "조사 중 조사 안 됨 병합됨"
-    date registered_on "처음 본 날"
-    date first_price_on "첫 가격 조사일"
-    date last_price_on
-    int missing_streak "3이면 조사 안 됨"
-    int merged_into FK "병합 대상"
+    text status "surveyed not_surveyed merged"
+    int merged_into FK
   }
   product_source_key {
-    int source_item_id PK "FK"
-    date valid_from PK
+    int source_item_id PK, FK
+    date valid_from PK "기간 겹침 거부"
     int product_id FK
   }
   product_attr_history {
-    int product_id PK "FK"
-    date valid_from PK
-    numeric total_qty
-    text al_code
+    int product_id PK, FK
+    date valid_from PK "기간 겹침 거부"
+    bigint raw_object_id FK
   }
   product_variety_map {
-    int product_id PK "FK"
-    date valid_from PK
+    int product_id PK, FK
+    date valid_from PK "기간 겹침 거부"
+    text status "pending mapped ignored"
     int variety_id FK
     int spec_id FK
+    int unit_rule_id FK
     text origin "al_rule operator"
   }
   al_variety_rule {
     text al_code PK
     int variety_id FK
     int spec_id FK
-  }
-  spec {
-    int variety_id "unique (variety_id, id)"
-    int id PK
-  }
-  source_item {
-    int id PK
+    int unit_rule_id FK
   }
 </pre>
+<!-- /erd:group-4 -->
       </div>
     </div>
 
@@ -633,46 +613,43 @@ erDiagram
         </ul>
       </div>
       <div class="figure">
+<!-- erd:group-5 -->
 <pre class="mermaid">
 erDiagram
   spec ||--o{ daily_quote : "(variety_id, spec_id)"
   product ||--o{ product_daily_summary : ""
-  spec ||--o{ reference_price : ""
-  spec ||--o{ usual_price : ""
-  judgment_batch ||--o{ judgment_snapshot : "묶음"
-  judgment_current }o--|| judgment_batch : "지금 보이는 묶음"
-  spec ||--o{ judgment_snapshot : ""
+  spec ||--o{ reference_price : "(variety_id, spec_id)"
+  spec ||--o{ usual_price : "(variety_id, spec_id)"
+  judgment_batch ||--o{ judgment_current : "batch_id"
+  judgment_batch ||--o{ judgment_snapshot : "batch_id"
+  spec ||--o{ judgment_snapshot : "(variety_id, spec_id)"
+  judgment_current ||..o{ current_judgment : "뷰가 읽음"
+  judgment_snapshot ||..o{ current_judgment : "뷰가 읽음"
   daily_quote {
-    int variety_id PK "FK"
-    int spec_id PK "FK"
+    int variety_id PK, FK
+    int spec_id PK, FK
     text price_tier PK "retail wholesale"
     text basis PK "quote shelf_price"
-    text scope_key PK "전국 시장유형 업태"
-    date obs_date PK "키의 맨 뒤"
-    numeric value
-    int n
+    text scope_key PK
+    date obs_date PK
   }
   product_daily_summary {
-    int product_id PK "FK"
+    int product_id PK, FK
     text scope_key PK
-    date obs_date PK "키의 맨 뒤"
-    numeric median_excl_promo
-    numeric seller_avg "판매처 2단 평균"
+    date obs_date PK
   }
   reference_price {
-    int variety_id PK "FK"
-    int spec_id PK "FK"
-    text ref_type PK "평년 1년전 1달전"
+    int variety_id PK, FK
+    int spec_id PK, FK
+    text ref_type PK "normal_year year_ago month_ago"
     text source PK "ekape computed"
     text scope_key PK
     date ref_date PK
   }
   usual_price {
-    int variety_id PK "FK"
-    int spec_id PK "FK"
+    int variety_id PK, FK
+    int spec_id PK, FK
     date as_of PK
-    numeric value
-    jsonb components
   }
   judgment_batch {
     bigint id PK
@@ -683,24 +660,24 @@ erDiagram
     bigint batch_id FK
   }
   judgment_snapshot {
-    bigint batch_id PK "FK"
-    int variety_id PK "FK"
-    int spec_id PK "FK"
+    bigint batch_id PK, FK
+    int variety_id PK, FK
+    int spec_id PK, FK
     text verdict "cheap normal expensive"
-    numeric diff_pct
   }
   calc_param {
     text key PK
     text status "decided placeholder"
   }
-  spec {
-    int variety_id "unique (variety_id, id)"
-    int id PK
-  }
-  product {
-    int id PK
+  current_judgment {
+    text _ "뷰 (security_invoker)"
+    bigint batch_id
+    int variety_id
+    int spec_id
+    text verdict
   }
 </pre>
+<!-- /erd:group-5 -->
       </div>
     </div>
 
@@ -716,54 +693,54 @@ erDiagram
         </ul>
       </div>
       <div class="figure">
+<!-- erd:group-6 -->
 <pre class="mermaid">
 erDiagram
-  ingest_run ||--o{ raw_object : "올린 파일"
   raw_object |o--o{ raw_object : "duplicate_of"
-  raw_object |o--o{ source_master_change : "마스터 변경 (병합은 없음)"
+  ingest_run ||--o{ raw_object : ""
+  raw_object |o--o{ source_master_change : ""
   source_day ||--o{ source_day_part : "(source, target_date)"
   ingest_run {
     bigint id PK
-    text job "daily recheck backfill 등"
-    text status
-    int calls_used
-    int call_budget
+    text source "kamis ekape chamga all"
+    text job "daily recheck reregistration_watch master backfill recompute"
+    text status "running ok partial failed"
   }
   raw_object {
     bigint id PK
+    text source "kamis ekape chamga"
     text storage_path UK
-    text content_sha256
-    text load_status "loaded duplicate 등"
     bigint ingest_run_id FK
+    text load_status "pending_load loaded partially_rejected rejected duplicate"
     bigint duplicate_of FK
-    timestamptz purged_at "행은 남김"
-  }
-  source_day {
-    text source PK
-    date target_date PK
-    text status "6종, 수집 완결성만"
-    int row_count
-    timestamptz corrected_at "정정"
-    int correction_count
-  }
-  source_day_part {
-    text source PK "FK"
-    date target_date PK "FK"
-    text part_kind PK
-    text part_key PK
-  }
-  backfill_task {
-    text source PK
-    text task_key PK
-    text status
   }
   source_master_change {
     bigint id PK
+    text source "kamis ekape chamga"
     text entity "product store code"
-    text action "merged 등"
-    bigint raw_object_id FK "병합이면 null"
+    text change_kind "added removed changed"
+    bigint raw_object_id FK
+    text action "recorded mapping_reset linked attr_versioned merged"
+  }
+  source_day {
+    text source PK "kamis ekape chamga"
+    date target_date PK
+    text status "pending ok partial empty_expected empty_unexpected failed"
+  }
+  source_day_part {
+    text source PK, FK
+    date target_date PK, FK
+    text part_kind PK "item seller store fresh_panel"
+    text part_key PK
+    text status "ok partial missing"
+  }
+  backfill_task {
+    text source PK "kamis ekape chamga"
+    text task_key PK
+    text status "pending running done failed"
   }
 </pre>
+<!-- /erd:group-6 -->
       </div>
     </div>
 
@@ -777,17 +754,17 @@ erDiagram
     <table>
       <thead><tr><th>데이터</th><th>DB에 두는 기간</th><th>용량 (추정)</th><th>그 뒤에는</th></tr></thead>
       <tbody>
-        <tr><td><span class="src k">KAMIS</span> 시장별 관측값</td><td>최근 90일</td><td>약 70~85MB</td><td>시장 유형별·품종별 집계로 영구. 시장 하나의 추이는 90일까지. 5년 백필은 세션 임시 표를 거쳐 집계와 최근 90일만 남김</td></tr>
-        <tr><td><span class="src c">참가격</span> 점포별 관측값</td><td>최근 8 조사일 (약 16주)</td><td>약 130~225MB</td><td>상품별 집계로 영구</td></tr>
+        <tr><td><span class="src k">KAMIS</span> 시장별 관측값</td><td>최근 90일</td><td>약 75MB</td><td>시장 유형별·품종별 집계로 영구. 시장 하나의 추이는 90일까지. 5년 백필은 세션 임시 표를 거쳐 집계와 최근 90일만 남김</td></tr>
+        <tr><td><span class="src c">참가격</span> 점포별 관측값</td><td>최근 6 조사일 (약 12주)</td><td>약 90~150MB</td><td>상품별 집계로 영구</td></tr>
         <tr><td><span class="src e">축평원</span> 관측값·평년</td><td>영구</td><td>약 15~18MB (5년)</td><td>-</td></tr>
-        <tr><td>집계 (<code>daily_quote</code> 등)</td><td>영구</td><td>약 90~110MB (5년) + 연 50~60MB (평년·상품 집계 포함)</td><td>-</td></tr>
-        <tr><td>평소가 (<code>usual_price</code>)</td><td>영구</td><td>연 약 8만 행, 약 16~24MB</td><td>화면에 필요한 날짜만 두면 줄어듦</td></tr>
+        <tr><td>집계 (<code>daily_quote</code> 등)</td><td>영구</td><td><code>daily_quote</code> 약 200MB (5년) + 연 40MB, 평년·상품 집계 연 약 50MB</td><td>-</td></tr>
+        <tr><td>평소가 (<code>usual_price</code>)</td><td>영구</td><td>연 약 8만 행, 약 23MB</td><td>화면에 필요한 날짜만 두면 줄어듦</td></tr>
         <tr><td>원본 파일</td><td>Storage</td><td>1년차 250~330MB, 이후 연 130~200MB</td><td>KAMIS·축평원은 1년 뒤 파일 삭제(기록 행은 남김), 참가격은 영구</td></tr>
-        <tr><td><b>DB 합계 (1년차)</b></td><td></td><td><b>약 365~515MB</b></td><td>이후 연 70~95MB 증가. 상단은 무료 500MB를 넘음</td></tr>
+        <tr><td><b>DB 합계 (1년차)</b></td><td></td><td><b>약 465~525MB</b></td><td>이후 연 약 120MB 증가. 상단은 무료 500MB를 넘음</td></tr>
       </tbody>
     </table>
   </div>
-  <p class="caption">행당 크기를 어림한 값입니다 (2026-10-20에 관측값 200~250B, 집계 120~150B로 올림). 마이그레이션 단계에서 관측값 1만 행과 집계 표 샘플을 넣어 <code>pg_total_relation_size</code>로 먼저 잽니다.</p>
+  <p class="caption">행당 크기는 2026-10-21 로컬 실측값입니다 (표마다 1만·10만 행, <code>pg_total_relation_size</code>, 인덱스 포함): 관측값 KAMIS 216B, 참가격 185B(품종 매핑 뒤 220B), <code>daily_quote</code> 266B, <code>product_daily_summary</code> 175B, <code>reference_price</code> 208B, <code>usual_price</code> 291B. 집계가 어림(120~150B)의 약 두 배라 참가격 보관을 8에서 6 조사일로 줄였습니다. 다시 재려면 <code>pnpm --filter @workspace/price-db measure</code>.</p>
 </section>
 
 <section>
@@ -798,18 +775,18 @@ erDiagram
     <div class="check"><input type="checkbox" id="c1"><label for="c1"><strong>세 층 구조</strong><span>원본은 Storage, 관측값과 집계는 Postgres, 화면은 집계만 읽음</span></label></div>
     <div class="check"><input type="checkbox" id="c2"><label for="c2"><strong>품종 중심 연결</strong><span>KAMIS·축평원은 원천 코드로, 참가격은 상품 ID를 거쳐 품종에 이어짐</span></label></div>
     <div class="check"><input type="checkbox" id="c3"><label for="c3"><strong>축산 대표 출처</strong><span>겹치는 조합은 축평원, KAMIS에만 있는 조합(1++, 계란 규격, 닭 호수)은 KAMIS</span></label></div>
-    <div class="check"><input type="checkbox" id="c4"><label for="c4"><strong>보관 기간</strong><span>KAMIS 90일, 참가격 8 조사일, 축평원·집계 영구, 참가격 원본 영구</span></label></div>
+    <div class="check"><input type="checkbox" id="c4"><label for="c4"><strong>보관 기간</strong><span>KAMIS 90일, 참가격 6 조사일, 축평원·집계 영구, 참가격 원본 영구</span></label></div>
     <div class="check"><input type="checkbox" id="c5"><label for="c5"><strong>기간이 있는 연결표</strong><span>상품 번호, 원천 코드 매핑, 점포 → 판매처는 기간별로 저장하고 겹침은 DB가 거부</span></label></div>
     <div class="check"><input type="checkbox" id="c6"><label for="c6"><strong>행사 3상태</strong><span>Y 행사, N 일반, 값 없음은 모름. 평소가에는 일반 가격만 사용</span></label></div>
     <div class="check"><input type="checkbox" id="c7"><label for="c7"><strong>판정 교체 방식</strong><span>새 판정을 다 만든 뒤 한 번에 교체. 실패하면 직전 판정 유지</span></label></div>
     <div class="check"><input type="checkbox" id="c11"><label for="c11"><strong>서버 전용 읽기</strong><span>표는 노출하지 않는 스키마 price. 웹앱 서버 컴포넌트가 web_reader 롤로 읽고, 수집은 ingest_writer 롤로 씀. 브라우저에는 Supabase 키 없음</span></label></div>
     <div class="check open"><input type="checkbox" id="c9"><label for="c9"><strong>아직 열림: 백업 추후</strong><span>주 1회 pg_dump는 정식 서비스 전으로 미룸. 그동안 운영자가 정한 매핑(원천 코드 매핑, 점포 → 판매처, 상품 → 품종 등)은 원본으로 되살릴 수 없음</span></label></div>
-    <div class="check open"><input type="checkbox" id="c10"><label for="c10"><strong>아직 열림: DB 용량</strong><span>1년차 추정 365~515MB로 상단은 무료 500MB를 넘음. 관측값 1만 행과 집계 표 실측 뒤 참가격 6 조사일 등으로 줄일지 정함</span></label></div>
+    <div class="check open"><input type="checkbox" id="c10"><label for="c10"><strong>아직 열림: DB 용량</strong><span>실측 뒤 참가격을 6 조사일로 줄여도 1년차 465~525MB. 다음 순서: 평년·평소가를 화면이 쓰는 날짜만(약 −40MB), daily_quote의 sources 열 정리(약 −30MB), 그래도 부족하면 Pro 플랜</span></label></div>
   </div>
 </section>
 
 <footer>
-  근거: <code>grocery-price/docs/30-data/pipeline.md</code> 3장(테이블), 3-9(용량), 3-10(샘플 예시), 6-1(결정). 출처별 실측: <code>grocery-price/docs/30-data/sources/</code>. 이 페이지는 설계 문서를 옮겨 그린 것이라, 둘이 다르면 <code>pipeline.md</code>가 기준입니다.
+  근거: <code>grocery-price/docs/30-data/pipeline.md</code> 3장(테이블), 3-9(용량), 3-10(샘플 예시), 6-1(결정). 출처별 실측: <code>grocery-price/docs/30-data/sources/</code>. 관계도 밖의 글은 설계 문서를 옮겨 쓴 것입니다. 표 정의가 다르면 <code>supabase/migrations/</code>가, 설계 이유는 <code>pipeline.md</code>가 기준입니다.
 </footer>
 
 </div>

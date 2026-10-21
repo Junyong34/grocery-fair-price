@@ -19,7 +19,7 @@
 | # | 제목 | 유형 | 상태 | 선행 |
 |---|---|---|---|---|
 | 01 | Supabase 계정·연결 정보 설정 | task | ready-for-human | - |
-| 02 | 스키마·마이그레이션·권한·RLS | task | ready-for-agent | p4/01 |
+| 02 | 스키마·마이그레이션·권한·RLS | task | resolved (로컬 검증, 운영 적용은 01 뒤) | p4/01 |
 | 03 | 수집 패키지와 GitHub Actions 워크플로 | task | ready-for-agent | 01, 02, p2/12 |
 | 04 | KAMIS 5년 백필과 평년 계산 입력 | task | ready-for-agent | 03 |
 | 05 | 장애 처리·알림·수집 상태 | task | ready-for-agent | 03 |

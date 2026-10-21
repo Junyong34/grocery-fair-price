@@ -11,7 +11,12 @@
     "ui:add": "pnpm --filter @workspace/ui ui:add",
     "test": "turbo test",
     "foods:sync": "node scripts/sync-food-images.mjs && node scripts/measure-food-bounds.mjs",
-    "foods:bounds": "node scripts/measure-food-bounds.mjs"
+    "foods:bounds": "node scripts/measure-food-bounds.mjs",
+    "db:start": "supabase start -x studio,realtime,edge-runtime,logflare,vector,imgproxy,mailpit,postgres-meta",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset --local",
+    "db:test": "pnpm --filter @workspace/price-db test:db",
+    "db:erd": "pnpm --filter @workspace/price-db erd"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
@@ -19,6 +24,7 @@
     "prettier": "^3.9.9",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "sharp": "0.35.5",
+    "supabase": "2.120.0",
     "turbo": "^2.11.7",
     "typescript": "^5"
   },

@@ -25,8 +25,10 @@ grocery-fair-price/
 ├─ packages/
 │  ├─ seasonal/              @workspace/seasonal: 제철 도메인 (순수 TS, React 없음)
 │  ├─ ui/                    @workspace/ui: Oura 토큰, cojeev UI, 범용 컴포넌트
+│  ├─ price-db/              @workspace/price-db: 가격 DB 마이그레이션 검증 테스트, 샘플 테스트 데이터, 용량 실측, ERD 생성
 │  ├─ eslint-config/         @workspace/eslint-config: base, next-js, react-internal
 │  └─ typescript-config/     @workspace/typescript-config: base, nextjs, react-library
+├─ supabase/                 Supabase CLI 프로젝트: config.toml, migrations/(스키마 price의 DDL·DCL), seed.sql(로컬 기준 데이터)
 ├─ grocery-price/            가격 서비스 기획·도메인·API 조사·파이프라인 설계 문서 (코드 없음)
 ├─ scripts/                  저장소 단위 스크립트 (일러스트 동기화, 비밀 값 검사)
 ├─ docs/
@@ -276,6 +278,19 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 - 새 일러스트는 프로젝트 스킬 `/seasonal-food-illustrator`로 그린다.
 - 브랜드 파일(`apps/web/public/images/brand/`, `app/favicon.ico`, `app/icon.svg`, `app/apple-icon.png`)은 `prototypes/branding/`에서 손으로 복사한다(`apps/web/docs/brand-assets.md`). `logo-lockup.svg`·`logo-lockup-ivory.svg`는 고운돋움 Regular의 글자 윤곽을 포함한 가로 로고이며, `GowunDodum-OFL.txt`는 서체 라이선스다.
 
+## 8-1. 가격 DB (supabase/, packages/price-db)
+
+| 경로 | 내용 |
+|---|---|
+| `supabase/config.toml` | 로컬 Supabase 설정. 포트는 5532x대(API 55321, DB 55322), `raw` 버킷(비공개) |
+| `supabase/migrations/` | `price_foundation`(확장·스키마·롤), `price_tables`(표 40개·뷰), `price_grants_rls`(GRANT·RLS 정책), `price_calc_param_retention`(계산 상수 초기값, 보존 정리 함수). 표 정의의 기준이다 (pipeline.md 3장은 설계 이유) |
+| `supabase/seed.sql` | `supabase db reset` 때만 들어가는 로컬 기준 데이터: 지역(전국·시도), 샘플 품종 임시 목록, 환산 규칙, 판매처. 끝에서 기본 규격 검사를 돌린다 |
+| `packages/price-db/src/` | 로컬 접속(`db.ts`), 샘플 응답 파서(`samples.ts`), 임시 표 COPY(`copy.ts`), 관측값 적재·백필(`observation-load.ts`), 간이 집계(`aggregate.ts`), 샘플 테스트 데이터(`load-samples.ts`). 정식 수집 코드는 `ingest-foundation/03`이 따로 만든다 |
+| `packages/price-db/test/*.db.test.ts` | 권한·RLS·제약·적재 시나리오·ERD 최신 여부. 로컬 DB가 떠 있어야 해서 루트 `pnpm test`에는 들어가지 않는다 |
+| `packages/price-db/scripts/` | `load-samples.ts`, `measure-size.ts`(행당 크기 실측), `build-erd.ts`(`grocery-price/docs/30-data/schema-map.html`의 ERD 생성) |
+
+마이그레이션은 운영 DB에 로컬에서 `pnpm exec supabase db push`로 적용한다 (`SUPABASE_DB_PASSWORD`, `ingest-foundation/01`). 시드는 운영 DB에 들어가지 않는다.
+
 ## 9. 명령어
 
 루트에서 실행한다. Turborepo가 각 패키지의 같은 이름 스크립트를 돌린다.
@@ -291,6 +306,11 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `pnpm ui:add <name-or-url>` | cojeev·shadcn 컴포넌트를 `packages/ui`에 설치 |
 | `pnpm foods:sync` / `pnpm foods:bounds` | 일러스트 동기화 / 그림 아래 끝 재측정 |
 | `pnpm --filter @workspace/seasonal build:foods` | 품종 목록 생성 |
+| `pnpm db:start` / `pnpm db:stop` | 로컬 Supabase (Docker). 쓰지 않는 서비스는 끄고 띄운다 |
+| `pnpm db:reset` | 로컬 DB를 지우고 마이그레이션·시드를 다시 적용 |
+| `pnpm db:test` | DB 테스트 (`db reset` → 샘플 적재 → 권한·RLS·적재 검사). `pnpm db:start` 뒤에 |
+| `pnpm db:erd` | `schema-map.html`의 ERD를 로컬 DB에서 다시 만든다 |
+| `pnpm --filter @workspace/price-db load:samples` / `measure` | 샘플 테스트 데이터 넣기 / 행당 크기 실측 |
 | `scripts/check-no-secrets.sh [--tree]` | `.env` 값이 커밋 대상에 들어갔는지 검사 (pre-commit) |
 
 처음 클론하면 `git config core.hooksPath .githooks`를 한 번 실행한다.
@@ -305,7 +325,7 @@ grocery-price/
 │  ├─ 00-overview/           product-concept.md, roadmap.md (4단계: 수집 기반·판정 설계·화면 설계·구현)
 │  ├─ 10-research/           api-spec.md (API 실측), gov-price-sites (정부 가격 화면 대조), public-data-survey, data-sourcing-legal, content-and-taxonomy, images, supabase-skills
 │  ├─ 20-domain/             domain-model.md
-│  ├─ 30-data/               pipeline.md (저장 구조, 테이블, 수집 일정, 장애 처리)
+│  ├─ 30-data/               pipeline.md (저장 구조, 테이블, 수집 일정, 장애 처리), schema-map.html (데이터 지도, ERD는 pnpm db:erd가 생성)
 │  └─ adr/                   0001 공공데이터와 제보, 크롤링 안 함 · 0002 Supabase + GitHub Actions
 └─ reference/public-data/
    ├─ kamis/, ekape/         원본 API 명세·코드표
@@ -319,7 +339,7 @@ grocery-price/
 | `seasonal-mvp/` | 제철달력 MVP 화면 13개 티켓 | 01~11 resolved, 12 ready-for-agent(데스크톱·태블릿), 13 needs-info(디자인 다듬기) |
 | `calendar-print/` | 달력 PDF 어드민(에디션 생성·공개)과 다운로드 | 1차 구현됨(인쇄물 4종, 어드민, 내려받기). 배치 끌어 옮기기·명절·음력 옵션은 남음 |
 | `seo/` | 검색 색인(SEO) 기반: 레지스트리·sitemap·robots·JSON-LD·색인 스위치 | 01~07 resolved, 08 needs-triage(품종 본문 보강) |
-| `ingest-foundation/` | 가격 서비스 ① 수집 기반: Supabase 설정, 스키마, 수집 패키지·Actions, 백필, 장애 처리, 웹앱 읽기 | 01 ready-for-human(Supabase 계정), 02~05 ready-for-agent, 06 resolved (서버 전용 읽기) |
+| `ingest-foundation/` | 가격 서비스 ① 수집 기반: Supabase 설정, 스키마, 수집 패키지·Actions, 백필, 장애 처리, 웹앱 읽기 | 01 ready-for-human(Supabase 계정), 02 resolved (스키마·마이그레이션·RLS, 로컬 검증), 03~05 ready-for-agent, 06 resolved (서버 전용 읽기) |
 | `p2-data-source-spec/` | 가격 서비스 ① 요청·응답 분석 (이전 번호 P2) | 진행 중. 01 resolved, 05 wontfix, 08~10 후순위 |
 | `p3-variety-catalog/` | ② 품종 목록, 점포 데이터가 없는 품종의 대응 (이전 번호 P3) | ready-for-human |
 | `p4-canonical-model/` | ① 통합 스키마·어댑터 (이전 번호 P4) | 01·03 ready-for-agent, 02 resolved (ADR 0002) |
@@ -343,5 +363,6 @@ grocery-price/
 | 용어 | `grocery-price/GLOSSARY.md` |
 | 가격 서비스 단계 | `grocery-price/docs/00-overview/roadmap.md` |
 | 가격 수집 설계 | `grocery-price/docs/30-data/pipeline.md`, ADR 0002 |
+| 가격 DB 표 정의 | `supabase/migrations/` |
 | 공공 API 호출 | `grocery-price/docs/10-research/api-spec.md` |
 | 일러스트 출처 | `apps/web/public/foods/PROVENANCE.md` |
