@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { festivalDate, festivalsInMonth, festivalsWithFood } from "./festivals"
+import { festivalDate, festivalOf, FESTIVALS, festivalsInMonth, festivalsWithFood } from "./festivals"
 
 describe("festivalDate", () => {
   it("연도마다 다른 양력 날짜를 돌려준다", () => {
@@ -39,5 +39,11 @@ describe("festivalsWithFood", () => {
     expect(festivalsWithFood("gizzard-shad").map((f) => f.slug)).toEqual(["chuseok"])
     expect(festivalsWithFood("watermelon").map((f) => f.slug)).toEqual(["sambok"])
     expect(festivalsWithFood("persimmon")).toEqual([])
+  })
+})
+
+describe("festivalOf", () => {
+  it("slug로 그 명절을 찾는다", () => {
+    for (const festival of FESTIVALS) expect(festivalOf(festival.slug)).toBe(festival)
   })
 })

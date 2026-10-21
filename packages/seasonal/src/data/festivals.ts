@@ -79,8 +79,15 @@ export const FESTIVALS = [
 
 export type Festival = (typeof FESTIVALS)[number]["slug"]
 
+export type FestivalInfo = (typeof FESTIVALS)[number]
+
 export function isFestival(value: string): value is Festival {
   return FESTIVALS.some((festival) => festival.slug === value)
+}
+
+/** slug로 명절 하나. Festival 타입이면 언제나 있다. */
+export function festivalOf(slug: Festival): FestivalInfo {
+  return FESTIVALS.find((festival) => festival.slug === slug)!
 }
 
 /** month(1~12) 이후 가장 가까운 명절. 그해 명절이 다 지났으면 다음 해 첫 명절. */
@@ -90,18 +97,18 @@ export function upcomingFestival(month: number): Festival {
 
 /** 그해 명절의 양력 날짜. 하루로 정할 수 없는 명절(삼복)이면 null이다. */
 export function festivalDate(slug: Festival, year: number): CalendarDate | null {
-  const festival = FESTIVALS.find((candidate) => candidate.slug === slug)!
+  const festival = festivalOf(slug)
   const rule = (festival as { date?: FestivalDateRule }).date
   if (!rule) return null
   return rule === "solstice" ? winterSolstice(year) : lunarToSolar(year, rule.lunar[0], rule.lunar[1])
 }
 
 /** 그해 그 달에 드는 명절. 날짜가 없으면(삼복) 대표 달로 본다. */
-export function festivalsInMonth(month: number, year: number): readonly (typeof FESTIVALS)[number][] {
+export function festivalsInMonth(month: number, year: number): readonly FestivalInfo[] {
   return FESTIVALS.filter((festival) => (festivalDate(festival.slug, year)?.month ?? festival.month) === month)
 }
 
 /** 그 무렵 제철 품종으로 그 품종을 꼽은 명절(품종 상세의 관련 명절). */
-export function festivalsWithFood(foodId: string): readonly (typeof FESTIVALS)[number][] {
+export function festivalsWithFood(foodId: string): readonly FestivalInfo[] {
   return FESTIVALS.filter((festival) => (festival.seasonalFoodIds as readonly string[]).includes(foodId))
 }

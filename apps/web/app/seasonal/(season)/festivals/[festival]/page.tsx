@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
-import { FESTIVALS, isFestival } from "@workspace/seasonal/data/festivals"
+import { festivalOf, FESTIVALS, isFestival } from "@workspace/seasonal/data/festivals"
 import { seasonOfMonth } from "@workspace/seasonal/data/seasons"
 
 import { FestivalView } from "@/features/seasonal/festivals/festival-view"
@@ -22,7 +22,7 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { festival: slug } = await props.params
   if (!isFestival(slug)) return {}
-  const item = FESTIVALS.find((festival) => festival.slug === slug)!
+  const item = festivalOf(slug)
   return createMetadata({
     ...festivalSeo(slug),
     path: routes.seasonal.festival(slug),

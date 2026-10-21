@@ -4,25 +4,18 @@ import Link from "next/link"
 import { Suspense } from "react"
 
 import { WEEKDAY_NAMES, weekdayOf } from "@workspace/seasonal/calendar/date-utils"
-import {
-  festivalDate,
-  FESTIVALS,
-  type Festival,
-} from "@workspace/seasonal/data/festivals"
+import { festivalDate, festivalOf, type Festival } from "@workspace/seasonal/data/festivals"
 import { Button } from "@workspace/ui/components/button"
 
 import { routes } from "@/shared/routes"
 import { useToday } from "@/shared/today-context"
-
-const find = (slug: Festival) =>
-  FESTIVALS.find((festival) => festival.slug === slug)!
 
 /**
  * 올해(서울) 양력 날짜. 하루로 정할 수 없는 명절(삼복)이면 시기만 보인다.
  * 연도는 요청 시점 값이라 Suspense 안에서 읽는다.
  */
 export function FestivalPeriod({ slug }: { slug: Festival }) {
-  const festival = find(slug)
+  const festival = festivalOf(slug)
   return (
     <p className="text-sm text-stone">
       시기 {festival.period}
@@ -51,7 +44,7 @@ function ThisYearDate({ slug }: { slug: Festival }) {
 /** "{m}월 달력에서 보기". 올해 날짜가 든 달로 간다(정월대보름은 해마다 2월이거나 3월). 날짜가 없으면 대표 달. */
 export function CalendarLink({ slug }: { slug: Festival }) {
   return (
-    <Suspense fallback={<CalendarButton month={find(slug).month} />}>
+    <Suspense fallback={<CalendarButton month={festivalOf(slug).month} />}>
       <ThisYearCalendarLink slug={slug} />
     </Suspense>
   )
@@ -61,7 +54,7 @@ function ThisYearCalendarLink({ slug }: { slug: Festival }) {
   const { year } = useToday()
   return (
     <CalendarButton
-      month={festivalDate(slug, year)?.month ?? find(slug).month}
+      month={festivalDate(slug, year)?.month ?? festivalOf(slug).month}
     />
   )
 }

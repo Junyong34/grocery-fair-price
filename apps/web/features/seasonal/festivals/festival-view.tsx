@@ -2,7 +2,7 @@ import Link from "next/link"
 import { Soup } from "lucide-react"
 
 import { FESTIVAL_BACKGROUNDS } from "@workspace/seasonal/data/copy"
-import { FESTIVALS, type Festival } from "@workspace/seasonal/data/festivals"
+import { festivalOf, type Festival } from "@workspace/seasonal/data/festivals"
 import { findFood, type Food } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 
@@ -17,7 +17,7 @@ import { CalendarLink, FestivalPeriod } from "./festival-date"
  * 전통 음식은 품종이 아니라 상세로 가지 않는다. 모바일·데스크톱 모두 가운데 한 열(최대 720).
  */
 export function FestivalView({ slug }: { slug: Festival }) {
-  const festival = FESTIVALS.find((candidate) => candidate.slug === slug)!
+  const festival = festivalOf(slug)
   const foods = festival.seasonalFoodIds
     .map((id) => findFood(id))
     .filter((food): food is Food => !!food)
