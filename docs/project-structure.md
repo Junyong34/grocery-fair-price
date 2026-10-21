@@ -306,7 +306,7 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `pnpm ui:add <name-or-url>` | cojeev·shadcn 컴포넌트를 `packages/ui`에 설치 |
 | `pnpm foods:sync` / `pnpm foods:bounds` | 일러스트 동기화 / 그림 아래 끝 재측정 |
 | `pnpm --filter @workspace/seasonal build:foods` | 품종 목록 생성 |
-| `pnpm db:start` / `pnpm db:stop` | 로컬 Supabase (Docker). 쓰지 않는 서비스는 끄고 띄운다 |
+| `pnpm db:start` / `pnpm db:stop` | 로컬 Supabase (Docker). 쓰지 않는 서비스는 끄고 띄운다. DB 어드민은 Studio http://127.0.0.1:55323 (Table Editor에서 schema `price`) |
 | `pnpm db:reset` | 로컬 DB를 지우고 마이그레이션·시드를 다시 적용 |
 | `pnpm db:test` | DB 테스트 (`db reset` → 샘플 적재 → 권한·RLS·적재 검사). `pnpm db:start` 뒤에 |
 | `pnpm db:erd` | `schema-map.html`의 ERD를 로컬 DB에서 다시 만든다 |

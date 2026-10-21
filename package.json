@@ -12,7 +12,7 @@
     "test": "turbo test",
     "foods:sync": "node scripts/sync-food-images.mjs && node scripts/measure-food-bounds.mjs",
     "foods:bounds": "node scripts/measure-food-bounds.mjs",
-    "db:start": "supabase start -x studio,realtime,edge-runtime,logflare,vector,imgproxy,mailpit,postgres-meta",
+    "db:start": "supabase start -x realtime,edge-runtime,logflare,vector,imgproxy,mailpit",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset --local",
     "db:test": "pnpm --filter @workspace/price-db test:db",
