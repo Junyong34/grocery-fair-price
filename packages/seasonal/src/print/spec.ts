@@ -183,26 +183,12 @@ export const DEFAULT_SPECS: { [K in PrintKind]: Extract<PrintSpec, { kind: K }> 
   },
 }
 
-/** 결과 파일 하나가 담는 쪽. 달 하나이거나 묶음 전체(all)다. */
-export type PageKey = Month | "all"
-
-/** 종류마다 만들 결과 파일. 생성기·미리보기 탭·다운로드 버튼이 모두 이 표를 읽는다. */
-export const KIND_PAGES = {
-  // 월간 달력은 12개월(표지 선택)을 담은 PDF 하나만 만든다. 달별 파일은 만들지 않는다.
-  monthly: ["all"],
-  "year-sheet": ["all"],
-  "season-poster": ["all"],
-  "month-poster": ["all"],
-} as const satisfies Record<PrintKind, readonly PageKey[]>
-
-export function isPageKey(kind: PrintKind, value: string): PageKey | undefined {
-  return (KIND_PAGES[kind] as readonly PageKey[]).find((page) => String(page) === value)
-}
-
-/** 결과 파일 하나의 쪽 수. 생성기가 PDF를 검사할 때 쓴다. */
-export function pageCount(spec: PrintSpec, page: PageKey): number {
-  if (spec.kind !== "monthly" || page !== "all") return 1
-  return MONTHS.length + (spec.cover ? 1 : 0)
+/**
+ * 결과 PDF의 쪽 수. 결과 파일은 사양·용지마다 하나다. 월간 달력은 열두 달(표지를 켜면 표지 포함)을 한 파일에 담는다.
+ * 생성기가 PDF를 검사할 때 쓴다.
+ */
+export function pageCount(spec: PrintSpec): number {
+  return spec.kind === "monthly" ? MONTHS.length + (spec.cover ? 1 : 0) : 1
 }
 
 /** URL 쿼리에 넣는 모양(UTF-8 JSON의 base64url). */

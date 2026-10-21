@@ -118,14 +118,9 @@ const PAPERS = {
   A3: { width: 297, height: 420, scale: Math.SQRT2 },
 } as const satisfies Record<Paper, { width: number; height: number; scale: number }>
 
-/** 종류마다 만들 쪽(page)의 목록. 생성기·미리보기 탭·다운로드 버튼이 모두 이 표를 읽는다. */
-type PageKey = Month | "all"
-const KIND_PAGES = {
-  monthly: [...MONTHS, "all"],   // "all"은 표지 + 12장 묶음
-  "year-sheet": ["all"],
-  "season-poster": ["all"],
-  "month-poster": ["all"],
-} as const satisfies Record<PrintSpec["kind"], readonly PageKey[]>
+/** 결과 PDF는 사양·용지마다 하나다(2026-10-22, 달별 파일과 PageKey·KIND_PAGES를 지웠다).
+ *  월간 달력은 표지(선택) + 12장을 한 파일에 담는다. 쪽 수는 pageCount(spec)가 계산한다. */
+function pageCount(spec: PrintSpec): number
 
 type Edition = {
   id: string                      // slug, 다운로드 경로에 쓴다
@@ -146,8 +141,8 @@ type DownloadManifest = {
     /** 이 파일을 만든 사양의 해시. 어드민이 "다시 생성 필요"를 판단한다. */
     specHash: string
     generatedAt: string
-    /** 경로는 public 기준. 예: /downloads/monthly-cream/a4/10.pdf */
-    files: Record<Paper, Partial<Record<PageKey, { path: string; bytes: number }>>>
+    /** 경로는 public 기준. 예: /downloads/monthly-cream/a4.pdf */
+    files: Record<Paper, { path: string; bytes: number }>
   }[]
 }
 ```
@@ -190,7 +185,7 @@ apps/web/features/
   admin-print/                   편집기 컴포넌트, 옵션 폼
   print/                         인쇄물 종류별 컴포넌트 4개 + parts/(시트, 달력 격자, 품종 그림)
 packages/seasonal/src/print/
-  spec.ts, spec.test.ts          PrintSpec 유니언, PAPERS, KIND_PAGES, 종류별 기본값, 파서, 해시
+  spec.ts, spec.test.ts          PrintSpec 유니언, PAPERS, pageCount, 종류별 기본값, 파서, 해시
 ```
 
 `print`가 어드민 아래가 아니라 따로 있는 이유: 미리보기 iframe, PDF 생성기, 개발자의 브라우저가 모두 같은 주소를 연다. 사양을 URL에 담으므로 인쇄 페이지는 저장소를 읽지 않고, 같은 URL은 언제나 같은 화면이다.
@@ -231,7 +226,7 @@ packages/seasonal/src/print/
 | 서체·배경 | O | O | O | O |
 | 여백(메모·체크 칸) | O | - | - | - |
 
-미리보기 위 쪽 탭은 `KIND_PAGES`를 따른다. 월간은 1~12와 전체, 나머지는 한 장이라 탭이 없다.
+미리보기는 결과 PDF와 같은 한 파일을 보여 준다(쪽 탭 없음). 월간 달력은 표지와 열두 달이 이어진다.
 
 - 옵션을 바꾸면 iframe의 `spec` 쿼리만 바뀐다. 미리보기는 실제 PDF와 같은 페이지이므로 따로 맞출 일이 없다.
 - 미리보기 위의 A4·A3 토글은 iframe의 `paper`만 바꾼다. A3에서 글자·선 굵기가 벽에 걸었을 때 괜찮은지 확인하는 용도다. 사양에는 저장하지 않는다.
@@ -244,8 +239,8 @@ packages/seasonal/src/print/
 관리자의 컴퓨터에서 개발 서버(`pnpm dev`)를 띄우고 진행한다. 운영 사이트에는 어드민이 없다.
 
 1. **저장**: 편집기의 저장 버튼이 `apps/web/print-editions/<id>.json`에 사양을 쓴다. 사양은 git에 남으므로 언제든 같은 PDF를 다시 뽑을 수 있다.
-2. **PDF 생성**: 생성 버튼(또는 같은 일을 하는 `pnpm prints:build [id]`)이 Playwright Chromium으로 `/print?spec=…&paper=…&page=…`를 열고 `page.pdf({ preferCSSPageSize: true, printBackground: true })`로 저장한다. 용지 2벌 × `KIND_PAGES[kind]`만큼 만든다(월간 26개, 나머지 2개).
-3. 파일은 `apps/web/public/downloads/{editionId}/{a4|a3}/{1..12|all}.pdf`에 쓴다. 경로에 해시가 없어 다시 생성해도 사용자 링크가 그대로다. 이전 파일은 git 기록에 남는다.
+2. **PDF 생성**: 생성 버튼(또는 같은 일을 하는 `pnpm prints:build [id]`)이 Playwright Chromium으로 `/print?spec=…&paper=…`를 열고 `page.pdf({ preferCSSPageSize: true, printBackground: true })`로 저장한다. 용지마다 하나씩, 에디션마다 2개를 만든다.
+3. 파일은 `apps/web/public/downloads/{editionId}/{a4|a3}.pdf`에 쓴다. 경로에 해시가 없어 다시 생성해도 사용자 링크가 그대로다. 이전 파일은 git 기록에 남는다.
 4. 생성기는 끝에 `public/downloads/manifest.json`을 `status: "published"`인 에디션으로 다시 쓴다. 같은 사양이면 같은 파일과 같은 매니페스트가 나온다(멱등). `generatedAt`은 사양 해시가 바뀐 에디션만 갱신한다.
 5. 생성이 끝나면 편집기에 파일 링크가 뜬다. 관리자가 PDF를 열어 보고, 괜찮으면 상태를 `published`로 바꾼 뒤 사양·PDF·매니페스트를 한 커밋으로 올린다. 배포되면 사용자 링크가 살아난다.
 6. 내리기: 상태를 `draft`로 돌리고 생성기를 다시 돌리면 매니페스트에서 빠진다. PDF 파일은 남겨 둔다(이미 공유된 링크가 깨지지 않게). 지울 때는 손으로 지운다.
@@ -254,7 +249,7 @@ AGENTS.md "Generated files" 표에 `public/downloads/**`와 명령 `pnpm prints:
 
 ### 사용자 다운로드 (`/seasonal/downloads`)
 
-매니페스트에 있는(공개된) 에디션을 종류별로 묶어 카드로 보여 준다(달력 / 포스터). 카드를 누르면 용지 선택(A4 기본 / A3, 세그먼트 컨트롤)이 나온다. 월간 달력은 1~12월·"12개월 전체" 버튼, 나머지는 "내려받기" 버튼 하나다. 버튼은 `KIND_PAGES`로 그린다. 용지 옆에 "A4 · 가정용 프린터", "A3 · 벽걸이용"처럼 쓰임을 한 줄로 적는다. 고른 용지는 `seasonal:settings`에 저장해 다음 방문에도 유지한다. 목록과 링크는 `manifest.json`을 빌드 때 읽어 정적으로 그린다. 링크에는 `download` 속성과 파일 크기를 붙인다. 2a ⚙ 설정 시트에는 이 화면으로 가는 링크 한 줄만 둔다. 이 페이지는 색인 대상이다(`shared/seo/pages.ts`).
+매니페스트에 있는(공개된) 에디션을 종류별로 묶어 카드로 보여 준다(달력 / 포스터). 카드를 누르면 용지 선택(A4 기본 / A3, 세그먼트 컨트롤)이 나온다. 버튼은 하나다. 월간 달력은 "12개월 전체", 나머지는 "내려받기"다. 용지 옆에 "A4 · 가정용 프린터", "A3 · 벽걸이용"처럼 쓰임을 한 줄로 적는다. 고른 용지는 `seasonal:settings`에 저장해 다음 방문에도 유지한다. 목록과 링크는 `manifest.json`을 빌드 때 읽어 정적으로 그린다. 링크에는 `download` 속성과 파일 크기를 붙인다. 2a ⚙ 설정 시트에는 이 화면으로 가는 링크 한 줄만 둔다. 이 페이지는 색인 대상이다(`shared/seo/pages.ts`).
 
 ## 기술 결정
 
@@ -342,7 +337,7 @@ AGENTS.md "Generated files" 표에 `public/downloads/**`와 명령 `pnpm prints:
 ### 확인 방법
 
 - `spec.test.ts`에서 `PAPERS`의 A3 치수가 A4 × √2와 1mm 안으로 맞는지 확인한다.
-- 생성된 PDF를 `pdfinfo`로 열어 쪽 크기(A4 595×842pt, A3 842×1191pt)와 쪽 수(`KIND_PAGES`와 표지 여부로 계산한 값)를 확인하는 스크립트를 생성 단계 끝에 둔다. 다르면 생성기가 실패하고 매니페스트를 쓰지 않는다.
+- 생성된 PDF를 `pdfinfo`로 열어 쪽 크기(A4 595×842pt, A3 842×1191pt)와 쪽 수(`pageCount`, 월간 달력은 표지 여부 포함)를 확인하는 스크립트를 생성 단계 끝에 둔다. 다르면 생성기가 실패하고 매니페스트를 쓰지 않는다.
 - A4·A3 PDF를 각각 실제 프린터로 한 장씩 뽑아 안전 여백 안에서 글자가 잘리지 않는지 본다(착수 순서 3에서 한 번).
 
 ## 먼저 할 일 (착수 순서)

@@ -1,7 +1,7 @@
 import { foodsInMonth } from "@workspace/seasonal/data/foods"
 import { formatMonthLabel, MONTHS, type Month } from "@workspace/seasonal/data/months"
 import { monthFoods, yearFoods } from "@workspace/seasonal/print/foods"
-import type { MonthlySpec, PageKey, Paper } from "@workspace/seasonal/print/spec"
+import type { MonthlySpec, Paper } from "@workspace/seasonal/print/spec"
 
 import { FoodArea } from "./parts/food-area"
 import { PrintCalendar } from "./parts/print-calendar"
@@ -14,12 +14,11 @@ import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
 const HEADER = 26
 const MEMO = 34
 
-export function MonthlySheets({ spec, paper, page }: { spec: MonthlySpec; paper: Paper; page: PageKey }) {
-  const months = page === "all" ? MONTHS : [page]
+export function MonthlySheets({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
   return (
     <>
-      {page === "all" && spec.cover && <Cover spec={spec} paper={paper} />}
-      {months.map((month) => (
+      {spec.cover && <Cover spec={spec} paper={paper} />}
+      {MONTHS.map((month) => (
         <MonthSheet key={month} spec={spec} paper={paper} month={month} />
       ))}
     </>

@@ -54,20 +54,23 @@ describe("nextEditionId", () => {
 })
 
 describe("downloadPath", () => {
-  it("에디션·용지·쪽으로 해시 없는 고정 경로를 만든다", () => {
-    expect(downloadPath("monthly-cream", "A4", 10)).toBe("/downloads/monthly-cream/a4/10.pdf")
-    expect(downloadPath("monthly-cream", "A3", "all")).toBe("/downloads/monthly-cream/a3/all.pdf")
+  it("에디션·용지마다 해시 없는 고정 경로 하나를 만든다", () => {
+    expect(downloadPath("monthly-cream", "A4")).toBe("/downloads/monthly-cream/a4.pdf")
+    expect(downloadPath("monthly-cream", "A3")).toBe("/downloads/monthly-cream/a3.pdf")
   })
 })
 
 describe("buildManifest", () => {
-  it("공개된 에디션만, id 순서로 담고 파일 경로는 KIND_PAGES를 따른다", () => {
+  it("공개된 에디션만, id 순서로 담고 용지마다 파일 하나와 크기를 적는다", () => {
     const manifest = buildManifest(
       [edition("b", "published"), edition("a", "published"), edition("c", "draft")],
-      { a: { specHash: "aa", generatedAt: "2026-10-16", bytes: {} }, b: { specHash: "bb", generatedAt: "2026-10-15", bytes: {} } },
+      { a: { specHash: "aa", generatedAt: "2026-10-16", bytes: { "/downloads/a/a4.pdf": 120 } }, b: { specHash: "bb", generatedAt: "2026-10-15", bytes: {} } },
     )
     expect(manifest.editions.map((entry) => entry.id)).toEqual(["a", "b"])
-    expect(Object.keys(manifest.editions[0]!.files.A4)).toEqual(["all"])
+    expect(manifest.editions[0]!.files).toEqual({
+      A4: { path: "/downloads/a/a4.pdf", bytes: 120 },
+      A3: { path: "/downloads/a/a3.pdf", bytes: 0 },
+    })
     expect(manifest.editions[0]!.specHash).toBe("aa")
   })
 })

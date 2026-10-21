@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import { KIND_PAGES, PAPER_SIZES, parsePrintSpec, specHash, type PageKey, type Paper, type PrintKind, type PrintSpec } from "./spec"
+import { PAPER_SIZES, parsePrintSpec, specHash, type Paper, type PrintKind, type PrintSpec } from "./spec"
 
 // 에디션: 이름이 붙은 인쇄 사양 하나. 원본은 apps/web/print-editions/<id>.json(git), 결과 PDF는 public/downloads/.
 // 사용자 다운로드 화면은 생성기가 쓰는 public/downloads/manifest.json만 읽는다.
@@ -48,9 +48,9 @@ export function downloadDir(editionId: string): string {
   return `/downloads/${editionId}`
 }
 
-/** public 기준 다운로드 경로. 해시가 없어 다시 만들어도 사용자 링크가 그대로다. */
-export function downloadPath(editionId: string, paper: Paper, page: PageKey): string {
-  return `${downloadDir(editionId)}/${paper.toLowerCase()}/${page}.pdf`
+/** public 기준 다운로드 경로. 에디션·용지마다 파일 하나다. 해시가 없어 다시 만들어도 사용자 링크가 그대로다. */
+export function downloadPath(editionId: string, paper: Paper): string {
+  return `${downloadDir(editionId)}/${paper.toLowerCase()}.pdf`
 }
 
 export type DownloadFile = { path: string; bytes: number }
@@ -63,7 +63,7 @@ export type ManifestEntry = {
   /** 이 파일을 만든 사양의 해시. 어드민이 "다시 생성 필요"를 가린다. */
   specHash: string
   generatedAt: string
-  files: Record<Paper, Partial<Record<PageKey, DownloadFile>>>
+  files: Record<Paper, DownloadFile>
 }
 
 export type DownloadManifest = { editions: ManifestEntry[] }
@@ -84,13 +84,10 @@ export function buildManifest(editions: readonly Edition[], builds: Readonly<Rec
       .sort((a, b) => a.id.localeCompare(b.id))
       .map((edition) => {
         const build = builds[edition.id]!
-        const filesFor = (paper: Paper) =>
-          Object.fromEntries(
-            KIND_PAGES[edition.spec.kind].map((page) => {
-              const path = downloadPath(edition.id, paper, page)
-              return [page, { path, bytes: build.bytes[path] ?? 0 }]
-            }),
-          )
+        const fileFor = (paper: Paper): DownloadFile => {
+          const path = downloadPath(edition.id, paper)
+          return { path, bytes: build.bytes[path] ?? 0 }
+        }
         return {
           id: edition.id,
           kind: edition.spec.kind,
@@ -98,7 +95,7 @@ export function buildManifest(editions: readonly Edition[], builds: Readonly<Rec
           description: edition.description,
           specHash: build.specHash,
           generatedAt: build.generatedAt,
-          files: Object.fromEntries(PAPER_SIZES.map((paper) => [paper, filesFor(paper)])) as ManifestEntry["files"],
+          files: Object.fromEntries(PAPER_SIZES.map((paper) => [paper, fileFor(paper)])) as ManifestEntry["files"],
         }
       }),
   }

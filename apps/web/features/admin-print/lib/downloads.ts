@@ -1,12 +1,7 @@
-import { downloadDir, downloadPath } from "@workspace/seasonal/print/edition"
-import { KIND_PAGES, PAPER_SIZES, type PageKey, type Paper, type PrintKind } from "@workspace/seasonal/print/spec"
+import { downloadDir } from "@workspace/seasonal/print/edition"
+import { PAPER_SIZES } from "@workspace/seasonal/print/spec"
 
-export function pdfPaths(id: string, kind: PrintKind, paper: Paper): string[] {
-  return KIND_PAGES[kind].map((page) => downloadPath(id, paper, page))
-}
-
+/** 어드민에 보여 줄 에디션의 다운로드 주소 꼴. 용지 자리를 비운다. */
 export function downloadPattern(id: string): string {
-  return `${downloadDir(id)}/{${PAPER_SIZES.map((paper) => paper.toLowerCase()).join("|")}}/{쪽}.pdf`
+  return `${downloadDir(id)}/{${PAPER_SIZES.map((paper) => paper.toLowerCase()).join("|")}}.pdf`
 }
-
-export const pageLabel = (page: PageKey) => (page === "all" ? "전체" : `${page}월`)

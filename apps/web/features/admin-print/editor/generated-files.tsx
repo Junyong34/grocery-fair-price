@@ -3,11 +3,11 @@
 import { Badge } from "@workspace/ui/components/badge"
 import { Card, CardContent } from "@workspace/ui/components/card"
 
-import type { BuildRecord, Edition } from "@workspace/seasonal/print/edition"
-import { KIND_PAGES, PAPER_SIZES, type Paper } from "@workspace/seasonal/print/spec"
+import { downloadPath, type BuildRecord, type Edition } from "@workspace/seasonal/print/edition"
+import { PAPER_SIZES, type Paper } from "@workspace/seasonal/print/spec"
 
 import { useCopy } from "../hooks/use-copy"
-import { downloadPattern, pageLabel, pdfPaths } from "../lib/downloads"
+import { downloadPattern } from "../lib/downloads"
 import { formatBuildTime } from "../lib/format"
 
 export function GeneratedFiles({ edition, build, stale }: { edition: Edition; build: BuildRecord; stale: boolean }) {
@@ -26,16 +26,14 @@ export function GeneratedFiles({ edition, build, stale }: { edition: Edition; bu
         </div>
         <div className="flex flex-wrap gap-x-8 gap-y-1.5">
           {PAPER_SIZES.map((paper) => {
-            const paths = pdfPaths(edition.id, edition.spec.kind, paper)
+            const file = downloadPath(edition.id, paper)
             return (
               <div key={paper} className="flex flex-wrap items-center gap-x-3 gap-y-1">
                 <Badge>{paper}</Badge>
-                {KIND_PAGES[edition.spec.kind].map((page, index) => (
-                  <a key={page} className="text-stone underline-offset-4 hover:text-ink hover:underline" href={paths[index]} target="_blank" rel="noreferrer">
-                    {pageLabel(page)}
-                  </a>
-                ))}
-                <button type="button" onClick={() => copy(paper, paths.join("\n"))} className="text-caption underline-offset-4 hover:text-ink hover:underline">
+                <a className="text-stone underline-offset-4 hover:text-ink hover:underline" href={file} target="_blank" rel="noreferrer">
+                  PDF 열기
+                </a>
+                <button type="button" onClick={() => copy(paper, file)} className="text-caption underline-offset-4 hover:text-ink hover:underline">
                   {copied === paper ? "복사했어요" : "주소 복사"}
                 </button>
               </div>

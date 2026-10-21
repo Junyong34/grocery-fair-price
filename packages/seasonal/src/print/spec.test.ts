@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest"
 
 import {
   DEFAULT_SPECS,
-  KIND_PAGES,
   PAPERS,
   PRINT_KINDS,
   decodeSpec,
@@ -74,16 +73,15 @@ describe("specHash", () => {
   })
 })
 
-describe("쪽", () => {
-  it("월간 달력도 다른 종류처럼 묶음 PDF 하나만 만든다", () => {
-    expect(KIND_PAGES.monthly).toEqual(["all"])
-    expect(KIND_PAGES["year-sheet"]).toEqual(["all"])
+describe("쪽 수", () => {
+  it("월간 달력은 열두 달에 표지를 켜면 하나 더한다", () => {
+    expect(pageCount({ ...DEFAULT_SPECS.monthly, cover: false })).toBe(12)
+    expect(pageCount({ ...DEFAULT_SPECS.monthly, cover: true })).toBe(13)
   })
 
-  it("묶음 쪽 수는 표지를 켜면 하나 늘어난다", () => {
-    expect(pageCount({ ...DEFAULT_SPECS.monthly, cover: false }, "all")).toBe(12)
-    expect(pageCount({ ...DEFAULT_SPECS.monthly, cover: true }, "all")).toBe(13)
-    expect(pageCount(DEFAULT_SPECS.monthly, 10)).toBe(1)
-    expect(pageCount(DEFAULT_SPECS["season-poster"], "all")).toBe(1)
+  it("나머지 종류는 한 장이다", () => {
+    expect(pageCount(DEFAULT_SPECS["year-sheet"])).toBe(1)
+    expect(pageCount(DEFAULT_SPECS["season-poster"])).toBe(1)
+    expect(pageCount(DEFAULT_SPECS["month-poster"])).toBe(1)
   })
 })
