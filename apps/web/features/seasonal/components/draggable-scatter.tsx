@@ -7,20 +7,18 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { FOOD_BOTTOM } from "@workspace/seasonal/data/food-bounds.generated"
 import type { Food } from "@workspace/seasonal/data/foods"
 import {
-  mergeSavedLayout,
-  type SavedSpot,
-} from "@workspace/seasonal/layout/merge-saved"
+  clampCalendar,
+  moveSpot,
+  restingSpots,
+  settleSpots,
+  type Spots,
+} from "@workspace/seasonal/layout/arrangement"
 import {
   labelFontPx,
-  labelHeight,
   SCATTER_FRAMES,
   type ScatterFrame,
   type ScatterLayout,
 } from "@workspace/seasonal/layout/scatter"
-import {
-  relaxCircles,
-  type Circle,
-} from "@workspace/seasonal/geometry/relax-circles"
 import { PatternBackground } from "@workspace/ui/components/pattern-background"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -39,8 +37,6 @@ import { FoodImage } from "./food-image"
 const TAP_SLOP = 6
 /** 손가락은 이만큼(ms) 누르고 있어야 끌기가 시작된다. 그 전에 움직이면 화면 스크롤이다. */
 const LONG_PRESS_MS = 250
-/** 그림 사이에 남길 틈(프레임 px). */
-const GAP = 10
 /** 이름표와 그림 아래 끝 사이 간격(그림 크기 대비). */
 const LABEL_GAP = 0.06
 /** 그림 아래 끝을 모르는 품종(그림 없음)의 기본값. 이름 카드(원)는 상자를 끝까지 채운다. */
@@ -48,7 +44,6 @@ const DEFAULT_BOTTOM = 1
 /** 판 위 달력의 처음 자리(오른쪽 아래): 오른쪽 끝에서 띄울 폭(판 폭 대비)과 아래 끝에서 띄울 높이(판 높이 대비). */
 const CALENDAR_INSET = { right: 0.02, bottom: 0.03 }
 
-type Spot = { cx: number; cy: number }
 type Gesture = {
   id: string
   pointerId: number
@@ -58,7 +53,9 @@ type Gesture = {
   /** 그림 중심과 누른 점의 차이(프레임 px). 끄는 동안 그림이 손가락 아래에서 튀지 않게 한다. */
   grabX: number
   grabY: number
-  from: Map<string, Spot>
+  from: Spots
+  /** 끄는 동안 마지막으로 그린 자리. 놓을 때 이 자리를 저장한다. */
+  spots: Spots
   dragging: boolean
   timer?: ReturnType<typeof setTimeout>
   /** 이 제스처가 window에 건 리스너를 뗀다. 리스너는 렌더마다 새 함수라 건 쪽이 직접 들고 있는다. */
@@ -102,46 +99,15 @@ export function DraggableScatter({
     () => new Map<string, Food>(foods.map((food) => [food.id, food])),
     [foods]
   )
-  const sizeOf = useMemo(
-    () => new Map(seed.items.map((item) => [item.id, item.size])),
-    [seed]
+  // 쉬는 자리: 저장된 배치(새 품종 넣기 + 겹침 풀기) 또는 시드 배치.
+  const rest = useMemo(
+    () => restingSpots({ month, seed, saved, frame }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- frame은 frameName에서 정해진다.
+    [saved, seed, month, frameName]
   )
-  const bounds = {
-    width: frame.width,
-    height: frame.height - labelHeight(frame),
-  }
-
-  const toCircles = (spots: Map<string, Spot>): Circle[] =>
-    [...spots].map(([id, spot]) => ({
-      id,
-      x: spot.cx * frame.width,
-      y: spot.cy * frame.height,
-      r: (sizeOf.get(id)! * frame.width) / 2,
-    }))
-  const toSpots = (circles: readonly Circle[]) =>
-    new Map(
-      circles.map((c) => [
-        c.id,
-        { cx: c.x / frame.width, cy: c.y / frame.height },
-      ])
-    )
-
-  // 쉬는 자리: 저장된 배치(새 품종 넣기 + 크기 변화로 생긴 겹침 풀기) 또는 시드 배치.
-  const rest = useMemo(() => {
-    const merged = saved
-      ? mergeSavedLayout({ month, seed, saved, frame })
-      : seed
-    const spots = new Map(
-      merged.items.map((item) => [item.id, { cx: item.cx, cy: item.cy }])
-    )
-    return saved
-      ? toSpots(relaxCircles(toCircles(spots), { bounds, gap: GAP }))
-      : spots
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- frame·bounds는 frameName에서 정해진다.
-  }, [saved, seed, month, frameName])
 
   const [live, setLive] = useState<{
-    spots: Map<string, Spot>
+    spots: Spots
     dragging: string
   } | null>(null)
   const spots = live?.spots ?? rest
@@ -178,20 +144,15 @@ export function DraggableScatter({
 
   const moveTo = (g: Gesture, clientX: number, clientY: number) => {
     const point = toFrame(clientX, clientY)
-    const moved = new Map(g.from)
-    moved.set(g.id, {
+    const to = {
       cx: (point.x - g.grabX) / frame.width,
       cy: (point.y - g.grabY) / frame.height,
-    })
+    }
     // 한 프레임에 한 번만 계산한다.
     cancelAnimationFrame(frameRequest.current)
     frameRequest.current = requestAnimationFrame(() => {
-      const relaxed = relaxCircles(toCircles(moved), {
-        bounds,
-        pinned: g.id,
-        gap: GAP,
-      })
-      setLive({ spots: toSpots(relaxed), dragging: g.id })
+      g.spots = moveSpot({ seed, frame, spots: g.from, id: g.id, to })
+      setLive({ spots: g.spots, dragging: g.id })
     })
   }
 
@@ -203,25 +164,9 @@ export function DraggableScatter({
     cancelAnimationFrame(frameRequest.current)
     g.detach?.()
     if (!g.dragging) return
-    setLive((current) => {
-      if (commit && current) {
-        // 끈 그림도 영역 안으로 들이고, 남은 겹침을 한 번 더 푼다.
-        const settled = relaxCircles(toCircles(current.spots), {
-          bounds,
-          pinned: g.id,
-          gap: GAP,
-        })
-        save(
-          key,
-          settled.map((c): SavedSpot => ({
-            id: c.id,
-            cx: c.x / frame.width,
-            cy: c.y / frame.height,
-          }))
-        )
-      }
-      return null
-    })
+    // 저장(스토어 갱신)은 setLive 갱신 함수 밖에서 한다. 갱신 함수 안에서 다른 상태를 바꾸면 렌더 중 갱신이 된다.
+    if (commit) save(key, settleSpots({ seed, frame, spots: g.spots }))
+    setLive(null)
   }
 
   function onPointerMove(event: PointerEvent) {
@@ -259,7 +204,8 @@ export function DraggableScatter({
       startY: event.clientY,
       grabX: point.x - center.cx * frame.width,
       grabY: point.y - center.cy * frame.height,
-      from: new Map(spots),
+      from: spots,
+      spots,
       dragging: false,
     }
     if (event.pointerType === "touch")
@@ -289,15 +235,6 @@ export function DraggableScatter({
     calendarLive ??
     (savedCalendar ? { ...savedCalendar, x: Math.min(savedCalendar.x, 1 - calendarWidth) } : null)
 
-  const clampCalendar = (x: number, y: number): CalendarSpot => {
-    const box = field.current!.getBoundingClientRect()
-    const height = calendarRef.current!.offsetHeight / box.height
-    return {
-      x: Math.min(Math.max(x, 0), 1 - calendarWidth),
-      y: Math.min(Math.max(y, 0), Math.max(0, 1 - height)),
-    }
-  }
-
   const onCalendarPointerDown = (event: React.PointerEvent) => {
     if (event.button !== 0 || gesture.current) return
     const box = field.current!.getBoundingClientRect()
@@ -309,11 +246,15 @@ export function DraggableScatter({
     }
     const startX = event.clientX
     const startY = event.clientY
+    const size = { width: calendarWidth, height: rect.height / box.height }
     let latest = from
     const move = (e: PointerEvent) => {
       latest = clampCalendar(
-        from.x + (e.clientX - startX) / box.width,
-        from.y + (e.clientY - startY) / box.height
+        {
+          x: from.x + (e.clientX - startX) / box.width,
+          y: from.y + (e.clientY - startY) / box.height,
+        },
+        size
       )
       setCalendarLive(latest)
     }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import { lloydRelax } from "./lloyd"
-import type { Circle } from "./relax-circles"
+import type { Circle } from "./lloyd"
 
 const bounds = { width: 600, height: 400 }
 

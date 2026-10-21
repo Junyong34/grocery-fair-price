@@ -38,6 +38,12 @@ describe("relaxShapes", () => {
     expect(input[0]).toEqual({ id: "a", x: 5, y: 5, r: 30, labelW: 120, labelH: 16 })
   })
 
+  it("고정한 묶음은 움직이지 않고, 상대가 전부 비켜선다", () => {
+    const [a, b] = relaxShapes([shape("a", 100, 100), shape("b", 110, 100)], { bounds, pinned: "a" })
+    expect(a).toMatchObject({ x: 100, y: 100 })
+    expect(Math.hypot(b!.x - a!.x, b!.y - a!.y)).toBeGreaterThanOrEqual(60 - 0.5)
+  })
+
   it("같은 입력이면 같은 결과를 낸다", () => {
     const input = [shape("a", 100, 100), shape("b", 110, 105), shape("c", 120, 98)]
     expect(relaxShapes(input, { bounds })).toEqual(relaxShapes(input, { bounds }))

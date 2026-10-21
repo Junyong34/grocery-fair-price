@@ -3,7 +3,8 @@
 // 칸은 영역을 격자로 훑어 가장 가까운 원에 배정하는 방식으로 근사한다(외부 의존성 없음, N≈15~35에서 수 ms).
 // 순수 함수이며 같은 입력이면 같은 결과가 나온다.
 
-import type { Circle } from "./relax-circles"
+/** 원 하나(중심과 반지름). */
+export type Circle = { id: string; x: number; y: number; r: number }
 
 export type LloydOptions = {
   /** 점이 머물 영역(0..width, 0..height). */

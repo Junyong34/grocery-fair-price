@@ -1,4 +1,4 @@
-// "원 + 아래 이름표(직사각형)" 묶음끼리 겹치지 않게 밀어내는 완화. relax-circles의 확장이다.
+// "원 + 아래 이름표(직사각형)" 묶음끼리 겹치지 않게 밀어내는 완화. 시드 배치와 끌어 옮기기(layout/arrangement)가 같이 쓴다.
 // 그림은 원, 이름은 그 원 바로 아래에 가로로 놓이는 직사각형이다. 원·원, 원·직사각형, 직사각형·직사각형을 모두 푼다.
 // DOM·React와 무관한 순수 함수이며 같은 입력이면 같은 결과가 나온다.
 
@@ -17,6 +17,8 @@ export type Shape = {
 export type RelaxShapesOptions = {
   /** 전체가 머물 영역(0..width, 0..height). 원과 이름표가 모두 이 안에 남는다. */
   bounds: { width: number; height: number }
+  /** 움직이지 않을 묶음(끄는 중인 그림). 겹침은 상대가 전부 비켜서 푼다. */
+  pinned?: string
   /** 묶음 사이에 남길 틈. */
   gap?: number
   iterations?: number
@@ -27,7 +29,7 @@ type Rect = { cx: number; cy: number; w: number; h: number }
 const labelRect = (s: Shape): Rect => ({ cx: s.x, cy: s.y + s.r + s.labelH / 2, w: s.labelW, h: s.labelH })
 
 /** 겹친 묶음을 서로 밀어낸 새 배열을 돌려준다. 입력은 바꾸지 않는다. */
-export function relaxShapes(shapes: readonly Shape[], { bounds, gap = 0, iterations = 60 }: RelaxShapesOptions): Shape[] {
+export function relaxShapes(shapes: readonly Shape[], { bounds, pinned, gap = 0, iterations = 60 }: RelaxShapesOptions): Shape[] {
   const next = shapes.map((shape) => ({ ...shape }))
   for (let step = 0; step < iterations; step++) {
     let moved = false
@@ -36,10 +38,11 @@ export function relaxShapes(shapes: readonly Shape[], { bounds, gap = 0, iterati
         const push = separation(next[i]!, next[j]!, gap)
         if (!push) continue
         moved = true
-        next[i]!.x -= push.x / 2
-        next[i]!.y -= push.y / 2
-        next[j]!.x += push.x / 2
-        next[j]!.y += push.y / 2
+        const [a, b] = next[i]!.id === pinned ? [0, 1] : next[j]!.id === pinned ? [1, 0] : [0.5, 0.5]
+        next[i]!.x -= push.x * a
+        next[i]!.y -= push.y * a
+        next[j]!.x += push.x * b
+        next[j]!.y += push.y * b
       }
     }
     for (const shape of next) clamp(shape, bounds)

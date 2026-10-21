@@ -227,7 +227,7 @@ import 경로:
 | `calendar/lunar.ts` | 음력 → 양력, 동지 |
 | `calendar/date-utils.ts` | 요일 이름, 달의 날 수 |
 | `layout/scatter.ts` | 흩어진 배치. 시드 난수(LCG)로 같은 입력이면 같은 결과, 0..1 정규화 좌표, 화면 구간(`SCATTER_FRAMES`)별 고정 비율 |
-| `layout/merge-saved.ts` | 저장된 배치와 바뀐 품종 목록 병합 |
+| `layout/arrangement.ts` | 시드 뒤의 판 위 자리: 저장된 배치 병합(`restingSpots`), 끄는 동안(`moveSpot`)·놓은 뒤(`settleSpots`) 겹침 풀기, 판 위 달력 가두기. 시드와 같은 그림+이름표 겹침 규칙 |
 | `search/match-foods.ts` | 이름·별칭·초성 검색 |
 | `print/spec.ts` | 인쇄 사양 `PrintSpec`(종류별 유니언, zod 파서), `PAPERS`, `KIND_PAGES`, 종류별 기본값, URL 인코딩, 해시 |
 | `print/edition.ts` | 에디션, 다운로드 경로, 매니페스트 |
@@ -245,7 +245,6 @@ import 경로:
 | `src/styles/cojeev-fonts.css`, `fonts/` | cojeev display 서체(Bricolage Grotesque, DM Sans)와 라이선스 |
 | `src/components/` | cojeev·shadcn에서 받은 컴포넌트와 직접 만든 범용 컴포넌트 |
 | `src/lib/cojeev/`, `src/lib/cojeev-motion/` | cojeev 컴포넌트가 쓰는 기하·모션 코드 (설치 시 생성) |
-| `src/lib/geometry/relax-circles.ts` | 원 겹침 해소(밀어내기). 흩어진 배치 드래그가 쓴다 |
 | `src/lib/utils.ts` | `cn()` |
 | `scripts/fix-ui-css.mjs` | `pnpm ui:add` 뒤 cojeev.css import 목록을 고친다 |
 | `scripts/cojeev-materialize-fonts.mjs` | cojeev 서체를 파일로 꺼내는 선택 도구 (기본은 스타일시트에 인라인) |

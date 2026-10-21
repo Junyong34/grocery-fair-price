@@ -59,8 +59,8 @@ export type ScatterLayout = {
 
 /** 새 그림 하나를 놓을 때 "이미 놓인 그림 하나당" 보는 후보 수. 후보를 개수에 비례해 늘린다(Mitchell 1991, m·n+1). */
 const CANDIDATES_PER_POINT = 10
-/** 시드 배치 직후 겹침을 풀 때 남길 틈(프레임 px). */
-const SEED_GAP = 8
+/** 그림·이름표 묶음 사이에 남길 틈(프레임 px). 시드 배치와 끌어 옮긴 배치(arrangement)가 같은 값을 쓴다. */
+export const SCATTER_GAP = 8
 const SEED_RELAX_ITERATIONS = 60
 /** 후보 선택 뒤 빈 곳을 고르게 메우는 Lloyd 완화 횟수와 한 번에 가는 비율. 0이면 쓰지 않는다. */
 const LLOYD_ITERATIONS = 10
@@ -82,7 +82,7 @@ export function scatterLayout({
 }): ScatterLayout {
   const { width: W, height: H, big } = frame
   const n = ids.length
-  const rand = seededRandom((month * 7919 + n * 104729 + W) % 233280)
+  const rand = scatterRandom({ month, count: n, frame })
   const label = labelHeight(frame)
   const base = Math.min(
     Math.max(
@@ -113,15 +113,11 @@ export function scatterLayout({
     ? lloydRelax(circles, { bounds: area, iterations: lloydIterations, step: LLOYD_STEP })
     : circles
   const relaxed = relaxShapes(
-    spread.map((circle) => ({
-      ...circle,
-      labelW: labelWidth(findFood(circle.id)?.name ?? circle.id, frame),
-      labelH: label,
-    })),
+    spread.map((circle) => ({ ...circle, ...labelBox(circle.id, frame) })),
     {
       // 이름표까지 영역 안에 남도록, 이름표 높이를 포함한 전체 높이를 준다.
       bounds: { width: area.width, height: area.height + label },
-      gap: SEED_GAP,
+      gap: SCATTER_GAP,
       iterations: SEED_RELAX_ITERATIONS,
     }
   )
@@ -141,8 +137,21 @@ export function scatterLayout({
 /** 프레임 px 기준 원(그림 중심과 반지름). */
 export type PlacedCircle = { x: number; y: number; r: number }
 
+/**
+ * 배치 하나에 쓰는 난수열. 같은 달·품종 수·프레임이면 같은 수열이다.
+ * salt는 같은 배치 안에서 다른 용도(저장된 배치에 새 품종 넣기)의 수열을 따로 얻을 때 쓴다.
+ */
+export function scatterRandom({ month, count, frame, salt = 0 }: { month: number; count: number; frame: ScatterFrame; salt?: number }) {
+  return seededRandom((month * 7919 + count * 104729 + frame.width + salt) % 233280)
+}
+
+/** 품종 이름표의 폭·높이(px). 그림 아래 가운데에 놓인다. */
+export function labelBox(id: string, frame: ScatterFrame): { labelW: number; labelH: number } {
+  return { labelW: labelWidth(findFood(id)?.name ?? id, frame), labelH: labelHeight(frame) }
+}
+
 /** 와이어프레임 scat의 LCG. 같은 시드면 같은 수열이 나온다. */
-export function seededRandom(seed: number): () => number {
+function seededRandom(seed: number): () => number {
   let s = seed
   return () => {
     s = (s * 9301 + 49297) % 233280

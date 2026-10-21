@@ -4,7 +4,7 @@ import { useEffect } from "react"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-import type { SavedSpot } from "@workspace/seasonal/layout/merge-saved"
+import type { SavedSpot } from "@workspace/seasonal/layout/arrangement"
 
 // 2a 흩어진 그림을 사용자가 옮긴 배치. (달, 화면 구간)마다 따로 기기에 저장한다.
 // 히어로와 그 달 섹션은 같은 키를 쓰므로 한쪽에서 옮기면 다른 쪽도 같이 바뀐다.
