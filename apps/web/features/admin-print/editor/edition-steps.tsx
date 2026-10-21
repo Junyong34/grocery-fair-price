@@ -5,7 +5,7 @@ import { Check } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
-import type { EditionFlow, StepState } from "../lib/flow"
+import { stepNotes, type EditionFlow, type StepState } from "../lib/flow"
 import type { EditorAction } from "../types"
 
 type Props = {
@@ -18,17 +18,7 @@ type Props = {
 }
 
 export function EditionSteps({ flow, pending, running, generatedLabel, onSave, onGenerate }: Props) {
-  const saveNote = flow.save.state === "done" ? "저장됨" : flow.save.state === "current" ? "저장 안 됨" : flow.save.reason
-  const pdfNote =
-    running === "generate"
-      ? "만드는 중이에요. 끝날 때까지 이 창을 두세요"
-      : flow.pdf.state === "done"
-      ? `${generatedLabel ?? ""} 생성`.trim()
-      : flow.pdf.state === "locked"
-        ? flow.pdf.reason
-        : flow.pdf.action === "regenerate"
-          ? "옛 옵션으로 만든 PDF예요"
-          : "아직 만들지 않았어요"
+  const notes = stepNotes(flow, { generating: running === "generate", generatedLabel })
 
   return (
     <section aria-label="작업 순서" className="flex flex-col gap-2 rounded-2xl bg-surface px-4 py-3">
@@ -37,7 +27,7 @@ export function EditionSteps({ flow, pending, running, generatedLabel, onSave, o
           index={1}
           title="옵션 저장"
           step={flow.save}
-          note={saveNote}
+          note={notes.save}
           last={false}
           action={
             flow.save.state === "current" && (
@@ -51,7 +41,7 @@ export function EditionSteps({ flow, pending, running, generatedLabel, onSave, o
           index={2}
           title="PDF 만들기"
           step={flow.pdf}
-          note={pdfNote}
+          note={notes.pdf}
           last
           action={
             flow.pdf.state === "current" ? (

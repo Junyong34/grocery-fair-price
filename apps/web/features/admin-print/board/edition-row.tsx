@@ -10,8 +10,7 @@ import { EditionId } from "../components/edition-id"
 import { Status } from "../components/status"
 import { EDITION_STATUS_LABELS } from "../constants"
 import type { EditionSummary } from "../types"
-import { BOARD_COLUMNS } from "./columns"
-import { ABOVE_ROW_LINK, ROW_LINK } from "./row-link"
+import { ABOVE_ROW_LINK, BOARD_COLUMNS, ROW_LINK } from "./columns"
 
 export function EditionRow({ edition }: { edition: EditionSummary }) {
   const href = routes.admin.edition(edition.id)

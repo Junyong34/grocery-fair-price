@@ -2,10 +2,9 @@
 
 import { useMemo, useState, useTransition } from "react"
 
-import { isBuildCurrent, type BuildRecord, type Edition, type EditionStatus } from "@workspace/seasonal/print/edition"
-import { parsePrintSpec } from "@workspace/seasonal/print/spec"
+import type { BuildRecord, Edition, EditionStatus } from "@workspace/seasonal/print/edition"
 
-import { editionFlow, type BuildState } from "../lib/flow"
+import { editionDraft } from "../lib/flow"
 import { setAt } from "../lib/spec-path"
 import { generateEdition, saveEdition } from "../server/actions"
 import type { EditorAction } from "../types"
@@ -18,12 +17,7 @@ export function useEditionEditor(initial: Edition, initialBuild: BuildRecord | u
   const [running, setRunning] = useState<EditorAction>()
   const [pending, startTransition] = useTransition()
 
-  const checked = useMemo(() => parsePrintSpec(draft.spec), [draft.spec])
-  const invalid = checked instanceof Error
-  const dirty = JSON.stringify(draft) !== JSON.stringify(saved)
-  const buildState: BuildState = !build ? "none" : isBuildCurrent(saved.spec, build) ? "current" : "stale"
-  const flow = editionFlow({ dirty, invalid, build: buildState })
-  const previewSpec = invalid ? saved.spec : checked
+  const state = useMemo(() => editionDraft({ saved, draft, build }), [saved, draft, build])
 
   const run = (action: EditorAction, task: () => Promise<string | undefined>) => {
     setRunning(action)
@@ -52,14 +46,10 @@ export function useEditionEditor(initial: Edition, initialBuild: BuildRecord | u
     draft,
     saved,
     build,
-    flow,
-    dirty,
-    buildState,
+    ...state,
     pending,
     running,
     error,
-    specError: invalid ? checked.message : undefined,
-    previewSpec,
     setTitle: (title: string) => setDraft((current) => ({ ...current, title })),
     setDescription: (description: string) => setDraft((current) => ({ ...current, description })),
     setStatus: (status: EditionStatus) => setDraft((current) => ({ ...current, status })),
