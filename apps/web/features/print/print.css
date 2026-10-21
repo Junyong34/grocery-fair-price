@@ -12,8 +12,7 @@
 .print-sheet[data-paper="A3"][data-orientation="portrait"] { page: a3-portrait; }
 .print-sheet[data-paper="A3"][data-orientation="landscape"] { page: a3-landscape; }
 
-.print-sheet[data-paper="A4"] { --u: 1mm; }
-.print-sheet[data-paper="A3"] { --u: calc(1mm * 1.41421); }
+/* --u(용지 단위)는 Sheet가 PAPERS의 배율로 넣는다. */
 
 .print-sheet {
   /* 가정용 프린터가 못 찍는 가장자리. 글자와 선은 이 안에만 둔다. */

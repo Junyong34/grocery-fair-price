@@ -8,6 +8,7 @@ import {
   encodeSpec,
   pageCount,
   parsePrintSpec,
+  sheetSize,
   specHash,
 } from "./spec"
 
@@ -15,6 +16,13 @@ describe("PAPERS", () => {
   it("A3는 A4를 √2배 키운 크기다(1mm 안)", () => {
     expect(Math.abs(PAPERS.A4.width * PAPERS.A3.scale - PAPERS.A3.width)).toBeLessThan(1)
     expect(Math.abs(PAPERS.A4.height * PAPERS.A3.scale - PAPERS.A3.height)).toBeLessThan(1)
+  })
+})
+
+describe("sheetSize", () => {
+  it("가로 방향은 폭과 높이를 맞바꾼다", () => {
+    expect(sheetSize("A4", "portrait")).toEqual({ width: 210, height: 297 })
+    expect(sheetSize("A3", "landscape")).toEqual({ width: 420, height: 297 })
   })
 })
 

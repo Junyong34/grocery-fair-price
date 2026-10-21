@@ -26,6 +26,12 @@ export const PAPERS = {
   A3: { width: 297, height: 420, scale: Math.SQRT2 },
 } as const satisfies Record<Paper, { width: number; height: number; scale: number }>
 
+/** 방향을 반영한 용지 크기(mm). 인쇄 시트, 어드민 미리보기, 생성기의 PDF 쪽 크기 검사가 모두 이것을 쓴다. */
+export function sheetSize(paper: Paper, orientation: "portrait" | "landscape"): { width: number; height: number } {
+  const { width, height } = PAPERS[paper]
+  return orientation === "portrait" ? { width, height } : { width: height, height: width }
+}
+
 export function isPaper(value: string): value is Paper {
   return PAPER_SIZES.some((paper) => paper === value)
 }

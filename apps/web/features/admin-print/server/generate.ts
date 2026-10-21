@@ -4,7 +4,7 @@ import { mkdir, readdir, readFile, rm } from "node:fs/promises"
 import path from "node:path"
 
 import { downloadDir, downloadPath, type BuildRecord, type Edition } from "@workspace/seasonal/print/edition"
-import { PAPER_SIZES, PAPERS, pageCount, specHash, type Paper } from "@workspace/seasonal/print/spec"
+import { PAPER_SIZES, pageCount, sheetSize, specHash, type Paper } from "@workspace/seasonal/print/spec"
 
 import { routes } from "@/shared/routes"
 
@@ -47,8 +47,8 @@ async function removeUnused(id: string, made: Readonly<Record<string, number>>) 
 
 function checkPdf(pdf: string, edition: Edition, paper: Paper): number {
   const boxes = [...pdf.matchAll(/\/MediaBox\s*\[\s*[\d.]+\s+[\d.]+\s+([\d.]+)\s+([\d.]+)\s*\]/g)].map((match) => [Math.round(Number(match[1])), Math.round(Number(match[2]))])
-  const { width, height } = PAPERS[paper]
-  const expected = edition.spec.orientation === "portrait" ? [pt(width), pt(height)] : [pt(height), pt(width)]
+  const { width, height } = sheetSize(paper, edition.spec.orientation)
+  const expected = [pt(width), pt(height)]
   const count = pageCount(edition.spec)
   if (boxes.length !== count) throw new Error(`${edition.id} ${paper}: 쪽 수 ${boxes.length}, 기대 ${count}`)
   const wrong = boxes.find(([w, h]) => Math.abs(w! - expected[0]!) > 1 || Math.abs(h! - expected[1]!) > 1)

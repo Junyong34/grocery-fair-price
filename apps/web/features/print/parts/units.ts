@@ -1,6 +1,6 @@
 import type { Month } from "@workspace/seasonal/data/months"
 import { seasonOfMonth, type Season } from "@workspace/seasonal/data/seasons"
-import type { PrintSpec } from "@workspace/seasonal/print/spec"
+import { sheetSize, type PrintSpec } from "@workspace/seasonal/print/spec"
 
 /** 용지 단위 길이(A4 기준 mm). A3에서는 CSS의 --u가 √2배가 된다. */
 export const u = (n: number) => `calc(var(--u) * ${n})`
@@ -28,5 +28,6 @@ const MARGIN = { safe: 12, none: 0 } as const
 /** 여백 안쪽 크기(A4 기준 용지 단위). 종류별 레이아웃은 이 크기 안에 칸을 나눈다. */
 export function innerSize(spec: PrintSpec): { width: number; height: number } {
   const margin = MARGIN[spec.margin] * 2
-  return spec.orientation === "portrait" ? { width: 210 - margin, height: 297 - margin } : { width: 297 - margin, height: 210 - margin }
+  const { width, height } = sheetSize("A4", spec.orientation)
+  return { width: width - margin, height: height - margin }
 }

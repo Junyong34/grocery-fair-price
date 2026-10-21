@@ -296,10 +296,7 @@ AGENTS.md "Generated files" 표에 `public/downloads/**`와 명령 `pnpm prints:
 
 ### 크기 단위
 
-```css
-.print-sheet[data-paper="A4"] { --u: 1mm; }
-.print-sheet[data-paper="A3"] { --u: calc(1mm * 1.41421); }
-```
+`--u`(용지 단위)는 A4에서 1mm, A3에서 √2mm다. `Sheet`가 `PAPERS`의 `scale`로 인라인 스타일에 넣는다(CSS에 배율을 따로 적지 않는다).
 
 글자, 선 굵기, 칸 높이, 그림 크기, 패딩은 모두 `calc(var(--u) * n)`으로 쓴다. A4에서 맞춘 디자인이 A3에서 그대로 √2배 커지므로 용지별 CSS 분기가 생기지 않는다. 기준 크기 예: 달 제목 `calc(var(--u) * 14)`(A4 약 40pt), 날짜 숫자 `calc(var(--u) * 4.2)`(약 12pt), 공휴일 이름 `calc(var(--u) * 2.3)`(약 6.5pt, 최소 가독 크기).
 
