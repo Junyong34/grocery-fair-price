@@ -93,8 +93,8 @@ const monthlySchema = z.object({
   cover: z.enum(["none", "year"]),
   monthLabel,
   calendar: calendar(z.enum(["hidden", "mark", "mark-and-name"])).extend({ variant: z.enum(CALENDAR_VARIANTS) }),
-  /** 위 그림 + 아래 달력(M-A). 그림을 흩뿌림 / 줄 맞춘 격자 / 그림 없음 */
-  layout: z.enum(["scatter", "grid", "none"]),
+  /** 위 그림 + 아래 달력(M-A). 그림을 흩뿌림 / 줄 맞춘 격자 / 그림 없음. side-check: 달력 옆에 그 달 품종 체크 목록(M-B. 세로 용지만) */
+  layout: z.enum(["scatter", "grid", "none", "side-check"]),
   /** 달력 아래 여백: 없음 / 메모 줄 / 먹은 음식 체크 칸(빈 칸 인쇄) */
   memo: z.enum(["none", "lines", "eaten-check"]),
 })
@@ -107,8 +107,8 @@ const yearSheetSchema = z.object({
   monthLabel: z.enum([...MONTH_LABEL_STYLES, "big-number"]),
   // 칸이 작아 공휴일 이름은 들어가지 않는다.
   calendar: calendar(z.enum(["hidden", "mark"])),
-  /** 그림·달력 짝 체크무늬(Y-A) */
-  layout: z.enum(["pairs"]).default("pairs"),
+  /** 그림·달력 짝 체크무늬(Y-A) / 위에 1년치 그림 한 판, 아래 열두 달 3x4(Y-B. 세로 용지만) */
+  layout: z.enum(["pairs", "hero-top"]).default("pairs"),
   /** 달 배열(열×행) */
   grid,
 })
@@ -135,6 +135,14 @@ const monthPosterSchema = z.object({
   categories,
 })
 
+/** 세로 용지에서만 되는 구성. 가로 용지에서는 칸이 너무 좁거나 낮아진다. */
+const PORTRAIT_ONLY: { [K in PrintKind]: readonly string[] } = {
+  monthly: ["side-check"],
+  "year-sheet": ["hero-top"],
+  "season-poster": [],
+  "month-poster": ["rows-check"],
+}
+
 /**
  * 1차 구현(2026-10-16) 때 저장된 월간 사양을 지금 모양으로 옮긴다. foodLayout → layout, cover 참·거짓 → "year"·"none".
  * 나머지 종류의 빠진 layout은 스키마의 default가 채운다. 저장된 JSON은 고치지 않고, 다음 저장 때 새 모양으로 써진다.
@@ -152,8 +160,8 @@ const printSpecSchema = z.preprocess(
   z.discriminatedUnion("kind", [monthlySchema, yearSheetSchema, seasonPosterSchema, monthPosterSchema]).refine((spec) => !("grid" in spec && spec.grid === "2x6" && spec.orientation === "landscape"), {
     message: "가로 용지에 2x6 배열은 칸이 너무 작다",
   })
-  .refine((spec) => !(spec.kind === "month-poster" && spec.layout === "rows-check" && spec.orientation === "landscape"), {
-    message: "한 줄에 한 달 구성은 세로 용지만 된다(가로는 줄이 너무 얇다)",
+  .refine((spec) => spec.orientation === "portrait" || !PORTRAIT_ONLY[spec.kind].includes(spec.layout), {
+    message: "이 구성은 세로 용지만 된다",
   }),
 )
 

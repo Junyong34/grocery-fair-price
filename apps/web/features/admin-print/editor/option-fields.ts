@@ -72,6 +72,10 @@ const foods = (max: number, when?: { names?: OptionFieldSpec["when"]; max?: Opti
 const layout = (entries: Record<string, string>): OptionFieldSpec => ({ type: "select", label: "구성", path: ["layout"], options: options(entries) })
 
 const monthlyHasFoods = (spec: PrintSpec) => spec.kind === "monthly" && spec.layout !== "none"
+/** M-B는 체크 목록이 달력 옆에 있어 달력 아래 메모를 쓰지 않는다. */
+const monthlyHasMemo = (spec: PrintSpec) => spec.kind === "monthly" && spec.layout !== "side-check"
+/** Y-B는 달 배열이 3x4로, 위 그림은 달마다 하나로 정해져 있다. */
+const yearSheetInPairs = (spec: PrintSpec) => spec.kind === "year-sheet" && spec.layout === "pairs"
 /** P-D는 이름을 체크 목록에 늘 적고, 달을 한 줄씩 쌓는다. */
 const monthPosterInCells = (spec: PrintSpec) => spec.kind === "month-poster" && spec.layout === "cells"
 
@@ -90,7 +94,12 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
     {
       title: "구성",
       fields: [
-        layout({ scatter: "그림 위, 달력 아래 · 흩뿌림", grid: "그림 위, 달력 아래 · 줄 맞춤", none: "달력만(그림 없음)" }),
+        layout({
+          scatter: "그림 위, 달력 아래 · 흩뿌림",
+          grid: "그림 위, 달력 아래 · 줄 맞춤",
+          none: "달력만(그림 없음)",
+          "side-check": "달력 옆 제철 체크 목록(세로 용지)",
+        }),
         { type: "select", label: "12개월 묶음 표지", path: ["cover"], options: options({ year: "큰 연도 + 대표 품종", none: "표지 없음" }) },
       ],
     },
@@ -104,15 +113,15 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
         { type: "select", label: "공휴일", path: ["calendar", "holidays"], options: options({ "mark-and-name": "날짜와 이름", mark: "빨간 날짜만", hidden: "표시 안 함" }) },
         calendarSize,
         monthLabel,
-        { type: "select", label: "달력 아래", path: ["memo"], options: options({ none: "없음", lines: "메모 줄", "eaten-check": "먹은 음식 체크 칸" }) },
+        { type: "select", label: "달력 아래", path: ["memo"], options: options({ none: "없음", lines: "메모 줄", "eaten-check": "먹은 음식 체크 칸" }), when: monthlyHasMemo },
       ],
     },
     foods(20, { names: monthlyHasFoods, max: monthlyHasFoods }),
     look,
   ],
   "year-sheet": [
-    { title: "구성", fields: [layout({ pairs: "그림·달력 짝 체크무늬" })] },
-    { title: "용지", fields: [orientation, margin, year, grid] },
+    { title: "구성", fields: [layout({ pairs: "그림·달력 짝 체크무늬", "hero-top": "큰 그림 위, 열두 달 아래(세로 용지)" })] },
+    { title: "용지", fields: [orientation, margin, year, { ...grid, when: yearSheetInPairs }] },
     {
       title: "달력",
       fields: [
@@ -123,7 +132,7 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
         { ...monthLabel, options: [{ value: "big-number", label: "그림 위 큰 숫자" }, ...monthLabel.options] } as OptionFieldSpec,
       ],
     },
-    foods(8),
+    foods(8, { max: yearSheetInPairs }),
     look,
   ],
   "season-poster": [

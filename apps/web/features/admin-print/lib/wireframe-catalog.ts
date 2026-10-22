@@ -117,7 +117,7 @@ const monthly: WireframeEntry[] = [
     title: "달력 옆 제철 체크 목록",
     summary: "그 달 품종 이름을 달력 오른쪽 세로 목록으로 옮겨 그림 수보다 많은 품종을 싣는다. 먹은 것에 체크한다.",
     source: "④ 정보형 · K10(이 달의 요리 목록), K11(품목 카드, 먹은 것 스티커), R1",
-    availability: { status: "needs-option", options: 'layout: "side-check"' },
+    availability: { status: "available", options: 'layout: "side-check"(세로 용지만)' },
     orientations: ["portrait"],
     draw: () => {
       const [header, food, body] = split(contentBox("portrait"), "rows", [26, 80, "*"], 8)
@@ -281,13 +281,13 @@ const yearSheet: WireframeEntry[] = [
     kind: "year-sheet",
     page: "sheet",
     title: "큰 그림 위, 열두 달 아래",
-    summary: "위 1/3에 1년치 품종을 한 판으로 모으고, 아래에 작은 달력 열둘. 달별 그림 칸이 없어 달력 글자가 커진다.",
+    summary: "위 1/3에 1년치 품종(달마다 하나, 열둘)을 한 판으로 모으고, 아래에 작은 달력 열둘(3×4). 달별 그림 칸이 없어 달력 글자가 커진다.",
     source: "⑤ 콜라주형 + ② · K14, K3 연력",
-    availability: { status: "needs-option", options: 'layout: "hero-top"' },
+    availability: { status: "available", options: 'layout: "hero-top"(세로 용지만)' },
     orientations: ["portrait"],
     draw: () => {
       const [header, art, body] = split(contentBox("portrait"), "rows", [26, 84, "*"], 6)
-      return [...yearHeader(header!, 20), ...scatter(art!, { count: 14, seed: 21 }), ...monthGrid(body!, 4, 3, 4).flatMap((cell, i) => labelledMiniCalendar(cell, MONTHS[i]!))]
+      return [...yearHeader(header!, 20), ...scatter(art!, { count: 12, seed: 21 }), ...monthGrid(body!, 3, 4, 4).flatMap((cell, i) => labelledMiniCalendar(cell, MONTHS[i]!))]
     },
   },
   {

@@ -92,6 +92,16 @@ describe("parsePrintSpec", () => {
     expect(parsePrintSpec({ ...spec, orientation: "landscape" })).toBeInstanceOf(Error)
   })
 
+  it("월간 달력 옆 체크 목록(side-check)과 연간 큰 그림 위(hero-top)는 세로 용지만 받는다", () => {
+    for (const spec of [
+      { ...DEFAULT_SPECS.monthly, layout: "side-check" },
+      { ...DEFAULT_SPECS["year-sheet"], layout: "hero-top" },
+    ]) {
+      expect(parsePrintSpec(spec)).not.toBeInstanceOf(Error)
+      expect(parsePrintSpec({ ...spec, orientation: "landscape" })).toBeInstanceOf(Error)
+    }
+  })
+
   it("계절 포스터는 사분면·네 열(quarters)을 두 방향 모두 받는다", () => {
     const spec = { ...DEFAULT_SPECS["season-poster"], layout: "quarters" }
     expect(parsePrintSpec(spec)).not.toBeInstanceOf(Error)

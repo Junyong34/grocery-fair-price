@@ -104,3 +104,17 @@ describe("월별 포스터 한 줄에 한 달", () => {
     expect(isFieldShown(byPath("categories"), spec)).toBe(true)
   })
 })
+
+describe("구성마다 숨는 옵션", () => {
+  const field = (kind: keyof typeof KIND_SECTIONS, path: string) => KIND_SECTIONS[kind].flatMap((section) => section.fields).find((f) => f.path.join(".") === path)!
+
+  it("월간 달력 옆 체크 목록은 달력 아래 메모를 숨긴다", () => {
+    expect(isFieldShown(field("monthly", "memo"), { ...DEFAULT_SPECS.monthly, layout: "side-check" })).toBe(false)
+  })
+
+  it("연간 큰 그림 위는 달 배열(3x4 고정)과 품종 개수(달마다 하나 고정)를 숨긴다", () => {
+    const spec = { ...DEFAULT_SPECS["year-sheet"], layout: "hero-top" as const }
+    expect(isFieldShown(field("year-sheet", "grid"), spec)).toBe(false)
+    expect(isFieldShown(field("year-sheet", "foods.max"), spec)).toBe(false)
+  })
+})
