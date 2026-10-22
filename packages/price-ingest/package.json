@@ -8,10 +8,12 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:live": "vitest run --config vitest.live.config.ts",
+    "test:db": "vitest run --config vitest.db.config.ts",
     "contract:baseline": "node scripts/capture-baseline.ts"
   },
   "dependencies": {
     "fast-xml-parser": "5.11.2",
+    "postgres": "3.4.9",
     "zod": "4.4.3"
   },
   "devDependencies": {
