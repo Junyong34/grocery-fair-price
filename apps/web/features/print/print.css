@@ -96,6 +96,14 @@
 .print-chart-bars { position: relative; }
 .print-chart-bars span { position: absolute; top: 50%; translate: 0 -50%; }
 
+/* 원형 판(parts/wheel.tsx). 부채꼴은 SVG, 그림·표기는 그 위에 절대 위치로 얹는다. 선은 확대와 상관없이 --line 굵기다. */
+.print-wheel { position: relative; flex: none; }
+.print-wheel svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.print-wheel svg path, .print-wheel svg circle { stroke: var(--color-hairline); stroke-width: var(--line); vector-effect: non-scaling-stroke; }
+.print-wheel svg .print-wheel-core { fill: var(--color-surface); }
+.print-wheel-label { position: absolute; translate: -50% -50%; white-space: nowrap; font-weight: 700; line-height: 1; }
+.print-wheel-center { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+
 /* 브라우저 화면(미리보기)에서는 회색 바탕 위에 용지를 띄운다. 인쇄에는 영향이 없다. */
 @media screen {
   .print-root { min-height: 100vh; padding: var(--print-gutter) 0; background: var(--color-hairline); }

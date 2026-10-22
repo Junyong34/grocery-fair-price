@@ -176,6 +176,8 @@ type DownloadManifest = {
 - **월간 표지 열두 달 미리보기(C-2, `cover: "months"`)**: 두 방향 모두(세로 3×4, 가로 4×3). 위에 "제철 달력"과 연도, 아래 달 칸마다 그 달 대표 품종 둘과 달 표기(`monthLabel`). 대표 품종은 C-1과 같은 규칙(`yearFoods`: 앞 달에 나오지 않은 품종을 그 달 특별한 것부터)을 달마다 묶은 `yearFoodsByMonth`로 고른다. 달마다 둘이면 빈 달이 없다(테스트). 칸 바탕은 달의 계절색, 이름은 넣지 않는다. 표지 한 쪽이라 `pageCount`는 그대로다.
 - **제철 막대표 부품**: 줄 배치는 `@workspace/seasonal/print/period-chart`(`chartFoods`·`chartLines`·`chartColumns`·`seasonRuns`), 그리기는 `features/print/parts/period-chart.tsx`(한 단). 줄 = 카테고리 머리 줄(채소·과일·수산·곡물·견과) + 품종 줄(제철 시작 달 순, 같으면 이름순), 품종 줄 앞에 작은 그림, 막대 색은 제철이 시작하는 계절색. 12월→1월로 넘는 제철은 막대 둘. 여러 단이면 묶음 중간에서 시작하는 단에 머리 줄을 다시 둔다. 이름 글자는 줄 높이 × 0.55, 상한 3.2(A4 약 9pt). 와이어프레임 `periodChart`는 가짜 막대를 그리는 도형이라 계산을 나눠 쓰지 않는다.
 - **월별 포스터 막대표(P-B, `chart`)**: 두 방향 모두. 그림 있는 품종(카테고리로 줄일 수 있다) 전부, 세로 2단·가로 3단(줄이 24개 이하면 한 단, 줄 높이 상한 9mm). A4 이름 약 9pt, 달 머리 한글 약 6pt·영문 약 5.5pt(달 열 폭 약 5mm). `grid`·`foods.names`(늘 적음)·`foods.max`(전부 싣는다)는 쓰지 않는다.
+- **원형 판 부품**: 자리 계산은 `@workspace/seasonal/print/wheel`의 `wheelLayout({ diameter, sectors, counts })`, 그리기는 `features/print/parts/wheel.tsx`(SVG 부채꼴 + 그림·표기). 12시 방향부터 시계 방향, 가운데 빈 원(반지름 0.3)과 바깥 표기 띠(0.11) 사이 고리에 그림을 놓는다. 부채꼴마다 고리 줄 수·줄마다 개수를 그림이 가장 커지게 고르고, 모든 그림 크기는 가장 빽빽한 부채꼴에 맞춘다. 그림이 부채꼴 밖으로 나가지 않고 서로 겹치지 않음을 테스트한다.
+- **월별 포스터 원형 판(P-C, `wheel`)**: 두 방향 모두(세로는 판 폭, 가로는 판 높이가 지름, 가운데 정렬). 조각마다 그 달 품종 최대 넷(`foods.max`와 4 중 작은 값), 이름은 넣지 않는다. 달 표기는 바깥 띠에 A4 약 12pt, 가운데에 "열두 달 / 제철 음식". 바탕 `season`이면 조각마다 계절색. `grid`·`foods.names`는 쓰지 않는다.
 - **세로 전용 구성**은 `spec.ts`의 `PORTRAIT_ONLY` 표 하나에 모은다(M-B, Y-B, P-D).
 - **달력 글자 크기(`calendar.size`)**: small 0.85 / medium 1 / large 1.2배, `type.scale`과 곱한다. 연간 한 장은 키워도 날짜 인쇄 크기가 칸 폭의 절반을 넘지 않는다(두 자리 날짜가 붙지 않게).
 

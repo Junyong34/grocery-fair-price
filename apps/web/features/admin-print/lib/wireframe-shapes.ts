@@ -250,14 +250,6 @@ export function flow(
   return shapes
 }
 
-/** 메모 줄 */
-export function memoLines(rect: Rect, count: number): Shape[] {
-  return Array.from({ length: count }, (_, i) => {
-    const y = rect.y + (rect.height * (i + 1)) / count
-    return { type: "line", tone: "faint", from: [rect.x, y], to: [rect.x + rect.width, y] } as const
-  })
-}
-
 /** 품종 이름 목록. check면 이름 앞에 손으로 체크하는 칸. */
 export function nameList(rect: Rect, { count, columns = 1, check = false, seed = count }: { count: number; columns?: number; check?: boolean; seed?: number }): Shape[] {
   const gap = 2

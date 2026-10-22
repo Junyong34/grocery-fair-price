@@ -153,6 +153,13 @@ describe("구성마다 숨는 옵션", () => {
     expect(isFieldShown(field("month-poster", "monthLabel"), spec)).toBe(true)
   })
 
+  it("월별 포스터 원형 판은 달 배열·품종 이름(부채꼴이 좁다)을 숨기고 개수는 남긴다", () => {
+    const spec = { ...DEFAULT_SPECS["month-poster"], layout: "wheel" as const }
+    expect(isFieldShown(field("month-poster", "grid"), spec)).toBe(false)
+    expect(isFieldShown(field("month-poster", "foods.names"), spec)).toBe(false)
+    expect(isFieldShown(field("month-poster", "foods.max"), spec)).toBe(true)
+  })
+
   it("연간 큰 그림 위는 달 배열(3x4 고정)과 품종 개수(달마다 하나 고정)를 숨긴다", () => {
     const spec = { ...DEFAULT_SPECS["year-sheet"], layout: "hero-top" as const }
     expect(isFieldShown(field("year-sheet", "grid"), spec)).toBe(false)

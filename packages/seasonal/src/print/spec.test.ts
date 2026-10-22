@@ -120,6 +120,12 @@ describe("parsePrintSpec", () => {
     expect(parsePrintSpec({ ...spec, orientation: "landscape" })).not.toBeInstanceOf(Error)
   })
 
+  it("월별 포스터 원형 판(wheel)은 두 방향 모두 받는다", () => {
+    const spec = { ...DEFAULT_SPECS["month-poster"], layout: "wheel" }
+    expect(parsePrintSpec(spec)).not.toBeInstanceOf(Error)
+    expect(parsePrintSpec({ ...spec, orientation: "landscape" })).not.toBeInstanceOf(Error)
+  })
+
   it("월별 포스터 막대표(chart)는 두 방향 모두 받는다", () => {
     const spec = { ...DEFAULT_SPECS["month-poster"], layout: "chart" }
     expect(parsePrintSpec(spec)).not.toBeInstanceOf(Error)

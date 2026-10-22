@@ -1,17 +1,19 @@
 import { formatMonthLabel, MONTHS } from "@workspace/seasonal/data/months"
 import { monthChecklist, monthFoods } from "@workspace/seasonal/print/foods"
 import { chartColumns, chartFoods, chartLines } from "@workspace/seasonal/print/period-chart"
+import { wheelLayout } from "@workspace/seasonal/print/wheel"
 import type { MonthPosterSpec, Paper } from "@workspace/seasonal/print/spec"
 
 import { CheckList } from "./parts/check-list"
 import { FoodArea, flowSize } from "./parts/food-area"
 import { gridSize } from "./parts/grid"
 import { chartLabelWidth, PeriodChart } from "./parts/period-chart"
+import { Wheel } from "./parts/wheel"
 import { Sheet } from "./parts/sheet"
 import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
 
 // 월별 제철 포스터. 날짜가 없어 해가 바뀌어도 그대로 쓴다.
-// cells(P-A): 열두 칸에 그 달 품종. chart(P-B): 품종×달 막대표(세로 2단, 가로 3단). rows-check(P-D): 달마다 한 줄에 큰 달 표기, 그림, 장보기 체크 목록(세로 용지만).
+// cells(P-A): 열두 칸에 그 달 품종. chart(P-B): 품종×달 막대표(세로 2단, 가로 3단). wheel(P-C): 열두 조각 원형 판. rows-check(P-D): 달마다 한 줄에 큰 달 표기, 그림, 장보기 체크 목록(세로 용지만).
 
 const HEADER = 22
 const CELL_LABEL = 7
@@ -23,7 +25,7 @@ export function MonthPoster({ spec, paper }: { spec: MonthPosterSpec; paper: Pap
       <h1 className="print-heading" style={{ height: u(HEADER), margin: 0, textAlign: "center", fontSize: t(8), fontWeight: 700 }}>
         {spec.title}
       </h1>
-      {spec.layout === "rows-check" ? <MonthRows spec={spec} /> : spec.layout === "chart" ? <MonthChart spec={spec} /> : <MonthCells spec={spec} />}
+      {spec.layout === "rows-check" ? <MonthRows spec={spec} /> : spec.layout === "chart" ? <MonthChart spec={spec} /> : spec.layout === "wheel" ? <MonthWheel spec={spec} /> : <MonthCells spec={spec} />}
     </Sheet>
   )
 }
@@ -85,6 +87,37 @@ function MonthChart({ spec }: { spec: MonthPosterSpec }) {
       {columns.map((column, i) => (
         <PeriodChart key={i} lines={column} width={width} rowHeight={rowHeight} labelWidth={labelWidth} monthLabel={spec.monthLabel} pictures />
       ))}
+    </div>
+  )
+}
+
+/**
+ * P-C 원형 판: 조각마다 그림 상한(foods.max와 이것 중 작은 값), 달 표기 크기. 넷이면 A4 세로 그림 한 변 약 11mm다.
+ * 조각이 좁아 이름은 넣지 않는다. 세로는 판 폭, 가로는 판 높이가 지름이다.
+ */
+const WHEEL = { perSector: 4, label: 4.2 } as const
+
+function MonthWheel({ spec }: { spec: MonthPosterSpec }) {
+  const inner = innerSize(spec)
+  const diameter = Math.min(inner.width, inner.height - HEADER)
+  const foods = MONTHS.map((month) => monthFoods(month, { max: Math.min(spec.foods.max, WHEEL.perSector), categories: spec.categories }))
+  const layout = wheelLayout({ diameter, sectors: MONTHS.length, counts: foods.map((list) => list.length) })
+  const items = MONTHS.map((month, i) => ({
+    foods: foods[i]!,
+    label: formatMonthLabel(month, spec.monthLabel, "short"),
+    color: `var(--color-season-${monthSeason(month)})`,
+    fill: spec.surface === "season" ? surfaceColor("season", monthSeason(month)) : undefined,
+  }))
+  return (
+    <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <Wheel layout={layout} items={items} labelSize={WHEEL.label}>
+        <span className="print-heading" style={{ fontSize: t(5), fontWeight: 700 }}>
+          열두 달
+        </span>
+        <span className="print-heading" style={{ marginTop: u(1.5), fontSize: t(3.2), color: "var(--color-stone)" }}>
+          제철 음식
+        </span>
+      </Wheel>
     </div>
   )
 }

@@ -149,7 +149,7 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
     look,
   ],
   "month-poster": [
-    { title: "구성", fields: [layout({ cells: "열두 칸", chart: "품종×달 막대표", "rows-check": "한 줄에 한 달 · 장보기 체크(세로 용지)" })] },
+    { title: "구성", fields: [layout({ cells: "열두 칸", chart: "품종×달 막대표", wheel: "열두 달 원형 판", "rows-check": "한 줄에 한 달 · 장보기 체크(세로 용지)" })] },
     { title: "용지", fields: [orientation, margin, title, { ...grid, when: monthPosterInCells }, monthLabel] },
     { ...foods(12), fields: [...foods(12, { names: monthPosterInCells, max: monthPosterNotChart }).fields, categories] },
     look,

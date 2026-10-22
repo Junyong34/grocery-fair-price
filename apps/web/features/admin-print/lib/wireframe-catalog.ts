@@ -8,7 +8,6 @@ import {
   dayColumn,
   flow,
   inset,
-  memoLines,
   monthGrid,
   nameList,
   periodChart,
@@ -451,13 +450,15 @@ const monthPoster: WireframeEntry[] = [
     kind: "month-poster",
     page: "sheet",
     title: "열두 달 원형 판",
-    summary: "열두 조각 원에 달마다 그림 셋. 해가 바뀌어도 쓰는 포스터라 시계처럼 둥근 모양이 어울린다. 칸이 좁아 이름은 넣기 어렵다.",
+    summary: "열두 조각 원에 달마다 그림 넷까지. 해가 바뀌어도 쓰는 포스터라 시계처럼 둥근 모양이 어울린다. 칸이 좁아 이름은 넣지 않는다.",
     source: "⑧ 원형 휠 · G6, R8",
-    availability: { status: "needs-option", options: 'layout: "wheel"' },
-    orientations: ["portrait"],
-    draw: () => {
-      const [title, art, memo] = split(contentBox("portrait"), "rows", [12, 190, "*"], 6)
-      return [...posterTitle(title!), ...wheel(art!, { sectors: 12, perSector: 3 }), ...memoLines(memo!, 3)]
+    availability: { status: "available", options: 'layout: "wheel"' },
+    orientations: ["portrait", "landscape"],
+    draw: (orientation) => {
+      // 지름은 판 폭(세로)·판 높이(가로)이고 가운데에 놓는다(month-poster.tsx의 MonthWheel).
+      const [title, body] = split(contentBox(orientation), "rows", [orientation === "portrait" ? 12 : 10, "*"], 4)
+      const d = Math.min(body!.width, body!.height)
+      return [...posterTitle(title!), ...wheel({ x: body!.x + (body!.width - d) / 2, y: body!.y + (body!.height - d) / 2, width: d, height: d }, { sectors: 12, perSector: 4 })]
     },
   },
   {
