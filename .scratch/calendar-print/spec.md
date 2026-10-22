@@ -1,6 +1,6 @@
 # 달력 PDF 어드민 · 다운로드 스펙
 
-Status: ready-for-agent (1차 구현 2026-10-16, 남은 일은 아래 "1차 구현에서 달라진 점과 남은 일")
+Status: ready-for-agent (1차 구현 2026-10-16, 남은 일은 아래 "1차 구현에서 달라진 점과 남은 일", 구성 늘리기는 "구성(layout) 늘리기")
 Phase: MVP 이후.
 작성일: 2026-10-14, 어드민 기준으로 다시 씀: 2026-10-16
 
@@ -371,6 +371,41 @@ AGENTS.md "Generated files" 표에 `public/downloads/**`와 명령 `pnpm prints:
 2. 배치 끌어 옮기기(`placements`, 월간 달력).
 3. 월간 달력의 명절(공휴일이 아닌 것)·음력 표시.
 4. 실제 프린터로 A4·A3 한 장씩 뽑아 안전 여백과 연간 한 장의 작은 글자 확인.
+
+## 구성(layout) 늘리기 (2026-10-22 결정)
+
+와이어프레임 안(`/admin/wireframes`, 근거는 `research/market.md`)을 실제 인쇄물로 만든다. 안 목록 원본은 `apps/web/features/admin-print/lib/wireframe-catalog.ts`다. M-C(이달의 대표 품종)와 Y-D(달마다 이름 목록)는 폐기했다.
+
+### 결정
+
+- **종류마다 `layout` 하나.** 값 하나가 와이어프레임 안 하나다. 안 안에서 용지 방향에 따라 갈리는 모양(M-E 모서리 블록/가장자리 열, S-B 사분면/네 열)은 하위 옵션을 두지 않고 `orientation`으로 정한다. 그래서 말이 안 되는 조합이 생기지 않고, 옵션 패널 썸네일이 값과 1:1로 맞는다.
+- 어느 안에서나 조합되는 값(서체, 배경, 여백, 품종 이름·개수, 공휴일, 요일 표기)은 지금처럼 따로 둔다.
+- **일부 안에서만 뜻이 있는 옵션**(`grid`, `memo`, `monthLabel: "big-number"` 등)은 사양에 그대로 둔다. 해당하지 않는 안을 고르면 옵션 패널에서 숨기고 인쇄할 때 무시한다. 파서는 거부하지 않는다(안을 바꿔 봐도 값이 지워지지 않는다).
+- 고르는 순서: 종류 → 구성(썸네일) → 세부 조정. 사용자 다운로드 화면은 바뀌지 않는다.
+
+### 값
+
+| 종류 | 필드 | 값 → 안 | 지금 있는 값 |
+|---|---|---|---|
+| 월간 | `layout` | `scatter`·`grid`·`none` → M-A, `side-check` → M-B, `strip` → M-D, `allover` → M-E | `scatter`·`grid`·`none`(`foodLayout`) |
+| 월간 표지 | `cover` | `none`, `year` → C-1, `months` → C-2, `chart` → C-3 | `true`·`false` |
+| 연간 한 장 | `layout` | `pairs` → Y-A, `hero-top` → Y-B, `chart` → Y-C | `pairs`(필드 없음) |
+| 계절 포스터 | `layout` | `bands` → S-A, `quarters` → S-B, `wheel` → S-C, `per-season` → S-D | `bands`(필드 없음) |
+| 월별 포스터 | `layout` | `cells` → P-A, `chart` → P-B, `wheel` → P-C, `rows-check` → P-D | `cells`(필드 없음) |
+
+값은 티켓마다 하나씩 사양에 더한다. 사양에 없는 값을 미리 넣지 않는다.
+
+### 예전 에디션 호환
+
+`version`은 1 그대로 두고, 파서가 읽을 때 옮긴다. 저장된 JSON은 고치지 않는다. 다음 저장 때 새 모양으로 써진다.
+
+- 월간: `foodLayout`이 있고 `layout`이 없으면 `layout`으로 옮긴다. `cover: true`는 `"year"`, `false`는 `"none"`으로 읽는다.
+- 연간 한 장·계절 포스터·월별 포스터: `layout`이 없으면 `pairs`·`bands`·`cells`(`margin`과 같은 `.default()`).
+- 필드 이름이 바뀌어 예전 에디션의 `specHash`가 달라지므로, `edition.ts`의 생성 기록 대조(`build.specHash === specHash(spec)`)가 "다시 생성 필요"로 본다. PDF를 아직 공개하지 않았으니 다시 생성하면 된다. 해시를 예전 값에 맞추는 코드는 두지 않는다.
+
+### 티켓 흐름
+
+티켓 하나가 세션 하나다. 순서: `spec.ts`·`spec.test.ts` → `option-fields.ts`·`option-fields.test.ts`(선택지가 스키마와 맞는지) → `features/print/<kind>.tsx` → `wireframe-catalog.ts`에서 그 안을 `available`로. 새 부품은 A4 한 장을 실제로 인쇄해 글자 크기를 본 뒤 다음으로 간다. 티켓: `issues/01`~`15`.
 
 ## 정해야 할 것
 
