@@ -38,6 +38,8 @@ export const routes = {
   admin: {
     root: "/admin",
     edition: (id: string) => `/admin/edit?id=${encodeURIComponent(id)}`,
+    /** 인쇄물 구조 안(와이어프레임) 모음 */
+    wireframes: "/admin/wireframes",
   },
 
   /** 인쇄 전용 페이지. 어드민 미리보기와 PDF 생성기가 연다. */

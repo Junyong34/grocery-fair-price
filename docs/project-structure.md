@@ -107,7 +107,7 @@ import 경로:
 | `/seasonal/my-table` | 1h 나의 식탁 | `seasonal/my-table/page.tsx` | `my-table/my-table-view` |
 | `/seasonal/foods/[food]` | 1i 품종 상세 (전체 페이지) | `seasonal/foods/[food]/page.tsx` | `food-detail/food-detail` |
 | `/seasonal/downloads` | 달력·포스터 PDF 내려받기 | `seasonal/downloads/page.tsx` | `downloads/downloads-view`. `public/downloads/manifest.json`을 빌드 때 읽는다 |
-| `/admin`, `/admin/edit?id=` | 인쇄물 어드민 (개발 서버 전용, 운영 404) | `app/admin/` | `features/admin-print/` |
+| `/admin`, `/admin/edit?id=`, `/admin/wireframes` | 인쇄물 어드민 (개발 서버 전용, 운영 404). `wireframes`는 인쇄물 구조 안 모음 | `app/admin/` | `features/admin-print/` |
 | `/print?spec=&paper=&page=` | 인쇄 전용 페이지 (개발 서버 전용, 운영 404) | `app/print/page.tsx` | `features/print/print-document` |
 | (제철 화면 안에서 이동) | 1i 품종 상세 (하단 시트) | `seasonal/@sheet/(.)foods/[food]/page.tsx` | `components/food-sheet` + `food-detail` |
 | `/api/og` | 공유 미리보기 이미지 1200×630 | `app/api/og/route.tsx` | 쿼리 `title`, `subtitle`, `badge`, `season` |
@@ -168,10 +168,11 @@ import 경로:
 | 위치 | 하는 일 |
 |---|---|
 | `types.ts`, `constants.ts` | 화면 사이에 오가는 타입(`ActionResult`, `EditionSummary`, …)과 상수(종류 설명·모양 `KIND_LOOKS`, 상태 이름, 미리보기 폭). 도메인 타입·상수(`Edition`, `EDITION_LIMITS`, `PRINT_KIND_LABELS`)는 `@workspace/seasonal/print` |
-| `lib/` | 순수 함수와 vitest: `flow`(편집 상태 `editionDraft`, 저장 → PDF 단계, 단계 문구), `downloads`(PDF 주소·쪽 이름), `summary`(목록 요약·다음 id), `preview`(미리보기 크기), `spec-path`(옵션 경로 읽고 쓰기), `format`(서울 시각) |
+| `lib/` | 순수 함수와 vitest: `flow`(편집 상태 `editionDraft`, 저장 → PDF 단계, 단계 문구), `downloads`(PDF 주소·쪽 이름), `summary`(목록 요약·다음 id), `preview`(미리보기 크기), `spec-path`(옵션 경로 읽고 쓰기), `format`(서울 시각), `wireframe-shapes`(와이어프레임 도형: 용지 mm 좌표의 그림 박스·달력 칸·글 막대·막대표·원형 판), `wireframe-catalog`(종류별 구조 안 목록. 근거는 `.scratch/calendar-print/research/market.md`) |
 | `hooks/` | `use-copy`(클립보드와 "복사했어요"), `use-element-width` |
 | `server/` | `import "server-only"`. `guard`(개발 서버에서만), `files`(에디션 JSON·생성 기록·매니페스트 읽고 쓰기), `generate`(이 컴퓨터의 Chrome으로 PDF 저장, 쪽 크기·수 검사), `queries`(라우트가 읽는 값), `actions`(Server Action, `ActionResult`를 돌려준다) |
 | `components/` | 목록과 편집기가 함께 쓰는 조각: `kind-mark`, `status`, `edition-id`, `delete-edition-button` |
+| `wireframes/` | `wireframe`(안 하나를 SVG로. 옵션 고르기의 미리보기로 쓸 수 있다), `wireframe-gallery`(`/admin/wireframes`) |
 | `board/` | `/admin` 목록. 서버 컴포넌트(`admin-board`, `edition-board`, `kind-group`, `edition-row`) |
 | `new-edition/` | 새 에디션 3단계 폼(`new-edition-form`, `kind-picker`, `form-step`) |
 | `editor/` | `/admin/edit`. `use-edition-editor`(편집본·저장·생성을 들고 있고, 판단은 `lib/flow`의 `editionDraft`)와 화면 조각(`editor-header`, `edition-steps`, `generated-files`, `options-panel`·`option-field`·`option-fields`(종류별 옵션 표. `option-fields.test`가 표의 값이 사양 스키마와 맞는지 본다), `listing-panel`, `preview-panel`·`print-preview`) |
