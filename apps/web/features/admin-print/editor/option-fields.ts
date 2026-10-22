@@ -142,7 +142,7 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
     look,
   ],
   "season-poster": [
-    { title: "구성", fields: [layout({ bands: "가로 띠 넷", quarters: "사분면(가로 용지는 네 열)" })] },
+    { title: "구성", fields: [layout({ bands: "가로 띠 넷", quarters: "사분면(가로 용지는 네 열)", "per-season": "계절마다 한 장(4쪽)" })] },
     { title: "용지", fields: [orientation, margin, title, { type: "select", label: "계절 표기", path: ["seasonLabel"], options: options({ "english-korean": "Spring · 봄", korean: "봄" }) }] },
     { ...foods(30), fields: [...foods(30).fields, categories] },
     look,

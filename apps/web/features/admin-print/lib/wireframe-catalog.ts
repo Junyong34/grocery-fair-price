@@ -384,7 +384,7 @@ const seasonPoster: WireframeEntry[] = [
     title: "계절마다 한 장(4쪽)",
     summary: "계절 하나에 시트 한 장. 품종 그림이 네 배 커지고 계절마다 바꿔 건다. 결과 PDF가 1쪽에서 4쪽이 된다.",
     source: "⑦ 계절마다 한 장 · K9, R10",
-    availability: { status: "needs-option", options: 'layout: "per-season"' },
+    availability: { status: "available", options: 'layout: "per-season"' },
     orientations: ["portrait", "landscape"],
     draw: (orientation) => {
       const portrait = orientation === "portrait"

@@ -1,4 +1,4 @@
-import { SEASONS, type Season } from "@workspace/seasonal/data/seasons"
+import { SEASON_MONTHS, SEASONS, type Season } from "@workspace/seasonal/data/seasons"
 import { seasonFoods } from "@workspace/seasonal/print/foods"
 import type { Paper, SeasonPosterSpec } from "@workspace/seasonal/print/spec"
 
@@ -8,6 +8,7 @@ import { innerSize, surfaceColor, t, u } from "./parts/units"
 
 // 계절 제철 포스터: 봄·여름·가을·겨울 네 칸에 그 계절에 제철이 시작하는 품종을 놓는다. 달력이 없다.
 // bands(S-A): 위에서 아래로 가로 띠 넷. quarters(S-B): 세로 용지는 2×2 사분면, 가로 용지는 네 열.
+// per-season(S-D): 계절마다 한 장(PDF 4쪽). 계절 이름을 크게 쓰고 판 전체에 그 계절 품종을 놓는다.
 
 const HEADER = 22
 const BAND_LABEL = 9
@@ -27,6 +28,14 @@ function arrangement(spec: SeasonPosterSpec) {
 }
 
 export function SeasonPoster({ spec, paper }: { spec: SeasonPosterSpec; paper: Paper }) {
+  if (spec.layout === "per-season")
+    return (
+      <>
+        {SEASONS.map((season, i) => (
+          <SeasonSheet key={season} spec={spec} paper={paper} season={season} index={i} />
+        ))}
+      </>
+    )
   const inner = innerSize(spec)
   const { columns, rows, padding } = arrangement(spec)
   const cell = {
@@ -77,3 +86,56 @@ export function SeasonPoster({ spec, paper }: { spec: SeasonPosterSpec; paper: P
     </Sheet>
   )
 }
+
+/** S-D 한 장의 머리(계절 이름)·줄·발(제목과 쪽 번호) 높이와 사이 간격. 세로·가로 순서다. */
+const SHEET = {
+  portrait: { header: 34, rule: 1.2, foot: 8, gap: 7, title: 24, name: 3.6 },
+  landscape: { header: 26, rule: 1.2, foot: 7, gap: 5, title: 18, name: 3.2 },
+} as const
+
+/** S-D: 계절 하나에 한 장. 품종 수가 계절마다 달라(그림 있는 품종 겨울 10 ~ 가을 26) 그림 크기는 장마다 판에 맞춘다. */
+function SeasonSheet({ spec, paper, season, index }: { spec: SeasonPosterSpec; paper: Paper; season: Season; index: number }) {
+  const inner = innerSize(spec)
+  const size = SHEET[spec.orientation]
+  const foods = seasonFoods(season, { max: spec.foods.max, categories: spec.categories })
+  const art = { width: inner.width, height: inner.height - size.header - size.rule - size.foot - size.gap * 3 }
+  const color = `var(--color-season-${season})`
+  return (
+    <Sheet spec={spec} paper={paper} background={surfaceColor(spec.surface, season)}>
+      <header style={{ height: u(size.header), display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+        <div>
+          {spec.seasonLabel === "english-korean" && (
+            <p className="print-heading" style={{ margin: 0, marginBottom: u(1.5), fontSize: t(5), letterSpacing: "0.12em", color }}>
+              {SEASON_NAMES[season].english}
+            </p>
+          )}
+          <h1 className="print-heading" style={{ margin: 0, fontSize: t(size.title), lineHeight: 1, fontWeight: 700, color }}>
+            {SEASON_NAMES[season].korean}
+          </h1>
+        </div>
+        <span className="print-number" style={{ fontSize: t(4), color: "var(--color-caption)" }}>
+          {SEASON_MONTHS[season].join(" · ")}월
+        </span>
+      </header>
+      <div style={{ width: "50%", height: u(size.rule), marginTop: u(size.gap), background: color }} />
+      <FoodArea
+        foods={foods}
+        width={art.width}
+        height={art.height}
+        layout="flow"
+        month={13 + index}
+        showName={spec.foods.names === "korean"}
+        nameSize={size.name}
+        // 품종이 적은 계절은 그림이 폭에 막혀 커지지 못하므로, 줄 사이를 넓혀 판 높이를 고르게 채운다.
+        style={{ marginTop: u(size.gap), alignContent: "space-evenly" }}
+      />
+      <footer style={{ height: u(size.foot), marginTop: u(size.gap), display: "flex", alignItems: "flex-end", justifyContent: "space-between", fontSize: t(3.2), color: "var(--color-stone)" }}>
+        <span className="print-heading">{spec.title}</span>
+        <span className="print-number">
+          {index + 1} / {SEASONS.length}
+        </span>
+      </footer>
+    </Sheet>
+  )
+}
+

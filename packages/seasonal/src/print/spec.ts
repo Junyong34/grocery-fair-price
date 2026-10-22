@@ -3,6 +3,7 @@ import { z } from "zod"
 import { CALENDAR_VARIANTS } from "../calendar/variants"
 import { FOODS, type FoodCategory } from "../data/foods"
 import { MONTH_LABEL_STYLES, MONTHS, type Month } from "../data/months"
+import { SEASONS } from "../data/seasons"
 
 // PDF 인쇄 사양(.scratch/calendar-print/spec.md "데이터 모양"). 같은 사양이면 언제나 같은 PDF가 나온다.
 // 종류(kind)마다 쓰는 옵션이 달라 kind로 갈리는 유니언이다. 선택지는 모두 유한한 값이고, 바깥에서 온 값은 parsePrintSpec 하나로 들어온다.
@@ -121,8 +122,8 @@ const seasonPosterSchema = z.object({
   ...base,
   kind: z.literal("season-poster"),
   title,
-  /** 가로 띠 넷(S-A) / 사분면, 가로 용지는 네 열(S-B) */
-  layout: z.enum(["bands", "quarters"]).default("bands"),
+  /** 가로 띠 넷(S-A) / 사분면, 가로 용지는 네 열(S-B) / 계절마다 한 장, PDF 4쪽(S-D) */
+  layout: z.enum(["bands", "quarters", "per-season"]).default("bands"),
   seasonLabel: z.enum(["korean", "english-korean"]),
   /** 넣을 카테고리. 비우면 전부 */
   categories,
@@ -238,11 +239,13 @@ export const DEFAULT_SPECS: { [K in PrintKind]: Extract<PrintSpec, { kind: K }> 
 }
 
 /**
- * 결과 PDF의 쪽 수. 결과 파일은 사양·용지마다 하나다. 월간 달력은 열두 달(표지를 켜면 표지 포함)을 한 파일에 담는다.
+ * 결과 PDF의 쪽 수. 결과 파일은 사양·용지마다 하나다. 월간 달력은 열두 달(표지를 켜면 표지 포함), 계절마다 한 장(S-D)은 네 계절을 한 파일에 담는다.
  * 생성기가 PDF를 검사할 때 쓴다.
  */
 export function pageCount(spec: PrintSpec): number {
-  return spec.kind === "monthly" ? MONTHS.length + (spec.cover === "none" ? 0 : 1) : 1
+  if (spec.kind === "monthly") return MONTHS.length + (spec.cover === "none" ? 0 : 1)
+  if (spec.kind === "season-poster" && spec.layout === "per-season") return SEASONS.length
+  return 1
 }
 
 /** URL 쿼리에 넣는 모양(UTF-8 JSON의 base64url). */
