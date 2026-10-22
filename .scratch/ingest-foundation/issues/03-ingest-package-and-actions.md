@@ -13,6 +13,7 @@ API 호출 → 원본 Storage 저장 → 변환 → Postgres upsert → 재계�
 - [ ] 패키지: `packages/price-ingest` (제안). `p2/12`의 API 클라이언트·계약 테스트와 `p4/03`의 어댑터가 이 안에 들어간다
 - [ ] CLI: `ingest --source kamis|ekape|chamga --date YYYY-MM-DD`, `ingest --fill-gaps`(`source_day`의 빈 날 메우기), `recompute`(시작 때 기본 규격 검사 질의, pipeline.md 3-1), 운영자용 `merge-product --from A --into B` (상품 병합, pipeline.md 3-6)
 - [ ] 순서: 원본을 먼저 Storage에 올린 뒤 적재한다 (DB 실패 시 다시 적재할 수 있게)
+- [ ] 적재 전 대조 (결정 B, 2026-10-22): 실행마다 Storage의 최근 N일 폴더(`raw/{source}/…`)를 목록으로 읽어 `raw_object`에 없는 파일을 `pending_load`로 채운 뒤, `pending_load` 파일을 모두 적재한다. N은 7일을 기본으로 둔다 (확인 필요). 실행 사이의 로컬 기록은 쓰지 않는다. 완료 기준의 "DB를 끊고 돌려도 다음 실행에서 적재"가 이 경로로 검증된다
 - [ ] 접속: DB는 `INGEST_DATABASE_URL`(`ingest_writer`, Supavisor **세션 모드 5432**)로만. 트랜잭션 모드(6543)는 쓰지 않는다. Storage는 `SUPABASE_URL` + `SUPABASE_SECRET_KEY`(`sb_secret_…`)로만 (pipeline.md 3-0 "접속", "키")
 - [ ] 적재 단위: **원본 파일 하나 = 트랜잭션 하나.** `begin` → `pg_advisory_xact_lock(hashtext('ingest:' || source))` → `COPY` → 임시 표(`on commit drop`) → 정정 비교·`observation_revision` → 병합 → `raw_object.load_status` → `commit`. `recompute`는 `hashtext('recompute')` lock
 - [ ] 병합은 바뀐 행만 고쳐 쓴다: `on conflict … do update … where (비교 열) is distinct from (excluded…)` (pipeline.md 3-3의 SQL, 비교 열에 `product_id` 포함). 값이 같은 다시 받기에서 갱신 행 수가 0인지 테스트로 고정. 정정은 `source_day.status`를 바꾸지 않고 `corrected_at`·`correction_count`만 올린다

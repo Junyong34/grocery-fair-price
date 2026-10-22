@@ -873,7 +873,7 @@ raw_object
 
 - 인덱스: `(source, target_from)`, `(ingest_run_id)`, `(load_status) where load_status = 'pending_load'`, `(duplicate_of)`.
 - **원본을 지울 때 행은 지우지 않는다** (2026-10-20). 보존 기간(3-9 권장 5)이 지난 KAMIS·축평원 원본은 Storage 파일만 지우고 `purged_at`을 채운다. 관측값·정정 이력·평년 행·상품 속성 이력·마스터 변경 기록이 `raw_object_id`로 이 행을 FK로 가리키므로, 행을 지우면 FK가 막거나(관측값이 남아 있을 때) 출처 기록이 사라진다. 행 하나는 약 300B라 연 수천 행이면 1MB 남짓이다. 다시 계산할 때 `purged_at`이 있는 파일은 API에서 다시 받는다.
-- 순서: Storage에 먼저 올리고 `pending_load`로 기록한 뒤 적재한다. DB 적재가 실패하면 다음 실행이 `pending_load` 파일을 다시 적재한다 (5-2 "DB에 연결 못 함"). Storage 업로드 전에 DB가 안 되면 실행 로컬에 남긴 기록으로 다음 실행이 `raw_object` 행을 채운다.
+- 순서: Storage에 먼저 올리고 `pending_load`로 기록한 뒤 적재한다. DB 적재가 실패하면 다음 실행이 `pending_load` 파일을 다시 적재한다 (5-2 "DB에 연결 못 함"). DB가 안 되어 `raw_object` 행을 못 쓴 경우에도 원본은 Storage에 남는다. 그래서 다음 실행은 적재 전에 Storage의 최근 날짜 폴더(`raw/{source}/…`)를 목록으로 읽어 `raw_object`에 없는 파일을 `pending_load`로 채운 뒤 적재한다 (2026-10-22 결정). 실행 사이에 남는 로컬 기록은 쓰지 않는다. GitHub Actions는 실행마다 빈 환경이라 그 기록이 사라진다.
 - 파일 단위는 **실행 × 기능 × 대상 날짜 묶음 하나**로 한다 (권장). 호출마다 파일을 만들면 참가격 조사일 하나에 457개, 1년 약 16만 줄이 된다. 묶으면 하루 몇 줄이다. `call-key`는 이 묶음 키다 (`ingest-foundation/03`).
 - 같은 대상을 다시 받았는데 내용 해시가 직전 파일과 같으면 올리지 않고 `duplicate`로 기록만 한다 (참가격 다시 받기, 축평원 D-2·D-3). 원본 용량을 크게 줄인다 (3-9).
 
