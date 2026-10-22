@@ -26,6 +26,7 @@ grocery-fair-price/
 │  ├─ seasonal/              @workspace/seasonal: 제철 도메인 (순수 TS, React 없음)
 │  ├─ ui/                    @workspace/ui: Oura 토큰, cojeev UI, 범용 컴포넌트
 │  ├─ price-db/              @workspace/price-db: 가격 DB 마이그레이션 검증 테스트, 샘플 테스트 데이터, 용량 실측, ERD 생성
+│  ├─ price-ingest/          @workspace/price-ingest: 공공 API 3개의 호출 모듈, 응답 계약 테스트, 실측 기준 (8-2)
 │  ├─ eslint-config/         @workspace/eslint-config: base, next-js, react-internal
 │  └─ typescript-config/     @workspace/typescript-config: base, nextjs, react-library
 ├─ supabase/                 Supabase CLI 프로젝트: config.toml, migrations/(스키마 price의 DDL·DCL), seed.sql(로컬 기준 데이터)
@@ -289,6 +290,20 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `packages/price-db/scripts/` | `load-samples.ts`, `measure-size.ts`(행당 크기 실측), `build-erd.ts`(`grocery-price/docs/30-data/schema-map.html`의 ERD 생성) |
 
 마이그레이션은 운영 DB에 로컬에서 `pnpm exec supabase db push`로 적용한다 (`SUPABASE_DB_PASSWORD`, `ingest-foundation/01`). 시드는 운영 DB에 들어가지 않는다.
+
+## 8-2. 공공 API 수집 모듈 (packages/price-ingest)
+
+| 경로 | 내용 |
+|---|---|
+| `packages/price-ingest/src/sources/` | 출처별 요청 주소, 응답 판정(성공 코드·게이트웨이 오류·HTTP 상태), 계약 스키마(strict). `kamis.ts`(perDay/price, 성공 `"0"`), `ekape.ts`(consumerPriceDaily, 성공 `00`, http 주소), `chamgagyeok.ts`(ProductPriceInfoService 4기능, 가격 조회만 `serviceKey`, 나머지 `ServiceKey`) |
+| `packages/price-ingest/src/contract/` | 응답 형태 기술(`shape.ts`: 경로별 타입), 기준과 실측 비교(`compare.ts`: 실패와 경고), 실측 항목 16개와 기준 파일 경로(`probes.ts`) |
+| `packages/price-ingest/src/` 공통 | `errors.ts`(오류 종류, 메시지에 키·주소 없음), `http.ts`(fetch 래퍼, 전송 오류 감싸기), `response.ts`(XML·JSON 읽기, 판정), `validate.ts`(검사 결과를 필드 경로로 풀어 쓰기) |
+| `packages/price-ingest/test/` | 오프라인 테스트 (`pnpm test`에 들어간다. 키·네트워크 없음): 요청 주소, 가짜 응답으로 본 클라이언트 동작, 샘플 계약, 필드 이름 변경 감지 |
+| `packages/price-ingest/test/live/` | 실측 테스트 (`pnpm --filter @workspace/price-ingest test:live`). 루트 `.env`의 `DATA_GO_KR_SERVICE_KEY`로 16회 호출한다. 명시적으로 켤 때만 돈다. 수집 시각 앞뒤로 돌리지 않는다 |
+| `packages/price-ingest/baseline/contract-baseline.json` | 실측으로 만든 기준: 필드 타입, 코드 목록, 건수. 값(가격)은 없다. 의도한 응답 변경일 때만 `pnpm --filter @workspace/price-ingest contract:baseline`으로 다시 만든다 |
+| `packages/price-ingest/scripts/capture-baseline.ts` | 기준 파일 생성. 계약과 다른 응답은 저장하지 않는다 |
+
+수집 CLI와 GitHub Actions 워크플로는 `ingest-foundation/03`에서 이 패키지에 더한다.
 
 ## 9. 명령어
 

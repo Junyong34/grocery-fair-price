@@ -1,0 +1,2194 @@
+{
+  "capturedAt": "2026-10-22T06:11:08.674Z",
+  "note": "라이브 실측의 필드 타입·코드 목록·건수만 담는다 (값은 담지 않는다). 생성: pnpm contract:baseline",
+  "probes": {
+    "kamis.perDay.vegetable-baechu-retail": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.body": [
+          "object"
+        ],
+        "response.body.dataType": [
+          "string"
+        ],
+        "response.body.items": [
+          "object"
+        ],
+        "response.body.items.item": [
+          "array"
+        ],
+        "response.body.items.item[]": [
+          "object"
+        ],
+        "response.body.items.item[].ctgry_cd": [
+          "string"
+        ],
+        "response.body.items.item[].ctgry_nm": [
+          "string"
+        ],
+        "response.body.items.item[].exmn_dd_cnvs_prc": [
+          "string"
+        ],
+        "response.body.items.item[].exmn_dd_prc": [
+          "string"
+        ],
+        "response.body.items.item[].exmn_ymd": [
+          "string"
+        ],
+        "response.body.items.item[].grd_cd": [
+          "string"
+        ],
+        "response.body.items.item[].grd_nm": [
+          "string"
+        ],
+        "response.body.items.item[].item_cd": [
+          "string"
+        ],
+        "response.body.items.item[].item_nm": [
+          "string"
+        ],
+        "response.body.items.item[].mrkt_cd": [
+          "string"
+        ],
+        "response.body.items.item[].mrkt_nm": [
+          "string"
+        ],
+        "response.body.items.item[].orgnl_reg_dt": [
+          "string"
+        ],
+        "response.body.items.item[].se_cd": [
+          "string"
+        ],
+        "response.body.items.item[].se_nm": [
+          "string"
+        ],
+        "response.body.items.item[].sgg_cd": [
+          "string"
+        ],
+        "response.body.items.item[].sgg_nm": [
+          "string"
+        ],
+        "response.body.items.item[].unit": [
+          "string"
+        ],
+        "response.body.items.item[].unit_sz": [
+          "string"
+        ],
+        "response.body.items.item[].vrty_cd": [
+          "string"
+        ],
+        "response.body.items.item[].vrty_nm": [
+          "string"
+        ],
+        "response.body.numOfRows": [
+          "number"
+        ],
+        "response.body.pageNo": [
+          "number"
+        ],
+        "response.body.totalCount": [
+          "number"
+        ],
+        "response.header": [
+          "object"
+        ],
+        "response.header.resultCode": [
+          "string"
+        ],
+        "response.header.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "se_cd": [
+          "01"
+        ],
+        "ctgry_cd": [
+          "200"
+        ],
+        "item_cd": [
+          "211"
+        ],
+        "vrty_cd": [
+          "02"
+        ],
+        "grd_cd": [
+          "04"
+        ],
+        "unit": [
+          "포기"
+        ]
+      },
+      "rowCount": 48
+    },
+    "kamis.perDay.livestock-sogogi-retail": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.body": [
+          "object"
+        ],
+        "response.body.dataType": [
+          "string"
+        ],
+        "response.body.items": [
+          "object"
+        ],
+        "response.body.items.item": [
+          "array"
+        ],
+        "response.body.items.item[]": [
+          "object"
+        ],
+        "response.body.items.item[].ctgry_cd": [
+          "string"
+        ],
+        "response.body.items.item[].ctgry_nm": [
+          "string"
+        ],
+        "response.body.items.item[].exmn_dd_cnvs_prc": [
+          "string"
+        ],
+        "response.body.items.item[].exmn_dd_prc": [
+          "string"
+        ],
+        "response.body.items.item[].exmn_ymd": [
+          "string"
+        ],
+        "response.body.items.item[].grd_cd": [
+          "string"
+        ],
+        "response.body.items.item[].grd_nm": [
+          "string"
+        ],
+        "response.body.items.item[].item_cd": [
+          "string"
+        ],
+        "response.body.items.item[].item_nm": [
+          "string"
+        ],
+        "response.body.items.item[].mrkt_cd": [
+          "null"
+        ],
+        "response.body.items.item[].mrkt_nm": [
+          "null"
+        ],
+        "response.body.items.item[].orgnl_reg_dt": [
+          "null"
+        ],
+        "response.body.items.item[].se_cd": [
+          "string"
+        ],
+        "response.body.items.item[].se_nm": [
+          "string"
+        ],
+        "response.body.items.item[].sgg_cd": [
+          "string"
+        ],
+        "response.body.items.item[].sgg_nm": [
+          "string"
+        ],
+        "response.body.items.item[].unit": [
+          "string"
+        ],
+        "response.body.items.item[].unit_sz": [
+          "string"
+        ],
+        "response.body.items.item[].vrty_cd": [
+          "string"
+        ],
+        "response.body.items.item[].vrty_nm": [
+          "string"
+        ],
+        "response.body.numOfRows": [
+          "number"
+        ],
+        "response.body.pageNo": [
+          "number"
+        ],
+        "response.body.totalCount": [
+          "number"
+        ],
+        "response.header": [
+          "object"
+        ],
+        "response.header.resultCode": [
+          "string"
+        ],
+        "response.header.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "se_cd": [
+          "01"
+        ],
+        "ctgry_cd": [
+          "500"
+        ],
+        "item_cd": [
+          "4301"
+        ],
+        "vrty_cd": [
+          "21",
+          "22",
+          "36",
+          "40",
+          "50"
+        ],
+        "grd_cd": [
+          "1",
+          "2",
+          "3"
+        ],
+        "unit": [
+          "g"
+        ]
+      },
+      "rowCount": 264
+    },
+    "ekape.consumerPriceDaily.4301": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.body": [
+          "object"
+        ],
+        "response.body.items": [
+          "object"
+        ],
+        "response.body.items.item": [
+          "array"
+        ],
+        "response.body.items.item[]": [
+          "object"
+        ],
+        "response.body.items.item[].grdNm": [
+          "string"
+        ],
+        "response.body.items.item[].itemCd": [
+          "string"
+        ],
+        "response.body.items.item[].itemNm": [
+          "string"
+        ],
+        "response.body.items.item[].judgeKind": [
+          "string"
+        ],
+        "response.body.items.item[].judgeKindNm": [
+          "string"
+        ],
+        "response.body.items.item[].maxPrc": [
+          "string"
+        ],
+        "response.body.items.item[].minPrc": [
+          "string"
+        ],
+        "response.body.items.item[].ntslPrc": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc1": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc10": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc11": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc12": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc13": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc14": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc15": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc16": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc17": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc2": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc3": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc4": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc5": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc6": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc7": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc8": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc9": [
+          "string"
+        ],
+        "response.body.items.item[].standYmd": [
+          "string"
+        ],
+        "response.body.items.item[].unit": [
+          "string"
+        ],
+        "response.header": [
+          "object"
+        ],
+        "response.header.resultCode": [
+          "string"
+        ],
+        "response.header.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "judgeKind": [
+          "4301"
+        ],
+        "itemCd": [
+          "21",
+          "22",
+          "36",
+          "40",
+          "50"
+        ],
+        "grdNm": [
+          "1+등급",
+          "1등급"
+        ],
+        "unit": [
+          "원/100g"
+        ]
+      },
+      "rowCount": 20
+    },
+    "ekape.consumerPriceDaily.4304": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.body": [
+          "object"
+        ],
+        "response.body.items": [
+          "object"
+        ],
+        "response.body.items.item": [
+          "array"
+        ],
+        "response.body.items.item[]": [
+          "object"
+        ],
+        "response.body.items.item[].grdNm": [
+          "string"
+        ],
+        "response.body.items.item[].itemCd": [
+          "string"
+        ],
+        "response.body.items.item[].itemNm": [
+          "string"
+        ],
+        "response.body.items.item[].judgeKind": [
+          "string"
+        ],
+        "response.body.items.item[].judgeKindNm": [
+          "string"
+        ],
+        "response.body.items.item[].maxPrc": [
+          "string"
+        ],
+        "response.body.items.item[].minPrc": [
+          "string"
+        ],
+        "response.body.items.item[].ntslPrc": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc1": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc10": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc11": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc12": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc13": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc14": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc15": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc16": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc17": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc2": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc3": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc4": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc5": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc6": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc7": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc8": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc9": [
+          "string"
+        ],
+        "response.body.items.item[].standYmd": [
+          "string"
+        ],
+        "response.body.items.item[].unit": [
+          "string"
+        ],
+        "response.header": [
+          "object"
+        ],
+        "response.header.resultCode": [
+          "string"
+        ],
+        "response.header.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "judgeKind": [
+          "4304"
+        ],
+        "itemCd": [
+          "25",
+          "27",
+          "28",
+          "68"
+        ],
+        "grdNm": [
+          "구분없음"
+        ],
+        "unit": [
+          "원/100g"
+        ]
+      },
+      "rowCount": 8
+    },
+    "ekape.consumerPriceDaily.4401": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.body": [
+          "object"
+        ],
+        "response.body.items": [
+          "object"
+        ],
+        "response.body.items.item": [
+          "array"
+        ],
+        "response.body.items.item[]": [
+          "object"
+        ],
+        "response.body.items.item[].grdNm": [
+          "string"
+        ],
+        "response.body.items.item[].itemCd": [
+          "string"
+        ],
+        "response.body.items.item[].itemNm": [
+          "string"
+        ],
+        "response.body.items.item[].judgeKind": [
+          "string"
+        ],
+        "response.body.items.item[].judgeKindNm": [
+          "string"
+        ],
+        "response.body.items.item[].maxPrc": [
+          "string"
+        ],
+        "response.body.items.item[].minPrc": [
+          "string"
+        ],
+        "response.body.items.item[].ntslPrc": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc1": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc10": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc11": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc12": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc13": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc14": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc15": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc16": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc17": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc2": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc3": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc4": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc5": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc6": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc7": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc8": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc9": [
+          "string"
+        ],
+        "response.body.items.item[].standYmd": [
+          "string"
+        ],
+        "response.body.items.item[].unit": [
+          "string"
+        ],
+        "response.header": [
+          "object"
+        ],
+        "response.header.resultCode": [
+          "string"
+        ],
+        "response.header.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "judgeKind": [
+          "4401"
+        ],
+        "itemCd": [
+          "29",
+          "31",
+          "37",
+          "62",
+          "68"
+        ],
+        "grdNm": [
+          "미국산",
+          "호주산"
+        ],
+        "unit": [
+          "원/100g"
+        ]
+      },
+      "rowCount": 17
+    },
+    "ekape.consumerPriceDaily.4402": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.body": [
+          "object"
+        ],
+        "response.body.items": [
+          "object"
+        ],
+        "response.body.items.item": [
+          "array"
+        ],
+        "response.body.items.item[]": [
+          "object"
+        ],
+        "response.body.items.item[].grdNm": [
+          "string"
+        ],
+        "response.body.items.item[].itemCd": [
+          "string"
+        ],
+        "response.body.items.item[].itemNm": [
+          "string"
+        ],
+        "response.body.items.item[].judgeKind": [
+          "string"
+        ],
+        "response.body.items.item[].judgeKindNm": [
+          "string"
+        ],
+        "response.body.items.item[].maxPrc": [
+          "string"
+        ],
+        "response.body.items.item[].minPrc": [
+          "string"
+        ],
+        "response.body.items.item[].ntslPrc": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc1": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc10": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc11": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc12": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc13": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc14": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc15": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc16": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc17": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc2": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc3": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc4": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc5": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc6": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc7": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc8": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc9": [
+          "string"
+        ],
+        "response.body.items.item[].standYmd": [
+          "string"
+        ],
+        "response.body.items.item[].unit": [
+          "string"
+        ],
+        "response.header": [
+          "object"
+        ],
+        "response.header.resultCode": [
+          "string"
+        ],
+        "response.header.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "judgeKind": [
+          "4402"
+        ],
+        "itemCd": [
+          "27"
+        ],
+        "grdNm": [
+          "구분없음"
+        ],
+        "unit": [
+          "원/100g"
+        ]
+      },
+      "rowCount": 2
+    },
+    "ekape.consumerPriceDaily.9901": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.body": [
+          "object"
+        ],
+        "response.body.items": [
+          "object"
+        ],
+        "response.body.items.item": [
+          "array"
+        ],
+        "response.body.items.item[]": [
+          "object"
+        ],
+        "response.body.items.item[].grdNm": [
+          "string"
+        ],
+        "response.body.items.item[].itemCd": [
+          "string"
+        ],
+        "response.body.items.item[].itemNm": [
+          "string"
+        ],
+        "response.body.items.item[].judgeKind": [
+          "string"
+        ],
+        "response.body.items.item[].judgeKindNm": [
+          "string"
+        ],
+        "response.body.items.item[].maxPrc": [
+          "string"
+        ],
+        "response.body.items.item[].minPrc": [
+          "string"
+        ],
+        "response.body.items.item[].ntslPrc": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc1": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc10": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc11": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc12": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc13": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc14": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc15": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc16": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc17": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc2": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc3": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc4": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc5": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc6": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc7": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc8": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc9": [
+          "string"
+        ],
+        "response.body.items.item[].standYmd": [
+          "string"
+        ],
+        "response.body.items.item[].unit": [
+          "string"
+        ],
+        "response.header": [
+          "object"
+        ],
+        "response.header.resultCode": [
+          "string"
+        ],
+        "response.header.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "judgeKind": [
+          "9901"
+        ],
+        "itemCd": [
+          "99"
+        ],
+        "grdNm": [
+          "구분없음"
+        ],
+        "unit": [
+          "원/Kg"
+        ]
+      },
+      "rowCount": 2
+    },
+    "ekape.consumerPriceDaily.9903": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.body": [
+          "object"
+        ],
+        "response.body.items": [
+          "object"
+        ],
+        "response.body.items.item": [
+          "array"
+        ],
+        "response.body.items.item[]": [
+          "object"
+        ],
+        "response.body.items.item[].grdNm": [
+          "string"
+        ],
+        "response.body.items.item[].itemCd": [
+          "string"
+        ],
+        "response.body.items.item[].itemNm": [
+          "string"
+        ],
+        "response.body.items.item[].judgeKind": [
+          "string"
+        ],
+        "response.body.items.item[].judgeKindNm": [
+          "string"
+        ],
+        "response.body.items.item[].maxPrc": [
+          "string"
+        ],
+        "response.body.items.item[].minPrc": [
+          "string"
+        ],
+        "response.body.items.item[].ntslPrc": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc1": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc10": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc11": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc12": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc13": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc14": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc15": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc16": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc17": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc2": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc3": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc4": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc5": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc6": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc7": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc8": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc9": [
+          "string"
+        ],
+        "response.body.items.item[].standYmd": [
+          "string"
+        ],
+        "response.body.items.item[].unit": [
+          "string"
+        ],
+        "response.header": [
+          "object"
+        ],
+        "response.header.resultCode": [
+          "string"
+        ],
+        "response.header.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "judgeKind": [
+          "9903"
+        ],
+        "itemCd": [
+          "23"
+        ],
+        "grdNm": [
+          "일반란"
+        ],
+        "unit": [
+          "원/30구"
+        ]
+      },
+      "rowCount": 2
+    },
+    "ekape.consumerPriceDaily.9908": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.body": [
+          "object"
+        ],
+        "response.body.items": [
+          "object"
+        ],
+        "response.body.items.item": [
+          "array"
+        ],
+        "response.body.items.item[]": [
+          "object"
+        ],
+        "response.body.items.item[].grdNm": [
+          "string"
+        ],
+        "response.body.items.item[].itemCd": [
+          "string"
+        ],
+        "response.body.items.item[].itemNm": [
+          "string"
+        ],
+        "response.body.items.item[].judgeKind": [
+          "string"
+        ],
+        "response.body.items.item[].judgeKindNm": [
+          "string"
+        ],
+        "response.body.items.item[].maxPrc": [
+          "string"
+        ],
+        "response.body.items.item[].minPrc": [
+          "string"
+        ],
+        "response.body.items.item[].ntslPrc": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc1": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc10": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc11": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc12": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc13": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc14": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc15": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc16": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc17": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc2": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc3": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc4": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc5": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc6": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc7": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc8": [
+          "string"
+        ],
+        "response.body.items.item[].regionPrc9": [
+          "string"
+        ],
+        "response.body.items.item[].standYmd": [
+          "string"
+        ],
+        "response.body.items.item[].unit": [
+          "string"
+        ],
+        "response.header": [
+          "object"
+        ],
+        "response.header.resultCode": [
+          "string"
+        ],
+        "response.header.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "judgeKind": [
+          "9908"
+        ],
+        "itemCd": [
+          "01"
+        ],
+        "grdNm": [
+          "구분없음"
+        ],
+        "unit": [
+          "원/1L"
+        ]
+      },
+      "rowCount": 2
+    },
+    "chamgagyeok.standard.AL": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.result": [
+          "object"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO": [
+          "array"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO[]": [
+          "object"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO[].code": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO[].codeName": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO[].highCode": [
+          "string"
+        ],
+        "response.resultCode": [
+          "string"
+        ],
+        "response.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "code": [
+          "030100000",
+          "030101000",
+          "030101001",
+          "030101002",
+          "030101003",
+          "030101004",
+          "030102000",
+          "030102001",
+          "030102002",
+          "030102003",
+          "030102004",
+          "030102005",
+          "030102006",
+          "030102007",
+          "030102008",
+          "030102009",
+          "030102010",
+          "030102011",
+          "030102012",
+          "030102013",
+          "030102014",
+          "030102015",
+          "030102016",
+          "030102017",
+          "030102018",
+          "030102020",
+          "030102021",
+          "030102022",
+          "030102023",
+          "030103000",
+          "030103001",
+          "030103002",
+          "030103003",
+          "030103004",
+          "030103005",
+          "030103006",
+          "030103008",
+          "030104000",
+          "030200000",
+          "030201000",
+          "030201001",
+          "030201004",
+          "030201005",
+          "030201007",
+          "030201008",
+          "030201009",
+          "030201010",
+          "030201011",
+          "030201012",
+          "030201014",
+          "030201015",
+          "030201019",
+          "030201020",
+          "030201021",
+          "030201024",
+          "030201025",
+          "030201026",
+          "030201027",
+          "030201028",
+          "030201029",
+          "030201030",
+          "030201031",
+          "030201032",
+          "030201033",
+          "030201034",
+          "030201035",
+          "030202000",
+          "030202002",
+          "030202003",
+          "030202004",
+          "030202005",
+          "030202008",
+          "030202009",
+          "030202010",
+          "030203000",
+          "030203002",
+          "030203003",
+          "030203004",
+          "030203005",
+          "030203006",
+          "030203007",
+          "030203008",
+          "030203009",
+          "030203010",
+          "030203011",
+          "030203012",
+          "030203013",
+          "030204000",
+          "030204001",
+          "030204002",
+          "030204004",
+          "030204005",
+          "030204006",
+          "030204007",
+          "030204008",
+          "030204009",
+          "030204010",
+          "030204011",
+          "030204012",
+          "030204013",
+          "030204014",
+          "030204015",
+          "030204016",
+          "030204019",
+          "030204020",
+          "030204021",
+          "030204022",
+          "030204023",
+          "030204024",
+          "030205000",
+          "030205001",
+          "030205002",
+          "030205003",
+          "030205005",
+          "030205006",
+          "030205007",
+          "030205008",
+          "030205009",
+          "030205011",
+          "030205012",
+          "030205013",
+          "030205014",
+          "030205015",
+          "030206000",
+          "030206001",
+          "030206002",
+          "030206003",
+          "030206004",
+          "030206005",
+          "030206006",
+          "030206007",
+          "030206008",
+          "030206011",
+          "030206012",
+          "030206013",
+          "030206016",
+          "030206019",
+          "030206021",
+          "030206022",
+          "030206024",
+          "030206025",
+          "030206026",
+          "030207000",
+          "030300000",
+          "030301000",
+          "030301001",
+          "030301002",
+          "030301004",
+          "030301006",
+          "030301007",
+          "030301010",
+          "030301012",
+          "030301013",
+          "030301017",
+          "030301020",
+          "030301021",
+          "030301024",
+          "030301026",
+          "030301028",
+          "030301029",
+          "030302000",
+          "030302001",
+          "030302002",
+          "030302003",
+          "030302005",
+          "030302006",
+          "030302007",
+          "030302008",
+          "030302009",
+          "030302010",
+          "030302011",
+          "030302012",
+          "030302013",
+          "030302014",
+          "030302015",
+          "030302016",
+          "030302017",
+          "030302018",
+          "030302019",
+          "030304009",
+          "030304029",
+          "030304030",
+          "030304031",
+          "030304032",
+          "030304033",
+          "030305000",
+          "030305001",
+          "030305002"
+        ]
+      },
+      "rowCount": 188
+    },
+    "chamgagyeok.standard.UT": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.result": [
+          "object"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO": [
+          "array"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO[]": [
+          "object"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO[].code": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO[].codeName": [
+          "string"
+        ],
+        "response.resultCode": [
+          "string"
+        ],
+        "response.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "code": [
+          "BE",
+          "BO",
+          "BX",
+          "CA",
+          "CP",
+          "CS",
+          "DA",
+          "EA",
+          "G",
+          "GO",
+          "JO",
+          "KG",
+          "L",
+          "LO",
+          "M0",
+          "MA",
+          "ME",
+          "MG",
+          "ML",
+          "MR",
+          "P",
+          "PA",
+          "PG",
+          "PK",
+          "PO",
+          "PY",
+          "T",
+          "TO",
+          "WW"
+        ]
+      },
+      "rowCount": 29
+    },
+    "chamgagyeok.standard.AR": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.result": [
+          "object"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO": [
+          "array"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO[]": [
+          "object"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO[].code": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO[].codeName": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO[].highCode": [
+          "string"
+        ],
+        "response.resultCode": [
+          "string"
+        ],
+        "response.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "code": [
+          "020100000",
+          "020101000",
+          "020102000",
+          "020103000",
+          "020104000",
+          "020105000",
+          "020106000",
+          "020107000",
+          "020108000",
+          "020109000",
+          "020110000",
+          "020111000",
+          "020112000",
+          "020113000",
+          "020114000",
+          "020115000",
+          "020116000",
+          "020117000",
+          "020118000",
+          "020119000",
+          "020120000",
+          "020121000",
+          "020122000",
+          "020123000",
+          "020124000",
+          "020125000",
+          "020200000",
+          "020201000",
+          "020201100",
+          "020202000",
+          "020202100",
+          "020203000",
+          "020203100",
+          "020204000",
+          "020204100",
+          "020205000",
+          "020205100",
+          "020300000",
+          "020301000",
+          "020302000",
+          "020303000",
+          "020304000",
+          "020305000",
+          "020306000",
+          "020307000",
+          "020308000",
+          "020400000",
+          "020401000",
+          "020402000",
+          "020403000",
+          "020404000",
+          "020405000",
+          "020500000",
+          "020501000",
+          "020502000",
+          "020503000",
+          "020504000",
+          "020505000",
+          "020506000",
+          "020507000",
+          "020508000",
+          "020509000",
+          "020510000",
+          "020511000",
+          "020512000",
+          "020513000",
+          "020514000",
+          "020515000",
+          "020516000",
+          "020517000",
+          "020518000",
+          "020600000",
+          "020601000",
+          "020602000",
+          "020603000",
+          "020604000",
+          "020605000",
+          "020700000",
+          "020701000",
+          "020702000",
+          "020703000",
+          "020704000",
+          "020705000",
+          "020706000",
+          "020707000",
+          "020708000",
+          "020709000",
+          "020710000",
+          "020711000",
+          "020800000",
+          "020801000",
+          "020802000",
+          "020803000",
+          "020804000",
+          "020805000",
+          "020806000",
+          "020807000",
+          "020808000",
+          "020809000",
+          "020810000",
+          "020811000",
+          "020812000",
+          "020813000",
+          "020814000",
+          "020815000",
+          "020816000",
+          "020817000",
+          "020818000",
+          "020900000",
+          "020901000",
+          "020902000",
+          "020903000",
+          "020904000",
+          "020905000",
+          "020906000",
+          "020907000",
+          "020908000",
+          "020909000",
+          "020910000",
+          "020911000",
+          "020912000",
+          "020913000",
+          "020914000",
+          "020915000",
+          "020916000",
+          "020917000",
+          "020918000",
+          "020919000",
+          "020920000",
+          "020921000",
+          "020922000",
+          "020923000",
+          "020924000",
+          "020925000",
+          "020926000",
+          "020927000",
+          "020928000",
+          "020929000",
+          "020930000",
+          "020931000",
+          "020932000",
+          "020933000",
+          "020934000",
+          "020935000",
+          "020936000",
+          "020937000",
+          "020938000",
+          "020939000",
+          "020940000",
+          "021000000",
+          "021001000",
+          "021002000",
+          "021003000",
+          "021004000",
+          "021005000",
+          "021006000",
+          "021007000",
+          "021008000",
+          "021009000",
+          "021010000",
+          "021011000",
+          "021012000",
+          "021013000",
+          "021014000",
+          "021015000",
+          "021016000",
+          "021017000",
+          "021018000",
+          "021019000",
+          "021020000",
+          "021021000",
+          "021022000",
+          "021023000",
+          "021100000",
+          "021101000",
+          "021102000",
+          "021103000",
+          "021104000",
+          "021105000",
+          "021106000",
+          "021107000",
+          "021108000",
+          "021109000",
+          "021110000",
+          "021111000",
+          "021112000",
+          "021113000",
+          "021114000",
+          "021115000",
+          "021116000",
+          "021117000",
+          "021118000",
+          "021119000",
+          "021120000",
+          "021121000",
+          "021122000",
+          "021123000",
+          "021124000",
+          "021125000",
+          "021126000",
+          "021127000",
+          "021128000",
+          "021200000",
+          "021201000",
+          "021201100",
+          "021202000",
+          "021202100",
+          "021203000",
+          "021203100",
+          "021204000",
+          "021204100",
+          "021205000",
+          "021205100",
+          "021206000",
+          "021206100",
+          "021207000",
+          "021207100",
+          "021208000",
+          "021208100",
+          "021209000",
+          "021209100",
+          "021210000",
+          "021210100",
+          "021211000",
+          "021211100",
+          "021212000",
+          "021212100",
+          "021213000",
+          "021213100",
+          "021214000",
+          "021214100",
+          "021215000",
+          "021215100",
+          "021216000",
+          "021216100",
+          "021217000",
+          "021217100",
+          "021218000",
+          "021218100",
+          "021219000",
+          "021219100",
+          "021220000",
+          "021220100",
+          "021221000",
+          "021221200",
+          "021222000",
+          "021222200",
+          "021223000",
+          "021223100",
+          "021224000",
+          "021224100",
+          "021300000",
+          "021301000",
+          "021302000",
+          "021303000",
+          "021304000",
+          "021305000",
+          "021306000",
+          "021307000",
+          "021308000",
+          "021309000",
+          "021310000",
+          "021311000",
+          "021312000",
+          "021313000",
+          "021314000",
+          "021315000",
+          "021316000",
+          "021400000",
+          "021401000",
+          "021402000",
+          "021403000",
+          "021404000",
+          "021405000",
+          "021406000",
+          "021407000",
+          "021408000",
+          "021409000",
+          "021410000",
+          "021411000",
+          "021412000",
+          "021413000",
+          "021414000",
+          "021415000",
+          "021416000",
+          "021417000",
+          "021418000",
+          "021419000",
+          "021420000",
+          "021421000",
+          "021500000",
+          "021501000",
+          "021502000",
+          "021503000",
+          "021504000",
+          "021505000",
+          "021506000",
+          "021507000",
+          "021508000",
+          "021509000",
+          "021510000",
+          "021511000",
+          "021512000",
+          "021600000",
+          "021601000",
+          "021602000",
+          "021603000",
+          "021604000",
+          "021700000",
+          "021700010",
+          "021800000"
+        ]
+      },
+      "rowCount": 311
+    },
+    "chamgagyeok.standard.BU": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.result": [
+          "object"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO": [
+          "array"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO[]": [
+          "object"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO[].code": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.stdInfoVO[].codeName": [
+          "string"
+        ],
+        "response.resultCode": [
+          "string"
+        ],
+        "response.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "code": [
+          "CS",
+          "DP",
+          "LM",
+          "MF",
+          "SM"
+        ]
+      },
+      "rowCount": 5
+    },
+    "chamgagyeok.store.all": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.result": [
+          "object"
+        ],
+        "response.result.iros.openapi.service.vo.entpInfoVO": [
+          "array"
+        ],
+        "response.result.iros.openapi.service.vo.entpInfoVO[]": [
+          "object"
+        ],
+        "response.result.iros.openapi.service.vo.entpInfoVO[].areaDetailCode": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.entpInfoVO[].entpAreaCode": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.entpInfoVO[].entpId": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.entpInfoVO[].entpName": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.entpInfoVO[].entpTelno": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.entpInfoVO[].entpTypeCode": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.entpInfoVO[].plmkAddrBasic": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.entpInfoVO[].plmkAddrDetail": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.entpInfoVO[].postNo": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.entpInfoVO[].roadAddrBasic": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.entpInfoVO[].roadAddrDetail": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.entpInfoVO[].xMapCoord": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.entpInfoVO[].yMapCoord": [
+          "string"
+        ],
+        "response.resultCode": [
+          "string"
+        ],
+        "response.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "entpTypeCode": [
+          "CS",
+          "DP",
+          "LM",
+          "SM"
+        ],
+        "entpAreaCode": [
+          "020100000",
+          "020200000",
+          "020300000",
+          "020400000",
+          "020500000",
+          "020600000",
+          "020700000",
+          "020800000",
+          "020900000",
+          "021000000",
+          "021100000",
+          "021200000",
+          "021300000",
+          "021400000",
+          "021500000",
+          "021600000",
+          "021700000",
+          "021800000"
+        ]
+      },
+      "rowCount": 630
+    },
+    "chamgagyeok.product.all": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.result": [
+          "object"
+        ],
+        "response.result.item": [
+          "array"
+        ],
+        "response.result.item[]": [
+          "object"
+        ],
+        "response.result.item[].detailMean": [
+          "string"
+        ],
+        "response.result.item[].goodBaseCnt": [
+          "string"
+        ],
+        "response.result.item[].goodId": [
+          "string"
+        ],
+        "response.result.item[].goodName": [
+          "string"
+        ],
+        "response.result.item[].goodSmlclsCode": [
+          "string"
+        ],
+        "response.result.item[].goodTotalCnt": [
+          "string"
+        ],
+        "response.result.item[].goodTotalDivCode": [
+          "string"
+        ],
+        "response.result.item[].goodUnitDivCode": [
+          "string"
+        ],
+        "response.result.item[].productEntpCode": [
+          "string"
+        ],
+        "response.resultCode": [
+          "string"
+        ],
+        "response.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "goodSmlclsCode": [
+          "030101001",
+          "030101002",
+          "030101003",
+          "030101004",
+          "030102001",
+          "030102002",
+          "030102003",
+          "030102004",
+          "030102005",
+          "030102006",
+          "030102007",
+          "030102008",
+          "030102009",
+          "030102010",
+          "030102011",
+          "030102012",
+          "030102013",
+          "030102014",
+          "030102015",
+          "030102016",
+          "030102017",
+          "030102018",
+          "030102020",
+          "030102021",
+          "030102023",
+          "030103001",
+          "030103002",
+          "030103003",
+          "030103004",
+          "030103006",
+          "030103008",
+          "030201001",
+          "030201004",
+          "030201005",
+          "030201007",
+          "030201008",
+          "030201009",
+          "030201010",
+          "030201011",
+          "030201012",
+          "030201014",
+          "030201015",
+          "030201019",
+          "030201020",
+          "030201021",
+          "030201024",
+          "030201025",
+          "030201026",
+          "030201027",
+          "030201028",
+          "030201029",
+          "030201030",
+          "030201031",
+          "030201032",
+          "030201033",
+          "030201034",
+          "030201035",
+          "030202002",
+          "030202003",
+          "030202004",
+          "030202005",
+          "030202008",
+          "030202009",
+          "030202010",
+          "030203002",
+          "030203003",
+          "030203004",
+          "030203005",
+          "030203006",
+          "030203007",
+          "030203008",
+          "030203009",
+          "030203010",
+          "030203011",
+          "030203012",
+          "030203013",
+          "030204001",
+          "030204002",
+          "030204004",
+          "030204005",
+          "030204006",
+          "030204007",
+          "030204008",
+          "030204009",
+          "030204010",
+          "030204011",
+          "030204012",
+          "030204013",
+          "030204014",
+          "030204015",
+          "030204016",
+          "030204019",
+          "030204020",
+          "030204021",
+          "030204022",
+          "030204023",
+          "030204024",
+          "030205001",
+          "030205002",
+          "030205003",
+          "030205005",
+          "030205006",
+          "030205007",
+          "030205008",
+          "030205009",
+          "030205011",
+          "030205012",
+          "030205013",
+          "030205014",
+          "030205015",
+          "030206001",
+          "030206002",
+          "030206003",
+          "030206004",
+          "030206005",
+          "030206006",
+          "030206007",
+          "030206008",
+          "030206011",
+          "030206012",
+          "030206013",
+          "030206016",
+          "030206019",
+          "030206021",
+          "030206022",
+          "030206024",
+          "030206025",
+          "030206026",
+          "030301001",
+          "030301002",
+          "030301004",
+          "030301006",
+          "030301007",
+          "030301010",
+          "030301012",
+          "030301013",
+          "030301017",
+          "030301020",
+          "030301021",
+          "030301024",
+          "030301026",
+          "030301028",
+          "030301029",
+          "030302001",
+          "030302002",
+          "030302003",
+          "030302005",
+          "030302006",
+          "030302007",
+          "030302008",
+          "030302009",
+          "030302010",
+          "030302011",
+          "030302012",
+          "030302013",
+          "030302015",
+          "030302016",
+          "030302017",
+          "030302018",
+          "030302019",
+          "030304009",
+          "030304029",
+          "030304030",
+          "030304031",
+          "030304032",
+          "030304033",
+          "030305001",
+          "030305002"
+        ],
+        "goodTotalDivCode": [
+          "DA",
+          "EA",
+          "G",
+          "LO",
+          "M0",
+          "MA",
+          "ME",
+          "ML",
+          "MR",
+          "PK"
+        ],
+        "goodUnitDivCode": [
+          "DA",
+          "EA",
+          "G",
+          "LO",
+          "M0",
+          "MA",
+          "ME",
+          "ML",
+          "MR",
+          "PK"
+        ]
+      },
+      "rowCount": 604
+    },
+    "chamgagyeok.price.good-1000": {
+      "shape": {
+        "response": [
+          "object"
+        ],
+        "response.result": [
+          "object"
+        ],
+        "response.result.iros.openapi.service.vo.goodPriceVO": [
+          "array"
+        ],
+        "response.result.iros.openapi.service.vo.goodPriceVO[]": [
+          "object"
+        ],
+        "response.result.iros.openapi.service.vo.goodPriceVO[].entpId": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.goodPriceVO[].goodDcYn": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.goodPriceVO[].goodId": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.goodPriceVO[].goodInspectDay": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.goodPriceVO[].goodPrice": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.goodPriceVO[].inputDttm": [
+          "string"
+        ],
+        "response.result.iros.openapi.service.vo.goodPriceVO[].plusoneYn": [
+          "string"
+        ],
+        "response.resultCode": [
+          "string"
+        ],
+        "response.resultMsg": [
+          "string"
+        ]
+      },
+      "codes": {
+        "goodDcYn": [
+          "N"
+        ],
+        "plusoneYn": [
+          "N"
+        ]
+      },
+      "rowCount": 419
+    }
+  }
+}
