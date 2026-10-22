@@ -59,7 +59,7 @@ describe("editionDraft", () => {
   })
 
   it("옵션을 바꾸면 바뀐 것이고, 미리보기는 편집본을 따른다", () => {
-    const draft = { ...edition, spec: { ...edition.spec, cover: false } }
+    const draft = { ...edition, spec: { ...edition.spec, cover: "none" as const } }
     const state = editionDraft({ saved: edition, draft, build: undefined })
     expect(state.dirty).toBe(true)
     expect(state.previewSpec).toEqual(draft.spec)
@@ -75,7 +75,7 @@ describe("editionDraft", () => {
   })
 
   it("만든 PDF의 사양이 저장본과 다르면 옛 PDF다(편집본은 보지 않는다)", () => {
-    const old = { ...edition.spec, cover: false }
+    const old = { ...edition.spec, cover: "none" as const }
     expect(editionDraft({ saved: edition, draft: edition, build: buildOf(old) }).buildState).toBe("stale")
     const draft = { ...edition, spec: old }
     expect(editionDraft({ saved: edition, draft, build: buildOf(edition.spec) }).buildState).toBe("current")

@@ -19,6 +19,15 @@ describe("parseEdition", () => {
   })
 })
 
+describe("parseEdition 예전 에디션", () => {
+  it("1차 구현 때 저장한 월간 에디션(foodLayout, cover: true)이 새 모양으로 읽힌다", () => {
+    const { layout: _layout, ...rest } = DEFAULT_SPECS.monthly
+    const parsed = parseEdition({ ...edition("monthly-1", "draft"), spec: { ...rest, foodLayout: "scatter", cover: true } })
+    expect(parsed).not.toBeInstanceOf(Error)
+    expect((parsed as Edition).spec).toEqual(DEFAULT_SPECS.monthly)
+  })
+})
+
 describe("parseEdition 글자 수", () => {
   it("이름은 1자 이상 EDITION_LIMITS.title자 이하만 받는다", () => {
     expect(parseEdition({ ...edition("monthly-1", "draft"), title: " " })).toBeInstanceOf(Error)

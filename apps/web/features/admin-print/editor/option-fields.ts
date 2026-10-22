@@ -1,7 +1,7 @@
 import { CALENDAR_VARIANT_LABELS, CALENDAR_VARIANTS } from "@workspace/seasonal/calendar/variants"
 import { FOODS } from "@workspace/seasonal/data/foods"
 import { formatMonthLabel, MONTH_LABEL_STYLES } from "@workspace/seasonal/data/months"
-import type { PrintKind } from "@workspace/seasonal/print/spec"
+import type { PrintKind, PrintSpec } from "@workspace/seasonal/print/spec"
 
 export const FOOD_CATEGORIES = [...new Set(FOODS.map((food) => food.category))]
 
@@ -13,9 +13,17 @@ export type OptionFieldSpec = (
   | { type: "number"; label: string; path: readonly string[]; min: number; max: number }
   | { type: "text"; label: string; path: readonly string[] }
   | { type: "categories"; label: string; path: readonly string[] }
-) & { hint?: string }
+) & {
+  hint?: string
+  /** 이 구성에서만 뜻이 있는 옵션. 거짓이면 패널에서 숨기고, 인쇄도 그 값을 보지 않는다. 값은 사양에 남는다. */
+  when?: (spec: PrintSpec) => boolean
+}
 
 export type OptionSection = { title: string; fields: readonly OptionFieldSpec[] }
+
+export function isFieldShown(field: OptionFieldSpec, spec: PrintSpec): boolean {
+  return field.when?.(spec) ?? true
+}
 
 const options = (entries: Record<string, string>): Option[] => Object.entries(entries).map(([value, label]) => ({ value, label }))
 
@@ -45,13 +53,18 @@ const weekday: OptionFieldSpec = {
 }
 const categories: OptionFieldSpec = { type: "categories", label: "카테고리(비우면 전부)", path: ["categories"] }
 
-const foods = (max: number): OptionSection => ({
+const foods = (max: number, when?: OptionFieldSpec["when"]): OptionSection => ({
   title: "품종",
   fields: [
-    { type: "select", label: "이름", path: ["foods", "names"], options: options({ korean: "한글 이름", hidden: "숨김" }) },
-    { type: "number", label: "칸마다 최대 개수", path: ["foods", "max"], min: 1, max },
+    { type: "select", label: "이름", path: ["foods", "names"], options: options({ korean: "한글 이름", hidden: "숨김" }), when },
+    { type: "number", label: "칸마다 최대 개수", path: ["foods", "max"], min: 1, max, when },
   ],
 })
+
+/** 구성(layout) 선택. 값마다 와이어프레임 안 하나다(wireframe-catalog.ts). */
+const layout = (entries: Record<string, string>): OptionFieldSpec => ({ type: "select", label: "구성", path: ["layout"], options: options(entries) })
+
+const monthlyHasFoods = (spec: PrintSpec) => spec.kind === "monthly" && spec.layout !== "none"
 
 const look: OptionSection = {
   title: "서체·배경",
@@ -65,7 +78,14 @@ const look: OptionSection = {
 
 export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
   monthly: [
-    { title: "용지", fields: [orientation, margin, year, { type: "toggle", label: "12개월 묶음에 표지", path: ["cover"] }] },
+    {
+      title: "구성",
+      fields: [
+        layout({ scatter: "그림 위, 달력 아래 · 흩뿌림", grid: "그림 위, 달력 아래 · 줄 맞춤", none: "달력만(그림 없음)" }),
+        { type: "select", label: "12개월 묶음 표지", path: ["cover"], options: options({ year: "큰 연도 + 대표 품종", none: "표지 없음" }) },
+      ],
+    },
+    { title: "용지", fields: [orientation, margin, year] },
     {
       title: "달력",
       fields: [
@@ -77,10 +97,11 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
         { type: "select", label: "달력 아래", path: ["memo"], options: options({ none: "없음", lines: "메모 줄", "eaten-check": "먹은 음식 체크 칸" }) },
       ],
     },
-    { ...foods(20), fields: [{ type: "select", label: "배치", path: ["foodLayout"], options: options({ scatter: "흩뿌림", grid: "줄 맞춤", none: "그림 없음" }) }, ...foods(20).fields] },
+    foods(20, monthlyHasFoods),
     look,
   ],
   "year-sheet": [
+    { title: "구성", fields: [layout({ pairs: "그림·달력 짝 체크무늬" })] },
     { title: "용지", fields: [orientation, margin, year, grid] },
     {
       title: "달력",
@@ -95,11 +116,13 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
     look,
   ],
   "season-poster": [
+    { title: "구성", fields: [layout({ bands: "가로 띠 넷" })] },
     { title: "용지", fields: [orientation, margin, title, { type: "select", label: "계절 표기", path: ["seasonLabel"], options: options({ "english-korean": "Spring · 봄", korean: "봄" }) }] },
     { ...foods(30), fields: [...foods(30).fields, categories] },
     look,
   ],
   "month-poster": [
+    { title: "구성", fields: [layout({ cells: "열두 칸" })] },
     { title: "용지", fields: [orientation, margin, title, grid, monthLabel] },
     { ...foods(12), fields: [...foods(12).fields, categories] },
     look,

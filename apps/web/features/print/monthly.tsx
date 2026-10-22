@@ -17,7 +17,7 @@ const MEMO = 34
 export function MonthlySheets({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
   return (
     <>
-      {spec.cover && <Cover spec={spec} paper={paper} />}
+      {spec.cover === "year" && <Cover spec={spec} paper={paper} />}
       {MONTHS.map((month) => (
         <MonthSheet key={month} spec={spec} paper={paper} month={month} />
       ))}
@@ -28,8 +28,8 @@ export function MonthlySheets({ spec, paper }: { spec: MonthlySpec; paper: Paper
 function MonthSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; month: Month }) {
   const inner = innerSize(spec)
   const portrait = spec.orientation === "portrait"
-  const foods = spec.foodLayout === "none" ? [] : monthFoods(month, { max: spec.foods.max, categories: [] })
-  const showFoods = spec.foodLayout !== "none"
+  const foods = spec.layout === "none" ? [] : monthFoods(month, { max: spec.foods.max, categories: [] })
+  const showFoods = spec.layout !== "none"
 
   const food = portrait
     ? { width: inner.width, height: showFoods ? 112 : 0 }
@@ -50,7 +50,7 @@ function MonthSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; m
             foods={foods}
             width={food.width}
             height={food.height}
-            layout={spec.foodLayout === "scatter" ? "scatter" : "flow"}
+            layout={spec.layout === "scatter" ? "scatter" : "flow"}
             month={month}
             showName={spec.foods.names === "korean"}
             nameSize={3.2}

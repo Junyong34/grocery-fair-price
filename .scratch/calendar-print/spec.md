@@ -357,7 +357,7 @@ AGENTS.md "Generated files" 표에 `public/downloads/**`와 명령 `pnpm prints:
 - `pnpm prints:build` 명령은 만들지 않았다. 생성기(`features/admin-print/generate.ts`)는 Next 안의 TypeScript라 어드민 "PDF 생성" 버튼(Server Action)으로만 돈다. 저장소에 TS를 바로 돌릴 도구(tsx)가 없다.
 - 품종 이름의 `korean-english`는 뺐다. 품종 데이터에 영어 이름이 없다.
 - `foods.seed`는 뺐다. 흩뿌림 배치는 달·품종·판 크기로 정해진다(화면 2a와 같다).
-- 월간 달력의 `foodLayout`은 `scatter | grid | none`이다(`hero`, `strip` 없음).
+- 월간 달력의 `foodLayout`은 `scatter | grid | none`이다(`hero`, `strip` 없음). 2026-10-22부터 이름이 `layout`이고, `cover`는 `"none" | "year"` 값 목록이다("구성(layout) 늘리기").
 - 연간 한 장은 달력 모양(`variant`)을 고르지 않는다. 칸이 작아 plain만 쓴다.
 - 숫자 display 서체는 라이선스 확인 전이라 고를 수 없다.
 - 그림이 없는 품종은 인쇄물에 넣지 않는다.

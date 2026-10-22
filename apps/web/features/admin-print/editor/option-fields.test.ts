@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import { DEFAULT_SPECS, parsePrintSpec, PRINT_KINDS } from "@workspace/seasonal/print/spec"
 
 import { getAt, setAt } from "../lib/spec-path"
-import { FOOD_CATEGORIES, KIND_SECTIONS, type OptionFieldSpec } from "./option-fields"
+import { FOOD_CATEGORIES, isFieldShown, KIND_SECTIONS, type OptionFieldSpec } from "./option-fields"
 
 // 폼(KIND_SECTIONS)과 사양 스키마(parsePrintSpec)가 어긋나지 않는지 본다. 폼이 내는 값은 모두 사양으로 읽혀야 하고, 사양의 값은 모두 폼에서 바꿀 수 있어야 한다.
 
@@ -65,8 +65,30 @@ describe.each(PRINT_KINDS)("%s 폼", (kind) => {
     expect(missing).toEqual([])
   })
 
+  it("첫 섹션은 구성이고, 구성(layout) 선택이 맨 앞이다", () => {
+    const [first] = KIND_SECTIONS[kind]
+    expect(first!.title).toBe("구성")
+    expect(first!.fields[0]!.path).toEqual(["layout"])
+  })
+
+  it("기본 사양에서는 모든 필드가 보인다", () => {
+    for (const field of fields) expect(isFieldShown(field, base), field.label).toBe(true)
+  })
+
   it("한 경로를 두 필드가 나눠 갖지 않는다", () => {
     const paths = fields.map((field) => field.path.join("."))
     expect(paths.length).toBe(new Set(paths).size)
+  })
+})
+
+describe("isFieldShown", () => {
+  const monthly = KIND_SECTIONS.monthly.flatMap((section) => section.fields)
+  const byPath = (path: string) => monthly.find((field) => field.path.join(".") === path)!
+
+  it("월간에서 그림 없음을 고르면 품종 이름·개수를 숨긴다", () => {
+    const spec = { ...DEFAULT_SPECS.monthly, layout: "none" as const }
+    expect(isFieldShown(byPath("foods.names"), spec)).toBe(false)
+    expect(isFieldShown(byPath("foods.max"), spec)).toBe(false)
+    expect(isFieldShown(byPath("memo"), spec)).toBe(true)
   })
 })

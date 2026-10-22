@@ -97,7 +97,7 @@ const monthly: WireframeEntry[] = [
     title: "그림 위, 달력 아래",
     summary: "지금 모양. 그림과 달력이 반씩 나뉘어 벽에 걸면 그림이 먼저 보인다.",
     source: "① 그림 위 · 달력 아래 · K3, K7, K12, G3, G4",
-    availability: { status: "available", options: 'foodLayout: "scatter" | "grid"' },
+    availability: { status: "available", options: 'layout: "scatter" | "grid"' },
     orientations: ["portrait", "landscape"],
     draw: (orientation) => {
       const c = contentBox(orientation)
@@ -117,7 +117,7 @@ const monthly: WireframeEntry[] = [
     title: "달력 옆 제철 체크 목록",
     summary: "그 달 품종 이름을 달력 오른쪽 세로 목록으로 옮겨 그림 수보다 많은 품종을 싣는다. 먹은 것에 체크한다.",
     source: "④ 정보형 · K10(이 달의 요리 목록), K11(품목 카드, 먹은 것 스티커), R1",
-    availability: { status: "needs-option", options: 'memoPlacement: "below" | "side"' },
+    availability: { status: "needs-option", options: 'layout: "side-check"' },
     orientations: ["portrait"],
     draw: () => {
       const [header, food, body] = split(contentBox("portrait"), "rows", [26, 80, "*"], 8)
@@ -141,7 +141,7 @@ const monthly: WireframeEntry[] = [
     summary:
       "달력 칸을 키워 일정을 적는다. 그림 띠를 두 줄(14개)로 늘리고 1일 앞·말일 뒤 빈 칸에도 그림을 넣어 품종 수를 지킨다. 2027년은 빈 칸이 달마다 0~11개지만 띠 14개와 합치면 그림 있는 품종(달마다 7~19개)이 주 시작과 상관없이 모두 들어간다.",
     source: "④ 정보형 · K10(그림 30 : 달력 70), G3·G5(쓰기 칸). 빈 칸 그림은 판매 사례 없는 제안",
-    availability: { status: "needs-option", options: 'foodLayout: "strip", calendar.fillBlanks' },
+    availability: { status: "needs-option", options: 'layout: "strip", calendar.fillBlanks' },
     orientations: ["portrait", "landscape"],
     draw: (orientation) => {
       const c = contentBox(orientation)
@@ -162,7 +162,7 @@ const monthly: WireframeEntry[] = [
     title: "그림이 판 전체, 달력은 작은 블록",
     summary: "품종 그림을 시트 전체에 깔고 달력을 모서리 블록(세로)이나 가장자리 날짜 한 열(가로)로 줄인다. 감상용이고 그림이 가장 많다. 날짜가 작아지는 것이 약점이다(K12 리뷰).",
     source: "② 그림이 판 전체 · K1(모서리 블록), K4(가장자리 날짜 열), K8",
-    availability: { status: "needs-option", options: 'foodLayout: "allover", calendar.placement: "corner" | "edge"' },
+    availability: { status: "needs-option", options: 'layout: "allover"(세로는 모서리 블록, 가로는 날짜 한 열)' },
     orientations: ["portrait", "landscape"],
     draw: (orientation) => {
       const c = contentBox(orientation)
@@ -193,7 +193,7 @@ const monthly: WireframeEntry[] = [
     title: "표지: 큰 연도 + 대표 품종",
     summary: "지금 표지. 연도 숫자가 주인공이다.",
     source: "① 표지 · K7, R1, G5",
-    availability: { status: "available", options: "cover: true" },
+    availability: { status: "available", options: 'cover: "year"' },
     orientations: ["portrait"],
     draw: () => {
       const c = contentBox("portrait")
@@ -212,7 +212,7 @@ const monthly: WireframeEntry[] = [
     title: "표지: 열두 달 미리보기",
     summary: "달마다 대표 그림 하나를 3×4로 모아 표지에서 1년을 보여 준다.",
     source: "⑤ 연간 한 장 격자를 표지로 · K5, K13",
-    availability: { status: "needs-option", options: 'cover: "year" | "months" | "chart" | false' },
+    availability: { status: "needs-option", options: 'cover: "months"' },
     orientations: ["portrait"],
     draw: () => {
       const [header, body] = split(contentBox("portrait"), "rows", [26, "*"], 6)
@@ -251,7 +251,7 @@ const yearSheet: WireframeEntry[] = [
     title: "그림·달력 짝 체크무늬",
     summary: "지금 모양. 달마다 그림과 달력이 같은 크기라 열두 달이 고르게 보인다.",
     source: "⑤ 연간 한 장 격자 · K5(A3 3×4), K13, K6",
-    availability: { status: "available", options: 'grid: "2x6" | "3x4" | "4x3", monthLabel: "big-number"' },
+    availability: { status: "available", options: 'layout: "pairs", grid: "2x6" | "3x4" | "4x3"' },
     orientations: ["portrait", "landscape"],
     draw: (orientation) => {
       const c = contentBox(orientation)
@@ -283,7 +283,7 @@ const yearSheet: WireframeEntry[] = [
     title: "큰 그림 위, 열두 달 아래",
     summary: "위 1/3에 1년치 품종을 한 판으로 모으고, 아래에 작은 달력 열둘. 달별 그림 칸이 없어 달력 글자가 커진다.",
     source: "⑤ 콜라주형 + ② · K14, K3 연력",
-    availability: { status: "needs-option", options: 'layout: "pairs" | "hero-top"' },
+    availability: { status: "needs-option", options: 'layout: "hero-top"' },
     orientations: ["portrait"],
     draw: () => {
       const [header, art, body] = split(contentBox("portrait"), "rows", [26, 84, "*"], 6)
@@ -322,7 +322,7 @@ const seasonPoster: WireframeEntry[] = [
     title: "가로 띠 넷",
     summary: "지금 모양. 위에서 아래로 계절이 흐른다.",
     source: "⑦ 계절 구획(4띠) · K10 계절표, G8",
-    availability: { status: "available", options: 'seasonLabel, surface: "season"' },
+    availability: { status: "available", options: 'layout: "bands"' },
     orientations: ["portrait"],
     draw: () => {
       const [title, body] = split(contentBox("portrait"), "rows", [12, "*"], 4)
@@ -342,7 +342,7 @@ const seasonPoster: WireframeEntry[] = [
     title: "사분면(세로) / 네 열(가로)",
     summary: "계절 칸이 정사각에 가까워 그림이 커진다. 가로 용지는 계절을 열로 세우고 그림 아래에 그림 없는 품종 이름까지 적는다.",
     source: "⑦ 계절 구획(블록) · G8, R11, R12. X자 대각선 G9도 같은 갈래",
-    availability: { status: "needs-option", options: 'layout: "bands" | "quadrants" | "columns"' },
+    availability: { status: "needs-option", options: 'layout: "quarters"(세로는 사분면, 가로는 네 열)' },
     orientations: ["portrait", "landscape"],
     draw: (orientation) => {
       const [title, body] = split(contentBox(orientation), "rows", [orientation === "portrait" ? 12 : 10, "*"], 4)
@@ -384,7 +384,7 @@ const seasonPoster: WireframeEntry[] = [
     title: "계절마다 한 장(4쪽)",
     summary: "계절 하나에 시트 한 장. 품종 그림이 네 배 커지고 계절마다 바꿔 건다. 결과 PDF가 1쪽에서 4쪽이 된다.",
     source: "⑦ 계절마다 한 장 · K9, R10",
-    availability: { status: "needs-option", options: 'pages: "one" | "per-season"' },
+    availability: { status: "needs-option", options: 'layout: "per-season"' },
     orientations: ["portrait", "landscape"],
     draw: (orientation) => {
       const portrait = orientation === "portrait"
@@ -412,7 +412,7 @@ const monthPoster: WireframeEntry[] = [
     title: "열두 칸",
     summary: '지금 모양. "이 달에 뭐가 나지"를 칸 하나에서 바로 읽는다.',
     source: "⑥ 한 장 12칸 · G2, R6, R7 (국내 판매 사례 없음)",
-    availability: { status: "available", options: "grid, categories" },
+    availability: { status: "available", options: 'layout: "cells", grid' },
     orientations: ["portrait", "landscape"],
     draw: (orientation) => {
       const [title, body] = split(contentBox(orientation), "rows", [orientation === "portrait" ? 12 : 10, "*"], 4)
@@ -433,7 +433,7 @@ const monthPoster: WireframeEntry[] = [
     title: "품종×달 막대표",
     summary: "행 하나가 품종 하나, 제철 달에 막대를 칠한다. 품종이 반복되지 않고 제철 길이가 보인다. 카테고리 띠로 묶는다.",
     source: "⑨ 기간 표시 · G10, G7. 행 = 품종인 표 자체는 판매 사례로 확인 못 함",
-    availability: { status: "needs-option", options: 'layout: "cells" | "chart"' },
+    availability: { status: "needs-option", options: 'layout: "chart"' },
     orientations: ["portrait", "landscape"],
     draw: (orientation) => {
       const [title, body] = split(contentBox(orientation), "rows", [orientation === "portrait" ? 12 : 10, "*"], 4)
@@ -463,7 +463,7 @@ const monthPoster: WireframeEntry[] = [
     title: "한 줄에 한 달, 장보기 체크",
     summary: "달마다 한 줄: 큰 숫자, 그림 다섯, 이름 체크 칸. 냉장고에 붙여 두고 그 달 줄만 본다.",
     source: "④ + ⑥ · R6(그림 + 이름 목록), G2(장보기 목록용), K11(먹은 것 표시)",
-    availability: { status: "needs-option", options: 'grid: "1x12", check' },
+    availability: { status: "needs-option", options: 'layout: "rows-check"' },
     orientations: ["portrait"],
     draw: () => {
       const [title, body] = split(contentBox("portrait"), "rows", [12, "*"], 4)

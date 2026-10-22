@@ -74,16 +74,19 @@ const calendar = <H extends z.ZodEnum>(holidays: H) =>
 
 const year = z.number().int().min(2020).max(2100)
 
+// 구성(layout): 종류마다 값 하나가 와이어프레임 안 하나다(apps/web/features/admin-print/lib/wireframe-catalog.ts).
+// 용지 방향에 따라 갈리는 모양은 하위 옵션 없이 orientation으로 정한다. 안을 실제로 구현할 때마다 값을 더한다.
+
 const monthlySchema = z.object({
   ...base,
   kind: z.literal("monthly"),
   year,
-  /** 첫 장에 연도 표지. 12개월 묶음에만 붙는다. */
-  cover: z.boolean(),
+  /** 12개월 묶음 첫 장의 표지. none: 표지 없음, year: 큰 연도 + 대표 품종(C-1) */
+  cover: z.enum(["none", "year"]),
   monthLabel,
   calendar: calendar(z.enum(["hidden", "mark", "mark-and-name"])).extend({ variant: z.enum(CALENDAR_VARIANTS) }),
-  /** 흩뿌림 / 줄 맞춘 격자 / 그림 없음 */
-  foodLayout: z.enum(["scatter", "grid", "none"]),
+  /** 위 그림 + 아래 달력(M-A). 그림을 흩뿌림 / 줄 맞춘 격자 / 그림 없음 */
+  layout: z.enum(["scatter", "grid", "none"]),
   /** 달력 아래 여백: 없음 / 메모 줄 / 먹은 음식 체크 칸(빈 칸 인쇄) */
   memo: z.enum(["none", "lines", "eaten-check"]),
 })
@@ -96,6 +99,8 @@ const yearSheetSchema = z.object({
   monthLabel: z.enum([...MONTH_LABEL_STYLES, "big-number"]),
   // 칸이 작아 공휴일 이름은 들어가지 않는다.
   calendar: calendar(z.enum(["hidden", "mark"])),
+  /** 그림·달력 짝 체크무늬(Y-A) */
+  layout: z.enum(["pairs"]).default("pairs"),
   /** 달 배열(열×행) */
   grid,
 })
@@ -104,6 +109,8 @@ const seasonPosterSchema = z.object({
   ...base,
   kind: z.literal("season-poster"),
   title,
+  /** 가로 띠 넷(S-A) */
+  layout: z.enum(["bands"]).default("bands"),
   seasonLabel: z.enum(["korean", "english-korean"]),
   /** 넣을 카테고리. 비우면 전부 */
   categories,
@@ -113,16 +120,31 @@ const monthPosterSchema = z.object({
   ...base,
   kind: z.literal("month-poster"),
   title,
+  /** 열두 칸(P-A) */
+  layout: z.enum(["cells"]).default("cells"),
   monthLabel,
   grid,
   categories,
 })
 
-const printSpecSchema = z
-  .discriminatedUnion("kind", [monthlySchema, yearSheetSchema, seasonPosterSchema, monthPosterSchema])
-  .refine((spec) => !("grid" in spec && spec.grid === "2x6" && spec.orientation === "landscape"), {
+/**
+ * 1차 구현(2026-10-16) 때 저장된 월간 사양을 지금 모양으로 옮긴다. foodLayout → layout, cover 참·거짓 → "year"·"none".
+ * 나머지 종류의 빠진 layout은 스키마의 default가 채운다. 저장된 JSON은 고치지 않고, 다음 저장 때 새 모양으로 써진다.
+ */
+function migrateLegacy(value: unknown): unknown {
+  if (!value || typeof value !== "object" || (value as { kind?: unknown }).kind !== "monthly") return value
+  const { foodLayout, ...spec } = value as Record<string, unknown>
+  if (!("layout" in spec) && foodLayout !== undefined) spec.layout = foodLayout
+  if (typeof spec.cover === "boolean") spec.cover = spec.cover ? "year" : "none"
+  return spec
+}
+
+const printSpecSchema = z.preprocess(
+  migrateLegacy,
+  z.discriminatedUnion("kind", [monthlySchema, yearSheetSchema, seasonPosterSchema, monthPosterSchema]).refine((spec) => !("grid" in spec && spec.grid === "2x6" && spec.orientation === "landscape"), {
     message: "가로 용지에 2x6 배열은 칸이 너무 작다",
-  })
+  }),
+)
 
 export type PrintSpec = z.infer<typeof printSpecSchema>
 export type MonthlySpec = z.infer<typeof monthlySchema>
@@ -151,11 +173,11 @@ export const DEFAULT_SPECS: { [K in PrintKind]: Extract<PrintSpec, { kind: K }> 
     ...common,
     kind: "monthly",
     year: 2027,
-    cover: true,
+    cover: "year",
     monthLabel: "number",
     calendar: { variant: "plain", weekStart: 0, weekday: "korean", holidays: "mark-and-name" },
     foods: { names: "korean", max: 8 },
-    foodLayout: "scatter",
+    layout: "scatter",
     memo: "none",
   },
   "year-sheet": {
@@ -166,6 +188,7 @@ export const DEFAULT_SPECS: { [K in PrintKind]: Extract<PrintSpec, { kind: K }> 
     monthLabel: "big-number",
     calendar: { weekStart: 0, weekday: "korean", holidays: "mark" },
     foods: { names: "hidden", max: 4 },
+    layout: "pairs",
     grid: "2x6",
   },
   "season-poster": {
@@ -173,6 +196,7 @@ export const DEFAULT_SPECS: { [K in PrintKind]: Extract<PrintSpec, { kind: K }> 
     surface: "white",
     kind: "season-poster",
     title: "계절별 제철 음식",
+    layout: "bands",
     seasonLabel: "english-korean",
     foods: { names: "korean", max: 24 },
     categories: [],
@@ -182,6 +206,7 @@ export const DEFAULT_SPECS: { [K in PrintKind]: Extract<PrintSpec, { kind: K }> 
     surface: "white",
     kind: "month-poster",
     title: "달마다 제철",
+    layout: "cells",
     monthLabel: "korean",
     foods: { names: "korean", max: 8 },
     grid: "3x4",
@@ -194,7 +219,7 @@ export const DEFAULT_SPECS: { [K in PrintKind]: Extract<PrintSpec, { kind: K }> 
  * 생성기가 PDF를 검사할 때 쓴다.
  */
 export function pageCount(spec: PrintSpec): number {
-  return spec.kind === "monthly" ? MONTHS.length + (spec.cover ? 1 : 0) : 1
+  return spec.kind === "monthly" ? MONTHS.length + (spec.cover === "none" ? 0 : 1) : 1
 }
 
 /** URL 쿼리에 넣는 모양(UTF-8 JSON의 base64url). */

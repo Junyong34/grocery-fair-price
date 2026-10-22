@@ -12,6 +12,39 @@ import {
   specHash,
 } from "./spec"
 
+// 1차 구현(2026-10-16) 때 저장된 모양. 월간은 foodLayout·cover: boolean, 나머지는 layout이 없다.
+const LEGACY_COMMON = {
+  version: 1,
+  orientation: "portrait",
+  type: { heading: "gowun-batang", number: "pretendard", scale: 1 },
+  surface: "cream",
+  margin: "safe",
+} as const
+const LEGACY = {
+  monthly: {
+    ...LEGACY_COMMON,
+    kind: "monthly",
+    year: 2027,
+    cover: true,
+    monthLabel: "number",
+    calendar: { variant: "plain", weekStart: 0, weekday: "korean", holidays: "mark-and-name" },
+    foods: { names: "korean", max: 8 },
+    foodLayout: "grid",
+    memo: "none",
+  },
+  "year-sheet": {
+    ...LEGACY_COMMON,
+    kind: "year-sheet",
+    year: 2027,
+    monthLabel: "big-number",
+    calendar: { weekStart: 0, weekday: "korean", holidays: "mark" },
+    foods: { names: "hidden", max: 4 },
+    grid: "2x6",
+  },
+  "season-poster": { ...LEGACY_COMMON, kind: "season-poster", title: "계절별 제철 음식", seasonLabel: "english-korean", foods: { names: "korean", max: 24 }, categories: [] },
+  "month-poster": { ...LEGACY_COMMON, kind: "month-poster", title: "달마다 제철", monthLabel: "korean", foods: { names: "korean", max: 8 }, grid: "3x4", categories: [] },
+}
+
 describe("PAPERS", () => {
   it("A3는 A4를 √2배 키운 크기다(1mm 안)", () => {
     expect(Math.abs(PAPERS.A4.width * PAPERS.A3.scale - PAPERS.A3.width)).toBeLessThan(1)
@@ -34,6 +67,29 @@ describe("parsePrintSpec", () => {
   it("여백 옵션이 없는 예전 사양은 기본 여백으로 읽는다", () => {
     const { margin: _margin, ...legacy } = DEFAULT_SPECS.monthly
     expect(parsePrintSpec(legacy)).toEqual({ ...DEFAULT_SPECS.monthly, margin: "safe" })
+  })
+
+  it("예전 월간 사양의 foodLayout은 layout으로, cover 참·거짓은 year·none으로 읽는다", () => {
+    const parsed = parsePrintSpec(LEGACY.monthly)
+    expect(parsed).toMatchObject({ layout: "grid", cover: "year" })
+    expect(parsed).not.toHaveProperty("foodLayout")
+    expect(parsePrintSpec({ ...LEGACY.monthly, cover: false })).toMatchObject({ cover: "none" })
+  })
+
+  it("layout이 없는 예전 사양은 지금 모양(pairs·bands·cells)으로 읽는다", () => {
+    expect(parsePrintSpec(LEGACY["year-sheet"])).toMatchObject({ layout: "pairs" })
+    expect(parsePrintSpec(LEGACY["season-poster"])).toMatchObject({ layout: "bands" })
+    expect(parsePrintSpec(LEGACY["month-poster"])).toMatchObject({ layout: "cells" })
+  })
+
+  it("새 모양 사양에 layout이 있으면 foodLayout보다 layout을 따른다", () => {
+    expect(parsePrintSpec({ ...DEFAULT_SPECS.monthly, layout: "none", foodLayout: "scatter" })).toMatchObject({ layout: "none" })
+  })
+
+  it("없는 구성 값은 오류다", () => {
+    expect(parsePrintSpec({ ...DEFAULT_SPECS.monthly, layout: "wheel" })).toBeInstanceOf(Error)
+    expect(parsePrintSpec({ ...DEFAULT_SPECS["year-sheet"], layout: "cells" })).toBeInstanceOf(Error)
+    expect(parsePrintSpec({ ...DEFAULT_SPECS.monthly, cover: "poster" })).toBeInstanceOf(Error)
   })
 
   it("모르는 종류, 없는 선택지는 오류다", () => {
@@ -77,14 +133,14 @@ describe("specHash", () => {
     const spec = DEFAULT_SPECS.monthly
     const shuffled = Object.fromEntries(Object.entries(spec).reverse()) as typeof spec
     expect(specHash(shuffled)).toBe(specHash(spec))
-    expect(specHash({ ...spec, cover: !spec.cover })).not.toBe(specHash(spec))
+    expect(specHash({ ...spec, cover: "none" })).not.toBe(specHash(spec))
   })
 })
 
 describe("쪽 수", () => {
   it("월간 달력은 열두 달에 표지를 켜면 하나 더한다", () => {
-    expect(pageCount({ ...DEFAULT_SPECS.monthly, cover: false })).toBe(12)
-    expect(pageCount({ ...DEFAULT_SPECS.monthly, cover: true })).toBe(13)
+    expect(pageCount({ ...DEFAULT_SPECS.monthly, cover: "none" })).toBe(12)
+    expect(pageCount({ ...DEFAULT_SPECS.monthly, cover: "year" })).toBe(13)
   })
 
   it("나머지 종류는 한 장이다", () => {
