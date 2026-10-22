@@ -72,8 +72,10 @@ const foods = (max: number, when?: { names?: OptionFieldSpec["when"]; max?: Opti
 const layout = (entries: Record<string, string>): OptionFieldSpec => ({ type: "select", label: "구성", path: ["layout"], options: options(entries) })
 
 const monthlyHasFoods = (spec: PrintSpec) => spec.kind === "monthly" && spec.layout !== "none"
-/** M-B는 체크 목록이 달력 옆에 있고, M-D는 달력 칸 자체가 쓰는 자리라 달력 아래 메모를 쓰지 않는다. */
-const monthlyHasMemo = (spec: PrintSpec) => spec.kind === "monthly" && spec.layout !== "side-check" && spec.layout !== "strip"
+/** M-B는 체크 목록이 달력 옆에 있고, M-D는 달력 칸 자체가 쓰는 자리이며, M-E는 그림이 판 전체라 달력 아래 메모를 쓰지 않는다. */
+const monthlyHasMemo = (spec: PrintSpec) => spec.kind === "monthly" && !(["side-check", "strip", "allover"] as const).some((layout) => layout === spec.layout)
+/** M-E 가로는 달력 대신 날짜를 한 열로 늘어놓아 달력 모양과 주 시작이 없다. */
+const monthlyHasWeeks = (spec: PrintSpec) => spec.kind !== "monthly" || spec.layout !== "allover" || spec.orientation === "portrait"
 /** M-D는 쓰는 칸이 필요해 격자 모양으로 정해져 있고, 그림 있는 품종을 모두 띠와 빈 칸에 넣는다. */
 const monthlyNotStrip = (spec: PrintSpec) => spec.kind === "monthly" && spec.layout !== "strip"
 /** Y-B는 달 배열이 3x4로, 위 그림은 달마다 하나로 정해져 있다. */
@@ -102,6 +104,7 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
           none: "달력만(그림 없음)",
           "side-check": "달력 옆 제철 체크 목록(세로 용지)",
           strip: "쓰는 큰 칸 달력 + 그림 띠(빈 날짜 칸에도 그림)",
+          allover: "그림이 판 전체, 달력은 모서리 블록(세로)·날짜 한 열(가로)",
         }),
         { type: "select", label: "12개월 묶음 표지", path: ["cover"], options: options({ year: "큰 연도 + 대표 품종", none: "표지 없음" }) },
       ],
@@ -110,8 +113,8 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
     {
       title: "달력",
       fields: [
-        { type: "select", label: "모양", path: ["calendar", "variant"], options: CALENDAR_VARIANTS.map((variant) => ({ value: variant, label: CALENDAR_VARIANT_LABELS[variant] })), when: monthlyNotStrip },
-        weekStart,
+        { type: "select", label: "모양", path: ["calendar", "variant"], options: CALENDAR_VARIANTS.map((variant) => ({ value: variant, label: CALENDAR_VARIANT_LABELS[variant] })), when: (spec) => monthlyNotStrip(spec) && monthlyHasWeeks(spec) },
+        { ...weekStart, when: monthlyHasWeeks },
         weekday,
         { type: "select", label: "공휴일", path: ["calendar", "holidays"], options: options({ "mark-and-name": "날짜와 이름", mark: "빨간 날짜만", hidden: "표시 안 함" }) },
         calendarSize,

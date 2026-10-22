@@ -20,6 +20,7 @@ export function FoodArea({
   showName,
   nameSize,
   maxSize,
+  avoid,
   style,
 }: {
   foods: readonly Food[]
@@ -33,13 +34,20 @@ export function FoodArea({
   nameSize?: number
   /** flow 그림 크기 상한. 한 장의 여러 칸이 같은 크기로 보이게 할 때 준다(flowSize의 최솟값). */
   maxSize?: number
+  /** scatter에서 그림을 놓지 않을 사각형(판 왼쪽 위 기준 용지 단위). 그 자리에 달력 블록 같은 것이 얹힌다. */
+  avoid?: readonly { x: number; y: number; width: number; height: number }[]
   style?: React.CSSProperties
 }) {
   const box = { position: "relative", width: u(width), height: u(height), flex: "none", ...style } as const
   if (foods.length === 0) return <div style={box} />
 
   if (layout === "scatter") {
-    const frame: ScatterFrame = { width: width * PX_PER_UNIT, height: height * PX_PER_UNIT, big: true }
+    const frame: ScatterFrame = {
+      width: width * PX_PER_UNIT,
+      height: height * PX_PER_UNIT,
+      big: true,
+      avoid: avoid?.map((box) => ({ x: box.x * PX_PER_UNIT, y: box.y * PX_PER_UNIT, width: box.width * PX_PER_UNIT, height: box.height * PX_PER_UNIT })),
+    }
     const { items } = scatterLayout({ month, ids: foods.map((food) => food.id), frame })
     const label = labelFontPx(frame) / PX_PER_UNIT
     return (

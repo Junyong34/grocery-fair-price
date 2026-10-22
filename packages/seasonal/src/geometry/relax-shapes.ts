@@ -19,17 +19,21 @@ export type RelaxShapesOptions = {
   bounds: { width: number; height: number }
   /** 움직이지 않을 묶음(끄는 중인 그림). 겹침은 상대가 전부 비켜서 푼다. */
   pinned?: string
-  /** 묶음 사이에 남길 틈. */
+  /** 묶음 사이에 남길 틈. 피할 영역과의 틈도 같다. */
   gap?: number
+  /** 묶음이 들어가면 안 되는 사각형(왼쪽 위 x·y와 폭·높이). 겹친 묶음은 영역 안에 남는 쪽 중 가장 가까운 쪽으로 밀려난다. */
+  obstacles?: readonly Box[]
   iterations?: number
 }
 
 type Rect = { cx: number; cy: number; w: number; h: number }
+/** 왼쪽 위 기준 사각형 */
+export type Box = { x: number; y: number; width: number; height: number }
 
 const labelRect = (s: Shape): Rect => ({ cx: s.x, cy: s.y + s.r + s.labelH / 2, w: s.labelW, h: s.labelH })
 
 /** 겹친 묶음을 서로 밀어낸 새 배열을 돌려준다. 입력은 바꾸지 않는다. */
-export function relaxShapes(shapes: readonly Shape[], { bounds, pinned, gap = 0, iterations = 60 }: RelaxShapesOptions): Shape[] {
+export function relaxShapes(shapes: readonly Shape[], { bounds, pinned, gap = 0, iterations = 60, obstacles = [] }: RelaxShapesOptions): Shape[] {
   const next = shapes.map((shape) => ({ ...shape }))
   for (let step = 0; step < iterations; step++) {
     let moved = false
@@ -45,10 +49,41 @@ export function relaxShapes(shapes: readonly Shape[], { bounds, pinned, gap = 0,
         next[j]!.y += push.y * b
       }
     }
-    for (const shape of next) clamp(shape, bounds)
+    for (const shape of next) {
+      clamp(shape, bounds)
+      for (const obstacle of obstacles) if (pushOut(shape, obstacle, bounds, gap)) moved = true
+    }
     if (!moved) break
   }
   return next
+}
+
+/**
+ * 묶음(원과 이름표를 감싸는 상자)이 피할 영역과 겹치면 네 방향 중 영역 안에 남는 가장 짧은 쪽으로 옮긴다.
+ * 옮겼으면 true. 어느 쪽으로도 영역 안에 남을 수 없으면 그대로 둔다.
+ */
+function pushOut(shape: Shape, obstacle: Box, bounds: RelaxShapesOptions["bounds"], gap: number): boolean {
+  const half = Math.max(shape.r, shape.labelW / 2)
+  const left = shape.x - half
+  const right = shape.x + half
+  const top = shape.y - shape.r
+  const bottom = shape.y + shape.r + shape.labelH
+  const x0 = obstacle.x - gap
+  const x1 = obstacle.x + obstacle.width + gap
+  const y0 = obstacle.y - gap
+  const y1 = obstacle.y + obstacle.height + gap
+  if (right <= x0 || left >= x1 || bottom <= y0 || top >= y1) return false
+  const moves = [
+    { dx: x0 - right, dy: 0 },
+    { dx: x1 - left, dy: 0 },
+    { dx: 0, dy: y0 - bottom },
+    { dx: 0, dy: y1 - top },
+  ].filter(({ dx, dy }) => left + dx >= 0 && right + dx <= bounds.width && top + dy >= 0 && bottom + dy <= bounds.height)
+  const move = moves.sort((a, b) => Math.abs(a.dx) + Math.abs(a.dy) - (Math.abs(b.dx) + Math.abs(b.dy)))[0]
+  if (!move) return false
+  shape.x += move.dx
+  shape.y += move.dy
+  return true
 }
 
 /**

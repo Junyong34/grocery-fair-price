@@ -48,4 +48,14 @@ describe("lloydRelax", () => {
     const circles: Circle[] = Array.from({ length: 8 }, (_, i) => ({ id: String(i), x: 50 + i * 60, y: 200, r: 30 }))
     expect(lloydRelax(circles, { bounds })).toEqual(lloydRelax(circles, { bounds }))
   })
+
+  it("피할 영역(avoid)은 어느 원의 칸에도 넣지 않아 원이 그쪽으로 끌려가지 않는다", () => {
+    const avoid = { x: 300, y: 200, width: 300, height: 200 }
+    const circles: Circle[] = Array.from({ length: 8 }, (_, i) => ({ id: String(i), x: 60 + (i % 4) * 70, y: 60 + Math.floor(i / 4) * 70, r: 20 }))
+    const free = lloydRelax(circles, { bounds, iterations: 12 })
+    const avoided = lloydRelax(circles, { bounds, iterations: 12, avoid: [avoid] })
+    const inside = (c: Circle) => c.x > avoid.x && c.y > avoid.y
+    expect(free.some(inside)).toBe(true)
+    expect(avoided.some(inside)).toBe(false)
+  })
 })

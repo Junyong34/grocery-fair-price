@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import { foodsInMonth } from "../data/foods"
-import { labelHeight, labelWidth, SCATTER_FRAMES, scatterLayout } from "./scatter"
+import { labelHeight, labelWidth, SCATTER_FRAMES, scatterLayout, type ScatterFrame } from "./scatter"
 
 const ids = (n: number) => Array.from({ length: n }, (_, i) => `food-${i}`)
 
@@ -178,6 +178,46 @@ describe("scatterLayout 이름표", () => {
           }
         }
       }
+    }
+  })
+})
+
+describe("scatterLayout avoid", () => {
+  // 인쇄 월간 M-E 세로: 판 전체에 그림, 오른쪽 아래 모서리에 달력 블록.
+  const block = { x: 744 * 0.46, y: 988 * 0.64, width: 744 * 0.54, height: 988 * 0.36 }
+  const frame: ScatterFrame = { width: 744, height: 988, big: true, avoid: [block] }
+
+  it("피할 영역과 겹치는 그림·이름표가 없다", () => {
+    for (const month of [1, 4, 8, 11]) {
+      for (const n of [8, 14, 20]) {
+        const foods = foodsInMonth(month).slice(0, n)
+        const { items } = scatterLayout({ month, ids: foods.map((food) => food.id), frame })
+        for (const item of items) {
+          const r = (item.size * frame.width) / 2
+          const x = item.cx * frame.width
+          const y = item.cy * frame.height
+          const half = Math.max(r, labelWidth(foods.find((food) => food.id === item.id)!.name, frame) / 2)
+          const clear =
+            x + half <= block.x + 0.5 ||
+            x - half >= block.x + block.width - 0.5 ||
+            y + r + labelHeight(frame) <= block.y + 0.5 ||
+            y - r >= block.y + block.height - 0.5
+          expect(clear, `${month}월 ${n}개 ${item.id}`).toBe(true)
+        }
+      }
+    }
+  })
+
+  it("피할 영역 밖에서도 그림끼리 겹치지 않는다", () => {
+    for (const month of [1, 5, 10]) {
+      const { items } = scatterLayout({ month, ids: ids(18), frame })
+      for (let i = 0; i < items.length; i++)
+        for (let j = i + 1; j < items.length; j++) {
+          const a = items[i]!
+          const b = items[j]!
+          const distance = Math.hypot((a.cx - b.cx) * frame.width, (a.cy - b.cy) * frame.height)
+          expect(distance, `${month}월 ${i}-${j}`).toBeGreaterThanOrEqual(((a.size + b.size) * frame.width) / 2 - 0.5)
+        }
     }
   })
 })

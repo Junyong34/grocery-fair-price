@@ -4,7 +4,7 @@ import type { CalendarVariant } from "@workspace/seasonal/calendar/variants"
 
 import { t, u } from "./units"
 
-const WEEKDAYS = {
+export const WEEKDAYS = {
   korean: ["일", "월", "화", "수", "목", "금", "토"],
   "english-short": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
   "english-initial": ["S", "M", "T", "W", "T", "F", "S"],

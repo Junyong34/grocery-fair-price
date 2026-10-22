@@ -162,7 +162,7 @@ const monthly: WireframeEntry[] = [
     title: "그림이 판 전체, 달력은 작은 블록",
     summary: "품종 그림을 시트 전체에 깔고 달력을 모서리 블록(세로)이나 가장자리 날짜 한 열(가로)로 줄인다. 감상용이고 그림이 가장 많다. 날짜가 작아지는 것이 약점이다(K12 리뷰).",
     source: "② 그림이 판 전체 · K1(모서리 블록), K4(가장자리 날짜 열), K8",
-    availability: { status: "needs-option", options: 'layout: "allover"(세로는 모서리 블록, 가로는 날짜 한 열)' },
+    availability: { status: "available", options: 'layout: "allover"' },
     orientations: ["portrait", "landscape"],
     draw: (orientation) => {
       const c = contentBox(orientation)

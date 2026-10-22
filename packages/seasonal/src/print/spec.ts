@@ -96,8 +96,9 @@ const monthlySchema = z.object({
   /**
    * 위 그림 + 아래 달력(M-A). 그림을 흩뿌림 / 줄 맞춘 격자 / 그림 없음.
    * side-check: 달력 옆에 그 달 품종 체크 목록(M-B. 세로 용지만). strip: 쓰는 큰 칸 달력 + 그림 띠, 빈 날짜 칸에도 그림(M-D)
+   * allover: 그림이 판 전체, 달력은 세로 용지에서 오른쪽 아래 모서리 블록, 가로 용지에서 오른쪽 날짜 한 열(M-E)
    */
-  layout: z.enum(["scatter", "grid", "none", "side-check", "strip"]),
+  layout: z.enum(["scatter", "grid", "none", "side-check", "strip", "allover"]),
   /** 달력 아래 여백: 없음 / 메모 줄 / 먹은 음식 체크 칸(빈 칸 인쇄) */
   memo: z.enum(["none", "lines", "eaten-check"]),
 })

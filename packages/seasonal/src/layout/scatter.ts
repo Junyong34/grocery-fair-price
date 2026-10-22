@@ -1,6 +1,6 @@
 import { foodScale } from "../data/food-sizes"
 import { lloydRelax } from "../geometry/lloyd"
-import { relaxShapes } from "../geometry/relax-shapes"
+import { relaxShapes, type Box } from "../geometry/relax-shapes"
 import { findFood } from "../data/foods"
 
 // 흩어진 이미지 배치(와이어프레임 3.1 scat). 격자 없이 빈 자리를 찾아 촘촘히 흩뿌린다.
@@ -18,6 +18,8 @@ export type ScatterFrame = {
   reserveRight?: number
   /** 아래에 비워 둘 높이(px). 모바일 달 판은 그 자리에 달력이 고정된다. 시드만 피하고 끌기 범위는 프레임 전체다. */
   reserveBottom?: number
+  /** 그림·이름표를 놓지 않을 사각형(px, 왼쪽 위 기준). 인쇄 월간 M-E의 모서리 달력 블록처럼 판 안쪽 한 곳을 비울 때 쓴다. */
+  avoid?: readonly Box[]
 }
 
 export const SCATTER_FRAMES = {
@@ -84,9 +86,11 @@ export function scatterLayout({
   const n = ids.length
   const rand = scatterRandom({ month, count: n, frame })
   const label = labelHeight(frame)
+  const avoid = frame.avoid ?? []
+  const open = (W - (frame.reserveRight ?? 0)) * (H - (frame.reserveBottom ?? 0)) - avoid.reduce((sum, box) => sum + box.width * box.height, 0)
   const base = Math.min(
     Math.max(
-      Math.sqrt(((W - (frame.reserveRight ?? 0)) * (H - (frame.reserveBottom ?? 0)) * COVERAGE) / Math.max(n, 1)) - label * 0.5,
+      Math.sqrt((Math.max(open, 0) * COVERAGE) / Math.max(n, 1)) - label * 0.5,
       big ? 34 : 24
     ),
     big ? 120 : 96
@@ -110,7 +114,7 @@ export function scatterLayout({
   }
   const circles = placed.map((spot, i) => ({ id: drafts[i]!.id, x: spot.x, y: spot.y, r: spot.r }))
   const spread = lloydIterations
-    ? lloydRelax(circles, { bounds: area, iterations: lloydIterations, step: LLOYD_STEP })
+    ? lloydRelax(circles, { bounds: area, iterations: lloydIterations, step: LLOYD_STEP, avoid })
     : circles
   const relaxed = relaxShapes(
     spread.map((circle) => ({ ...circle, ...labelBox(circle.id, frame) })),
@@ -119,6 +123,7 @@ export function scatterLayout({
       bounds: { width: area.width, height: area.height + label },
       gap: SCATTER_GAP,
       iterations: SEED_RELAX_ITERATIONS,
+      obstacles: avoid,
     }
   )
 
@@ -180,8 +185,15 @@ export function labelWidth(name: string, frame: ScatterFrame): number {
   return Math.ceil(units * fontPx * 0.95)
 }
 
+/** 두 사각형 사이 거리. 겹치면 음수(겹친 깊이)다. */
+function boxGap(a: Box, b: Box): number {
+  const dx = Math.max(b.x - (a.x + a.width), a.x - (b.x + b.width))
+  const dy = Math.max(b.y - (a.y + a.height), a.y - (b.y + b.height))
+  return dx > 0 && dy > 0 ? Math.hypot(dx, dy) : Math.max(dx, dy)
+}
+
 /**
- * 이미 놓인 그림들과 가장 멀리 떨어진 자리를 후보 가운데서 고른다(그림 아래 라벨 자리를 남긴다). 후보 수는 놓인 그림 수에 비례한다.
+ * 이미 놓인 그림들과 피할 영역(avoid)에서 가장 멀리 떨어진 자리를 후보 가운데서 고른다(그림 아래 라벨 자리를 남긴다). 후보 수는 놓인 그림 수에 비례한다.
  * 시드 배치와, 저장된 배치에 새 품종을 넣을 때 같이 쓴다.
  */
 export function findOpenSpot({
@@ -201,9 +213,10 @@ export function findOpenSpot({
   for (let c = 0; c < candidates; c++) {
     const x = rand() * (frame.width - (frame.reserveRight ?? 0) - size) + r
     const y = rand() * (frame.height - (frame.reserveBottom ?? 0) - size - labelHeight(frame)) + r
-    const gap = placed.length
-      ? Math.min(...placed.map((p) => Math.hypot(p.x - x, p.y - y) - (p.r + r)))
-      : Infinity
+    const gap = Math.min(
+      placed.length ? Math.min(...placed.map((p) => Math.hypot(p.x - x, p.y - y) - (p.r + r))) : Infinity,
+      ...(frame.avoid ?? []).map((box) => boxGap({ x: x - r, y: y - r, width: size, height: size + labelHeight(frame) }, box))
+    )
     if (gap > best.gap) best = { x, y, gap }
   }
   return { x: best.x, y: best.y, r }

@@ -5,6 +5,7 @@ import { monthChecklist, monthFoods, stripFoods, yearFoods } from "@workspace/se
 import { CALENDAR_TEXT_SCALE, type MonthlySpec, type Paper } from "@workspace/seasonal/print/spec"
 
 import { CheckList } from "./parts/check-list"
+import { DayColumn } from "./parts/day-column"
 import { FoodArea } from "./parts/food-area"
 import { FoodFigure } from "./parts/food-figure"
 import { PrintCalendar } from "./parts/print-calendar"
@@ -13,7 +14,8 @@ import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
 
 // 월간 달력: 한 장에 한 달(위 그림, 아래 달력). 12개월 묶음은 표지 + 열두 장이다.
 // side-check(M-B)는 달력 오른쪽에 그 달 품종 체크 목록을 세로로 둔다(세로 용지만).
-// strip(M-D)은 일정을 적는 큰 칸 격자 달력에 그림 띠(세로는 위, 가로는 왼쪽)를 붙이고, 1일 앞·말일 뒤 빈 칸에도 그림을 넣는다. 치수는 A4 기준 용지 단위(innerSize).
+// strip(M-D)은 일정을 적는 큰 칸 격자 달력에 그림 띠(세로는 위, 가로는 왼쪽)를 붙이고, 1일 앞·말일 뒤 빈 칸에도 그림을 넣는다.
+// allover(M-E)는 그림을 판 전체에 흩뿌리고, 달력은 세로에서 오른쪽 아래 모서리 블록, 가로에서 오른쪽 날짜 한 열로 줄인다. 치수는 A4 기준 용지 단위(innerSize).
 
 const HEADER = 26
 const MEMO = 34
@@ -21,13 +23,21 @@ const MEMO = 34
 const SIDE = { width: 52, title: 8, gap: 6 } as const
 /** M-D 그림 띠: 품종 수, 세로 용지의 띠 높이, 가로 용지의 띠 폭, 달력과의 간격. 띠 14개와 빈 칸이면 2027년 모든 달의 그림 있는 품종이 들어간다(stripFoods 테스트). */
 const STRIP = { size: 14, height: 44, width: 48, gap: 5 } as const
+/** M-E: 세로의 모서리 달력 블록 크기·안쪽 여백, 가로의 날짜 열 폭, 그림과의 간격 */
+const ALLOVER = { block: { width: 100, height: 88, padding: 4 }, column: 34, gap: 6 } as const
 
 export function MonthlySheets({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
   return (
     <>
       {spec.cover === "year" && <Cover spec={spec} paper={paper} />}
       {MONTHS.map((month) =>
-        spec.layout === "strip" ? <StripSheet key={month} spec={spec} paper={paper} month={month} /> : <MonthSheet key={month} spec={spec} paper={paper} month={month} />,
+        spec.layout === "strip" ? (
+          <StripSheet key={month} spec={spec} paper={paper} month={month} />
+        ) : spec.layout === "allover" ? (
+          <AlloverSheet key={month} spec={spec} paper={paper} month={month} />
+        ) : (
+          <MonthSheet key={month} spec={spec} paper={paper} month={month} />
+        ),
       )}
     </>
   )
@@ -119,6 +129,75 @@ function StripSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; m
       </div>
     </Sheet>
   )
+}
+
+function AlloverSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; month: Month }) {
+  const inner = innerSize(spec)
+  const foods = monthFoods(month, { max: spec.foods.max, categories: [] })
+  const showName = spec.foods.names === "korean"
+  const scale = CALENDAR_TEXT_SCALE[spec.calendar.size]
+  const background = surfaceColor(spec.surface, monthSeason(month))
+
+  if (spec.orientation === "landscape") {
+    const art = { width: inner.width - ALLOVER.column - ALLOVER.gap, height: inner.height - HEADER }
+    return (
+      <Sheet spec={spec} paper={paper} background={background}>
+        <div style={{ display: "flex", gap: u(ALLOVER.gap) }}>
+          <div style={{ width: u(art.width) }}>
+            <MonthHeader spec={spec} month={month} />
+            <FoodArea foods={foods} width={art.width} height={art.height} layout="scatter" month={month} showName={showName} />
+          </div>
+          {/* 31일이면 줄 높이가 A4 6mm. 날짜 A4 약 10.8pt, 요일 7.5pt, 공휴일 이름 6.5pt(보통 크기). 크게(1.2배)·글자 크게(1.1배)여도 줄 안에 든다 */}
+          <DayColumn
+            year={spec.year}
+            month={month}
+            weekday={spec.calendar.weekday}
+            holidays={spec.calendar.holidays}
+            dayFont={3.8 * scale}
+            width={ALLOVER.column}
+            height={inner.height}
+          />
+        </div>
+      </Sheet>
+    )
+  }
+
+  const art = { width: inner.width, height: inner.height - HEADER }
+  const { block, gap } = ALLOVER
+  // 블록 왼쪽·위로 간격만큼 더 비워 그림이 블록에 붙지 않게 한다.
+  const avoid = { x: art.width - block.width - gap, y: art.height - block.height - gap, width: block.width + gap, height: block.height + gap }
+  return (
+    <Sheet spec={spec} paper={paper} background={background}>
+      <MonthHeader spec={spec} month={month} />
+      <div style={{ position: "relative", width: u(art.width), height: u(art.height) }}>
+        <FoodArea foods={foods} width={art.width} height={art.height} layout="scatter" month={month} showName={showName} avoid={[avoid]} />
+        <div className="print-calendar-block" style={{ width: u(block.width), height: u(block.height), padding: u(block.padding) }}>
+          <PrintCalendar
+            year={spec.year}
+            month={month}
+            weekStart={spec.calendar.weekStart}
+            weekday={spec.calendar.weekday}
+            holidays={spec.calendar.holidays}
+            variant={spec.calendar.variant}
+            dayFont={blockDayFont(spec, block.height - block.padding * 2)}
+            height={block.height - block.padding * 2}
+          />
+        </div>
+      </div>
+    </Sheet>
+  )
+}
+
+/**
+ * M-E 모서리 블록의 날짜 크기. 보통은 4.6(A4 약 13pt) × 달력 글자 배율이지만, 블록이 작아 6주짜리 달에 공휴일 이름까지 들어간 줄이
+ * 칸을 넘지 않게 상한을 둔다. 줄 하나 = 날짜(editorial은 1.4배) + 공휴일 이름(0.48) + 위아래 여백(약 0.65), 요일 줄 = 1.3(PrintCalendar와 같은 비율).
+ */
+function blockDayFont(spec: MonthlySpec, height: number): number {
+  const digit = spec.calendar.variant === "editorial" ? 1.4 : 1
+  const row = spec.type.scale * (digit + 0.48) + 0.65
+  // tiles는 칸 사이 간격(0.8)이 줄마다 더 든다.
+  const spacing = spec.calendar.variant === "tiles" ? 0.8 * 7 : 0
+  return Math.min(4.6 * CALENDAR_TEXT_SCALE[spec.calendar.size], (height - spacing) / (6 * row + 1.3))
 }
 
 /** 빈 날짜 칸 하나에 그림 하나. 칸 가운데에 놓는다. */

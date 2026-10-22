@@ -65,6 +65,19 @@
 .print-calendar[data-variant="tiles"] td.has-day { background: color-mix(in oklab, var(--color-surface) 70%, transparent); border-radius: calc(var(--u) * 1.2); }
 .print-calendar[data-variant="tiles"] td.has-day.is-red-cell { background: var(--color-holiday-wash); }
 
+/* 월간 M-E 세로의 모서리 달력 블록. 그림 판 오른쪽 아래에 얹는다. */
+.print-calendar-block { position: absolute; right: 0; bottom: 0; box-sizing: border-box; background: var(--color-surface); border: var(--line) solid var(--color-hairline); border-radius: calc(var(--u) * 2); }
+
+/* 날짜 한 열(월간 M-E 가로). 줄마다 아래 선이 적을 자리다. */
+.print-day-column { margin: 0; padding: 0; list-style: none; flex: none; font-size: 0; line-height: 1; }
+.print-day-column li { box-sizing: border-box; display: flex; align-items: center; border-bottom: var(--line) solid var(--color-hairline); }
+.print-day-column li.is-week-start { border-top: var(--line) solid var(--color-stone); }
+.print-day-column li > span { flex: none; }
+.print-day-column .print-number { text-align: right; }
+.print-day-column .weekday { color: var(--color-caption); }
+.print-day-column .is-red { color: var(--color-holiday); }
+.print-day-column .holiday-name { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--color-holiday); }
+
 .print-food { position: absolute; display: flex; flex-direction: column; align-items: center; }
 .print-food img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; }
 .print-food-name { white-space: nowrap; color: var(--color-stone); line-height: 1.25; }

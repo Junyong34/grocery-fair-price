@@ -120,6 +120,18 @@ describe("구성마다 숨는 옵션", () => {
     expect(isFieldShown(field("monthly", "foods.names"), spec)).toBe(true)
   })
 
+  it("월간 그림 판 전체는 메모를 숨기고, 가로(날짜 한 열)에서는 달력 모양·주 시작도 숨긴다", () => {
+    const portrait = { ...DEFAULT_SPECS.monthly, layout: "allover" as const, orientation: "portrait" as const }
+    const landscape = { ...portrait, orientation: "landscape" as const }
+    expect(isFieldShown(field("monthly", "memo"), portrait)).toBe(false)
+    expect(isFieldShown(field("monthly", "calendar.variant"), portrait)).toBe(true)
+    expect(isFieldShown(field("monthly", "calendar.weekStart"), portrait)).toBe(true)
+    expect(isFieldShown(field("monthly", "foods.max"), portrait)).toBe(true)
+    expect(isFieldShown(field("monthly", "memo"), landscape)).toBe(false)
+    expect(isFieldShown(field("monthly", "calendar.variant"), landscape)).toBe(false)
+    expect(isFieldShown(field("monthly", "calendar.weekStart"), landscape)).toBe(false)
+  })
+
   it("연간 큰 그림 위는 달 배열(3x4 고정)과 품종 개수(달마다 하나 고정)를 숨긴다", () => {
     const spec = { ...DEFAULT_SPECS["year-sheet"], layout: "hero-top" as const }
     expect(isFieldShown(field("year-sheet", "grid"), spec)).toBe(false)

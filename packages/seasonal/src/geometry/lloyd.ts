@@ -15,12 +15,14 @@ export type LloydOptions = {
   step?: number
   /** 격자 한 칸의 한 변(px). 작을수록 정확하고 느리다. */
   cell?: number
+  /** 어느 원의 칸에도 넣지 않을 사각형(왼쪽 위 x·y와 폭·높이). 그 자리로 원이 끌려가지 않는다. */
+  avoid?: readonly { x: number; y: number; width: number; height: number }[]
 }
 
 /** 원 중심을 Voronoi 무게중심 쪽으로 옮긴 새 배열을 돌려준다. 입력은 바꾸지 않는다. */
 export function lloydRelax(
   circles: readonly Circle[],
-  { bounds, iterations = 6, step = 0.7, cell = 8 }: LloydOptions
+  { bounds, iterations = 6, step = 0.7, cell = 8, avoid = [] }: LloydOptions
 ): Circle[] {
   const next = circles.map((circle) => ({ ...circle }))
   if (next.length < 2) return next
@@ -37,6 +39,7 @@ export function lloydRelax(
       const y = (row + 0.5) * cellH
       for (let column = 0; column < columns; column++) {
         const x = (column + 0.5) * cellW
+        if (avoid.some((box) => x >= box.x && x <= box.x + box.width && y >= box.y && y <= box.y + box.height)) continue
         let owner = 0
         let best = Infinity
         for (let i = 0; i < next.length; i++) {

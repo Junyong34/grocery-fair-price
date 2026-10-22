@@ -48,4 +48,16 @@ describe("relaxShapes", () => {
     const input = [shape("a", 100, 100), shape("b", 110, 105), shape("c", 120, 98)]
     expect(relaxShapes(input, { bounds })).toEqual(relaxShapes(input, { bounds }))
   })
+
+  it("피할 영역(obstacles)에 걸친 묶음을 영역 밖으로 밀어낸다", () => {
+    const obstacle = { x: 200, y: 150, width: 200, height: 150 }
+    const out = relaxShapes([shape("a", 250, 200), shape("b", 380, 280), shape("c", 100, 100)], { bounds, obstacles: [obstacle], gap: 4 })
+    for (const s of out) {
+      const half = Math.max(s.r, s.labelW / 2)
+      const clear =
+        s.x + half <= obstacle.x + 1e-6 || s.x - half >= obstacle.x + obstacle.width - 1e-6 || s.y + s.r + s.labelH <= obstacle.y + 1e-6 || s.y - s.r >= obstacle.y + obstacle.height - 1e-6
+      expect(clear, s.id).toBe(true)
+    }
+    expect(out[2]).toMatchObject({ x: 100, y: 100 })
+  })
 })
