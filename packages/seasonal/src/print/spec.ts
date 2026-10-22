@@ -93,8 +93,11 @@ const monthlySchema = z.object({
   cover: z.enum(["none", "year"]),
   monthLabel,
   calendar: calendar(z.enum(["hidden", "mark", "mark-and-name"])).extend({ variant: z.enum(CALENDAR_VARIANTS) }),
-  /** 위 그림 + 아래 달력(M-A). 그림을 흩뿌림 / 줄 맞춘 격자 / 그림 없음. side-check: 달력 옆에 그 달 품종 체크 목록(M-B. 세로 용지만) */
-  layout: z.enum(["scatter", "grid", "none", "side-check"]),
+  /**
+   * 위 그림 + 아래 달력(M-A). 그림을 흩뿌림 / 줄 맞춘 격자 / 그림 없음.
+   * side-check: 달력 옆에 그 달 품종 체크 목록(M-B. 세로 용지만). strip: 쓰는 큰 칸 달력 + 그림 띠, 빈 날짜 칸에도 그림(M-D)
+   */
+  layout: z.enum(["scatter", "grid", "none", "side-check", "strip"]),
   /** 달력 아래 여백: 없음 / 메모 줄 / 먹은 음식 체크 칸(빈 칸 인쇄) */
   memo: z.enum(["none", "lines", "eaten-check"]),
 })

@@ -16,6 +16,7 @@ const NO_TODAY = { year: 0, month: 0, day: 0 }
 /**
  * 인쇄용 한 달 달력. 화면 달력(MonthCalendar)과 같은 네 모양이지만 크기를 용지 단위로 쓴다.
  * 토·일은 늘 빨강이고, 공휴일은 holidays가 hidden이 아닐 때만 빨강, mark-and-name이면 이름까지 적는다.
+ * renderBlank를 주면 1일 앞·말일 뒤 빈 칸에 그 내용을 넣는다(쓰는 달력의 빈 칸 그림).
  */
 export function PrintCalendar({
   year,
@@ -26,6 +27,7 @@ export function PrintCalendar({
   variant = "plain",
   dayFont,
   height,
+  renderBlank,
 }: {
   year: number
   month: number
@@ -37,6 +39,8 @@ export function PrintCalendar({
   dayFont: number
   /** 요일 줄까지 포함한 달력 높이(용지 단위). 주 수(4~6)에 맞춰 나눈다. */
   height: number
+  /** 빈 칸에 넣을 내용. index는 앞 빈 칸부터 센 차례, rowHeight는 칸 높이(용지 단위)다. */
+  renderBlank?: (index: number, rowHeight: number) => React.ReactNode
 }) {
   const weeks = monthCalendar({
     year,
@@ -49,6 +53,7 @@ export function PrintCalendar({
   const weekend = (day: number) => day === 0 || day === 6
   const rowHeight = (height - dayFont * 1.3) / weeks.length
   const cellPadding = variant === "grid" || variant === "editorial" ? u(dayFont * 0.25) : 0
+  let blank = 0
 
   return (
     <table className="print-calendar" data-variant={variant}>
@@ -72,6 +77,7 @@ export function PrintCalendar({
                   className={[cell && "has-day", red && "is-red-cell"].filter(Boolean).join(" ") || undefined}
                   style={{ height: u(rowHeight), padding: cellPadding, paddingTop: u(dayFont * 0.25) }}
                 >
+                  {!cell && renderBlank?.(blank++, rowHeight)}
                   {cell && (
                     <>
                       <span className={`day print-number ${red ? "is-red" : ""}`} style={{ fontSize: t(variant === "editorial" ? dayFont * 1.4 : dayFont), lineHeight: 1 }}>

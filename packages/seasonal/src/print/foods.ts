@@ -1,3 +1,4 @@
+import { monthCalendar } from "../calendar/month-calendar"
 import { FOODS, isDrawn, type Food, type FoodCategory } from "../data/foods"
 import { MONTHS, orderSeasonMonths } from "../data/months"
 import { seasonOfMonth, type Season } from "../data/seasons"
@@ -46,4 +47,22 @@ export function seasonFoods(season: Season, pick: FoodPick): readonly Food[] {
   return FOODS.filter((food) => startSeason(food.months) === season && pickable(pick)(food))
     .sort((a, b) => order(start(a)) - order(start(b)) || a.name.localeCompare(b.name, "ko"))
     .slice(0, pick.max)
+}
+
+/**
+ * 쓰는 달력(월간 M-D)의 그림 나누기. 그 달 그림 있는 품종을 monthFoods 차례로 띠에 stripSize개까지 먼저 채우고,
+ * 남은 것을 1일 앞·말일 뒤 빈 날짜 칸 수만큼 넣는다. 빈 칸 차례는 달력 칸 차례(앞 빈 칸 → 뒤 빈 칸)다. 그래도 남으면 dropped로 센다.
+ */
+export function stripFoods({ year, month, weekStart, stripSize }: { year: number; month: number; weekStart: 0 | 1; stripSize: number }): {
+  strip: readonly Food[]
+  blanks: readonly Food[]
+  dropped: number
+} {
+  const foods = monthFoods(month, { max: Infinity, categories: [] })
+  const blankCount = monthCalendar({ year, month, today: { year: 0, month: 0, day: 0 }, holidays: {}, weekStart })
+    .flat()
+    .filter((cell) => cell === null).length
+  const strip = foods.slice(0, stripSize)
+  const blanks = foods.slice(stripSize, stripSize + blankCount)
+  return { strip, blanks, dropped: foods.length - strip.length - blanks.length }
 }

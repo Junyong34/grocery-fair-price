@@ -1,29 +1,34 @@
 import { foodsInMonth } from "@workspace/seasonal/data/foods"
 import { formatMonthLabel, MONTHS, type Month } from "@workspace/seasonal/data/months"
-import { monthChecklist, monthFoods, yearFoods } from "@workspace/seasonal/print/foods"
+import type { Food } from "@workspace/seasonal/data/foods"
+import { monthChecklist, monthFoods, stripFoods, yearFoods } from "@workspace/seasonal/print/foods"
 import { CALENDAR_TEXT_SCALE, type MonthlySpec, type Paper } from "@workspace/seasonal/print/spec"
 
 import { CheckList } from "./parts/check-list"
 import { FoodArea } from "./parts/food-area"
+import { FoodFigure } from "./parts/food-figure"
 import { PrintCalendar } from "./parts/print-calendar"
 import { Sheet } from "./parts/sheet"
 import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
 
 // 월간 달력: 한 장에 한 달(위 그림, 아래 달력). 12개월 묶음은 표지 + 열두 장이다.
-// side-check(M-B)는 달력 오른쪽에 그 달 품종 체크 목록을 세로로 둔다(세로 용지만). 치수는 A4 기준 용지 단위(innerSize).
+// side-check(M-B)는 달력 오른쪽에 그 달 품종 체크 목록을 세로로 둔다(세로 용지만).
+// strip(M-D)은 일정을 적는 큰 칸 격자 달력에 그림 띠(세로는 위, 가로는 왼쪽)를 붙이고, 1일 앞·말일 뒤 빈 칸에도 그림을 넣는다. 치수는 A4 기준 용지 단위(innerSize).
 
 const HEADER = 26
 const MEMO = 34
 /** M-B 체크 목록의 폭·제목 높이와 달력과의 간격 */
 const SIDE = { width: 52, title: 8, gap: 6 } as const
+/** M-D 그림 띠: 품종 수, 세로 용지의 띠 높이, 가로 용지의 띠 폭, 달력과의 간격. 띠 14개와 빈 칸이면 2027년 모든 달의 그림 있는 품종이 들어간다(stripFoods 테스트). */
+const STRIP = { size: 14, height: 44, width: 48, gap: 5 } as const
 
 export function MonthlySheets({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
   return (
     <>
       {spec.cover === "year" && <Cover spec={spec} paper={paper} />}
-      {MONTHS.map((month) => (
-        <MonthSheet key={month} spec={spec} paper={paper} month={month} />
-      ))}
+      {MONTHS.map((month) =>
+        spec.layout === "strip" ? <StripSheet key={month} spec={spec} paper={paper} month={month} /> : <MonthSheet key={month} spec={spec} paper={paper} month={month} />,
+      )}
     </>
   )
 }
@@ -79,6 +84,51 @@ function MonthSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; m
         </div>
       </div>
     </Sheet>
+  )
+}
+
+function StripSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; month: Month }) {
+  const inner = innerSize(spec)
+  const portrait = spec.orientation === "portrait"
+  const { strip, blanks } = stripFoods({ year: spec.year, month, weekStart: spec.calendar.weekStart, stripSize: STRIP.size })
+  const showName = spec.foods.names === "korean"
+  const band = portrait ? { width: inner.width, height: STRIP.height } : { width: STRIP.width, height: inner.height - HEADER }
+  const calendar = portrait
+    ? { width: inner.width, height: inner.height - HEADER - STRIP.height - STRIP.gap }
+    : { width: inner.width - STRIP.width - STRIP.gap, height: inner.height - HEADER }
+  // 날짜는 칸 왼쪽 위에 작게 두고 나머지를 쓰는 자리로 남긴다.
+  const dayFont = 4.6 * CALENDAR_TEXT_SCALE[spec.calendar.size]
+  return (
+    <Sheet spec={spec} paper={paper} background={surfaceColor(spec.surface, monthSeason(month))}>
+      <MonthHeader spec={spec} month={month} />
+      <div style={{ display: "flex", flexDirection: portrait ? "column" : "row", gap: u(STRIP.gap) }}>
+        <FoodArea foods={strip} width={band.width} height={band.height} layout="flow" month={month} showName={showName} nameSize={2.8} />
+        <div style={{ width: u(calendar.width) }}>
+          <PrintCalendar
+            year={spec.year}
+            month={month}
+            weekStart={spec.calendar.weekStart}
+            weekday={spec.calendar.weekday}
+            holidays={spec.calendar.holidays}
+            variant="grid"
+            dayFont={dayFont}
+            height={calendar.height}
+            renderBlank={(index, rowHeight) => blanks[index] && <BlankFood food={blanks[index]} width={calendar.width / 7} height={rowHeight} showName={showName} />}
+          />
+        </div>
+      </div>
+    </Sheet>
+  )
+}
+
+/** 빈 날짜 칸 하나에 그림 하나. 칸 가운데에 놓는다. */
+function BlankFood({ food, width, height, showName }: { food: Food; width: number; height: number; showName: boolean }) {
+  const nameSize = 2.4
+  const size = Math.min(width * 0.62, (height - (showName ? nameSize * 1.6 : 0)) * 0.7)
+  return (
+    <div style={{ height: u(height * 0.9), display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <FoodFigure food={food} size={size} nameSize={nameSize} showName={showName} style={{ position: "static" }} />
+    </div>
   )
 }
 

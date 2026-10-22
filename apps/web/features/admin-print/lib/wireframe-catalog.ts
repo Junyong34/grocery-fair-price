@@ -139,20 +139,20 @@ const monthly: WireframeEntry[] = [
     page: "sheet",
     title: "쓰는 달력: 큰 칸 + 그림 띠 두 줄",
     summary:
-      "달력 칸을 키워 일정을 적는다. 그림 띠를 두 줄(14개)로 늘리고 1일 앞·말일 뒤 빈 칸에도 그림을 넣어 품종 수를 지킨다. 2027년은 빈 칸이 달마다 0~11개지만 띠 14개와 합치면 그림 있는 품종(달마다 7~19개)이 주 시작과 상관없이 모두 들어간다.",
+      "달력 칸을 키워 일정을 적는다(격자 고정). 그림 띠를 14개(세로는 위 두 줄, 가로는 왼쪽 두 열)로 늘리고 1일 앞·말일 뒤 빈 칸에도 그림을 넣어 품종 수를 지킨다. 2027년은 빈 칸이 달마다 0~11개지만 띠 14개와 합치면 그림 있는 품종(달마다 7~19개)이 주 시작과 상관없이 모두 들어간다.",
     source: "④ 정보형 · K10(그림 30 : 달력 70), G3·G5(쓰기 칸). 빈 칸 그림은 판매 사례 없는 제안",
-    availability: { status: "needs-option", options: 'layout: "strip", calendar.fillBlanks' },
+    availability: { status: "available", options: 'layout: "strip"' },
     orientations: ["portrait", "landscape"],
     draw: (orientation) => {
       const c = contentBox(orientation)
       const grid = (rect: Rect) => calendar(rect, { year: YEAR, month: MONTH, holidays: HOLIDAYS, style: "grid", write: true, fillBlanks: true })
       if (orientation === "portrait") {
-        const [header, strip, rest, memo] = split(c, "rows", [22, 44, "*", 12], 5)
-        return [...monthHeader(header!, 16), ...flow(strip!, { count: 14, names: true }), ...grid(rest!), ...memoLines(memo!, 2)]
+        const [header, strip, rest] = split(c, "rows", [22, 44, "*"], 5)
+        return [...monthHeader(header!, 16), ...flow(strip!, { count: 14, names: true }), ...grid(rest!)]
       }
       const [header, body] = split(c, "rows", [20, "*"], 5)
       const [strip, rest] = split(body!, "cols", [48, "*"], 6)
-      return [...monthHeader(header!, 14), ...flow(strip!, { count: 12, names: true }), ...grid(rest!)]
+      return [...monthHeader(header!, 14), ...flow(strip!, { count: 14, names: true }), ...grid(rest!)]
     },
   },
   {

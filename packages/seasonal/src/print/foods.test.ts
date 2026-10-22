@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import { findFood, foodsInMonth, isDrawn } from "../data/foods"
 import { SEASONS } from "../data/seasons"
 import { MONTHS } from "../data/months"
-import { monthChecklist, monthFoods, seasonFoods, startSeason, yearFoods } from "./foods"
+import { monthChecklist, monthFoods, seasonFoods, startSeason, stripFoods, yearFoods } from "./foods"
 
 describe("startSeason", () => {
   it("해를 넘는 제철은 시작하는 달의 계절이다", () => {
@@ -71,5 +71,26 @@ describe("monthChecklist", () => {
   it("카테고리를 고르면 그 카테고리만", () => {
     const [category] = new Set(foodsInMonth(10).map((food) => food.category))
     expect(monthChecklist(10, [category!]).every((food) => food.category === category)).toBe(true)
+  })
+})
+
+describe("stripFoods", () => {
+  it("띠에 먼저 채우고, 남은 품종을 1일 앞·말일 뒤 빈 칸 수만큼 넣는다", () => {
+    // 2027년 11월 1일은 월요일이다. 일요일 시작이면 앞 1칸, 30일 뒤 4칸이 빈다.
+    const { strip, blanks, dropped } = stripFoods({ year: 2027, month: 11, weekStart: 0, stripSize: 3 })
+    expect(strip).toEqual(monthFoods(11, { max: 3, categories: [] }))
+    expect(blanks).toEqual(monthFoods(11, { max: Infinity, categories: [] }).slice(3, 8))
+    expect(dropped).toBe(monthFoods(11, { max: Infinity, categories: [] }).length - 8)
+  })
+
+  it("2027년 모든 달·주 시작에서 띠 14개와 빈 칸이면 그림 있는 품종이 모두 들어간다", () => {
+    for (const weekStart of [0, 1] as const)
+      for (const month of MONTHS) expect(stripFoods({ year: 2027, month, weekStart, stripSize: 14 }).dropped, `${month}월 주 시작 ${weekStart}`).toBe(0)
+  })
+
+  it("품종이 띠보다 적으면 빈 칸에는 넣지 않는다", () => {
+    const { strip, blanks } = stripFoods({ year: 2027, month: 5, weekStart: 0, stripSize: 30 })
+    expect(strip).toHaveLength(monthFoods(5, { max: Infinity, categories: [] }).length)
+    expect(blanks).toEqual([])
   })
 })
