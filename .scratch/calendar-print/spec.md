@@ -405,7 +405,7 @@ AGENTS.md "Generated files" 표에 `public/downloads/**`와 명령 `pnpm prints:
 
 ### 티켓 흐름
 
-티켓 하나가 세션 하나다. 순서: `spec.ts`·`spec.test.ts` → `option-fields.ts`·`option-fields.test.ts`(선택지가 스키마와 맞는지) → `features/print/<kind>.tsx` → `wireframe-catalog.ts`에서 그 안을 `available`로. 새 부품은 A4 한 장을 실제로 인쇄해 글자 크기를 본 뒤 다음으로 간다. 티켓: `issues/01`~`15`.
+티켓 하나가 세션 하나다. 순서: `spec.ts`·`spec.test.ts` → `option-fields.ts`·`option-fields.test.ts`(선택지가 스키마와 맞는지) → `features/print/<kind>.tsx` → `wireframe-catalog.ts`에서 그 안을 `available`로. 새 부품은 A4 한 장을 실제로 인쇄해 글자 크기를 본 뒤 다음으로 간다. 티켓: `issues/01`~`16`(16은 구성과 상관없는 달력 글자 크기).
 
 ## 정해야 할 것
 
