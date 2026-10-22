@@ -1,6 +1,6 @@
 import { formatMonthLabel, MONTHS, type Month } from "@workspace/seasonal/data/months"
 import { monthFoods } from "@workspace/seasonal/print/foods"
-import type { Paper, YearSheetSpec } from "@workspace/seasonal/print/spec"
+import { CALENDAR_TEXT_SCALE, type Paper, type YearSheetSpec } from "@workspace/seasonal/print/spec"
 
 import { FoodArea } from "./parts/food-area"
 import { gridSize } from "./parts/grid"
@@ -47,7 +47,9 @@ function MonthCell({ spec, month, width, height, flip }: { spec: YearSheetSpec; 
   const monthLabel = spec.monthLabel === "big-number" ? undefined : spec.monthLabel
   const bigNumber = !monthLabel
   const label = bigNumber ? 0 : 5
-  const dayFont = Math.min((calendar.width / 7) * 0.42, ((calendar.height - label) / 7.3) * 0.62)
+  // 칸에 맞춘 크기에 달력 글자 배율을 곱한다. 키워도 두 자리 날짜가 옆 날짜와 붙지 않게, 인쇄 크기(t()가 type.scale을 곱한 값)가 칸 폭의 절반을 넘지 않는다.
+  const fit = Math.min((calendar.width / 7) * 0.42, ((calendar.height - label) / 7.3) * 0.62)
+  const dayFont = Math.min(fit * CALENDAR_TEXT_SCALE[spec.calendar.size], ((calendar.width / 7) * 0.5) / spec.type.scale)
   const season = monthSeason(month)
 
   const foodCell = (

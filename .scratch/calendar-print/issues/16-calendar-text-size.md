@@ -1,6 +1,6 @@
 # 16. 달력 글자 크기 3단계
 
-Status: ready-for-agent
+Status: resolved
 Blocked by: 01
 
 ## 목적
@@ -16,14 +16,23 @@ Blocked by: 01
 
 ## 할 일
 
-- [ ] `spec.ts`: 월간·연간 한 장의 `calendar`에 `size`. `spec.test.ts`에 예전 사양(값 없음)이 `"medium"`으로 읽히는 테스트를 더한다.
-- [ ] `option-fields.ts`: "달력" 탭에 "달력 글자 크기" 선택(작게 / 보통 / 크게). 01의 `when`은 필요 없다(달력이 있는 종류에만 넣는다).
-- [ ] `parts/print-calendar.tsx`: `dayFont`에 배율을 곱한다. 요일·공휴일 이름은 `dayFont`를 따라가므로 함께 바뀐다. `monthly.tsx`·`year-sheet.tsx`가 넘기는 값을 고친다.
-- [ ] 넘침 확인: 연간 한 장은 칸이 작다(`year-sheet.tsx`가 칸 크기에서 `dayFont`를 계산함). `"large"`와 전체 "크게"를 함께 골랐을 때 날짜·공휴일 이름이 칸을 넘치는지 A4로 본다. 넘치면 칸 크기로 정한 상한을 두거나, 파서가 그 조합을 거른다. 어느 쪽을 골랐는지 Answer에 적는다.
-- [ ] 월간도 `"large"`에서 6주짜리 달(예: 2027년 10월, 주 시작 일요일)이 칸을 넘치지 않는지 본다.
+- [x] `spec.ts`: 월간·연간 한 장의 `calendar`에 `size`. `spec.test.ts`에 예전 사양(값 없음)이 `"medium"`으로 읽히는 테스트를 더한다.
+- [x] `option-fields.ts`: "달력" 탭에 "달력 글자 크기" 선택(작게 / 보통 / 크게). 01의 `when`은 필요 없다(달력이 있는 종류에만 넣는다).
+- [x] `parts/print-calendar.tsx`: `dayFont`에 배율을 곱한다. 요일·공휴일 이름은 `dayFont`를 따라가므로 함께 바뀐다. `monthly.tsx`·`year-sheet.tsx`가 넘기는 값을 고친다.
+- [x] 넘침 확인: 연간 한 장은 칸이 작다(`year-sheet.tsx`가 칸 크기에서 `dayFont`를 계산함). `"large"`와 전체 "크게"를 함께 골랐을 때 날짜·공휴일 이름이 칸을 넘치는지 A4로 본다. 넘치면 칸 크기로 정한 상한을 두거나, 파서가 그 조합을 거른다. 어느 쪽을 골랐는지 Answer에 적는다.
+- [x] 월간도 `"large"`에서 6주짜리 달(예: 2027년 10월, 주 시작 일요일)이 칸을 넘치지 않는지 본다.
 
 ## 완료 조건
 
 - 루트 `pnpm typecheck`, `pnpm lint`(오류 0), `pnpm test` 통과.
 - `/print?spec=…&paper=A4`에서 월간·연간 한 장을 small·large로 한 쪽씩 스크린샷 확인.
 - `/admin` 편집기에서 바꾸면 미리보기가 바뀌고 콘솔 오류가 없다.
+
+## Answer
+
+2026-10-22 완료.
+
+- `CALENDAR_TEXT_SIZES`·`CALENDAR_TEXT_SCALE`(0.85 / 1 / 1.2)은 `spec.ts`. 월간·연간 한 장 `calendar.size`, 없으면 `"medium"`.
+- 넘침: 연간 한 장 2×6, 전체 "크게"(1.1) + 달력 "크게"에서 칸 넘침은 없었지만 두 자리 날짜가 거의 붙었다. 파서로 거르지 않고 상한을 뒀다: 날짜 인쇄 크기(`type.scale`을 곱한 값)가 칸 폭의 절반을 넘지 않는다(`year-sheet.tsx`). 이 조합에서 날짜 9.3pt.
+- 월간: 같은 조합(1.1 × 1.2, A4 세로, 2027년, 6주짜리 달 3개 포함)에서 날짜·공휴일 이름이 칸을 넘치지 않음(스크립트로 잼). 날짜 21pt.
+- small은 화면으로만 보고 따로 재지 않았다. 3x4·4x3 배열은 보지 않았다(칸 폭 상한이 먼저 걸린다).

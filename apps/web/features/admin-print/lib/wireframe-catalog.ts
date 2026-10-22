@@ -340,9 +340,9 @@ const seasonPoster: WireframeEntry[] = [
     kind: "season-poster",
     page: "sheet",
     title: "사분면(세로) / 네 열(가로)",
-    summary: "계절 칸이 정사각에 가까워 그림이 커진다. 가로 용지는 계절을 열로 세우고 그림 아래에 그림 없는 품종 이름까지 적는다.",
+    summary: "계절 칸이 정사각에 가까워 그림이 커진다. 가로 용지는 계절을 열로 세운다.",
     source: "⑦ 계절 구획(블록) · G8, R11, R12. X자 대각선 G9도 같은 갈래",
-    availability: { status: "needs-option", options: 'layout: "quarters"(세로는 사분면, 가로는 네 열)' },
+    availability: { status: "available", options: 'layout: "quarters"(세로는 사분면, 가로는 네 열)' },
     orientations: ["portrait", "landscape"],
     draw: (orientation) => {
       const [title, body] = split(contentBox(orientation), "rows", [orientation === "portrait" ? 12 : 10, "*"], 4)
@@ -357,8 +357,8 @@ const seasonPoster: WireframeEntry[] = [
       return [
         ...posterTitle(title!),
         ...monthGrid(body!, 4, 1, 4).flatMap((cell, i) => {
-          const [label, art, names] = split(inset(cell, 3), "rows", [5, "*", "*"], 2)
-          return [frame(cell), smallLabel(label!, SEASON_NAMES[i]!), ...flow(art!, { count: 8, names: true }), ...nameList(names!, { count: 7 })]
+          const [label, art] = split(inset(cell, 3), "rows", [5, "*"], 2)
+          return [frame(cell), smallLabel(label!, SEASON_NAMES[i]!), ...flow(art!, { count: 9, names: true })]
         }),
       ]
     },
@@ -461,9 +461,9 @@ const monthPoster: WireframeEntry[] = [
     kind: "month-poster",
     page: "sheet",
     title: "한 줄에 한 달, 장보기 체크",
-    summary: "달마다 한 줄: 큰 숫자, 그림 다섯, 이름 체크 칸. 냉장고에 붙여 두고 그 달 줄만 본다.",
+    summary: "달마다 한 줄: 큰 달 표기, 그림(최대 여섯), 그 달 품종 전체의 이름 체크 칸(그림 없는 품종 포함). 냉장고에 붙여 두고 그 달 줄만 본다.",
     source: "④ + ⑥ · R6(그림 + 이름 목록), G2(장보기 목록용), K11(먹은 것 표시)",
-    availability: { status: "needs-option", options: 'layout: "rows-check"' },
+    availability: { status: "available", options: 'layout: "rows-check"(세로 용지만)' },
     orientations: ["portrait"],
     draw: () => {
       const [title, body] = split(contentBox("portrait"), "rows", [12, "*"], 4)

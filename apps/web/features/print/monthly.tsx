@@ -1,8 +1,9 @@
 import { foodsInMonth } from "@workspace/seasonal/data/foods"
 import { formatMonthLabel, MONTHS, type Month } from "@workspace/seasonal/data/months"
 import { monthFoods, yearFoods } from "@workspace/seasonal/print/foods"
-import type { MonthlySpec, Paper } from "@workspace/seasonal/print/spec"
+import { CALENDAR_TEXT_SCALE, type MonthlySpec, type Paper } from "@workspace/seasonal/print/spec"
 
+import { CheckList } from "./parts/check-list"
 import { FoodArea } from "./parts/food-area"
 import { PrintCalendar } from "./parts/print-calendar"
 import { Sheet } from "./parts/sheet"
@@ -39,7 +40,7 @@ function MonthSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; m
     ? { width: inner.width, height: inner.height - HEADER - food.height - gap }
     : { width: inner.width - food.width - gap, height: inner.height - HEADER }
   const memo = spec.memo === "none" ? 0 : MEMO
-  const dayFont = portrait ? 5.6 : 5
+  const dayFont = (portrait ? 5.6 : 5) * CALENDAR_TEXT_SCALE[spec.calendar.size]
 
   return (
     <Sheet spec={spec} paper={paper} background={surfaceColor(spec.surface, monthSeason(month))}>
@@ -101,17 +102,7 @@ function Memo({ kind, month, height }: { kind: "lines" | "eaten-check"; month: M
         ))}
       </div>
     )
-  const foods = foodsInMonth(month)
-  return (
-    <ul style={{ height: u(height), margin: 0, padding: `${u(4)} 0 0`, listStyle: "none", columns: 4, columnGap: u(4), fontSize: t(2.8) }}>
-      {foods.map((food) => (
-        <li key={food.id} style={{ display: "flex", alignItems: "center", gap: u(1.2), lineHeight: 1.6, breakInside: "avoid" }}>
-          <span style={{ width: u(2.6), height: u(2.6), border: "var(--line) solid var(--color-stone)", borderRadius: u(0.5), flex: "none" }} />
-          {food.name}
-        </li>
-      ))}
-    </ul>
-  )
+  return <CheckList foods={foodsInMonth(month)} columns={4} fontSize={2.8} style={{ height: u(height), paddingTop: u(4) }} />
 }
 
 function Cover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {

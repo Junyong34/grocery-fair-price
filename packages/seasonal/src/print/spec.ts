@@ -64,12 +64,20 @@ const base = {
   }),
 }
 
+export const CALENDAR_TEXT_SIZES = ["small", "medium", "large"] as const
+export type CalendarTextSize = (typeof CALENDAR_TEXT_SIZES)[number]
+
+/** 달력 글자 배율. 인쇄 달력이 날짜 크기에 곱한다. */
+export const CALENDAR_TEXT_SCALE: Record<CalendarTextSize, number> = { small: 0.85, medium: 1, large: 1.2 }
+
 const calendar = <H extends z.ZodEnum>(holidays: H) =>
   z.object({
     weekStart: z.union([z.literal(0), z.literal(1)]),
     weekday: z.enum(["korean", "english-short", "english-initial"]),
     /** 미노출 / 빨간 날짜만 / 날짜와 이름 */
     holidays,
+    /** 달력 글자(날짜·요일·공휴일 이름)만의 크기. type.scale과 곱한다. 이 값이 없던 예전 사양은 medium으로 읽는다. */
+    size: z.enum(CALENDAR_TEXT_SIZES).default("medium"),
   })
 
 const year = z.number().int().min(2020).max(2100)
@@ -109,8 +117,8 @@ const seasonPosterSchema = z.object({
   ...base,
   kind: z.literal("season-poster"),
   title,
-  /** 가로 띠 넷(S-A) */
-  layout: z.enum(["bands"]).default("bands"),
+  /** 가로 띠 넷(S-A) / 사분면, 가로 용지는 네 열(S-B) */
+  layout: z.enum(["bands", "quarters"]).default("bands"),
   seasonLabel: z.enum(["korean", "english-korean"]),
   /** 넣을 카테고리. 비우면 전부 */
   categories,
@@ -120,8 +128,8 @@ const monthPosterSchema = z.object({
   ...base,
   kind: z.literal("month-poster"),
   title,
-  /** 열두 칸(P-A) */
-  layout: z.enum(["cells"]).default("cells"),
+  /** 열두 칸(P-A) / 한 줄에 한 달, 그림과 장보기 체크 목록(P-D. 세로 용지만) */
+  layout: z.enum(["cells", "rows-check"]).default("cells"),
   monthLabel,
   grid,
   categories,
@@ -143,6 +151,9 @@ const printSpecSchema = z.preprocess(
   migrateLegacy,
   z.discriminatedUnion("kind", [monthlySchema, yearSheetSchema, seasonPosterSchema, monthPosterSchema]).refine((spec) => !("grid" in spec && spec.grid === "2x6" && spec.orientation === "landscape"), {
     message: "가로 용지에 2x6 배열은 칸이 너무 작다",
+  })
+  .refine((spec) => !(spec.kind === "month-poster" && spec.layout === "rows-check" && spec.orientation === "landscape"), {
+    message: "한 줄에 한 달 구성은 세로 용지만 된다(가로는 줄이 너무 얇다)",
   }),
 )
 
@@ -175,7 +186,7 @@ export const DEFAULT_SPECS: { [K in PrintKind]: Extract<PrintSpec, { kind: K }> 
     year: 2027,
     cover: "year",
     monthLabel: "number",
-    calendar: { variant: "plain", weekStart: 0, weekday: "korean", holidays: "mark-and-name" },
+    calendar: { variant: "plain", weekStart: 0, weekday: "korean", holidays: "mark-and-name", size: "medium" },
     foods: { names: "korean", max: 8 },
     layout: "scatter",
     memo: "none",
@@ -186,7 +197,7 @@ export const DEFAULT_SPECS: { [K in PrintKind]: Extract<PrintSpec, { kind: K }> 
     kind: "year-sheet",
     year: 2027,
     monthLabel: "big-number",
-    calendar: { weekStart: 0, weekday: "korean", holidays: "mark" },
+    calendar: { weekStart: 0, weekday: "korean", holidays: "mark", size: "medium" },
     foods: { names: "hidden", max: 4 },
     layout: "pairs",
     grid: "2x6",

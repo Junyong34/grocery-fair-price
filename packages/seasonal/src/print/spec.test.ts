@@ -86,6 +86,27 @@ describe("parsePrintSpec", () => {
     expect(parsePrintSpec({ ...DEFAULT_SPECS.monthly, layout: "none", foodLayout: "scatter" })).toMatchObject({ layout: "none" })
   })
 
+  it("한 줄에 한 달(rows-check)은 세로 용지만 받는다", () => {
+    const spec = { ...DEFAULT_SPECS["month-poster"], layout: "rows-check" }
+    expect(parsePrintSpec(spec)).not.toBeInstanceOf(Error)
+    expect(parsePrintSpec({ ...spec, orientation: "landscape" })).toBeInstanceOf(Error)
+  })
+
+  it("계절 포스터는 사분면·네 열(quarters)을 두 방향 모두 받는다", () => {
+    const spec = { ...DEFAULT_SPECS["season-poster"], layout: "quarters" }
+    expect(parsePrintSpec(spec)).not.toBeInstanceOf(Error)
+    expect(parsePrintSpec({ ...spec, orientation: "landscape" })).not.toBeInstanceOf(Error)
+  })
+
+  it("달력 글자 크기가 없는 예전 사양은 보통으로 읽고, 포스터에는 없다", () => {
+    for (const kind of ["monthly", "year-sheet"] as const) {
+      const { size: _size, ...calendar } = DEFAULT_SPECS[kind].calendar
+      expect(parsePrintSpec({ ...DEFAULT_SPECS[kind], calendar })).toMatchObject({ calendar: { size: "medium" } })
+      expect(parsePrintSpec({ ...DEFAULT_SPECS[kind], calendar: { ...calendar, size: "huge" } })).toBeInstanceOf(Error)
+    }
+    expect(parsePrintSpec(LEGACY.monthly)).toMatchObject({ calendar: { size: "medium" } })
+  })
+
   it("없는 구성 값은 오류다", () => {
     expect(parsePrintSpec({ ...DEFAULT_SPECS.monthly, layout: "wheel" })).toBeInstanceOf(Error)
     expect(parsePrintSpec({ ...DEFAULT_SPECS["year-sheet"], layout: "cells" })).toBeInstanceOf(Error)

@@ -9,11 +9,19 @@ export type FoodPick = { max: number; categories: readonly FoodCategory[] }
 const pickable = ({ categories }: FoodPick) => (food: Food) =>
   isDrawn(food.id) && (categories.length === 0 || categories.includes(food.category))
 
+const inMonth = (month: number) => (food: Food) => (food.months as readonly number[]).includes(month)
+const byMonthOrder = (a: Food, b: Food) => a.months.length - b.months.length || a.name.localeCompare(b.name, "ko")
+
 /** 그 달 품종. 그 달에 더 특별한(제철이 짧은) 품종부터, 같으면 이름순. */
 export function monthFoods(month: number, pick: FoodPick): readonly Food[] {
-  return FOODS.filter((food) => (food.months as readonly number[]).includes(month) && pickable(pick)(food))
-    .sort((a, b) => a.months.length - b.months.length || a.name.localeCompare(b.name, "ko"))
+  return FOODS.filter((food) => inMonth(month)(food) && pickable(pick)(food))
+    .sort(byMonthOrder)
     .slice(0, pick.max)
+}
+
+/** 이름만 적는 체크 목록(월별 포스터 P-D)의 그 달 품종. 글자라 그림이 없는 품종도 넣는다. 차례는 monthFoods와 같다. */
+export function monthChecklist(month: number, categories: readonly FoodCategory[]): readonly Food[] {
+  return FOODS.filter((food) => inMonth(month)(food) && (categories.length === 0 || categories.includes(food.category))).sort(byMonthOrder)
 }
 
 /** 열두 달을 한 판에 모을 때의 품종. 달마다 앞 달에 아직 나오지 않은 품종을 pick.max개까지 고른다(여러 달에 걸친 품종이 두 번 나오지 않게). */

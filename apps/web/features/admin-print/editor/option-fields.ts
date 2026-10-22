@@ -51,13 +51,20 @@ const weekday: OptionFieldSpec = {
   path: ["calendar", "weekday"],
   options: options({ korean: "일 월 화", "english-short": "Sun Mon", "english-initial": "S M T" }),
 }
+const calendarSize: OptionFieldSpec = {
+  type: "select",
+  label: "달력 글자 크기",
+  path: ["calendar", "size"],
+  options: options({ small: "작게", medium: "보통", large: "크게" }),
+  hint: "날짜·요일·공휴일 이름만 바뀌어요. 서체·배경의 글자 크기와 곱해져요.",
+}
 const categories: OptionFieldSpec = { type: "categories", label: "카테고리(비우면 전부)", path: ["categories"] }
 
-const foods = (max: number, when?: OptionFieldSpec["when"]): OptionSection => ({
+const foods = (max: number, when?: { names?: OptionFieldSpec["when"]; max?: OptionFieldSpec["when"] }): OptionSection => ({
   title: "품종",
   fields: [
-    { type: "select", label: "이름", path: ["foods", "names"], options: options({ korean: "한글 이름", hidden: "숨김" }), when },
-    { type: "number", label: "칸마다 최대 개수", path: ["foods", "max"], min: 1, max, when },
+    { type: "select", label: "이름", path: ["foods", "names"], options: options({ korean: "한글 이름", hidden: "숨김" }), when: when?.names },
+    { type: "number", label: "칸마다 최대 개수", path: ["foods", "max"], min: 1, max, when: when?.max },
   ],
 })
 
@@ -65,6 +72,8 @@ const foods = (max: number, when?: OptionFieldSpec["when"]): OptionSection => ({
 const layout = (entries: Record<string, string>): OptionFieldSpec => ({ type: "select", label: "구성", path: ["layout"], options: options(entries) })
 
 const monthlyHasFoods = (spec: PrintSpec) => spec.kind === "monthly" && spec.layout !== "none"
+/** P-D는 이름을 체크 목록에 늘 적고, 달을 한 줄씩 쌓는다. */
+const monthPosterInCells = (spec: PrintSpec) => spec.kind === "month-poster" && spec.layout === "cells"
 
 const look: OptionSection = {
   title: "서체·배경",
@@ -93,11 +102,12 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
         weekStart,
         weekday,
         { type: "select", label: "공휴일", path: ["calendar", "holidays"], options: options({ "mark-and-name": "날짜와 이름", mark: "빨간 날짜만", hidden: "표시 안 함" }) },
+        calendarSize,
         monthLabel,
         { type: "select", label: "달력 아래", path: ["memo"], options: options({ none: "없음", lines: "메모 줄", "eaten-check": "먹은 음식 체크 칸" }) },
       ],
     },
-    foods(20, monthlyHasFoods),
+    foods(20, { names: monthlyHasFoods, max: monthlyHasFoods }),
     look,
   ],
   "year-sheet": [
@@ -109,6 +119,7 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
         weekStart,
         weekday,
         { type: "select", label: "공휴일", path: ["calendar", "holidays"], options: options({ mark: "빨간 날짜", hidden: "표시 안 함" }) },
+        calendarSize,
         { ...monthLabel, options: [{ value: "big-number", label: "그림 위 큰 숫자" }, ...monthLabel.options] } as OptionFieldSpec,
       ],
     },
@@ -116,15 +127,15 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
     look,
   ],
   "season-poster": [
-    { title: "구성", fields: [layout({ bands: "가로 띠 넷" })] },
+    { title: "구성", fields: [layout({ bands: "가로 띠 넷", quarters: "사분면(가로 용지는 네 열)" })] },
     { title: "용지", fields: [orientation, margin, title, { type: "select", label: "계절 표기", path: ["seasonLabel"], options: options({ "english-korean": "Spring · 봄", korean: "봄" }) }] },
     { ...foods(30), fields: [...foods(30).fields, categories] },
     look,
   ],
   "month-poster": [
-    { title: "구성", fields: [layout({ cells: "열두 칸" })] },
-    { title: "용지", fields: [orientation, margin, title, grid, monthLabel] },
-    { ...foods(12), fields: [...foods(12).fields, categories] },
+    { title: "구성", fields: [layout({ cells: "열두 칸", "rows-check": "한 줄에 한 달 · 장보기 체크(세로 용지)" })] },
+    { title: "용지", fields: [orientation, margin, title, { ...grid, when: monthPosterInCells }, monthLabel] },
+    { ...foods(12), fields: [...foods(12, { names: monthPosterInCells }).fields, categories] },
     look,
   ],
 }

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest"
 
-import { findFood, isDrawn } from "../data/foods"
+import { findFood, foodsInMonth, isDrawn } from "../data/foods"
 import { SEASONS } from "../data/seasons"
 import { MONTHS } from "../data/months"
-import { monthFoods, seasonFoods, startSeason, yearFoods } from "./foods"
+import { monthChecklist, monthFoods, seasonFoods, startSeason, yearFoods } from "./foods"
 
 describe("startSeason", () => {
   it("해를 넘는 제철은 시작하는 달의 계절이다", () => {
@@ -53,5 +53,23 @@ describe("seasonFoods", () => {
     const oyster = findFood("oyster")!
     const season = startSeason(oyster.months)
     expect(seasonFoods(season, { max: 99, categories: [] }).some((food) => food.id === "oyster")).toBe(isDrawn("oyster"))
+  })
+})
+
+describe("monthChecklist", () => {
+  it("그 달 품종을 그림이 없어도 모두 담는다(이름만 적는 체크 목록)", () => {
+    for (const month of MONTHS) expect(monthChecklist(month, []).map((food) => food.id).sort()).toEqual(foodsInMonth(month).map((food) => food.id).sort())
+    expect(MONTHS.some((month) => monthChecklist(month, []).some((food) => !isDrawn(food.id)))).toBe(true)
+  })
+
+  it("그림 칸과 같은 차례로 놓는다(그림 있는 품종만 보면 그림 칸 순서와 같다)", () => {
+    const pictures = monthFoods(4, { max: 5, categories: [] })
+    const list = monthChecklist(4, [])
+    expect(list.filter((food) => isDrawn(food.id)).slice(0, pictures.length)).toEqual(pictures)
+  })
+
+  it("카테고리를 고르면 그 카테고리만", () => {
+    const [category] = new Set(foodsInMonth(10).map((food) => food.category))
+    expect(monthChecklist(10, [category!]).every((food) => food.category === category)).toBe(true)
   })
 })

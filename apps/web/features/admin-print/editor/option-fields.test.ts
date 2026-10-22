@@ -92,3 +92,15 @@ describe("isFieldShown", () => {
     expect(isFieldShown(byPath("memo"), spec)).toBe(true)
   })
 })
+
+describe("월별 포스터 한 줄에 한 달", () => {
+  const fields = KIND_SECTIONS["month-poster"].flatMap((section) => section.fields)
+  const byPath = (path: string) => fields.find((field) => field.path.join(".") === path)!
+
+  it("이름은 체크 목록에 늘 적고 배열은 한 줄 고정이라, 품종 이름·달 배열을 숨긴다", () => {
+    const spec = { ...DEFAULT_SPECS["month-poster"], layout: "rows-check" as const }
+    expect(isFieldShown(byPath("foods.names"), spec)).toBe(false)
+    expect(isFieldShown(byPath("grid"), spec)).toBe(false)
+    expect(isFieldShown(byPath("categories"), spec)).toBe(true)
+  })
+})
