@@ -84,6 +84,18 @@
 .print-flow { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; }
 .print-flow .print-food { position: static; }
 
+/* 제철 막대표(parts/period-chart.tsx). 왼쪽 이름 칸 + 오른쪽 열두 달. 줄 높이는 grid-auto-rows로 준다. */
+.print-chart { position: relative; display: grid; flex: none; align-items: center; line-height: 1; }
+.print-chart-grid { position: absolute; display: grid; grid-template-columns: repeat(12, 1fr); pointer-events: none; }
+.print-chart-grid span { border-left: var(--line) solid var(--color-hairline); }
+.print-chart-grid span:last-child { border-right: var(--line) solid var(--color-hairline); }
+.print-chart-months { display: grid; grid-template-columns: repeat(12, 1fr); align-self: end; padding-bottom: calc(var(--u) * 0.8); text-align: center; color: var(--color-caption); }
+.print-chart-group { grid-column: 1 / -1; align-self: stretch; display: flex; align-items: center; margin: 0; font-weight: 700; color: var(--color-ink); border-top: var(--line) solid var(--color-stone); }
+.print-chart-row { grid-column: 1 / -1; align-self: stretch; display: grid; grid-template-columns: subgrid; border-top: var(--line) solid var(--color-hairline); }
+.print-chart-name { display: flex; align-items: center; min-width: 0; white-space: nowrap; color: var(--color-ink); }
+.print-chart-bars { position: relative; }
+.print-chart-bars span { position: absolute; top: 50%; translate: 0 -50%; }
+
 /* 브라우저 화면(미리보기)에서는 회색 바탕 위에 용지를 띄운다. 인쇄에는 영향이 없다. */
 @media screen {
   .print-root { min-height: 100vh; padding: var(--print-gutter) 0; background: var(--color-hairline); }

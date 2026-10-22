@@ -431,15 +431,19 @@ const monthPoster: WireframeEntry[] = [
     kind: "month-poster",
     page: "sheet",
     title: "품종×달 막대표",
-    summary: "행 하나가 품종 하나, 제철 달에 막대를 칠한다. 품종이 반복되지 않고 제철 길이가 보인다. 카테고리 띠로 묶는다.",
+    summary: "행 하나가 품종 하나, 제철 달에 막대를 칠한다. 품종이 반복되지 않고 제철 길이가 보인다. 카테고리 띠로 묶는다. 그림 있는 품종 67개를 세로 2단, 가로 3단에 나눠 이름이 A4 약 9pt다.",
     source: "⑨ 기간 표시 · G10, G7. 행 = 품종인 표 자체는 판매 사례로 확인 못 함",
-    availability: { status: "needs-option", options: 'layout: "chart"' },
+    availability: { status: "available", options: 'layout: "chart"' },
     orientations: ["portrait", "landscape"],
     draw: (orientation) => {
       const [title, body] = split(contentBox(orientation), "rows", [orientation === "portrait" ? 12 : 10, "*"], 4)
-      if (orientation === "portrait") return [...posterTitle(title!), ...periodChart(body!, { rows: 24, groups: ["채소", "과일", "수산"], seed: 41 })]
-      const [left, right] = split(body!, "cols", ["*", "*"], 8)
-      return [...posterTitle(title!), ...periodChart(left!, { rows: 13, seed: 42, label: 0.3 }), ...periodChart(right!, { rows: 13, seed: 43, label: 0.3 })]
+      // 그림 있는 품종 전부를 세로 2단, 가로 3단에 나눈다(month-poster.tsx의 CHART).
+      if (orientation === "portrait") {
+        const [left, right] = split(body!, "cols", ["*", "*"], 8)
+        return [...posterTitle(title!), ...periodChart(left!, { rows: 30, groups: ["채소", "과일"], seed: 41, label: 0.3 }), ...periodChart(right!, { rows: 30, groups: ["수산", "곡물·견과"], seed: 44, label: 0.3 })]
+      }
+      const columns = split(body!, "cols", ["*", "*", "*"], 8)
+      return [...posterTitle(title!), ...columns.flatMap((column, i) => periodChart(column, { rows: 20, groups: [["채소"], ["과일", "수산"], ["수산", "곡물·견과"]][i], seed: 42 + i, label: 0.32 }))]
     },
   },
   {

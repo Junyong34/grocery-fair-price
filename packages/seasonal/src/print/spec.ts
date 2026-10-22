@@ -133,8 +133,8 @@ const monthPosterSchema = z.object({
   ...base,
   kind: z.literal("month-poster"),
   title,
-  /** 열두 칸(P-A) / 한 줄에 한 달, 그림과 장보기 체크 목록(P-D. 세로 용지만) */
-  layout: z.enum(["cells", "rows-check"]).default("cells"),
+  /** 열두 칸(P-A) / 품종×달 막대표(P-B) / 한 줄에 한 달, 그림과 장보기 체크 목록(P-D. 세로 용지만) */
+  layout: z.enum(["cells", "chart", "rows-check"]).default("cells"),
   monthLabel,
   grid,
   categories,

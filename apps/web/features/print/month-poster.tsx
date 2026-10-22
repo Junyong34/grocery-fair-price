@@ -1,15 +1,17 @@
 import { formatMonthLabel, MONTHS } from "@workspace/seasonal/data/months"
 import { monthChecklist, monthFoods } from "@workspace/seasonal/print/foods"
+import { chartColumns, chartFoods, chartLines } from "@workspace/seasonal/print/period-chart"
 import type { MonthPosterSpec, Paper } from "@workspace/seasonal/print/spec"
 
 import { CheckList } from "./parts/check-list"
 import { FoodArea, flowSize } from "./parts/food-area"
 import { gridSize } from "./parts/grid"
+import { chartLabelWidth, PeriodChart } from "./parts/period-chart"
 import { Sheet } from "./parts/sheet"
 import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
 
 // 월별 제철 포스터. 날짜가 없어 해가 바뀌어도 그대로 쓴다.
-// cells(P-A): 열두 칸에 그 달 품종. rows-check(P-D): 달마다 한 줄에 큰 달 표기, 그림, 장보기 체크 목록(세로 용지만).
+// cells(P-A): 열두 칸에 그 달 품종. chart(P-B): 품종×달 막대표(세로 2단, 가로 3단). rows-check(P-D): 달마다 한 줄에 큰 달 표기, 그림, 장보기 체크 목록(세로 용지만).
 
 const HEADER = 22
 const CELL_LABEL = 7
@@ -21,7 +23,7 @@ export function MonthPoster({ spec, paper }: { spec: MonthPosterSpec; paper: Pap
       <h1 className="print-heading" style={{ height: u(HEADER), margin: 0, textAlign: "center", fontSize: t(8), fontWeight: 700 }}>
         {spec.title}
       </h1>
-      {spec.layout === "rows-check" ? <MonthRows spec={spec} /> : <MonthCells spec={spec} />}
+      {spec.layout === "rows-check" ? <MonthRows spec={spec} /> : spec.layout === "chart" ? <MonthChart spec={spec} /> : <MonthCells spec={spec} />}
     </Sheet>
   )
 }
@@ -59,6 +61,30 @@ function MonthCells({ spec }: { spec: MonthPosterSpec }) {
             />
           </section>
         ))}
+    </div>
+  )
+}
+
+/**
+ * P-B 막대표의 단 수와 단 사이 간격, 줄 높이 상한. 그림 있는 품종(67개)을 한 단에 넣으면 A4 세로 줄이 3.5mm(이름 약 6pt)라
+ * 세로 2단(줄 약 6.8mm), 가로 3단(줄 약 6.4mm)으로 나눈다. 카테고리를 골라 줄이 적으면 한 단으로 두고, 줄이 너무 높아지지 않게 상한을 둔다.
+ */
+const CHART = { columns: { portrait: 2, landscape: 3 }, single: 24, gap: 8, maxRow: 9 } as const
+
+function MonthChart({ spec }: { spec: MonthPosterSpec }) {
+  const inner = innerSize(spec)
+  const lines = chartLines(chartFoods(spec.categories))
+  const count = lines.length <= CHART.single ? 1 : CHART.columns[spec.orientation]
+  const columns = chartColumns(lines, count)
+  const width = (inner.width - CHART.gap * (count - 1)) / count
+  // 달 머리 줄 하나 + 가장 긴 단의 줄 수
+  const rowHeight = Math.min(CHART.maxRow, (inner.height - HEADER) / (Math.max(...columns.map((column) => column.length)) + 1))
+  const labelWidth = chartLabelWidth(lines, rowHeight, true)
+  return (
+    <div style={{ display: "flex", gap: u(CHART.gap), alignItems: "flex-start" }}>
+      {columns.map((column, i) => (
+        <PeriodChart key={i} lines={column} width={width} rowHeight={rowHeight} labelWidth={labelWidth} monthLabel={spec.monthLabel} pictures />
+      ))}
     </div>
   )
 }

@@ -80,8 +80,9 @@ const monthlyHasWeeks = (spec: PrintSpec) => spec.kind !== "monthly" || spec.lay
 const monthlyNotStrip = (spec: PrintSpec) => spec.kind === "monthly" && spec.layout !== "strip"
 /** Y-B는 달 배열이 3x4로, 위 그림은 달마다 하나로 정해져 있다. */
 const yearSheetInPairs = (spec: PrintSpec) => spec.kind === "year-sheet" && spec.layout === "pairs"
-/** P-D는 이름을 체크 목록에 늘 적고, 달을 한 줄씩 쌓는다. */
+/** P-D는 이름을 체크 목록에 늘 적고, 달을 한 줄씩 쌓는다. P-B는 줄마다 이름을 적고 그림 있는 품종을 모두 싣는다. */
 const monthPosterInCells = (spec: PrintSpec) => spec.kind === "month-poster" && spec.layout === "cells"
+const monthPosterNotChart = (spec: PrintSpec) => spec.kind === "month-poster" && spec.layout !== "chart"
 
 const look: OptionSection = {
   title: "서체·배경",
@@ -148,9 +149,9 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
     look,
   ],
   "month-poster": [
-    { title: "구성", fields: [layout({ cells: "열두 칸", "rows-check": "한 줄에 한 달 · 장보기 체크(세로 용지)" })] },
+    { title: "구성", fields: [layout({ cells: "열두 칸", chart: "품종×달 막대표", "rows-check": "한 줄에 한 달 · 장보기 체크(세로 용지)" })] },
     { title: "용지", fields: [orientation, margin, title, { ...grid, when: monthPosterInCells }, monthLabel] },
-    { ...foods(12), fields: [...foods(12, { names: monthPosterInCells }).fields, categories] },
+    { ...foods(12), fields: [...foods(12, { names: monthPosterInCells, max: monthPosterNotChart }).fields, categories] },
     look,
   ],
 }
