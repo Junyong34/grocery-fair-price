@@ -212,7 +212,7 @@ const monthly: WireframeEntry[] = [
     title: "표지: 열두 달 미리보기",
     summary: "달마다 대표 그림 하나를 3×4로 모아 표지에서 1년을 보여 준다.",
     source: "⑤ 연간 한 장 격자를 표지로 · K5, K13",
-    availability: { status: "needs-option", options: 'cover: "months"' },
+    availability: { status: "available", options: 'cover: "months"' },
     orientations: ["portrait"],
     draw: () => {
       const [header, body] = split(contentBox("portrait"), "rows", [26, "*"], 6)

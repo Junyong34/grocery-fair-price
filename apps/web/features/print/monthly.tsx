@@ -1,12 +1,12 @@
 import { foodsInMonth } from "@workspace/seasonal/data/foods"
 import { formatMonthLabel, MONTHS, type Month } from "@workspace/seasonal/data/months"
 import type { Food } from "@workspace/seasonal/data/foods"
-import { monthChecklist, monthFoods, stripFoods, yearFoods } from "@workspace/seasonal/print/foods"
+import { monthChecklist, monthFoods, stripFoods, yearFoods, yearFoodsByMonth } from "@workspace/seasonal/print/foods"
 import { CALENDAR_TEXT_SCALE, type MonthlySpec, type Paper } from "@workspace/seasonal/print/spec"
 
 import { CheckList } from "./parts/check-list"
 import { DayColumn } from "./parts/day-column"
-import { FoodArea } from "./parts/food-area"
+import { FoodArea, flowSize } from "./parts/food-area"
 import { FoodFigure } from "./parts/food-figure"
 import { PrintCalendar } from "./parts/print-calendar"
 import { Sheet } from "./parts/sheet"
@@ -24,12 +24,15 @@ const SIDE = { width: 52, title: 8, gap: 6 } as const
 /** M-D 그림 띠: 품종 수, 세로 용지의 띠 높이, 가로 용지의 띠 폭, 달력과의 간격. 띠 14개와 빈 칸이면 2027년 모든 달의 그림 있는 품종이 들어간다(stripFoods 테스트). */
 const STRIP = { size: 14, height: 44, width: 48, gap: 5 } as const
 /** M-E: 세로의 모서리 달력 블록 크기·안쪽 여백, 가로의 날짜 열 폭, 그림과의 간격 */
+/** C-2 표지: 머리(제목·연도) 높이, 달 칸 사이 간격·안쪽 여백·달 표기 높이, 칸마다 그림 수 */
+const MONTHS_COVER = { header: 40, gap: 4, padding: 3, label: 7, perMonth: 2 } as const
 const ALLOVER = { block: { width: 100, height: 88, padding: 4 }, column: 34, gap: 6 } as const
 
 export function MonthlySheets({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
   return (
     <>
       {spec.cover === "year" && <Cover spec={spec} paper={paper} />}
+      {spec.cover === "months" && <MonthsCover spec={spec} paper={paper} />}
       {MONTHS.map((month) =>
         spec.layout === "strip" ? (
           <StripSheet key={month} spec={spec} paper={paper} month={month} />
@@ -272,3 +275,45 @@ function Cover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
     </Sheet>
   )
 }
+
+/** C-2: 큰 연도 아래 열두 달 칸(세로 3×4, 가로 4×3). 칸마다 그 달 대표 품종 둘(yearFoodsByMonth, 앞 달과 겹치지 않음)과 달 표기. */
+function MonthsCover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
+  const inner = innerSize(spec)
+  const portrait = spec.orientation === "portrait"
+  const { header, gap, padding, label, perMonth } = MONTHS_COVER
+  const [columns, rows] = portrait ? [3, 4] : [4, 3]
+  const cell = { width: (inner.width - gap * (columns - 1)) / columns, height: (inner.height - header - gap * (rows - 1)) / rows }
+  const art = { width: cell.width - padding * 2, height: cell.height - padding * 2 - label }
+  const picks = yearFoodsByMonth({ max: perMonth, categories: [] })
+  // 칸마다 그림 수가 같아도 한두 개로 다를 수 있어, 그림 크기를 가장 작은 칸에 맞춘다.
+  const size = Math.min(...picks.map((foods) => flowSize(foods.length, art.width, art.height, 0)))
+  return (
+    <Sheet spec={spec} paper={paper} background={surfaceColor(spec.surface === "season" ? "cream" : spec.surface)}>
+      <header style={{ height: u(header), display: "flex", alignItems: "flex-end", justifyContent: "space-between", paddingBottom: u(gap), boxSizing: "border-box" }}>
+        <p className="print-heading" style={{ margin: 0, fontSize: t(6), letterSpacing: "0.2em", color: "var(--color-forest)" }}>
+          제철 달력
+        </p>
+        <p className="print-number" style={{ margin: 0, fontSize: t(28), lineHeight: 1, color: "var(--color-forest)" }}>
+          {spec.year}
+        </p>
+      </header>
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${columns}, ${u(cell.width)})`, gap: u(gap) }}>
+        {MONTHS.map((month, i) => (
+          <section
+            key={month}
+            style={{ height: u(cell.height), padding: u(padding), boxSizing: "border-box", borderRadius: u(2), background: surfaceColor("season", monthSeason(month)) }}
+          >
+            <FoodArea foods={picks[i]!} width={art.width} height={art.height} layout="flow" month={month} showName={false} maxSize={size} />
+            <p
+              className={spec.monthLabel === "korean" ? "print-heading" : "print-number"}
+              style={{ height: u(label), margin: 0, display: "flex", alignItems: "flex-end", justifyContent: "center", fontSize: t(5), lineHeight: 1, color: `var(--color-season-${monthSeason(month)})` }}
+            >
+              {formatMonthLabel(month, spec.monthLabel, "long")}
+            </p>
+          </section>
+        ))}
+      </div>
+    </Sheet>
+  )
+}
+

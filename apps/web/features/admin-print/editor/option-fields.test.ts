@@ -139,6 +139,11 @@ describe("구성마다 숨는 옵션", () => {
     for (const f of KIND_SECTIONS["season-poster"].flatMap((section) => section.fields)) expect(isFieldShown(f, spec), f.label).toBe(true)
   })
 
+  it("월간 표지 선택지에 열두 달 미리보기(months)가 있다", () => {
+    const cover = field("monthly", "cover")
+    expect(cover.type === "select" && cover.options.map((option) => option.value)).toEqual(["year", "months", "none"])
+  })
+
   it("연간 큰 그림 위는 달 배열(3x4 고정)과 품종 개수(달마다 하나 고정)를 숨긴다", () => {
     const spec = { ...DEFAULT_SPECS["year-sheet"], layout: "hero-top" as const }
     expect(isFieldShown(field("year-sheet", "grid"), spec)).toBe(false)

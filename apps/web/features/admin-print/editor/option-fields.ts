@@ -106,7 +106,7 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
           strip: "쓰는 큰 칸 달력 + 그림 띠(빈 날짜 칸에도 그림)",
           allover: "그림이 판 전체, 달력은 모서리 블록(세로)·날짜 한 열(가로)",
         }),
-        { type: "select", label: "12개월 묶음 표지", path: ["cover"], options: options({ year: "큰 연도 + 대표 품종", none: "표지 없음" }) },
+        { type: "select", label: "12개월 묶음 표지", path: ["cover"], options: options({ year: "큰 연도 + 대표 품종", months: "큰 연도 + 열두 달 미리보기", none: "표지 없음" }) },
       ],
     },
     { title: "용지", fields: [orientation, margin, year] },

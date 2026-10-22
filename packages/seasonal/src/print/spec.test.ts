@@ -190,6 +190,7 @@ describe("쪽 수", () => {
   it("월간 달력은 열두 달에 표지를 켜면 하나 더한다", () => {
     expect(pageCount({ ...DEFAULT_SPECS.monthly, cover: "none" })).toBe(12)
     expect(pageCount({ ...DEFAULT_SPECS.monthly, cover: "year" })).toBe(13)
+    expect(pageCount({ ...DEFAULT_SPECS.monthly, cover: "months" })).toBe(13)
   })
 
   it("계절 포스터를 계절마다 한 장(per-season)으로 하면 4쪽이다", () => {

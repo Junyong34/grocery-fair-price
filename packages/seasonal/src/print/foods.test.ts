@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import { findFood, foodsInMonth, isDrawn } from "../data/foods"
 import { SEASONS } from "../data/seasons"
 import { MONTHS } from "../data/months"
-import { monthChecklist, monthFoods, seasonFoods, startSeason, stripFoods, yearFoods } from "./foods"
+import { monthChecklist, monthFoods, seasonFoods, startSeason, stripFoods, yearFoods, yearFoodsByMonth } from "./foods"
 
 describe("startSeason", () => {
   it("해를 넘는 제철은 시작하는 달의 계절이다", () => {
@@ -40,6 +40,19 @@ describe("yearFoods", () => {
   it("고른 품종은 모두 그 달의 제철 품종이다", () => {
     const foods = yearFoods({ max: 1, categories: [] })
     foods.forEach((food, index) => expect(food.months as readonly number[]).toContain(MONTHS[index]))
+  })
+})
+
+describe("yearFoodsByMonth", () => {
+  it("yearFoods와 같은 품종을 달마다 묶는다(1월부터 열두 묶음)", () => {
+    const byMonth = yearFoodsByMonth({ max: 2, categories: [] })
+    expect(byMonth).toHaveLength(MONTHS.length)
+    expect(byMonth.flat()).toEqual(yearFoods({ max: 2, categories: [] }))
+    byMonth.forEach((foods, index) => foods.forEach((food) => expect(food.months as readonly number[]).toContain(MONTHS[index])))
+  })
+
+  it("표지 열두 달 미리보기(달마다 둘)에서 빈 달이 없다", () => {
+    for (const [index, foods] of yearFoodsByMonth({ max: 2, categories: [] }).entries()) expect(foods.length, `${index + 1}월`).toBeGreaterThan(0)
   })
 })
 

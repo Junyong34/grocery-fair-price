@@ -90,8 +90,8 @@ const monthlySchema = z.object({
   ...base,
   kind: z.literal("monthly"),
   year,
-  /** 12개월 묶음 첫 장의 표지. none: 표지 없음, year: 큰 연도 + 대표 품종(C-1) */
-  cover: z.enum(["none", "year"]),
+  /** 12개월 묶음 첫 장의 표지. none: 표지 없음, year: 큰 연도 + 대표 품종(C-1), months: 큰 연도 + 열두 달 미리보기(C-2) */
+  cover: z.enum(["none", "year", "months"]),
   monthLabel,
   calendar: calendar(z.enum(["hidden", "mark", "mark-and-name"])).extend({ variant: z.enum(CALENDAR_VARIANTS) }),
   /**

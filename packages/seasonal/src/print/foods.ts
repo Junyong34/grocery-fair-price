@@ -27,8 +27,13 @@ export function monthChecklist(month: number, categories: readonly FoodCategory[
 
 /** 열두 달을 한 판에 모을 때의 품종. 달마다 앞 달에 아직 나오지 않은 품종을 pick.max개까지 고른다(여러 달에 걸친 품종이 두 번 나오지 않게). */
 export function yearFoods(pick: FoodPick): readonly Food[] {
+  return yearFoodsByMonth(pick).flat()
+}
+
+/** yearFoods를 달마다 묶은 것(1월부터 열두 묶음). 월간 표지 열두 달 미리보기(C-2)가 칸마다 쓴다. */
+export function yearFoodsByMonth(pick: FoodPick): readonly (readonly Food[])[] {
   const picked = new Set<string>()
-  return MONTHS.flatMap((month) => {
+  return MONTHS.map((month) => {
     const fresh = monthFoods(month, { ...pick, max: Infinity }).filter((food) => !picked.has(food.id)).slice(0, pick.max)
     fresh.forEach((food) => picked.add(food.id))
     return fresh
