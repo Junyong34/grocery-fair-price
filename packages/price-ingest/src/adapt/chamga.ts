@@ -1,6 +1,6 @@
 // 참가격 goodPriceVO 행 → 관측값 초안 (pipeline 3-11 참가격 열).
 import type { ChamgaPriceRow } from "../sources/chamgagyeok.ts"
-import { priceFlags, ymdFromCompact, type Flag, type ObservationDraft } from "./draft.ts"
+import { isPositiveInt, priceFlags, RowRejectedError, ymdFromCompact, type Flag, type ObservationDraft } from "./draft.ts"
 import type { AdaptContext } from "./mapping.ts"
 import { pricePerBase } from "./units.ts"
 
@@ -17,7 +17,15 @@ function kstIso(inputDttm: string): string {
   return `${date}T${time}+09:00`
 }
 
+// 행 단위 거부 사유 (pipeline 3-11: goodPrice 양의 정수. 날짜 형식은 계약 스키마가 본다). 거부할 이유가 없으면 null.
+export function chamgaPriceRowRejection(row: ChamgaPriceRow): string | null {
+  return isPositiveInt(row.goodPrice) ? null : "가격이 양의 정수가 아니다"
+}
+
 export function adaptChamgaPriceRow(row: ChamgaPriceRow, ctx: ChamgaContext): ObservationDraft {
+  const rejection = chamgaPriceRowRejection(row)
+  if (rejection) throw new RowRejectedError(rejection)
+
   // 원천 키: 상품 번호(goodId) 그대로 (3-11). 같은 번호의 재사용 여부는 DB에서 본다 (3-12 #17)
   const sourceKey = row.goodId
   const obsDate = ymdFromCompact(row.goodInspectDay)

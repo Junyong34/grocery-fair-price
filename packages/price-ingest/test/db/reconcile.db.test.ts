@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url"
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest"
 
-import { buildRawFile, callKeyOf, rawObjectKey, type Json } from "../../src/load/raw-file.ts"
+import { buildRawFile, callKeyOf, rawObjectKey, storagePathOf, type Json } from "../../src/load/raw-file.ts"
 import { reconcileRawFiles } from "../../src/load/reconcile.ts"
 import { connectIngest, type Sql } from "../../src/load/db.ts"
 import { registerRun } from "../../src/load/ledger.ts"
@@ -35,22 +35,41 @@ const storedKeys: string[] = []
 const runIds: number[] = []
 let sql: Sql
 
-// 테스트용 원본 파일. fetchedAt의 KST 날짜가 폴더 날짜가 된다.
-function testFile(fetchedAt: string, rows: Json[]) {
+// 테스트용 원본 파일. 폴더 날짜는 rawObjectKey에 주는 날짜다.
+function testFile(options: { fetchedAt: string; runStartedAt: string; ingestRunId: number | null; rows: Json[] }) {
   return buildRawFile(
     {
       source: "kamis",
       endpoint: "test-endpoint",
-      fetchedAt,
-      requests: [{ test: true }],
-      callCount: 1,
+      job: "daily",
+      ingestRunId: options.ingestRunId,
+      runStartedAt: options.runStartedAt,
+      fetchedAt: options.fetchedAt,
+      requests: [{ endpoint: "test-endpoint", params: { pageNo: "1" }, httpStatus: 200, resultCode: "0", rowCount: options.rows.length }],
       targetFrom: "2026-10-21",
       targetTo: "2026-10-21",
       contractBaseline: "baseline:test",
       adapterVersion: "test",
     },
-    rows,
+    options.rows,
   )
+}
+
+async function put(day: string, label: string, file: ReturnType<typeof testFile>): Promise<string> {
+  const key = rawObjectKey("kamis", day, callKeyOf(label, file.header.fetchedAt))
+  storedKeys.push(key)
+  expect(await store.upload(key, file.bytes)).toBe("uploaded")
+  return key
+}
+
+type RawRow = { load_status: string; row_count: number; content_sha256: string; endpoint: string; ingest_run_id: string }
+type RunRow = { status: string; error_code: string | null; started_at: Date; job: string }
+
+async function rawRow(key: string): Promise<RawRow | undefined> {
+  const [row] = await sql<RawRow[]>`
+    select load_status, row_count, content_sha256, endpoint, ingest_run_id
+      from price.raw_object where storage_path = ${storagePathOf(key)}`
+  return row
 }
 
 beforeAll(async () => {
@@ -62,63 +81,65 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  for (const key of storedKeys) await store.remove([key])
-  await sql`delete from price.raw_object where storage_path = any(${sql.array(storedKeys)})`
-  await sql`delete from price.ingest_run where id = any(${sql.array(runIds, 20)})`  // 20 = bigint
+  await store.remove(storedKeys)
+  const paths = storedKeys.map(storagePathOf)
+  const removed = await sql<{ ingest_run_id: string }[]>`
+    delete from price.raw_object
+     where storage_path in (select jsonb_array_elements_text(${sql.json(paths)}))
+    returning ingest_run_id`
+  const ids = [...new Set([...runIds, ...removed.map((row) => Number(row.ingest_run_id))])]
+  await sql`delete from price.ingest_run where id in (select (jsonb_array_elements_text(${sql.json(ids)}))::bigint)`
   await sql.end()
 })
 
 describe("대조: DB 기록 없이 Storage에만 있는 원본을 다음 실행이 등록한다", () => {
-  it("DB를 쓰기 전에 올린 파일을 다음 실행이 pending_load로 등록한다 (DB 장애 뒤 복구)", async () => {
-    // 이전 실행: 원본은 Storage에 올라갔지만 DB 기록은 못 남겼다
-    const file = testFile("2026-10-21T16:30:00Z", [{ a: 1 }, { a: 2 }])
-    const key = rawObjectKey("kamis", TODAY, callKeyOf(testLabel, file.sha256))
-    storedKeys.push(key)
-    expect(await store.upload(key, file.bytes)).toBe("uploaded")
+  const RUN_STARTED_AT = "2026-10-21T21:30:00.000Z" // DB가 안 되어 기록을 못 만든 실행
 
-    // 다음 실행: DB가 살아 있고, 대조해서 빠진 파일을 등록한다
-    const runId = await registerRun(sql, { source: "kamis", job: "daily", callBudget: 100 })
-    runIds.push(runId)
-    const result = await reconcileRawFiles({ sql, store, ingestRunId: runId, source: "kamis", today: TODAY })
-    expect(result.registered).toContain(key)
+  it("DB가 처음부터 안 되었던 실행의 원본: pending_load로 등록하고, 받은 실행을 실패로 기록해 가리킨다", async () => {
+    const file = testFile({ fetchedAt: "2026-10-21T21:30:05Z", runStartedAt: RUN_STARTED_AT, ingestRunId: null, rows: [{ a: 1 }, { a: 2 }] })
+    const key = await put(TODAY, testLabel, file)
 
-    const [row] = await sql<{ load_status: string; row_count: number; content_sha256: string; endpoint: string; ingest_run_id: string }[]>`
-      select load_status, row_count, content_sha256, endpoint, ingest_run_id
-        from price.raw_object where storage_path = ${key}`
-    expect(row).toMatchObject({
-      load_status: "pending_load",
-      row_count: 2,
-      content_sha256: file.sha256,
-      endpoint: "test-endpoint",
-    })
-    expect(Number(row?.ingest_run_id)).toBe(runId)
+    const result = await reconcileRawFiles({ sql, store, source: "kamis", today: TODAY })
+    expect(result.registered).toContain(storagePathOf(key))
+
+    const row = await rawRow(key)
+    expect(row).toMatchObject({ load_status: "pending_load", row_count: 2, content_sha256: file.contentSha256, endpoint: "test-endpoint" })
+    const [run] = await sql<RunRow[]>`select status, error_code, started_at, job from price.ingest_run where id = ${row!.ingest_run_id}`
+    expect(run).toMatchObject({ status: "failed", error_code: "db_unreachable", job: "daily" })
+    expect(run?.started_at.toISOString()).toBe(RUN_STARTED_AT)
   })
 
-  it("이미 기록된 파일은 다시 등록하지 않는다 (두 번째 실행은 같은 파일을 건드리지 않는다)", async () => {
-    const runId = await registerRun(sql, { source: "kamis", job: "daily", callBudget: 100 })
-    runIds.push(runId)
-    const second = await reconcileRawFiles({ sql, store, ingestRunId: runId, source: "kamis", today: TODAY })
-    expect(second.registered).not.toContain(storedKeys[0])
+  it("같은 실행의 다른 원본은 같은 실행 기록을 가리킨다 (실행 기록을 원본마다 만들지 않는다)", async () => {
+    const file = testFile({ fetchedAt: "2026-10-21T21:31:00Z", runStartedAt: RUN_STARTED_AT, ingestRunId: null, rows: [{ b: 1 }] })
+    const key = await put(TODAY, `${testLabel}-second`, file)
+    await reconcileRawFiles({ sql, store, source: "kamis", today: TODAY })
+    expect((await rawRow(key))?.ingest_run_id).toBe((await rawRow(storedKeys[0]!))?.ingest_run_id)
   })
 
-  it("같은 내용을 다시 올리면 이미 있다고 돌려준다 (중복 업로드 없음)", async () => {
-    const file = testFile("2026-10-21T16:30:00Z", [{ a: 1 }, { a: 2 }])
-    const key = rawObjectKey("kamis", TODAY, callKeyOf(testLabel, file.sha256))
-    expect(await store.upload(key, file.bytes)).toBe("exists")
-  })
-
-  it("대조 기간(7일)보다 오래된 파일은 대조하지 않는다", async () => {
-    // 2026-10-10 폴더는 기간 밖이다
-    const old = testFile("2026-10-09T16:30:00Z", [{ old: true }])
-    const key = rawObjectKey("kamis", "2026-10-10", callKeyOf(`${testLabel}-old`, old.sha256))
-    storedKeys.push(key)
-    expect(await store.upload(key, old.bytes)).toBe("uploaded")
-
+  it("실행 기록은 있었는데 적재 전에 DB가 끊긴 원본: 헤더의 실행 번호를 그대로 쓴다", async () => {
     const runId = await registerRun(sql, { source: "kamis", job: "daily", callBudget: 100 })
     runIds.push(runId)
-    const result = await reconcileRawFiles({ sql, store, ingestRunId: runId, source: "kamis", today: TODAY })
-    expect(result.registered).not.toContain(key)
-    const rows = await sql`select 1 from price.raw_object where storage_path = ${key}`
-    expect(rows).toHaveLength(0)
+    const file = testFile({ fetchedAt: "2026-10-21T21:40:00Z", runStartedAt: "2026-10-21T21:39:00Z", ingestRunId: runId, rows: [{ c: 1 }] })
+    const key = await put(TODAY, `${testLabel}-known`, file)
+    await reconcileRawFiles({ sql, store, source: "kamis", today: TODAY })
+    expect(Number((await rawRow(key))?.ingest_run_id)).toBe(runId)
+  })
+
+  it("이미 기록된 파일은 다시 등록하지 않는다", async () => {
+    const again = await reconcileRawFiles({ sql, store, source: "kamis", today: TODAY })
+    for (const key of storedKeys) expect(again.registered).not.toContain(storagePathOf(key))
+  })
+
+  it("같은 파일을 다시 올리면 이미 있다고 돌려준다 (겹쳐 올리지 않는다)", async () => {
+    const file = testFile({ fetchedAt: "2026-10-21T21:30:05Z", runStartedAt: RUN_STARTED_AT, ingestRunId: null, rows: [{ a: 1 }, { a: 2 }] })
+    expect(await store.upload(storedKeys[0]!, file.bytes)).toBe("exists")
+  })
+
+  it("대조 기간(7일)보다 오래된 폴더의 파일은 대조하지 않는다", async () => {
+    const old = testFile({ fetchedAt: "2026-10-09T21:30:00Z", runStartedAt: "2026-10-09T21:29:00Z", ingestRunId: null, rows: [{ old: true }] })
+    const key = await put("2026-10-10", `${testLabel}-old`, old)
+    const result = await reconcileRawFiles({ sql, store, source: "kamis", today: TODAY })
+    expect(result.registered).not.toContain(storagePathOf(key))
+    expect(await rawRow(key)).toBeUndefined()
   })
 })

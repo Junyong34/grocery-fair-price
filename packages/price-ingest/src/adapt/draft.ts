@@ -5,12 +5,31 @@ import { z } from "zod"
 export const FLAGS = ["outlier", "unit_mismatch", "one_plus_one_unverified"] as const
 export type Flag = (typeof FLAGS)[number]
 
+// 변환 규칙의 버전. 규칙을 바꾸면 올린다. raw_object.adapter_version에 들어가, 다시 적재할 원본을 고르는 데 쓴다.
+export const ADAPTER_VERSION = "2026-10-22.1"
+
 // 임시 상한(원). 이보다 크면 이상치로 표시한다. 전날·다른 시장과 비교하는 규칙은 ②·③에서 정한다 (pipeline 5-2).
 export const PRICE_UPPER_BOUND = 10_000_000
 
-// 가격이 0 이하이거나 상한을 넘으면 이상치. 집계에서는 빼고 원본은 남긴다 (pipeline 5-2).
+// 상한을 넘으면 이상치. 집계에서는 빼고 관측값은 남긴다 (pipeline 5-2).
+// 0 이하인 가격은 이상치가 아니라 행 단위 거부다 (아래 RowRejectedError).
 export function priceFlags(priceRaw: number): Flag[] {
-  return priceRaw <= 0 || priceRaw > PRICE_UPPER_BOUND ? ["outlier"] : []
+  return priceRaw > PRICE_UPPER_BOUND ? ["outlier"] : []
+}
+
+// 행 단위 거부 (pipeline 3-11 "행 단위 거부", 3-12 #26). 이 행은 관측값으로 넘기지 않고 원본에만 남기며,
+// raw_object.rejected_rows로 센다. 가격이 0 이하인 행이 섞이면 DB 검사(price_raw > 0)가 파일 하나의 적재 전체를 되돌린다.
+export class RowRejectedError extends Error {
+  reason: string
+  constructor(reason: string) {
+    super(`관측값으로 넘기지 않는 행: ${reason}`)
+    this.name = "RowRejectedError"
+    this.reason = reason
+  }
+}
+
+export function isPositiveInt(text: string): boolean {
+  return /^\d+$/.test(text) && Number(text) > 0
 }
 
 // 20261011 → 2026-10-11
@@ -38,7 +57,7 @@ const observationSchema = z
     obsDate: ymd,
     priceTier: z.literal("retail"),
     obsKind: z.enum(["quote_sample", "quote_aggregate", "shelf_price"]),
-    priceRaw: z.number().int(),
+    priceRaw: z.number().int().positive(),
     qtyRaw: z.number().positive().nullable(),
     unitRaw: z.string().nullable(),
     pricePerBase: z.number().nonnegative().nullable(),
@@ -63,7 +82,7 @@ const referenceSchema = z
     sourceKey: z.string().min(1),
     placeKey: z.string().min(1),
     refDate: ymd,
-    priceRaw: z.number().int(),
+    priceRaw: z.number().int().positive(),
     unitRaw: z.string(),
     pricePerBase: z.number().nonnegative().nullable(),
     varietyKey: z.string().nullable(),

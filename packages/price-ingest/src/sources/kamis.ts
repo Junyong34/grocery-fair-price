@@ -1,12 +1,15 @@
 // KAMIS 일별 도·소매 가격 (perDay/price). 명세와 실측: grocery-price/docs/30-data/sources/kamis.md
 import { z } from "zod"
 
-import { assertServiceKey, assertYmd, getText, type CallOptions } from "../http.ts"
-import { dig, interpret, parseBody } from "../response.ts"
+import { ApiContractError } from "../errors.ts"
+import { assertServiceKey, assertYmd, runCall, type CallOptions } from "../http.ts"
+import { codeIn, dig, interpret, listAt, parseBody } from "../response.ts"
 import { parseOrThrow } from "../validate.ts"
 
 const BASE_URL = "https://apis.data.go.kr/B552845/perDay/price"
+export const KAMIS_ENDPOINT = "perDay/price"
 const SUCCESS_CODE = "0" // 축평원·참가격의 "00"과 다르다 (kamis.md 0장)
+export const KAMIS_PAGE_SIZE = 1000 // 1000보다 크게 줘도 1000으로 줄인다 (kamis.md 1장)
 
 // 본문에서 행 배열이 있는 경로 (contract 실측에서 행을 세는 데 쓴다)
 export const KAMIS_ROW_PATH = ["response", "body", "items", "item"] as const
@@ -31,7 +34,7 @@ export function kamisPerDayUrl(serviceKey: string, query: KamisPerDayQuery): str
     ["serviceKey", serviceKey],
     ["returnType", "JSON"],
     ["pageNo", String(query.pageNo ?? 1)],
-    ["numOfRows", "1000"],
+    ["numOfRows", String(KAMIS_PAGE_SIZE)],
     ["cond[exmn_ymd::GTE]", query.fromYmd],
     ["cond[exmn_ymd::LTE]", query.toYmd],
     ["cond[ctgry_cd::EQ]", query.ctgryCd],
@@ -97,17 +100,62 @@ export function readKamisPerDay(status: number, text: string): unknown {
   })
 }
 
+function parseKamisBody(status: number, text: string) {
+  return parseOrThrow("kamis", kamisPerDaySchema, readKamisPerDay(status, text))
+}
+
 export function parseKamisPerDay(status: number, text: string): KamisRow[] {
-  const body = parseOrThrow("kamis", kamisPerDaySchema, readKamisPerDay(status, text))
-  return body.response.body.items.item
+  return parseKamisBody(status, text).response.body.items.item
 }
 
-export async function fetchKamisPerDayRaw(call: CallOptions, query: KamisPerDayQuery): Promise<unknown> {
-  const { status, text } = await getText("kamis", kamisPerDayUrl(call.serviceKey, query), call)
-  return readKamisPerDay(status, text)
+function kamisCall<T>(
+  call: CallOptions,
+  query: KamisPerDayQuery,
+  read: (status: number, text: string) => T,
+  rowCount: (value: T) => number,
+): Promise<T> {
+  return runCall({
+    source: "kamis",
+    endpoint: KAMIS_ENDPOINT,
+    url: kamisPerDayUrl(call.serviceKey, query),
+    call,
+    read,
+    rowCount,
+    resultCode: (text) => codeIn("json", text, ["response", "header", "resultCode"]),
+  })
 }
 
-export async function fetchKamisPerDay(call: CallOptions, query: KamisPerDayQuery): Promise<KamisRow[]> {
-  const { status, text } = await getText("kamis", kamisPerDayUrl(call.serviceKey, query), call)
-  return parseKamisPerDay(status, text)
+export function fetchKamisPerDayRaw(call: CallOptions, query: KamisPerDayQuery): Promise<unknown> {
+  return kamisCall(call, query, readKamisPerDay, (raw) => listAt(raw, KAMIS_ROW_PATH).length)
+}
+
+// 한 페이지만 받는다 (query.pageNo, 기본 1)
+export function fetchKamisPerDay(call: CallOptions, query: KamisPerDayQuery): Promise<KamisRow[]> {
+  return kamisCall(call, query, parseKamisPerDay, (rows) => rows.length)
+}
+
+// 모든 페이지를 받는다. 페이지 수는 ceil(totalCount / 1000)이다. 결과는 조사일 오름차순이고 페이지 사이에
+// 중복·누락이 없었다 (kamis.md 1장 실측). 받은 행 수가 totalCount와 다르거나 totalCount가 페이지 사이에
+// 바뀌면 계약 오류로 끊는다.
+export async function fetchKamisPerDayAll(
+  call: CallOptions,
+  query: Omit<KamisPerDayQuery, "pageNo">,
+): Promise<KamisRow[]> {
+  const page = (pageNo: number) =>
+    kamisCall(call, { ...query, pageNo }, parseKamisBody, (body) => body.response.body.items.item.length)
+  const first = await page(1)
+  const total = first.response.body.totalCount
+  const rows = [...first.response.body.items.item]
+  for (let pageNo = 2; pageNo <= Math.ceil(total / KAMIS_PAGE_SIZE); pageNo += 1) {
+    const next = await page(pageNo)
+    const nextTotal = next.response.body.totalCount
+    if (nextTotal !== total) {
+      throw new ApiContractError("kamis", [`totalCount가 페이지 사이에 바뀌었다 (${total} → ${nextTotal})`])
+    }
+    rows.push(...next.response.body.items.item)
+  }
+  if (rows.length !== total) {
+    throw new ApiContractError("kamis", [`받은 행 수 ${rows.length}가 totalCount ${total}와 다르다`])
+  }
+  return rows
 }

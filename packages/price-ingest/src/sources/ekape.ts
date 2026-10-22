@@ -1,12 +1,13 @@
 // 축평원 일자별 축산물소비자가격 (consumerPriceDaily). 명세와 실측: grocery-price/docs/30-data/sources/ekape.md
 import { z } from "zod"
 
-import { assertServiceKey, assertYmd, getText, type CallOptions } from "../http.ts"
-import { dig, interpret, parseBody } from "../response.ts"
+import { assertServiceKey, assertYmd, runCall, type CallOptions } from "../http.ts"
+import { codeIn, dig, interpret, listAt, parseBody } from "../response.ts"
 import { parseOrThrow } from "../validate.ts"
 
 // 주소는 http다. https가 아니다 (ekape.md 0장).
 const BASE_URL = "http://data.ekape.or.kr/openapi-data/service/user/grade/consumerPriceDaily"
+export const EKAPE_ENDPOINT = "consumerPriceDaily"
 const SUCCESS_CODE = "00"
 
 export const EKAPE_ROW_PATH = ["response", "body", "items", "item"] as const
@@ -83,12 +84,33 @@ export function parseEkapeConsumerPrice(status: number, text: string): EkapeRow[
   return parsed.response.body.items.item
 }
 
-export async function fetchEkapeConsumerPriceRaw(call: CallOptions, query: EkapeQuery): Promise<unknown> {
-  const { status, text } = await getText("ekape", ekapeConsumerPriceUrl(call.serviceKey, query), call)
-  return readEkapeConsumerPrice(status, text)
+function ekapeCall<T>(
+  call: CallOptions,
+  query: EkapeQuery,
+  read: (status: number, text: string) => T,
+  rowCount: (value: T) => number,
+): Promise<T> {
+  return runCall({
+    source: "ekape",
+    endpoint: EKAPE_ENDPOINT,
+    url: ekapeConsumerPriceUrl(call.serviceKey, query),
+    call,
+    read,
+    rowCount,
+    resultCode: (text) => codeIn("xml", text, ["response", "header", "resultCode"]),
+  })
 }
 
-export async function fetchEkapeConsumerPrice(call: CallOptions, query: EkapeQuery): Promise<EkapeRow[]> {
-  const { status, text } = await getText("ekape", ekapeConsumerPriceUrl(call.serviceKey, query), call)
-  return parseEkapeConsumerPrice(status, text)
+export function fetchEkapeConsumerPriceRaw(call: CallOptions, query: EkapeQuery): Promise<unknown> {
+  return ekapeCall(call, query, readEkapeConsumerPrice, (raw) => listAt(raw, EKAPE_ROW_PATH).length)
+}
+
+export function fetchEkapeConsumerPrice(call: CallOptions, query: EkapeQuery): Promise<EkapeRow[]> {
+  return ekapeCall(call, query, parseEkapeConsumerPrice, (rows) => rows.length)
+}
+
+// 성공은 resultCode 00 그리고 당일 행 1개 이상이다 (pipeline 3-11). 아직 안 올라온 날은 평년 행만 오고,
+// 자료가 없는 날은 0건이다 (ekape.md 6장). false이면 원본은 남기고 그날을 다음 실행에서 다시 받는다.
+export function ekapeHasDayRows(rows: readonly EkapeRow[]): boolean {
+  return rows.some((row) => row.standYmd !== "평년")
 }

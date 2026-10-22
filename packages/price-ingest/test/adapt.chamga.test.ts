@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { adaptChamgaPriceRow } from "../src/adapt/chamga.ts"
+import { adaptChamgaPriceRow, chamgaPriceRowRejection } from "../src/adapt/chamga.ts"
+import { RowRejectedError } from "../src/adapt/draft.ts"
 import { chamgaPriceRows, chamgaProduct, fixtureMapping, first } from "./fixtures/adapt.ts"
 
 const ctx = { mapping: fixtureMapping, product: chamgaProduct }
@@ -74,9 +75,11 @@ describe("참가격 어댑터", () => {
     expect(Object.keys(draft)).not.toContain("regionCode")
   })
 
-  it("가격이 0이면 이상치로 표시한다", () => {
-    const draft = adaptChamgaPriceRow({ ...first(chamgaPriceRows()), goodPrice: "0" }, ctx)
-    expect(draft.flags).toEqual(["outlier"])
+  it("가격이 0이면 관측값으로 넘기지 않는다 (3-11 행 단위 거부)", () => {
+    const row = { ...first(chamgaPriceRows()), goodPrice: "0" }
+    expect(chamgaPriceRowRejection(row)).toBe("가격이 양의 정수가 아니다")
+    expect(() => adaptChamgaPriceRow(row, ctx)).toThrow(RowRejectedError)
+    expect(chamgaPriceRowRejection(first(chamgaPriceRows()))).toBeNull()
   })
 
   it("편의점 본사 가격의 지역 범위는 어댑터가 정하지 않는다. 범위는 점포 표에서 정한다 (3-12 #19)", () => {

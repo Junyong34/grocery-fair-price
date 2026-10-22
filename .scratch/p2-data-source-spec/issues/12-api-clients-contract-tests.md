@@ -62,3 +62,13 @@ Blocked by: 01
 - **의존성**: `zod@4.4.3`. 저장소 lockfile에 이미 있는 버전이다. 4.6.7로 설치했다가 다른 도구의 zod까지 올라가서 되돌렸다. lockfile 변경은 추가뿐이다. `fast-xml-parser@5.11.2`는 price-db와 같다. Context7은 이 세션에 없어서 설치된 zod의 API로 맞췄다.
 - **호출량**: 이번 작업의 실측 호출은 기준 생성 두 번(첫 시도는 파일 쓰기에서 실패했지만 호출은 끝났다) 32회와 라이브 테스트 16회, 합 48회다. 모두 한도 안이다.
 - **문서**: `docs/project-structure.md`에 패키지 줄과 8-2절(경로·명령·기준 갱신 규칙)을 더했다.
+
+## Comments
+
+- 2026-10-22 점검 뒤 고침:
+  - **호출 기록**: 모든 호출이 `CallOptions.onCall`로 기록을 남긴다. 기록에는 엔드포인트, 인증키를 뺀 파라미터(`pageNo` 포함), HTTP 상태, `resultCode`, 행 수가 들어간다. 게이트웨이 오류는 `gateway:<코드>`, 응답을 못 받으면 HTTP 상태 0이다. 원본 파일 헤더와 `raw_object.requests`에 들어간다.
+  - **KAMIS 모든 페이지**: `fetchKamisPerDayAll`이 `ceil(totalCount / 1000)` 페이지를 받는다. 받은 행 수가 `totalCount`와 다르거나 `totalCount`가 페이지 사이에 바뀌면 계약 오류로 끊는다.
+  - **축평원 성공 판정**: `ekapeHasDayRows`. `resultCode 00`이어도 당일 행이 없으면(평년 행만 또는 0건) 성공이 아니다 (pipeline 3-11).
+  - **계약 기준 버전**: `contractBaselineVersion()` = `baseline:<기준을 만든 시각>`. `raw_object.contract_baseline`에 들어간다.
+  - 라이브 테스트 17개를 다시 통과했다 (호출 16회).
+  - 남은 것: KAMIS 재등록 감시 조건 `cond[orgnl_reg_dt::GTE]`의 지원과 계약 고정, 게이트웨이 오류 분류(키 만료·한도 초과·일시 장애), KAMIS 부류·품목 코드 목록 비교. 각각 `ingest-foundation/03`, `05`에서 다룬다.

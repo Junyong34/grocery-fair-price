@@ -7,3 +7,7 @@ export type DbSource = "kamis" | "ekape" | "chamga"
 export function dbSourceOf(source: Source): DbSource {
   return source === "chamgagyeok" ? "chamga" : source
 }
+
+// ingest_run.job 검사 값
+export const RUN_JOBS = ["daily", "recheck", "reregistration_watch", "master", "backfill", "recompute"] as const
+export type RunJob = (typeof RUN_JOBS)[number]

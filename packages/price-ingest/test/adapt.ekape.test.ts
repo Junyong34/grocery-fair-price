@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { adaptEkapeRow } from "../src/adapt/ekape.ts"
+import { RowRejectedError } from "../src/adapt/draft.ts"
+import { adaptEkapeRow, ekapeRowRejection } from "../src/adapt/ekape.ts"
 import type { Mapping } from "../src/adapt/mapping.ts"
 import { ekapeConsumerPriceSchema, readEkapeConsumerPrice } from "../src/sources/ekape.ts"
 import { checkWith } from "../src/validate.ts"
@@ -71,6 +72,18 @@ describe("축평원 어댑터", () => {
     if (draft.recordKind !== "observation") throw new Error("관측값이어야 한다")
     expect(draft.promo).toEqual({ discount: null, onePlusOne: null, from: null, to: null })
     expect(draft.sourceRegisteredAt).toBeNull()
+  })
+
+  it("가격이 0이면 관측값으로 넘기지 않는다 (3-11 행 단위 거부)", () => {
+    const row = { ...first(ekapePorkRows()), ntslPrc: "0" }
+    expect(ekapeRowRejection(row)).toBe("가격이 양의 정수가 아니다")
+    expect(() => adaptEkapeRow(row, ctx)).toThrow(RowRejectedError)
+  })
+
+  it("축종 코드가 요청과 다르면 거부한다 (3-11)", () => {
+    const row = first(ekapePorkRows())
+    expect(ekapeRowRejection(row, { judgeKind: "4304" })).toBeNull()
+    expect(ekapeRowRejection(row, { judgeKind: "4301" })).toBe("축종 코드가 요청과 다르다")
   })
 
   it("형식이 깨진 행(필드 이름이 바뀜)은 어댑터까지 오지 않는다. 계약 검사에서 막힌다 (3-12 #26)", () => {

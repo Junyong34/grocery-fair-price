@@ -298,8 +298,11 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 |---|---|
 | `packages/price-ingest/src/sources/` | 출처별 요청 주소, 응답 판정(성공 코드·게이트웨이 오류·HTTP 상태), 계약 스키마(strict). `kamis.ts`(perDay/price, 성공 `"0"`), `ekape.ts`(consumerPriceDaily, 성공 `00`, http 주소), `chamgagyeok.ts`(ProductPriceInfoService 4기능, 가격 조회만 `serviceKey`, 나머지 `ServiceKey`) |
 | `packages/price-ingest/src/contract/` | 응답 형태 기술(`shape.ts`: 경로별 타입), 기준과 실측 비교(`compare.ts`: 실패와 경고), 실측 항목 16개와 기준 파일 경로(`probes.ts`) |
-| `packages/price-ingest/src/` 공통 | `errors.ts`(오류 종류, 메시지에 키·주소 없음), `http.ts`(fetch 래퍼, 전송 오류 감싸기), `response.ts`(XML·JSON 읽기, 판정), `validate.ts`(검사 결과를 필드 경로로 풀어 쓰기) |
-| `packages/price-ingest/test/` | 오프라인 테스트 (`pnpm test`에 들어간다. 키·네트워크 없음): 요청 주소, 가짜 응답으로 본 클라이언트 동작, 샘플 계약, 필드 이름 변경 감지 |
+| `packages/price-ingest/src/` 공통 | `errors.ts`(오류 종류, 메시지에 키·주소 없음), `http.ts`(fetch 래퍼, 호출 기록 `CallRecord`: 인증키를 뺀 파라미터·HTTP 상태·resultCode·행 수), `response.ts`(XML·JSON 읽기, 판정), `validate.ts`(검사 결과를 필드 경로로 풀어 쓰기) |
+| `packages/price-ingest/src/adapt/` | 어댑터: 응답 행 → 관측값 초안 (원천 키·장소 키. DB 번호는 적재가 만든다). `kamis.ts`·`ekape.ts`(평년 행은 `reference`)·`chamga.ts`, 행 단위 거부(`*RowRejection`, `batch.ts`의 `adaptRows`), 단위 환산(`units.ts`), 매핑 함수와 미매핑 리포트(`mapping.ts`), 초안 스키마와 `ADAPTER_VERSION`(`draft.ts`) |
+| `packages/price-ingest/src/load/` | 원본 보관과 대조: 원본 파일 형식(`raw-file.ts`: 헤더 + 행, 행만의 내용 해시, 객체 키와 `raw/…` storage_path), Storage(`storage.ts`, 비밀 키), 실행·원본 기록(`ledger.ts`), 최근 7일 대조(`reconcile.ts`, `window.ts`), 접속(`db.ts`, `ingest_writer`) |
+| `packages/price-ingest/test/` | 오프라인 테스트 (`pnpm test`에 들어간다. 키·네트워크 없음): 요청 주소, 가짜 응답으로 본 클라이언트 동작·호출 기록·페이지, 샘플 계약, 필드 이름 변경 감지, 어댑터와 3-12 케이스, 원본 형식. `test/fixtures/`는 임시 매핑 |
+| `packages/price-ingest/test/db/` | 로컬 DB·Storage 통합 테스트 (`pnpm --filter @workspace/price-ingest test:db`, `pnpm db:start` 필요). 루트 `pnpm test`에는 들어가지 않는다 |
 | `packages/price-ingest/test/live/` | 실측 테스트 (`pnpm --filter @workspace/price-ingest test:live`). 루트 `.env`의 `DATA_GO_KR_SERVICE_KEY`로 16회 호출한다. 명시적으로 켤 때만 돈다. 수집 시각 앞뒤로 돌리지 않는다 |
 | `packages/price-ingest/baseline/contract-baseline.json` | 실측으로 만든 기준: 필드 타입, 코드 목록, 건수. 값(가격)은 없다. 의도한 응답 변경일 때만 `pnpm --filter @workspace/price-ingest contract:baseline`으로 다시 만든다 |
 | `packages/price-ingest/scripts/capture-baseline.ts` | 기준 파일 생성. 계약과 다른 응답은 저장하지 않는다 |
@@ -316,7 +319,7 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `pnpm build` | `next build` |
 | `pnpm typecheck` | 세 패키지 `tsc --noEmit` |
 | `pnpm lint` | ESLint (2026-10-15 기준 0 오류, `packages/ui` 경고 4건) |
-| `pnpm test` | vitest: `packages/seasonal`, `packages/ui`, `apps/web`(SEO 가드 포함) |
+| `pnpm test` | vitest: `packages/seasonal`, `packages/ui`, `packages/price-ingest`(오프라인), `apps/web`(SEO 가드 포함) |
 | `pnpm format` | Prettier |
 | `pnpm ui:add <name-or-url>` | cojeev·shadcn 컴포넌트를 `packages/ui`에 설치 |
 | `pnpm foods:sync` / `pnpm foods:bounds` | 일러스트 동기화 / 그림 아래 끝 재측정 |

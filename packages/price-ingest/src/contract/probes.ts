@@ -53,6 +53,11 @@ export function readBaseline(): Baseline {
   }
 }
 
+// raw_object.contract_baseline에 남기는 기준 버전 (기준 파일을 만든 시각). 기준을 다시 만들면 바뀐다.
+export function contractBaselineVersion(baseline: Baseline = readBaseline()): string {
+  return `baseline:${baseline.capturedAt}`
+}
+
 // 실측 호출기: 호출 수를 세고, 주소에 붙는 키는 여기서만 다룬다.
 export function createLiveCall(serviceKey: string): { call: CallOptions; calls: () => number } {
   let count = 0

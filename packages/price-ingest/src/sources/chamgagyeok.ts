@@ -1,8 +1,8 @@
 // 참가격 생필품 가격 (ProductPriceInfoService). 명세와 실측: grocery-price/docs/30-data/sources/chamgagyeok.md
 import { z } from "zod"
 
-import { assertServiceKey, assertYmd, getText, type CallOptions } from "../http.ts"
-import { dig, interpret, parseBody } from "../response.ts"
+import { assertServiceKey, assertYmd, runCall, type CallOptions } from "../http.ts"
+import { codeIn, dig, interpret, listAt, parseBody } from "../response.ts"
 import { parseOrThrow } from "../validate.ts"
 
 const BASE_URL = "https://apis.data.go.kr/B551919/ProductPriceInfoService"
@@ -186,48 +186,70 @@ export const CHAMGA_ROW_PATH = {
   standard: ["response", "result", STANDARD_KEY],
 } as const
 
-export async function fetchChamgaPriceRaw(
+// raw_object.endpoint에 남기는 기능 이름 (주소 끝 그대로)
+export const CHAMGA_ENDPOINT = {
+  price: "getProductPriceInfoSvc",
+  store: "getStoreInfoSvc.do",
+  product: "getProductInfoSvc.do",
+  standard: "getStandardInfoSvc.do",
+} as const
+
+function chamgaCall<T>(
   call: CallOptions,
-  query: { goodInspectDay: string; entpId?: string; goodId?: string },
-): Promise<unknown> {
-  const { status, text } = await getText("chamgagyeok", chamgaPriceUrl(call.serviceKey, query), call)
-  return readChamgaPrice(status, text)
+  endpoint: string,
+  url: string,
+  read: (status: number, text: string) => T,
+  rowCount: (value: T) => number,
+): Promise<T> {
+  return runCall({
+    source: "chamgagyeok",
+    endpoint,
+    url,
+    call,
+    read,
+    rowCount,
+    resultCode: (text) => codeIn("xml", text, ["response", "resultCode"]),
+  })
 }
 
-export async function fetchChamgaPrice(
-  call: CallOptions,
-  query: { goodInspectDay: string; entpId?: string; goodId?: string },
-): Promise<ChamgaPriceRow[]> {
-  const { status, text } = await getText("chamgagyeok", chamgaPriceUrl(call.serviceKey, query), call)
-  return parseChamgaPrice(status, text)
+type PriceQuery = { goodInspectDay: string; entpId?: string; goodId?: string }
+
+export function fetchChamgaPriceRaw(call: CallOptions, query: PriceQuery): Promise<unknown> {
+  const url = chamgaPriceUrl(call.serviceKey, query)
+  return chamgaCall(call, CHAMGA_ENDPOINT.price, url, readChamgaPrice, (raw) => listAt(raw, CHAMGA_ROW_PATH.price).length)
 }
 
-export async function fetchChamgaStoreRaw(call: CallOptions, query: { entpId?: string }): Promise<unknown> {
-  const { status, text } = await getText("chamgagyeok", chamgaStoreUrl(call.serviceKey, query), call)
-  return readChamgaStore(status, text)
+export function fetchChamgaPrice(call: CallOptions, query: PriceQuery): Promise<ChamgaPriceRow[]> {
+  const url = chamgaPriceUrl(call.serviceKey, query)
+  return chamgaCall(call, CHAMGA_ENDPOINT.price, url, parseChamgaPrice, (rows) => rows.length)
 }
 
-export async function fetchChamgaStore(call: CallOptions, query: { entpId?: string }): Promise<ChamgaStoreRow[]> {
-  const { status, text } = await getText("chamgagyeok", chamgaStoreUrl(call.serviceKey, query), call)
-  return parseChamgaStore(status, text)
+export function fetchChamgaStoreRaw(call: CallOptions, query: { entpId?: string }): Promise<unknown> {
+  const url = chamgaStoreUrl(call.serviceKey, query)
+  return chamgaCall(call, CHAMGA_ENDPOINT.store, url, readChamgaStore, (raw) => listAt(raw, CHAMGA_ROW_PATH.store).length)
 }
 
-export async function fetchChamgaProductRaw(call: CallOptions, query: { goodId?: string }): Promise<unknown> {
-  const { status, text } = await getText("chamgagyeok", chamgaProductUrl(call.serviceKey, query), call)
-  return readChamgaProduct(status, text)
+export function fetchChamgaStore(call: CallOptions, query: { entpId?: string }): Promise<ChamgaStoreRow[]> {
+  const url = chamgaStoreUrl(call.serviceKey, query)
+  return chamgaCall(call, CHAMGA_ENDPOINT.store, url, parseChamgaStore, (rows) => rows.length)
 }
 
-export async function fetchChamgaProduct(call: CallOptions, query: { goodId?: string }): Promise<ChamgaProductRow[]> {
-  const { status, text } = await getText("chamgagyeok", chamgaProductUrl(call.serviceKey, query), call)
-  return parseChamgaProduct(status, text)
+export function fetchChamgaProductRaw(call: CallOptions, query: { goodId?: string }): Promise<unknown> {
+  const url = chamgaProductUrl(call.serviceKey, query)
+  return chamgaCall(call, CHAMGA_ENDPOINT.product, url, readChamgaProduct, (raw) => listAt(raw, CHAMGA_ROW_PATH.product).length)
 }
 
-export async function fetchChamgaStandardRaw(call: CallOptions, query: { classCode: string }): Promise<unknown> {
-  const { status, text } = await getText("chamgagyeok", chamgaStandardUrl(call.serviceKey, query), call)
-  return readChamgaStandard(status, text)
+export function fetchChamgaProduct(call: CallOptions, query: { goodId?: string }): Promise<ChamgaProductRow[]> {
+  const url = chamgaProductUrl(call.serviceKey, query)
+  return chamgaCall(call, CHAMGA_ENDPOINT.product, url, parseChamgaProduct, (rows) => rows.length)
 }
 
-export async function fetchChamgaStandard(call: CallOptions, query: { classCode: string }): Promise<ChamgaStandardRow[]> {
-  const { status, text } = await getText("chamgagyeok", chamgaStandardUrl(call.serviceKey, query), call)
-  return parseChamgaStandard(status, text)
+export function fetchChamgaStandardRaw(call: CallOptions, query: { classCode: string }): Promise<unknown> {
+  const url = chamgaStandardUrl(call.serviceKey, query)
+  return chamgaCall(call, CHAMGA_ENDPOINT.standard, url, readChamgaStandard, (raw) => listAt(raw, CHAMGA_ROW_PATH.standard).length)
+}
+
+export function fetchChamgaStandard(call: CallOptions, query: { classCode: string }): Promise<ChamgaStandardRow[]> {
+  const url = chamgaStandardUrl(call.serviceKey, query)
+  return chamgaCall(call, CHAMGA_ENDPOINT.standard, url, parseChamgaStandard, (rows) => rows.length)
 }

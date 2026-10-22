@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import { adaptChamgaPriceRow } from "../src/adapt/chamga.ts"
 import { adaptEkapeRow } from "../src/adapt/ekape.ts"
-import { draftSchema, naturalKey, type Draft } from "../src/adapt/draft.ts"
+import { ADAPTER_VERSION, draftSchema, naturalKey, RowRejectedError, type Draft } from "../src/adapt/draft.ts"
 import { adaptKamisRow } from "../src/adapt/kamis.ts"
 import { chamgaPriceRows, chamgaProduct, ekapePorkRows, fixtureMapping, first, kamisBaechuRows } from "./fixtures/adapt.ts"
 
@@ -51,20 +51,26 @@ describe.each(batches)("$name 배치의 공통 규칙", ({ drafts }) => {
   })
 })
 
-describe("이상치 표시 (0, 음수, 비정상적으로 큰 값)", () => {
+describe("0·음수는 거부, 비정상적으로 큰 값은 이상치", () => {
   const row = first(kamisBaechuRows())
 
-  it("0이면 outlier", () => {
-    expect(adaptKamisRow({ ...row, exmn_dd_prc: "0" }, ctx).flags).toEqual(["outlier"])
+  it("0이면 이상치가 아니라 행 단위 거부다 (DB가 price_raw > 0만 받는다)", () => {
+    expect(() => adaptKamisRow({ ...row, exmn_dd_prc: "0" }, ctx)).toThrow(RowRejectedError)
   })
 
-  it("음수는 어댑터가 받아도 outlier로 표시한다 (형식 검사는 앞 단계가 막는다)", () => {
-    expect(adaptKamisRow({ ...row, exmn_dd_prc: "-5" }, ctx).flags).toEqual(["outlier"])
+  it("음수도 거부한다 (형식 검사가 놓쳐도 어댑터가 막는다)", () => {
+    expect(() => adaptKamisRow({ ...row, exmn_dd_prc: "-5" }, ctx)).toThrow(RowRejectedError)
   })
 
   it("임시 상한(1천만 원)을 넘으면 outlier", () => {
     expect(adaptKamisRow({ ...row, exmn_dd_prc: "10000001" }, ctx).flags).toEqual(["outlier"])
     expect(adaptKamisRow({ ...row, exmn_dd_prc: "9999999" }, ctx).flags).toEqual([])
+  })
+})
+
+describe("어댑터 버전 (raw_object.adapter_version)", () => {
+  it("날짜.순번 모양이다. 변환 규칙을 바꾸면 올린다", () => {
+    expect(ADAPTER_VERSION).toMatch(/^\d{4}-\d{2}-\d{2}\.\d+$/)
   })
 })
 

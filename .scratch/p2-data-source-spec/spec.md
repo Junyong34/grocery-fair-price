@@ -26,7 +26,7 @@
 | 09 | 보조 출처: 뉴스 수집 경로와 약관 | research | ready-for-agent (후순위, E4) | - |
 | 10 | 보조 출처: 제철 | research | ready-for-agent (후순위, E4) | - |
 | 11 | P2 마무리 점검 | task | ready-for-agent | 02, 03, 04, 06, 07, 13 |
-| 12 | API 호출 모듈과 계약 테스트 (→ 수집 패키지) | task | ready-for-agent | 01 |
+| 12 | API 호출 모듈과 계약 테스트 (→ 수집 패키지) | task | resolved (2026-10-22, `packages/price-ingest`) | 01 |
 | 13 | 출처별 제공 품목 전수 목록 | research | resolved | - |
 | [sfv/03](../search-first-view/issues/03-local-gov-price-survey.md) | 지자체 물가조사(15109061) 실측과 출처 문서 | research | resolved (제외) | - |
 

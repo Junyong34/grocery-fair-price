@@ -1,6 +1,14 @@
 // 축평원 consumerPriceDaily 행 → 관측값 초안 또는 평년 기준 값 (pipeline 3-11 축평원 열).
 import type { EkapeRow } from "../sources/ekape.ts"
-import { priceFlags, ymdFromCompact, type Flag, type ObservationDraft, type ReferenceDraft } from "./draft.ts"
+import {
+  isPositiveInt,
+  priceFlags,
+  RowRejectedError,
+  ymdFromCompact,
+  type Flag,
+  type ObservationDraft,
+  type ReferenceDraft,
+} from "./draft.ts"
 import type { AdaptContext } from "./mapping.ts"
 import { pricePerBase } from "./units.ts"
 
@@ -26,7 +34,17 @@ function parseEkapeUnit(unit: string): { qty: number; unitText: string } | undef
   return { qty: match[1] ? Number(match[1]) : 1, unitText: match[2] ?? "" }
 }
 
+// 행 단위 거부 사유 (pipeline 3-11: 가격 정수, judgeKind = 요청). 거부할 이유가 없으면 null.
+export function ekapeRowRejection(row: EkapeRow, request?: { judgeKind: string }): string | null {
+  if (request && row.judgeKind !== request.judgeKind) return "축종 코드가 요청과 다르다"
+  if (!isPositiveInt(row.ntslPrc)) return "가격이 양의 정수가 아니다"
+  return null
+}
+
 export function adaptEkapeRow(row: EkapeRow, ctx: EkapeContext): ObservationDraft | ReferenceDraft {
+  const rejection = ekapeRowRejection(row)
+  if (rejection) throw new RowRejectedError(rejection)
+
   // 원천 키: 축종·품목·등급(grdNm) (3-11). 등급 값이 무엇인지(규격인지 원산지인지)는 매핑이 정한다 (3-12 #1)
   const sourceKey = [row.judgeKind, row.itemCd, row.grdNm].join("-")
   const placeKey = "national"

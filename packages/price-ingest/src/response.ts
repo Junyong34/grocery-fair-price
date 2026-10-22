@@ -38,6 +38,15 @@ export function listAt(value: unknown, path: readonly string[]): Record<string, 
   return Array.isArray(found) ? (found as Record<string, unknown>[]) : []
 }
 
+// 호출 기록에 남길 결과 코드. 본문의 resultCode, 없으면 게이트웨이 오류 코드(gateway:<코드>), 그것도 없으면 null.
+export function codeIn(format: BodyFormat, text: string, path: readonly string[]): string | null {
+  const body = parseBody(format, text)
+  const code = dig(body, path)
+  if (typeof code === "string") return code
+  const reason = dig(body, ["OpenAPI_ServiceResponse", "cmmMsgHeader", "returnReasonCode"])
+  return reason === undefined ? null : `gateway:${String(reason)}`
+}
+
 // 게이트웨이 오류 → HTTP 상태 → resultCode 순서로 판정한다.
 // 성공이면 본문을 그대로 돌려준다 (스키마 검사는 호출한 쪽이 한다).
 export function interpret(options: {

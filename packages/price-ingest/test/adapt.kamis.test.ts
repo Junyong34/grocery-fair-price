@@ -1,9 +1,42 @@
 import { describe, expect, it } from "vitest"
 
-import { adaptKamisRow } from "../src/adapt/kamis.ts"
+import { RowRejectedError } from "../src/adapt/draft.ts"
+import { adaptKamisRow, kamisRowRejection } from "../src/adapt/kamis.ts"
 import { fixtureMapping, first, kamisBaechuRows } from "./fixtures/adapt.ts"
 
 const ctx = { mapping: fixtureMapping }
+
+describe("KAMIS 행 단위 거부 (pipeline 3-11)", () => {
+  const row = first(kamisBaechuRows())
+  const request = { seCd: "01", fromYmd: "20260928", toYmd: "20260928" } as const
+
+  it("샘플 행은 거부하지 않는다", () => {
+    expect(kamisRowRejection(row, request)).toBeNull()
+  })
+
+  it("가격이 양의 정수가 아니면 거부한다 (0, 음수)", () => {
+    expect(kamisRowRejection({ ...row, exmn_dd_prc: "0" })).toBe("가격이 양의 정수가 아니다")
+    expect(kamisRowRejection({ ...row, exmn_dd_prc: "-5" })).toBe("가격이 양의 정수가 아니다")
+  })
+
+  it("단위 크기가 0이면 거부한다", () => {
+    expect(kamisRowRejection({ ...row, unit_sz: "0" })).toBe("단위 크기가 양의 정수가 아니다")
+  })
+
+  it("조사일이 요청 기간 밖이면 거부한다", () => {
+    expect(kamisRowRejection({ ...row, exmn_ymd: "20260929" }, request)).toBe("조사일이 요청 기간 밖이다")
+  })
+
+  it("구분 코드가 요청과 다르면 거부한다", () => {
+    expect(kamisRowRejection({ ...row, se_cd: "02" }, request)).toBe("구분 코드가 요청과 다르다")
+  })
+
+  it("축산이 아닌데 시장 코드나 등록 시각이 비면 거부한다 (null은 부류 500만)", () => {
+    expect(kamisRowRejection({ ...row, mrkt_cd: null })).toBe("축산이 아닌데 시장 코드나 등록 시각이 비었다")
+    expect(kamisRowRejection({ ...row, orgnl_reg_dt: null })).toBe("축산이 아닌데 시장 코드나 등록 시각이 비었다")
+    expect(kamisRowRejection({ ...row, ctgry_cd: "500", mrkt_cd: null, mrkt_nm: null, orgnl_reg_dt: null })).toBeNull()
+  })
+})
 
 describe("KAMIS 어댑터", () => {
   it("배추 샘플 행을 관측값 초안으로 바꾼다: 원천 키, 시장 코드, 날짜, 가격, 기준 단위 가격", () => {
@@ -99,10 +132,14 @@ describe("KAMIS 어댑터", () => {
     expect(livestock.sourceRegisteredAt).toBeNull()
   })
 
-  it("가격이 0이면 이상치로 표시한다", () => {
-    const draft = adaptKamisRow({ ...first(kamisBaechuRows()), exmn_dd_prc: "0" }, ctx)
-    expect(draft.flags).toEqual(["outlier"])
-    expect(draft.pricePerBase).toBe(0)
+  it("가격이 0이면 관측값으로 넘기지 않는다 (3-11 행 단위 거부. DB도 price_raw > 0만 받는다)", () => {
+    expect(() => adaptKamisRow({ ...first(kamisBaechuRows()), exmn_dd_prc: "0" }, ctx)).toThrow(RowRejectedError)
+  })
+
+  it("시장 유형은 어댑터가 정하지 않는다. 이름 규칙으로 못 가르는 시장도 코드로 장소를 잡는다 (3-12 #6)", () => {
+    const draft = adaptKamisRow({ ...first(kamisBaechuRows()), mrkt_cd: "1000006", mrkt_nm: "가락소매" }, ctx)
+    expect(draft.placeKey).toBe("market:1000006")
+    expect(Object.keys(draft)).not.toContain("marketType")
   })
 
   it("같은 값이 여러 날 이어져도 어댑터는 이어 쓴 값을 표시하지 않는다. 판단은 ②가 한다 (3-12 #8)", () => {
