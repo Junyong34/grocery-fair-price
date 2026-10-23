@@ -371,13 +371,22 @@ const seasonPoster: WireframeEntry[] = [
     kind: "season-poster",
     page: "sheet",
     title: "사계절 원형 판",
-    summary: "원을 네 조각으로 나눠 해가 도는 느낌을 준다. 아래에 그림 없는 품종 이름 목록.",
+    summary: "원을 네 조각으로 나눠 12시부터 봄·여름·가을·겨울이 돈다. 조각이 커서 그 계절 그림을 고리에 빽빽이 넣고 이름은 넣지 않는다. 계절 이름은 원 밖 모서리에 크게.",
     source: "⑧ 원형 휠 · R8(사분면 = 계절), R14",
-    availability: { status: "needs-option", options: 'layout: "wheel"' },
-    orientations: ["portrait"],
-    draw: () => {
-      const [title, art, list] = split(contentBox("portrait"), "rows", [12, 186, "*"], 6)
-      return [...posterTitle(title!), ...wheel(art!, { sectors: 4, perSector: 9, labels: SEASON_NAMES }), ...nameList(list!, { count: 12, columns: 4 })]
+    availability: { status: "available", options: 'layout: "wheel"' },
+    orientations: ["portrait", "landscape"],
+    draw: (orientation) => {
+      // 지름은 판 폭(세로)·판 높이(가로)이고, 계절 이름은 원을 감싼 정사각형 모서리에 쓴다(season-poster.tsx의 SeasonWheel).
+      const [title, body] = split(contentBox(orientation), "rows", [orientation === "portrait" ? 12 : 10, "*"], 4)
+      const d = Math.min(body!.width, body!.height)
+      const box = { x: body!.x + (body!.width - d) / 2, y: body!.y + (body!.height - d) / 2, width: d, height: d }
+      const size = d * 0.05
+      const corners: Shape[] = SEASON_NAMES.map((text, i) => {
+        const left = i >= 2
+        const top = i === 0 || i === 3
+        return { type: "label", tone: "strong", anchor: left ? "start" : "end", x: left ? box.x : box.x + d, y: top ? box.y : box.y + d - size, size, text }
+      })
+      return [...posterTitle(title!), ...wheel(box, { sectors: 4, perSector: 9, labels: ["", "", "", ""] }), ...corners]
     },
   },
   {

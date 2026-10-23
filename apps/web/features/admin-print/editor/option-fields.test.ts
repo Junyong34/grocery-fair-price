@@ -141,6 +141,14 @@ describe("구성마다 숨는 옵션", () => {
     for (const f of KIND_SECTIONS["season-poster"].flatMap((section) => section.fields)) expect(isFieldShown(f, spec), f.label).toBe(true)
   })
 
+  it("계절 포스터 사계절 원형 판은 품종 이름(고리에 빽빽이 놓음)만 숨기고 개수·카테고리는 남긴다", () => {
+    const spec = { ...DEFAULT_SPECS["season-poster"], layout: "wheel" as const }
+    expect(isFieldShown(field("season-poster", "foods.names"), spec)).toBe(false)
+    expect(isFieldShown(field("season-poster", "foods.max"), spec)).toBe(true)
+    expect(isFieldShown(field("season-poster", "categories"), spec)).toBe(true)
+    expect(isFieldShown(field("season-poster", "seasonLabel"), spec)).toBe(true)
+  })
+
   it("월간 표지 선택지에 열두 달 미리보기(months)와 1년 제철 표(chart)가 있다", () => {
     const cover = field("monthly", "cover")
     expect(cover.type === "select" && cover.options.map((option) => option.value)).toEqual(["year", "months", "chart", "none"])

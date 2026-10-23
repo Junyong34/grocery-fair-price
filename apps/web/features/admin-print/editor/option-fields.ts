@@ -105,6 +105,8 @@ const monthlyNotStrip = (spec: PrintSpec) => spec.kind === "monthly" && spec.lay
 const yearSheetInPairs = (spec: PrintSpec) => spec.kind === "year-sheet" && spec.layout === "pairs"
 /** Y-C 막대표는 줄마다 이름을 늘 적는다. */
 const yearSheetNotChart = (spec: PrintSpec) => spec.kind === "year-sheet" && spec.layout !== "chart"
+/** S-C는 그림을 고리에 빽빽이 놓아 이름 자리가 없다. */
+const seasonPosterNotWheel = (spec: PrintSpec) => spec.kind === "season-poster" && spec.layout !== "wheel"
 /** P-D는 이름을 체크 목록에 늘 적고, 달을 한 줄씩 쌓는다. P-B는 줄마다 이름을 적고 그림 있는 품종을 모두 싣는다. */
 const monthPosterInCells = (spec: PrintSpec) => spec.kind === "month-poster" && spec.layout === "cells"
 const monthPosterNotChart = (spec: PrintSpec) => spec.kind === "month-poster" && spec.layout !== "chart"
@@ -179,9 +181,9 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
     look,
   ],
   "season-poster": [
-    { title: "구성", fields: [layout({ bands: ["가로 띠 넷", "S-A"], quarters: ["사분면(가로 용지는 네 열)", "S-B"], "per-season": ["계절마다 한 장(4쪽)", "S-D"] })] },
+    { title: "구성", fields: [layout({ bands: ["가로 띠 넷", "S-A"], quarters: ["사분면(가로 용지는 네 열)", "S-B"], wheel: ["사계절 원형 판", "S-C"], "per-season": ["계절마다 한 장(4쪽)", "S-D"] })] },
     { title: "용지", fields: [orientation, margin, title, { type: "select", label: "계절 표기", path: ["seasonLabel"], options: options({ "english-korean": "Spring · 봄", korean: "봄" }) }] },
-    { ...foods(30), fields: [...foods(30).fields, categories] },
+    { ...foods(30), fields: [...foods(30, { names: seasonPosterNotWheel }).fields, categories] },
     look,
   ],
   "month-poster": [

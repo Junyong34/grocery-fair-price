@@ -348,7 +348,9 @@ export function wheel(rect: Rect, { sectors, perSector, labels = [] }: { sectors
     shapes.push({ type: "line", from: at(angle, core), to: at(angle, radius) })
     const [lx, ly] = at(angle + spread / 2, radius * 0.93)
     const size = radius * 0.06
-    shapes.push({ type: "label", tone: "small", anchor: "middle", x: lx, y: ly - size / 2, size, text: labels[sector] ?? String(sector + 1) })
+    // 빈 표기("")는 띠에 적지 않는다(S-C는 계절 이름을 모서리에 쓴다).
+    const text = labels[sector] ?? String(sector + 1)
+    if (text) shapes.push({ type: "label", tone: "small", anchor: "middle", x: lx, y: ly - size / 2, size, text })
     for (let i = 0; i < perSector; i++) {
       const ring = Math.floor(i / across)
       const r = rings === 1 ? radius * 0.62 : radius * 0.44 + (ring * radius * 0.35) / (rings - 1)

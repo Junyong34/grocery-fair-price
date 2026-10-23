@@ -120,6 +120,13 @@ describe("parsePrintSpec", () => {
     expect(parsePrintSpec({ ...spec, orientation: "landscape" })).not.toBeInstanceOf(Error)
   })
 
+  it("계절 포스터 사계절 원형 판(wheel)은 두 방향 모두 받고 1쪽이다", () => {
+    const spec = { ...DEFAULT_SPECS["season-poster"], layout: "wheel" }
+    expect(parsePrintSpec(spec)).not.toBeInstanceOf(Error)
+    expect(parsePrintSpec({ ...spec, orientation: "landscape" })).not.toBeInstanceOf(Error)
+    expect(pageCount({ ...DEFAULT_SPECS["season-poster"], layout: "wheel" })).toBe(1)
+  })
+
   it("월별 포스터 원형 판(wheel)은 두 방향 모두 받는다", () => {
     const spec = { ...DEFAULT_SPECS["month-poster"], layout: "wheel" }
     expect(parsePrintSpec(spec)).not.toBeInstanceOf(Error)

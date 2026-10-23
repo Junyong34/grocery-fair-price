@@ -90,7 +90,7 @@ const year = z.number().int().min(2020).max(2100)
 export const LAYOUTS = {
   monthly: ["scatter", "grid", "none", "side-check", "strip", "allover"],
   "year-sheet": ["pairs", "hero-top", "chart"],
-  "season-poster": ["bands", "quarters", "per-season"],
+  "season-poster": ["bands", "quarters", "wheel", "per-season"],
   "month-poster": ["cells", "chart", "wheel", "rows-check"],
 } as const satisfies Record<PrintKind, readonly string[]>
 
@@ -133,7 +133,7 @@ const seasonPosterSchema = z.object({
   ...base,
   kind: z.literal("season-poster"),
   title,
-  /** 가로 띠 넷(S-A) / 사분면, 가로 용지는 네 열(S-B) / 계절마다 한 장, PDF 4쪽(S-D) */
+  /** 가로 띠 넷(S-A) / 사분면, 가로 용지는 네 열(S-B) / 사계절 원형 판(S-C) / 계절마다 한 장, PDF 4쪽(S-D) */
   layout: z.enum(LAYOUTS["season-poster"]).default("bands"),
   seasonLabel: z.enum(["korean", "english-korean"]),
   /** 넣을 카테고리. 비우면 전부 */

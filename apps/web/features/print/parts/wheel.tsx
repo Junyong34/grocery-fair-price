@@ -6,10 +6,10 @@ import { t, u } from "./units"
 
 export type WheelItem = {
   foods: readonly Food[]
-  /** 바깥 띠에 적는 표기(달·계절 이름) */
-  label: string
+  /** 바깥 띠에 적는 표기(달 이름). 없으면 띠에 적지 않는다(S-C는 계절 이름을 판 모서리에 따로 쓴다). */
+  label?: string
   /** 표기 글자색 */
-  color: string
+  color?: string
   /** 부채꼴 바탕. 없으면 칠하지 않는다. */
   fill?: string
 }
@@ -18,7 +18,7 @@ export type WheelItem = {
  * 원형 판. 자리 계산은 @workspace/seasonal/print/wheel의 wheelLayout이 하고, 여기서는 부채꼴(SVG)과 그림·표기를 그 자리에 놓는다.
  * items는 layout.sectors와 같은 차례(12시 방향부터 시계 방향)다. children은 가운데 빈 원 안에 놓는다.
  */
-export function Wheel({ layout, items, labelSize, children }: { layout: WheelLayout; items: readonly WheelItem[]; labelSize: number; children?: React.ReactNode }) {
+export function Wheel({ layout, items, labelSize = 0, children }: { layout: WheelLayout; items: readonly WheelItem[]; labelSize?: number; children?: React.ReactNode }) {
   const { diameter: d, inner, pictureSize, sectors } = layout
   const c = d / 2
   const at = (angle: number, r: number) => `${c + r * Math.sin(angle)} ${c - r * Math.cos(angle)}`
@@ -35,7 +35,7 @@ export function Wheel({ layout, items, labelSize, children }: { layout: WheelLay
         <circle cx={c} cy={c} r={c} fill="none" />
         <circle cx={c} cy={c} r={inner} className="print-wheel-core" />
       </svg>
-      {sectors.map((sector, i) => (
+      {sectors.map((sector, i) => items[i]?.label && (
         <span key={`label-${i}`} className="print-wheel-label print-heading" style={{ left: u(sector.label.x), top: u(sector.label.y), fontSize: t(labelSize), color: items[i]?.color }}>
           {items[i]?.label}
         </span>
