@@ -75,6 +75,13 @@ const monthStyle: OptionFieldSpec[] = [
   },
   { type: "select", label: "달 표기 크기", path: ["monthStyle", "size"], options: options({ small: "작게", medium: "보통", large: "크게" }) },
   { type: "select", label: "달 표기 장식", path: ["monthStyle", "frame"], options: options({ none: "없음", rule: "밑줄", pill: "알약 태그", ribbon: "책갈피 리본", outline: "외곽선 숫자" }) },
+  {
+    type: "select",
+    label: "달 표기 서체",
+    path: ["monthStyle", "font"],
+    options: options({ auto: "서체·배경 따름", "gowun-batang": "고운바탕", pretendard: "프리텐다드" }),
+    hint: "따름이면 숫자는 숫자 서체, 1월·January는 제목 서체를 써요.",
+  },
 ]
 const grid: OptionFieldSpec = { type: "select", label: "달 배열(열×행)", path: ["grid"], options: options({ "2x6": "2×6", "3x4": "3×4", "4x3": "4×3" }) }
 const weekStart: OptionFieldSpec = { type: "select", label: "주 시작", path: ["calendar", "weekStart"], options: [{ value: 0, label: "일요일" }, { value: 1, label: "월요일" }] }
@@ -177,7 +184,7 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
       ],
     },
     { title: "달 표기", fields: [monthLabel, ...monthStyle] },
-    foods(20, { names: monthlyHasFoods, max: (spec) => monthlyHasFoods(spec) && monthlyNotStrip(spec) }),
+    foods(40, { names: monthlyHasFoods, max: (spec) => monthlyHasFoods(spec) && monthlyNotStrip(spec) }),
     look,
   ],
   "year-sheet": [

@@ -34,6 +34,13 @@ export const MONTH_LABEL_SCALE: Record<MonthLabelSize, number> = { small: 0.7, m
 export const MONTH_LABEL_FRAMES = ["none", "rule", "pill", "ribbon", "outline"] as const
 export type MonthLabelFrame = (typeof MONTH_LABEL_FRAMES)[number]
 
+/**
+ * 달 표기 서체. auto: 서체·배경의 서체를 따른다(숫자는 숫자 서체, 한글·영어 이름은 제목 서체, 대문자는 프리텐다드).
+ * 서체를 고르면 큰 글자와 곁들이는 영문이 모두 그 서체다. 숫자 display 서체는 PDF 포함 라이선스를 확인하기 전까지 고를 수 없다.
+ */
+export const MONTH_LABEL_FONTS = ["auto", "gowun-batang", "pretendard"] as const
+export type MonthLabelFont = (typeof MONTH_LABEL_FONTS)[number]
+
 /** 글자 모양. number: 숫자 서체, text: 제목 서체, caps: 자간을 넓힌 대문자 */
 export type MonthLabelKind = "number" | "text" | "caps"
 export type MonthLabelText = { main: string; kind: MonthLabelKind; sub?: { text: string; kind: MonthLabelKind } }
@@ -100,4 +107,4 @@ export function monthFlow(month: number): { from: Season; to: Season; weight: nu
   return { from, to, weight: Math.round(100 - ((month - start) / (end - start)) * 100) }
 }
 
-export type MonthStyle = { palette: MonthLabelPalette; size: MonthLabelSize; frame: MonthLabelFrame }
+export type MonthStyle = { palette: MonthLabelPalette; size: MonthLabelSize; frame: MonthLabelFrame; font: MonthLabelFont }

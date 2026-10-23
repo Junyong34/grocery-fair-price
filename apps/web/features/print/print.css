@@ -77,6 +77,8 @@
 .print-month-label .main[data-kind="caps"] { font-family: var(--font-sans); font-weight: 700; letter-spacing: 0.06em; }
 .print-month-label .sub { font-size: 0.22em; font-family: var(--font-sans); font-weight: 700; letter-spacing: 0.22em; }
 .print-month-label .sub[data-kind="text"] { font-family: var(--print-heading); font-size: 0.26em; letter-spacing: 0.02em; }
+/* 달 표기 서체를 고르면 큰 글자·곁들이는 영문 모두 그 서체다. 굵기는 글자 모양대로 둔다. */
+.print-month-label[data-font] :is(.main, .sub) { font-family: var(--month-font); }
 .print-month-label[data-sub="inline"] { flex-direction: row; align-items: baseline; gap: 0.3em; }
 .print-month-label[data-sub="inline"] .sub { font-size: 0.42em; }
 .print-month-label[data-sub="inline"] .sub[data-kind="text"] { font-size: 0.5em; }

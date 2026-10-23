@@ -58,7 +58,7 @@ type Base = {
   surface: "cream" | "white" | "season"   // 배경: 크림 / 흰색(잉크 절약) / 계절색
   foods: {
     names: "hidden" | "korean" | "korean-english"
-    max: number                           // 칸 하나(달·계절)에 넣을 품종 수 상한
+    max: number                           // 칸 하나(달·계절)에 넣을 품종 수 상한(1~40). 폼 상한: 월간 40(흩뿌림·줄 맞춤·M-E 모두 그림끼리 겹치지 않음, 2026-10-23 측정), 계절 30, 월별 12, 연간 8
     seed: number
     /** 관리자가 미리보기에서 끌어 옮긴 자리. 키는 칸(달 "1".."12" 또는 계절). 없으면 시드 배치. */
     placements: Partial<Record<Month | Season, readonly SavedSpot[]>>
@@ -126,7 +126,8 @@ type MonthStyle = {
   palette: "season" | "flow" | "twelve" | "vivid"   // 계절색 / 계절색 사이를 섞은 열두 달 흐름 / 차분한 열두 색 / 채도 높은 열두 색. 바탕까지 칠하는 건 surface: "season"
   size: "small" | "medium" | "large"                // 0.7·1·1.4배. 월간 머리 높이가 20·26·34mm로 따라 바뀐다
   frame: "none" | "rule" | "pill" | "ribbon" | "outline"   // 글자만 / 밑줄 / 알약 태그 / 책갈피 리본 / 외곽선 숫자 + 아래 영문
-}   // 없던 예전 사양은 season·medium·none(지금까지의 모양)
+  font: "auto" | "gowun-batang" | "pretendard"      // auto: type의 서체를 따름(숫자는 type.number, 1월·January는 type.heading, 대문자는 프리텐다드). 고르면 큰 글자·곁들이는 영문 모두 그 서체
+}   // 없던 예전 사양은 season·medium·none·auto(지금까지의 모양). font만 없으면 auto
 // 표기는 놓일 자리 높이·폭을 넘지 않게 줄어든다. 곁들이는 영문이 A4 약 5pt보다 작아지는 자리(포스터 칸·연간 달력 머리)에서는 아래 줄 대신 옆에 붙인다.
 // ribbon은 네 글자 넘는 이름을 숫자로 바꾸고 이름을 아래로, outline은 숫자만 크게 쓰고("11월"의 "월"을 뗀다) 이름을 아래로 내린다.
 // 막대표 머리·원형 판 표기는 글자(표기)만 따르고, 원형 판은 색도 따른다. 장식·크기는 쓰지 않는다.

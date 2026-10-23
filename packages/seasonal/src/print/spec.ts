@@ -4,7 +4,7 @@ import { CALENDAR_VARIANTS } from "../calendar/variants"
 import { FOODS, type FoodCategory } from "../data/foods"
 import { MONTHS, type Month } from "../data/months"
 import { SEASONS } from "../data/seasons"
-import { MONTH_LABEL_FRAMES, MONTH_LABEL_PALETTES, MONTH_LABEL_SIZES, PRINT_MONTH_LABELS } from "./month-label"
+import { MONTH_LABEL_FONTS, MONTH_LABEL_FRAMES, MONTH_LABEL_PALETTES, MONTH_LABEL_SIZES, PRINT_MONTH_LABELS } from "./month-label"
 
 // PDF 인쇄 사양(.scratch/calendar-print/spec.md "데이터 모양"). 같은 사양이면 언제나 같은 PDF가 나온다.
 // 종류(kind)마다 쓰는 옵션이 달라 kind로 갈리는 유니언이다. 선택지는 모두 유한한 값이고, 바깥에서 온 값은 parsePrintSpec 하나로 들어온다.
@@ -44,10 +44,15 @@ const orientation = z.enum(["portrait", "landscape"])
 /** 예전 사양의 "english"(좁은 자리 Jan, 제목 January)는 지금의 english-full과 같은 모양이다. */
 const legacyEnglish = (value: unknown) => (value === "english" ? "english-full" : value)
 const monthLabel = z.preprocess(legacyEnglish, z.enum(PRINT_MONTH_LABELS))
-/** 달 표기의 색·크기·장식(print/month-label.ts). 이 값이 없던 예전 사양은 지금까지의 모양(계절색·보통·장식 없음)으로 읽는다. */
+/** 달 표기의 색·크기·장식·서체(print/month-label.ts). 이 값이 없던 예전 사양은 지금까지의 모양(계절색·보통·장식 없음·서체 따름)으로 읽는다. 서체만 없으면 따름이다. */
 const monthStyle = z
-  .object({ palette: z.enum(MONTH_LABEL_PALETTES), size: z.enum(MONTH_LABEL_SIZES), frame: z.enum(MONTH_LABEL_FRAMES) })
-  .default({ palette: "season", size: "medium", frame: "none" })
+  .object({
+    palette: z.enum(MONTH_LABEL_PALETTES),
+    size: z.enum(MONTH_LABEL_SIZES),
+    frame: z.enum(MONTH_LABEL_FRAMES),
+    font: z.enum(MONTH_LABEL_FONTS).default("auto"),
+  })
+  .default({ palette: "season", size: "medium", frame: "none", font: "auto" })
 const grid = z.enum(["4x3", "3x4", "2x6"])
 const title = z.string().trim().min(1).max(40)
 const categories = z.array(z.custom<FoodCategory>((value) => typeof value === "string" && CATEGORIES.has(value)))
@@ -67,8 +72,8 @@ const base = {
   margin: z.enum(["safe", "none"]).default("safe"),
   foods: z.object({
     names: z.enum(["hidden", "korean"]),
-    /** 칸 하나(달·계절)에 넣을 품종 수 상한 */
-    max: z.number().int().min(1).max(30),
+    /** 칸 하나(달·계절)에 넣을 품종 수 상한. 종류마다 폼의 상한이 따로 있다(월간 40은 흩뿌림·줄 맞춤 모두 그림끼리 겹치지 않는 데까지). */
+    max: z.number().int().min(1).max(40),
   }),
 }
 
@@ -220,7 +225,7 @@ export const DEFAULT_SPECS: { [K in PrintKind]: Extract<PrintSpec, { kind: K }> 
     year: 2027,
     cover: "year",
     monthLabel: "number",
-    monthStyle: { palette: "season", size: "medium", frame: "none" },
+    monthStyle: { palette: "season", size: "medium", frame: "none", font: "auto" },
     calendar: { variant: "plain", weekStart: 0, weekday: "korean", holidays: "mark-and-name", size: "medium" },
     foods: { names: "korean", max: 8 },
     layout: "scatter",
@@ -232,7 +237,7 @@ export const DEFAULT_SPECS: { [K in PrintKind]: Extract<PrintSpec, { kind: K }> 
     kind: "year-sheet",
     year: 2027,
     monthLabel: "big-number",
-    monthStyle: { palette: "season", size: "medium", frame: "none" },
+    monthStyle: { palette: "season", size: "medium", frame: "none", font: "auto" },
     calendar: { weekStart: 0, weekday: "korean", holidays: "mark", size: "medium" },
     foods: { names: "hidden", max: 4 },
     layout: "pairs",
@@ -255,7 +260,7 @@ export const DEFAULT_SPECS: { [K in PrintKind]: Extract<PrintSpec, { kind: K }> 
     title: "달마다 제철",
     layout: "cells",
     monthLabel: "korean",
-    monthStyle: { palette: "season", size: "medium", frame: "none" },
+    monthStyle: { palette: "season", size: "medium", frame: "none", font: "auto" },
     foods: { names: "korean", max: 8 },
     grid: "3x4",
     categories: [],

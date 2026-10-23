@@ -12,6 +12,9 @@ import {
 
 import { t, u } from "./units"
 
+/** 고른 달 표기 서체. auto는 print.css가 글자 모양(data-kind)마다 서체·배경의 서체를 고른다. */
+const FONT = { "gowun-batang": "var(--font-heading)", pretendard: "var(--font-sans)" } as const
+
 /** 달 표기 색. 토큰은 packages/ui의 globals.css(--color-season-*, --color-month-tone-*, --color-month-vivid-*)에 있다. */
 export function monthColor(palette: MonthLabelPalette, month: number): string {
   if (palette === "flow") {
@@ -31,8 +34,12 @@ const SUB_HEIGHT = 0.36
 const GLYPH: Record<MonthLabelKind, number> = { number: 0.66, text: 0.56, caps: 0.74 }
 const HANGUL = 1
 
-function estimateWidth(text: string, kind: MonthLabelKind): number {
-  return [...text].reduce((sum, char) => sum + (/[가-힣]/.test(char) ? HANGUL : GLYPH[kind]), 0)
+/** 프리텐다드로 쓴 영어 이름(text)은 고운바탕보다 넓다. */
+const SANS_TEXT = 0.64
+
+function estimateWidth(text: string, kind: MonthLabelKind, sans = false): number {
+  const glyph = kind === "text" && sans ? SANS_TEXT : GLYPH[kind]
+  return [...text].reduce((sum, char) => sum + (/[가-힣]/.test(char) ? HANGUL : glyph), 0)
 }
 
 /** 곁들이는 글자 크기(큰 글자 크기 배). 아래 줄(stack)과 옆(inline)이 다르다. print.css의 .sub와 맞춘다. */
@@ -42,11 +49,11 @@ const SUB_MIN = 1.8
 /** 옆에 붙일 때 큰 글자와의 간격(큰 글자 크기 배) */
 const INLINE_GAP = 0.3
 
-function subWidth(sub: { text: string; kind: MonthLabelKind }, layout: "stack" | "inline"): number {
+function subWidth(sub: { text: string; kind: MonthLabelKind }, layout: "stack" | "inline", sans: boolean): number {
   const kind = sub.kind === "caps" ? "caps" : "text"
   const size = SUB_SIZE[layout][kind]
   // 대문자는 자간(0.22em)이 붙는다.
-  return kind === "caps" ? [...sub.text].length * (GLYPH.caps + 0.22) * size : estimateWidth(sub.text, sub.kind) * size
+  return kind === "caps" ? [...sub.text].length * (GLYPH.caps + 0.22) * size : estimateWidth(sub.text, sub.kind, sans) * size
 }
 
 /**
@@ -79,12 +86,13 @@ export function MonthLabel({
   const label = printMonthLabel(month, text, { length, frame: style.frame })
   const wanted = (label.kind === "number" ? fontSize : textFontSize) * MONTH_LABEL_SCALE[style.size]
   const frameScale = style.frame === "pill" || style.frame === "ribbon" ? 0.6 : 1
-  const mainWidth = estimateWidth(label.main, label.kind) * frameScale + (style.frame === "pill" ? 0.5 : 0)
+  const sans = style.font === "pretendard"
+  const mainWidth = estimateWidth(label.main, label.kind, sans) * frameScale + (style.frame === "pill" ? 0.5 : 0)
   const fit = (height: number, width: number) => ({ height, width, size: Math.min(wanted, (maxHeight ?? Infinity) / height, (maxWidth ?? Infinity) / width) })
-  const stack = fit(FRAME_HEIGHT[style.frame] + (label.sub ? SUB_HEIGHT : 0), Math.max(mainWidth, label.sub ? subWidth(label.sub, "stack") : 0))
+  const stack = fit(FRAME_HEIGHT[style.frame] + (label.sub ? SUB_HEIGHT : 0), Math.max(mainWidth, label.sub ? subWidth(label.sub, "stack", sans) : 0))
   // 작은 자리(포스터 칸·연간 달력 머리)에서는 아래 줄 글자가 읽히지 않을 만큼 작아져 큰 글자 옆에 붙인다.
   const inline = !!label.sub && stack.size * SUB_SIZE.stack[label.sub.kind === "caps" ? "caps" : "text"] < SUB_MIN
-  const box = inline && label.sub ? fit(FRAME_HEIGHT[style.frame], mainWidth + INLINE_GAP + subWidth(label.sub, "inline")) : stack
+  const box = inline && label.sub ? fit(FRAME_HEIGHT[style.frame], mainWidth + INLINE_GAP + subWidth(label.sub, "inline", sans)) : stack
   // 상한은 글자 배율(type.scale)을 곱하지 않은 용지 길이라, 글자를 키워도 자리를 넘지 않는다.
   const limits = [maxHeight && u(maxHeight / box.height), maxWidth && u(maxWidth / box.width)].filter(Boolean)
   const size = limits.length ? `min(${[t(wanted), ...limits].join(", ")})` : t(wanted)
@@ -94,7 +102,8 @@ export function MonthLabel({
       data-frame={style.frame}
       data-align={align}
       data-sub={inline ? "inline" : undefined}
-      style={{ fontSize: size, "--month-color": monthColor(style.palette, month) } as React.CSSProperties}
+      data-font={style.font === "auto" ? undefined : style.font}
+      style={{ fontSize: size, "--month-color": monthColor(style.palette, month), "--month-font": style.font === "auto" ? undefined : FONT[style.font] } as React.CSSProperties}
     >
       <span className="main" data-kind={label.kind}>
         {label.main}
