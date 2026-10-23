@@ -5,7 +5,7 @@ import { DEFAULT_SPECS, LAYOUTS, MONTHLY_COVERS, parsePrintSpec, PRINT_KINDS } f
 import { wireframeOf, wireframesOf } from "../lib/wireframe-catalog"
 
 import { getAt, setAt } from "../lib/spec-path"
-import { FOOD_CATEGORIES, isFieldShown, KIND_SECTIONS, type OptionFieldSpec } from "./option-fields"
+import { FOOD_CATEGORIES, isFieldShown, KIND_SECTIONS, shownField, type OptionFieldSpec } from "./option-fields"
 
 // 폼(KIND_SECTIONS)과 사양 스키마(parsePrintSpec)가 어긋나지 않는지 본다. 폼이 내는 값은 모두 사양으로 읽혀야 하고, 사양의 값은 모두 폼에서 바꿀 수 있어야 한다.
 
@@ -141,9 +141,9 @@ describe("구성마다 숨는 옵션", () => {
     for (const f of KIND_SECTIONS["season-poster"].flatMap((section) => section.fields)) expect(isFieldShown(f, spec), f.label).toBe(true)
   })
 
-  it("월간 표지 선택지에 열두 달 미리보기(months)가 있다", () => {
+  it("월간 표지 선택지에 열두 달 미리보기(months)와 1년 제철 표(chart)가 있다", () => {
     const cover = field("monthly", "cover")
-    expect(cover.type === "select" && cover.options.map((option) => option.value)).toEqual(["year", "months", "none"])
+    expect(cover.type === "select" && cover.options.map((option) => option.value)).toEqual(["year", "months", "chart", "none"])
   })
 
   it("월별 포스터 막대표는 달 배열·품종 이름(늘 적음)·품종 개수(그림 있는 품종 전부)를 숨긴다", () => {
@@ -166,6 +166,25 @@ describe("구성마다 숨는 옵션", () => {
     const spec = { ...DEFAULT_SPECS["year-sheet"], layout: "hero-top" as const }
     expect(isFieldShown(field("year-sheet", "grid"), spec)).toBe(false)
     expect(isFieldShown(field("year-sheet", "foods.max"), spec)).toBe(false)
+  })
+
+  it("연간 열두 달 달력 + 막대표는 달 배열·품종 개수(달마다 넷 고정)·품종 이름(늘 적음)을 숨긴다", () => {
+    const spec = { ...DEFAULT_SPECS["year-sheet"], layout: "chart" as const }
+    expect(isFieldShown(field("year-sheet", "grid"), spec)).toBe(false)
+    expect(isFieldShown(field("year-sheet", "foods.max"), spec)).toBe(false)
+    expect(isFieldShown(field("year-sheet", "foods.names"), spec)).toBe(false)
+    expect(isFieldShown(field("year-sheet", "monthLabel"), spec)).toBe(true)
+  })
+
+  it("연간 달 표기의 '그림 위 큰 숫자'는 그림 칸이 있는 짝 체크무늬에서만 고를 수 있다", () => {
+    const values = (layout: "pairs" | "hero-top" | "chart") => {
+      const shown = shownField(field("year-sheet", "monthLabel"), { ...DEFAULT_SPECS["year-sheet"], layout })
+      return shown.type === "select" ? shown.options.map((option) => option.value) : []
+    }
+    expect(values("pairs")).toContain("big-number")
+    expect(values("hero-top")).not.toContain("big-number")
+    expect(values("chart")).not.toContain("big-number")
+    expect(values("chart")).toContain("number")
   })
 })
 

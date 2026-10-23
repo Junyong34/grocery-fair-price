@@ -176,6 +176,9 @@ type DownloadManifest = {
 - **월간 표지 열두 달 미리보기(C-2, `cover: "months"`)**: 두 방향 모두(세로 3×4, 가로 4×3). 위에 "제철 달력"과 연도, 아래 달 칸마다 그 달 대표 품종 둘과 달 표기(`monthLabel`). 대표 품종은 C-1과 같은 규칙(`yearFoods`: 앞 달에 나오지 않은 품종을 그 달 특별한 것부터)을 달마다 묶은 `yearFoodsByMonth`로 고른다. 달마다 둘이면 빈 달이 없다(테스트). 칸 바탕은 달의 계절색, 이름은 넣지 않는다. 표지 한 쪽이라 `pageCount`는 그대로다.
 - **제철 막대표 부품**: 줄 배치는 `@workspace/seasonal/print/period-chart`(`chartFoods`·`chartLines`·`chartColumns`·`seasonRuns`), 그리기는 `features/print/parts/period-chart.tsx`(한 단). 줄 = 카테고리 머리 줄(채소·과일·수산·곡물·견과) + 품종 줄(제철 시작 달 순, 같으면 이름순), 품종 줄 앞에 작은 그림, 막대 색은 제철이 시작하는 계절색. 12월→1월로 넘는 제철은 막대 둘. 여러 단이면 묶음 중간에서 시작하는 단에 머리 줄을 다시 둔다. 이름 글자는 줄 높이 × 0.55, 상한 3.2(A4 약 9pt). 와이어프레임 `periodChart`는 가짜 막대를 그리는 도형이라 계산을 나눠 쓰지 않는다.
 - **월별 포스터 막대표(P-B, `chart`)**: 두 방향 모두. 그림 있는 품종(카테고리로 줄일 수 있다) 전부, 세로 2단·가로 3단(줄이 24개 이하면 한 단, 줄 높이 상한 9mm). A4 이름 약 9pt, 달 머리 한글 약 6pt·영문 약 5.5pt(달 열 폭 약 5mm). `grid`·`foods.names`(늘 적음)·`foods.max`(전부 싣는다)는 쓰지 않는다.
+- **제철 막대표 여러 단**: `PeriodChartColumns`(`features/print/parts/period-chart.tsx`)가 줄을 단으로 나누고(`chartColumns`), 가장 긴 단과 달 머리 줄이 높이에 들도록 줄 높이를 정한다(상한 9mm). 단마다 이름 칸 폭이 같다. P-B·Y-C·C-3이 같이 쓴다.
+- **연간 열두 달 달력 + 막대표(Y-C, `chart`)**: 두 방향 모두. 위에 작은 달력 열둘(세로 4×3, 가로 6×2, 칸 높이 36·35mm, 칸 폭 약 44mm), 아래에 막대표(세로 2단, 가로 3단). 막대표 품종은 달마다 대표 넷(`yearFoods`, 48개). 67개를 다 넣으면 세로 줄이 약 3.7mm(이름 약 6pt)라 줄였다. A4 날짜 세로 약 7.5pt·가로 약 7.2pt, 이름 약 7.6·7.4pt, 달 머리 약 6.3pt. 그림 칸이 없어 `monthLabel: "big-number"`는 숫자로 그리고 선택지에서 뺀다(짝 체크무늬에서만 보인다). `grid`·`foods.max`·`foods.names`(늘 적음)는 쓰지 않는다.
+- **월간 표지 1년 제철 표(C-3, `cover: "chart"`)**: 두 방향 모두. C-2와 같은 머리(왼쪽 "제철 달력", 오른쪽 큰 연도, 40mm) 아래 그림 있는 품종 전부(67개)의 막대표, 세로 2단·가로 3단. 월간에는 카테고리 옵션이 없고 표지는 1년 전체를 보여 주는 쪽이라 줄이지 않는다. A4 이름 약 9pt(상한), 달 머리 약 7.7pt(영문 약 5.6pt). 표지 한 쪽이라 `pageCount`는 그대로다.
 - **원형 판 부품**: 자리 계산은 `@workspace/seasonal/print/wheel`의 `wheelLayout({ diameter, sectors, counts })`, 그리기는 `features/print/parts/wheel.tsx`(SVG 부채꼴 + 그림·표기). 12시 방향부터 시계 방향, 가운데 빈 원(반지름 0.3)과 바깥 표기 띠(0.11) 사이 고리에 그림을 놓는다. 부채꼴마다 고리 줄 수·줄마다 개수를 그림이 가장 커지게 고르고, 모든 그림 크기는 가장 빽빽한 부채꼴에 맞춘다. 그림이 부채꼴 밖으로 나가지 않고 서로 겹치지 않음을 테스트한다.
 - **월별 포스터 원형 판(P-C, `wheel`)**: 두 방향 모두(세로는 판 폭, 가로는 판 높이가 지름, 가운데 정렬). 조각마다 그 달 품종 최대 넷(`foods.max`와 4 중 작은 값), 이름은 넣지 않는다. 달 표기는 바깥 띠에 A4 약 12pt, 가운데에 "열두 달 / 제철 음식". 바탕 `season`이면 조각마다 계절색. `grid`·`foods.names`는 쓰지 않는다.
 - **세로 전용 구성**은 `spec.ts`의 `PORTRAIT_ONLY` 표 하나에 모은다(M-B, Y-B, P-D).
@@ -273,7 +276,7 @@ AGENTS.md "Generated files" 표에 `public/downloads/**`와 명령 `pnpm prints:
 |---|---|---|
 | 렌더링 | HTML 인쇄 페이지 → 헤드리스 Chrome `page.pdf()` | 앱 컴포넌트·Oura 토큰·SVG 일러스트를 그대로 쓴다. 글자와 그림이 벡터라 A3에서도 선명하다. (이전 판 결정 유지) |
 | 생성 위치 | 관리자의 컴퓨터. 개발 서버 + Playwright(`apps/web` devDependency) | 운영에 PDF 엔진이 필요 없다. Vercel 함수 크기·시간 제한, `@sparticuz/chromium` 호환 문제가 사라진다. |
-| 다운로드 폴더 | `apps/web/public/downloads/`(git에 커밋, Vercel CDN이 내려준다). 링크의 앞부분은 `DOWNLOADS_BASE` 상수 하나 | 에디션 몇 개 규모면 저장소가 견딘다. PDF 한 개 크기는 아직 모른다(SVG 벡터라 작을 것으로 추측). 합계가 100MB를 넘으면 R2·Blob으로 옮기고 `DOWNLOADS_BASE`만 바꾼다. |
+| 다운로드 폴더 | `apps/web/public/downloads/`(git에 커밋, Vercel CDN이 내려준다). 링크의 앞부분은 `DOWNLOADS_BASE` 상수 하나 | 에디션 몇 개 규모면 저장소가 견딘다. PDF 한 개 크기는 아직 모른다(SVG 벡터라 작을 것으로 추측). 합계가 100MB를 넘으면 R2·Blob으로 옮기고 `DOWNLOADS_BASE`만 바꾼다. (2026-10-23: PDF는 커밋하지 않고 Supabase Storage에 두기로 정했다. "남은 일" 1) |
 | 접근 제한 | `/admin`, `/print`의 layout이 `process.env.NODE_ENV === "production"`이면 `notFound()` | 어드민이 운영에 없으므로 로그인·Basic Auth·비밀번호 관리가 없다. 저장 Server Action도 같은 검사를 한다(파일을 쓰므로). |
 | 색인 | `/admin`, `/print`는 `shared/seo/pages.ts`에 noindex로 등록. `/seasonal/downloads`는 색인 대상. PDF는 `robots.ts`에서 막지 않는다 | 가드 테스트가 등록을 강제한다. 운영에서 404인 경로라 sitemap에 넣지 않는다. |
 | 사양 전달 | `?spec=`에 JSON을 base64url로. 인쇄 페이지는 `<Suspense>` 안에서 `searchParams`를 읽고 `parsePrintSpec` 실패 시 `notFound()` | 저장 전 상태도 미리 볼 수 있다. 정적 프리렌더 대상이 아니다. |
@@ -383,7 +386,7 @@ AGENTS.md "Generated files" 표에 `public/downloads/**`와 명령 `pnpm prints:
 
 남은 일:
 
-1. **용량.** (2026-10-16 결정: PDF는 커밋하지 않는다. `apps/web/public/downloads/**/*.pdf`를 `.gitignore`에 넣었다. 저장 위치를 정할 때까지 에디션을 공개하지 않는다.) 처음 잰 값: 월간 에디션 하나(PDF 26개)가 34MB, A4 12개월 묶음 6.6MB, A3 묶음 11.8MB. A3가 A4보다 큰 것은 일러스트 SVG의 필터 효과가 래스터로 들어가기 때문으로 추정한다(확인 전). 포스터·연간 한 장은 한 파일 0.6~2.2MB. 월간 에디션 서너 개면 "100MB 넘으면 스토리지로" 기준에 닿는다. 다운로드 폴더를 git에 둘지 R2·Blob으로 옮길지 정해야 한다.
+1. **용량.** (2026-10-16 결정: PDF는 커밋하지 않는다. `apps/web/public/downloads/**/*.pdf`를 `.gitignore`에 넣었다. 저장 위치를 정할 때까지 에디션을 공개하지 않는다.) 처음 잰 값: 월간 에디션 하나(PDF 26개)가 34MB, A4 12개월 묶음 6.6MB, A3 묶음 11.8MB. A3가 A4보다 큰 것은 일러스트 SVG의 필터 효과가 래스터로 들어가기 때문으로 추정한다(확인 전). 포스터·연간 한 장은 한 파일 0.6~2.2MB. 월간 에디션 서너 개면 "100MB 넘으면 스토리지로" 기준에 닿는다. 2026-10-23 결정: PDF는 Supabase Storage에 올리고 사용자는 거기서 내려받는다(가격 DB와 같은 Supabase 프로젝트). 올리는 방법과 버킷·경로, `DOWNLOADS_BASE`를 바꾸는 일은 아직 하지 않았다. 그때까지 에디션을 공개하지 않는다.
 2. 배치 끌어 옮기기(`placements`, 월간 달력).
 3. 월간 달력의 명절(공휴일이 아닌 것)·음력 표시.
 4. 실제 프린터로 A4·A3 한 장씩 뽑아 안전 여백과 연간 한 장의 작은 글자 확인.

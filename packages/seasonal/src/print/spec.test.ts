@@ -132,6 +132,16 @@ describe("parsePrintSpec", () => {
     expect(parsePrintSpec({ ...spec, orientation: "landscape" })).not.toBeInstanceOf(Error)
   })
 
+  it("연간 한 장 열두 달 달력 + 막대표(chart)는 두 방향 모두 받는다", () => {
+    const spec = { ...DEFAULT_SPECS["year-sheet"], layout: "chart" }
+    expect(parsePrintSpec(spec)).not.toBeInstanceOf(Error)
+    expect(parsePrintSpec({ ...spec, orientation: "landscape", grid: "3x4" })).not.toBeInstanceOf(Error)
+  })
+
+  it("월간 표지 1년 제철 표(chart)를 받는다", () => {
+    expect(parsePrintSpec({ ...DEFAULT_SPECS.monthly, cover: "chart" })).toMatchObject({ cover: "chart" })
+  })
+
   it("계절 포스터는 사분면·네 열(quarters)을 두 방향 모두 받는다", () => {
     const spec = { ...DEFAULT_SPECS["season-poster"], layout: "quarters" }
     expect(parsePrintSpec(spec)).not.toBeInstanceOf(Error)
@@ -203,6 +213,7 @@ describe("쪽 수", () => {
     expect(pageCount({ ...DEFAULT_SPECS.monthly, cover: "none" })).toBe(12)
     expect(pageCount({ ...DEFAULT_SPECS.monthly, cover: "year" })).toBe(13)
     expect(pageCount({ ...DEFAULT_SPECS.monthly, cover: "months" })).toBe(13)
+    expect(pageCount({ ...DEFAULT_SPECS.monthly, cover: "chart" })).toBe(13)
   })
 
   it("계절 포스터를 계절마다 한 장(per-season)으로 하면 4쪽이다", () => {

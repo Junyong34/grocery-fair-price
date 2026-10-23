@@ -89,19 +89,19 @@ const year = z.number().int().min(2020).max(2100)
 /** 종류마다 구성(layout) 값. 편집기의 구성 썸네일 표가 이 값을 모두 덮는지 테스트한다. 값은 스키마 주석의 와이어프레임 안 하나씩이다. */
 export const LAYOUTS = {
   monthly: ["scatter", "grid", "none", "side-check", "strip", "allover"],
-  "year-sheet": ["pairs", "hero-top"],
+  "year-sheet": ["pairs", "hero-top", "chart"],
   "season-poster": ["bands", "quarters", "per-season"],
   "month-poster": ["cells", "chart", "wheel", "rows-check"],
 } as const satisfies Record<PrintKind, readonly string[]>
 
 /** 월간 12개월 묶음 표지 값 */
-export const MONTHLY_COVERS = ["none", "year", "months"] as const
+export const MONTHLY_COVERS = ["none", "year", "months", "chart"] as const
 
 const monthlySchema = z.object({
   ...base,
   kind: z.literal("monthly"),
   year,
-  /** 12개월 묶음 첫 장의 표지. none: 표지 없음, year: 큰 연도 + 대표 품종(C-1), months: 큰 연도 + 열두 달 미리보기(C-2) */
+  /** 12개월 묶음 첫 장의 표지. none: 표지 없음, year: 큰 연도 + 대표 품종(C-1), months: 큰 연도 + 열두 달 미리보기(C-2), chart: 큰 연도 + 1년 제철 막대표(C-3) */
   cover: z.enum(MONTHLY_COVERS),
   monthLabel,
   calendar: calendar(z.enum(["hidden", "mark", "mark-and-name"])).extend({ variant: z.enum(CALENDAR_VARIANTS) }),
@@ -123,7 +123,7 @@ const yearSheetSchema = z.object({
   monthLabel: z.enum([...MONTH_LABEL_STYLES, "big-number"]),
   // 칸이 작아 공휴일 이름은 들어가지 않는다.
   calendar: calendar(z.enum(["hidden", "mark"])),
-  /** 그림·달력 짝 체크무늬(Y-A) / 위에 1년치 그림 한 판, 아래 열두 달 3x4(Y-B. 세로 용지만) */
+  /** 그림·달력 짝 체크무늬(Y-A) / 위에 1년치 그림 한 판, 아래 열두 달 3x4(Y-B. 세로 용지만) / 위에 작은 달력 열둘, 아래 제철 막대표(Y-C) */
   layout: z.enum(LAYOUTS["year-sheet"]).default("pairs"),
   /** 달 배열(열×행) */
   grid,

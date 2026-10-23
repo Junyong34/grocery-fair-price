@@ -2,12 +2,14 @@ import { foodsInMonth } from "@workspace/seasonal/data/foods"
 import { formatMonthLabel, MONTHS, type Month } from "@workspace/seasonal/data/months"
 import type { Food } from "@workspace/seasonal/data/foods"
 import { monthChecklist, monthFoods, stripFoods, yearFoods, yearFoodsByMonth } from "@workspace/seasonal/print/foods"
+import { chartFoods, chartLines } from "@workspace/seasonal/print/period-chart"
 import { CALENDAR_TEXT_SCALE, type MonthlySpec, type Paper } from "@workspace/seasonal/print/spec"
 
 import { CheckList } from "./parts/check-list"
 import { DayColumn } from "./parts/day-column"
 import { FoodArea, flowSize } from "./parts/food-area"
 import { FoodFigure } from "./parts/food-figure"
+import { PeriodChartColumns } from "./parts/period-chart"
 import { PrintCalendar } from "./parts/print-calendar"
 import { Sheet } from "./parts/sheet"
 import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
@@ -26,6 +28,11 @@ const STRIP = { size: 14, height: 44, width: 48, gap: 5 } as const
 /** M-E: 세로의 모서리 달력 블록 크기·안쪽 여백, 가로의 날짜 열 폭, 그림과의 간격 */
 /** C-2 표지: 머리(제목·연도) 높이, 달 칸 사이 간격·안쪽 여백·달 표기 높이, 칸마다 그림 수 */
 const MONTHS_COVER = { header: 40, gap: 4, padding: 3, label: 7, perMonth: 2 } as const
+/**
+ * C-3 표지: 막대표 단 수와 단 사이 간격. 그림 있는 품종 67개를 모두 싣는다(월간에는 카테고리 옵션이 없고, 표지는 1년 전체를 보여 주는 쪽이다).
+ * 머리가 C-2와 같은 40mm라 A4 줄 높이가 세로 2단 약 6.3mm, 가로 3단 약 5.8mm이고, 이름은 둘 다 상한인 약 9pt다.
+ */
+const CHART_COVER = { columns: { portrait: 2, landscape: 3 }, gap: 8 } as const
 const ALLOVER = { block: { width: 100, height: 88, padding: 4 }, column: 34, gap: 6 } as const
 
 export function MonthlySheets({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
@@ -33,6 +40,7 @@ export function MonthlySheets({ spec, paper }: { spec: MonthlySpec; paper: Paper
     <>
       {spec.cover === "year" && <Cover spec={spec} paper={paper} />}
       {spec.cover === "months" && <MonthsCover spec={spec} paper={paper} />}
+      {spec.cover === "chart" && <ChartCover spec={spec} paper={paper} />}
       {MONTHS.map((month) =>
         spec.layout === "strip" ? (
           <StripSheet key={month} spec={spec} paper={paper} month={month} />
@@ -289,14 +297,7 @@ function MonthsCover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
   const size = Math.min(...picks.map((foods) => flowSize(foods.length, art.width, art.height, 0)))
   return (
     <Sheet spec={spec} paper={paper} background={surfaceColor(spec.surface === "season" ? "cream" : spec.surface)}>
-      <header style={{ height: u(header), display: "flex", alignItems: "flex-end", justifyContent: "space-between", paddingBottom: u(gap), boxSizing: "border-box" }}>
-        <p className="print-heading" style={{ margin: 0, fontSize: t(6), letterSpacing: "0.2em", color: "var(--color-forest)" }}>
-          제철 달력
-        </p>
-        <p className="print-number" style={{ margin: 0, fontSize: t(28), lineHeight: 1, color: "var(--color-forest)" }}>
-          {spec.year}
-        </p>
-      </header>
+      <CoverHeader year={spec.year} height={header} gap={gap} />
       <div style={{ display: "grid", gridTemplateColumns: `repeat(${columns}, ${u(cell.width)})`, gap: u(gap) }}>
         {MONTHS.map((month, i) => (
           <section
@@ -317,3 +318,35 @@ function MonthsCover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
   )
 }
 
+/** C-3: 큰 연도 아래 그림 있는 품종 전부의 제철 막대표(세로 2단, 가로 3단). 달을 넘기기 전에 1년 흐름을 본다. */
+function ChartCover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
+  const inner = innerSize(spec)
+  const { header, gap } = MONTHS_COVER
+  return (
+    <Sheet spec={spec} paper={paper} background={surfaceColor(spec.surface === "season" ? "cream" : spec.surface)}>
+      <CoverHeader year={spec.year} height={header} gap={gap} />
+      <PeriodChartColumns
+        lines={chartLines(chartFoods([]))}
+        columns={CHART_COVER.columns[spec.orientation]}
+        width={inner.width}
+        height={inner.height - header}
+        gap={CHART_COVER.gap}
+        monthLabel={spec.monthLabel}
+      />
+    </Sheet>
+  )
+}
+
+/** C-2·C-3 표지 머리: 왼쪽 "제철 달력", 오른쪽 큰 연도. 아래 내용과 gap만큼 띄운다. */
+function CoverHeader({ year, height, gap }: { year: number; height: number; gap: number }) {
+  return (
+    <header style={{ height: u(height), display: "flex", alignItems: "flex-end", justifyContent: "space-between", paddingBottom: u(gap), boxSizing: "border-box" }}>
+      <p className="print-heading" style={{ margin: 0, fontSize: t(6), letterSpacing: "0.2em", color: "var(--color-forest)" }}>
+        제철 달력
+      </p>
+      <p className="print-number" style={{ margin: 0, fontSize: t(28), lineHeight: 1, color: "var(--color-forest)" }}>
+        {year}
+      </p>
+    </header>
+  )
+}

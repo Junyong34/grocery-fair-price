@@ -229,13 +229,15 @@ const monthly: WireframeEntry[] = [
     kind: "monthly",
     page: "cover",
     title: "표지: 1년 제철 표",
-    summary: "첫 장을 품종×달 막대표로 만든다. 달을 넘기기 전에 1년 흐름을 한눈에 본다.",
+    summary: "첫 장을 품종×달 막대표로 만든다. 달을 넘기기 전에 1년 흐름을 한눈에 본다. 그림 있는 품종 67개를 세로 2단, 가로 3단에 나눠 이름이 A4 약 9pt다.",
     source: "⑨ 기간 표시 · G10, G7. 표지 자리에 계절표·범례 쪽을 넣는 K10, G5. 막대표 자체는 판매 사례로 확인 못 함",
-    availability: { status: "needs-option", options: 'cover: "chart"' },
+    availability: { status: "available", options: 'cover: "chart"' },
     orientations: ["portrait"],
     draw: () => {
+      // 그림 있는 품종 전부를 세로 2단에 나눈다(monthly.tsx의 CHART_COVER).
       const [header, body] = split(contentBox("portrait"), "rows", [26, "*"], 6)
-      return [...yearHeader(header!, 20), ...periodChart(body!, { rows: 18, groups: ["채소", "과일", "수산"], seed: 11 })]
+      const [left, right] = split(body!, "cols", ["*", "*"], 8)
+      return [...yearHeader(header!, 20), ...periodChart(left!, { rows: 30, groups: ["채소", "과일"], seed: 11, label: 0.3 }), ...periodChart(right!, { rows: 30, groups: ["수산", "곡물·견과"], seed: 12, label: 0.3 })]
     },
   },
 ]
@@ -294,19 +296,21 @@ const yearSheet: WireframeEntry[] = [
     kind: "year-sheet",
     page: "sheet",
     title: "열두 달 달력 + 제철 막대표",
-    summary: "날짜는 작은 달력 열둘이, 제철은 품종×달 막대표가 맡는다. 세로 용지는 같은 달 열이 위아래로 이어져 달력과 제철을 함께 읽는다.",
+    summary: "날짜는 작은 달력 열둘이, 제철은 품종×달 막대표가 맡는다. 막대표는 달마다 대표 넷(48개)이고, 날짜와 이름이 A4 약 7pt를 넘게 달력 칸 폭을 44mm로 잡았다.",
     source: "⑤ + ⑨ · 이 조합의 판매 사례는 없음. 막대표는 G10·G7을 편 것",
-    availability: { status: "needs-option", options: 'layout: "chart"' },
+    availability: { status: "available", options: 'layout: "chart"' },
     orientations: ["portrait", "landscape"],
     draw: (orientation) => {
+      // 달력 세로 4×3·가로 6×2, 막대표 세로 2단·가로 3단(year-sheet.tsx의 CHART).
       const c = contentBox(orientation)
-      if (orientation === "portrait") {
-        const [header, months, chart] = split(c, "rows", [18, 56, "*"], 5)
-        return [...yearHeader(header!, 12), ...monthGrid(months!, 6, 2, 3).flatMap((cell, i) => labelledMiniCalendar(cell, MONTHS[i]!)), ...periodChart(chart!, { rows: 16, seed: 31 })]
-      }
-      const [header, body] = split(c, "rows", [14, "*"], 4)
-      const [months, chart] = split(body!, "cols", [96, "*"], 6)
-      return [...yearHeader(header!, 10), ...monthGrid(months!, 3, 4, 3).flatMap((cell, i) => labelledMiniCalendar(cell, MONTHS[i]!)), ...periodChart(chart!, { rows: 14, seed: 32, label: 0.24 })]
+      const [header, months, chart] = split(c, "rows", [18, orientation === "portrait" ? 114 : 73, "*"], 5)
+      const [columns, rows, chartColumns] = orientation === "portrait" ? [4, 3, 2] : [6, 2, 3]
+      const groups = orientation === "portrait" ? [["채소", "과일"], ["과일", "수산", "곡물·견과"]] : [["채소"], ["과일"], ["수산", "곡물·견과"]]
+      return [
+        ...yearHeader(header!, 12),
+        ...monthGrid(months!, columns, rows, 3).flatMap((cell, i) => labelledMiniCalendar(cell, MONTHS[i]!)),
+        ...split(chart!, "cols", Array<"*">(chartColumns).fill("*"), 8).flatMap((column, i) => periodChart(column, { rows: orientation === "portrait" ? 25 : 16, groups: groups[i], seed: 31 + i, label: 0.3 })),
+      ]
     },
   },
 ]

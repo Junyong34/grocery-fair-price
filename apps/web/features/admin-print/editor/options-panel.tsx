@@ -6,14 +6,14 @@ import type { PrintSpec } from "@workspace/seasonal/print/spec"
 
 import { getAt } from "../lib/spec-path"
 import { OptionField } from "./option-field"
-import { isFieldShown, KIND_SECTIONS } from "./option-fields"
+import { isFieldShown, KIND_SECTIONS, shownField } from "./option-fields"
 
 type Props = { spec: PrintSpec; error: string | undefined; onChange: (path: readonly string[], value: unknown) => void }
 
 export function OptionsPanel({ spec, error, onChange }: Props) {
-  // 고른 구성에서 뜻이 없는 옵션은 숨긴다. 모두 숨겨진 묶음은 탭째 뺀다.
+  // 고른 구성에서 뜻이 없는 옵션·선택지는 숨긴다. 모두 숨겨진 묶음은 탭째 뺀다.
   const sections = KIND_SECTIONS[spec.kind]
-    .map((section) => ({ ...section, fields: section.fields.filter((field) => isFieldShown(field, spec)) }))
+    .map((section) => ({ ...section, fields: section.fields.filter((field) => isFieldShown(field, spec)).map((field) => shownField(field, spec)) }))
     .filter((section) => section.fields.length > 0)
   return (
     <section aria-labelledby="options-title" className="flex flex-col gap-3">

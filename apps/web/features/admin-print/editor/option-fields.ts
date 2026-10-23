@@ -5,8 +5,11 @@ import type { PrintKind, PrintSpec } from "@workspace/seasonal/print/spec"
 
 export const FOOD_CATEGORIES = [...new Set(FOODS.map((food) => food.category))]
 
-/** code는 그 값이 그리는 와이어프레임 안(wireframe-catalog.ts). 구성·표지 선택을 썸네일로 보일 때 쓴다. */
-export type Option = { value: string | number; label: string; code?: string }
+/**
+ * code는 그 값이 그리는 와이어프레임 안(wireframe-catalog.ts). 구성·표지 선택을 썸네일로 보일 때 쓴다.
+ * when이 거짓이면 이 구성에서 뜻이 없는 선택지라 목록에서 뺀다. 이미 고른 값은 사양에 남는다.
+ */
+export type Option = { value: string | number; label: string; code?: string; when?: (spec: PrintSpec) => boolean }
 
 export type OptionFieldSpec = (
   | {
@@ -31,6 +34,12 @@ export type OptionSection = { title: string; fields: readonly OptionFieldSpec[] 
 
 export function isFieldShown(field: OptionFieldSpec, spec: PrintSpec): boolean {
   return field.when?.(spec) ?? true
+}
+
+/** 패널에 보일 모양. 선택 필드에서 이 구성에 뜻이 없는 선택지(Option.when)를 뺀다. */
+export function shownField(field: OptionFieldSpec, spec: PrintSpec): OptionFieldSpec {
+  if (field.type !== "select" || !field.options.some((option) => option.when)) return field
+  return { ...field, options: field.options.filter((option) => option.when?.(spec) ?? true) }
 }
 
 const options = (entries: Record<string, string>): Option[] => Object.entries(entries).map(([value, label]) => ({ value, label }))
@@ -92,8 +101,10 @@ const monthlyHasMemo = (spec: PrintSpec) => spec.kind === "monthly" && !(["side-
 const monthlyHasWeeks = (spec: PrintSpec) => spec.kind !== "monthly" || spec.layout !== "allover" || spec.orientation === "portrait"
 /** M-D는 쓰는 칸이 필요해 격자 모양으로 정해져 있고, 그림 있는 품종을 모두 띠와 빈 칸에 넣는다. */
 const monthlyNotStrip = (spec: PrintSpec) => spec.kind === "monthly" && spec.layout !== "strip"
-/** Y-B는 달 배열이 3x4로, 위 그림은 달마다 하나로 정해져 있다. */
+/** Y-B는 달 배열이 3x4로, 위 그림은 달마다 하나로 정해져 있다. Y-C는 달 배열이 방향마다 정해져 있고, 막대표 품종이 달마다 넷이다. 둘 다 그림 칸이 없어 큰 숫자를 얹을 데가 없다. */
 const yearSheetInPairs = (spec: PrintSpec) => spec.kind === "year-sheet" && spec.layout === "pairs"
+/** Y-C 막대표는 줄마다 이름을 늘 적는다. */
+const yearSheetNotChart = (spec: PrintSpec) => spec.kind === "year-sheet" && spec.layout !== "chart"
 /** P-D는 이름을 체크 목록에 늘 적고, 달을 한 줄씩 쌓는다. P-B는 줄마다 이름을 적고 그림 있는 품종을 모두 싣는다. */
 const monthPosterInCells = (spec: PrintSpec) => spec.kind === "month-poster" && spec.layout === "cells"
 const monthPosterNotChart = (spec: PrintSpec) => spec.kind === "month-poster" && spec.layout !== "chart"
@@ -128,6 +139,7 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
           options: [
             { value: "year", label: "큰 연도 + 대표 품종", code: "C-1" },
             { value: "months", label: "큰 연도 + 열두 달 미리보기", code: "C-2" },
+            { value: "chart", label: "큰 연도 + 1년 제철 막대표", code: "C-3" },
             { value: "none", label: "표지 없음" },
           ],
           wireframes: "cover",
@@ -151,7 +163,7 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
     look,
   ],
   "year-sheet": [
-    { title: "구성", fields: [layout({ pairs: ["그림·달력 짝 체크무늬", "Y-A"], "hero-top": ["큰 그림 위, 열두 달 아래(세로 용지)", "Y-B"] })] },
+    { title: "구성", fields: [layout({ pairs: ["그림·달력 짝 체크무늬", "Y-A"], "hero-top": ["큰 그림 위, 열두 달 아래(세로 용지)", "Y-B"], chart: ["열두 달 달력 + 제철 막대표", "Y-C"] })] },
     { title: "용지", fields: [orientation, margin, year, { ...grid, when: yearSheetInPairs }] },
     {
       title: "달력",
@@ -160,10 +172,10 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
         weekday,
         { type: "select", label: "공휴일", path: ["calendar", "holidays"], options: options({ mark: "빨간 날짜", hidden: "표시 안 함" }) },
         calendarSize,
-        { ...monthLabel, options: [{ value: "big-number", label: "그림 위 큰 숫자" }, ...monthLabel.options] } as OptionFieldSpec,
+        { ...monthLabel, options: [{ value: "big-number", label: "그림 위 큰 숫자", when: yearSheetInPairs }, ...monthLabel.options] } as OptionFieldSpec,
       ],
     },
-    foods(8, { max: yearSheetInPairs }),
+    foods(8, { names: yearSheetNotChart, max: yearSheetInPairs }),
     look,
   ],
   "season-poster": [

@@ -1,9 +1,11 @@
 import { formatMonthLabel, MONTHS, type Month, type MonthLabelStyle } from "@workspace/seasonal/data/months"
 import { monthFoods, yearFoods } from "@workspace/seasonal/print/foods"
+import { chartLines } from "@workspace/seasonal/print/period-chart"
 import { CALENDAR_TEXT_SCALE, type Paper, type YearSheetSpec } from "@workspace/seasonal/print/spec"
 
 import { FoodArea } from "./parts/food-area"
 import { gridSize } from "./parts/grid"
+import { PeriodChartColumns } from "./parts/period-chart"
 import { PrintCalendar } from "./parts/print-calendar"
 import { Sheet } from "./parts/sheet"
 import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
@@ -11,6 +13,7 @@ import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
 // 연간 달력 한 장.
 // pairs(Y-A): 달마다 그림 칸과 작은 달력이 한 쌍이다. 2x6은 한 줄에 두 달이고 그림·달력을 좌우로, 줄마다 순서를 바꿔 체크무늬로 놓는다. 3x4·4x3은 그림 위, 달력 아래.
 // hero-top(Y-B): 위에 1년치 품종을 한 판으로 흩뿌리고, 아래에 작은 달력 열두 개를 3x4로 놓는다(세로 용지만). 달마다 그림 칸이 없어 달력이 커진다.
+// chart(Y-C): 위에 작은 달력 열둘(세로 4x3, 가로 6x2), 아래에 제철 막대표(세로 2단, 가로 3단). 날짜는 달력이, 제철은 막대표가 맡는다.
 
 const HEADER = 18
 const GAP = 3
@@ -18,6 +21,18 @@ const GAP = 3
 const HERO = { height: 84, perMonth: 1 } as const
 const HERO_GRID = { columns: 3, rows: 4 } as const
 const LABEL = 5
+/**
+ * Y-C. 달력 칸 폭 약 44mm·높이 35~36mm면 A4 날짜가 약 7.2~7.5pt다(7pt 하한은 폭 41mm·높이 34mm).
+ * 막대표 품종은 달마다 대표 넷(yearFoods, 48개)이다. 그림 있는 품종 67개를 다 넣으면 세로 2단 줄이 약 3.7mm(이름 약 6pt)라 줄였고,
+ * 넷이면 이름이 세로 약 7.6pt, 가로 약 7.4pt다.
+ */
+const CHART = {
+  perMonth: 4,
+  grid: { portrait: { columns: 4, rows: 3, height: 36 }, landscape: { columns: 6, rows: 2, height: 35 } },
+  columns: { portrait: 2, landscape: 3 },
+  gap: 5,
+  columnGap: 8,
+} as const
 
 export function YearSheet({ spec, paper }: { spec: YearSheetSpec; paper: Paper }) {
   const inner = innerSize(spec)
@@ -38,6 +53,8 @@ export function YearSheet({ spec, paper }: { spec: YearSheetSpec; paper: Paper }
       </header>
       {spec.layout === "hero-top" ? (
         <HeroTop spec={spec} />
+      ) : spec.layout === "chart" ? (
+        <CalendarsAndChart spec={spec} />
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: `repeat(${columns}, ${u(cell.width)})`, gap: u(GAP) }}>
           {MONTHS.map((month, i) => (
@@ -76,6 +93,34 @@ function HeroTop({ spec }: { spec: YearSheetSpec }) {
           </div>
         ))}
       </div>
+    </>
+  )
+}
+
+function CalendarsAndChart({ spec }: { spec: YearSheetSpec }) {
+  const inner = innerSize(spec)
+  const grid = CHART.grid[spec.orientation]
+  const cellWidth = (inner.width - GAP * (grid.columns - 1)) / grid.columns
+  const calendars = grid.height * grid.rows + GAP * (grid.rows - 1)
+  // 얹을 그림 칸이 없으니 big-number는 달력 위 숫자로 쓴다.
+  const label = spec.monthLabel === "big-number" ? "number" : spec.monthLabel
+  return (
+    <>
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${grid.columns}, ${u(cellWidth)})`, gap: u(GAP), marginBottom: u(CHART.gap) }}>
+        {MONTHS.map((month) => (
+          <div key={month} style={{ borderRadius: u(2), background: spec.surface === "season" ? surfaceColor("season", monthSeason(month)) : undefined }}>
+            <CalendarBlock spec={spec} month={month} width={cellWidth} height={grid.height} label={label} />
+          </div>
+        ))}
+      </div>
+      <PeriodChartColumns
+        lines={chartLines(yearFoods({ max: CHART.perMonth, categories: [] }))}
+        columns={CHART.columns[spec.orientation]}
+        width={inner.width}
+        height={inner.height - HEADER - calendars - CHART.gap}
+        gap={CHART.columnGap}
+        monthLabel={label}
+      />
     </>
   )
 }
