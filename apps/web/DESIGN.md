@@ -381,6 +381,10 @@ Color discipline is the signature move. The whole palette is earth-toned — mus
 ### Semantic
 - **Error** (`{colors.error}` — #e33a22): validation and focus-error state on form fields (the focused email field border).
 
+### Print month colors (this app only)
+- **Month tone** (`--color-month-tone-1` … `-12`): twelve quiet month colors for the print month label. Seven reuse Oura colors (stone, clay, sage, olive, forest, gold); five sit between them.
+- **Month vivid** (`--color-month-vivid-1` … `-12`): twelve saturated month colors, the one deliberate break from the Oura palette. Print only (the "쨍한 열두 달" option on PDFs); screens never use them.
+
 ## Typography
 
 ### Font Family

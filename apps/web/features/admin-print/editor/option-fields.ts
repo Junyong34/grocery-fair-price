@@ -1,6 +1,6 @@
 import { CALENDAR_VARIANT_LABELS, CALENDAR_VARIANTS } from "@workspace/seasonal/calendar/variants"
 import { FOODS } from "@workspace/seasonal/data/foods"
-import { formatMonthLabel, MONTH_LABEL_STYLES } from "@workspace/seasonal/data/months"
+import { printMonthLabel, PRINT_MONTH_LABELS } from "@workspace/seasonal/print/month-label"
 import type { PrintKind, PrintSpec } from "@workspace/seasonal/print/spec"
 
 export const FOOD_CATEGORIES = [...new Set(FOODS.map((food) => food.category))]
@@ -54,12 +54,28 @@ const margin: OptionFieldSpec = {
 }
 const year: OptionFieldSpec = { type: "number", label: "연도", path: ["year"], min: 2020, max: 2100 }
 const title: OptionFieldSpec = { type: "text", label: "제목", path: ["title"] }
+/** 선택지 이름은 1월로 적은 그 표기다(두 자리가 숫자와 구별되게). 곁들이는 영문은 한 칸 띄워 붙인다. */
 const monthLabel: OptionFieldSpec = {
   type: "select",
   label: "달 표기",
   path: ["monthLabel"],
-  options: MONTH_LABEL_STYLES.map((style) => ({ value: style, label: formatMonthLabel(10, style, "long") })),
+  options: PRINT_MONTH_LABELS.map((style) => {
+    const label = printMonthLabel(1, style)
+    return { value: style, label: label.sub ? `${label.main} ${label.sub.text}` : label.main }
+  }),
 }
+/** 달 표기의 색·크기·장식. 연간 Y-A의 "그림 위 큰 숫자"는 색만 따른다. */
+const monthStyle: OptionFieldSpec[] = [
+  {
+    type: "select",
+    label: "달 표기 색",
+    path: ["monthStyle", "palette"],
+    options: options({ season: "계절색", flow: "열두 달 흐름", twelve: "달마다 다른 색", vivid: "쨍한 열두 달" }),
+    hint: "바탕까지 계절색으로 칠하려면 서체·배경에서 배경을 계절색으로 고르세요.",
+  },
+  { type: "select", label: "달 표기 크기", path: ["monthStyle", "size"], options: options({ small: "작게", medium: "보통", large: "크게" }) },
+  { type: "select", label: "달 표기 장식", path: ["monthStyle", "frame"], options: options({ none: "없음", rule: "밑줄", pill: "알약 태그", ribbon: "책갈피 리본", outline: "외곽선 숫자" }) },
+]
 const grid: OptionFieldSpec = { type: "select", label: "달 배열(열×행)", path: ["grid"], options: options({ "2x6": "2×6", "3x4": "3×4", "4x3": "4×3" }) }
 const weekStart: OptionFieldSpec = { type: "select", label: "주 시작", path: ["calendar", "weekStart"], options: [{ value: 0, label: "일요일" }, { value: 1, label: "월요일" }] }
 const weekday: OptionFieldSpec = {
@@ -157,10 +173,10 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
         weekday,
         { type: "select", label: "공휴일", path: ["calendar", "holidays"], options: options({ "mark-and-name": "날짜와 이름", mark: "빨간 날짜만", hidden: "표시 안 함" }) },
         calendarSize,
-        monthLabel,
         { type: "select", label: "달력 아래", path: ["memo"], options: options({ none: "없음", lines: "메모 줄", "eaten-check": "먹은 음식 체크 칸" }), when: monthlyHasMemo },
       ],
     },
+    { title: "달 표기", fields: [monthLabel, ...monthStyle] },
     foods(20, { names: monthlyHasFoods, max: (spec) => monthlyHasFoods(spec) && monthlyNotStrip(spec) }),
     look,
   ],
@@ -174,9 +190,9 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
         weekday,
         { type: "select", label: "공휴일", path: ["calendar", "holidays"], options: options({ mark: "빨간 날짜", hidden: "표시 안 함" }) },
         calendarSize,
-        { ...monthLabel, options: [{ value: "big-number", label: "그림 위 큰 숫자", when: yearSheetInPairs }, ...monthLabel.options] } as OptionFieldSpec,
       ],
     },
+    { title: "달 표기", fields: [{ ...monthLabel, options: [{ value: "big-number", label: "그림 위 큰 숫자", when: yearSheetInPairs }, ...monthLabel.options] } as OptionFieldSpec, ...monthStyle] },
     foods(8, { names: yearSheetNotChart, max: yearSheetInPairs }),
     look,
   ],
@@ -188,7 +204,8 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
   ],
   "month-poster": [
     { title: "구성", fields: [layout({ cells: ["열두 칸", "P-A"], chart: ["품종×달 막대표", "P-B"], wheel: ["열두 달 원형 판", "P-C"], "rows-check": ["한 줄에 한 달 · 장보기 체크(세로 용지)", "P-D"] })] },
-    { title: "용지", fields: [orientation, margin, title, { ...grid, when: monthPosterInCells }, monthLabel] },
+    { title: "용지", fields: [orientation, margin, title, { ...grid, when: monthPosterInCells }] },
+    { title: "달 표기", fields: [monthLabel, ...monthStyle] },
     { ...foods(12), fields: [...foods(12, { names: monthPosterInCells, max: monthPosterNotChart }).fields, categories] },
     look,
   ],

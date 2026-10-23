@@ -21,7 +21,8 @@ export function OptionsPanel({ spec, error, onChange }: Props) {
         옵션
       </h2>
       <Tabs defaultValue={sections[0]!.title} variant="underline">
-        <TabsList aria-label="옵션 묶음">
+        {/* 탭이 패널보다 넓으면(좁은 화면, 달 표기 탭이 있는 종류) 옆으로 밀어 본다. */}
+        <TabsList aria-label="옵션 묶음" className="max-w-full overflow-x-auto [scrollbar-width:none]">
           {sections.map((section) => (
             <TabsTrigger key={section.title} value={section.title}>
               {section.title}

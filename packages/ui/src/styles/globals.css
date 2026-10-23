@@ -42,6 +42,33 @@
     --color-season-autumn: var(--color-gold);
     --color-season-winter: var(--color-stone);
 
+    /* 인쇄물 달 표기 색(@workspace/seasonal/print/month-label). tone은 오우라 색 사이를 이은 차분한 열두 색, vivid는 채도 높은 열두 색이다.
+       vivid는 인쇄물에만 쓰는 예외 색이라 화면에는 쓰지 않는다. 겨울 코발트·바이올렛 → 봄 핑크·코랄·라임 → 여름 에메랄드·청록·하늘 → 가을 머스터드·주황·빨강 → 12월 인디고 */
+    --color-month-tone-1: var(--color-stone);
+    --color-month-tone-2: var(--color-clay);
+    --color-month-tone-3: var(--color-sage);
+    --color-month-tone-4: #8f9e5a;
+    --color-month-tone-5: var(--color-olive);
+    --color-month-tone-6: #3d6b4a;
+    --color-month-tone-7: var(--color-forest);
+    --color-month-tone-8: #7a8a3c;
+    --color-month-tone-9: var(--color-gold);
+    --color-month-tone-10: #b0662a;
+    --color-month-tone-11: var(--color-clay);
+    --color-month-tone-12: #5b6470;
+    --color-month-vivid-1: #2d5bd8;
+    --color-month-vivid-2: #6a4fd8;
+    --color-month-vivid-3: #e04a8b;
+    --color-month-vivid-4: #ef5a6f;
+    --color-month-vivid-5: #4f9e12;
+    --color-month-vivid-6: #0f9d62;
+    --color-month-vivid-7: #0a93a8;
+    --color-month-vivid-8: #1f78d6;
+    --color-month-vivid-9: #d98a00;
+    --color-month-vivid-10: #ef5a1a;
+    --color-month-vivid-11: #d6332a;
+    --color-month-vivid-12: #3b4fc4;
+
     /* 달력의 토·일·공휴일 숫자(빨간 날). 베이지 바탕에서 튀지 않게 채도를 조금 낮춘 빨강 */
     --color-holiday: #c43c2a;
     --color-holiday-wash: color-mix(in oklab, var(--color-holiday) 9%, var(--color-canvas));

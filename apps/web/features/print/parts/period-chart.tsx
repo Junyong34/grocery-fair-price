@@ -1,4 +1,5 @@
-import { formatMonthLabel, MONTHS, type MonthLabelStyle } from "@workspace/seasonal/data/months"
+import { MONTHS } from "@workspace/seasonal/data/months"
+import { printMonthLabel, type PrintMonthLabel } from "@workspace/seasonal/print/month-label"
 import { startSeason } from "@workspace/seasonal/print/foods"
 import { chartColumns, type ChartLine } from "@workspace/seasonal/print/period-chart"
 
@@ -11,8 +12,12 @@ const ROW_MAX = 9
 /** 줄 높이 대비 크기: 품종 그림, 이름 글자(상한 3.2 = A4 약 9pt), 막대 높이 */
 const RATIO = { picture: 0.82, name: 0.55, bar: 0.46 } as const
 const NAME_MAX = 3.2
-/** 달 열 폭 대비 달 머리 글자 크기. 가장 긴 표기가 열 안에 들게 표기마다 다르다. */
-const MONTH_FIT: Record<MonthLabelStyle, number> = { number: 0.6, korean: 0.42, english: 0.4 }
+/** 달 열 폭 대비 달 머리 글자 크기. 가장 긴 표기(두 글자 0.6, "12월"·"Sep" 0.4)가 열 안에 들게 글자 수로 나눈다. 대문자는 더 넓다. */
+function monthFit(monthLabel: PrintMonthLabel): number {
+  const labels = MONTHS.map((month) => printMonthLabel(month, monthLabel, { length: "short" }))
+  const longest = Math.max(...labels.map((label) => label.main.length))
+  return Math.min(0.6, (labels[0]!.kind === "caps" ? 1.1 : 1.2) / longest)
+}
 /** 막대를 달 경계에서 들이는 폭(용지 단위) */
 const BAR_INSET = 0.6
 
@@ -44,13 +49,13 @@ function PeriodChart({
   /** 한 줄 높이(용지 단위). 달 머리 줄도 같은 높이다. */
   rowHeight: number
   labelWidth: number
-  monthLabel: MonthLabelStyle
+  monthLabel: PrintMonthLabel
   pictures: boolean
 }) {
   const nameSize = chartNameSize(rowHeight)
   const monthWidth = (width - labelWidth) / MONTHS.length
   // 달 머리 글자: 열 폭에 가장 긴 표기("12월"·"Sep"·"12")가 들어가는 크기, 이름 글자보다 조금 작게.
-  const monthSize = Math.min(nameSize * 0.85, monthWidth * MONTH_FIT[monthLabel])
+  const monthSize = Math.min(nameSize * 0.85, monthWidth * monthFit(monthLabel))
   const bar = rowHeight * RATIO.bar
   return (
     <div className="print-chart" style={{ width: u(width), gridTemplateColumns: `${u(labelWidth)} 1fr`, gridAutoRows: u(rowHeight) }}>
@@ -64,7 +69,7 @@ function PeriodChart({
       <div className="print-chart-months">
         {MONTHS.map((month) => (
           <span key={month} className="print-number" style={{ fontSize: t(monthSize) }}>
-            {formatMonthLabel(month, monthLabel, "short")}
+            {printMonthLabel(month, monthLabel, { length: "short" }).main}
           </span>
         ))}
       </div>
@@ -119,7 +124,7 @@ export function PeriodChartColumns({
   height: number
   /** 단 사이 간격(용지 단위) */
   gap: number
-  monthLabel: MonthLabelStyle
+  monthLabel: PrintMonthLabel
 }) {
   const split = chartColumns(lines, columns)
   const columnWidth = (width - gap * (columns - 1)) / columns

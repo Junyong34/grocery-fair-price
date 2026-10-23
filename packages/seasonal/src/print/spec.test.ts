@@ -69,6 +69,18 @@ describe("parsePrintSpec", () => {
     expect(parsePrintSpec(legacy)).toEqual({ ...DEFAULT_SPECS.monthly, margin: "safe" })
   })
 
+  it("달 표기 색·크기·장식이 없는 예전 사양은 계절색·보통·장식 없음으로 읽는다", () => {
+    for (const kind of ["monthly", "year-sheet", "month-poster"] as const) {
+      const { monthStyle: _monthStyle, ...legacy } = DEFAULT_SPECS[kind]
+      expect(parsePrintSpec(legacy)).toEqual({ ...DEFAULT_SPECS[kind], monthStyle: { palette: "season", size: "medium", frame: "none" } })
+    }
+  })
+
+  it("예전 달 표기 english는 english-full(좁은 자리 Jan, 제목 January)로 읽는다", () => {
+    expect(parsePrintSpec({ ...DEFAULT_SPECS.monthly, monthLabel: "english" })).toEqual({ ...DEFAULT_SPECS.monthly, monthLabel: "english-full" })
+    expect(parsePrintSpec({ ...DEFAULT_SPECS["year-sheet"], monthLabel: "english" })).toEqual({ ...DEFAULT_SPECS["year-sheet"], monthLabel: "english-full" })
+  })
+
   it("예전 월간 사양의 foodLayout은 layout으로, cover 참·거짓은 year·none으로 읽는다", () => {
     const parsed = parsePrintSpec(LEGACY.monthly)
     expect(parsed).toMatchObject({ layout: "grid", cover: "year" })

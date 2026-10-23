@@ -65,8 +65,25 @@
 .print-calendar[data-variant="tiles"] td.has-day { background: color-mix(in oklab, var(--color-surface) 70%, transparent); border-radius: calc(var(--u) * 1.2); }
 .print-calendar[data-variant="tiles"] td.has-day.is-red-cell { background: var(--color-holiday-wash); }
 
-/* 월간 M-E 세로의 모서리 달력 블록. 그림 판 오른쪽 아래에 얹는다. */
-.print-calendar-block { position: absolute; right: 0; bottom: 0; box-sizing: border-box; background: var(--color-surface); border: var(--line) solid var(--color-hairline); border-radius: calc(var(--u) * 2); }
+/* 월간 M-E 세로의 모서리 달력 블록. 그림 판 오른쪽 아래에 얹는다. 바탕은 비워 시트 바탕(크림·계절색)이 그대로 보이게 하고, 테두리로만 칸을 나눈다. */
+.print-calendar-block { position: absolute; right: 0; bottom: 0; box-sizing: border-box; background: transparent; border: var(--line) solid var(--color-hairline); border-radius: calc(var(--u) * 2); }
+
+/* 달 표기(parts/month-label.tsx). 길이는 모두 em이라 큰 글자 크기를 따라 커진다. 줄 높이는 FRAME_HEIGHT·SUB_HEIGHT와 맞춘다. */
+.print-month-label { --month-line: max(var(--line), 0.06em); display: inline-flex; flex-direction: column; align-items: flex-start; gap: 0.12em; line-height: 1; color: var(--month-color); white-space: nowrap; }
+.print-month-label[data-align="center"] { align-items: center; }
+.print-month-label[data-align="end"] { align-items: flex-end; }
+.print-month-label .main[data-kind="number"] { font-family: var(--print-number); font-weight: 500; font-variant-numeric: tabular-nums; }
+.print-month-label .main[data-kind="text"] { font-family: var(--print-heading); font-weight: 700; }
+.print-month-label .main[data-kind="caps"] { font-family: var(--font-sans); font-weight: 700; letter-spacing: 0.06em; }
+.print-month-label .sub { font-size: 0.22em; font-family: var(--font-sans); font-weight: 700; letter-spacing: 0.22em; }
+.print-month-label .sub[data-kind="text"] { font-family: var(--print-heading); font-size: 0.26em; letter-spacing: 0.02em; }
+.print-month-label[data-sub="inline"] { flex-direction: row; align-items: baseline; gap: 0.3em; }
+.print-month-label[data-sub="inline"] .sub { font-size: 0.42em; }
+.print-month-label[data-sub="inline"] .sub[data-kind="text"] { font-size: 0.5em; }
+.print-month-label[data-frame="rule"] .main { padding-bottom: 0.08em; border-bottom: max(var(--line), 0.07em) solid currentColor; }
+.print-month-label[data-frame="pill"] .main { font-size: 0.6em; padding: 0.14em 0.42em 0.18em; border: var(--month-line) solid currentColor; border-radius: 999px; }
+.print-month-label[data-frame="ribbon"] .main { font-size: 0.55em; min-width: 1.2em; padding: 0.42em 0.32em 0.76em; text-align: center; color: var(--color-surface); background: var(--month-color); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%); }
+.print-month-label[data-frame="outline"] .main { color: transparent; -webkit-text-stroke: max(var(--line), 0.035em) var(--month-color); }
 
 /* 날짜 한 열(월간 M-E 가로). 줄마다 아래 선이 적을 자리다. */
 .print-day-column { margin: 0; padding: 0; list-style: none; flex: none; font-size: 0; line-height: 1; }

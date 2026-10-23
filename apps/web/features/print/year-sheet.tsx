@@ -1,10 +1,12 @@
-import { formatMonthLabel, MONTHS, type Month, type MonthLabelStyle } from "@workspace/seasonal/data/months"
+import { MONTHS, type Month } from "@workspace/seasonal/data/months"
 import { monthFoods, yearFoods } from "@workspace/seasonal/print/foods"
+import type { PrintMonthLabel } from "@workspace/seasonal/print/month-label"
 import { chartLines } from "@workspace/seasonal/print/period-chart"
 import { CALENDAR_TEXT_SCALE, type Paper, type YearSheetSpec } from "@workspace/seasonal/print/spec"
 
 import { FoodArea } from "./parts/food-area"
 import { gridSize } from "./parts/grid"
+import { MonthLabel, monthColor } from "./parts/month-label"
 import { PeriodChartColumns } from "./parts/period-chart"
 import { PrintCalendar } from "./parts/print-calendar"
 import { Sheet } from "./parts/sheet"
@@ -138,7 +140,7 @@ function MonthCell({ spec, month, width, height, flip }: { spec: YearSheetSpec; 
       {bigNumber && (
         <span
           className="print-number"
-          style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", fontSize: t(food.height * 0.62), lineHeight: 1, color: `color-mix(in oklab, var(--color-season-${season}) 32%, transparent)` }}
+          style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", fontSize: t(food.height * 0.62), lineHeight: 1, color: `color-mix(in oklab, ${monthColor(spec.monthStyle.palette, month)} 32%, transparent)` }}
         >
           {month}
         </span>
@@ -173,7 +175,7 @@ function MonthCell({ spec, month, width, height, flip }: { spec: YearSheetSpec; 
 }
 
 /** 달 이름(없으면 생략)과 작은 달력. 날짜 크기는 칸에 맞춘다. */
-function CalendarBlock({ spec, month, width, height, label }: { spec: YearSheetSpec; month: Month; width: number; height: number; label: MonthLabelStyle | undefined }) {
+function CalendarBlock({ spec, month, width, height, label }: { spec: YearSheetSpec; month: Month; width: number; height: number; label: PrintMonthLabel | undefined }) {
   const labelHeight = label ? LABEL : 0
   // 칸에 맞춘 크기에 달력 글자 배율을 곱한다. 키워도 두 자리 날짜가 옆 날짜와 붙지 않게, 인쇄 크기(t()가 type.scale을 곱한 값)가 칸 폭의 절반을 넘지 않는다.
   const fit = Math.min((width / 7) * 0.42, ((height - labelHeight) / 7.3) * 0.62)
@@ -181,9 +183,9 @@ function CalendarBlock({ spec, month, width, height, label }: { spec: YearSheetS
   return (
     <div style={{ width: u(width), height: u(height), padding: `0 ${u(1)}`, boxSizing: "border-box", display: "flex", flexDirection: "column", justifyContent: "center" }}>
       {label && (
-        <span className="print-heading" style={{ height: u(labelHeight), fontSize: t(3.6), fontWeight: 700, color: `var(--color-season-${monthSeason(month)})` }}>
-          {formatMonthLabel(month, label, "long")}
-        </span>
+        <div style={{ height: u(labelHeight), display: "flex", alignItems: "flex-start" }}>
+          <MonthLabel month={month} text={label} style={spec.monthStyle} fontSize={3.6} maxHeight={labelHeight} maxWidth={width - 2} />
+        </div>
       )}
       <PrintCalendar
         year={spec.year}

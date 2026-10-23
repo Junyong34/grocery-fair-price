@@ -1,5 +1,5 @@
 import { foodsInMonth } from "@workspace/seasonal/data/foods"
-import { formatMonthLabel, MONTHS, type Month } from "@workspace/seasonal/data/months"
+import { MONTHS, type Month } from "@workspace/seasonal/data/months"
 import type { Food } from "@workspace/seasonal/data/foods"
 import { monthChecklist, monthFoods, stripFoods, yearFoods, yearFoodsByMonth } from "@workspace/seasonal/print/foods"
 import { chartFoods, chartLines } from "@workspace/seasonal/print/period-chart"
@@ -9,6 +9,7 @@ import { CheckList } from "./parts/check-list"
 import { DayColumn } from "./parts/day-column"
 import { FoodArea, flowSize } from "./parts/food-area"
 import { FoodFigure } from "./parts/food-figure"
+import { MonthLabel } from "./parts/month-label"
 import { PeriodChartColumns } from "./parts/period-chart"
 import { PrintCalendar } from "./parts/print-calendar"
 import { Sheet } from "./parts/sheet"
@@ -19,7 +20,9 @@ import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
 // strip(M-D)은 일정을 적는 큰 칸 격자 달력에 그림 띠(세로는 위, 가로는 왼쪽)를 붙이고, 1일 앞·말일 뒤 빈 칸에도 그림을 넣는다.
 // allover(M-E)는 그림을 판 전체에 흩뿌리고, 달력은 세로에서 오른쪽 아래 모서리 블록, 가로에서 오른쪽 날짜 한 열로 줄인다. 치수는 A4 기준 용지 단위(innerSize).
 
-const HEADER = 26
+/** 머리(달 표기·연도) 높이. 달 표기 크기마다 다르고, 달 표기는 이 안에 들도록 줄어든다. 보통(26)이 예전 고정값이다. */
+const HEADER = { small: 20, medium: 26, large: 34 } as const
+const headerHeight = (spec: MonthlySpec) => HEADER[spec.monthStyle.size]
 const MEMO = 34
 /** M-B 체크 목록의 폭·제목 높이와 달력과의 간격 */
 const SIDE = { width: 52, title: 8, gap: 6 } as const
@@ -56,6 +59,7 @@ export function MonthlySheets({ spec, paper }: { spec: MonthlySpec; paper: Paper
 
 function MonthSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; month: Month }) {
   const inner = innerSize(spec)
+  const header = headerHeight(spec)
   const portrait = spec.orientation === "portrait"
   const foods = spec.layout === "none" ? [] : monthFoods(month, { max: spec.foods.max, categories: [] })
   const showFoods = spec.layout !== "none"
@@ -63,11 +67,11 @@ function MonthSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; m
 
   const food = portrait
     ? { width: inner.width, height: showFoods ? 112 : 0 }
-    : { width: showFoods ? 128 : 0, height: inner.height - HEADER }
+    : { width: showFoods ? 128 : 0, height: inner.height - header }
   const gap = showFoods ? 8 : 0
   const side = portrait
-    ? { width: inner.width, height: inner.height - HEADER - food.height - gap }
-    : { width: inner.width - food.width - gap, height: inner.height - HEADER }
+    ? { width: inner.width, height: inner.height - header - food.height - gap }
+    : { width: inner.width - food.width - gap, height: inner.height - header }
   const memo = sideCheck || spec.memo === "none" ? 0 : MEMO
   const calendarWidth = sideCheck ? side.width - SIDE.width - SIDE.gap : side.width
   const dayFont = (portrait ? 5.6 : 5) * CALENDAR_TEXT_SCALE[spec.calendar.size]
@@ -110,13 +114,14 @@ function MonthSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; m
 
 function StripSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; month: Month }) {
   const inner = innerSize(spec)
+  const header = headerHeight(spec)
   const portrait = spec.orientation === "portrait"
   const { strip, blanks } = stripFoods({ year: spec.year, month, weekStart: spec.calendar.weekStart, stripSize: STRIP.size })
   const showName = spec.foods.names === "korean"
-  const band = portrait ? { width: inner.width, height: STRIP.height } : { width: STRIP.width, height: inner.height - HEADER }
+  const band = portrait ? { width: inner.width, height: STRIP.height } : { width: STRIP.width, height: inner.height - header }
   const calendar = portrait
-    ? { width: inner.width, height: inner.height - HEADER - STRIP.height - STRIP.gap }
-    : { width: inner.width - STRIP.width - STRIP.gap, height: inner.height - HEADER }
+    ? { width: inner.width, height: inner.height - header - STRIP.height - STRIP.gap }
+    : { width: inner.width - STRIP.width - STRIP.gap, height: inner.height - header }
   // 날짜는 칸 왼쪽 위에 작게 두고 나머지를 쓰는 자리로 남긴다.
   const dayFont = 4.6 * CALENDAR_TEXT_SCALE[spec.calendar.size]
   return (
@@ -144,18 +149,19 @@ function StripSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; m
 
 function AlloverSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; month: Month }) {
   const inner = innerSize(spec)
+  const header = headerHeight(spec)
   const foods = monthFoods(month, { max: spec.foods.max, categories: [] })
   const showName = spec.foods.names === "korean"
   const scale = CALENDAR_TEXT_SCALE[spec.calendar.size]
   const background = surfaceColor(spec.surface, monthSeason(month))
 
   if (spec.orientation === "landscape") {
-    const art = { width: inner.width - ALLOVER.column - ALLOVER.gap, height: inner.height - HEADER }
+    const art = { width: inner.width - ALLOVER.column - ALLOVER.gap, height: inner.height - header }
     return (
       <Sheet spec={spec} paper={paper} background={background}>
         <div style={{ display: "flex", gap: u(ALLOVER.gap) }}>
           <div style={{ width: u(art.width) }}>
-            <MonthHeader spec={spec} month={month} />
+            <MonthHeader spec={spec} month={month} width={art.width} />
             <FoodArea foods={foods} width={art.width} height={art.height} layout="scatter" month={month} showName={showName} />
           </div>
           {/* 31일이면 줄 높이가 A4 6mm. 날짜 A4 약 10.8pt, 요일 7.5pt, 공휴일 이름 6.5pt(보통 크기). 크게(1.2배)·글자 크게(1.1배)여도 줄 안에 든다 */}
@@ -173,7 +179,7 @@ function AlloverSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper;
     )
   }
 
-  const art = { width: inner.width, height: inner.height - HEADER }
+  const art = { width: inner.width, height: inner.height - header }
   const { block, gap } = ALLOVER
   // 블록 왼쪽·위로 간격만큼 더 비워 그림이 블록에 붙지 않게 한다.
   const avoid = { x: art.width - block.width - gap, y: art.height - block.height - gap, width: block.width + gap, height: block.height + gap }
@@ -222,15 +228,14 @@ function BlankFood({ food, width, height, showName }: { food: Food; width: numbe
   )
 }
 
-function MonthHeader({ spec, month }: { spec: MonthlySpec; month: Month }) {
-  const big = spec.monthLabel === "number"
+/** width는 머리가 놓인 폭(용지 단위). M-E 가로는 날짜 열을 뺀 그림 판 폭이다. */
+function MonthHeader({ spec, month, width = innerSize(spec).width }: { spec: MonthlySpec; month: Month; width?: number }) {
+  const height = headerHeight(spec)
   return (
-    <header style={{ height: u(HEADER), display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-      <h2
-        className={big ? "print-number" : "print-heading"}
-        style={{ margin: 0, fontSize: t(big ? 20 : 12), lineHeight: 1, fontWeight: big ? 500 : 700, color: `var(--color-season-${monthSeason(month)})` }}
-      >
-        {formatMonthLabel(month, spec.monthLabel, "long")}
+    <header style={{ height: u(height), display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+      <h2 style={{ margin: 0, lineHeight: 1 }}>
+        {/* 오른쪽 연도 자리(약 30)를 비운다. */}
+        <MonthLabel month={month} text={spec.monthLabel} style={spec.monthStyle} fontSize={20} textFontSize={12} maxHeight={height - 2} maxWidth={width - 30} />
       </h2>
       <span className="print-number" style={{ fontSize: t(4), color: "var(--color-caption)", letterSpacing: "0.08em" }}>
         {spec.year}
@@ -305,11 +310,8 @@ function MonthsCover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
             style={{ height: u(cell.height), padding: u(padding), boxSizing: "border-box", borderRadius: u(2), background: surfaceColor("season", monthSeason(month)) }}
           >
             <FoodArea foods={picks[i]!} width={art.width} height={art.height} layout="flow" month={month} showName={false} maxSize={size} />
-            <p
-              className={spec.monthLabel === "korean" ? "print-heading" : "print-number"}
-              style={{ height: u(label), margin: 0, display: "flex", alignItems: "flex-end", justifyContent: "center", fontSize: t(5), lineHeight: 1, color: `var(--color-season-${monthSeason(month)})` }}
-            >
-              {formatMonthLabel(month, spec.monthLabel, "long")}
+            <p style={{ height: u(label), margin: 0, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+              <MonthLabel month={month} text={spec.monthLabel} style={spec.monthStyle} fontSize={5} maxHeight={label} maxWidth={art.width} align="center" />
             </p>
           </section>
         ))}

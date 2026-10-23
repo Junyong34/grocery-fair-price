@@ -1,5 +1,6 @@
-import { formatMonthLabel, MONTHS } from "@workspace/seasonal/data/months"
+import { MONTHS } from "@workspace/seasonal/data/months"
 import { monthChecklist, monthFoods } from "@workspace/seasonal/print/foods"
+import { printMonthLabel } from "@workspace/seasonal/print/month-label"
 import { chartFoods, chartLines } from "@workspace/seasonal/print/period-chart"
 import { wheelLayout } from "@workspace/seasonal/print/wheel"
 import type { MonthPosterSpec, Paper } from "@workspace/seasonal/print/spec"
@@ -7,6 +8,7 @@ import type { MonthPosterSpec, Paper } from "@workspace/seasonal/print/spec"
 import { CheckList } from "./parts/check-list"
 import { FoodArea, flowSize } from "./parts/food-area"
 import { gridSize } from "./parts/grid"
+import { MonthLabel, monthColor } from "./parts/month-label"
 import { PeriodChartColumns } from "./parts/period-chart"
 import { Wheel } from "./parts/wheel"
 import { Sheet } from "./parts/sheet"
@@ -48,8 +50,8 @@ function MonthCells({ spec }: { spec: MonthPosterSpec }) {
             key={month}
             style={{ height: u(cell.height), borderRadius: u(2), padding: `0 ${u(2)}`, boxSizing: "border-box", background: spec.surface === "season" ? surfaceColor("season", monthSeason(month)) : undefined }}
           >
-            <h2 className="print-heading" style={{ height: u(CELL_LABEL), margin: 0, display: "flex", alignItems: "center", fontSize: t(4.2), fontWeight: 700, color: `var(--color-season-${monthSeason(month)})` }}>
-              {formatMonthLabel(month, spec.monthLabel, "long")}
+            <h2 style={{ height: u(CELL_LABEL), margin: 0, display: "flex", alignItems: "center" }}>
+              <MonthLabel month={month} text={spec.monthLabel} style={spec.monthStyle} fontSize={4.2} maxHeight={CELL_LABEL - 1} maxWidth={area.width} />
             </h2>
             <FoodArea
               foods={foods[i]!}
@@ -101,8 +103,8 @@ function MonthWheel({ spec }: { spec: MonthPosterSpec }) {
   const layout = wheelLayout({ diameter, sectors: MONTHS.length, counts: foods.map((list) => list.length) })
   const items = MONTHS.map((month, i) => ({
     foods: foods[i]!,
-    label: formatMonthLabel(month, spec.monthLabel, "short"),
-    color: `var(--color-season-${monthSeason(month)})`,
+    label: printMonthLabel(month, spec.monthLabel, { length: "short" }).main,
+    color: monthColor(spec.monthStyle.palette, month),
     fill: spec.surface === "season" ? surfaceColor("season", monthSeason(month)) : undefined,
   }))
   return (
@@ -137,7 +139,6 @@ function MonthRows({ spec }: { spec: MonthPosterSpec }) {
   const size = Math.min(...pictures.filter((list) => list.length).map((list) => flowSize(list.length, ROW.pictures, body, 0)))
   const lines = Math.ceil(Math.max(1, ...lists.map((list) => list.length)) / CHECK_COLUMNS)
   const fontSize = Math.min(2.8, body / (lines * CHECK_LINE * 1.1))
-  const big = spec.monthLabel === "number"
   return (
     <div>
       {MONTHS.map((month, i) => (
@@ -154,11 +155,8 @@ function MonthRows({ spec }: { spec: MonthPosterSpec }) {
             background: spec.surface === "season" ? surfaceColor("season", monthSeason(month)) : undefined,
           }}
         >
-          <h2
-            className={big ? "print-number" : "print-heading"}
-            style={{ width: u(ROW.label), flex: "none", margin: 0, textAlign: "right", fontSize: t(big ? Math.min(body * 0.6, 11) : 4.2), lineHeight: 1, fontWeight: big ? 500 : 700, color: `var(--color-season-${monthSeason(month)})` }}
-          >
-            {formatMonthLabel(month, spec.monthLabel, "short")}
+          <h2 style={{ width: u(ROW.label), flex: "none", margin: 0, display: "flex", justifyContent: "flex-end" }}>
+            <MonthLabel month={month} text={spec.monthLabel} style={spec.monthStyle} fontSize={Math.min(body * 0.6, 11)} textFontSize={4.2} maxHeight={body} maxWidth={ROW.label} length="short" align="end" />
           </h2>
           <FoodArea foods={pictures[i]!} width={ROW.pictures} height={body} layout="flow" month={month} showName={false} maxSize={size} style={{ justifyContent: "flex-start" }} />
           <CheckList foods={lists[i]!} columns={CHECK_COLUMNS} fontSize={fontSize} lineHeight={CHECK_LINE} style={{ flex: 1, alignSelf: "stretch", columnFill: "auto", height: u(body) }} />

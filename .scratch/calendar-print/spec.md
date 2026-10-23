@@ -77,7 +77,8 @@ type MonthlySpec = Base & {
   kind: "monthly"
   year: number
   cover: boolean                          // 첫 장에 연도 표지
-  monthLabel: MonthLabelStyle             // number("10") · korean("10월") · english("October")
+  monthLabel: PrintMonthLabel             // 아래 "달 표기"
+  monthStyle: MonthStyle
   calendar: CalendarBlock<"hidden" | "mark" | "mark-and-name"> & {
     festivals: boolean                    // 공휴일이 아닌 명절(정월대보름·단오·삼복·동지)
     lunar: boolean
@@ -89,7 +90,8 @@ type MonthlySpec = Base & {
 type YearSheetSpec = Base & {
   kind: "year-sheet"
   year: number
-  monthLabel: MonthLabelStyle | "big-number"   // big-number: 시안 5처럼 그림 위에 크게 쓴 숫자
+  monthLabel: PrintMonthLabel | "big-number"   // big-number: 시안 5처럼 그림 위에 크게 쓴 숫자(monthStyle은 색만 따른다)
+  monthStyle: MonthStyle
   // 칸이 작아 공휴일 이름·음력·명절은 들어가지 않는다. 타입에서 아예 고를 수 없다.
   calendar: CalendarBlock<"hidden" | "mark">
   grid: "4x3" | "3x4" | "2x6"             // 열×행. 방향과 맞지 않는 값은 파서가 거른다
@@ -105,10 +107,29 @@ type SeasonPosterSpec = Base & {
 type MonthPosterSpec = Base & {
   kind: "month-poster"
   title: string
-  monthLabel: MonthLabelStyle
+  monthLabel: PrintMonthLabel
+  monthStyle: MonthStyle
   grid: "4x3" | "3x4" | "2x6"
   categories: readonly FoodCategory[]
 }
+
+// ── 달 표기(packages/seasonal/src/print/month-label.ts, 2026-10-23) ──
+// 표기(글자) × 색 × 크기 × 장식. 화면(2a)은 data/months.ts의 세 가지(number·korean·english)만 쓴다.
+type PrintMonthLabel =
+  | "number" | "two-digit"                          // 1 / 01
+  | "korean"                                        // 1월
+  | "english-short" | "english-short-caps"          // Jan / JAN
+  | "english-full" | "english-full-caps"            // January / JANUARY. 좁은 자리(막대표 머리·원형 판)는 세 글자
+  | "number-english" | "korean-english"            // 1 + JANUARY / 1월 + JAN. 좁은 자리는 큰 글자만
+  // 예전 값 english는 english-full로 읽는다
+type MonthStyle = {
+  palette: "season" | "flow" | "twelve" | "vivid"   // 계절색 / 계절색 사이를 섞은 열두 달 흐름 / 차분한 열두 색 / 채도 높은 열두 색. 바탕까지 칠하는 건 surface: "season"
+  size: "small" | "medium" | "large"                // 0.7·1·1.4배. 월간 머리 높이가 20·26·34mm로 따라 바뀐다
+  frame: "none" | "rule" | "pill" | "ribbon" | "outline"   // 글자만 / 밑줄 / 알약 태그 / 책갈피 리본 / 외곽선 숫자 + 아래 영문
+}   // 없던 예전 사양은 season·medium·none(지금까지의 모양)
+// 표기는 놓일 자리 높이·폭을 넘지 않게 줄어든다. 곁들이는 영문이 A4 약 5pt보다 작아지는 자리(포스터 칸·연간 달력 머리)에서는 아래 줄 대신 옆에 붙인다.
+// ribbon은 네 글자 넘는 이름을 숫자로 바꾸고 이름을 아래로, outline은 숫자만 크게 쓰고("11월"의 "월"을 뗀다) 이름을 아래로 내린다.
+// 막대표 머리·원형 판 표기는 글자(표기)만 따르고, 원형 판은 색도 따른다. 장식·크기는 쓰지 않는다.
 
 type Paper = "A4" | "A3"
 
