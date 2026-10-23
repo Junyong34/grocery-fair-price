@@ -38,11 +38,21 @@ export function formatMonthLabel(month: number, style: MonthLabelStyle, length: 
 }
 
 /**
- * 제철 달을 화면 문자열로 만든다. 예: [9, 10] → "제철 9·10월"
- * 달을 원으로 보고 빈 달이 가장 긴 곳 다음부터 적으므로, 해를 넘는 제철은 [1, 2, 11, 12] → "제철 11·12·1·2월"이 된다.
+ * 제철 달을 화면 문자열로 만든다. 예: [9, 10] → "제철 9·10월", [7, 8, 9, 10, 11] → "제철 7~11월"
+ * 달을 원으로 보고 빈 달이 가장 긴 곳 다음부터 적으므로, 해를 넘는 제철은 [1, 2, 11, 12] → "제철 11~2월"이 된다.
+ * 세 달 이상 이어지는 구간은 처음~끝으로 줄이고, 구간 사이는 가운뎃점으로 잇는다(재첩 "제철 4~6·9~11월").
  */
 export function formatSeasonMonths(months: readonly number[]): string {
-  return `제철 ${orderSeasonMonths(months).join("·")}월`
+  const ordered = orderSeasonMonths(months)
+  if (ordered.length >= 12) return "제철 연중"
+  const runs: number[][] = []
+  for (const month of ordered) {
+    const run = runs.at(-1)
+    if (run && month === (run.at(-1)! % 12) + 1) run.push(month)
+    else runs.push([month])
+  }
+  const text = runs.map((run) => (run.length >= 3 ? `${run[0]}~${run.at(-1)}` : run.join("·"))).join("·")
+  return `제철 ${text}월`
 }
 
 /** 제철 달을 제철이 시작하는 달부터 차례로 늘어놓는다. 예: [1, 2, 11, 12] → [11, 12, 1, 2] */

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import { findFood, foodsInMonth, isDrawn } from "../data/foods"
 import { SEASONS } from "../data/seasons"
 import { MONTHS } from "../data/months"
-import { monthChecklist, monthFoods, seasonFoods, startSeason, stripFoods, yearFoods, yearFoodsByMonth } from "./foods"
+import { CHECKLIST_MAX, monthChecklist, monthFoods, seasonFoods, startSeason, stripFoods, yearFoods, yearFoodsByMonth } from "./foods"
 
 describe("startSeason", () => {
   it("해를 넘는 제철은 시작하는 달의 계절이다", () => {
@@ -62,17 +62,38 @@ describe("seasonFoods", () => {
     expect(new Set(ids).size).toBe(ids.length)
   })
 
-  it("11월에 시작해 2월까지 나는 굴은 가을에 들어간다", () => {
-    const oyster = findFood("oyster")!
-    const season = startSeason(oyster.months)
-    expect(seasonFoods(season, { max: 99, categories: [] }).some((food) => food.id === "oyster")).toBe(isDrawn("oyster"))
+  it("시장 범위(8~10월)는 여름에 시작해도 대표 달(9·10월)이 가을인 배는 가을에 들어간다", () => {
+    const pear = findFood("pear")!
+    expect(startSeason(pear.months)).toBe("summer")
+    expect(startSeason(pear.peak)).toBe("autumn")
+    expect(seasonFoods("autumn", { max: 99, categories: [] })).toContain(pear)
+    expect(seasonFoods("summer", { max: 99, categories: [] })).not.toContain(pear)
+  })
+
+  it("품종이 max보다 많으면 그 계절에 대표 달이 많은 품종을 남기고, 시작 달 순으로 놓는다", () => {
+    const all = seasonFoods("autumn", { max: 99, categories: [] })
+    const few = seasonFoods("autumn", { max: 8, categories: [] })
+    expect(few).toHaveLength(8)
+    const peaksIn = (food: (typeof all)[number]) => food.peak.filter((month) => [9, 10, 11].includes(month)).length
+    const cut = Math.min(...few.map(peaksIn))
+    expect(all.filter((food) => !few.includes(food)).every((food) => peaksIn(food) <= cut)).toBe(true)
+    const starts = few.map((food) => Math.min(...food.peak.filter((month) => [9, 10, 11].includes(month))))
+    expect(starts).toEqual([...starts].sort((a, b) => a - b))
   })
 })
 
 describe("monthChecklist", () => {
-  it("그 달 품종을 그림이 없어도 모두 담는다(이름만 적는 체크 목록)", () => {
-    for (const month of MONTHS) expect(monthChecklist(month, []).map((food) => food.id).sort()).toEqual(foodsInMonth(month).map((food) => food.id).sort())
-    expect(MONTHS.some((month) => monthChecklist(month, []).some((food) => !isDrawn(food.id)))).toBe(true)
+  it("그 달 품종을 그림과 상관없이 CHECKLIST_MAX개까지 담는다(이름만 적는 체크 목록)", () => {
+    for (const month of MONTHS) {
+      const list = monthChecklist(month, [])
+      expect(list).toHaveLength(Math.min(CHECKLIST_MAX, foodsInMonth(month).length))
+      expect(list.every((food) => foodsInMonth(month).includes(food))).toBe(true)
+    }
+  })
+
+  it("대표 달(peak)이 그 달인 품종을 먼저 적는다", () => {
+    const peaks = monthChecklist(10, []).map((food) => (food.peak as readonly number[]).includes(10))
+    expect(peaks).toEqual([...peaks].sort((a, b) => Number(b) - Number(a)))
   })
 
   it("그림 칸과 같은 차례로 놓는다(그림 있는 품종만 보면 그림 칸 순서와 같다)", () => {
@@ -96,14 +117,14 @@ describe("stripFoods", () => {
     expect(dropped).toBe(monthFoods(11, { max: Infinity, categories: [] }).length - 8)
   })
 
-  it("2027년 모든 달·주 시작에서 띠 14개와 빈 칸이면 그림 있는 품종이 모두 들어간다", () => {
+  it("2027년 모든 달·주 시작에서 띠 14개는 늘 찬다(한 달 제철이 가장 적은 2월도 23개)", () => {
     for (const weekStart of [0, 1] as const)
-      for (const month of MONTHS) expect(stripFoods({ year: 2027, month, weekStart, stripSize: 14 }).dropped, `${month}월 주 시작 ${weekStart}`).toBe(0)
+      for (const month of MONTHS) expect(stripFoods({ year: 2027, month, weekStart, stripSize: 14 }).strip, `${month}월 주 시작 ${weekStart}`).toHaveLength(14)
   })
 
   it("품종이 띠보다 적으면 빈 칸에는 넣지 않는다", () => {
-    const { strip, blanks } = stripFoods({ year: 2027, month: 5, weekStart: 0, stripSize: 30 })
-    expect(strip).toHaveLength(monthFoods(5, { max: Infinity, categories: [] }).length)
+    const { strip, blanks } = stripFoods({ year: 2027, month: 2, weekStart: 0, stripSize: 40 })
+    expect(strip).toHaveLength(monthFoods(2, { max: Infinity, categories: [] }).length)
     expect(blanks).toEqual([])
   })
 })

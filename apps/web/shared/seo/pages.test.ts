@@ -50,8 +50,9 @@ describe("SEO_PAGES", () => {
     const foods = SEO_PAGES["/seasonal/foods/[food]"]!()
     const crab = foods.find((entry) => entry.path === "/seasonal/foods/snow-crab")!
     expect(crab.images).toEqual(["/foods/snow-crab/color.svg"])
-    const undrawn = FOODS.find((food) => !isDrawn(food.id))!
-    expect(foods.find((entry) => entry.path === `/seasonal/foods/${undrawn.id}`)!.images).toBeUndefined()
+    // 2026-10-23부터 모든 품종에 그림이 있다. 그림 없는 품종이 다시 생기면 그 페이지에는 이미지가 없어야 한다.
+    for (const food of FOODS.filter((food) => !isDrawn(food.id)))
+      expect(foods.find((entry) => entry.path === `/seasonal/foods/${food.id}`)!.images).toBeUndefined()
   })
 
   it("정적 생성되는 상세 페이지를 모두 담는다", () => {

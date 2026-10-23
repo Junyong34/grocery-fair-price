@@ -1,5 +1,6 @@
-import { FOODS, isDrawn, type Food, type FoodCategory } from "../data/foods"
+import type { Food, FoodCategory } from "../data/foods"
 import { orderSeasonMonths } from "../data/months"
+import { yearFoods } from "./foods"
 
 // 제철 막대표: 행 = 품종, 열 = 1~12월, 제철 달에 막대. 월별 포스터 P-B, 연간 한 장 Y-C, 월간 표지 C-3이 같이 쓴다.
 // 여기서는 어떤 줄을 어떤 차례로 몇 단에 놓을지만 정하고, 그리기(크기·색)는 apps/web/features/print/parts/period-chart.tsx가 한다.
@@ -11,7 +12,7 @@ export type SeasonRun = { from: number; to: number }
 export type ChartLine = { type: "group"; category: FoodCategory } | { type: "food"; food: Food; runs: readonly SeasonRun[] }
 
 /** 카테고리 묶음 차례. 품종이 많은 묶음부터 장보기에서 자주 보는 차례로 둔다. */
-const CATEGORY_ORDER: readonly FoodCategory[] = ["채소", "과일", "수산", "곡물·견과"]
+const CATEGORY_ORDER: readonly FoodCategory[] = ["채소", "버섯", "과일", "수산", "곡물·견과"]
 
 /** 제철 달을 1월부터 이어진 막대로 묶는다. 12월에서 1월로 넘는 제철은 1월 쪽 막대와 12월 쪽 막대 둘이 된다. */
 export function seasonRuns(months: readonly number[]): SeasonRun[] {
@@ -25,9 +26,12 @@ export function seasonRuns(months: readonly number[]): SeasonRun[] {
   return runs
 }
 
-/** 막대표에 실을 품종: 그림 있는 품종 가운데 고른 카테고리(비우면 전부). */
+/** 막대표에 싣는 품종의 달마다 상한. 여섯이면 많아야 72줄로, 그림 있는 품종 67개를 다 싣던 때와 글자 크기가 같다. */
+export const CHART_PER_MONTH = 6
+
+/** 막대표에 실을 품종: 고른 카테고리(비우면 전부)에서 달마다 대표 CHART_PER_MONTH개(yearFoods, 앞 달과 겹치지 않음). 품종이 192개라 다 실으면 글자가 6pt 아래로 준다. */
 export function chartFoods(categories: readonly FoodCategory[]): readonly Food[] {
-  return FOODS.filter((food) => isDrawn(food.id) && (categories.length === 0 || categories.includes(food.category)))
+  return yearFoods({ max: CHART_PER_MONTH, categories })
 }
 
 /** 품종을 카테고리 묶음(머리 줄 + 품종 줄)으로 늘어놓는다. 묶음 안은 제철이 시작하는 달 순, 같으면 이름순. */

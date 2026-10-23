@@ -114,7 +114,7 @@ describe("구성마다 숨는 옵션", () => {
     expect(isFieldShown(field("monthly", "memo"), { ...DEFAULT_SPECS.monthly, layout: "side-check" })).toBe(false)
   })
 
-  it("월간 쓰는 달력은 메모·달력 모양(격자 고정)·품종 개수(그림 있는 품종 전부)를 숨긴다", () => {
+  it("월간 쓰는 달력은 메모·달력 모양(격자 고정)·품종 개수(띠·빈 칸 수로 정함)를 숨긴다", () => {
     const spec = { ...DEFAULT_SPECS.monthly, layout: "strip" as const }
     expect(isFieldShown(field("monthly", "memo"), spec)).toBe(false)
     expect(isFieldShown(field("monthly", "calendar.variant"), spec)).toBe(false)
@@ -154,7 +154,7 @@ describe("구성마다 숨는 옵션", () => {
     expect(cover.type === "select" && cover.options.map((option) => option.value)).toEqual(["year", "months", "chart", "none"])
   })
 
-  it("월별 포스터 막대표는 달 배열·품종 이름(늘 적음)·품종 개수(그림 있는 품종 전부)를 숨긴다", () => {
+  it("월별 포스터 막대표는 달 배열·품종 이름(늘 적음)·품종 개수(달마다 대표 여섯)를 숨긴다", () => {
     const spec = { ...DEFAULT_SPECS["month-poster"], layout: "chart" as const }
     expect(isFieldShown(field("month-poster", "grid"), spec)).toBe(false)
     expect(isFieldShown(field("month-poster", "foods.names"), spec)).toBe(false)

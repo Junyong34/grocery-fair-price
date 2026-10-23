@@ -47,7 +47,7 @@ export const FESTIVALS = [
     month: 7,
     period: "초복(하지 뒤 셋째 경일)부터 말복(입추 뒤 첫 경일)까지, 7월 중순~8월 중순",
     traditionalDishes: ["삼계탕", "육개장", "팥죽"],
-    seasonalFoodIds: ["corn", "watermelon", "brown-croaker", "conger-eel"],
+    seasonalFoodIds: ["corn", "watermelon", "croaker", "conger-eel"],
   },
   {
     slug: "chuseok",

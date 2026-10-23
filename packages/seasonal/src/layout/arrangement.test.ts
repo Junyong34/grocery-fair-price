@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest"
 
-import { findFood, foodsInMonth } from "../data/foods"
+import { findFood, monthHighlights } from "../data/foods"
 import { clampCalendar, moveSpot, restingSpots, settleSpots, type Spots } from "./arrangement"
-import { labelHeight, labelWidth, SCATTER_FRAMES, scatterLayout, type ScatterFrame, type ScatterLayout } from "./scatter"
+import { labelHeight, labelWidth, SCATTER_FRAMES, SCATTER_MAX_FOODS, scatterLayout, type ScatterFrame, type ScatterLayout } from "./scatter"
 
 const frame = SCATTER_FRAMES.mobile
 
@@ -94,8 +94,8 @@ describe("moveSpot", () => {
 
   it("실제 품종을 끌어 놓아도 그림과 이름표가 겹치지 않는다", () => {
     for (const frame of [SCATTER_FRAMES.desktopMonth, SCATTER_FRAMES.mobileMonth]) {
-      for (const month of [1, 4, 8, 10]) {
-        const ids = foodsInMonth(month).map((food) => food.id)
+      for (const month of [1, 4, 8, 10, 11]) {
+        const ids = monthHighlights(month, SCATTER_MAX_FOODS).map((food) => food.id)
         const seed = scatterLayout({ month, ids, frame })
         let spots = restingSpots({ month, seed, saved: undefined, frame })
         // 첫 그림을 두 번째 그림 바로 아래(이름표 자리)로 끌어 놓는다.

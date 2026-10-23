@@ -4,8 +4,9 @@ import { holidaysInMonth } from "@workspace/seasonal/calendar/holidays"
 import { monthCalendar, type CalendarDate } from "@workspace/seasonal/calendar/month-calendar"
 import { MONTH_NOTES, UI_COPY } from "@workspace/seasonal/data/copy"
 import { festivalDate, festivalsInMonth } from "@workspace/seasonal/data/festivals"
-import { foodsInMonth } from "@workspace/seasonal/data/foods"
+import { foodsInMonth, monthHighlights } from "@workspace/seasonal/data/foods"
 import { MONTHS, type Month } from "@workspace/seasonal/data/months"
+import { SCATTER_MAX_FOODS } from "@workspace/seasonal/layout/scatter"
 import { TextReveal } from "@workspace/ui/components/text-reveal"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -17,6 +18,7 @@ import { DesktopMonthPanel } from "./desktop-month-panel"
 import { JumpButton, MonthRail } from "./month-jump"
 import { MonthScrollSpy } from "./month-scroll-spy"
 import { MonthTitle } from "./month-title"
+import { MoreFoods } from "./more-foods"
 import { SettingsCalendar, SettingsScope } from "./settings-scope"
 import { YearEnd } from "./year-end"
 
@@ -26,7 +28,8 @@ import { YearEnd } from "./year-end"
  */
 export function ThisMonthView({ today }: { today: CalendarDate }) {
   const { year, month: thisMonth } = today
-  const months = MONTHS.map((month) => ({ month, foods: foodsInMonth(month), note: MONTH_NOTES[month] }))
+  // 판에는 그 달 대표 품종만 그린다(한 달 제철이 최대 78개라 다 그리면 그림과 이름표가 겹친다). 나머지는 판 아래 이름 목록이다.
+  const months = MONTHS.map((month) => ({ month, foods: foodsInMonth(month), pictured: monthHighlights(month, SCATTER_MAX_FOODS), note: MONTH_NOTES[month] }))
   const current = months[thisMonth - 1]!
 
   return (
@@ -64,7 +67,7 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
             />
             <div className="lg:mt-6">
               <div>
-                <Scatter month={thisMonth} foods={current.foods} year={year} className="mt-6 lg:mt-0" desktopFrame="desktopHero" />
+                <Scatter month={thisMonth} foods={current.pictured} year={year} className="mt-6 lg:mt-0" desktopFrame="desktopHero" />
                 <p className="mt-3 text-xs text-caption">
                   {current.foods.length}가지 제철<span className="hidden lg:inline"> · 그림을 끌어 옮겨 보세요</span>
                 </p>
@@ -83,8 +86,8 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
             </div>
           </section>
 
-          {months.map(({ month, foods, note }) => (
-            <MonthSection key={month} month={month} foods={foods} note={note} today={today} />
+          {months.map(({ month, foods, pictured, note }) => (
+            <MonthSection key={month} month={month} foods={foods} pictured={pictured} note={note} today={today} />
           ))}
 
           <YearEnd year={year} thisMonth={thisMonth} />
@@ -98,11 +101,14 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
 function MonthSection({
   month,
   foods,
+  pictured,
   note,
   today,
 }: {
   month: Month
   foods: ReturnType<typeof foodsInMonth>
+  /** 판에 그리는 대표 품종(foods의 일부) */
+  pictured: ReturnType<typeof foodsInMonth>
   note: string
   today: CalendarDate
 }) {
@@ -131,7 +137,7 @@ function MonthSection({
       <div className="lg:mt-5">
         <Scatter
           month={month}
-          foods={foods}
+          foods={pictured}
           year={today.year}
           className="mt-5 lg:mt-0"
           desktopFrame="desktopMonth"
@@ -142,6 +148,7 @@ function MonthSection({
         <p className="mt-3 text-xs text-caption">
           {foods.length}가지 제철<span> · 그림을 끌어 달력 위에도 놓아 꾸며 보세요</span>
         </p>
+        <MoreFoods foods={foods.filter((food) => !pictured.includes(food))} />
         <p className="mt-3 text-xs text-stone">
           {festivals.length
             ? `명절 ${festivals

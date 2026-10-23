@@ -23,13 +23,13 @@ const HEADER = 26
 const MEMO = 34
 /** M-B 체크 목록의 폭·제목 높이와 달력과의 간격 */
 const SIDE = { width: 52, title: 8, gap: 6 } as const
-/** M-D 그림 띠: 품종 수, 세로 용지의 띠 높이, 가로 용지의 띠 폭, 달력과의 간격. 띠 14개와 빈 칸이면 2027년 모든 달의 그림 있는 품종이 들어간다(stripFoods 테스트). */
+/** M-D 그림 띠: 품종 수, 세로 용지의 띠 높이, 가로 용지의 띠 폭, 달력과의 간격. 그 달 대표 품종부터 띠 14개와 빈 칸에 넣고, 못 들어간 품종은 뺀다(한 달 제철이 23~78개라 띠는 늘 찬다). */
 const STRIP = { size: 14, height: 44, width: 48, gap: 5 } as const
 /** M-E: 세로의 모서리 달력 블록 크기·안쪽 여백, 가로의 날짜 열 폭, 그림과의 간격 */
 /** C-2 표지: 머리(제목·연도) 높이, 달 칸 사이 간격·안쪽 여백·달 표기 높이, 칸마다 그림 수 */
 const MONTHS_COVER = { header: 40, gap: 4, padding: 3, label: 7, perMonth: 2 } as const
 /**
- * C-3 표지: 막대표 단 수와 단 사이 간격. 그림 있는 품종 67개를 모두 싣는다(월간에는 카테고리 옵션이 없고, 표지는 1년 전체를 보여 주는 쪽이다).
+ * C-3 표지: 막대표 단 수와 단 사이 간격. 달마다 대표 여섯(chartFoods, 많아야 72개)을 싣는다(월간에는 카테고리 옵션이 없고, 표지는 1년 전체를 보여 주는 쪽이다).
  * 머리가 C-2와 같은 40mm라 A4 줄 높이가 세로 2단 약 6.3mm, 가로 3단 약 5.8mm이고, 이름은 둘 다 상한인 약 9pt다.
  */
 const CHART_COVER = { columns: { portrait: 2, landscape: 3 }, gap: 8 } as const
@@ -318,7 +318,7 @@ function MonthsCover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
   )
 }
 
-/** C-3: 큰 연도 아래 그림 있는 품종 전부의 제철 막대표(세로 2단, 가로 3단). 달을 넘기기 전에 1년 흐름을 본다. */
+/** C-3: 큰 연도 아래 달마다 대표 품종의 제철 막대표(세로 2단, 가로 3단). 달을 넘기기 전에 1년 흐름을 본다. */
 function ChartCover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
   const inner = innerSize(spec)
   const { header, gap } = MONTHS_COVER

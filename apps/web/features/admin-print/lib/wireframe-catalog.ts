@@ -138,7 +138,7 @@ const monthly: WireframeEntry[] = [
     page: "sheet",
     title: "쓰는 달력: 큰 칸 + 그림 띠 두 줄",
     summary:
-      "달력 칸을 키워 일정을 적는다(격자 고정). 그림 띠를 14개(세로는 위 두 줄, 가로는 왼쪽 두 열)로 늘리고 1일 앞·말일 뒤 빈 칸에도 그림을 넣어 품종 수를 지킨다. 2027년은 빈 칸이 달마다 0~11개지만 띠 14개와 합치면 그림 있는 품종(달마다 7~19개)이 주 시작과 상관없이 모두 들어간다.",
+      "달력 칸을 키워 일정을 적는다(격자 고정). 그림 띠를 14개(세로는 위 두 줄, 가로는 왼쪽 두 열)로 늘리고 1일 앞·말일 뒤 빈 칸에도 그림을 넣어 품종 수를 지킨다. 그 달 대표 품종부터 띠 14개와 빈 칸(2027년 달마다 0~11개)에 넣는다. 한 달 제철이 23~78개라 다 들어가지는 않는다.",
     source: "④ 정보형 · K10(그림 30 : 달력 70), G3·G5(쓰기 칸). 빈 칸 그림은 판매 사례 없는 제안",
     availability: { status: "available", options: 'layout: "strip"' },
     orientations: ["portrait", "landscape"],
@@ -229,12 +229,12 @@ const monthly: WireframeEntry[] = [
     kind: "monthly",
     page: "cover",
     title: "표지: 1년 제철 표",
-    summary: "첫 장을 품종×달 막대표로 만든다. 달을 넘기기 전에 1년 흐름을 한눈에 본다. 그림 있는 품종 67개를 세로 2단, 가로 3단에 나눠 이름이 A4 약 9pt다.",
+    summary: "첫 장을 품종×달 막대표로 만든다. 달을 넘기기 전에 1년 흐름을 한눈에 본다. 달마다 대표 여섯(많아야 72개)을 세로 2단, 가로 3단에 나눠 이름이 A4 약 9pt다.",
     source: "⑨ 기간 표시 · G10, G7. 표지 자리에 계절표·범례 쪽을 넣는 K10, G5. 막대표 자체는 판매 사례로 확인 못 함",
     availability: { status: "available", options: 'cover: "chart"' },
     orientations: ["portrait"],
     draw: () => {
-      // 그림 있는 품종 전부를 세로 2단에 나눈다(monthly.tsx의 CHART_COVER).
+      // 달마다 대표 품종을 세로 2단에 나눈다(monthly.tsx의 CHART_COVER).
       const [header, body] = split(contentBox("portrait"), "rows", [26, "*"], 6)
       const [left, right] = split(body!, "cols", ["*", "*"], 8)
       return [...yearHeader(header!, 20), ...periodChart(left!, { rows: 30, groups: ["채소", "과일"], seed: 11, label: 0.3 }), ...periodChart(right!, { rows: 30, groups: ["수산", "곡물·견과"], seed: 12, label: 0.3 })]
@@ -443,13 +443,13 @@ const monthPoster: WireframeEntry[] = [
     kind: "month-poster",
     page: "sheet",
     title: "품종×달 막대표",
-    summary: "행 하나가 품종 하나, 제철 달에 막대를 칠한다. 품종이 반복되지 않고 제철 길이가 보인다. 카테고리 띠로 묶는다. 그림 있는 품종 67개를 세로 2단, 가로 3단에 나눠 이름이 A4 약 9pt다.",
+    summary: "행 하나가 품종 하나, 제철 달에 막대를 칠한다. 품종이 반복되지 않고 제철 길이가 보인다. 카테고리 띠로 묶는다. 달마다 대표 여섯(많아야 72개)을 세로 2단, 가로 3단에 나눠 이름이 A4 약 9pt다.",
     source: "⑨ 기간 표시 · G10, G7. 행 = 품종인 표 자체는 판매 사례로 확인 못 함",
     availability: { status: "available", options: 'layout: "chart"' },
     orientations: ["portrait", "landscape"],
     draw: (orientation) => {
       const [title, body] = split(contentBox(orientation), "rows", [orientation === "portrait" ? 12 : 10, "*"], 4)
-      // 그림 있는 품종 전부를 세로 2단, 가로 3단에 나눈다(month-poster.tsx의 CHART).
+      // 달마다 대표 품종을 세로 2단, 가로 3단에 나눈다(month-poster.tsx의 CHART).
       if (orientation === "portrait") {
         const [left, right] = split(body!, "cols", ["*", "*"], 8)
         return [...posterTitle(title!), ...periodChart(left!, { rows: 30, groups: ["채소", "과일"], seed: 41, label: 0.3 }), ...periodChart(right!, { rows: 30, groups: ["수산", "곡물·견과"], seed: 44, label: 0.3 })]

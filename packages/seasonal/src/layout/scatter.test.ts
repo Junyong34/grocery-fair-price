@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { foodsInMonth } from "../data/foods"
-import { labelHeight, labelWidth, SCATTER_FRAMES, scatterLayout, type ScatterFrame } from "./scatter"
+import { monthHighlights } from "../data/foods"
+import { labelHeight, labelWidth, SCATTER_FRAMES, SCATTER_MAX_FOODS, scatterLayout, type ScatterFrame } from "./scatter"
 
 const ids = (n: number) => Array.from({ length: n }, (_, i) => `food-${i}`)
 
@@ -148,8 +148,8 @@ describe("scatterLayout Lloyd 완화", () => {
 describe("scatterLayout 이름표", () => {
   it("실제 품종으로 그림과 이름표가 서로 겹치지 않는다(원 ↔ 이름표 포함)", () => {
     for (const frame of [SCATTER_FRAMES.desktopMonth, SCATTER_FRAMES.desktopHero, SCATTER_FRAMES.mobileMonth]) {
-      for (const month of [1, 4, 8, 10]) {
-        const foods = foodsInMonth(month)
+      for (const month of [1, 4, 8, 10, 11]) {
+        const foods = monthHighlights(month, SCATTER_MAX_FOODS)
         const { items } = scatterLayout({ month, ids: foods.map((food) => food.id), frame })
         const parts = items.map((item) => {
           const r = (item.size * frame.width) / 2
@@ -190,7 +190,7 @@ describe("scatterLayout avoid", () => {
   it("피할 영역과 겹치는 그림·이름표가 없다", () => {
     for (const month of [1, 4, 8, 11]) {
       for (const n of [8, 14, 20]) {
-        const foods = foodsInMonth(month).slice(0, n)
+        const foods = monthHighlights(month, n)
         const { items } = scatterLayout({ month, ids: foods.map((food) => food.id), frame })
         for (const item of items) {
           const r = (item.size * frame.width) / 2

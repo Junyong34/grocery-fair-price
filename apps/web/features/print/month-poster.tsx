@@ -68,7 +68,7 @@ function MonthCells({ spec }: { spec: MonthPosterSpec }) {
 }
 
 /**
- * P-B 막대표의 단 수와 단 사이 간격. 그림 있는 품종(67개)을 한 단에 넣으면 A4 세로 줄이 3.5mm(이름 약 6pt)라
+ * P-B 막대표의 단 수와 단 사이 간격. 달마다 대표 여섯(chartFoods, 많아야 72개)을 한 단에 넣으면 A4 세로 줄이 3.5mm(이름 약 6pt)라
  * 세로 2단(줄 약 6.8mm), 가로 3단(줄 약 6.4mm)으로 나눈다. 카테고리를 골라 줄이 적으면 한 단으로 둔다.
  */
 const CHART = { columns: { portrait: 2, landscape: 3 }, single: 24, gap: 8 } as const

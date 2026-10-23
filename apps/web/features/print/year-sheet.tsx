@@ -23,7 +23,7 @@ const HERO_GRID = { columns: 3, rows: 4 } as const
 const LABEL = 5
 /**
  * Y-C. 달력 칸 폭 약 44mm·높이 35~36mm면 A4 날짜가 약 7.2~7.5pt다(7pt 하한은 폭 41mm·높이 34mm).
- * 막대표 품종은 달마다 대표 넷(yearFoods, 48개)이다. 그림 있는 품종 67개를 다 넣으면 세로 2단 줄이 약 3.7mm(이름 약 6pt)라 줄였고,
+ * 막대표 품종은 달마다 대표 넷(yearFoods, 48개)이다. 다른 막대표처럼 달마다 여섯(72개)이면 세로 2단 줄이 약 3.7mm(이름 약 6pt)라 줄였고,
  * 넷이면 이름이 세로 약 7.6pt, 가로 약 7.4pt다.
  */
 const CHART = {

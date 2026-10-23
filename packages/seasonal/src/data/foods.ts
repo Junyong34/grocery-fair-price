@@ -48,20 +48,33 @@ export function seasonsOf(food: Food): readonly Season[] {
 
 // 대표 품종 고르기 규칙은 쓰는 곳마다 조금씩 다르다. 화면·검색 설명용은 여기, 인쇄물용(그림 있는 품종만)은 print/foods.ts에 있다.
 
-/** 그 달을 대표하는 품종(검색 설명). 그림이 있는 것, 그 달에만 가까운(제철 달이 적은) 것 순. */
+/** 그 달이 품종의 대표 달(peak)인지. months는 시장에 많이 나오는 범위이고, peak는 그 안에서 조사가 대표로 고른 달이다. */
+const isPeak = (food: Food, month: number) => (food.peak as readonly number[]).includes(month)
+
+/**
+ * 그 달을 대표하는 품종(2a 흩뿌리기 판, 검색 설명). 그림이 있는 것, 그 달이 대표 달인 것, 처음부터 검증한 품종(core), 그 달에만 가까운(제철 달이 적은) 것, 이름 순.
+ * 그 달 제철 품종이 많아(최대 78) 판에는 앞에서 몇 개만 그리고 나머지는 이름 목록으로 둔다.
+ */
 export function monthHighlights(month: number, count: number): readonly Food[] {
   return [...foodsInMonth(month)]
-    .sort((a, b) => Number(isDrawn(b.id)) - Number(isDrawn(a.id)) || a.months.length - b.months.length)
+    .sort(
+      (a, b) =>
+        Number(isDrawn(b.id)) - Number(isDrawn(a.id)) ||
+        Number(isPeak(b, month)) - Number(isPeak(a, month)) ||
+        Number(b.core) - Number(a.core) ||
+        a.months.length - b.months.length ||
+        a.name.localeCompare(b.name, "ko"),
+    )
     .slice(0, count)
 }
 
 /**
- * 계절 대표 품종(3a 계절 카드). 카드에 크게 그리므로 그림이 있는 품종을 먼저, 그 안에서는 그 계절에 제철인 달이 많은 품종부터 고른다.
+ * 계절 대표 품종(3a 계절 카드). 카드에 크게 그리므로 그림이 있는 품종을 먼저, 그 안에서는 그 계절에 대표 달(peak)이 많은 품종, 제철인 달이 많은 품종부터 고른다.
  * 그림이 모자라면 그림 없는 품종으로 채운다. 그림 목록이 늘면 결과도 바뀐다.
  */
 export function seasonHighlights(season: Season, count: number): readonly Food[] {
-  const monthsIn = (food: Food) => food.months.filter((month) => SEASON_MONTHS[season].includes(month)).length
+  const monthsIn = (months: readonly number[]) => months.filter((month) => SEASON_MONTHS[season].includes(month)).length
   return [...foodsInSeason(season)]
-    .sort((a, b) => Number(isDrawn(b.id)) - Number(isDrawn(a.id)) || monthsIn(b) - monthsIn(a))
+    .sort((a, b) => Number(isDrawn(b.id)) - Number(isDrawn(a.id)) || monthsIn(b.peak) - monthsIn(a.peak) || monthsIn(b.months) - monthsIn(a.months))
     .slice(0, count)
 }

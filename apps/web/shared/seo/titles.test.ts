@@ -38,7 +38,7 @@ describe("페이지 제목·설명", () => {
   })
 
   it("품종 설명에 제철 달과 다른 이름을 넣는다", () => {
-    expect(foodSeo(findFood("snow-crab")!).description).toContain("12·1·2·3월")
+    expect(foodSeo(findFood("snow-crab")!).description).toContain("제철은 12~5월이에요")
     expect(foodSeo(findFood("olive-flounder")!).description).toContain("광어(넙치)")
   })
 

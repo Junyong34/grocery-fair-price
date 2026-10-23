@@ -67,6 +67,9 @@ const SEED_RELAX_ITERATIONS = 60
 /** 후보 선택 뒤 빈 곳을 고르게 메우는 Lloyd 완화 횟수와 한 번에 가는 비율. 0이면 쓰지 않는다. */
 const LLOYD_ITERATIONS = 10
 const LLOYD_STEP = 0.7
+/** 판 하나에 흩뿌리는 품종 수의 상한. 이보다 많으면 그림·이름표가 서로 겹친다(테스트가 이 수로 확인한다). 나머지는 화면이 이름 목록으로 보인다. */
+export const SCATTER_MAX_FOODS = 20
+
 /** 그림이 판 넓이에서 차지하는 비율. 낮을수록 그림이 작고 사이가 넓다. */
 const COVERAGE = 0.45
 

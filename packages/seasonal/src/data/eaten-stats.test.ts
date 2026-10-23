@@ -5,7 +5,7 @@ import { FOODS, foodsInMonth, foodsInSeason } from "./foods"
 import { MONTHS } from "./months"
 import { SEASONS } from "./seasons"
 
-// 감 10·11월, 굴 12·1월, 전어 9·10월
+// 감 9~11월, 굴 12·1월, 전어 8~10월
 const eaten = new Set(["persimmon", "oyster", "gizzard-shad"])
 
 describe("scopeFoods", () => {
@@ -31,7 +31,7 @@ describe("monthTallies", () => {
     const tallies = monthTallies(eaten)
     expect(tallies).toHaveLength(12)
     MONTHS.forEach((month, i) => expect(tallies[i]!.total).toBe(foodsInMonth(month).length))
-    expect(tallies.map((t) => t.eaten)).toEqual([1, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1, 1])
+    expect(tallies.map((t) => t.eaten)).toEqual([1, 0, 0, 0, 0, 0, 0, 1, 2, 2, 1, 1])
   })
 })
 

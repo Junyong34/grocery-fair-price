@@ -16,49 +16,8 @@ const prototype = resolve(root, "prototypes/seasonal-food")
 const out = resolve(here, "../src/data/foods.generated.ts")
 
 // 일러스트가 아직 없는 품종의 id. 일러스트를 그릴 때 이 id를 쓴다.
-const NEW_IDS = {
-  아스파라거스: "asparagus",
-  애호박: "korean-zucchini",
-  오이: "cucumber",
-  참나물: "chamnamul",
-  토마토: "tomato",
-  홍고추: "red-chili",
-  수박: "watermelon",
-  유자: "yuzu",
-  자두: "plum",
-  참외: "korean-melon",
-  포도: "grape",
-  한라봉: "hallabong",
-  송이버섯: "pine-mushroom",
-  표고버섯: "shiitake",
-  밤: "chestnut",
-  옥수수: "corn",
-  완두콩: "green-pea",
-  은행: "ginkgo-nut",
-  과메기: "gwamegi",
-  굴: "oyster",
-  꼬막: "cockle",
-  꽃게: "blue-crab",
-  농어: "sea-bass",
-  대게: "snow-crab",
-  "동해한치(화살꼴뚜기)": "spear-squid",
-  매생이: "maesaengi",
-  멍게: "sea-squirt",
-  민어: "brown-croaker",
-  바다장어: "conger-eel",
-  바지락: "manila-clam",
-  병어: "pomfret",
-  "봄 도다리(문치가자미)": "marbled-flounder",
-  아귀: "monkfish",
-  오징어: "squid",
-  재첩: "marsh-clam",
-  전복: "abalone",
-  전어: "gizzard-shad",
-  "제주한치(창꼴뚜기)": "swordtip-squid",
-  주꾸미: "webfoot-octopus",
-  키조개: "pen-shell",
-  홍합: "mussel",
-}
+// 2026-10-23 기준 모든 품종에 일러스트가 있어 비어 있다.
+const NEW_IDS = {}
 
 // 이름이 달라 자동으로 맞지 않지만 같은 품종을 그린 일러스트. 새우 일러스트는 대하 기준으로 그렸다.
 const DRAWN_AS = { 대하: "shrimp" }
@@ -88,7 +47,9 @@ const rows = foods
     const name = nameParts(food.name)[0]
     const aliases = [...new Set(keys.filter((key) => key !== name))]
     const months = [...new Set(food.months)].sort((a, b) => a - b)
-    return { id, name, aliases, category: food.category, months }
+    const peak = [...new Set(food.peak ?? food.months)].sort((a, b) => a - b)
+    // core: 처음부터 조사로 제철을 검증한 품종. false는 2026-10-23 정보누리 생산시기로 올린 품종이다. 대표를 고를 때 core를 앞에 둔다.
+    return { id, name, aliases, category: food.category, months, peak, core: !food.promoted }
   })
   .sort((a, b) => a.name.localeCompare(b.name, "ko"))
 
@@ -99,7 +60,7 @@ if (duplicate) throw new Error(`id가 겹친다: ${duplicate}`)
 const body = rows
   .map(
     (row) =>
-      `  { id: ${JSON.stringify(row.id)}, name: ${JSON.stringify(row.name)}, aliases: ${JSON.stringify(row.aliases)}, category: ${JSON.stringify(row.category)}, months: ${JSON.stringify(row.months)} },`,
+      `  { id: ${JSON.stringify(row.id)}, name: ${JSON.stringify(row.name)}, aliases: ${JSON.stringify(row.aliases)}, category: ${JSON.stringify(row.category)}, months: ${JSON.stringify(row.months)}, peak: ${JSON.stringify(row.peak)}, core: ${row.core} },`,
   )
   .join("\n")
 
