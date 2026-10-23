@@ -5,10 +5,18 @@ import type { PrintKind, PrintSpec } from "@workspace/seasonal/print/spec"
 
 export const FOOD_CATEGORIES = [...new Set(FOODS.map((food) => food.category))]
 
-export type Option = { value: string | number; label: string }
+/** code는 그 값이 그리는 와이어프레임 안(wireframe-catalog.ts). 구성·표지 선택을 썸네일로 보일 때 쓴다. */
+export type Option = { value: string | number; label: string; code?: string }
 
 export type OptionFieldSpec = (
-  | { type: "select"; label: string; path: readonly string[]; options: readonly Option[] }
+  | {
+      type: "select"
+      label: string
+      path: readonly string[]
+      options: readonly Option[]
+      /** 있으면 선택지를 이 쪽(시트·표지)의 와이어프레임 썸네일로 보인다. 아직 안 되는 안(needs-option)은 "준비 중"으로 덧붙인다. */
+      wireframes?: "sheet" | "cover"
+    }
   | { type: "toggle"; label: string; path: readonly string[] }
   | { type: "number"; label: string; path: readonly string[]; min: number; max: number }
   | { type: "text"; label: string; path: readonly string[] }
@@ -68,8 +76,14 @@ const foods = (max: number, when?: { names?: OptionFieldSpec["when"]; max?: Opti
   ],
 })
 
-/** 구성(layout) 선택. 값마다 와이어프레임 안 하나다(wireframe-catalog.ts). */
-const layout = (entries: Record<string, string>): OptionFieldSpec => ({ type: "select", label: "구성", path: ["layout"], options: options(entries) })
+/** 구성(layout) 선택. 값마다 [이름, 와이어프레임 안 코드]다(wireframe-catalog.ts). 한 안을 여러 값이 같이 쓸 수 있다(M-A). */
+const layout = (entries: Record<string, readonly [label: string, code: string]>): OptionFieldSpec => ({
+  type: "select",
+  label: "구성",
+  path: ["layout"],
+  options: Object.entries(entries).map(([value, [label, code]]) => ({ value, label, code })),
+  wireframes: "sheet",
+})
 
 const monthlyHasFoods = (spec: PrintSpec) => spec.kind === "monthly" && spec.layout !== "none"
 /** M-B는 체크 목록이 달력 옆에 있고, M-D는 달력 칸 자체가 쓰는 자리이며, M-E는 그림이 판 전체라 달력 아래 메모를 쓰지 않는다. */
@@ -100,14 +114,24 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
       title: "구성",
       fields: [
         layout({
-          scatter: "그림 위, 달력 아래 · 흩뿌림",
-          grid: "그림 위, 달력 아래 · 줄 맞춤",
-          none: "달력만(그림 없음)",
-          "side-check": "달력 옆 제철 체크 목록(세로 용지)",
-          strip: "쓰는 큰 칸 달력 + 그림 띠(빈 날짜 칸에도 그림)",
-          allover: "그림이 판 전체, 달력은 모서리 블록(세로)·날짜 한 열(가로)",
+          scatter: ["그림 위, 달력 아래 · 흩뿌림", "M-A"],
+          grid: ["그림 위, 달력 아래 · 줄 맞춤", "M-A"],
+          none: ["달력만(그림 없음)", "M-A"],
+          "side-check": ["달력 옆 제철 체크 목록(세로 용지)", "M-B"],
+          strip: ["쓰는 큰 칸 달력 + 그림 띠(빈 날짜 칸에도 그림)", "M-D"],
+          allover: ["그림이 판 전체, 달력은 모서리 블록(세로)·날짜 한 열(가로)", "M-E"],
         }),
-        { type: "select", label: "12개월 묶음 표지", path: ["cover"], options: options({ year: "큰 연도 + 대표 품종", months: "큰 연도 + 열두 달 미리보기", none: "표지 없음" }) },
+        {
+          type: "select",
+          label: "12개월 묶음 표지",
+          path: ["cover"],
+          options: [
+            { value: "year", label: "큰 연도 + 대표 품종", code: "C-1" },
+            { value: "months", label: "큰 연도 + 열두 달 미리보기", code: "C-2" },
+            { value: "none", label: "표지 없음" },
+          ],
+          wireframes: "cover",
+        },
       ],
     },
     { title: "용지", fields: [orientation, margin, year] },
@@ -127,7 +151,7 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
     look,
   ],
   "year-sheet": [
-    { title: "구성", fields: [layout({ pairs: "그림·달력 짝 체크무늬", "hero-top": "큰 그림 위, 열두 달 아래(세로 용지)" })] },
+    { title: "구성", fields: [layout({ pairs: ["그림·달력 짝 체크무늬", "Y-A"], "hero-top": ["큰 그림 위, 열두 달 아래(세로 용지)", "Y-B"] })] },
     { title: "용지", fields: [orientation, margin, year, { ...grid, when: yearSheetInPairs }] },
     {
       title: "달력",
@@ -143,13 +167,13 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
     look,
   ],
   "season-poster": [
-    { title: "구성", fields: [layout({ bands: "가로 띠 넷", quarters: "사분면(가로 용지는 네 열)", "per-season": "계절마다 한 장(4쪽)" })] },
+    { title: "구성", fields: [layout({ bands: ["가로 띠 넷", "S-A"], quarters: ["사분면(가로 용지는 네 열)", "S-B"], "per-season": ["계절마다 한 장(4쪽)", "S-D"] })] },
     { title: "용지", fields: [orientation, margin, title, { type: "select", label: "계절 표기", path: ["seasonLabel"], options: options({ "english-korean": "Spring · 봄", korean: "봄" }) }] },
     { ...foods(30), fields: [...foods(30).fields, categories] },
     look,
   ],
   "month-poster": [
-    { title: "구성", fields: [layout({ cells: "열두 칸", chart: "품종×달 막대표", wheel: "열두 달 원형 판", "rows-check": "한 줄에 한 달 · 장보기 체크(세로 용지)" })] },
+    { title: "구성", fields: [layout({ cells: ["열두 칸", "P-A"], chart: ["품종×달 막대표", "P-B"], wheel: ["열두 달 원형 판", "P-C"], "rows-check": ["한 줄에 한 달 · 장보기 체크(세로 용지)", "P-D"] })] },
     { title: "용지", fields: [orientation, margin, title, { ...grid, when: monthPosterInCells }, monthLabel] },
     { ...foods(12), fields: [...foods(12, { names: monthPosterInCells, max: monthPosterNotChart }).fields, categories] },
     look,

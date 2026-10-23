@@ -31,7 +31,7 @@ export function OptionsPanel({ spec, error, onChange }: Props) {
         {sections.map((section) => (
           <TabsContent key={section.title} value={section.title} className="flex flex-col gap-4 pt-4">
             {section.fields.map((field) => (
-              <OptionField key={field.path.join(".")} field={field} value={getAt(spec, field.path)} onChange={(value) => onChange(field.path, value)} />
+              <OptionField key={field.path.join(".")} field={field} value={getAt(spec, field.path)} orientation={spec.orientation} onChange={(value) => onChange(field.path, value)} />
             ))}
           </TabsContent>
         ))}

@@ -7,13 +7,19 @@ import { NumberInput } from "@workspace/ui/components/number-input"
 import { Switch } from "@workspace/ui/components/switch"
 import { ToggleGroup, ToggleGroupItem } from "@workspace/ui/components/toggle-group"
 
+import type { Orientation } from "../lib/wireframe-shapes"
 import { FOOD_CATEGORIES, type OptionFieldSpec } from "./option-fields"
+import { WireframeChoice } from "./wireframe-choice"
 
 const TEXT_MAX = 40
 
-type Props = { field: OptionFieldSpec; value: unknown; onChange: (value: unknown) => void }
+/** orientation은 구성 썸네일을 그릴 용지 방향이다. */
+type Props = { field: OptionFieldSpec; value: unknown; orientation: Orientation; onChange: (value: unknown) => void }
 
-export function OptionField({ field, value, onChange }: Props) {
+export function OptionField({ field, value, orientation, onChange }: Props) {
+  if (field.type === "select" && field.wireframes)
+    return <WireframeChoice label={field.label} options={field.options} page={field.wireframes} value={value} orientation={orientation} onChange={onChange} />
+
   if (field.type === "toggle")
     return (
       <label className="flex items-center justify-between gap-4 text-sm">

@@ -34,3 +34,10 @@
 .admin-ui .v-toggle:not([data-state="on"]):hover {
   outline-color: var(--color-ash);
 }
+/* 구성 썸네일 선택(editor/wireframe-choice.tsx). 카드 바탕·테두리가 고른 표시라 cojeev 동그라미 표시는 감춘다. */
+.admin-ui .wireframe-choice [data-slot="radio-group-indicator"] {
+  display: none;
+}
+.admin-ui .wireframe-choice [data-slot="radio-group-item"][data-state="checked"] {
+  box-shadow: inset 0 0 0 2px var(--color-gold);
+}

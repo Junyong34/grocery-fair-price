@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest"
 
-import { DEFAULT_SPECS, parsePrintSpec, PRINT_KINDS } from "@workspace/seasonal/print/spec"
+import { DEFAULT_SPECS, LAYOUTS, MONTHLY_COVERS, parsePrintSpec, PRINT_KINDS } from "@workspace/seasonal/print/spec"
+
+import { wireframeOf, wireframesOf } from "../lib/wireframe-catalog"
 
 import { getAt, setAt } from "../lib/spec-path"
 import { FOOD_CATEGORIES, isFieldShown, KIND_SECTIONS, type OptionFieldSpec } from "./option-fields"
@@ -166,3 +168,37 @@ describe("구성마다 숨는 옵션", () => {
     expect(isFieldShown(field("year-sheet", "foods.max"), spec)).toBe(false)
   })
 })
+
+describe("구성 썸네일 표(선택지 → 와이어프레임 안)", () => {
+  const fieldOf = (kind: keyof typeof KIND_SECTIONS, path: string) => KIND_SECTIONS[kind].flatMap((section) => section.fields).find((f) => f.path.join(".") === path)!
+  const optionsOf = (kind: keyof typeof KIND_SECTIONS, path: string) => {
+    const field = fieldOf(kind, path)
+    return field.type === "select" ? field.options : []
+  }
+
+  it.each(PRINT_KINDS)("%s: 구성 선택지가 사양의 구성 값을 모두 덮고, 값마다 지금 되는 시트 안이 있다", (kind) => {
+    const options = optionsOf(kind, "layout")
+    expect(fieldOf(kind, "layout")).toMatchObject({ wireframes: "sheet" })
+    expect(options.map((option) => option.value).sort()).toEqual([...LAYOUTS[kind]].sort())
+    for (const option of options) {
+      const entry = wireframeOf(option.code ?? "")
+      expect(entry, String(option.value)).toMatchObject({ kind, page: "sheet", availability: { status: "available" } })
+    }
+  })
+
+  it.each(PRINT_KINDS)("%s: 지금 되는 시트 안은 모두 구성 선택지에서 고를 수 있다", (kind) => {
+    const codes = new Set(optionsOf(kind, "layout").map((option) => option.code))
+    for (const entry of wireframesOf(kind, "sheet").filter((entry) => entry.availability.status === "available")) expect(codes.has(entry.code), entry.code).toBe(true)
+  })
+
+  it("월간 표지 선택지가 표지 값을 모두 덮고, 표지 없음 말고는 지금 되는 표지 안이 있다", () => {
+    const options = optionsOf("monthly", "cover")
+    expect(fieldOf("monthly", "cover")).toMatchObject({ wireframes: "cover" })
+    expect(options.map((option) => option.value).sort()).toEqual([...MONTHLY_COVERS].sort())
+    for (const option of options.filter((option) => option.value !== "none"))
+      expect(wireframeOf(option.code ?? ""), String(option.value)).toMatchObject({ kind: "monthly", page: "cover", availability: { status: "available" } })
+    const codes = new Set(options.map((option) => option.code))
+    for (const entry of wireframesOf("monthly", "cover").filter((entry) => entry.availability.status === "available")) expect(codes.has(entry.code), entry.code).toBe(true)
+  })
+})
+

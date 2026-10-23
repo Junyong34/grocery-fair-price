@@ -86,12 +86,23 @@ const year = z.number().int().min(2020).max(2100)
 // 구성(layout): 종류마다 값 하나가 와이어프레임 안 하나다(apps/web/features/admin-print/lib/wireframe-catalog.ts).
 // 용지 방향에 따라 갈리는 모양은 하위 옵션 없이 orientation으로 정한다. 안을 실제로 구현할 때마다 값을 더한다.
 
+/** 종류마다 구성(layout) 값. 편집기의 구성 썸네일 표가 이 값을 모두 덮는지 테스트한다. 값은 스키마 주석의 와이어프레임 안 하나씩이다. */
+export const LAYOUTS = {
+  monthly: ["scatter", "grid", "none", "side-check", "strip", "allover"],
+  "year-sheet": ["pairs", "hero-top"],
+  "season-poster": ["bands", "quarters", "per-season"],
+  "month-poster": ["cells", "chart", "wheel", "rows-check"],
+} as const satisfies Record<PrintKind, readonly string[]>
+
+/** 월간 12개월 묶음 표지 값 */
+export const MONTHLY_COVERS = ["none", "year", "months"] as const
+
 const monthlySchema = z.object({
   ...base,
   kind: z.literal("monthly"),
   year,
   /** 12개월 묶음 첫 장의 표지. none: 표지 없음, year: 큰 연도 + 대표 품종(C-1), months: 큰 연도 + 열두 달 미리보기(C-2) */
-  cover: z.enum(["none", "year", "months"]),
+  cover: z.enum(MONTHLY_COVERS),
   monthLabel,
   calendar: calendar(z.enum(["hidden", "mark", "mark-and-name"])).extend({ variant: z.enum(CALENDAR_VARIANTS) }),
   /**
@@ -99,7 +110,7 @@ const monthlySchema = z.object({
    * side-check: 달력 옆에 그 달 품종 체크 목록(M-B. 세로 용지만). strip: 쓰는 큰 칸 달력 + 그림 띠, 빈 날짜 칸에도 그림(M-D)
    * allover: 그림이 판 전체, 달력은 세로 용지에서 오른쪽 아래 모서리 블록, 가로 용지에서 오른쪽 날짜 한 열(M-E)
    */
-  layout: z.enum(["scatter", "grid", "none", "side-check", "strip", "allover"]),
+  layout: z.enum(LAYOUTS.monthly),
   /** 달력 아래 여백: 없음 / 메모 줄 / 먹은 음식 체크 칸(빈 칸 인쇄) */
   memo: z.enum(["none", "lines", "eaten-check"]),
 })
@@ -113,7 +124,7 @@ const yearSheetSchema = z.object({
   // 칸이 작아 공휴일 이름은 들어가지 않는다.
   calendar: calendar(z.enum(["hidden", "mark"])),
   /** 그림·달력 짝 체크무늬(Y-A) / 위에 1년치 그림 한 판, 아래 열두 달 3x4(Y-B. 세로 용지만) */
-  layout: z.enum(["pairs", "hero-top"]).default("pairs"),
+  layout: z.enum(LAYOUTS["year-sheet"]).default("pairs"),
   /** 달 배열(열×행) */
   grid,
 })
@@ -123,7 +134,7 @@ const seasonPosterSchema = z.object({
   kind: z.literal("season-poster"),
   title,
   /** 가로 띠 넷(S-A) / 사분면, 가로 용지는 네 열(S-B) / 계절마다 한 장, PDF 4쪽(S-D) */
-  layout: z.enum(["bands", "quarters", "per-season"]).default("bands"),
+  layout: z.enum(LAYOUTS["season-poster"]).default("bands"),
   seasonLabel: z.enum(["korean", "english-korean"]),
   /** 넣을 카테고리. 비우면 전부 */
   categories,
@@ -134,7 +145,7 @@ const monthPosterSchema = z.object({
   kind: z.literal("month-poster"),
   title,
   /** 열두 칸(P-A) / 품종×달 막대표(P-B) / 열두 달 원형 판(P-C) / 한 줄에 한 달, 그림과 장보기 체크 목록(P-D. 세로 용지만) */
-  layout: z.enum(["cells", "chart", "wheel", "rows-check"]).default("cells"),
+  layout: z.enum(LAYOUTS["month-poster"]).default("cells"),
   monthLabel,
   grid,
   categories,
