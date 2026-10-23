@@ -199,6 +199,56 @@
 | 호박씨 | 곡물·견과 | 3월 | 3월~10월 | 올림 | [219952](https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219952&menuNo=300063) |
 | 흑미 | 곡물·견과 | 9월 | 9월~10월 | 올림 | [219959](https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219959&menuNo=300063) |
 
-## 수산물
+## 수산물 (2026-10-23 추가 조사)
 
-정보누리 같은 범위 자료가 없다. 해수부 "이달의 수산물"은 선정 월만 주고, 범위는 품종마다 FSIS·해수부 보도자료 본문에서 찾아야 한다. 검증 수산물 중 범위가 문서에 있는 것은 [proposal.md](proposal.md)의 "문서" 근거를 쓰고, 해수부 선정 후보 33개는 따로 조사한다.
+국립수산물품질관리원 수산물안전정보(FSIS) "수산물소개" 게시판 173편 본문에서 제철·어획 시기 문장을 찾았다. 본문에 범위(달 또는 계절)가 적힌 품종만 반영하고, 산란기만 적힌 품종은 올리지 않았다.
+
+### 검증 수산물 범위
+
+| 품종 | 범위 | 근거 | 출처 |
+|---|---|---|---|
+| 꽁치 | 9~11월 | FSIS 10~11월, 9월 가을 범위 | SEASONAL-FOODS.md |
+| 꽃게 | 4~6월·9~11월 | FSIS 봄 암게·가을 수게, 여름 금어기 제외 | SEASONAL-FOODS.md |
+| 대게 | 12~5월 | 조업철 12~5월 | SEASONAL-FOODS.md |
+| 매생이 | 12~1월 | 해수부 1월 선정, 12월 겨울 범위 | SEASONAL-FOODS.md |
+| 아귀 | 1~2월 | 해수부 1월 선정, 2월 보조 | SEASONAL-FOODS.md |
+| 전복 | 5~8월 | 해수부 5~7월 제철, 여름 대표 7~8월 | SEASONAL-FOODS.md |
+| 전어 | 8~10월 | FSIS 8월 중순 어획 개시, 가을 | SEASONAL-FOODS.md |
+| 키조개 | 3~5월 | FSIS 4~5월, 3월 보조 | SEASONAL-FOODS.md |
+| 홍합 | 2~3월 | 늦겨울~초봄이 제철 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=22711) |
+| 삼치 | 10~3월 | 10월부터 이듬해 봄까지가 제철 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=10289) |
+| 굴 | 10~2월 | 5~8월 산란 뒤 가을에 살이 차오르고 겨울에 가장 풍부 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=13869) |
+| 방어 | 11~2월 | 산란기 직전인 11월부터 2월까지가 가장 맛이 좋다 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=32241) |
+| 바지락 | 3~5월 | 봄이 제철, 3~4월에 가장 맛이 좋다(7~8월 산란기 제외 연중 출하) | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=34707) |
+| 꼬막 | 11~4월 | 11월부터 4월까지 추울 때 채취한 꼬막이 맛이 좋다 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=13870) |
+| 병어 | 5~8월 | 5월부터 8월까지 많이 잡힌다 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=37068) |
+| 민어 | 6~8월 | 여름 대표(어획은 봄~가을) | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=33933) |
+| 바다장어 | 6~8월 | 뱀장어·갯장어·붕장어·먹장어 모두 여름이 제철 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=4595) |
+| 동해한치 | 12~5월 | 동해한치는 봄이 제철이고 맛은 겨울에서 봄까지가 가장 좋다 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=18408) |
+| 제주한치 | 6~8월 | 제주한치는 여름에 가장 많이 어획되고 맛도 좋다 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=18408) |
+
+고등어(9~11월)·대하(9~10월)·우럭(10~12월)·재첩은 FSIS 본문이 지금 범위와 같아 바꾸지 않았다. 오징어는 범위 근거가 없어 그대로(8월).
+
+### 해수부 선정 후보 → 검증 품종(15)
+
+| 품종 | 범위 | 근거 | 출처 |
+|---|---|---|---|
+| 갈치 | 10~12월 | 제철은 가을(10~12월) | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=5651) |
+| 낙지 | 4~6월·9~11월 | 가을 꽃낙지, 5~6월 세발낙지(해수부 4·10월 선정) | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=5392) |
+| 대구 | 12~2월 | 산란기(12~2월)와 일치하는 겨울이 제철 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=5864) |
+| 메기 | 6~8월 | 여름 보양식의 대명사(해수부 7·8월 선정) | FSIS 제목(여름 보양식의 대명사 메기) |
+| 물메기 | 12~2월 | 12월부터 2월까지 주로 잡히는 겨울 생선 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=33203) |
+| 미꾸라지 | 8~11월 | 가을에 살이 올라 맛이 좋다(해수부 8~10월 선정) | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=39925) |
+| 미더덕 | 3~5월 | 알이 차는 4~5월이 가장 맛이 좋다(해수부 3월 선정) | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=23950) |
+| 새조개 | 11~2월 | 11월부터 살이 차올라 겨울에 가장 맛이 좋다, 6~9월 금어기 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=28541) |
+| 서대 | 6~10월 | 여름에서 가을까지(6~10월)가 제철 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=6884) |
+| 성게 | 3~8월 | 보라성게는 봄부터 여름까지가 제철(말똥성게는 겨울~봄) | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=26539) |
+| 숭어 | 3~5월 | 4~5월에 주로 잡히는 보리숭어(해수부 3·4월 선정) | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=36720) |
+| 임연수어 | 12~5월 | 제철은 겨울부터 봄까지 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=34707) |
+| 전갱이 | 6~9월 | 제철은 여름, 7월부터 기름이 올라 9월에 절정 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=32610) |
+| 조기 | 9~2월 | 참조기는 9월부터 이듬해 2월까지가 제철(옛 소개는 3~6월) | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=34244) |
+| 해삼 | 10~2월 | 10~11월 제철, 동지 전후에 가장 맛이 좋고 겨울~초봄까지 | [FSIS](https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=34244) |
+
+### 올리지 않은 후보(18)
+
+감성돔 갑오징어 기름가자미 김 다슬기 다시마 도루묵 동죽 멸치 문어 미역 복어 새우류 송어 향어 홍가리비 홍게 홍어: FSIS 본문에 제철 범위가 없거나(산란기만), 연중이거나(미역), 검증 품종과 겹친다(새우류=대하).

@@ -26,7 +26,7 @@ export function monthFoods(month: number, pick: FoodPick): readonly Food[] {
     .slice(0, pick.max)
 }
 
-/** 체크 목록에 적는 품종 수의 상한. 한 달 제철이 최대 78개라, 넷씩 다섯 줄(A4 약 8pt)을 넘지 않게 대표만 적는다. */
+/** 체크 목록에 적는 품종 수의 상한. 한 달 제철이 최대 86개라, 넷씩 다섯 줄(A4 약 8pt)을 넘지 않게 대표만 적는다. */
 export const CHECKLIST_MAX = 20
 
 /** 이름만 적는 체크 목록(월간 M-B·메모, 월별 포스터 P-D)의 그 달 품종. 글자라 그림이 없는 품종도 넣는다. 차례는 monthFoods와 같다. */

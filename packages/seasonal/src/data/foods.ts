@@ -53,7 +53,7 @@ const isPeak = (food: Food, month: number) => (food.peak as readonly number[]).i
 
 /**
  * 그 달을 대표하는 품종(2a 흩뿌리기 판, 검색 설명). 그림이 있는 것, 그 달이 대표 달인 것, 처음부터 검증한 품종(core), 그 달에만 가까운(제철 달이 적은) 것, 이름 순.
- * 그 달 제철 품종이 많아(최대 78) 판에는 앞에서 몇 개만 그리고 나머지는 이름 목록으로 둔다.
+ * 그 달 제철 품종이 많아(최대 86) 판에는 앞에서 몇 개만 그리고 나머지는 이름 목록으로 둔다.
  */
 export function monthHighlights(month: number, count: number): readonly Food[] {
   return [...foodsInMonth(month)]

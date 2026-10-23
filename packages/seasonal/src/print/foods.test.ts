@@ -117,7 +117,7 @@ describe("stripFoods", () => {
     expect(dropped).toBe(monthFoods(11, { max: Infinity, categories: [] }).length - 8)
   })
 
-  it("2027년 모든 달·주 시작에서 띠 14개는 늘 찬다(한 달 제철이 가장 적은 2월도 23개)", () => {
+  it("2027년 모든 달·주 시작에서 띠 14개는 늘 찬다(한 달 제철이 가장 적은 1·2월도 31개)", () => {
     for (const weekStart of [0, 1] as const)
       for (const month of MONTHS) expect(stripFoods({ year: 2027, month, weekStart, stripSize: 14 }).strip, `${month}월 주 시작 ${weekStart}`).toHaveLength(14)
   })

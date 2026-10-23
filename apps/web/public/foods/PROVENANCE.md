@@ -10,7 +10,7 @@
 | kit sha | `6806db565e0538c4` |
 | 변형 | `color`, `motion` |
 | 바닥 그림자 | 끔 |
-| 품종 수 | 192 |
+| 품종 수 | 207 |
 
 | id | 이름 | food.mjs sha |
 |---|---|---|
@@ -26,6 +26,7 @@
 | `ashitaba` | 신선초(명일엽) | `65a973021939c5b6` |
 | `asparagus` | 아스파라거스 | `78907c2804ebdc18` |
 | `aster-scaber` | 취나물(참취) | `b3a88d4def7e729f` |
+| `atka-mackerel` | 임연수어 | `1fed2990439eea71` |
 | `bamboo-shoot` | 죽순 | `074b42b55eabc00b` |
 | `bangah-leaf` | 방아잎 | `e8eea7eef67dfc50` |
 | `bangpung-namul` | 방풍나물 | `7101336b902143ad` |
@@ -33,6 +34,7 @@
 | `beet` | 비트 | `e6c672a395bf53e3` |
 | `bell-pepper` | 피망 | `2990fde9a64d6015` |
 | `bellflower-root` | 도라지 | `40ebd0a82ecb90e2` |
+| `bird-clam` | 새조개 | `c4a36e83ddce7693` |
 | `bireum-namul` | 비름나물 | `7e875979376aee60` |
 | `bitter-melon` | 여주(고야) | `5c591ab913357312` |
 | `black-raspberry` | 복분자 | `847a02d5ea6a2a63` |
@@ -50,6 +52,7 @@
 | `butterbur-stalk` | 머위대 | `f0982acf2cfa9b5f` |
 | `cabbage` | 양배추 | `35f016d67fe937c2` |
 | `carrot` | 당근 | `75175f5117116b70` |
+| `catfish` | 메기 | `9016845ed1eeedae` |
 | `cauliflower` | 콜리플라워 | `fe26c1672a08de3d` |
 | `celery` | 샐러리 | `33bc01ca761b388b` |
 | `chamnamul` | 참나물 | `f2f299cf8b65f99f` |
@@ -64,6 +67,7 @@
 | `chonggak-radish` | 총각무 | `10abdb52d7f9f7bf` |
 | `chwicheong-cucumber` | 취청오이 | `66c85b7fdd810593` |
 | `cockle` | 꼬막 | `7d46a2b15651594e` |
+| `cod` | 대구 | `8f32ccf40bb63b17` |
 | `conger-eel` | 바다장어 | `e9c8046d0ae9fb2b` |
 | `corn` | 옥수수 | `78fd3bd3b5af43de` |
 | `croaker` | 민어 | `b62d1b84ea0250c6` |
@@ -92,7 +96,9 @@
 | `green-pea` | 완두콩 | `a5b0f3dc7463a074` |
 | `green-plum` | 매실 | `5831124939add733` |
 | `gwamegi` | 과메기 | `7913c3bd8a478c93` |
+| `hairtail` | 갈치 | `67b18f9021e26091` |
 | `hallabong` | 한라봉 | `d0389aef816d9aec` |
+| `horse-mackerel` | 전갱이 | `a2407993303c2518` |
 | `ixeris` | 씀바귀 | `303c8ed480ececed` |
 | `ixeris-root-greens` | 고들빼기 | `f488fb527bde8b02` |
 | `jaecheop-clam` | 재첩 | `ab4f79837a5e00c5` |
@@ -107,6 +113,8 @@
 | `kudzu-root` | 칡 | `9e2384bb21bedd82` |
 | `lettuce` | 상추 | `58a733c4ecd5ba34` |
 | `lions-mane` | 노루궁뎅이버섯 | `3b6e68a30992befe` |
+| `loach` | 미꾸라지 | `eb6c3d1336f23c3b` |
+| `long-arm-octopus` | 낙지 | `d51e17ab21efdc98` |
 | `lotus-root` | 연근 | `cca6324471e7d97d` |
 | `luffa` | 수세미 | `5ea498bd5ae5c58e` |
 | `mackerel` | 고등어 | `923d2b276f46c17d` |
@@ -116,10 +124,12 @@
 | `manila-clam` | 바지락 | `38f358b92c63eae4` |
 | `matsutake` | 송이버섯 | `0cb8428e6ba53f4e` |
 | `melon` | 멜론 | `4ac7051b4eceda2a` |
+| `mideodeok` | 미더덕 | `2a0b5873f37ae210` |
 | `monkfish` | 아귀 | `f597c4d43ea7b60b` |
 | `mouse-eye-bean` | 쥐눈이콩 | `e3146e79b493d42b` |
 | `mugwort` | 쑥 | `21b9dad35ff9a09d` |
 | `mulberry` | 오디 | `e1779514cdb7b882` |
+| `mullet` | 숭어 | `b113cc4ebd1f92a0` |
 | `mung-bean` | 녹두 | `b61624ee7e1280bc` |
 | `mussel` | 홍합 | `f8373bf00966a246` |
 | `mustard-greens` | 갓 | `cc5337779b91e091` |
@@ -164,7 +174,9 @@
 | `scallion` | 쪽파 | `b5eabcfc962fe205` |
 | `scallop` | 가리비 | `89e88513eb54c80b` |
 | `sea-bass` | 농어 | `e31ae42669090309` |
+| `sea-cucumber` | 해삼 | `eacd768bf79195f0` |
 | `sea-squirt` | 멍게 | `8c582123ed5b1ca0` |
+| `sea-urchin` | 성게 | `ecefb0bc7b5c0e77` |
 | `sebal-namul` | 세발나물 | `a9663810512d0121` |
 | `seomcho` | 섬초 | `6633b8d3e7432ea6` |
 | `seoritae` | 서리태 | `6d23327ecf3a0d22` |
@@ -174,6 +186,7 @@
 | `shishito-pepper` | 꽈리고추 | `a4907f8a3d3a573d` |
 | `shrimp` | 새우 | `4986fb56c9feb43e` |
 | `silverberry` | 보리수열매 | `2a428d73cdc644b6` |
+| `snailfish` | 물메기 | `fb7d8dcf23ba9094` |
 | `snow-crab` | 대게 | `4d92b73ed85276df` |
 | `sorghum` | 수수 | `43db3e98e631209f` |
 | `soybean` | 대두 | `8bf1a15c4c54a4d7` |
@@ -191,6 +204,7 @@
 | `taro-stem` | 토란대 | `7bc3e1f459ff1f87` |
 | `thistle-greens` | 엉겅퀴 | `1d4c5e641e0654fb` |
 | `tomato` | 토마토 | `118cb32c4ef1bf1e` |
+| `tongue-sole` | 서대 | `735a8f8b3211e69c` |
 | `turnip` | 순무 | `3318a0533a121a5b` |
 | `uloe-melon` | 울외 | `a415bfe834b6a686` |
 | `walnut` | 호두 | `ca30fefb69949361` |
@@ -203,6 +217,7 @@
 | `winter-melon` | 동아 | `a9a31a3446113aa0` |
 | `wood-ear` | 목이버섯 | `03d14ceeaa94fdaa` |
 | `yacon` | 야콘 | `c41881d1d7e675a8` |
+| `yellow-croaker` | 조기 | `b03e74f3e5e1bcef` |
 | `yellowtail` | 방어 | `8ad190066d2b1275` |
 | `young-radish` | 열무 | `e23c9d15839e98bb` |
 | `yuzu` | 유자 | `2e92b24a5a9a4aa9` |

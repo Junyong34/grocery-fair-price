@@ -7,7 +7,7 @@ describe("foodsInMonth", () => {
   it("그 달이 제철인 품종만 고른다", () => {
     const october = foodsInMonth(10).map((food) => food.name)
 
-    expect(october).toHaveLength(78)
+    expect(october).toHaveLength(86)
     expect(october).toContain("전어")
     expect(october).toContain("사과")
     expect(october).not.toContain("수박")
