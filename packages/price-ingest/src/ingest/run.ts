@@ -6,7 +6,8 @@
 import { ADAPTER_VERSION } from "../adapt/draft.ts"
 import { contractBaselineVersion } from "../contract/probes.ts"
 import type { FetchLike } from "../http.ts"
-import { connectIngest, type Sql } from "../load/db.ts"
+import { datesOfRawObjects, recomputeDailyQuote } from "../load/daily-quote.ts"
+import { connectIngest, transaction, type Sql } from "../load/db.ts"
 import { finishRun, previousRawFile, registerDuplicate, registerPending, registerRun } from "../load/ledger.ts"
 import { loadPendingFiles } from "../load/load-pending.ts"
 import { buildRawFile, callKeyOf, rawObjectKey, storagePathOf } from "../load/raw-file.ts"
@@ -227,6 +228,7 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
   // 대조로 DB 기록 없는 원본(DB 장애 때 올라간 것)을 채운 뒤 pending_load를 모두 적재한다
   let loaded = 0
   let loadFailed = 0
+  const loadedIds: number[] = []
   if (sql && !storageFailed) {
     try {
       const reconciled = await reconcileRawFiles({ sql, store, source, today: kstDateOf(now().toISOString()) })
@@ -234,6 +236,7 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
       const result = await loadPendingFiles({ sql, store, source })
       loaded = result.loaded.length
       loadFailed = result.failed.length
+      loadedIds.push(...result.loaded.map((o) => o.rawObjectId))
       for (const outcome of result.loaded) {
         const o = outcome.observations
         say(
@@ -244,6 +247,19 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
       for (const failure of result.failed) say(`적재 실패: ${failure.storagePath} ${redact(failure.error).slice(0, 160)}`)
     } catch (error) {
       await dbDown("대조·적재", error)
+    }
+  }
+
+  // 적재한 원본이 담은 날의 일자 요약을 다시 계산한다 (ingest-foundation/10). 실패하면 부분으로 끝내고 다음 실행이 다시 한다
+  if (sql && loadedIds.length > 0) {
+    try {
+      const basis = source === "chamga" ? "shelf_price" : "quote"
+      const days = await datesOfRawObjects(sql, loadedIds)
+      const quotes = await transaction(sql, (tx) => recomputeDailyQuote(tx, basis, days, today))
+      say(`일자 요약: ${basis} ${days.length}일, 고친 행 ${quotes.written}, 지운 행 ${quotes.removed}`)
+    } catch (error) {
+      say(`일자 요약 실패: ${errorSummary(error, redact)}`)
+      loadFailed += 1
     }
   }
 

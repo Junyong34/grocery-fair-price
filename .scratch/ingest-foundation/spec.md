@@ -27,7 +27,7 @@
 | 07 | 참가격 판매처 연결·상품 요약·관측값 보존 정리 | task | ready-for-agent (기한 2027-02) | ingest-schedule/12 |
 | 08 | 품종 카탈로그를 운영 DB에 넣기 | task | resolved (운영 적용 2026-10-26) | p3-variety-catalog/01 |
 | 09 | 적재 때 품종 매핑 적용과 기존 관측값 다시 매핑 | task | resolved (운영 다시 매핑 2026-10-26) | 08 |
-| 10 | KAMIS 일별 시세 재계산과 90일 보존 정리 | task | ready-for-agent | 09, ingest-schedule/11 |
+| 10 | KAMIS 일별 시세 재계산과 90일 보존 정리 | task | resolved (운영 적용 2026-10-26) | 09, ingest-schedule/11 |
 
 정기 수집 켜기는 [ingest-schedule 지도](../ingest-schedule/map.md)로 나눴다 (2026-10-26). 03의 남은 일 대부분과 `search-first-view/04`가 거기 있다.
 

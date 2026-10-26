@@ -12,8 +12,8 @@ KAMIS는 몇 달 지난 날짜의 행을 다시 등록한다 (15일 넘게 뒤 7
 
 - [ ] API 클라이언트에 `cond[orgnl_reg_dt::GTE]` 지원과 계약 고정 (kamis.md 1장, 03 진행 기록 "남은 것")
 - [ ] 감시 기준 시각: 직전 성공 감시의 시각을 어디서 읽는지 (`ingest_run`)
-- [ ] 재등록 행은 05의 병합으로 정정 처리. 90일 밖 날짜의 행은 **이번 지도에서는 그냥 관측값에 넣는다** (관측값 정리를 안 하므로. 지도 Out of scope)
-- [ ] `ingest --source kamis --job reregistration_watch`, `--job recheck --days 14`. `ingest_run.job` 값은 이미 있다
+- [ ] 재등록 행은 05의 병합으로 정정 처리. **90일 밖 날짜의 행은 관측값에 넣지 않는다** (보존 정리가 켜졌다, ingest-foundation/10, 2026-10-26). 원본에서 그날 표본을 다시 만들어 `daily_quote`를 바꾸고 `observation_revision.rebuild_result`를 남긴다 (pipeline 3-3 "보존 기간이 지난 행이 다시 등록되어 오면" 1~5). `recomputeDailyQuote`는 90일 밖 날을 다시 계산하지 않으므로 복원은 원본 표본을 세션 임시 표에 넣고 같은 계산을 그 표에 하는 길이 필요하다
+- [ ] `ingest --source kamis --job reregistration_watch`. 주간 14일 다시 받기는 11에서 `--recheck-days 14`로 만들었다
 - [ ] 테스트: 재등록 행이 와서 값이 바뀌면 `revision`·`observation_revision`·`correction_count`
 
 ## 완료 기준

@@ -37,7 +37,7 @@ Label: wayfinder:map
 ## Out of scope
 
 - 재계산(`recompute`)과 판정 스냅샷: 대응표가 없으면 계산할 집계가 없고 판정 계산식(로드맵 ②)도 없다. 품종 목록 뒤에 만든다.
-- 90일 지난 KAMIS 관측값 정리와 "보존 기간 밖 재등록" 원본 복원 (pipeline.md 3-3): 대응표 없는 동안은 관측값을 지우지 않으므로 생기지 않는다. 품종 목록 뒤에 둘을 함께 켠다.
+- 90일 지난 KAMIS 관측값 정리: 품종 목록 뒤 [ingest-foundation/10](../ingest-foundation/issues/10-kamis-daily-quote-retention.md)에서 켰다 (2026-10-26). "보존 기간 밖 재등록" 복원은 [09](issues/09-kamis-reregistration-watch.md)로 들어왔다.
 - 원본 삭제와 보존 기간 (3-7): 품종 목록 전까지 지우지 않는다.
 - 상품 병합 CLI(`merge-product`): 합칠 상품이 쌓인 뒤의 운영 도구.
 - 참가격 판매처 연결·`product_daily_summary`·관측값 보존 정리: 수집이 멈추지 않게 하는 일이 아니라 DB에 무엇을 얼마나 둘지의 일이다. [ingest-foundation/07](../ingest-foundation/issues/07-chamga-seller-summary-retention.md) (2026-10-26). 같은 체인 안 가격이 대부분 같다는 실측과 "인기 동네 점포만 넣자" 안을 쓰지 않는 이유가 거기 있다.

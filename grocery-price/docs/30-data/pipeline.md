@@ -952,7 +952,7 @@ raw_object
 3. 축평원 관측값과 평년 행은 영구 보관한다.
 4. 집계(`daily_quote`, `product_daily_summary`)는 영구 보관하되 `region:` 범위는 MVP에서 만들지 않는다.
 5. 원본: **KAMIS·축평원은 다시 받을 수 있으므로** 1년이 지난 원본을 지워도 된다 (백필 원본 포함). **참가격은 과거를 다시 주지 않을 수 있으므로 원본을 지우지 않는다** (2026-06-12 이전은 이미 받을 수 없다). 같은 내용의 다시 받기는 올리지 않는다 (3-7).
-6. 보존 정리는 주 1회 묶음 `delete`로 하고 autovacuum에 맡긴다 (관측값은 `autovacuum_vacuum_scale_factor = 0.05`, 3-3). 정리 대상은 BRIN `(obs_date)`로 찾는다. 관측값이 수백만 행을 넘게 되면 월 단위 파티션으로 바꾸고 `drop partition`으로 정리한다.
+6. 보존 정리는 주 1회 묶음 `delete`로 하고 autovacuum에 맡긴다. **그날의 요약이 있어야 지운다** (2026-10-26, `ingest-foundation/10`): KAMIS는 그날 KAMIS 시세 요약(`daily_quote`)이 있거나 대표로 집계될 행이 없는 날, 참가격은 그 조사일의 상품 요약(`product_daily_summary`)이 있는 날만. KAMIS 워크플로의 월요일 실행이 `purge`를 부른다 (관측값은 `autovacuum_vacuum_scale_factor = 0.05`, 3-3). 정리 대상은 BRIN `(obs_date)`로 찾는다. 관측값이 수백만 행을 넘게 되면 월 단위 파티션으로 바꾸고 `drop partition`으로 정리한다.
 
 ### 3-10. 예시: 실제 샘플 한 건씩 넣어 보기
 

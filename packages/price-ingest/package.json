@@ -12,7 +12,8 @@
     "contract:baseline": "node scripts/capture-baseline.ts",
     "probe:runner": "node scripts/probe-runner.ts",
     "ingest": "node src/cli.ts",
-    "catalog": "node src/catalog/cli.ts"
+    "catalog": "node src/catalog/cli.ts",
+    "purge": "node src/purge.ts"
   },
   "dependencies": {
     "fast-xml-parser": "5.11.2",

@@ -222,6 +222,23 @@ describe("보존 기간 정리 (KAMIS 90일, 참가격 6 조사일)", () => {
     })
   })
 
+  test("참가격은 상품 요약이 없으면 지우지 않는다", async () => {
+    await inRollback(admin, async (tx) => {
+      await tx`
+        insert into price.observation
+        select o.source_item_id, (o.obs_date + (14 * g))::date, o.place_id, o.price_tier, o.obs_kind, o.product_id,
+               o.variety_id, o.spec_id, o.price_raw, o.qty_raw, o.unit_raw, o.price_per_base, o.unit_rule_id,
+               o.promo_discount, o.promo_one_plus_one, o.promo_from, o.promo_to, o.flags, o.source_registered_at,
+               o.first_seen_at, o.revision, o.raw_object_id
+        from price.observation o join price.source_item si on si.id = o.source_item_id
+        cross join generate_series(1, 8) g
+        where si.source = 'chamga'`
+      await tx`delete from price.product_daily_summary`
+      const result = await tx`select source, deleted::int from price.purge_expired_observations('2027-01-31')`
+      expect(result.find((r) => r.source === "chamga")).toEqual({ source: "chamga", deleted: 0 })
+    })
+  })
+
   test("참가격은 최근 6 조사일보다 오래된 날만 지운다", async () => {
     await inRollback(admin, async (tx) => {
       // 같은 행을 격주 금요일로 복제해 조사일 9개를 만든다 (소유자 접속, 롤백). 오래된 3개가 지워진다.
@@ -234,6 +251,12 @@ describe("보존 기간 정리 (KAMIS 90일, 참가격 6 조사일)", () => {
         from price.observation o join price.source_item si on si.id = o.source_item_id
         cross join generate_series(1, 8) g
         where si.source = 'chamga'`
+      // 지우려면 그 조사일의 상품 요약이 있어야 한다 (ingest-foundation/10)
+      await tx`
+        insert into price.product_daily_summary
+        select s.product_id, s.scope_key, (s.obs_date + (14 * g))::date, s.min, s.median, s.max, s.median_excl_promo,
+               s.seller_avg, s.n_stores, s.n_sellers, s.promo_n, s.promo_unknown_n, s.meets_min_n, s.computed_at
+        from price.product_daily_summary s cross join generate_series(1, 8) g`
       const [oldest] = await tx`select count(*)::int as n from price.observation o join price.source_item si
                                 on si.id = o.source_item_id
                                 where si.source = 'chamga' and o.obs_date < date '2026-09-25' + 14 * 3`

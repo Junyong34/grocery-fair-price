@@ -1,5 +1,6 @@
 # KAMIS 정기 수집 (.scratch/ingest-schedule/issues/11, pipeline.md 5-1).
 # 매일 06:30 KST에 기준일의 D-3~D-1을, 매주 월요일 07:10 KST에 D-14~D-1을 다시 받는다 (재등록 보조).
+# 월요일 실행은 끝에 보존 정리(KAMIS 90일, 참가격 6 조사일. 요약이 있는 날만)를 한다 (ingest-foundation/10).
 # 품목 140개 × 기간 호출 1회 (축산은 페이지가 늘어난다). 실행당 호출 예산 8,000 (하루 한도 10,000).
 # 수동 실행에서 date(YYYY-MM-DD, 기준일)와 recheck_days를 줄 수 있다. 비우면 오늘·매일 수집.
 name: ingest-kamis
@@ -53,3 +54,9 @@ jobs:
           if [ -n "$BASE_DATE" ]; then args+=(--date "$BASE_DATE"); fi
           if [ -n "$RECHECK_DAYS" ]; then args+=(--recheck-days "$RECHECK_DAYS"); fi
           pnpm --filter @workspace/price-ingest ingest --source kamis "${args[@]}"
+      # 주 1회 보존 정리. 수집이 부분 실패해도 정리는 한다 (요약이 없는 날은 함수가 지우지 않는다)
+      - name: 보존 정리
+        if: ${{ !cancelled() && github.event.schedule == '10 22 * * 0' }}
+        env:
+          INGEST_DATABASE_URL: ${{ secrets.INGEST_DATABASE_URL }}
+        run: pnpm --filter @workspace/price-ingest purge

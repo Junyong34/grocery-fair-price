@@ -1,14 +1,17 @@
 // 품종 카탈로그를 DB에 넣는 명령 (ingest-foundation/08). 사람이 로컬에서 부른다.
 //   pnpm --filter @workspace/price-ingest catalog --classes [--dry-run]    분류 표 (OWNER_DATABASE_URL, 소유자 postgres)
 //   pnpm --filter @workspace/price-ingest catalog --mappings [--dry-run]   매핑 (INGEST_DATABASE_URL, ingest_writer)
-// 분류 표를 먼저 넣고 매핑을 넣는다. 매핑을 넣은 뒤 이미 쌓인 관측값을 다시 매핑한다 (09).
+// 분류 표를 먼저 넣고 매핑을 넣는다. 매핑을 넣은 뒤 이미 쌓인 관측값을 다시 매핑하고(09), 관측값이 있는 날의
+// 일자 요약을 다시 계산한다(10).
 // --dry-run은 같은 일을 하고 되돌린다.
 // .env를 스스로 읽지 않는다. 넣을 곳(로컬 DB인지 운영인지)을 정해 직접 넘긴다.
 import { parseArgs } from "node:util"
 
 import { connectIngest, type Tx } from "../load/db.ts"
+import { recomputeDailyQuote } from "../load/daily-quote.ts"
 import { lockSource } from "../load/observation.ts"
 import { remapObservations } from "../load/variety.ts"
+import { seoulToday } from "../load/window.ts"
 import { describeError, redactorFromEnv } from "../secrets.ts"
 
 import { applyClasses, applyMappings } from "./apply.ts"
@@ -45,7 +48,16 @@ async function applyMappingsAndRemap(tx: Tx) {
     await lockSource(tx, source)
     remapped[source] = await remapObservations(tx, source)
   }
-  return { ...mappings, remapped }
+  const days = async (kind: string) =>
+    (await tx<{ day: string }[]>`select distinct obs_date::text as day from price.observation where obs_kind = any(${kind.split(",")})`).map(
+      (r) => r.day,
+    )
+  const today = seoulToday()
+  const dailyQuote = {
+    quote: await recomputeDailyQuote(tx, "quote", await days("quote_sample,quote_aggregate"), today),
+    shelf_price: await recomputeDailyQuote(tx, "shelf_price", await days("shelf_price"), today),
+  }
+  return { ...mappings, remapped, dailyQuote }
 }
 
 async function main(): Promise<void> {
