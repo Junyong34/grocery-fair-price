@@ -308,6 +308,7 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `packages/price-ingest/scripts/capture-baseline.ts` | 기준 파일 생성. 계약과 다른 응답은 저장하지 않는다 |
 | `packages/price-ingest/src/ingest/`, `src/cli.ts` | 수집 실행: 호출 예산·재시도·멈춤 판정(`calls.ts`), 출처별 호출 계획과 원본 파일 묶기(`collect.ts`, KAMIS 품목 140개 `kamis-items.ts`), 참가격 조사일 감지·완료 규칙(`chamga-schedule.ts`, 상태는 `load/survey-day.ts`), 실행 한 번(`run.ts`: 실행 기록 → 호출 → 업로드(바로 전 파일과 같으면 중복 기록) → 대조 → 적재 → 마감, 종료 코드 `EXIT`), 명령 진입점(`cli.ts`) |
 | `packages/price-ingest/scripts/probe-runner.ts` | 공공 API 3개·Supabase DB·Storage에 한 번씩 붙어 성공과 걸린 시간만 찍는다 (러너 접속 실측) |
+| `packages/price-ingest/src/catalog/` | 품종 카탈로그 (ingest-foundation/08): 분류 표와 매핑의 원본 데이터(`varieties.ts`, 사람이 읽는 표는 `grocery-price/docs/30-data/variety-list.md`이고 `test/catalog.test.ts`가 둘과 실측 코드표가 맞는지 본다), 원천 키 → 품종·규격·대표 여부(`match.ts`), DB 적용(`apply.ts`), 명령 진입점(`cli.ts`) |
 
 수집 CLI와 GitHub Actions 워크플로는 `ingest-foundation/03`에서 이 패키지에 더한다.
 
@@ -332,6 +333,7 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `pnpm db:erd` | `schema-map.html`의 ERD를 로컬 DB에서 다시 만든다 |
 | `pnpm --filter @workspace/price-db load:samples` / `measure` | 샘플 테스트 데이터 넣기 / 행당 크기 실측 |
 | `pnpm --filter @workspace/price-ingest ingest --source kamis\|ekape [--date YYYY-MM-DD]` / `--source chamga [--survey-day YYYY-MM-DD ...]` (조사일 없으면 자동 모드) | 수집 한 번. 환경변수 4개(`DATA_GO_KR_SERVICE_KEY`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `INGEST_DATABASE_URL`)를 넘긴다. `.env`를 스스로 읽지 않으므로 운영에 넣을지 로컬에 넣을지 직접 정한다. 종료 코드 0 성공, 1 부분, 2 키 오류, 3 DB 실패, 4 업로드 실패, 9 예상 밖 |
+| `pnpm --filter @workspace/price-ingest catalog --classes\|--mappings [--dry-run]` | 품종 카탈로그를 DB에 넣는다. `--classes`는 분류 표(소유자 접속 `OWNER_DATABASE_URL`, 로컬에서만), `--mappings`는 pending 매핑을 카탈로그대로 잇는다(`INGEST_DATABASE_URL`). 분류 표가 먼저다. `.env`를 읽지 않는다 |
 | `pnpm --filter @workspace/price-ingest probe:runner` | 접속 실측 (루트 `.env`를 읽는다. API 3회) |
 | `scripts/check-no-secrets.sh [--tree]` | `.env` 값이 커밋 대상에 들어갔는지 검사 (pre-commit) |
 

@@ -7,7 +7,8 @@ import { inspect } from "node:util"
 export const MASK = "***"
 
 // 수집이 쓰는 비밀 환경변수 (pipeline 5-3-1). SUPABASE_URL은 비밀이 아니다.
-export const SECRET_ENV = ["DATA_GO_KR_SERVICE_KEY", "SUPABASE_SECRET_KEY", "INGEST_DATABASE_URL"] as const
+// OWNER_DATABASE_URL은 카탈로그 분류 표를 넣을 때만 로컬에서 쓴다 (ingest-foundation/08). Actions에는 넣지 않는다.
+export const SECRET_ENV = ["DATA_GO_KR_SERVICE_KEY", "SUPABASE_SECRET_KEY", "INGEST_DATABASE_URL", "OWNER_DATABASE_URL"] as const
 
 // 너무 짧은 값은 지우지 않는다. 다른 글자까지 지워 출력이 망가진다.
 const MIN_LENGTH = 6

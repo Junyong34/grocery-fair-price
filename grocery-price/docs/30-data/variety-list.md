@@ -1,6 +1,6 @@
 # 품종 목록
 
-Status: 확정 (2026-10-26). `.scratch/p3-variety-catalog/issues/01-variety-list.md`의 산출물이다. 운영 DB의 품종·규격·매핑은 이 표에서 만든다.
+Status: 확정 (2026-10-26). `.scratch/p3-variety-catalog/issues/01-variety-list.md`의 산출물이다. 운영 DB에 넣는 원본은 `packages/price-ingest/src/catalog/varieties.ts`(slug·원천 키)이고, 테스트가 이 표와 같은지 본다. 품종을 고치면 둘을 같이 고친다.
 
 판정할 **품종**의 목록과 각 품종이 어느 출처의 어느 코드로 시세를 받는지 정한다. 용어는 [GLOSSARY.md](../../GLOSSARY.md). 입력은 [item-inventory.md](sources/item-inventory.md)(2026-10-19 실측)와 2026-10-19~23 KAMIS 가격 실측이다.
 
