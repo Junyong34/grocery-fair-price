@@ -22,7 +22,7 @@ beforeAll(async () => {
   sql = await connectLocalIngest() // 롤 비밀번호를 넣는다
 })
 
-// 1997-10-01 22:00Z(= 10-02 07:00 KST)부터 부를 때마다 1초씩 간다
+// 1997-10-01 22:00Z(= 10-02 07:00 KST)부터 부를 때마다 1초씩 간다 (호출마다 걸린 시간을 재느라 몇 분 지난다)
 function clock(startMinute: number): () => Date {
   let tick = 0
   return () => new Date(Date.UTC(1997, 9, 1, 22, startMinute, tick++))
@@ -80,7 +80,7 @@ describe("수집 실행 (커밋, 순서대로)", () => {
     const result = await run({ startMinute: 0, fetch: only211() })
     expect(result).toMatchObject({ exitCode: EXIT.ok, errorCode: null, callsUsed: 140, loadFailed: 0 })
     expect(result.uploaded).toHaveLength(1)
-    expect(result.uploaded[0]).toMatch(/^raw\/kamis\/1997\/10\/02\/daily-19971001T2200\d{2}000Z\.ndjson\.gz$/)
+    expect(result.uploaded[0]).toMatch(/^raw\/kamis\/1997\/10\/02\/daily-19971001T22\d{4}000Z\.ndjson\.gz$/)
     expect(await runRow(result.runId!)).toMatchObject({ status: "ok", error_code: null, calls_used: 140 })
 
     const [raw] = await sql<{ load_status: string; target_from: string; target_to: string; row_count: number }[]>`

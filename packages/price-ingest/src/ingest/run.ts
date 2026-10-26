@@ -15,7 +15,7 @@ import { closeEmpty, markNotYet, readSurveyDays, recordFetch, rowCountOf } from 
 import { createObjectStore, type ObjectStore } from "../load/storage.ts"
 import { kstDateOf } from "../load/window.ts"
 import { createRedactor, errorSummary } from "../secrets.ts"
-import { CALL_BUDGET, CallBudget, realSleep, type Sleep, type StopReason } from "./calls.ts"
+import { CALL_BUDGET, CALL_TIME_LIMIT_MS, CallBudget, realSleep, type Sleep, type StopReason } from "./calls.ts"
 import { backlogFridays, nextStableChecks, planChamga, recentFridays, type ChamgaPlan, type SurveyDayState } from "./chamga-schedule.ts"
 import { collect, type CollectContext, type CollectRequest } from "./collect.ts"
 
@@ -129,6 +129,8 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
     sleep: deps.sleep ?? realSleep,
     delays: deps.delays,
     log: say,
+    now: () => now().getTime(),
+    deadline: Date.parse(startedAt) + CALL_TIME_LIMIT_MS[source],
   }
   const today = kstDateOf(now().toISOString())
 

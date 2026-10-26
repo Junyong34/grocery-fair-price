@@ -8,8 +8,12 @@ export const CALL_BUDGET: Record<DbSource, number> = { kamis: 8_000, ekape: 800,
 
 export const RETRY_DELAYS_MS = [2_000, 4_000, 8_000] as const
 
+// 실행마다 호출에 쓸 시간. 워크플로 timeout-minutes(KAMIS 30, 축평원 15, 참가격 60)보다 짧게 두어 업로드·적재할 시간을 남긴다.
+// 넘기면 그때까지 받은 것을 올리고 부분(time_limit)으로 끝낸다. 시간 초과로 취소되면 받은 것을 다 잃는다 (ingest-schedule/11, 2026-10-26)
+export const CALL_TIME_LIMIT_MS: Record<DbSource, number> = { kamis: 20 * 60_000, ekape: 8 * 60_000, chamga: 45 * 60_000 }
+
 // 그 출처의 이번 실행을 멈추는 이유. ingest_run.error_code에 그대로 남는다 (13이 알림을 고른다).
-export type StopReason = "key_invalid" | "quota_exceeded" | "budget_exhausted" | "service_missing"
+export type StopReason = "key_invalid" | "quota_exceeded" | "budget_exhausted" | "service_missing" | "time_limit"
 
 export class SourceStopped extends Error {
   reason: StopReason

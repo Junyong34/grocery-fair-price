@@ -38,6 +38,7 @@ export type CollectContext = {
   delays?: readonly number[]
   log?: (line: string) => void // 진행·느린 호출·실패 (값·키·주소 없음)
   now?: () => number // 걸린 시간 (ms). 테스트가 바꾼다
+  deadline?: number // 이 시각(ms)이 지나면 새 호출을 하지 않고 time_limit으로 멈춘다
 }
 
 // 이보다 오래 걸린 논리 호출(다시 부르기 포함)은 로그에 남긴다. 러너에서 data.go.kr이 늦는지 보려고 (ingest-schedule/11)
@@ -90,6 +91,11 @@ class FileBuilder {
     if (this.stop) return null
     const now = this.ctx.now ?? Date.now
     const started = now()
+    if (this.ctx.deadline !== undefined && started >= this.ctx.deadline) {
+      this.stop = "time_limit"
+      this.ctx.log?.(`시간 한도: ${this.file.label} ${this.added}번째 호출까지 받고 멈춘다`)
+      return null
+    }
     const before = this.file.requests.length
     const statuses = () => this.file.requests.slice(before).map((r) => r.httpStatus || "응답없음").join(",")
     this.added += 1

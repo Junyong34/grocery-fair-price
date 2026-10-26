@@ -101,6 +101,20 @@ describe("출처별 호출 계획 (pipeline 5-1)", () => {
     expect(result.files[0]!.requests).toHaveLength(140)
   })
 
+  it("시간 한도가 지나면 새 호출을 하지 않고 받은 것까지 돌려준다 (time_limit)", async () => {
+    const calls: FakeCall[] = []
+    let clock = 0
+    const fetch = fakeKamis(() => [], calls)
+    const timed = async (url: string, init: { signal: AbortSignal }) => {
+      clock += 60_000 // 호출마다 1분
+      return fetch(url, init)
+    }
+    const result = await collectKamis({ ...ctx(timed), now: () => clock, deadline: 3 * 60_000 }, "2026-10-27")
+    expect(calls).toHaveLength(3)
+    expect(result.stop).toBe("time_limit")
+    expect(result.files[0]!.requests).toHaveLength(3)
+  })
+
   it("KAMIS 주간 다시 받기: D-14~D-1, 라벨 recheck", async () => {
     const calls: FakeCall[] = []
     const result = await collectKamis(ctx(fakeKamis(() => [], calls)), "2026-10-27", 14)
