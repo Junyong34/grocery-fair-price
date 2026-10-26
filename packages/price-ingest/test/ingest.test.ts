@@ -101,6 +101,14 @@ describe("출처별 호출 계획 (pipeline 5-1)", () => {
     expect(result.files[0]!.requests).toHaveLength(140)
   })
 
+  it("KAMIS 주간 다시 받기: D-14~D-1, 라벨 recheck", async () => {
+    const calls: FakeCall[] = []
+    const result = await collectKamis(ctx(fakeKamis(() => [], calls)), "2026-10-27", 14)
+    expect(calls[0]!.params.get("cond[exmn_ymd::GTE]")).toBe("20261013")
+    expect(calls[0]!.params.get("cond[exmn_ymd::LTE]")).toBe("20261026")
+    expect(result.files[0]).toMatchObject({ label: "recheck", targetFrom: "2026-10-13", targetTo: "2026-10-26" })
+  })
+
   it("KAMIS: 한 품목이 계속 실패하면 세고 넘어가며, 받은 행과 호출 기록의 행 수가 맞는다", async () => {
     const rows = syntheticKamisRows({ year: "1997", itemCd: "211" })
     const fetch = fakeKamis((item) => (item === "212" ? new Error("down") : item === "211" ? rows : []))
@@ -163,6 +171,9 @@ describe("명령 인자", () => {
     expect(() => parseRequest(["--source", "chamga", "--survey-day", "0612"], "2026-10-27")).toThrow(/survey-day/)
     expect(() => parseRequest(["--source", "nope"], "2026-10-27")).toThrow(/사용법/)
     expect(() => parseRequest(["--source", "kamis", "--date", "20261027"], "2026-10-27")).toThrow(/YYYY-MM-DD/)
+    expect(parseRequest(["--source", "kamis", "--recheck-days", "14"], "2026-10-27")).toEqual({ source: "kamis", day: "2026-10-27", recheckDays: 14 })
+    expect(() => parseRequest(["--source", "ekape", "--recheck-days", "14"], "2026-10-27")).toThrow(/recheck-days/)
+    expect(() => parseRequest(["--source", "kamis", "--recheck-days", "0"], "2026-10-27")).toThrow(/recheck-days/)
   })
 
   it("날짜 더하기", () => {

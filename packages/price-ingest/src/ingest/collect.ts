@@ -87,11 +87,15 @@ class FileBuilder {
   }
 }
 
-// KAMIS: 기준일 D의 D-3~D-1을 품목마다 기간 호출 한 번 (소매 01, 140개 품목)
-export async function collectKamis(ctx: CollectContext, day: string): Promise<Collected> {
-  const from = addDays(day, -3)
+// KAMIS: 기준일 D의 D-3~D-1을 품목마다 기간 호출 한 번 (소매 01, 140개 품목).
+// recheckDays를 주면 D-N~D-1을 다시 받는다 (주간 14일 다시 받기, pipeline 5-1). 라벨이 달라 매일 파일과 따로 중복 판정한다
+export const KAMIS_DAILY_DAYS = 3
+
+export async function collectKamis(ctx: CollectContext, day: string, recheckDays?: number): Promise<Collected> {
+  const from = addDays(day, -(recheckDays ?? KAMIS_DAILY_DAYS))
   const to = addDays(day, -1)
-  const builder = new FileBuilder(ctx, { endpoint: KAMIS_ENDPOINT, label: "daily", targetFrom: from, targetTo: to })
+  const label = recheckDays === undefined ? "daily" : "recheck"
+  const builder = new FileBuilder(ctx, { endpoint: KAMIS_ENDPOINT, label, targetFrom: from, targetTo: to })
   for (const item of KAMIS_ITEMS) {
     await builder.add((call) =>
       fetchKamisPerDayAll(call, { fromYmd: compact(from), toYmd: compact(to), ctgryCd: item.ctgryCd, itemCd: item.itemCd, seCd: "01" }),
@@ -167,12 +171,16 @@ export async function detectChamgaSurvey(ctx: CollectContext, surveyDay: string)
 }
 
 // 참가격: surveyDays를 주면 그 조사일들을 받는다(과거분 채우기 12). 주지 않으면 자동 모드(감지·완료 규칙, 10)
-export type CollectRequest = { source: "kamis" | "ekape"; day: string } | { source: "chamga"; surveyDays?: readonly string[] }
+// KAMIS recheckDays: 주간 다시 받기의 날 수 (없으면 매일 수집)
+export type CollectRequest =
+  | { source: "kamis"; day: string; recheckDays?: number }
+  | { source: "ekape"; day: string }
+  | { source: "chamga"; surveyDays?: readonly string[] }
 
 export function collect(ctx: CollectContext, request: CollectRequest): Promise<Collected> {
   switch (request.source) {
     case "kamis":
-      return collectKamis(ctx, request.day)
+      return collectKamis(ctx, request.day, request.recheckDays)
     case "ekape":
       return collectEkape(ctx, request.day)
     case "chamga":

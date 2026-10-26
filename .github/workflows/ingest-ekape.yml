@@ -1,0 +1,47 @@
+# 축평원 정기 수집 (.scratch/ingest-schedule/issues/11, pipeline.md 5-1).
+# 매일 06:40 KST에 기준일의 D-1과 다시 받기 D-2·D-3을 받는다. 축종 7개 × 3일 = 21회 (실행당 예산 800).
+# 수동 실행에서 date(YYYY-MM-DD, 기준일)를 줄 수 있다. 비우면 오늘(KST).
+name: ingest-ekape
+
+on:
+  schedule:
+    - cron: "40 21 * * *" # KST 06:40
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "기준일 (YYYY-MM-DD). 비우면 오늘(KST)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ingest-ekape
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15 # 21회 + 다시 부르기
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --filter "@workspace/price-ingest..."
+      # 비밀값은 이 단계의 env로만 넘긴다. CLI가 인코딩 변형까지 ::add-mask::로 더한다 (ingest-schedule/02)
+      # 입력값은 run 줄에 직접 넣지 않고 env로 넘긴다 (스크립트 주입 방지). 형식은 CLI가 검사한다
+      - name: 수집
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          INGEST_DATABASE_URL: ${{ secrets.INGEST_DATABASE_URL }}
+          BASE_DATE: ${{ inputs.date }}
+        run: |
+          args=()
+          if [ -n "$BASE_DATE" ]; then args+=(--date "$BASE_DATE"); fi
+          pnpm --filter @workspace/price-ingest ingest --source ekape "${args[@]}"

@@ -101,6 +101,7 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
   const say = (line: string) => log(redact(line))
   const source = request.source
   const startedAt = now().toISOString()
+  const job = request.source === "kamis" && request.recheckDays !== undefined ? "recheck" : "daily"
   const budget = new CallBudget(CALL_BUDGET[source])
   const store = deps.store ?? createObjectStore({ url: deps.env.supabaseUrl, secretKey: deps.env.secretKey })
 
@@ -117,7 +118,7 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
   }
   try {
     sql = (deps.connect ?? connectIngest)(deps.env.databaseUrl)
-    runId = await registerRun(sql, { source, job: "daily", callBudget: budget.limit, startedAt })
+    runId = await registerRun(sql, { source, job, callBudget: budget.limit, startedAt })
   } catch (error) {
     await dbDown("실행 기록", error)
   }
@@ -171,7 +172,7 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
       {
         source,
         endpoint: part.endpoint,
-        job: "daily",
+        job,
         ingestRunId: runId,
         runStartedAt: startedAt,
         fetchedAt,

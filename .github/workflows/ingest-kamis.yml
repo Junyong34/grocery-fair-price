@@ -1,0 +1,55 @@
+# KAMIS 정기 수집 (.scratch/ingest-schedule/issues/11, pipeline.md 5-1).
+# 매일 06:30 KST에 기준일의 D-3~D-1을, 매주 월요일 07:10 KST에 D-14~D-1을 다시 받는다 (재등록 보조).
+# 품목 140개 × 기간 호출 1회 (축산은 페이지가 늘어난다). 실행당 호출 예산 8,000 (하루 한도 10,000).
+# 수동 실행에서 date(YYYY-MM-DD, 기준일)와 recheck_days를 줄 수 있다. 비우면 오늘·매일 수집.
+name: ingest-kamis
+
+on:
+  schedule:
+    - cron: "30 21 * * *" # KST 06:30 매일
+    - cron: "10 22 * * 0" # KST 월 07:10 주간 다시 받기
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "기준일 (YYYY-MM-DD). 비우면 오늘(KST)"
+        required: false
+        default: ""
+      recheck_days:
+        description: "다시 받을 날 수 (1~31). 비우면 매일 수집(D-3~D-1)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ingest-kamis
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30 # 약 150회 × 1초 + 다시 부르기
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --filter "@workspace/price-ingest..."
+      # 비밀값은 이 단계의 env로만 넘긴다. CLI가 인코딩 변형까지 ::add-mask::로 더한다 (ingest-schedule/02)
+      # 입력값은 run 줄에 직접 넣지 않고 env로 넘긴다 (스크립트 주입 방지). 형식은 CLI가 검사한다
+      - name: 수집
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          INGEST_DATABASE_URL: ${{ secrets.INGEST_DATABASE_URL }}
+          BASE_DATE: ${{ inputs.date }}
+          RECHECK_DAYS: ${{ github.event.schedule == '10 22 * * 0' && '14' || inputs.recheck_days }}
+        run: |
+          args=()
+          if [ -n "$BASE_DATE" ]; then args+=(--date "$BASE_DATE"); fi
+          if [ -n "$RECHECK_DAYS" ]; then args+=(--recheck-days "$RECHECK_DAYS"); fi
+          pnpm --filter @workspace/price-ingest ingest --source kamis "${args[@]}"
