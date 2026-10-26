@@ -1,6 +1,5 @@
-import { foodsInMonth } from "@workspace/seasonal/data/foods"
-import { MONTHS, type Month } from "@workspace/seasonal/data/months"
 import type { Food } from "@workspace/seasonal/data/foods"
+import { MONTHS, type Month } from "@workspace/seasonal/data/months"
 import { monthChecklist, monthFoods, stripFoods, yearFoods, yearFoodsByMonth } from "@workspace/seasonal/print/foods"
 import { chartFoods, chartLines } from "@workspace/seasonal/print/period-chart"
 import { CALENDAR_TEXT_SCALE, type MonthlySpec, type Paper } from "@workspace/seasonal/print/spec"
@@ -254,7 +253,7 @@ function Memo({ kind, month, height }: { kind: "lines" | "eaten-check"; month: M
         ))}
       </div>
     )
-  return <CheckList foods={foodsInMonth(month)} columns={4} fontSize={2.8} style={{ height: u(height), paddingTop: u(4) }} />
+  return <CheckList foods={monthChecklist(month, [])} columns={4} fontSize={2.8} style={{ height: u(height), paddingTop: u(4) }} />
 }
 
 /** M-B: 그 달 품종 전체(그림 없는 품종 포함)를 한 줄에 하나씩. 품종이 많은 달은 글자를 줄여 높이에 맞춘다. */
