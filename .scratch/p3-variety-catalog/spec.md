@@ -8,7 +8,7 @@
 
 | # | 제목 | 유형 | 상태 | 선행 |
 |---|---|---|---|---|
-| 01 | 품종 리스트업 | grilling | ready-for-human | p2/13 |
+| 01 | 품종 리스트업 | grilling | resolved | p2/13 |
 | 02 | 목록 밖 품종과 점포 데이터가 없는 품종의 대응 | grilling | ready-for-human | 01 |
 
 ## 입력
