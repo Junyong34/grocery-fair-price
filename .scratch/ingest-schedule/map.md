@@ -11,7 +11,7 @@ Label: wayfinder:map
 
 - **실행까지 포함한다** (2026-10-26). 결정 티켓과 함께 구현 조각도 `task` 티켓으로 둔다. 티켓 하나를 한 세션에 끝내고, `pnpm typecheck`·`pnpm lint`·`pnpm test`(DB를 건드리면 `pnpm --filter @workspace/price-ingest test:db`도)가 통과하면 main에 커밋한다.
 - **참가격 경로가 먼저다.** 참가격 API는 2026-06-12 이후만 주고 그 범위가 유지된다는 보장이 없다. frontier에서 고를 때 참가격으로 가는 티켓(05 → 06 → 07 → 10 → 12)을 앞세운다.
-- **품종 대응표 없이 켠다** (2026-10-26). 운영 DB에는 품종·`source_code_map`이 없다(`supabase/seed.sql`은 로컬 전용). 관측값은 `variety_id = null`로 쌓이고, 처음 보는 코드는 `source_item`에 매핑 `pending`으로 등록되며, `daily_quote`는 생기지 않는다. 품종 목록(`p3-variety-catalog/01`)이 정해지면 원본에서 다시 적재한다. **그때까지 원본 파일과 관측값을 지우지 않는다.**
+- **품종 대응표 없이 켠다** (2026-10-26). 운영 DB에는 품종·`source_code_map`이 없다(`supabase/seed.sql`은 로컬 전용). 관측값은 `variety_id = null`로 쌓이고, 처음 보는 코드는 `source_item`에 매핑 `pending`으로 등록되며, `daily_quote`는 생기지 않는다. 품종 목록(`p3-variety-catalog/01`)이 정해지면 원본에서 다시 적재한다. **그때까지 원본 파일과 관측값을 지우지 않는다.** 단 기한이 있다: 운영 첫 실측(2026-10-26) 기준 참가격 조사일 하나가 약 17MB라, 지우지 않으면 2027년 2월쯤 400MB, 3월쯤 무료 한도 500MB에 닿는다 ([12](issues/12-chamga-workflow-and-catch-up.md) 진행 기록). 그 전에 품종 목록을 정하거나 보존 정리를 먼저 켠다.
 - **공개 저장소다.** Actions 로그를 누구나 본다. GitHub는 Secret 값을 그대로 쓴 경우만 가리고, URL 인코딩된 키는 가리지 않는다. 키·접속 주소가 로그·오류에 남지 않는 것을 첫 워크플로보다 먼저 막는다 (02). 비공개 전환은 프로토타입 뒤에 다시 본다.
 - 같은 data.go.kr 키와 일일 한도를 로컬과 Actions가 같이 쓴다. 수집 시각 앞뒤로 로컬에서 대량 호출하지 않는다.
 - 읽을 것: [pipeline.md](../../grocery-price/docs/30-data/pipeline.md) 3-0(접속·키·적재), 3-3(관측값 upsert), 3-5(`source_day`), 3-7(원본), 5장(일정·장애·Actions 운영). 출처별 실측은 `grocery-price/docs/30-data/sources/`(`kamis.md`, `ekape.md`, `chamgagyeok.md`). 이미 만든 것은 [ingest-foundation/03](../ingest-foundation/issues/03-ingest-package-and-actions.md)의 진행 기록. DB 작업 전에 `supabase-postgres-best-practices` 스킬.
