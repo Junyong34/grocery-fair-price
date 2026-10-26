@@ -1,6 +1,6 @@
 # 08. 품종 카탈로그를 운영 DB에 넣기
 
-Status: claimed
+Status: resolved
 Type: task
 Blocked by: p3-variety-catalog/01 (resolved)
 
@@ -20,7 +20,7 @@ Blocked by: p3-variety-catalog/01 (resolved)
 - [x] **분류 표 적용 명령** (소유자 접속): slug로 upsert, 카탈로그에서 빠진 품종은 지우지 않고 `hidden`. 끝에 "기본 규격이 없는 활성 품종" 검사(pipeline 3-1). 단위 규칙 `retail-g`·`retail-ea`·`retail-ml` (`same_unit`)
 - [x] **매핑 적용 명령** (`ingest_writer`): 카탈로그 키와 맞는 원천 키의 `pending` 매핑을 `mapped`로, 참가격 신선 상품은 `product_variety_map`에 `operator`로, 가공식품은 `ignored`로. 축산은 두 출처에 다 있으면 축평원이 `primary`, KAMIS가 `secondary` (pipeline 6-1)
 - [x] 로컬에서 두 명령을 빈 DB와 샘플 DB에 돌려 검증 (`test:db`)
-- [ ] 운영 적용: 사람이 소유자 비밀번호로 분류 표 명령을 돌리고, 매핑 명령을 돌린다
+- [x] 운영 적용: 사람이 소유자 비밀번호로 분류 표 명령을 돌리고, 매핑 명령을 돌린다
 
 ## 정한 것
 
@@ -38,4 +38,5 @@ Blocked by: p3-variety-catalog/01 (resolved)
 ## 진행 기록
 
 - 2026-10-26: 카탈로그 `packages/price-ingest/src/catalog/`(품종 133, 규격 193, KAMIS 키 187개로 소매 코드 186개 전부·축평원 27개 전부, 참가격 신선 상품 66개)와 명령 `catalog --classes|--mappings [--dry-run]`을 만들었다. `test/catalog.test.ts`(실측 코드표·제철 id·variety-list.md 대조)와 `test/db/catalog.db.test.ts`(되돌리는 트랜잭션에서 분류 표·매핑, `ingest_writer`가 분류 표를 못 씀, 같은 트랜잭션에서 `ingest_writer`로 매핑)가 통과한다.
-- 남은 것: 운영 적용. 사람이 Supabase 대시보드(Connect → Session pooler)의 `postgres` 접속 주소와 DB 비밀번호로 `.env`에 `OWNER_DATABASE_URL`을 넣는다 (Actions에는 넣지 않는다). 그 뒤 `--classes --dry-run` → `--classes` → `--mappings`.
+- 2026-10-26 운영 적용: `.env`의 `OWNER_DATABASE_URL`(Session pooler, 사용자 `postgres.<ref>`, Actions에는 없음)로 `--classes --dry-run` → `--classes`, 이어 `--mappings --dry-run` → `--mappings`. 결과: 활성 품종 133, 규격 193, 제철 매핑 66, 참가격 상품 mapped 66 · ignored 386 · pending 5(볶음참깨), 충돌 0, 기본 규격 없는 품종 0. KAMIS·축평원 원천 키는 아직 없어(수집 전) 매핑할 것이 없었다. 수집이 처음 등록하는 키는 `pending`이므로, 수집을 켠 뒤 `--mappings`를 한 번 더 돌리거나 09가 등록 때 바로 잇는다.
+- 관측값의 `variety_id`는 아직 `null`이다. 적재가 매핑을 쓰는 일과 기존 관측값 다시 매핑은 09.

@@ -25,7 +25,7 @@
 | 05 | 장애 처리·알림·수집 상태 | task | ready-for-agent | 03 |
 | 06 | 웹앱이 Supabase를 읽는 방식 | research | resolved (서버 전용, 2026-10-20. 캐시·갱신 신호는 ④) | 02 |
 | 07 | 참가격 판매처 연결·상품 요약·관측값 보존 정리 | task | ready-for-agent (기한 2027-02) | ingest-schedule/12 |
-| 08 | 품종 카탈로그를 운영 DB에 넣기 | task | in-progress | p3-variety-catalog/01 |
+| 08 | 품종 카탈로그를 운영 DB에 넣기 | task | resolved (운영 적용 2026-10-26) | p3-variety-catalog/01 |
 | 09 | 적재 때 품종 매핑 적용과 기존 관측값 다시 매핑 | task | ready-for-agent | 08 |
 | 10 | KAMIS 일별 시세 재계산과 90일 보존 정리 | task | ready-for-agent | 09, ingest-schedule/11 |
 
