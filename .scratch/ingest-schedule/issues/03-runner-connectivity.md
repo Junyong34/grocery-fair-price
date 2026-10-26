@@ -1,6 +1,6 @@
 # 03. GitHub 러너에서 data.go.kr·Supabase 접속 실측
 
-Status: open
+Status: claimed
 Type: task (AFK)
 Blocked by: 01, 02
 

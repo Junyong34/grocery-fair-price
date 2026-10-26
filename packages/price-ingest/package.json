@@ -9,7 +9,8 @@
     "test": "vitest run",
     "test:live": "vitest run --config vitest.live.config.ts",
     "test:db": "vitest run --config vitest.db.config.ts",
-    "contract:baseline": "node scripts/capture-baseline.ts"
+    "contract:baseline": "node scripts/capture-baseline.ts",
+    "probe:runner": "node scripts/probe-runner.ts"
   },
   "dependencies": {
     "fast-xml-parser": "5.11.2",

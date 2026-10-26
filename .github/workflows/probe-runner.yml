@@ -1,0 +1,36 @@
+# 임시: GitHub 러너에서 공공 API 3개와 Supabase에 붙는지 잰다 (.scratch/ingest-schedule/issues/03).
+# 수집 시각대(KST 06:30~07:10)에 며칠 돌려 결과를 03에 적은 뒤 이 파일을 지운다.
+name: probe-runner
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "35 21 * * *" # KST 06:35
+    - cron: "5 22 * * *" # KST 07:05
+
+permissions:
+  contents: read
+
+concurrency:
+  group: probe-runner
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --filter "@workspace/price-ingest..."
+      # 비밀값은 이 단계의 env로만 넘긴다. 스크립트가 인코딩 변형까지 ::add-mask::로 더한다 (02)
+      - run: pnpm --filter @workspace/price-ingest probe:runner
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          INGEST_DATABASE_URL: ${{ secrets.INGEST_DATABASE_URL }}
