@@ -29,7 +29,7 @@ export function seasonRuns(months: readonly number[]): SeasonRun[] {
 /** 막대표에 싣는 품종의 달마다 상한. 여섯이면 많아야 72줄로, 그림 있는 품종 67개를 다 싣던 때와 글자 크기가 같다. */
 export const CHART_PER_MONTH = 6
 
-/** 막대표에 실을 품종: 고른 카테고리(비우면 전부)에서 달마다 대표 CHART_PER_MONTH개(yearFoods, 앞 달과 겹치지 않음). 품종이 192개라 다 실으면 글자가 6pt 아래로 준다. */
+/** 막대표에 실을 품종: 고른 카테고리(비우면 전부)에서 달마다 대표 CHART_PER_MONTH개(yearFoods, 한 품종은 최적 달에 한 번). 품종이 192개라 다 실으면 글자가 6pt 아래로 준다. */
 export function chartFoods(categories: readonly FoodCategory[]): readonly Food[] {
   return yearFoods({ max: CHART_PER_MONTH, categories })
 }

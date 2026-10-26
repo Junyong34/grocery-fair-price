@@ -1,5 +1,6 @@
+import type { Food } from "@workspace/seasonal/data/foods"
 import { MONTHS, type Month } from "@workspace/seasonal/data/months"
-import { monthFoods, yearFoods } from "@workspace/seasonal/print/foods"
+import { yearFoods, yearFoodsByMonth } from "@workspace/seasonal/print/foods"
 import type { PrintMonthLabel } from "@workspace/seasonal/print/month-label"
 import { chartLines } from "@workspace/seasonal/print/period-chart"
 import { CALENDAR_TEXT_SCALE, type Paper, type YearSheetSpec } from "@workspace/seasonal/print/spec"
@@ -13,7 +14,7 @@ import { Sheet } from "./parts/sheet"
 import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
 
 // 연간 달력 한 장.
-// pairs(Y-A): 달마다 그림 칸과 작은 달력이 한 쌍이다. 2x6은 한 줄에 두 달이고 그림·달력을 좌우로, 줄마다 순서를 바꿔 체크무늬로 놓는다. 3x4·4x3은 그림 위, 달력 아래.
+// pairs(Y-A): 달마다 그림 칸과 작은 달력이 한 쌍이다. 그림은 yearFoodsByMonth라 한 품종이 한 해에 한 번, 최적 달에만 나온다. 2x6은 한 줄에 두 달이고 그림·달력을 좌우로, 줄마다 순서를 바꿔 체크무늬로 놓는다. 3x4·4x3은 그림 위, 달력 아래.
 // hero-top(Y-B): 위에 1년치 품종을 한 판으로 흩뿌리고, 아래에 작은 달력 열두 개를 3x4로 놓는다(세로 용지만). 달마다 그림 칸이 없어 달력이 커진다.
 // chart(Y-C): 위에 작은 달력 열둘(세로 4x3, 가로 6x2), 아래에 제철 막대표(세로 2단, 가로 3단). 날짜는 달력이, 제철은 막대표가 맡는다.
 
@@ -39,6 +40,7 @@ const CHART = {
 export function YearSheet({ spec, paper }: { spec: YearSheetSpec; paper: Paper }) {
   const inner = innerSize(spec)
   const { columns, rows } = gridSize(spec.grid)
+  const foodsByMonth = yearFoodsByMonth({ max: spec.foods.max, categories: [] })
   const cell = {
     width: (inner.width - GAP * (columns - 1)) / columns,
     height: (inner.height - HEADER - GAP * (rows - 1)) / rows,
@@ -60,7 +62,7 @@ export function YearSheet({ spec, paper }: { spec: YearSheetSpec; paper: Paper }
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: `repeat(${columns}, ${u(cell.width)})`, gap: u(GAP) }}>
           {MONTHS.map((month, i) => (
-            <MonthCell key={month} spec={spec} month={month} width={cell.width} height={cell.height} flip={spec.grid === "2x6" && Math.floor(i / columns) % 2 === 1} />
+            <MonthCell key={month} spec={spec} month={month} foods={foodsByMonth[i]!} width={cell.width} height={cell.height} flip={spec.grid === "2x6" && Math.floor(i / columns) % 2 === 1} />
           ))}
         </div>
       )}
@@ -127,7 +129,7 @@ function CalendarsAndChart({ spec }: { spec: YearSheetSpec }) {
   )
 }
 
-function MonthCell({ spec, month, width, height, flip }: { spec: YearSheetSpec; month: Month; width: number; height: number; flip: boolean }) {
+function MonthCell({ spec, month, foods, width, height, flip }: { spec: YearSheetSpec; month: Month; foods: readonly Food[]; width: number; height: number; flip: boolean }) {
   const sideBySide = spec.grid === "2x6"
   const food = sideBySide ? { width: width / 2, height } : { width, height: height * 0.46 }
   const calendar = sideBySide ? { width: width / 2, height } : { width, height: height - food.height }
@@ -146,7 +148,7 @@ function MonthCell({ spec, month, width, height, flip }: { spec: YearSheetSpec; 
         </span>
       )}
       <FoodArea
-        foods={monthFoods(month, { max: spec.foods.max, categories: [] })}
+        foods={foods}
         width={food.width}
         height={food.height}
         layout="scatter"

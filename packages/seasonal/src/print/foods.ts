@@ -1,4 +1,5 @@
 import { monthCalendar } from "../calendar/month-calendar"
+import { bestMonth, familiarity } from "../data/food-familiarity"
 import { FOODS, isDrawn, type Food, type FoodCategory } from "../data/foods"
 import { MONTHS, orderSeasonMonths } from "../data/months"
 import { seasonOfMonth, type Season } from "../data/seasons"
@@ -12,9 +13,10 @@ const pickable = ({ categories }: FoodPick) => (food: Food) =>
 
 const inMonth = (month: number) => (food: Food) => (food.months as readonly number[]).includes(month)
 const isPeak = (food: Food, month: number) => (food.peak as readonly number[]).includes(month)
-/** 그 달이 대표 달(peak)인 품종부터, 처음부터 검증한 품종(core), 그 달에 더 특별한(제철이 짧은) 품종, 이름순. 칸에 다 못 넣으면 앞에서 자른다. */
+/** 그 달이 대표 달(peak)인 품종부터, 친숙한 품종(familiarity), 처음부터 검증한 품종(core), 그 달에 더 특별한(제철이 짧은) 품종, 이름순. 칸에 다 못 넣으면 앞에서 자른다. */
 const byMonthOrder = (month: number) => (a: Food, b: Food) =>
   Number(isPeak(b, month)) - Number(isPeak(a, month)) ||
+  familiarity(a.id) - familiarity(b.id) ||
   Number(b.core) - Number(a.core) ||
   a.months.length - b.months.length ||
   a.name.localeCompare(b.name, "ko")
@@ -36,19 +38,18 @@ export function monthChecklist(month: number, categories: readonly FoodCategory[
     .slice(0, CHECKLIST_MAX)
 }
 
-/** 열두 달을 한 판에 모을 때의 품종. 달마다 앞 달에 아직 나오지 않은 품종을 pick.max개까지 고른다(여러 달에 걸친 품종이 두 번 나오지 않게). */
+/** 열두 달을 한 판에 모을 때의 품종(연간 Y-A·Y-B·Y-C, 월간 표지). 품종마다 최적 달(bestMonth) 한 곳에만 놓아 두 번 나오지 않고, 달마다 byMonthOrder로 pick.max개까지 고른다. 넘치는 품종은 싣지 않는다. */
 export function yearFoods(pick: FoodPick): readonly Food[] {
   return yearFoodsByMonth(pick).flat()
 }
 
 /** yearFoods를 달마다 묶은 것(1월부터 열두 묶음). 월간 표지 열두 달 미리보기(C-2)가 칸마다 쓴다. */
 export function yearFoodsByMonth(pick: FoodPick): readonly (readonly Food[])[] {
-  const picked = new Set<string>()
-  return MONTHS.map((month) => {
-    const fresh = monthFoods(month, { ...pick, max: Infinity }).filter((food) => !picked.has(food.id)).slice(0, pick.max)
-    fresh.forEach((food) => picked.add(food.id))
-    return fresh
-  })
+  return MONTHS.map((month) =>
+    FOODS.filter((food) => bestMonth(food) === month && pickable(pick)(food))
+      .sort(byMonthOrder(month))
+      .slice(0, pick.max),
+  )
 }
 
 /** 제철이 시작하는 달의 계절. 여러 계절에 걸친 품종을 포스터의 한 계절에만 놓을 때 쓴다. 대표 달(peak)을 넘기면 시장 범위가 넓어도 대표 계절에 놓인다. */
@@ -57,7 +58,7 @@ export function startSeason(months: readonly number[]): Season {
 }
 
 /**
- * 그 계절에 대표 달(peak)이 시작하는 품종. 많으면 그 계절에 대표 달이 많은 것, 처음부터 검증한 것(core), 제철이 짧은 것부터 pick.max개를 고르고,
+ * 그 계절에 대표 달(peak)이 시작하는 품종. 많으면 그 계절에 대표 달이 많은 것, 친숙한 것(familiarity), 처음부터 검증한 것(core), 제철이 짧은 것부터 pick.max개를 고르고,
  * 놓는 차례는 시작 달 순서, 같으면 이름순이다.
  */
 export function seasonFoods(season: Season, pick: FoodPick): readonly Food[] {
@@ -65,7 +66,7 @@ export function seasonFoods(season: Season, pick: FoodPick): readonly Food[] {
   const order = (month: number) => (month - (season === "winter" ? 12 : 0) + 12) % 12
   const peaksIn = (food: Food) => food.peak.filter((month) => seasonOfMonth(month) === season).length
   return FOODS.filter((food) => startSeason(food.peak) === season && pickable(pick)(food))
-    .sort((a, b) => peaksIn(b) - peaksIn(a) || Number(b.core) - Number(a.core) || a.months.length - b.months.length || a.name.localeCompare(b.name, "ko"))
+    .sort((a, b) => peaksIn(b) - peaksIn(a) || familiarity(a.id) - familiarity(b.id) || Number(b.core) - Number(a.core) || a.months.length - b.months.length || a.name.localeCompare(b.name, "ko"))
     .slice(0, pick.max)
     .sort((a, b) => order(start(a)) - order(start(b)) || a.name.localeCompare(b.name, "ko"))
 }

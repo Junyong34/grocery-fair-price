@@ -289,7 +289,7 @@ function Cover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
   )
 }
 
-/** C-2: 큰 연도 아래 열두 달 칸(세로 3×4, 가로 4×3). 칸마다 그 달 대표 품종 둘(yearFoodsByMonth, 앞 달과 겹치지 않음)과 달 표기. */
+/** C-2: 큰 연도 아래 열두 달 칸(세로 3×4, 가로 4×3). 칸마다 그 달 대표 품종 둘(yearFoodsByMonth, 한 품종은 한 해에 한 번)과 달 표기. */
 function MonthsCover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
   const inner = innerSize(spec)
   const portrait = spec.orientation === "portrait"
