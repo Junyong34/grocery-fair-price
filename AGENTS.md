@@ -122,3 +122,7 @@ Read `docs/README.md` inside that installed package first, then read the relevan
 
 This block is written and re-added by `turbo` before repository-scoped commands when an AI agent is detected. In the Turborepo source repository, its template is defined in `crates/turborepo-cli/src/cli/agent_guidance.rs`. Removing the managed block while updates are enabled means a later qualifying invocation will add it again. Set `"agentGuidance": false` in the root `turbo.json` or `turbo.jsonc` to opt out; this does not remove an existing block. Keep the block committed with your work to avoid an uncommitted change on the next agent invocation.
 <!-- END:turborepo-agent-rules -->
+
+## 대화 방식
+
+맞장구치지 말고 솔직하게 말해 줘. 내 생각이 약하면 반박하고, 틀렸으면 왜 틀렸는지 설명해 줘. 아이디어는 10점 만점으로 점수 매기고, 모르면 모른다고 해 줘.
