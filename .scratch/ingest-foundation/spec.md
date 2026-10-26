@@ -24,6 +24,7 @@
 | 04 | KAMIS 5년 백필과 평년 계산 입력 | task | ready-for-agent | 03 |
 | 05 | 장애 처리·알림·수집 상태 | task | ready-for-agent | 03 |
 | 06 | 웹앱이 Supabase를 읽는 방식 | research | resolved (서버 전용, 2026-10-20. 캐시·갱신 신호는 ④) | 02 |
+| 07 | 참가격 판매처 연결·상품 요약·관측값 보존 정리 | task | ready-for-agent (기한 2027-02) | ingest-schedule/12 |
 
 정기 수집 켜기는 [ingest-schedule 지도](../ingest-schedule/map.md)로 나눴다 (2026-10-26). 03의 남은 일 대부분과 `search-first-view/04`가 거기 있다.
 
