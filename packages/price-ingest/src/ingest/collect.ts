@@ -36,7 +36,13 @@ export type CollectContext = {
   budget: CallBudget
   sleep: Sleep
   delays?: readonly number[]
+  log?: (line: string) => void // 진행·느린 호출·실패 (값·키·주소 없음)
+  now?: () => number // 걸린 시간 (ms). 테스트가 바꾼다
 }
+
+// 이보다 오래 걸린 논리 호출(다시 부르기 포함)은 로그에 남긴다. 러너에서 data.go.kr이 늦는지 보려고 (ingest-schedule/11)
+const SLOW_CALL_MS = 5_000
+const PROGRESS_EVERY = 20
 
 // YYYY-MM-DD → YYYYMMDD
 const compact = (day: string) => day.replaceAll("-", "")
@@ -68,14 +74,36 @@ class FileBuilder {
     }
   }
 
+  private added = 0
+
+  // 호출 기록에서 요청을 가리키는 짧은 이름 (키 없는 파라미터 중 품목·축종·상품·날짜)
+  private lastTarget(): string {
+    const params = this.file.requests.at(-1)?.params ?? {}
+    return ["cond[item_cd::EQ]", "judgeKind", "goodId", "standYmd", "pageNo"]
+      .filter((k) => params[k] !== undefined)
+      .map((k) => `${k}=${params[k]}`)
+      .join(" ")
+  }
+
   // 받은 행을 파일에 더하고 돌려준다. 실패했거나 멈췄으면 null
   async add<Row extends object>(fetchRows: (call: CallOptions) => Promise<Row[]>): Promise<Row[] | null> {
     if (this.stop) return null
+    const now = this.ctx.now ?? Date.now
+    const started = now()
+    const before = this.file.requests.length
+    const statuses = () => this.file.requests.slice(before).map((r) => r.httpStatus || "응답없음").join(",")
+    this.added += 1
+    if (this.added % PROGRESS_EVERY === 0) this.ctx.log?.(`진행: ${this.file.label} ${this.added}번째 호출, 실제 호출 ${this.ctx.budget.used}회`)
     try {
       const rows = await callWithPolicy(() => fetchRows(this.call()), this.ctx)
       this.file.rows.push(...(rows as unknown as Json[]))
+      const took = now() - started
+      if (took >= SLOW_CALL_MS) this.ctx.log?.(`느린 호출: ${this.lastTarget()} ${Math.round(took / 1000)}초, HTTP ${statuses()}`)
       return rows
     } catch (error) {
+      const took = Math.round((now() - started) / 1000)
+      const kind = error instanceof Error ? error.name : "unknown"
+      this.ctx.log?.(`호출 실패: ${this.lastTarget()} ${kind} ${took}초, HTTP ${statuses()}`)
       if (error instanceof SourceStopped) this.stop = error.reason
       else this.failedCalls += 1
       return null

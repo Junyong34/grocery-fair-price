@@ -128,6 +128,7 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
     budget,
     sleep: deps.sleep ?? realSleep,
     delays: deps.delays,
+    log: say,
   }
   const today = kstDateOf(now().toISOString())
 
