@@ -1,6 +1,6 @@
 # 12. 참가격 워크플로와 2026-06-12 이후 빈 조사일 채우기
 
-Status: open
+Status: claimed
 Type: task (AFK)
 Blocked by: 03, 10
 

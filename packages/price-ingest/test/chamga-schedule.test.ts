@@ -1,10 +1,14 @@
 // 참가격 조사일 감지·완료 규칙 (chamgagyeok.md 5-4, ingest-schedule/10)
 import { describe, expect, it } from "vitest"
 
+import type { FetchLike } from "../src/http.ts"
+import { CallBudget } from "../src/ingest/calls.ts"
 import {
+  backlogFridays,
   emptyCloseDue,
   isComplete,
   nextStableChecks,
+  planChamga,
   recentFridays,
   surveyDayAction,
   type SurveyDayState,
@@ -61,5 +65,41 @@ describe("조사일마다 할 일", () => {
   it("금요일 뒤 10일이 지나야 빈 조사일로 닫는다 (격주 달력은 근거로 쓰지 않는다)", () => {
     expect(emptyCloseDue("2026-10-16", "2026-10-25")).toBe(false)
     expect(emptyCloseDue("2026-10-16", "2026-10-26")).toBe(true)
+  })
+})
+
+describe("지난 조사일 채우기 (12)", () => {
+  it("첫 조사일부터 최근 금요일 2개 전까지, 오래된 것부터", () => {
+    expect(backlogFridays("2026-07-14")).toEqual(["2026-06-12", "2026-06-19", "2026-06-26"]) // 최근: 07-10, 07-03
+  })
+
+  // 06-12, 06-26 에만 가격이 있는 가짜 API. 감지 상품을 부르면 행 하나, 아니면 빈 응답
+  const surveyed = new Set(["20260612", "20260626"])
+  const priceRow = (day: string) =>
+    `<iros.openapi.service.vo.goodPriceVO><goodInspectDay>${day}</goodInspectDay><entpId>1</entpId><goodId>1000</goodId><goodPrice>1</goodPrice><inputDttm>2026-06-12 10:00:00</inputDttm></iros.openapi.service.vo.goodPriceVO>`
+  const fetch: FetchLike = async (url) => {
+    const day = new URL(url).searchParams.get("goodInspectDay")!
+    const body = surveyed.has(day) ? priceRow(day) : ""
+    return new Response(`<response><result>${body}</result><resultCode>00</resultCode><resultMsg>ok</resultMsg></response>`)
+  }
+  const ctx = (limit: number) => ({ serviceKey: "FAKEKEY0123456789", fetch, budget: new CallBudget(limit), sleep: async () => {} })
+  const opts = { today: "2026-07-14", now: "2026-07-13T22:00:00Z", canClose: true }
+
+  it("감지되면 받고 닫을 날로, 없으면 빈 조사일로 닫는다. 닫힌 날은 건너뛴다", async () => {
+    const closed = open({ closedAt: "2026-07-01T00:00:00Z" })
+    const plan = await planChamga(ctx(1_500), new Map([["2026-06-19", closed]]), opts)
+    expect(plan.fetch.map((f) => [f.day, f.final])).toEqual([["2026-06-12", true], ["2026-06-26", true]])
+    expect(plan.closeEmpty).toEqual(["2026-07-03"]) // 최근이지만 금요일 뒤 10일이 지났다
+    expect(plan.notYet).toEqual(["2026-07-10"])
+  })
+
+  it("남는 예산으로 조사일 하나를 다 받을 수 없으면 더 채우지 않는다", async () => {
+    const plan = await planChamga(ctx(6 + 2 + 3 + 457), new Map(), opts) // 최근 감지 6 + 마스터 2 + 감지 3 + 가격 457
+    expect(plan.fetch.map((f) => f.day)).toEqual(["2026-06-12"])
+  })
+
+  it("DB가 안 되면(닫을 수 없으면) 채우지 않는다", async () => {
+    const plan = await planChamga(ctx(1_500), new Map(), { ...opts, canClose: false })
+    expect(plan.fetch).toEqual([])
   })
 })

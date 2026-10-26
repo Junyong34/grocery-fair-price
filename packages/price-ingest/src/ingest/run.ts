@@ -16,7 +16,7 @@ import { createObjectStore, type ObjectStore } from "../load/storage.ts"
 import { kstDateOf } from "../load/window.ts"
 import { createRedactor, errorSummary } from "../secrets.ts"
 import { CALL_BUDGET, CallBudget, realSleep, type Sleep, type StopReason } from "./calls.ts"
-import { nextStableChecks, planChamga, recentFridays, type ChamgaPlan, type SurveyDayState } from "./chamga-schedule.ts"
+import { backlogFridays, nextStableChecks, planChamga, recentFridays, type ChamgaPlan, type SurveyDayState } from "./chamga-schedule.ts"
 import { collect, type CollectContext, type CollectRequest } from "./collect.ts"
 
 // 종료 코드. 알림(ingest-schedule/13)이 이것과 ingest_run.error_code로 알림을 고른다.
@@ -46,6 +46,7 @@ export type IngestDeps = {
   delays?: readonly number[]
   log?: (line: string) => void
   gitSha?: string | null
+  chamgaFirstSurveyDay?: string // 지난 조사일 채우기의 시작 (기본 2026-06-12. 테스트가 바꾼다)
 }
 
 export type IngestResult = {
@@ -83,7 +84,7 @@ function describeTarget(request: CollectRequest): string {
 }
 
 // 받은 조사일의 행 수가 받기 전과 같으면 stable_checks를 올린다. 호출이 하나라도 실패한 실행은 세지 않는다
-// (빠진 상품 때문에 우연히 같을 수 있다). 마지막 받기(완료 뒤 월요일)였으면 닫는다.
+// (빠진 상품 때문에 우연히 같을 수 있다). 마지막 받기(완료 뒤 월요일, 지난 조사일 채우기)였으면 닫는다.
 async function settleChamga(sql: Sql, plan: ChamgaPlan, input: { clean: boolean }): Promise<void> {
   for (const day of plan.notYet) await markNotYet(sql, day)
   for (const day of plan.closeEmpty) await closeEmpty(sql, day)
@@ -129,19 +130,24 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
   }
   const today = kstDateOf(now().toISOString())
 
-  // 참가격 자동 모드: 조사일 상태를 읽고 감지한 뒤 받을 조사일을 정한다 (10)
+  // 참가격 자동 모드: 조사일 상태를 읽고 감지한 뒤 받을 조사일을 정한다 (10). 남는 예산으로 지난 조사일을 채운다 (12)
   let target = request
   let plan: ChamgaPlan | null = null
   if (request.source === "chamga" && request.surveyDays === undefined) {
     let states = new Map<string, SurveyDayState>()
     if (sql) {
       try {
-        states = await readSurveyDays(sql, recentFridays(today))
+        states = await readSurveyDays(sql, [...recentFridays(today), ...backlogFridays(today, deps.chamgaFirstSurveyDay)])
       } catch (error) {
         await dbDown("조사일 상태", error)
       }
     }
-    plan = await planChamga(ctx, states, { today, now: now().toISOString(), canClose: sql !== null })
+    plan = await planChamga(ctx, states, {
+      today,
+      now: now().toISOString(),
+      canClose: sql !== null,
+      firstSurveyDay: deps.chamgaFirstSurveyDay,
+    })
     say(
       `조사일: 받음 ${plan.fetch.map((f) => `${f.day}${f.final ? "(마지막)" : ""}`).join(", ") || "없음"}` +
         `, 아직 없음 ${plan.notYet.join(", ") || "-"}, 빈 조사일로 닫음 ${plan.closeEmpty.join(", ") || "-"}`,

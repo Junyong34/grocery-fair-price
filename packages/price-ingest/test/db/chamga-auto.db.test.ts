@@ -68,6 +68,7 @@ async function runOn(day: string): Promise<IngestResult> {
       now: () => new Date(start + 1000 * tick++),
       sleep: async () => {},
       log: () => {},
+      chamgaFirstSurveyDay: PREV, // 지난 조사일 채우기는 따로 본다 (test/chamga-schedule.test.ts)
     },
   )
 }

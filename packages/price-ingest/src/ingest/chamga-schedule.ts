@@ -58,7 +58,11 @@ export function surveyDayAction(state: SurveyDayState | undefined, today: string
   return "fetch"
 }
 
-export type PlannedFetch = { day: string; final: boolean; before: SurveyDayState | undefined }
+export type PlannedFetch = {
+  day: string
+  final: boolean // 이번 받기 뒤 닫는다 (완료 뒤 월요일, 지난 조사일 채우기)
+  before: SurveyDayState | undefined
+}
 
 export type ChamgaPlan = {
   fetch: PlannedFetch[] // 전체를 받을 조사일
@@ -68,31 +72,64 @@ export type ChamgaPlan = {
   stop: StopReason | null
 }
 
-// 최근 금요일 2개마다 할 일을 정한다. 감지가 필요한 날은 여기서 감지 상품을 부른다 (조사일당 최대 3회).
-// states: source_day에서 읽은 상태. DB가 안 되면 빈 표를 넘긴다 (둘 다 감지하고, 닫지 않는다).
+// 참가격 API가 주는 첫 조사일 (chamgagyeok.md 0장). 지난 조사일 채우기는 여기부터
+export const CHAMGA_FIRST_SURVEY_DAY = "2026-06-12"
+
+// 조사일 하나를 전체로 받는 데 드는 호출: 식품 가격 457회 (마스터 2회는 실행마다 한 번)
+export const CALLS_PER_SURVEY_DAY = 457
+const MASTER_CALLS = 2
+const DETECT_CALLS = 3
+
+// 지난 조사일 채우기 대상: 첫 조사일부터 최근 금요일 2개 전까지의 금요일, 오래된 것부터
+export function backlogFridays(today: string, firstSurveyDay = CHAMGA_FIRST_SURVEY_DAY): string[] {
+  const recent = recentFridays(today)
+  const oldestRecent = recent[recent.length - 1]!
+  const days: string[] = []
+  for (let day = firstSurveyDay; day < oldestRecent; day = addDays(day, 7)) days.push(day)
+  return days
+}
+
+// 최근 금요일 2개마다 할 일을 정하고, 남는 예산으로 지난 조사일을 오래된 것부터 채운다 (12).
+// 감지가 필요한 날은 여기서 감지 상품을 부른다 (조사일당 최대 3회).
+// states: source_day에서 읽은 상태. DB가 안 되면 빈 표와 canClose = false를 넘긴다 (최근 2개만 감지, 닫지 않음, 채우기 없음).
 export async function planChamga(
   ctx: CollectContext,
   states: ReadonlyMap<string, SurveyDayState>,
-  input: { today: string; now: string; canClose: boolean },
+  input: { today: string; now: string; canClose: boolean; firstSurveyDay?: string },
 ): Promise<ChamgaPlan> {
   const plan: ChamgaPlan = { fetch: [], notYet: [], closeEmpty: [], failedCalls: 0, stop: null }
-  for (const day of recentFridays(input.today)) {
-    const state = states.get(day)
-    const action = surveyDayAction(state, input.today, input.now)
-    if (action === "skip") continue
-    if (action === "fetch" || action === "final") {
-      plan.fetch.push({ day, final: action === "final", before: state })
-      continue
-    }
+
+  // 감지해서 찾으면 받기 목록에, 못 찾으면 닫거나 아직 안 옴으로. 멈춤 오류면 false
+  const detect = async (day: string, state: SurveyDayState | undefined, final: boolean): Promise<boolean> => {
     const detection = await detectChamgaSurvey(ctx, day)
     plan.failedCalls += detection.failedCalls
     if (detection.stop) {
       plan.stop = detection.stop
-      break
+      return false
     }
-    if (detection.found) plan.fetch.push({ day, final: false, before: state })
+    if (detection.found) plan.fetch.push({ day, final, before: state })
     else if (input.canClose && emptyCloseDue(day, input.today)) plan.closeEmpty.push(day)
     else plan.notYet.push(day)
+    return true
+  }
+
+  for (const day of recentFridays(input.today)) {
+    const state = states.get(day)
+    const action = surveyDayAction(state, input.today, input.now)
+    if (action === "skip") continue
+    if (action === "fetch" || action === "final") plan.fetch.push({ day, final: action === "final", before: state })
+    else if (!(await detect(day, state, false))) return plan
+  }
+
+  if (!input.canClose) return plan
+  // 남는 예산: 이미 쓴 호출, 마스터, 받기로 한 조사일의 가격을 빼고 본다
+  const left = () => ctx.budget.limit - ctx.budget.used - MASTER_CALLS - CALLS_PER_SURVEY_DAY * plan.fetch.length
+  for (const day of backlogFridays(input.today, input.firstSurveyDay)) {
+    const state = states.get(day)
+    if (state?.closedAt) continue
+    if (left() < DETECT_CALLS + CALLS_PER_SURVEY_DAY) break
+    // 지난 조사일은 다 들어와 있다. 받으면 바로 닫는다
+    if (!(await detect(day, state, true))) return plan
   }
   return plan
 }

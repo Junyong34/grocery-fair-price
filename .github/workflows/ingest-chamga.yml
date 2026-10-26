@@ -1,0 +1,48 @@
+# 참가격 정기 수집 (.scratch/ingest-schedule/issues/12, pipeline.md 5-1).
+# 매일 07:00 KST에 자동 모드로 돈다: 최근 금요일 2개를 감지·완료 규칙대로 받고(10), 남는 예산으로 지난 조사일을
+# 2026-06-12부터 오래된 것부터 채운다(12). 실행당 호출 예산 1,500 (하루 한도 2,000).
+# 수동 실행에서 survey_days(공백으로 구분한 YYYY-MM-DD)를 주면 그 조사일만 받는다.
+name: ingest-chamga
+
+on:
+  schedule:
+    - cron: "0 22 * * *" # KST 07:00
+  workflow_dispatch:
+    inputs:
+      survey_days:
+        description: "받을 조사일 (YYYY-MM-DD, 공백으로 구분). 비우면 자동 모드"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ingest-chamga
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60 # 1,500회 × 약 1초 + 다시 부르기
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --filter "@workspace/price-ingest..."
+      # 비밀값은 이 단계의 env로만 넘긴다. CLI가 인코딩 변형까지 ::add-mask::로 더한다 (ingest-schedule/02)
+      # 입력값은 run 줄에 직접 넣지 않고 env로 넘긴다 (스크립트 주입 방지). 형식은 CLI가 검사한다
+      - name: 수집
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          INGEST_DATABASE_URL: ${{ secrets.INGEST_DATABASE_URL }}
+          SURVEY_DAYS: ${{ inputs.survey_days }}
+        run: |
+          args=()
+          for day in $SURVEY_DAYS; do args+=(--survey-day "$day"); done
+          pnpm --filter @workspace/price-ingest ingest --source chamga "${args[@]}"
