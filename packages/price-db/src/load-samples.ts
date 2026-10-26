@@ -61,7 +61,7 @@ const ENDPOINT: Record<Source, string> = {
 const SAMPLE_MAPPINGS: { key: RegExp; variety: string; spec: string }[] = [
   { key: /^kamis:01-200-211-\d+-04$/, variety: "baechu", spec: "top" },   // 작형마다 품종 코드가 바뀐다
   { key: /^kamis:01-200-224-01-04$/, variety: "aehobak", spec: "top" },
-  { key: /^kamis:01-400-411-07-04$/, variety: "sagwa-hongro", spec: "top" },
+  { key: /^kamis:01-400-411-0[78]-04$/, variety: "sagwa", spec: "top" },     // 홍로·시나노골드는 같은 사과 (variety-list.md)
   { key: /^ekape:4304-27-구분없음$/, variety: "pork-belly-kr", spec: "default" },
   { key: /^ekape:4304-68-구분없음$/, variety: "pork-neck-kr", spec: "default" },
   { key: /^ekape:4301-22-1\+등급$/, variety: "hanwoo-sirloin", spec: "grade-1plus" },

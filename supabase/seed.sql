@@ -62,7 +62,7 @@ select i.id, v.slug, v.name, v.base_unit, v.base_unit_qty, 'active'
 from (values
   ('baechu', 'baechu', '배추', 'ea', 1),
   ('hobak', 'aehobak', '애호박', 'ea', 1),
-  ('sagwa', 'sagwa-hongro', '사과(홍로)', 'ea', 1),
+  ('sagwa', 'sagwa', '사과', 'ea', 1),
   ('godeungeo', 'godeungeo-salted', '고등어(염장)', 'ea', 1),
   ('pork', 'pork-belly-kr', '국산 삼겹살', 'g', 100),
   ('pork', 'pork-neck-kr', '국산 목심', 'g', 100),
@@ -76,7 +76,7 @@ select va.id, s.slug, s.name, s.is_default, s.sort
 from (values
   ('baechu', 'top', '상품', true, 1),
   ('aehobak', 'top', '상품', true, 1),
-  ('sagwa-hongro', 'top', '상품', true, 1),
+  ('sagwa', 'top', '상품', true, 1),
   ('godeungeo-salted', 'default', '기본', true, 1),
   ('pork-belly-kr', 'default', '기본', true, 1),
   ('pork-neck-kr', 'default', '기본', true, 1),
@@ -104,7 +104,7 @@ select va.id, m.seasonal_food_id
 from (values
   ('baechu', 'napa-cabbage'),
   ('aehobak', 'korean-zucchini'),
-  ('sagwa-hongro', 'apple'),
+  ('sagwa', 'apple'),
   ('godeungeo-salted', 'mackerel')
 ) m (variety_slug, seasonal_food_id)
 join price.variety va on va.slug = m.variety_slug;

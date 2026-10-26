@@ -40,6 +40,7 @@
 - [api-spec.md](docs/10-research/api-spec.md): 요청·응답 명세와 실측으로 확인한 명세 불일치. API를 호출하기 전에 읽는다
 - [gov-price-sites.md](docs/10-research/gov-price-sites.md): 참가격 생필품 화면과 API 대조, 다른 정부·공공 가격 출처 판정
 - [pipeline.md](docs/30-data/pipeline.md): 저장 구조, 테이블, 수집 일정, 장애 처리, 실행 환경
+- [variety-list.md](docs/30-data/variety-list.md): 판정할 품종 133개와 출처 코드·규격·기준 단위·커버 상태
 - `reference/public-data/samples/`: 실호출 응답 샘플(정상·빈 결과·오류), `fetch-samples.sh`로 다시 만든다
 - `reference/public-data/samples/viewer/api-explorer.html`: 샘플을 브라우저에서 보는 탐색기 (`build.py`로 생성, `smoke.sh`로 검사)
 
