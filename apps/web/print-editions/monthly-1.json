@@ -1,0 +1,34 @@
+{
+  "id": "monthly-1",
+  "title": "000",
+  "description": "",
+  "status": "draft",
+  "spec": {
+    "version": 1,
+    "orientation": "portrait",
+    "type": {
+      "heading": "gowun-batang",
+      "number": "pretendard",
+      "scale": 1
+    },
+    "surface": "cream",
+    "margin": "safe",
+    "foods": {
+      "names": "korean",
+      "max": 8
+    },
+    "kind": "monthly",
+    "year": 2027,
+    "cover": "year",
+    "monthLabel": "number",
+    "calendar": {
+      "weekStart": 0,
+      "weekday": "korean",
+      "holidays": "mark-and-name",
+      "size": "medium",
+      "variant": "plain"
+    },
+    "layout": "scatter",
+    "memo": "none"
+  }
+}

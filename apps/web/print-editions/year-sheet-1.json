@@ -1,0 +1,32 @@
+{
+  "id": "year-sheet-1",
+  "title": "222",
+  "description": "",
+  "status": "draft",
+  "spec": {
+    "version": 1,
+    "orientation": "portrait",
+    "type": {
+      "heading": "gowun-batang",
+      "number": "pretendard",
+      "scale": 1
+    },
+    "surface": "white",
+    "margin": "safe",
+    "foods": {
+      "names": "hidden",
+      "max": 4
+    },
+    "kind": "year-sheet",
+    "year": 2027,
+    "monthLabel": "big-number",
+    "calendar": {
+      "weekStart": 0,
+      "weekday": "korean",
+      "holidays": "mark",
+      "size": "medium"
+    },
+    "layout": "pairs",
+    "grid": "2x6"
+  }
+}
