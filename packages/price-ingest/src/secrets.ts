@@ -72,3 +72,10 @@ export function describeError(error: unknown, redact: Redactor): string {
 export function actionsMaskCommands(values: readonly (string | undefined)[]): string[] {
   return [...new Set(values.flatMap((value) => (value ? secretVariants(value) : [])))].map((v) => `::add-mask::${v}`)
 }
+
+// 오류 한 줄 요약: 이름, 코드(ECONNREFUSED·SQLSTATE·HTTP 상태), 메시지 첫 줄 앞부분. 비밀값은 지운다.
+export function errorSummary(error: unknown, redact: Redactor): string {
+  if (!(error instanceof Error)) return redact(String(error)).slice(0, 120)
+  const { code, status, cause } = error as { code?: unknown; status?: unknown; cause?: { code?: unknown } }
+  return redact([error.name, code ?? status, cause?.code, error.message.split("\n")[0]?.slice(0, 80)].filter(Boolean).join(" "))
+}

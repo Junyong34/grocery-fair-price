@@ -306,6 +306,8 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `packages/price-ingest/test/live/` | 실측 테스트 (`pnpm --filter @workspace/price-ingest test:live`). 루트 `.env`의 `DATA_GO_KR_SERVICE_KEY`로 16회 호출한다. 명시적으로 켤 때만 돈다. 수집 시각 앞뒤로 돌리지 않는다 |
 | `packages/price-ingest/baseline/contract-baseline.json` | 실측으로 만든 기준: 필드 타입, 코드 목록, 건수. 값(가격)은 없다. 의도한 응답 변경일 때만 `pnpm --filter @workspace/price-ingest contract:baseline`으로 다시 만든다 |
 | `packages/price-ingest/scripts/capture-baseline.ts` | 기준 파일 생성. 계약과 다른 응답은 저장하지 않는다 |
+| `packages/price-ingest/src/ingest/`, `src/cli.ts` | 수집 실행: 호출 예산·재시도·멈춤 판정(`calls.ts`), 출처별 호출 계획과 원본 파일 묶기(`collect.ts`, KAMIS 품목 140개 `kamis-items.ts`), 실행 한 번(`run.ts`: 실행 기록 → 호출 → 업로드(바로 전 파일과 같으면 중복 기록) → 대조 → 적재 → 마감, 종료 코드 `EXIT`), 명령 진입점(`cli.ts`) |
+| `packages/price-ingest/scripts/probe-runner.ts` | 공공 API 3개·Supabase DB·Storage에 한 번씩 붙어 성공과 걸린 시간만 찍는다 (러너 접속 실측) |
 
 수집 CLI와 GitHub Actions 워크플로는 `ingest-foundation/03`에서 이 패키지에 더한다.
 
@@ -329,6 +331,8 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `pnpm db:test` | DB 테스트 (`db reset` → 샘플 적재 → 권한·RLS·적재 검사). `pnpm db:start` 뒤에 |
 | `pnpm db:erd` | `schema-map.html`의 ERD를 로컬 DB에서 다시 만든다 |
 | `pnpm --filter @workspace/price-db load:samples` / `measure` | 샘플 테스트 데이터 넣기 / 행당 크기 실측 |
+| `pnpm --filter @workspace/price-ingest ingest --source kamis\|ekape [--date YYYY-MM-DD]` / `--source chamga --survey-day YYYY-MM-DD` | 수집 한 번. 환경변수 4개(`DATA_GO_KR_SERVICE_KEY`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `INGEST_DATABASE_URL`)를 넘긴다. `.env`를 스스로 읽지 않으므로 운영에 넣을지 로컬에 넣을지 직접 정한다. 종료 코드 0 성공, 1 부분, 2 키 오류, 3 DB 실패, 4 업로드 실패, 9 예상 밖 |
+| `pnpm --filter @workspace/price-ingest probe:runner` | 접속 실측 (루트 `.env`를 읽는다. API 3회) |
 | `scripts/check-no-secrets.sh [--tree]` | `.env` 값이 커밋 대상에 들어갔는지 검사 (pre-commit) |
 
 처음 클론하면 `git config core.hooksPath .githooks`를 한 번 실행한다.

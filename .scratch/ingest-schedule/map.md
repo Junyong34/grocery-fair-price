@@ -22,6 +22,7 @@ Label: wayfinder:map
 <!-- 닫힌 티켓마다 한 줄: [제목](링크): 답 요약 -->
 
 - [오류·로그에 키와 접속 주소가 남지 않게](issues/02-redact-secrets-in-logs.md): 잘못된 형식의 DB 주소만 샜다(Invalid URL의 input) → `DbUrlError`. 인코딩 변형까지 지우는 `describeError`를 CLI가 쓴다. 워크플로 규칙 다섯 가지
+- [수집 CLI 한 흐름](issues/07-ingest-cli.md): `ingest --source … [--date|--survey-day]`. KAMIS 140품목 매일, 원본은 실행×기능×대상 기간 하나, 바로 전 파일과 같으면 duplicate, 종료 코드 0/1/2/3/4/9. 실제 키로 로컬 실측 통과
 - [Supabase Free 일시정지 기준](issues/04-supabase-free-pause.md): 문턱값은 비공개, 매일 수집이 막아 줄 가능성이 높지만 미확정. 정지 1주 전 메일, 540·DNS 실패는 13에서 즉시 알림, 14에서 Storage 조회로 확인
 - [원본 적재 트랜잭션 (KAMIS·축평원)](issues/05-load-kamis-ekape.md): `loadRawFile`·`loadPendingFiles`. 위치·시장은 원본 행에서, 지역·품종은 비움, 시장 시군구 불일치는 행 거부, duplicate 판정은 07로. 병합 SQL은 price-ingest 한 곳
 - [참가격 원본 적재 (상품·점포)](issues/06-load-chamga.md): 마스터는 실행마다 받아 가격보다 먼저 적재. 마스터에 없는 번호는 점포는 위치만, 상품은 임시 이름으로 넣고 다음 마스터가 채움. 상품 연결 기간은 2026-06-12부터

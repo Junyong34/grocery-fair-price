@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url"
 
 import { createObjectStore } from "../src/load/storage.ts"
 import { connectIngest } from "../src/load/db.ts"
-import { actionsMaskCommands, redactorFromEnv, SECRET_ENV } from "../src/secrets.ts"
+import { actionsMaskCommands, errorSummary, redactorFromEnv, SECRET_ENV } from "../src/secrets.ts"
 import { fetchChamgaPrice } from "../src/sources/chamgagyeok.ts"
 import { fetchEkapeConsumerPrice } from "../src/sources/ekape.ts"
 import { fetchKamisPerDay } from "../src/sources/kamis.ts"
@@ -29,21 +29,13 @@ type Result = { target: string; ok: boolean; ms: number; detail: string }
 
 const redact = redactorFromEnv()
 
-// 오류 종류만 남긴다: 이름과 코드(ECONNREFUSED, ENOTFOUND, SQLSTATE, HTTP 상태). 메시지는 지운 뒤 앞부분만.
-function kindOf(error: unknown): string {
-  if (!(error instanceof Error)) return "unknown"
-  const code = (error as { code?: unknown; status?: unknown }).code ?? (error as { status?: unknown }).status
-  const cause = (error as { cause?: { code?: unknown } }).cause?.code
-  return redact([error.name, code, cause, error.message.split("\n")[0]?.slice(0, 80)].filter(Boolean).join(" "))
-}
-
 async function measure(target: string, run: () => Promise<string>): Promise<Result> {
   const start = performance.now()
   try {
     const detail = await run()
     return { target, ok: true, ms: Math.round(performance.now() - start), detail }
   } catch (error) {
-    return { target, ok: false, ms: Math.round(performance.now() - start), detail: kindOf(error) }
+    return { target, ok: false, ms: Math.round(performance.now() - start), detail: errorSummary(error, redact) }
   }
 }
 

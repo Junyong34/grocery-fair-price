@@ -76,3 +76,51 @@ export async function registerPending(sql: Sql | Tx, input: PendingInput): Promi
     returning id`
   return rows.length > 0
 }
+
+// 같은 대상의 바로 전 원본: 같은 출처·기능·묶음 라벨·대상 기간에서 가장 늦게 받은 파일 (3-7).
+// 바로 전 파일과만 비교한다. 아무 파일과 해시를 비교하면 되돌린 정정(100 → 120 → 100)을 중복으로 버린다 (05 Answer 4).
+export async function previousRawFile(
+  sql: Sql | Tx,
+  input: { source: string; endpoint: string; label: string; targetFrom: string | null; targetTo: string | null },
+): Promise<{ id: number; contentSha256: string } | undefined> {
+  // 객체 키 끝: /{라벨}-{YYYYMMDDTHHMMSSmmmZ}.ndjson.gz (raw-file.callKeyOf)
+  const [row] = await sql<{ id: string; content_sha256: string }[]>`
+    select id, content_sha256 from price.raw_object
+     where source = ${input.source} and endpoint = ${input.endpoint}
+       and storage_path like ${`%/${input.label}-________T_________Z.ndjson.gz`}
+       and target_from is not distinct from ${input.targetFrom}::date
+       and target_to is not distinct from ${input.targetTo}::date
+     order by fetched_at desc, id desc
+     limit 1`
+  return row ? { id: Number(row.id), contentSha256: row.content_sha256 } : undefined
+}
+
+// 바로 전 파일과 내용이 같아 올리지 않은 원본을 기록만 한다. storage_path는 올렸다면 가졌을 경로다 (Storage에는 없다).
+export async function registerDuplicate(sql: Sql | Tx, input: PendingInput & { duplicateOf: number }): Promise<void> {
+  const h = input.header
+  await sql`
+    insert into price.raw_object (
+      source, endpoint, storage_path, requests, call_count, row_count, bytes_gz, content_sha256,
+      target_from, target_to, fetched_at, ingest_run_id, contract_baseline, adapter_version, load_status, duplicate_of)
+    values (
+      ${h.source}, ${h.endpoint}, ${input.storagePath}, ${sql.json(h.requests as unknown as postgres.JSONValue)},
+      ${h.callCount}, ${h.rowCount}, ${input.bytesGz}, ${input.contentSha256},
+      ${h.targetFrom}, ${h.targetTo}, ${h.fetchedAt}, ${input.ingestRunId},
+      ${h.contractBaseline}, ${h.adapterVersion}, 'duplicate', ${input.duplicateOf})`
+}
+
+export type RunFinish = {
+  status: "ok" | "partial" | "failed"
+  callsUsed: number
+  errorCode: string | null
+  errorDetail: string | null // 원천 오류 문구·키는 넣지 않는다 (3-5)
+  gitSha: string | null
+}
+
+export async function finishRun(sql: Sql | Tx, runId: number, finish: RunFinish): Promise<void> {
+  await sql`
+    update price.ingest_run
+       set finished_at = now(), status = ${finish.status}, calls_used = ${finish.callsUsed},
+           error_code = ${finish.errorCode}, error_detail = ${finish.errorDetail}, git_sha = ${finish.gitSha}
+     where id = ${runId}`
+}
