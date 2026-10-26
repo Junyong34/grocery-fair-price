@@ -49,8 +49,8 @@ const margin: OptionFieldSpec = {
   type: "select",
   label: "여백",
   path: ["margin"],
-  options: options({ safe: "기본 여백", none: "여백 없이 꽉 채우기" }),
-  hint: "꽉 채우면 집 프린터에서 가장자리 3~5mm가 잘릴 수 있어요. 인쇄할 때 '여백 없음'을 고르세요.",
+  options: options({ safe: "기본 여백", none: "좁은 여백" }),
+  hint: "좁은 여백은 그림과 달력을 넓게 써요. 바탕색은 어느 쪽이든 용지 끝까지 칠해져요.",
 }
 const year: OptionFieldSpec = { type: "number", label: "연도", path: ["year"], min: 2020, max: 2100 }
 const title: OptionFieldSpec = { type: "text", label: "제목", path: ["title"] }

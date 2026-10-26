@@ -68,7 +68,7 @@ const base = {
   }),
   /** 배경: 크림 / 흰색(잉크 절약) / 계절색 */
   surface: z.enum(["cream", "white", "season"]),
-  /** safe: 가정용 프린터가 못 찍는 가장자리를 비운다. none: 여백 없이 용지 끝까지 채운다. 이 값이 없던 예전 사양은 safe로 읽는다. */
+  /** safe: 바깥 여백 12mm. none: 좁은 여백 6mm로 그림·달력을 넓게 쓴다(글자가 가정용 프린터가 못 찍는 가장자리 3~5mm에 걸리지 않는 최소). 이 값이 없던 예전 사양은 safe로 읽는다. */
   margin: z.enum(["safe", "none"]).default("safe"),
   foods: z.object({
     names: z.enum(["hidden", "korean"]),

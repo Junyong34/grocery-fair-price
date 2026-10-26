@@ -34,8 +34,8 @@
   -webkit-print-color-adjust: exact;
 }
 .print-sheet:last-child { break-after: auto; }
-/* 여백 없이 용지 끝까지 채운다. 가정용 프린터는 가장자리 몇 mm가 잘릴 수 있다. */
-.print-sheet[data-margin="none"] { --safe: 0px; }
+/* 좁은 여백. 가정용 프린터가 못 찍는 가장자리(3~5mm) 바로 안쪽이다. units.ts MARGIN과 같은 값. */
+.print-sheet[data-margin="none"] { --safe: calc(var(--u) * 6); }
 
 .print-sheet *,
 .print-sheet *::before,
