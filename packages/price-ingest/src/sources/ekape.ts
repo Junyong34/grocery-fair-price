@@ -39,7 +39,7 @@ const regionPrices = Object.fromEntries(
   Array.from({ length: 17 }, (_, index) => [`regionPrc${index + 1}`, digits.optional()]),
 )
 
-const ekapeItem = z.strictObject({
+export const ekapeRowSchema = z.strictObject({
   grdNm: z.string(),
   itemCd: z.string().regex(/^\d{2}$/),
   itemNm: z.string(),
@@ -61,13 +61,13 @@ export const ekapeConsumerPriceSchema = z.strictObject({
     body: z.strictObject({
       items: z.preprocess(
         (value) => (value === "" ? { item: [] } : value),
-        z.strictObject({ item: z.array(ekapeItem) }),
+        z.strictObject({ item: z.array(ekapeRowSchema) }),
       ),
     }),
   }),
 })
 
-export type EkapeRow = z.infer<typeof ekapeItem>
+export type EkapeRow = z.infer<typeof ekapeRowSchema>
 
 export function readEkapeConsumerPrice(status: number, text: string): unknown {
   return interpret({

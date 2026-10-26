@@ -135,6 +135,9 @@ importers:
 
   packages/price-db:
     dependencies:
+      '@workspace/price-ingest':
+        specifier: workspace:*
+        version: link:../price-ingest
       fast-xml-parser:
         specifier: 5.11.2
         version: 5.11.2

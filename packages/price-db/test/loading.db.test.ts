@@ -1,7 +1,7 @@
 // 제약·적재 (ingest-foundation/02 완료 기준 6~9, pipeline.md 3-1·3-3·3-5·3-9)
 import { afterAll, describe, expect, test } from "vitest"
 
-import { copyInto } from "../src/copy.ts"
+import { copyInto } from "@workspace/price-ingest/load/copy"
 import { connectAdmin, connectAs } from "../src/db.ts"
 import {
   CHAMGA_PRICE_FILES,

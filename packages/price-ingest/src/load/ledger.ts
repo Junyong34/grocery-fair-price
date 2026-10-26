@@ -2,12 +2,12 @@
 import type postgres from "postgres"
 
 import type { RawHeader } from "./raw-file.ts"
-import type { Sql } from "./db.ts"
+import type { Sql, Tx } from "./db.ts"
 import type { DbSource, RunJob } from "./types.ts"
 
 // 실행 한 번마다 한 줄. 원본 파일은 자기를 받은 실행을 가리킨다 (raw_object.ingest_run_id).
 export async function registerRun(
-  sql: Sql,
+  sql: Sql | Tx,
   input: { source: DbSource | "all"; job: RunJob; callBudget: number; startedAt?: string },
 ): Promise<number> {
   const [row] = await sql<{ id: string }[]>`
@@ -21,7 +21,7 @@ export async function registerRun(
 // 원본을 받은 실행의 번호. 헤더에 번호가 있고 그 실행이 있으면 그것을 쓴다.
 // 없으면(DB가 안 되어 실행 기록을 못 만들었으면) 헤더로 그 실행을 실패(db_unreachable)로 기록한다.
 // 같은 실행(출처·작업·시작 시각)의 원본은 같은 기록을 가리킨다.
-export async function runOfRawFile(sql: Sql, header: RawHeader): Promise<number> {
+export async function runOfRawFile(sql: Sql | Tx, header: RawHeader): Promise<number> {
   if (header.ingestRunId !== null) {
     const found = await sql`select 1 from price.ingest_run where id = ${header.ingestRunId}`
     if (found.length > 0) return header.ingestRunId
@@ -44,7 +44,7 @@ export async function runOfRawFile(sql: Sql, header: RawHeader): Promise<number>
 // 주어진 storage_path 중 원본 파일 기록이 이미 있는 것.
 // 목록은 JSON 배열로 넘긴다. sql.array는 연결의 첫 쿼리에서 배열로 보내지지 않아
 // "op ANY/ALL (array) requires array on right side"로 실패했다 (postgres 3.4.9, 로컬 실측).
-export async function registeredPaths(sql: Sql, paths: readonly string[]): Promise<Set<string>> {
+export async function registeredPaths(sql: Sql | Tx, paths: readonly string[]): Promise<Set<string>> {
   if (paths.length === 0) return new Set()
   const rows = await sql<{ storage_path: string }[]>`
     select storage_path from price.raw_object
@@ -61,7 +61,7 @@ export type PendingInput = {
 }
 
 // 원본 파일 기록을 pending_load로 남긴다. 이미 있으면 아무것도 하지 않고 false를 돌려준다.
-export async function registerPending(sql: Sql, input: PendingInput): Promise<boolean> {
+export async function registerPending(sql: Sql | Tx, input: PendingInput): Promise<boolean> {
   const h = input.header
   const rows = await sql<{ id: string }[]>`
     insert into price.raw_object (

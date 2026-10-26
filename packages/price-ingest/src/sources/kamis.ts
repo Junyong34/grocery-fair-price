@@ -48,7 +48,7 @@ const digits = z.string().regex(/^\d+$/)
 const yyyymmdd = z.string().regex(/^\d{8}$/)
 
 // 행 필드 20개. 빈 값은 없고, 축산(부류 500)만 mrkt_*·orgnl_reg_dt가 null이다 (kamis.md 2-2).
-const kamisRow = z.strictObject({
+export const kamisRowSchema = z.strictObject({
   exmn_ymd: yyyymmdd,
   se_cd: z.string().regex(/^\d{2}$/),
   se_nm: z.string(),
@@ -79,7 +79,7 @@ export const kamisPerDaySchema = z.strictObject({
     header: z.strictObject({ resultCode: z.string(), resultMsg: z.string() }),
     body: z.strictObject({
       dataType: z.literal("JSON"),
-      items: z.strictObject({ item: z.array(kamisRow) }),
+      items: z.strictObject({ item: z.array(kamisRowSchema) }),
       numOfRows: z.number(),
       pageNo: z.number(),
       totalCount: z.number(),
@@ -87,7 +87,7 @@ export const kamisPerDaySchema = z.strictObject({
   }),
 })
 
-export type KamisRow = z.infer<typeof kamisRow>
+export type KamisRow = z.infer<typeof kamisRowSchema>
 
 // 상태·본문을 판정해 raw 본문을 돌려준다. 계약 검사는 하지 않는다 (실측 비교가 이 값을 쓴다).
 export function readKamisPerDay(status: number, text: string): unknown {

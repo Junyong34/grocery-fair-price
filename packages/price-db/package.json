@@ -12,6 +12,7 @@
     "measure": "node scripts/measure-size.ts"
   },
   "dependencies": {
+    "@workspace/price-ingest": "workspace:*",
     "fast-xml-parser": "5.11.2",
     "postgres": "3.4.9"
   },

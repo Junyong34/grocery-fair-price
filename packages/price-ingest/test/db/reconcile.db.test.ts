@@ -1,34 +1,17 @@
-import { execFileSync } from "node:child_process"
 import { randomUUID } from "node:crypto"
-import { fileURLToPath } from "node:url"
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest"
 
 import { buildRawFile, callKeyOf, rawObjectKey, storagePathOf, type Json } from "../../src/load/raw-file.ts"
 import { reconcileRawFiles } from "../../src/load/reconcile.ts"
-import { connectIngest, type Sql } from "../../src/load/db.ts"
+import type { Sql } from "../../src/load/db.ts"
 import { registerRun } from "../../src/load/ledger.ts"
-import { createObjectStore, type ObjectStore } from "../../src/load/storage.ts"
+import type { ObjectStore } from "../../src/load/storage.ts"
+import { connectLocalIngest, localStore } from "./local.ts"
 
 // 로컬 Supabase(supabase start)가 떠 있어야 한다. 루트 pnpm test에는 들어가지 않는다.
-const REPO_ROOT = fileURLToPath(new URL("../../../../", import.meta.url))
-const ADMIN_URL = "postgresql://postgres:postgres@127.0.0.1:55322/postgres"
-const INGEST_URL = "postgresql://ingest_writer:local-only-password@127.0.0.1:55322/postgres"
 const TODAY = "2026-10-22"
-
-// supabase status의 로컬 값 (키는 메모리에만 두고 출력하지 않는다)
-function localStatus(): Record<string, string> {
-  const text = execFileSync("pnpm", ["exec", "supabase", "status", "-o", "env"], { cwd: REPO_ROOT, encoding: "utf8" })
-  const values: Record<string, string> = {}
-  for (const line of text.split("\n")) {
-    const match = /^([A-Z_]+)=(.*)$/.exec(line.trim())
-    if (match?.[1] !== undefined) values[match[1]] = (match[2] ?? "").replace(/^"|"$/g, "")
-  }
-  return values
-}
-
-const local = localStatus()
-const store: ObjectStore = createObjectStore({ url: local.API_URL ?? "", secretKey: local.SECRET_KEY ?? "" })
+const store: ObjectStore = localStore()
 
 const testLabel = `reconcile-${randomUUID().slice(0, 8)}`
 const storedKeys: string[] = []
@@ -73,11 +56,7 @@ async function rawRow(key: string): Promise<RawRow | undefined> {
 }
 
 beforeAll(async () => {
-  // 앱 롤에 로컬 비밀번호를 넣는다 (마이그레이션은 넣지 않는다). 이미 있으면 같은 값으로 바뀐다.
-  const admin = connectIngest(ADMIN_URL)
-  await admin.unsafe("alter role ingest_writer with password 'local-only-password'")
-  await admin.end()
-  sql = connectIngest(INGEST_URL)
+  sql = await connectLocalIngest()
 })
 
 afterAll(async () => {

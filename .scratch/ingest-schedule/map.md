@@ -21,6 +21,9 @@ Label: wayfinder:map
 
 <!-- 닫힌 티켓마다 한 줄: [제목](링크): 답 요약 -->
 
+- [Supabase Free 일시정지 기준](issues/04-supabase-free-pause.md): 문턱값은 비공개, 매일 수집이 막아 줄 가능성이 높지만 미확정. 정지 1주 전 메일, 540·DNS 실패는 13에서 즉시 알림, 14에서 Storage 조회로 확인
+- [원본 적재 트랜잭션 (KAMIS·축평원)](issues/05-load-kamis-ekape.md): `loadRawFile`·`loadPendingFiles`. 위치·시장은 원본 행에서, 지역·품종은 비움, 시장 시군구 불일치는 행 거부, duplicate 판정은 07로. 병합 SQL은 price-ingest 한 곳
+
 ## Not yet specified
 
 - **러너에서 data.go.kr이 안 되면 배치를 어디서 돌릴지.** martmemo-data는 GitHub 러너에서 data.go.kr 연결 시간 초과가 2주 연속 났다. 03의 실측이 실패하면 self-hosted 러너, 다른 배치 환경(ADR 0002의 Railway 후보), 재시도 간격 늘리기 중에서 정한다. ADR 0002를 고칠 수 있다.

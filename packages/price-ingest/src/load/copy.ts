@@ -3,7 +3,7 @@
 import { Readable } from "node:stream"
 import { pipeline } from "node:stream/promises"
 
-import type { Sql } from "./db.ts"
+import type { Sql, Tx } from "./db.ts"
 
 export type CopyValue = string | number | boolean | null | readonly string[]
 
@@ -16,7 +16,7 @@ function encode(value: CopyValue): string {
 }
 
 export async function copyInto<T extends Record<string, CopyValue>>(
-  sql: Sql,
+  sql: Sql | Tx,
   table: string,
   columns: readonly (keyof T & string)[],
   rows: readonly T[],

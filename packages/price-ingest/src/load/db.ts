@@ -3,7 +3,14 @@
 import postgres from "postgres"
 
 export type Sql = postgres.Sql
+export type Tx = postgres.TransactionSql
 
 export function connectIngest(url: string): Sql {
   return postgres(url, { max: 1, onnotice: () => {} })
+}
+
+// 트랜잭션 하나로 묶는다. 이미 트랜잭션 안이면(테스트의 롤백 묶음) savepoint로 묶는다.
+export function transaction<T>(sql: Sql | Tx, fn: (tx: Tx) => Promise<T>): Promise<T> {
+  if ("savepoint" in sql) return sql.savepoint(fn) as Promise<T>
+  return sql.begin(fn) as Promise<T>
 }

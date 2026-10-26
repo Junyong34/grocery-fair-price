@@ -286,7 +286,7 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `supabase/config.toml` | 로컬 Supabase 설정. 포트는 5532x대(API 55321, DB 55322), `raw` 버킷(비공개) |
 | `supabase/migrations/` | `price_foundation`(확장·스키마·롤), `price_tables`(표 40개·뷰), `price_grants_rls`(GRANT·RLS 정책), `price_calc_param_retention`(계산 상수 초기값, 보존 정리 함수), `price_comments`(모든 표·열·함수의 DB 주석: 뜻, 단위·형식, null의 뜻, 원천 필드명). 표 정의의 기준이다 (pipeline.md 3장은 설계 이유) |
 | `supabase/seed.sql` | `supabase db reset` 때만 들어가는 로컬 기준 데이터: 지역(전국·시도), 샘플 품종 임시 목록, 환산 규칙, 판매처. 끝에서 기본 규격 검사를 돌린다 |
-| `packages/price-db/src/` | 로컬 접속(`db.ts`), 샘플 응답 파서(`samples.ts`), 임시 표 COPY(`copy.ts`), 관측값 적재·백필(`observation-load.ts`), 간이 집계(`aggregate.ts`), 샘플 테스트 데이터(`load-samples.ts`). 정식 수집 코드는 `ingest-foundation/03`이 따로 만든다 |
+| `packages/price-db/src/` | 로컬 접속(`db.ts`), 샘플 응답 파서(`samples.ts`), 샘플용 관측값 적재·백필(`observation-load.ts`, 병합은 `@workspace/price-ingest/load/observation`을 쓴다), 간이 집계(`aggregate.ts`), 샘플 테스트 데이터(`load-samples.ts`) |
 | `packages/price-db/test/*.db.test.ts` | 권한·RLS·제약·적재 시나리오·DB 주석 빠짐·ERD 최신 여부. 로컬 DB가 떠 있어야 해서 루트 `pnpm test`에는 들어가지 않는다 |
 | `packages/price-db/scripts/` | `load-samples.ts`, `measure-size.ts`(행당 크기 실측), `build-erd.ts`(`grocery-price/docs/30-data/schema-map.html`의 ERD 생성) |
 
@@ -300,9 +300,9 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `packages/price-ingest/src/contract/` | 응답 형태 기술(`shape.ts`: 경로별 타입), 기준과 실측 비교(`compare.ts`: 실패와 경고), 실측 항목 16개와 기준 파일 경로(`probes.ts`) |
 | `packages/price-ingest/src/` 공통 | `errors.ts`(오류 종류, 메시지에 키·주소 없음), `http.ts`(fetch 래퍼, 호출 기록 `CallRecord`: 인증키를 뺀 파라미터·HTTP 상태·resultCode·행 수), `response.ts`(XML·JSON 읽기, 판정), `validate.ts`(검사 결과를 필드 경로로 풀어 쓰기) |
 | `packages/price-ingest/src/adapt/` | 어댑터: 응답 행 → 관측값 초안 (원천 키·장소 키. DB 번호는 적재가 만든다). `kamis.ts`·`ekape.ts`(평년 행은 `reference`)·`chamga.ts`, 행 단위 거부(`*RowRejection`, `batch.ts`의 `adaptRows`), 단위 환산(`units.ts`), 매핑 함수와 미매핑 리포트(`mapping.ts`), 초안 스키마와 `ADAPTER_VERSION`(`draft.ts`) |
-| `packages/price-ingest/src/load/` | 원본 보관과 대조: 원본 파일 형식(`raw-file.ts`: 헤더 + 행, 행만의 내용 해시, 객체 키와 `raw/…` storage_path), Storage(`storage.ts`, 비밀 키), 실행·원본 기록(`ledger.ts`), 최근 7일 대조(`reconcile.ts`, `window.ts`), 접속(`db.ts`, `ingest_writer`) |
+| `packages/price-ingest/src/load/` | 원본 보관과 대조: 원본 파일 형식(`raw-file.ts`: 헤더 + 행, 행만의 내용 해시, 객체 키와 `raw/…` storage_path), Storage(`storage.ts`, 비밀 키), 실행·원본 기록(`ledger.ts`), 최근 7일 대조(`reconcile.ts`, `window.ts`), 접속(`db.ts`, `ingest_writer`). 적재: 원본 파일 하나를 한 트랜잭션으로(`load-file.ts`), `pending_load` 모두(`load-pending.ts`), 원천 키·관측 위치·시장(`masters.ts`), 임시 표 COPY(`copy.ts`)와 바뀐 행만 고쳐 쓰는 병합(`observation.ts`), KAMIS 시장 유형·코드표(`kamis-market.ts`, `kamis-market-codes.ts`). `price-db`도 이 병합을 쓴다 (`exports` `./*`) |
 | `packages/price-ingest/test/` | 오프라인 테스트 (`pnpm test`에 들어간다. 키·네트워크 없음): 요청 주소, 가짜 응답으로 본 클라이언트 동작·호출 기록·페이지, 샘플 계약, 필드 이름 변경 감지, 어댑터와 3-12 케이스, 원본 형식. `test/fixtures/`는 임시 매핑 |
-| `packages/price-ingest/test/db/` | 로컬 DB·Storage 통합 테스트 (`pnpm --filter @workspace/price-ingest test:db`, `pnpm db:start` 필요). 루트 `pnpm test`에는 들어가지 않는다 |
+| `packages/price-ingest/test/db/` | 로컬 DB·Storage 통합 테스트 (`pnpm --filter @workspace/price-ingest test:db`, `pnpm db:start` 필요): 대조, 적재(정정·거부·평년 행, 같은 출처 동시 적재의 lock, DB 없이 올린 원본의 대조 → 적재). 접속 도우미는 `local.ts`. 루트 `pnpm test`에는 들어가지 않는다 |
 | `packages/price-ingest/test/live/` | 실측 테스트 (`pnpm --filter @workspace/price-ingest test:live`). 루트 `.env`의 `DATA_GO_KR_SERVICE_KEY`로 16회 호출한다. 명시적으로 켤 때만 돈다. 수집 시각 앞뒤로 돌리지 않는다 |
 | `packages/price-ingest/baseline/contract-baseline.json` | 실측으로 만든 기준: 필드 타입, 코드 목록, 건수. 값(가격)은 없다. 의도한 응답 변경일 때만 `pnpm --filter @workspace/price-ingest contract:baseline`으로 다시 만든다 |
 | `packages/price-ingest/scripts/capture-baseline.ts` | 기준 파일 생성. 계약과 다른 응답은 저장하지 않는다 |
