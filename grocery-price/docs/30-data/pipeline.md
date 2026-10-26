@@ -1189,7 +1189,7 @@ KAMIS `orgnl_reg_dt`는 재등록 때 덮어쓰이므로, 처음 받은 시각�
 
 - 작업마다 `concurrency: { group: ingest-<source>, cancel-in-progress: false }`를 둬서 같은 출처 수집이 겹쳐 돌지 않게 하고(DB 안에서는 advisory lock이 한 번 더 막는다, 3-0), `timeout-minutes`를 건다.
 - **정기 실행 꺼짐.** 공개 저장소는 60일 동안 저장소 활동이 없으면 GitHub가 정기 실행(schedule) 워크플로를 끈다. 수집이 매일 돌아도 커밋이 없으면 꺼진다. 그래서 (1) 주 1회 도는 점검(heartbeat) 워크플로가 수집 워크플로들이 켜져 있는지 보고 꺼졌으면 다시 켠다(`gh workflow enable`, `actions: write` 권한). (2) 같은 점검이 출처별 `source_day`의 마지막 `ok` 날짜를 보고 기대보다 2일 넘게 멈췄으면 알림 이슈를 연다 (5-3). (3) 점검 워크플로 자신도 같은 규칙으로 꺼질 수 있으므로, 50일째 되기 전에 사람에게 알리는 일정(달력)을 함께 둔다 (`ingest-foundation/05`).
-- 비밀값은 Actions Secrets에만 둔다: `DATA_GO_KR_SERVICE_KEY`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`(Storage 업로드 전용), `INGEST_DATABASE_URL`(`ingest_writer`, Supavisor 세션 모드 5432). 로그에 찍지 않는다. 옛 `SUPABASE_SERVICE_ROLE_KEY`·`DATABASE_URL`은 쓰지 않는다 (3-0 "키").
+- 비밀값은 Actions Secrets에만 둔다: `DATA_GO_KR_SERVICE_KEY`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`(Storage 업로드 전용), `INGEST_DATABASE_URL`(`ingest_writer`, Supavisor 세션 모드 5432). 로그에 찍지 않는다. 옛 `SUPABASE_SERVICE_ROLE_KEY`·`DATABASE_URL`은 쓰지 않는다 (3-0 "키"). 공개 저장소라 로그를 누구나 보고, GitHub는 URL 인코딩된 값과 주소 안의 비밀번호를 가리지 못한다. 그래서 CLI는 모든 오류를 인코딩 변형까지 지운 뒤 찍고(`price-ingest/src/secrets.ts`), 워크플로는 Secret을 단계 `env:`로만 넘기며 환경변수 덤프·`set -x`를 쓰지 않는다. `INGEST_DATABASE_URL`의 비밀번호는 퍼센트 인코딩해서 넣는다. 형식이 잘못된 주소는 postgres 오류에 주소 전체가 담겨 새므로 접속 전에 막는다 (`ingest-schedule/02`, 2026-10-26).
 - 로컬 탐색(`fetch-samples.sh`, 계약 테스트)과 Actions가 **같은 키, 같은 일일 한도**를 쓴다. 수집 시각 앞뒤로 로컬에서 대량 호출하지 않는다.
 - Supabase Free는 활동이 없으면 일시정지된다. 매일 도는 수집이 막아 주는지 확인한다.
 - **백업은 정식 서비스 전으로 미룬다** (2026-10-20). 무료 플랜에는 자동 백업이 없다. 지금은 시제품이라 관측값·집계는 ① 원본에서 다시 만들고, 운영자 매핑은 잃을 위험을 받아들인다 (7장). 나중 계획: 주 1회 `pg_dump --schema=price`를 Actions 아티팩트(최근 몇 주)로 남기고, 달마다 한 벌을 비공개 Storage 버킷에 둔다.

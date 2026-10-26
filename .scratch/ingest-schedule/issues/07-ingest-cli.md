@@ -16,6 +16,7 @@ Blocked by: 05
 - [ ] 호출 실패는 2s/4s/8s로 3번 재시도. 키 오류(`SERVICE_KEY_IS_NOT_REGISTERED_ERROR`, 코드 30, HTTP 401·403)는 재시도하지 않고 그 출처를 멈추며 알림이 읽을 수 있게 `ingest_run.error_code`를 남긴다 (13이 쓴다)
 - [ ] 출처별 받을 날짜 범위의 기본값: KAMIS D-3~D-1(품목당 기간 호출 1회), 축평원 D-1·D-2·D-3 (5-1). 참가격은 10이 정한다
 - [ ] 같은 대상 다시 받기: 올리기 전에 같은 묶음 라벨·같은 대상 기간의 **바로 전 파일**과 내용 해시가 같으면 올리지 않고 `raw_object`에 `duplicate`(`duplicate_of`)로 기록만 한다 (3-7). 해시만으로 아무 파일과 비교하면 되돌린 정정을 잃는다 (05 Answer 4)
+- [ ] 모든 오류는 `describeError(error, redactorFromEnv())`로만 찍는다. `GITHUB_ACTIONS=true`면 시작할 때 `actionsMaskCommands`를 출력한다 (02 Answer)
 - [ ] 종료 코드 규칙을 적는다: 성공 / 부분 실패 / 키 오류 / DB 실패. 13이 이 코드로 알림을 고른다
 - [ ] 로컬에서 실제 키로 KAMIS·축평원 하루치를 로컬 DB에 한 번 돌려 본다 (수집 시각 앞뒤는 피한다)
 
