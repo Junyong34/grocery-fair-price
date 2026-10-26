@@ -3,7 +3,6 @@
 // 행은 받은 그대로(계약 스키마를 통과한 값) 호출 순서대로 잇는다. 호출 기록의 행 수가 행을 호출로 되돌리는 열쇠다.
 import type { CallOptions, CallRecord, FetchLike } from "../http.ts"
 import type { Json } from "../load/raw-file.ts"
-import type { DbSource } from "../load/types.ts"
 import { isFoodProduct } from "../load/chamga.ts"
 import {
   CHAMGA_ENDPOINT,
@@ -122,27 +121,27 @@ export async function collectEkape(ctx: CollectContext, day: string): Promise<Co
   return builder.result()
 }
 
-// 참가격: 점포·상품 마스터를 먼저 받고(06 Answer 1), 조사일 하나의 식품 상품 가격을 상품마다 받는다 (chamgagyeok.md 8장).
-// 조사일을 언제 받을지(감지·완료)는 ingest-schedule/10이 정한다.
-export async function collectChamga(ctx: CollectContext, surveyDay: string): Promise<Collected> {
+// 참가격: 점포·상품 마스터를 먼저 받고(06 Answer 1), 조사일마다 식품 상품 가격을 상품마다 받는다 (chamgagyeok.md 8장).
+// 조사일 하나가 가격 파일 하나다. 어느 조사일을 받을지는 chamga-schedule.ts가 정한다 (10).
+export async function collectChamga(ctx: CollectContext, surveyDays: readonly string[]): Promise<Collected> {
+  if (surveyDays.length === 0) return { files: [], failedCalls: 0, stop: null }
   const stores = new FileBuilder(ctx, { endpoint: CHAMGA_ENDPOINT.store, label: "store-master", targetFrom: null, targetTo: null })
   await stores.add((call) => fetchChamgaStore(call, {}))
   const products = new FileBuilder(ctx, { endpoint: CHAMGA_ENDPOINT.product, label: "product-master", targetFrom: null, targetTo: null })
   const productRows = stores.stop ? null : await products.add((call) => fetchChamgaProduct(call, {}))
-
-  const prices = new FileBuilder(ctx, {
-    endpoint: CHAMGA_ENDPOINT.price,
-    label: "price",
-    targetFrom: surveyDay,
-    targetTo: surveyDay,
-  })
   // 상품 마스터가 없으면 부를 상품을 모른다. 가격은 받지 않는다
-  for (const product of (productRows ?? []).filter(isFoodProduct)) {
-    await prices.add((call) => fetchChamgaPrice(call, { goodInspectDay: compact(surveyDay), goodId: product.goodId }))
-    if (prices.stop) break
-  }
+  const goods = (productRows ?? []).filter(isFoodProduct).map((product) => product.goodId)
 
-  const parts = [stores, products, prices]
+  const parts = [stores, products]
+  for (const surveyDay of surveyDays) {
+    if (parts.some((part) => part.stop)) break
+    const prices = new FileBuilder(ctx, { endpoint: CHAMGA_ENDPOINT.price, label: "price", targetFrom: surveyDay, targetTo: surveyDay })
+    parts.push(prices)
+    for (const goodId of goods) {
+      await prices.add((call) => fetchChamgaPrice(call, { goodInspectDay: compact(surveyDay), goodId }))
+      if (prices.stop) break
+    }
+  }
   return {
     files: parts.map((part) => part.file).filter((file) => file.requests.length > 0),
     failedCalls: parts.reduce((sum, part) => sum + part.failedCalls, 0),
@@ -150,7 +149,25 @@ export async function collectChamga(ctx: CollectContext, surveyDay: string): Pro
   }
 }
 
-export type CollectRequest = { source: "kamis" | "ekape"; day: string } | { source: "chamga"; surveyDay: string }
+// 조사일 감지용 상품: 여러 업태가 취급하는 3개 (chamgagyeok.md 5-4). 1000 팔도 왕뚜껑, 1395 CJ 콩나물, 1075 CJ 계란 15개
+export const CHAMGA_PROBE_GOODS = ["1000", "1395", "1075"] as const
+
+export type Detection = { found: boolean; failedCalls: number; stop: StopReason | null }
+
+// 조사일에 가격이 들어왔는가: 감지 상품 셋 중 하나라도 행이 있으면 그렇다. 찾으면 남은 상품은 부르지 않는다.
+// 감지 응답은 원본으로 남기지 않는다. 찾으면 같은 날 전체 수집이 같은 행을 다시 받는다.
+export async function detectChamgaSurvey(ctx: CollectContext, surveyDay: string): Promise<Detection> {
+  const probe = new FileBuilder(ctx, { endpoint: CHAMGA_ENDPOINT.price, label: "probe", targetFrom: surveyDay, targetTo: surveyDay })
+  for (const goodId of CHAMGA_PROBE_GOODS) {
+    const rows = await probe.add((call) => fetchChamgaPrice(call, { goodInspectDay: compact(surveyDay), goodId }))
+    if (rows && rows.length > 0) return { found: true, failedCalls: probe.failedCalls, stop: null }
+    if (probe.stop) break
+  }
+  return { found: false, failedCalls: probe.failedCalls, stop: probe.stop }
+}
+
+// 참가격: surveyDays를 주면 그 조사일들을 받는다(과거분 채우기 12). 주지 않으면 자동 모드(감지·완료 규칙, 10)
+export type CollectRequest = { source: "kamis" | "ekape"; day: string } | { source: "chamga"; surveyDays?: readonly string[] }
 
 export function collect(ctx: CollectContext, request: CollectRequest): Promise<Collected> {
   switch (request.source) {
@@ -159,10 +176,6 @@ export function collect(ctx: CollectContext, request: CollectRequest): Promise<C
     case "ekape":
       return collectEkape(ctx, request.day)
     case "chamga":
-      return collectChamga(ctx, request.surveyDay)
+      return collectChamga(ctx, request.surveyDays ?? [])
   }
-}
-
-export function sourceOf(request: CollectRequest): DbSource {
-  return request.source
 }

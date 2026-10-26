@@ -11,11 +11,13 @@ import { finishRun, previousRawFile, registerDuplicate, registerPending, registe
 import { loadPendingFiles } from "../load/load-pending.ts"
 import { buildRawFile, callKeyOf, rawObjectKey, storagePathOf } from "../load/raw-file.ts"
 import { reconcileRawFiles } from "../load/reconcile.ts"
+import { closeEmpty, markNotYet, readSurveyDays, recordFetch, rowCountOf } from "../load/survey-day.ts"
 import { createObjectStore, type ObjectStore } from "../load/storage.ts"
 import { kstDateOf } from "../load/window.ts"
 import { createRedactor, errorSummary } from "../secrets.ts"
 import { CALL_BUDGET, CallBudget, realSleep, type Sleep, type StopReason } from "./calls.ts"
-import { collect, type CollectRequest } from "./collect.ts"
+import { nextStableChecks, planChamga, recentFridays, type ChamgaPlan, type SurveyDayState } from "./chamga-schedule.ts"
+import { collect, type CollectContext, type CollectRequest } from "./collect.ts"
 
 // 종료 코드. 알림(ingest-schedule/13)이 이것과 ingest_run.error_code로 알림을 고른다.
 export const EXIT = {
@@ -75,6 +77,22 @@ function decide(input: {
   return { exitCode: EXIT.ok, status: "ok", errorCode: null }
 }
 
+function describeTarget(request: CollectRequest): string {
+  if (request.source !== "chamga") return `기준일 ${request.day}`
+  return `조사일 ${request.surveyDays?.join(", ") || "없음"}`
+}
+
+// 받은 조사일의 행 수가 받기 전과 같으면 stable_checks를 올린다. 호출이 하나라도 실패한 실행은 세지 않는다
+// (빠진 상품 때문에 우연히 같을 수 있다). 마지막 받기(완료 뒤 월요일)였으면 닫는다.
+async function settleChamga(sql: Sql, plan: ChamgaPlan, input: { clean: boolean }): Promise<void> {
+  for (const day of plan.notYet) await markNotYet(sql, day)
+  for (const day of plan.closeEmpty) await closeEmpty(sql, day)
+  for (const fetched of plan.fetch) {
+    const stableChecks = input.clean ? nextStableChecks(fetched.before, await rowCountOf(sql, fetched.day)) : null
+    await recordFetch(sql, fetched.day, { stableChecks, close: fetched.final && input.clean })
+  }
+}
+
 export async function runIngest(request: CollectRequest, deps: IngestDeps): Promise<IngestResult> {
   const now = deps.now ?? (() => new Date())
   const log = deps.log ?? ((line: string) => console.log(line))
@@ -102,13 +120,40 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
   } catch (error) {
     await dbDown("실행 기록", error)
   }
-  say(`수집 시작: ${source} ${"day" in request ? `기준일 ${request.day}` : `조사일 ${request.surveyDay}`}, 실행 ${runId ?? "기록 없음"}`)
+  const ctx: CollectContext = {
+    serviceKey: deps.env.serviceKey,
+    fetch: deps.fetch,
+    budget,
+    sleep: deps.sleep ?? realSleep,
+    delays: deps.delays,
+  }
+  const today = kstDateOf(now().toISOString())
 
-  const collected = await collect(
-    { serviceKey: deps.env.serviceKey, fetch: deps.fetch, budget, sleep: deps.sleep ?? realSleep, delays: deps.delays },
-    request,
-  )
-  say(`호출 ${budget.used}회, 실패 ${collected.failedCalls}건${collected.stop ? `, 멈춤: ${collected.stop}` : ""}`)
+  // 참가격 자동 모드: 조사일 상태를 읽고 감지한 뒤 받을 조사일을 정한다 (10)
+  let target = request
+  let plan: ChamgaPlan | null = null
+  if (request.source === "chamga" && request.surveyDays === undefined) {
+    let states = new Map<string, SurveyDayState>()
+    if (sql) {
+      try {
+        states = await readSurveyDays(sql, recentFridays(today))
+      } catch (error) {
+        await dbDown("조사일 상태", error)
+      }
+    }
+    plan = await planChamga(ctx, states, { today, now: now().toISOString(), canClose: sql !== null })
+    say(
+      `조사일: 받음 ${plan.fetch.map((f) => `${f.day}${f.final ? "(마지막)" : ""}`).join(", ") || "없음"}` +
+        `, 아직 없음 ${plan.notYet.join(", ") || "-"}, 빈 조사일로 닫음 ${plan.closeEmpty.join(", ") || "-"}`,
+    )
+    target = { source: "chamga", surveyDays: plan.fetch.map((f) => f.day) }
+  }
+  say(`수집 시작: ${source} ${describeTarget(target)}, 실행 ${runId ?? "기록 없음"}`)
+
+  const collected = await collect(ctx, target)
+  const failedCalls = collected.failedCalls + (plan?.failedCalls ?? 0)
+  const stop = plan?.stop ?? collected.stop
+  say(`호출 ${budget.used}회, 실패 ${failedCalls}건${stop ? `, 멈춤: ${stop}` : ""}`)
 
   const uploaded: string[] = []
   const duplicates: string[] = []
@@ -192,7 +237,16 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
     }
   }
 
-  const inputs = { storageFailed, dbFailed, stop: collected.stop, failedCalls: collected.failedCalls, loadFailed }
+  // 참가격 조사일 상태: 안 온 날·빈 날 기록, 받은 날의 행 수 안정 횟수와 마지막 받기 뒤 닫기
+  if (plan && sql && !storageFailed) {
+    try {
+      await settleChamga(sql, plan, { clean: failedCalls === 0 && stop === null && loadFailed === 0 })
+    } catch (error) {
+      await dbDown("조사일 상태 기록", error)
+    }
+  }
+
+  const inputs = { storageFailed, dbFailed, stop, failedCalls, loadFailed }
   let outcome = decide(inputs)
   // dbDown이 sql을 비우므로 흐름 분석이 좁힌 타입을 다시 넓혀 읽는다
   const activeSql = sql as Sql | null
@@ -202,7 +256,7 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
         status: outcome.status,
         callsUsed: budget.used,
         errorCode: outcome.errorCode,
-        errorDetail: `업로드 ${uploaded.length}, 중복 ${duplicates.length}, 적재 ${loaded}, 적재 실패 ${loadFailed}, 호출 실패 ${collected.failedCalls}`,
+        errorDetail: `업로드 ${uploaded.length}, 중복 ${duplicates.length}, 적재 ${loaded}, 적재 실패 ${loadFailed}, 호출 실패 ${failedCalls}`,
         gitSha: deps.gitSha ?? null,
       })
     } catch (error) {

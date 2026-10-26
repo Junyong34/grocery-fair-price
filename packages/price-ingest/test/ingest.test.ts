@@ -143,7 +143,7 @@ describe("출처별 호출 계획 (pipeline 5-1)", () => {
       if (u.pathname.endsWith("getProductInfoSvc.do")) return new Response(readSampleText("chamgagyeok/product-all.xml"))
       return new Response(readSampleText("chamgagyeok/price-non-survey-day.xml"))
     }
-    const result = await collectChamga(ctx(fetch), "2026-10-23")
+    const result = await collectChamga(ctx(fetch), ["2026-10-23"])
     expect(paths.slice(0, 2)).toEqual(["getStoreInfoSvc.do", "getProductInfoSvc.do"])
     expect(paths.filter((p) => p === "getProductPriceInfoSvc")).toHaveLength(457)
     expect(result.files.map((f) => f.label)).toEqual(["store-master", "product-master", "price"])
@@ -152,11 +152,15 @@ describe("출처별 호출 계획 (pipeline 5-1)", () => {
 })
 
 describe("명령 인자", () => {
-  it("기준일은 기본 오늘이고, 참가격은 조사일이 꼭 있어야 한다", () => {
+  it("기준일은 기본 오늘이고, 참가격은 조사일이 없으면 자동 모드다", () => {
     expect(parseRequest(["--source", "kamis"], "2026-10-27")).toEqual({ source: "kamis", day: "2026-10-27" })
     expect(parseRequest(["--source", "ekape", "--date", "2026-10-20"], "2026-10-27")).toEqual({ source: "ekape", day: "2026-10-20" })
-    expect(parseRequest(["--source", "chamga", "--survey-day", "2026-10-23"], "x")).toEqual({ source: "chamga", surveyDay: "2026-10-23" })
-    expect(() => parseRequest(["--source", "chamga"], "2026-10-27")).toThrow(/survey-day/)
+    expect(parseRequest(["--source", "chamga"], "x")).toEqual({ source: "chamga" }) // 자동 모드
+    expect(parseRequest(["--source", "chamga", "--survey-day", "2026-06-12", "--survey-day", "2026-06-26"], "x")).toEqual({
+      source: "chamga",
+      surveyDays: ["2026-06-12", "2026-06-26"],
+    })
+    expect(() => parseRequest(["--source", "chamga", "--survey-day", "0612"], "2026-10-27")).toThrow(/survey-day/)
     expect(() => parseRequest(["--source", "nope"], "2026-10-27")).toThrow(/사용법/)
     expect(() => parseRequest(["--source", "kamis", "--date", "20261027"], "2026-10-27")).toThrow(/YYYY-MM-DD/)
   })

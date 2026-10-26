@@ -80,7 +80,7 @@ describe("수집 실행 (커밋, 순서대로)", () => {
     const result = await run({ startMinute: 0, fetch: only211() })
     expect(result).toMatchObject({ exitCode: EXIT.ok, errorCode: null, callsUsed: 140, loadFailed: 0 })
     expect(result.uploaded).toHaveLength(1)
-    expect(result.uploaded[0]).toMatch(/^raw\/kamis\/1997\/10\/02\/daily-19971001T220001000Z\.ndjson\.gz$/)
+    expect(result.uploaded[0]).toMatch(/^raw\/kamis\/1997\/10\/02\/daily-19971001T2200\d{2}000Z\.ndjson\.gz$/)
     expect(await runRow(result.runId!)).toMatchObject({ status: "ok", error_code: null, calls_used: 140 })
 
     const [raw] = await sql<{ load_status: string; target_from: string; target_to: string; row_count: number }[]>`

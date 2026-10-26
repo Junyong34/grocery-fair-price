@@ -22,6 +22,7 @@ Label: wayfinder:map
 <!-- 닫힌 티켓마다 한 줄: [제목](링크): 답 요약 -->
 
 - [오류·로그에 키와 접속 주소가 남지 않게](issues/02-redact-secrets-in-logs.md): 잘못된 형식의 DB 주소만 샜다(Invalid URL의 input) → `DbUrlError`. 인코딩 변형까지 지우는 `describeError`를 CLI가 쓴다. 워크플로 규칙 다섯 가지
+- [참가격 조사일 감지·완료 규칙](issues/10-chamga-survey-day.md): `--source chamga`(날짜 없음)는 최근 금요일 2개를 source_day 기존 열로 판단해 감지·전체 수집·월요일 마지막 받기·10일 뒤 빈 조사일 닫기. `--survey-day`는 지정 조사일(과거분)
 - [수집 CLI 한 흐름](issues/07-ingest-cli.md): `ingest --source … [--date|--survey-day]`. KAMIS 140품목 매일, 원본은 실행×기능×대상 기간 하나, 바로 전 파일과 같으면 duplicate, 종료 코드 0/1/2/3/4/9. 실제 키로 로컬 실측 통과
 - [Supabase Free 일시정지 기준](issues/04-supabase-free-pause.md): 문턱값은 비공개, 매일 수집이 막아 줄 가능성이 높지만 미확정. 정지 1주 전 메일, 540·DNS 실패는 13에서 즉시 알림, 14에서 Storage 조회로 확인
 - [원본 적재 트랜잭션 (KAMIS·축평원)](issues/05-load-kamis-ekape.md): `loadRawFile`·`loadPendingFiles`. 위치·시장은 원본 행에서, 지역·품종은 비움, 시장 시군구 불일치는 행 거부, duplicate 판정은 07로. 병합 SQL은 price-ingest 한 곳
