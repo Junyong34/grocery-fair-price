@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest"
 
 import { findFood, isDrawn } from "../data/foods"
 import { orderSeasonMonths } from "../data/months"
-import { CHART_PER_MONTH, chartColumns, chartFoods, chartLines, seasonRuns, type ChartLine } from "./period-chart"
+import { chartFoods } from "./foods"
+import { chartColumns, chartLines, seasonRuns, type ChartLine } from "./period-chart"
+import { DEFAULT_SPECS } from "./spec"
+
+const poster = DEFAULT_SPECS["month-poster"]
 
 const foodLines = (lines: readonly ChartLine[]) => lines.filter((line) => line.type === "food")
 
@@ -28,14 +32,13 @@ describe("seasonRuns", () => {
 })
 
 describe("chartLines", () => {
-  const lines = chartLines(chartFoods([]))
+  const lines = chartLines(chartFoods(poster))
 
-  it("달마다 대표 CHART_PER_MONTH개를 한 번씩 싣는다(그림 있는 품종만)", () => {
+  it("고른 품종을 한 번씩 싣는다", () => {
     const ids = foodLines(lines).map((line) => line.food.id)
     expect(new Set(ids).size).toBe(ids.length)
     expect(ids.every(isDrawn)).toBe(true)
-    expect(ids.length).toBe(chartFoods([]).length)
-    expect(ids.length).toBeLessThanOrEqual(CHART_PER_MONTH * 12)
+    expect(ids.length).toBe(chartFoods(poster).length)
   })
 
   it("카테고리 머리 줄 아래에 그 카테고리 품종만, 제철 시작 달 순으로 놓는다", () => {
@@ -55,7 +58,7 @@ describe("chartLines", () => {
   })
 
   it("고른 카테고리만 싣는다", () => {
-    const fruit = chartLines(chartFoods(["과일"]))
+    const fruit = chartLines(chartFoods({ ...poster, categories: ["과일"] }))
     expect(fruit.filter((line) => line.type === "group")).toEqual([{ type: "group", category: "과일" }])
     expect(foodLines(fruit).every((line) => line.food.category === "과일")).toBe(true)
   })
@@ -67,7 +70,7 @@ describe("chartLines", () => {
 })
 
 describe("chartColumns", () => {
-  const lines = chartLines(chartFoods([]))
+  const lines = chartLines(chartFoods(poster))
 
   it.each([1, 2, 3])("%i단으로 나눠도 품종 줄은 차례대로 한 번씩 나온다", (columns) => {
     const split = chartColumns(lines, columns)

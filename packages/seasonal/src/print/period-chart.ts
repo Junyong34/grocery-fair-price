@@ -1,9 +1,8 @@
 import type { Food, FoodCategory } from "../data/foods"
 import { orderSeasonMonths } from "../data/months"
-import { yearFoods } from "./foods"
 
 // 제철 막대표: 행 = 품종, 열 = 1~12월, 제철 달에 막대. 월별 포스터 P-B, 연간 한 장 Y-C, 월간 표지 C-3이 같이 쓴다.
-// 여기서는 어떤 줄을 어떤 차례로 몇 단에 놓을지만 정하고, 그리기(크기·색)는 apps/web/features/print/parts/period-chart.tsx가 한다.
+// 실을 품종은 print/foods.ts의 chartFoods가 고르고, 여기서는 어떤 줄을 어떤 차례로 몇 단에 놓을지만 정하고, 그리기(크기·색)는 apps/web/features/print/parts/period-chart.tsx가 한다.
 
 /** 막대 하나. 달(1~12), 양 끝 포함. */
 export type SeasonRun = { from: number; to: number }
@@ -24,14 +23,6 @@ export function seasonRuns(months: readonly number[]): SeasonRun[] {
     else runs.push({ from: month, to: month })
   }
   return runs
-}
-
-/** 막대표에 싣는 품종의 달마다 상한. 여섯이면 많아야 72줄로, 그림 있는 품종 67개를 다 싣던 때와 글자 크기가 같다. */
-export const CHART_PER_MONTH = 6
-
-/** 막대표에 실을 품종: 고른 카테고리(비우면 전부)에서 달마다 대표 CHART_PER_MONTH개(yearFoods, 한 품종은 최적 달에 한 번). 품종이 192개라 다 실으면 글자가 6pt 아래로 준다. */
-export function chartFoods(categories: readonly FoodCategory[]): readonly Food[] {
-  return yearFoods({ max: CHART_PER_MONTH, categories })
 }
 
 /** 품종을 카테고리 묶음(머리 줄 + 품종 줄)으로 늘어놓는다. 묶음 안은 제철이 시작하는 달 순, 같으면 이름순. */

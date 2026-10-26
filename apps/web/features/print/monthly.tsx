@@ -1,7 +1,7 @@
 import type { Food } from "@workspace/seasonal/data/foods"
 import { MONTHS, type Month } from "@workspace/seasonal/data/months"
-import { monthChecklist, monthFoods, stripFoods, yearFoods, yearFoodsByMonth } from "@workspace/seasonal/print/foods"
-import { chartFoods, chartLines } from "@workspace/seasonal/print/period-chart"
+import { chartFoods, monthChecklist, monthPictures, stripFoods, yearPictures } from "@workspace/seasonal/print/foods"
+import { chartLines } from "@workspace/seasonal/print/period-chart"
 import { CALENDAR_TEXT_SCALE, type MonthlySpec, type Paper } from "@workspace/seasonal/print/spec"
 
 import { CheckList } from "./parts/check-list"
@@ -25,13 +25,13 @@ const headerHeight = (spec: MonthlySpec) => HEADER[spec.monthStyle.size]
 const MEMO = 34
 /** M-B 체크 목록의 폭·제목 높이와 달력과의 간격 */
 const SIDE = { width: 52, title: 8, gap: 6 } as const
-/** M-D 그림 띠: 품종 수, 세로 용지의 띠 높이, 가로 용지의 띠 폭, 달력과의 간격. 그 달 대표 품종부터 띠 14개와 빈 칸에 넣고, 못 들어간 품종은 뺀다(한 달 제철이 31~86개라 띠는 늘 찬다). */
-const STRIP = { size: 14, height: 44, width: 48, gap: 5 } as const
+/** M-D 그림 띠: 세로 용지의 띠 높이, 가로 용지의 띠 폭, 달력과의 간격. 띠와 빈 칸에 넣을 품종은 stripFoods가 정한다. */
+const STRIP = { height: 44, width: 48, gap: 5 } as const
 /** M-E: 세로의 모서리 달력 블록 크기·안쪽 여백, 가로의 날짜 열 폭, 그림과의 간격 */
-/** C-2 표지: 머리(제목·연도) 높이, 달 칸 사이 간격·안쪽 여백·달 표기 높이, 칸마다 그림 수 */
-const MONTHS_COVER = { header: 40, gap: 4, padding: 3, label: 7, perMonth: 2 } as const
+/** C-2 표지: 머리(제목·연도) 높이, 달 칸 사이 간격·안쪽 여백·달 표기 높이 */
+const MONTHS_COVER = { header: 40, gap: 4, padding: 3, label: 7 } as const
 /**
- * C-3 표지: 막대표 단 수와 단 사이 간격. 달마다 대표 여섯(chartFoods, 많아야 72개)을 싣는다(월간에는 카테고리 옵션이 없고, 표지는 1년 전체를 보여 주는 쪽이다).
+ * C-3 표지: 막대표 단 수와 단 사이 간격. 품종은 chartFoods(달마다 대표 여섯, 많아야 72개)다(월간에는 카테고리 옵션이 없고, 표지는 1년 전체를 보여 주는 쪽이다).
  * 머리가 C-2와 같은 40mm라 A4 줄 높이가 세로 2단 약 6.3mm, 가로 3단 약 5.8mm이고, 이름은 둘 다 상한인 약 9pt다.
  */
 const CHART_COVER = { columns: { portrait: 2, landscape: 3 }, gap: 8 } as const
@@ -60,7 +60,7 @@ function MonthSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; m
   const inner = innerSize(spec)
   const header = headerHeight(spec)
   const portrait = spec.orientation === "portrait"
-  const foods = spec.layout === "none" ? [] : monthFoods(month, { max: spec.foods.max, categories: [] })
+  const foods = monthPictures(spec, month)
   const showFoods = spec.layout !== "none"
   const sideCheck = spec.layout === "side-check"
 
@@ -102,9 +102,9 @@ function MonthSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; m
               dayFont={dayFont}
               height={side.height - memo}
             />
-            {memo > 0 && spec.memo !== "none" && <Memo kind={spec.memo} month={month} height={memo} />}
+            {memo > 0 && spec.memo !== "none" && <Memo spec={spec} kind={spec.memo} month={month} height={memo} />}
           </div>
-          {sideCheck && <SideChecklist month={month} height={side.height} />}
+          {sideCheck && <SideChecklist spec={spec} month={month} height={side.height} />}
         </div>
       </div>
     </Sheet>
@@ -115,7 +115,7 @@ function StripSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; m
   const inner = innerSize(spec)
   const header = headerHeight(spec)
   const portrait = spec.orientation === "portrait"
-  const { strip, blanks } = stripFoods({ year: spec.year, month, weekStart: spec.calendar.weekStart, stripSize: STRIP.size })
+  const { strip, blanks } = stripFoods(spec, month)
   const showName = spec.foods.names === "korean"
   const band = portrait ? { width: inner.width, height: STRIP.height } : { width: STRIP.width, height: inner.height - header }
   const calendar = portrait
@@ -149,7 +149,7 @@ function StripSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; m
 function AlloverSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper; month: Month }) {
   const inner = innerSize(spec)
   const header = headerHeight(spec)
-  const foods = monthFoods(month, { max: spec.foods.max, categories: [] })
+  const foods = monthPictures(spec, month)
   const showName = spec.foods.names === "korean"
   const scale = CALENDAR_TEXT_SCALE[spec.calendar.size]
   const background = surfaceColor(spec.surface, monthSeason(month))
@@ -244,7 +244,7 @@ function MonthHeader({ spec, month, width = innerSize(spec).width }: { spec: Mon
 }
 
 /** 달력 아래 여백. lines는 메모 줄, eaten-check는 그 달 품종 이름 옆에 손으로 체크할 빈 칸이다. */
-function Memo({ kind, month, height }: { kind: "lines" | "eaten-check"; month: Month; height: number }) {
+function Memo({ spec, kind, month, height }: { spec: MonthlySpec; kind: "lines" | "eaten-check"; month: Month; height: number }) {
   if (kind === "lines")
     return (
       <div style={{ height: u(height), display: "flex", flexDirection: "column", justifyContent: "flex-end", gap: u(7) }}>
@@ -253,12 +253,12 @@ function Memo({ kind, month, height }: { kind: "lines" | "eaten-check"; month: M
         ))}
       </div>
     )
-  return <CheckList foods={monthChecklist(month, [])} columns={4} fontSize={2.8} style={{ height: u(height), paddingTop: u(4) }} />
+  return <CheckList foods={monthChecklist(spec, month)} columns={4} fontSize={2.8} style={{ height: u(height), paddingTop: u(4) }} />
 }
 
 /** M-B: 그 달 품종 전체(그림 없는 품종 포함)를 한 줄에 하나씩. 품종이 많은 달은 글자를 줄여 높이에 맞춘다. */
-function SideChecklist({ month, height }: { month: Month; height: number }) {
-  const foods = monthChecklist(month, [])
+function SideChecklist({ spec, month, height }: { spec: MonthlySpec; month: Month; height: number }) {
+  const foods = monthChecklist(spec, month)
   const fontSize = Math.min(3.2, (height - SIDE.title) / (Math.max(foods.length, 1) * 1.6 * 1.05))
   return (
     <aside style={{ width: u(SIDE.width), flex: "none", paddingLeft: u(SIDE.gap * 0.6), borderLeft: "var(--line) solid var(--color-hairline)", boxSizing: "border-box" }}>
@@ -272,7 +272,7 @@ function SideChecklist({ month, height }: { month: Month; height: number }) {
 
 function Cover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
   const inner = innerSize(spec)
-  const picks = yearFoods({ max: 1, categories: [] })
+  const picks = yearPictures(spec).flat()
   return (
     <Sheet spec={spec} paper={paper} background={surfaceColor(spec.surface === "season" ? "cream" : spec.surface)}>
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: u(10) }}>
@@ -288,15 +288,15 @@ function Cover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
   )
 }
 
-/** C-2: 큰 연도 아래 열두 달 칸(세로 3×4, 가로 4×3). 칸마다 그 달 대표 품종 둘(yearFoodsByMonth, 한 품종은 한 해에 한 번)과 달 표기. */
+/** C-2: 큰 연도 아래 열두 달 칸(세로 3×4, 가로 4×3). 칸마다 그 달 대표 품종 둘(yearPictures, 한 품종은 한 해에 한 번)과 달 표기. */
 function MonthsCover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
   const inner = innerSize(spec)
   const portrait = spec.orientation === "portrait"
-  const { header, gap, padding, label, perMonth } = MONTHS_COVER
+  const { header, gap, padding, label } = MONTHS_COVER
   const [columns, rows] = portrait ? [3, 4] : [4, 3]
   const cell = { width: (inner.width - gap * (columns - 1)) / columns, height: (inner.height - header - gap * (rows - 1)) / rows }
   const art = { width: cell.width - padding * 2, height: cell.height - padding * 2 - label }
-  const picks = yearFoodsByMonth({ max: perMonth, categories: [] })
+  const picks = yearPictures(spec)
   // 칸마다 그림 수가 같아도 한두 개로 다를 수 있어, 그림 크기를 가장 작은 칸에 맞춘다.
   const size = Math.min(...picks.map((foods) => flowSize(foods.length, art.width, art.height, 0)))
   return (
@@ -327,7 +327,7 @@ function ChartCover({ spec, paper }: { spec: MonthlySpec; paper: Paper }) {
     <Sheet spec={spec} paper={paper} background={surfaceColor(spec.surface === "season" ? "cream" : spec.surface)}>
       <CoverHeader year={spec.year} height={header} gap={gap} />
       <PeriodChartColumns
-        lines={chartLines(chartFoods([]))}
+        lines={chartLines(chartFoods(spec))}
         columns={CHART_COVER.columns[spec.orientation]}
         width={inner.width}
         height={inner.height - header}

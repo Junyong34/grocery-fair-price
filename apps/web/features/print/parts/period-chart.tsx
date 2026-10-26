@@ -1,6 +1,6 @@
 import { MONTHS } from "@workspace/seasonal/data/months"
+import { startSeason } from "@workspace/seasonal/data/seasons"
 import { printMonthLabel, type PrintMonthLabel } from "@workspace/seasonal/print/month-label"
-import { startSeason } from "@workspace/seasonal/print/foods"
 import { chartColumns, type ChartLine } from "@workspace/seasonal/print/period-chart"
 
 import { FoodFigure } from "./food-figure"

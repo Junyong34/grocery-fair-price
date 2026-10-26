@@ -49,7 +49,7 @@ export function seasonsOf(food: Food): readonly Season[] {
 // 대표 품종 고르기 규칙은 쓰는 곳마다 조금씩 다르다. 화면·검색 설명용은 여기, 인쇄물용(그림 있는 품종만)은 print/foods.ts에 있다.
 
 /** 그 달이 품종의 대표 달(peak)인지. months는 시장에 많이 나오는 범위이고, peak는 그 안에서 조사가 대표로 고른 달이다. */
-const isPeak = (food: Food, month: number) => (food.peak as readonly number[]).includes(month)
+export const isPeak = (food: Food, month: number): boolean => (food.peak as readonly number[]).includes(month)
 
 /**
  * 그 달을 대표하는 품종(2a 흩뿌리기 판, 검색 설명). 그림이 있는 것, 그 달이 대표 달인 것, 처음부터 검증한 품종(core), 그 달에만 가까운(제철 달이 적은) 것, 이름 순.

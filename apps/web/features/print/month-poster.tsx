@@ -1,7 +1,7 @@
 import { MONTHS } from "@workspace/seasonal/data/months"
-import { monthChecklist, monthFoods } from "@workspace/seasonal/print/foods"
+import { chartFoods, monthChecklist, monthPictures } from "@workspace/seasonal/print/foods"
 import { printMonthLabel } from "@workspace/seasonal/print/month-label"
-import { chartFoods, chartLines } from "@workspace/seasonal/print/period-chart"
+import { chartLines } from "@workspace/seasonal/print/period-chart"
 import { wheelLayout } from "@workspace/seasonal/print/wheel"
 import type { MonthPosterSpec, Paper } from "@workspace/seasonal/print/spec"
 
@@ -41,7 +41,7 @@ function MonthCells({ spec }: { spec: MonthPosterSpec }) {
   }
   const area = { width: cell.width - 4, height: cell.height - CELL_LABEL - 1 }
   const nameSize = spec.foods.names === "korean" ? 2.4 : 0
-  const foods = MONTHS.map((month) => monthFoods(month, { max: spec.foods.max, categories: spec.categories }))
+  const foods = MONTHS.map((month) => monthPictures(spec, month))
   const size = Math.min(...foods.filter((list) => list.length).map((list) => flowSize(list.length, area.width, area.height, nameSize)))
   return (
     <div style={{ display: "grid", gridTemplateColumns: `repeat(${columns}, ${u(cell.width)})`, gap: u(GAP) }}>
@@ -77,7 +77,7 @@ const CHART = { columns: { portrait: 2, landscape: 3 }, single: 24, gap: 8 } as 
 
 function MonthChart({ spec }: { spec: MonthPosterSpec }) {
   const inner = innerSize(spec)
-  const lines = chartLines(chartFoods(spec.categories))
+  const lines = chartLines(chartFoods(spec))
   return (
     <PeriodChartColumns
       lines={lines}
@@ -91,15 +91,15 @@ function MonthChart({ spec }: { spec: MonthPosterSpec }) {
 }
 
 /**
- * P-C 원형 판: 조각마다 그림 상한(foods.max와 이것 중 작은 값), 달 표기 크기. 넷이면 A4 세로 그림 한 변 약 11mm다.
+ * P-C 원형 판: 달 표기 크기. 조각마다 그림은 monthPictures가 넷 이하로 고르고, 넷이면 A4 세로 그림 한 변 약 11mm다.
  * 조각이 좁아 이름은 넣지 않는다. 세로는 판 폭, 가로는 판 높이가 지름이다.
  */
-const WHEEL = { perSector: 4, label: 4.2 } as const
+const WHEEL = { label: 4.2 } as const
 
 function MonthWheel({ spec }: { spec: MonthPosterSpec }) {
   const inner = innerSize(spec)
   const diameter = Math.min(inner.width, inner.height - HEADER)
-  const foods = MONTHS.map((month) => monthFoods(month, { max: Math.min(spec.foods.max, WHEEL.perSector), categories: spec.categories }))
+  const foods = MONTHS.map((month) => monthPictures(spec, month))
   const layout = wheelLayout({ diameter, sectors: MONTHS.length, counts: foods.map((list) => list.length) })
   const items = MONTHS.map((month, i) => ({
     foods: foods[i]!,
@@ -123,8 +123,6 @@ function MonthWheel({ spec }: { spec: MonthPosterSpec }) {
 
 /** P-D 한 줄의 칸 폭(용지 단위): 달 표기, 그림. 나머지가 체크 목록이다. */
 const ROW = { label: 16, pictures: 72, gap: 4, padding: 1.2 } as const
-/** 그림은 한 줄로만 놓는다. 이보다 많으면 두 줄로 접혀 그림이 작아진다. 나머지 품종은 체크 목록에 이름으로 있다. */
-const PICTURES_PER_ROW = 6
 const CHECK_COLUMNS = 4
 /** 체크 목록 한 줄 높이(글자 크기 배). 줄이 낮아 월간 메모(1.6)보다 좁게 잡고, 글자 크기는 여유(1.1배)를 두고 정해 열이 넘치지 않게 한다. */
 const CHECK_LINE = 1.35
@@ -133,8 +131,8 @@ function MonthRows({ spec }: { spec: MonthPosterSpec }) {
   const inner = innerSize(spec)
   const row = (inner.height - HEADER) / MONTHS.length
   const body = row - ROW.padding * 2
-  const pictures = MONTHS.map((month) => monthFoods(month, { max: Math.min(spec.foods.max, PICTURES_PER_ROW), categories: spec.categories }))
-  const lists = MONTHS.map((month) => monthChecklist(month, spec.categories))
+  const pictures = MONTHS.map((month) => monthPictures(spec, month))
+  const lists = MONTHS.map((month) => monthChecklist(spec, month))
   // 그림과 목록 글자를 열두 줄이 같은 크기로 쓴다. 가장 많은 달에 맞춘다.
   const size = Math.min(...pictures.filter((list) => list.length).map((list) => flowSize(list.length, ROW.pictures, body, 0)))
   const lines = Math.ceil(Math.max(1, ...lists.map((list) => list.length)) / CHECK_COLUMNS)

@@ -468,3 +468,12 @@ AGENTS.md "Generated files" 표에 `public/downloads/**`와 명령 `pnpm prints:
 - M-D 쓰는 달력: 띠 14개는 늘 차고, 빈 칸 뒤로 넘치는 품종은 뺀다.
 - 확인: P-B·P-D·C-3·M-D·M-B·S-C·Y-C A4 세로에서 용지 밖 0. M-B의 잘린 글자는 대체공휴일 이름(전부터 있던 말줄임)이다.
 
+### 친숙도와 칸 함수(2026-10-26)
+
+위 함수 이름(`monthFoods`·`seasonFoods`·`yearFoods`·`CHECKLIST_MAX`·`CHART_PER_MONTH`)은 이제 없다. 지금 규칙:
+
+- 품종 친숙도 1·2·3등급(`packages/seasonal/src/data/food-familiarity.ts`). 1등급 48개는 최적 달도 적는다(대표 달 안, 1등급이 한 달에 몰리지 않게). 나머지의 최적 달은 계절 순서로 첫 대표 달.
+- 차례: 대표 달 → 친숙도 → `core` → 제철이 짧은 품종 → 이름순. 계절 포스터는 그 계절 대표 달 수 → 친숙도 → ….
+- 연간 한 장(Y-A·Y-B·Y-C)과 월간 표지(C-1~3)는 한 품종을 최적 달에만 놓고, 넘치면 싣지 않는다.
+- 화면은 `print/foods.ts`의 칸 함수 여섯(`monthPictures`·`monthChecklist`·`stripFoods`·`yearPictures`·`chartFoods`·`seasonPictures`)에 사양만 넘긴다. 칸당 상한(체크 20, 원판 조각 4, P-D 줄 6, 띠 14, Y-B·C-1 1, C-2 2, 막대표 6, Y-C 4)은 그 파일의 `PER_CELL`에 근거와 함께 있다.
+

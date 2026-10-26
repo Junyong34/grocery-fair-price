@@ -1,5 +1,5 @@
 import { SEASON_MONTHS, SEASONS, type Season } from "@workspace/seasonal/data/seasons"
-import { seasonFoods } from "@workspace/seasonal/print/foods"
+import { seasonPictures } from "@workspace/seasonal/print/foods"
 import type { Paper, SeasonPosterSpec } from "@workspace/seasonal/print/spec"
 import { wheelLayout } from "@workspace/seasonal/print/wheel"
 
@@ -48,7 +48,7 @@ export function SeasonPoster({ spec, paper }: { spec: SeasonPosterSpec; paper: P
   }
   const area = { width: cell.width - padding * 2, height: cell.height - padding * 2 - BAND_LABEL }
   const nameSize = spec.foods.names === "korean" ? 2.8 : 0
-  const foods = SEASONS.map((season) => seasonFoods(season, { max: spec.foods.max, categories: spec.categories }))
+  const foods = SEASONS.map((season) => seasonPictures(spec, season))
   const size = Math.min(...foods.filter((list) => list.length).map((list) => flowSize(list.length, area.width, area.height, nameSize)))
   return (
     <Sheet spec={spec} paper={paper} background={surfaceColor(spec.surface === "season" ? "white" : spec.surface)}>
@@ -106,7 +106,7 @@ const CORNERS: Record<Season, { top: boolean; left: boolean }> = {
 function SeasonWheel({ spec, paper }: { spec: SeasonPosterSpec; paper: Paper }) {
   const inner = innerSize(spec)
   const diameter = Math.min(inner.width, inner.height - HEADER)
-  const foods = SEASONS.map((season) => seasonFoods(season, { max: spec.foods.max, categories: spec.categories }))
+  const foods = SEASONS.map((season) => seasonPictures(spec, season))
   const layout = wheelLayout({ diameter, sectors: SEASONS.length, counts: foods.map((list) => list.length), band: WHEEL.band })
   const items = SEASONS.map((season, i) => ({ foods: foods[i]!, fill: spec.surface === "season" ? surfaceColor("season", season) : undefined }))
   return (
@@ -160,7 +160,7 @@ const SHEET = {
 function SeasonSheet({ spec, paper, season, index }: { spec: SeasonPosterSpec; paper: Paper; season: Season; index: number }) {
   const inner = innerSize(spec)
   const size = SHEET[spec.orientation]
-  const foods = seasonFoods(season, { max: spec.foods.max, categories: spec.categories })
+  const foods = seasonPictures(spec, season)
   const art = { width: inner.width, height: inner.height - size.header - size.rule - size.foot - size.gap * 3 }
   const color = `var(--color-season-${season})`
   return (
