@@ -7,19 +7,15 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest"
 
 import { ADAPTER_VERSION } from "../../src/adapt/draft.ts"
 import type { Sql, Tx } from "../../src/load/db.ts"
-import { registerPending, registerRun } from "../../src/load/ledger.ts"
 import { loadRawFile } from "../../src/load/load-file.ts"
 import { loadPendingFiles } from "../../src/load/load-pending.ts"
 import { buildRawFile, callKeyOf, rawObjectKey, storagePathOf, type Json, type RawFile } from "../../src/load/raw-file.ts"
 import { reconcileRawFiles } from "../../src/load/reconcile.ts"
-import type { DbSource } from "../../src/load/types.ts"
 import { EKAPE_ENDPOINT, parseEkapeConsumerPrice, type EkapeRow } from "../../src/sources/ekape.ts"
-import { KAMIS_ENDPOINT, parseKamisPerDay, type KamisRow } from "../../src/sources/kamis.ts"
+import type { KamisRow } from "../../src/sources/kamis.ts"
 import { readSampleText } from "../helpers.ts"
+import { FETCHED_AT, kamisFile, kamisSample, pending } from "./files.ts"
 import { connectLocalAdmin, connectLocalIngest, inRollback, localStore } from "./local.ts"
-
-const KAMIS_SAMPLE = "kamis/vegetable-baechu-retail-14d.json"
-const FETCHED_AT = "2026-10-22T21:30:05.000Z"
 
 let sql: Sql
 let other: Sql // 동시 실행용 두 번째 접속
@@ -30,60 +26,12 @@ beforeAll(async () => {
   other = await connectLocalIngest()
 })
 
-function kamisSample(year: string, edit?: (row: KamisRow) => void): KamisRow[] {
-  return parseKamisPerDay(200, readSampleText(KAMIS_SAMPLE)).map((row) => {
-    const moved = {
-      ...row,
-      exmn_ymd: year + row.exmn_ymd.slice(4),
-      orgnl_reg_dt: row.orgnl_reg_dt && year + row.orgnl_reg_dt.slice(4),
-    }
-    edit?.(moved)
-    return moved
-  })
-}
-
 // 없는 품목·시장 코드로 바꾼 행. 커밋하는 테스트는 1998년으로 쓴다.
 function syntheticKamis(itemCd: string, year = "1998"): KamisRow[] {
   return kamisSample(year, (row) => {
     row.item_cd = itemCd
     if (row.mrkt_cd) row.mrkt_cd = `9${row.mrkt_cd.slice(1)}`
   })
-}
-
-function kamisFile(rows: readonly KamisRow[], ingestRunId: number | null, fetchedAt = FETCHED_AT): RawFile {
-  const days = rows.map((row) => row.exmn_ymd).sort()
-  const ymd = (compact: string) => `${compact.slice(0, 4)}-${compact.slice(4, 6)}-${compact.slice(6, 8)}`
-  return buildRawFile(
-    {
-      source: "kamis",
-      endpoint: KAMIS_ENDPOINT,
-      job: "daily",
-      ingestRunId,
-      runStartedAt: "2026-10-22T21:30:00.000Z",
-      fetchedAt,
-      requests: [{ endpoint: KAMIS_ENDPOINT, params: { pageNo: "1" }, httpStatus: 200, resultCode: "0", rowCount: rows.length }],
-      targetFrom: ymd(days[0]!),
-      targetTo: ymd(days.at(-1)!),
-      contractBaseline: "baseline:test",
-      adapterVersion: ADAPTER_VERSION,
-    },
-    rows as unknown as Json[],
-  )
-}
-
-// 원본을 올렸다고 보고 pending_load로 기록한다. 돌려주는 값: raw_object.id
-async function pending(db: Sql | Tx, file: RawFile, source: DbSource = "kamis"): Promise<number> {
-  const runId = await registerRun(db, { source, job: "daily", callBudget: 10 })
-  const storagePath = `raw/${source}/test/${randomUUID()}.ndjson.gz`
-  await registerPending(db, {
-    storagePath,
-    header: { ...file.header, ingestRunId: runId },
-    contentSha256: file.contentSha256,
-    bytesGz: file.bytes.length,
-    ingestRunId: runId,
-  })
-  const [row] = await db<{ id: string }[]>`select id from price.raw_object where storage_path = ${storagePath}`
-  return Number(row!.id)
 }
 
 describe("KAMIS 원본 적재 (롤백)", () => {

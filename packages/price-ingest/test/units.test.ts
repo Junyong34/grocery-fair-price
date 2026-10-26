@@ -32,6 +32,17 @@ describe("기준 단위 가격 환산", () => {
     expect(pricePerBase(1000, 1, "ml", { unit: "g", qty: 100 })).toBeNull()
   })
 
+  it("포기·마리·장은 1개다. 기준 단위 1개는 배추면 1포기, 생선이면 1마리 (variety-list.md 규칙 5)", () => {
+    expect(pricePerBase(8110, 1, "포기", { unit: "ea", qty: 1 })).toBe(8110)
+    expect(pricePerBase(12000, 10, "장", { unit: "ea", qty: 1 })).toBe(1200)
+    expect(pricePerBase(5000, 1, "MR", { unit: "ea", qty: 1 })).toBe(5000)
+  })
+
+  it("손·단·망은 묶음이라 1개로 환산하지 않는다 (3-12 #10)", () => {
+    expect(pricePerBase(9000, 1, "손", { unit: "ea", qty: 1 })).toBeNull()
+    expect(pricePerBase(3000, 1, "DA", { unit: "g", qty: 100 })).toBeNull()
+  })
+
   it("개수 단위 이름이 다르면 환산하지 않는다 (3-12 #10)", () => {
     expect(pricePerBase(1000, 1, "손", { unit: "g", qty: 100 })).toBeNull()
   })

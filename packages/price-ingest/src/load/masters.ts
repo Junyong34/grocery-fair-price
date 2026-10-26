@@ -58,12 +58,21 @@ export async function upsertSourceItems(
      where source = ${source} and source_key in (select jsonb_array_elements_text(${tx.json(rows.map((r) => r.source_key))}))`
 
   if (source === "chamga") return new Map(ids.map((row) => [row.source_key, row.id]))
+  const idList = tx.json(ids.map((r) => r.id))
   await tx`
     insert into price.source_code_map (source_item_id, valid_from, status)
     select s.id, s.first_seen_on, 'pending'
       from price.source_item s
-     where s.id in (select (jsonb_array_elements_text(${tx.json(ids.map((r) => r.id))}))::int)
+     where s.id in (select (jsonb_array_elements_text(${idList}))::int)
        and not exists (select 1 from price.source_code_map m where m.source_item_id = s.id)`
+  // 처음 본 날보다 오래된 행이 오면(지난 기간 채우기) 첫 매핑을 그날부터로 넓힌다. 그 전 매핑이 없으니
+  // "처음부터 이 매핑"이라는 뜻이 그대로다. 안 넓히면 오래된 관측값에 품종이 붙지 않는다 (09)
+  await tx`
+    update price.source_code_map m set valid_from = s.first_seen_on, updated_at = now()
+      from price.source_item s
+     where s.id = m.source_item_id and s.id in (select (jsonb_array_elements_text(${idList}))::int)
+       and s.first_seen_on < m.valid_from
+       and not exists (select 1 from price.source_code_map e where e.source_item_id = m.source_item_id and e.valid_from < m.valid_from)`
 
   return new Map(ids.map((row) => [row.source_key, row.id]))
 }

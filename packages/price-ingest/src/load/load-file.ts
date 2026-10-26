@@ -1,16 +1,15 @@
 // 원본 파일 하나를 적재한다 (pipeline 3-0 "접속", 3-3 "적재와 정정", 3-7).
-// 가격 파일은 한 트랜잭션: 출처 lock → 원천 키·관측 위치·시장(KAMIS)·상품(참가격) → 임시 표 COPY → 정정·병합
-// → (축평원) 평년 행 → raw_object 상태. 참가격 마스터 파일(점포·상품)은 마스터만 채운다 (chamga.ts).
+// 가격 파일은 한 트랜잭션: 출처 lock → 원천 키·관측 위치·시장(KAMIS)·상품(참가격) → 처음 본 키를 카탈로그대로 매핑
+// → 임시 표 COPY → 품종·기준 단위 가격(variety.ts) → 정정·병합 → (축평원) 평년 행 → raw_object 상태.
+// 참가격 마스터 파일(점포·상품)은 마스터만 채운다 (chamga.ts).
 // 실패하면 파일 하나만 되돌아가고 raw_object는 pending_load로 남는다. 다음 실행이 다시 적재한다.
-//
-// 품종 매핑은 적용하지 않는다. 관측값의 variety_id·spec_id·price_per_base는 null이다.
-// 품종 목록(p3-variety-catalog/01)이 정해지면 원본에서 다시 적재한다 (ingest-schedule Notes).
 import { adaptChamgaPriceRow, chamgaPriceRowRejection } from "../adapt/chamga.ts"
 import { adaptEkapeRow, ekapeRowRejection } from "../adapt/ekape.ts"
 import { adaptKamisRow, kamisRowRejection } from "../adapt/kamis.ts"
 import type { ObservationDraft, ReferenceDraft } from "../adapt/draft.ts"
 import type { RejectedRow } from "../adapt/batch.ts"
 import type { AdaptContext } from "../adapt/mapping.ts"
+import { applyMappings } from "../catalog/apply.ts"
 import type { CallRecord } from "../http.ts"
 import {
   CHAMGA_ENDPOINT,
@@ -43,8 +42,10 @@ import {
 import { lockSource, mergeObservations, stageObservations, type MergeResult, type ObservationRow } from "./observation.ts"
 import type { Json, RawFile } from "./raw-file.ts"
 import type { DbSource } from "./types.ts"
+import { mapStagedObservations } from "./variety.ts"
 import { kstDateOf } from "./window.ts"
 
+// 어댑터에는 매핑을 넘기지 않는다. 품종·기준 단위 가격은 DB 매핑으로 임시 표에서 붙인다 (variety.ts)
 const NO_MAPPING: AdaptContext = { mapping: () => undefined }
 
 // 적재할 관측값 하나와 그것을 DB 번호로 바꿀 재료
@@ -387,12 +388,16 @@ export async function loadRawFile(sql: Sql | Tx, rawObjectId: number, file: RawF
       return false
     })
 
+    // 처음 본 원천 키·상품이 카탈로그에 있으면 바로 잇는다. 없으면 pending으로 남아 운영자가 본다 (09)
+    await applyMappings(tx, { onLoad: true })
+
     let observations: MergeResult = NO_CHANGE
     if (accepted.length > 0) {
       const rows = accepted.map((item) =>
         toRow(item, ids, file, rawObjectId, item.goodId === null ? null : productOf.get(productKey(item))!),
       )
       await stageObservations(tx, "obs_load", lastByKey(rows))
+      await mapStagedObservations(tx, "obs_load")
       observations = await mergeObservations(tx, source, "obs_load")
       await tx`drop table obs_load` // commit 때 사라지지만, 바깥 트랜잭션 안에서 다시 부를 수 있게 지운다
     }

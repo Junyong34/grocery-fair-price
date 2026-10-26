@@ -26,22 +26,32 @@ const VOLUME = new Map<string, number>([
   ["l", 1000],
   ["L", 1000],
 ])
-// 개수 단위. 구(계란 30구)는 개(ea)와 같은 개수다 (pipeline 3-1: 30 ea(계란))
+// 개수 단위. 한 덩이로 세는 단위(개·구·포기·마리·장)는 모두 1개(ea)다: 품종의 기준 단위 "1개"는 배추면 1포기,
+// 생선이면 1마리다 (variety-list.md 규칙 5). 손(고등어 2마리)·단·망은 묶음이라 따로 둔다 (3-12 #10).
+// 영문은 참가격 UT 코드다.
 const COUNT = new Map<string, string>([
   ["개", "ea"],
   ["ea", "ea"],
   ["EA", "ea"],
   ["구", "ea"],
-  ["포기", "포기"],
-  ["PK", "포기"],
+  ["포기", "ea"],
+  ["PK", "ea"],
+  ["마리", "ea"],
+  ["MR", "ea"],
+  ["장", "ea"],
   ["손", "손"],
-  ["마리", "마리"],
-  ["MR", "마리"],
   ["단", "단"],
   ["DA", "단"],
   ["망", "망"],
   ["MA", "망"],
 ])
+
+// SQL 환산(load/variety.ts)이 같은 표를 쓴다. family별 factor: 질량은 g, 부피는 ml, 개수는 1
+export const UNIT_TABLE: readonly { unit: string; family: "mass" | "volume" | "count"; factor: number; name: string | null }[] = [
+  ...[...MASS].map(([unit, grams]) => ({ unit, family: "mass" as const, factor: grams, name: null })),
+  ...[...VOLUME].map(([unit, ml]) => ({ unit, family: "volume" as const, factor: ml, name: null })),
+  ...[...COUNT].map(([unit, name]) => ({ unit, family: "count" as const, factor: 1, name })),
+]
 
 export function parseMeasure(unitText: string): Measure | undefined {
   const text = unitText.trim()

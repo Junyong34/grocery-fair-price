@@ -1,6 +1,7 @@
 // 카탈로그를 DB에 넣는다 (ingest-foundation/08).
 //   분류 표(applyClasses): 운영자 표라 소유자(postgres) 접속으로만 쓴다
-//   매핑(applyMappings): ingest_writer가 쓴다. pending만 바꾸고, 이미 다르게 정한 매핑은 고치지 않고 알린다
+//   매핑(applyMappings): ingest_writer가 쓴다. pending만 바꾸고, 이미 다르게 정한 매핑은 고치지 않고 알린다.
+//     적재도 파일마다 부른다(onLoad, 09): 처음 본 키를 카탈로그대로 바로 잇는다
 import type { Tx } from "../load/db.ts"
 
 import { CHAMGA_UNDECIDED, UNIT_RULES, chamgaTarget, ekapeTarget, kamisTarget, type CatalogTarget } from "./match.ts"
@@ -110,8 +111,22 @@ const describeTarget = (t: CatalogTarget) => `${t.variety}/${t.spec} ${t.role}`
 
 type MapRow = { id: number; variety: string; spec: string; unit_rule: string; role: string }
 
-export async function applyMappings(tx: Tx): Promise<MappingsResult> {
+// onLoad(적재 중): 카탈로그에 없는 참가격 상품을 ignored로 두지 않고 pending으로 남겨 운영자가 보게 하고,
+// 품종이 DB에 아직 없는 대상은 건너뛴다. 아니면(사람이 부른 명령) ignored로 두고, 품종이 없으면 멈춘다.
+export async function applyMappings(tx: Tx, { onLoad = false }: { onLoad?: boolean } = {}): Promise<MappingsResult> {
   const conflicts: MappingConflict[] = []
+
+  const specRows = await tx<{ key: string }[]>`
+    select v.slug || '/' || s.slug as key from price.spec s join price.variety v on v.id = s.variety_id where v.status = 'active'`
+  const ruleRows = await tx<{ rule_code: string }[]>`select distinct rule_code from price.unit_rule`
+  const specs = new Set(specRows.map((r) => r.key))
+  const rules = new Set(ruleRows.map((r) => r.rule_code))
+  let missing = 0
+  const usable = (t: CatalogTarget) => {
+    const ok = specs.has(`${t.variety}/${t.spec}`) && rules.has(t.unitRule)
+    if (!ok) missing += 1
+    return ok
+  }
 
   // ── KAMIS·축평원: source_code_map의 열린 행 (valid_to null)
   const sourceRows = await tx<(OpenMap & { source: string; key_parts: Record<string, string> })[]>`
@@ -131,20 +146,12 @@ export async function applyMappings(tx: Tx): Promise<MappingsResult> {
       continue
     }
     if (row.map_id !== null && row.status === "pending") {
-      toMap.push({ id: row.map_id, variety: target.variety, spec: target.spec, unit_rule: target.unitRule, role: target.role })
+      if (usable(target)) toMap.push({ id: row.map_id, variety: target.variety, spec: target.spec, unit_rule: target.unitRule, role: target.role })
+      else pending += 1
     } else if (describe(row) !== describeTarget(target)) {
       conflicts.push({ key: row.key, current: describe(row), catalog: describeTarget(target) })
     }
   }
-  const mappedKeys = await tx`
-    update price.source_code_map m
-       set status = 'mapped', variety_id = v.id, spec_id = s.id, unit_rule_id = u.id, role = r.role,
-           note = 'catalog', updated_at = now()
-      from jsonb_to_recordset(${tx.json(toMap)}) as r (id int, variety text, spec text, unit_rule text, role text)
-      join price.variety v on v.slug = r.variety
-      join price.spec s on s.variety_id = v.id and s.slug = r.spec
-      join lateral (select id from price.unit_rule where rule_code = r.unit_rule order by version desc limit 1) u on true
-     where m.id = r.id`
 
   // ── 참가격: 상품의 열린 product_variety_map
   const productRows = await tx<(OpenMap & { product_id: number; valid_from: string; good_id: string })[]>`
@@ -170,14 +177,28 @@ export async function applyMappings(tx: Tx): Promise<MappingsResult> {
       continue
     }
     if (target !== undefined) {
-      productMap.push({ product_id: row.product_id, valid_from: row.valid_from, variety: target.variety, spec: target.spec, unit_rule: target.unitRule })
-    } else if (CHAMGA_UNDECIDED.has(goodId)) {
+      if (usable(target)) productMap.push({ product_id: row.product_id, valid_from: row.valid_from, variety: target.variety, spec: target.spec, unit_rule: target.unitRule })
+      else pending += 1
+    } else if (onLoad || CHAMGA_UNDECIDED.has(goodId)) {
       pending += 1
     } else {
       productIgnore.push({ product_id: row.product_id, valid_from: row.valid_from })
     }
   }
-  const mappedProducts = await tx`
+  if (missing > 0 && !onLoad) {
+    throw new Error("카탈로그의 품종·규격·단위 규칙이 DB에 없다. 분류 표를 먼저 넣는다 (catalog --classes)")
+  }
+
+  await tx`
+    update price.source_code_map m
+       set status = 'mapped', variety_id = v.id, spec_id = s.id, unit_rule_id = u.id, role = r.role,
+           note = 'catalog', updated_at = now()
+      from jsonb_to_recordset(${tx.json(toMap)}) as r (id int, variety text, spec text, unit_rule text, role text)
+      join price.variety v on v.slug = r.variety
+      join price.spec s on s.variety_id = v.id and s.slug = r.spec
+      join lateral (select id from price.unit_rule where rule_code = r.unit_rule order by version desc limit 1) u on true
+     where m.id = r.id`
+  await tx`
     update price.product_variety_map m
        set status = 'mapped', variety_id = v.id, spec_id = s.id, unit_rule_id = u.id, origin = 'operator'
       from jsonb_to_recordset(${tx.json(productMap)}) as r (product_id int, valid_from date, variety text, spec text, unit_rule text)
@@ -189,11 +210,6 @@ export async function applyMappings(tx: Tx): Promise<MappingsResult> {
     update price.product_variety_map m set status = 'ignored', origin = 'operator'
       from jsonb_to_recordset(${tx.json(productIgnore)}) as r (product_id int, valid_from date)
      where m.product_id = r.product_id and m.valid_from = r.valid_from`
-
-  // 품종·규격·단위 규칙이 DB에 없으면 join이 행을 버린다. 분류 표를 먼저 넣어야 한다
-  if (mappedKeys.count !== toMap.length || mappedProducts.count !== productMap.length) {
-    throw new Error("카탈로그의 품종·규격·단위 규칙이 DB에 없다. 분류 표를 먼저 넣는다 (catalog --classes)")
-  }
 
   return { mapped: toMap.length + productMap.length, ignored: productIgnore.length, pending, conflicts }
 }
