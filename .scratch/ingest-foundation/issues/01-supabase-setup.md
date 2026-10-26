@@ -9,13 +9,13 @@ Type: task
 
 ## 사람이 할 일
 
-- [ ] supabase.com 계정 생성, 새 프로젝트 생성 (Free 플랜, 리전은 서울 `ap-northeast-2`)
+- [x] supabase.com 계정 생성, 새 프로젝트 생성 (Free 플랜, 리전은 도쿄 `ap-northeast-1`, ref `ifrgflcbljozfcvuqprq`). 서울을 골라도 대시보드의 리전 자동 선택이 다른 리전을 잡아 도쿄로 정했다. 서울과 왕복 30ms 안팎 차이이고 웹앱은 서버에서 읽어 캐시하므로 감수한다. 리전은 만든 뒤 바꿀 수 없다 (2026-10-26)
 - [ ] DB 비밀번호를 비밀번호 관리자에 보관
-- [ ] Storage 버킷 `raw` 생성 (비공개, 정책 없음)
-- [ ] Project Settings → API Keys에서 새 비밀 키(`sb_secret_…`) 하나 만들기. 옛 `anon`·`service_role` 키는 쓰지 않는다
-- [ ] Project Settings → Data API의 노출 스키마(Exposed schemas)에 `price`를 넣지 않는다 (기본값 그대로 두면 된다)
-- [ ] (02의 마이그레이션 적용 뒤) 02의 마이그레이션이 롤 `ingest_writer`·`web_reader`를 만든 뒤, SQL 편집기에서 비밀번호만 정하기 (`alter role ingest_writer with password '…'`, `web_reader`도). 롤과 권한은 마이그레이션이 만들고 사람은 비밀번호와 접속 주소만 넣는다
-- [ ] 아래 값을 루트 `.env`에 넣기 (커밋 금지. pre-commit의 `scripts/check-no-secrets.sh`가 막는다)
+- [x] Storage 버킷 `raw` 생성 (비공개, 정책 없음)
+- [x] Project Settings → API Keys에서 새 비밀 키(`sb_secret_…`) 하나 만들기. 옛 `anon`·`service_role` 키는 쓰지 않는다
+- [x] Project Settings → Data API의 노출 스키마(Exposed schemas)에 `price`를 넣지 않는다 (기본값 그대로 두면 된다)
+- [x] (02의 마이그레이션 적용 뒤) 02의 마이그레이션이 롤 `ingest_writer`·`web_reader`를 만든 뒤, SQL 편집기에서 비밀번호만 정하기 (`alter role ingest_writer with password '…'`, `web_reader`도). 롤과 권한은 마이그레이션이 만들고 사람은 비밀번호와 접속 주소만 넣는다
+- [x] 아래 값을 루트 `.env`에 넣기 (커밋 금지. pre-commit의 `scripts/check-no-secrets.sh`가 막는다)
 - [ ] Actions용 값은 GitHub 저장소 Settings → Secrets and variables → Actions에, 웹앱용 값은 Vercel 프로젝트 환경변수에 등록
 
 | 변수 | 어디서 | 쓰는 곳 |
