@@ -23,6 +23,7 @@ Label: wayfinder:map
 
 - [Supabase Free 일시정지 기준](issues/04-supabase-free-pause.md): 문턱값은 비공개, 매일 수집이 막아 줄 가능성이 높지만 미확정. 정지 1주 전 메일, 540·DNS 실패는 13에서 즉시 알림, 14에서 Storage 조회로 확인
 - [원본 적재 트랜잭션 (KAMIS·축평원)](issues/05-load-kamis-ekape.md): `loadRawFile`·`loadPendingFiles`. 위치·시장은 원본 행에서, 지역·품종은 비움, 시장 시군구 불일치는 행 거부, duplicate 판정은 07로. 병합 SQL은 price-ingest 한 곳
+- [참가격 원본 적재 (상품·점포)](issues/06-load-chamga.md): 마스터는 실행마다 받아 가격보다 먼저 적재. 마스터에 없는 번호는 점포는 위치만, 상품은 임시 이름으로 넣고 다음 마스터가 채움. 상품 연결 기간은 2026-06-12부터
 
 ## Not yet specified
 
@@ -36,6 +37,7 @@ Label: wayfinder:map
 - 90일 지난 KAMIS 관측값 정리와 "보존 기간 밖 재등록" 원본 복원 (pipeline.md 3-3): 대응표 없는 동안은 관측값을 지우지 않으므로 생기지 않는다. 품종 목록 뒤에 둘을 함께 켠다.
 - 원본 삭제와 보존 기간 (3-7): 품종 목록 전까지 지우지 않는다.
 - 상품 병합 CLI(`merge-product`): 합칠 상품이 쌓인 뒤의 운영 도구.
+- 참가격 마스터 변경 감지(이름·용량 바뀜, `goodId` 재사용 의심, 점포 재등록 연결, 사라진 상품 판정)와 `product_daily_summary`: 몇 달 쌓인 뒤 운영자가 볼 일이고 원본에서 다시 계산할 수 있다 ([06](issues/06-load-chamga.md), 2026-10-26).
 - KAMIS 5년 백필·축평원 백필: [ingest-foundation/04](../ingest-foundation/issues/04-kamis-backfill.md)에 남긴다.
 - 5-2의 나머지 상황(일부만 옴, 이상치, 전일가 이어 씀, 출처 중복, 출처 오래 멈춤 등), DB 크기 감시, 수집 상태 화면, 개발계정 활용기간 만료 알림: [ingest-foundation/05](../ingest-foundation/issues/05-failure-handling.md)에 남긴다. 종료일은 01에서 확인해 사람이 달력에 적는다.
 - `pg_dump` 백업, 저장소 비공개 전환: 정식 서비스 전에 다시 본다.

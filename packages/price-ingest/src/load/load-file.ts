@@ -1,17 +1,35 @@
-// 원본 파일 하나를 관측값으로 적재한다 (pipeline 3-0 "접속", 3-3 "적재와 정정", 3-7).
-// 한 트랜잭션: 출처 lock → 원천 키·관측 위치·시장 → 임시 표 COPY → 정정·병합 → (축평원) 평년 행 → raw_object 상태.
+// 원본 파일 하나를 적재한다 (pipeline 3-0 "접속", 3-3 "적재와 정정", 3-7).
+// 가격 파일은 한 트랜잭션: 출처 lock → 원천 키·관측 위치·시장(KAMIS)·상품(참가격) → 임시 표 COPY → 정정·병합
+// → (축평원) 평년 행 → raw_object 상태. 참가격 마스터 파일(점포·상품)은 마스터만 채운다 (chamga.ts).
 // 실패하면 파일 하나만 되돌아가고 raw_object는 pending_load로 남는다. 다음 실행이 다시 적재한다.
 //
 // 품종 매핑은 적용하지 않는다. 관측값의 variety_id·spec_id·price_per_base는 null이다.
 // 품종 목록(p3-variety-catalog/01)이 정해지면 원본에서 다시 적재한다 (ingest-schedule Notes).
+import { adaptChamgaPriceRow, chamgaPriceRowRejection } from "../adapt/chamga.ts"
 import { adaptEkapeRow, ekapeRowRejection } from "../adapt/ekape.ts"
 import { adaptKamisRow, kamisRowRejection } from "../adapt/kamis.ts"
 import type { ObservationDraft, ReferenceDraft } from "../adapt/draft.ts"
 import type { RejectedRow } from "../adapt/batch.ts"
 import type { AdaptContext } from "../adapt/mapping.ts"
 import type { CallRecord } from "../http.ts"
+import {
+  CHAMGA_ENDPOINT,
+  chamgaPriceRowSchema,
+  chamgaProductRowSchema,
+  chamgaStoreRowSchema,
+  type ChamgaPriceRow,
+  type ChamgaProductRow,
+  type ChamgaStoreRow,
+} from "../sources/chamgagyeok.ts"
 import { ekapeRowSchema, type EkapeRow } from "../sources/ekape.ts"
 import { kamisRowSchema, type KamisRow } from "../sources/kamis.ts"
+import {
+  chamgaSourceKey,
+  loadProductMaster,
+  loadStoreMaster,
+  resolvePricedProducts,
+  type MasterOutcome,
+} from "./chamga.ts"
 import { transaction, type Sql, type Tx } from "./db.ts"
 import {
   placeKeyOf,
@@ -25,6 +43,7 @@ import {
 import { lockSource, mergeObservations, stageObservations, type MergeResult, type ObservationRow } from "./observation.ts"
 import type { Json, RawFile } from "./raw-file.ts"
 import type { DbSource } from "./types.ts"
+import { kstDateOf } from "./window.ts"
 
 const NO_MAPPING: AdaptContext = { mapping: () => undefined }
 
@@ -35,6 +54,7 @@ type PreparedObservation = {
   sourceKey: string
   placeKey: string
   marketSgg: { code: string; sgg: string } | null // 시장 행이면 시장 코드와 행의 sgg_cd
+  goodId: string | null // 참가격 행이면 상품 번호 (상품 ID로 바꾼다)
 }
 
 type PreparedReference = { draft: ReferenceDraft; sourceKey: string; placeKey: string }
@@ -90,6 +110,7 @@ function prepareKamis(rows: readonly Json[]): Prepared {
       sourceKey,
       placeKey: placeKeyOf(place.kind, place.code),
       marketSgg: row.mrkt_cd ? { code: row.mrkt_cd, sgg: row.sgg_cd } : null,
+      goodId: null,
     })
   })
   return out
@@ -133,8 +154,39 @@ function prepareEkape(file: RawFile): Prepared {
     })
     out.places.push({ kind: "region_avg", scope: "national", code: EKAPE_NATIONAL, seenOn: day })
     const placeKey = placeKeyOf("region_avg", EKAPE_NATIONAL)
-    if (draft.recordKind === "observation") out.observations.push({ index, draft, sourceKey, placeKey, marketSgg: null })
+    if (draft.recordKind === "observation") out.observations.push({ index, draft, sourceKey, placeKey, marketSgg: null, goodId: null })
     else out.references.push({ draft, sourceKey, placeKey })
+  })
+  return out
+}
+
+// 참가격 가격 행. 상품 용량은 상품 속성에 있어 관측값에는 두지 않는다 (qty_raw·unit_raw null, 3-3).
+function prepareChamgaPrice(rows: readonly Json[]): Prepared {
+  const out = emptyPrepared()
+  rows.forEach((raw, index) => {
+    const parsed = chamgaPriceRowSchema.safeParse(raw)
+    if (!parsed.success) {
+      out.rejected.push({ index, reason: FORMAT_CHANGED })
+      return
+    }
+    const row: ChamgaPriceRow = parsed.data
+    const reason = chamgaPriceRowRejection(row)
+    if (reason !== null) {
+      out.rejected.push({ index, reason })
+      return
+    }
+    const draft = adaptChamgaPriceRow(row, { ...NO_MAPPING, product: () => undefined })
+    const sourceKey = chamgaSourceKey(row.goodId)
+    out.items.push({ sourceKey, keyParts: { goodId: row.goodId }, label: null, seenOn: draft.obsDate })
+    out.places.push({ kind: "store", scope: "store", code: row.entpId, seenOn: draft.obsDate })
+    out.observations.push({
+      index,
+      draft,
+      sourceKey,
+      placeKey: placeKeyOf("store", row.entpId),
+      marketSgg: null,
+      goodId: row.goodId,
+    })
   })
   return out
 }
@@ -146,15 +198,34 @@ function prepare(file: RawFile): Prepared {
     case "ekape":
       return prepareEkape(file)
     case "chamga":
-      throw new Error("참가격 원본 적재는 아직 없다 (ingest-schedule/06)")
+      if (file.header.endpoint !== CHAMGA_ENDPOINT.price) throw new Error(`참가격 ${file.header.endpoint}는 가격 파일이 아니다`)
+      return prepareChamgaPrice(file.rows)
   }
 }
+
+// 마스터 행을 스키마로 거른다. 다른 행은 거부한다.
+function parseRows<Row>(
+  rows: readonly Json[],
+  schema: { safeParse: (value: unknown) => { success: true; data: Row } | { success: false } },
+): { parsed: Row[]; rejected: RejectedRow[] } {
+  const parsed: Row[] = []
+  const rejected: RejectedRow[] = []
+  rows.forEach((raw, index) => {
+    const result = schema.safeParse(raw)
+    if (result.success) parsed.push(result.data)
+    else rejected.push({ index, reason: FORMAT_CHANGED })
+  })
+  return { parsed, rejected }
+}
+
+const CHAMGA_MASTER_ENDPOINTS: readonly string[] = [CHAMGA_ENDPOINT.store, CHAMGA_ENDPOINT.product]
 
 function toRow(
   item: PreparedObservation,
   ids: { sourceItem: ReadonlyMap<string, number>; place: ReadonlyMap<string, number> },
   file: RawFile,
   rawObjectId: number,
+  productId: number | null,
 ): ObservationRow {
   const { draft } = item
   const sourceItemId = ids.sourceItem.get(item.sourceKey)
@@ -166,7 +237,7 @@ function toRow(
     place_id: placeId,
     price_tier: draft.priceTier,
     obs_kind: draft.obsKind,
-    product_id: null,
+    product_id: productId,
     variety_id: null,
     spec_id: null,
     price_raw: draft.priceRaw,
@@ -234,6 +305,7 @@ export type LoadOutcome = {
   rejected: RejectedRow[] // 사유에 값은 넣지 않는다
   observations: MergeResult
   references: number // 새로 생기거나 고쳐 쓴 평년 행
+  createdMasters: number // 참가격 마스터 파일이 새로 만든 점포·상품
 }
 
 function statusOf(total: number, rejected: number): LoadStatus {
@@ -241,9 +313,48 @@ function statusOf(total: number, rejected: number): LoadStatus {
   return rejected === total ? "rejected" : "partially_rejected"
 }
 
+async function markLoaded(tx: Tx, rawObjectId: number, status: LoadStatus, rejected: RejectedRow[]): Promise<void> {
+  await tx`
+    update price.raw_object
+       set load_status = ${status}, rejected_rows = ${rejected.length}, loaded_at = now()
+     where id = ${rawObjectId}`
+}
+
+const NO_CHANGE: MergeResult = { inserted: 0, changed: 0, corrections: 0 }
+
+// 참가격 마스터 파일 (점포·상품). 관측값은 만들지 않는다.
+function loadChamgaMaster(sql: Sql | Tx, rawObjectId: number, file: RawFile): Promise<LoadOutcome> {
+  return transaction(sql, async (tx) => {
+    await lockSource(tx, "chamga")
+    let outcome: MasterOutcome
+    if (file.header.endpoint === CHAMGA_ENDPOINT.store) {
+      const { parsed, rejected } = parseRows<ChamgaStoreRow>(file.rows, chamgaStoreRowSchema)
+      const loaded = await loadStoreMaster(tx, parsed)
+      outcome = { ...loaded, rejected: [...rejected, ...loaded.rejected] }
+    } else {
+      const { parsed, rejected } = parseRows<ChamgaProductRow>(file.rows, chamgaProductRowSchema)
+      const loaded = await loadProductMaster(tx, parsed, { collectedOn: kstDateOf(file.header.fetchedAt), rawObjectId })
+      outcome = { ...loaded, rejected: [...rejected, ...loaded.rejected] }
+    }
+    const status = statusOf(file.rows.length, outcome.rejected.length)
+    await markLoaded(tx, rawObjectId, status, outcome.rejected)
+    return {
+      rawObjectId,
+      status,
+      rejected: outcome.rejected,
+      observations: NO_CHANGE,
+      references: 0,
+      createdMasters: outcome.created,
+    }
+  })
+}
+
 // rawObjectId: 이 파일의 raw_object.id (load_status = pending_load)
 export async function loadRawFile(sql: Sql | Tx, rawObjectId: number, file: RawFile): Promise<LoadOutcome> {
   const source: DbSource = file.header.source
+  if (source === "chamga" && CHAMGA_MASTER_ENDPOINTS.includes(file.header.endpoint)) {
+    return loadChamgaMaster(sql, rawObjectId, file)
+  }
   const prepared = prepare(file)
 
   return transaction(sql, async (tx) => {
@@ -252,19 +363,36 @@ export async function loadRawFile(sql: Sql | Tx, rawObjectId: number, file: RawF
       sourceItem: await upsertSourceItems(tx, source, prepared.items),
       place: await upsertPlaces(tx, source, prepared.places),
     }
+    const rejected = [...prepared.rejected]
 
     // 시장의 sgg_cd는 시장이 정한다. 처음 본 값과 다른 행은 거부하고 경보 대상으로 남긴다 (3-3).
     const marketSgg = await upsertMarkets(tx, ids.place, prepared.markets)
-    const rejected = [...prepared.rejected]
-    const accepted = prepared.observations.filter((item) => {
+    let accepted = prepared.observations.filter((item) => {
       if (item.marketSgg === null || marketSgg.get(item.marketSgg.code) === item.marketSgg.sgg) return true
       rejected.push({ index: item.index, reason: "시장의 시군구 코드가 처음 본 값과 다르다" })
       return false
     })
 
-    let observations: MergeResult = { inserted: 0, changed: 0, corrections: 0 }
+    // 참가격: 상품 번호 → 상품 ID. 마스터에 없는 상품은 임시 이름으로 만든다 (chamga.ts).
+    const productKey = (item: PreparedObservation) => `${ids.sourceItem.get(item.sourceKey)}|${item.draft.obsDate}`
+    const priced = accepted.filter((item) => item.goodId !== null)
+    const productOf = await resolvePricedProducts(
+      tx,
+      priced.map((item) => ({ goodId: item.goodId!, sourceItemId: ids.sourceItem.get(item.sourceKey)!, obsDate: item.draft.obsDate })),
+      kstDateOf(file.header.fetchedAt),
+    )
+    accepted = accepted.filter((item) => {
+      if (item.goodId === null || productOf.has(productKey(item))) return true
+      rejected.push({ index: item.index, reason: "조사일에 유효한 상품 연결이 없다" })
+      return false
+    })
+
+    let observations: MergeResult = NO_CHANGE
     if (accepted.length > 0) {
-      await stageObservations(tx, "obs_load", lastByKey(accepted.map((item) => toRow(item, ids, file, rawObjectId))))
+      const rows = accepted.map((item) =>
+        toRow(item, ids, file, rawObjectId, item.goodId === null ? null : productOf.get(productKey(item))!),
+      )
+      await stageObservations(tx, "obs_load", lastByKey(rows))
       observations = await mergeObservations(tx, source, "obs_load")
       await tx`drop table obs_load` // commit 때 사라지지만, 바깥 트랜잭션 안에서 다시 부를 수 있게 지운다
     }
@@ -272,10 +400,7 @@ export async function loadRawFile(sql: Sql | Tx, rawObjectId: number, file: RawF
 
     rejected.sort((a, b) => a.index - b.index)
     const status = statusOf(file.rows.length, rejected.length)
-    await tx`
-      update price.raw_object
-         set load_status = ${status}, rejected_rows = ${rejected.length}, loaded_at = now()
-       where id = ${rawObjectId}`
-    return { rawObjectId, status, rejected, observations, references }
+    await markLoaded(tx, rawObjectId, status, rejected)
+    return { rawObjectId, status, rejected, observations, references, createdMasters: 0 }
   })
 }

@@ -9,7 +9,7 @@ import type { DbSource } from "./types.ts"
 export type SourceItemInput = {
   sourceKey: string // 'kamis:01-200-224-01-04' (출처 접두사 포함, source_item.source_key)
   keyParts: Record<string, string>
-  label: string
+  label: string | null // 이름을 모르면 null (참가격 가격 행). 나중에 이름이 오면 채운다
   seenOn: string
 }
 
@@ -20,8 +20,9 @@ function widen(range: SeenRange | undefined, day: string): SeenRange {
   return { first: day < range.first ? day : range.first, last: day > range.last ? day : range.last }
 }
 
-// 원천 키 등록부. 처음 본 키는 넣고, 다시 본 키는 본 날짜 범위가 넓어질 때만 고친다 (3-0).
-// 처음 본 키는 매핑을 pending으로 등록한다 (3-1 "원천 키를 처음 본 순간 pending으로 자동 등록").
+// 원천 키 등록부. 처음 본 키는 넣고, 다시 본 키는 본 날짜 범위가 넓어지거나 비어 있던 이름이 올 때만 고친다 (3-0).
+// KAMIS·축평원은 처음 본 키의 매핑을 pending으로 등록한다 (3-1 "원천 키를 처음 본 순간 pending으로 자동 등록").
+// 참가격은 상품을 거쳐 품종에 이어지므로 이 매핑을 쓰지 않는다 (3-1, 상품 연결은 chamga.ts).
 // 돌려주는 값: source_key → source_item.id
 export async function upsertSourceItems(
   tx: Tx,
@@ -48,12 +49,15 @@ export async function upsertSourceItems(
     from jsonb_to_recordset(${tx.json(rows)}) as r (source_key text, key_parts jsonb, label text, first date, last date)
     on conflict (source, source_key) do update
       set first_seen_on = least(s.first_seen_on, excluded.first_seen_on),
-          last_seen_on = greatest(s.last_seen_on, excluded.last_seen_on)
-      where s.first_seen_on > excluded.first_seen_on or s.last_seen_on < excluded.last_seen_on`
+          last_seen_on = greatest(s.last_seen_on, excluded.last_seen_on),
+          label = coalesce(s.label, excluded.label)
+      where s.first_seen_on > excluded.first_seen_on or s.last_seen_on < excluded.last_seen_on
+         or (s.label is null and excluded.label is not null)`
   const ids = await tx<{ id: number; source_key: string }[]>`
     select id, source_key from price.source_item
      where source = ${source} and source_key in (select jsonb_array_elements_text(${tx.json(rows.map((r) => r.source_key))}))`
 
+  if (source === "chamga") return new Map(ids.map((row) => [row.source_key, row.id]))
   await tx`
     insert into price.source_code_map (source_item_id, valid_from, status)
     select s.id, s.first_seen_on, 'pending'
@@ -74,6 +78,7 @@ export function placeKeyOf(kind: PlaceKind, code: string): string {
 }
 
 // 관측 위치. 가격 응답에서 본 날짜는 범위가 넓어질 때만 고친다.
+// 참가격 점포는 점포 마스터보다 가격에 먼저 나올 수 있다. 위치만 먼저 만들고 점포 상세(store)는 마스터가 채운다.
 // 돌려주는 값: placeKeyOf(kind, code) → obs_place.id
 export async function upsertPlaces(
   tx: Tx,

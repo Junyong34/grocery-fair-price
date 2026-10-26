@@ -62,7 +62,7 @@ const digits = z.string().regex(/^\d+$/)
 const yyyymmdd = z.string().regex(/^\d{8}$/)
 const yn = z.enum(["Y", "N"])
 
-const chamgaPriceRow = z.strictObject({
+export const chamgaPriceRowSchema = z.strictObject({
   goodInspectDay: yyyymmdd,
   entpId: digits,
   goodId: digits,
@@ -74,7 +74,7 @@ const chamgaPriceRow = z.strictObject({
   inputDttm: z.string().regex(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/),
 })
 
-const chamgaStoreRow = z
+export const chamgaStoreRowSchema = z
   .strictObject({
     entpId: digits,
     entpName: z.string(),
@@ -95,7 +95,7 @@ const chamgaStoreRow = z
   })
 
 // detailMean (명세 Swagger의 datailMean이 아니다)
-const chamgaProductRow = z.strictObject({
+export const chamgaProductRowSchema = z.strictObject({
   goodId: digits,
   goodName: z.string(),
   productEntpCode: z.string(),
@@ -127,14 +127,14 @@ function envelope<Row extends z.ZodType>(key: string, row: Row) {
   })
 }
 
-export const chamgaPriceSchema = envelope(PRICE_KEY, chamgaPriceRow)
-export const chamgaStoreSchema = envelope(STORE_KEY, chamgaStoreRow)
-export const chamgaProductSchema = envelope(PRODUCT_KEY, chamgaProductRow)
+export const chamgaPriceSchema = envelope(PRICE_KEY, chamgaPriceRowSchema)
+export const chamgaStoreSchema = envelope(STORE_KEY, chamgaStoreRowSchema)
+export const chamgaProductSchema = envelope(PRODUCT_KEY, chamgaProductRowSchema)
 export const chamgaStandardSchema = envelope(STANDARD_KEY, chamgaStandardRow)
 
-export type ChamgaPriceRow = z.infer<typeof chamgaPriceRow>
-export type ChamgaStoreRow = z.infer<typeof chamgaStoreRow>
-export type ChamgaProductRow = z.infer<typeof chamgaProductRow>
+export type ChamgaPriceRow = z.infer<typeof chamgaPriceRowSchema>
+export type ChamgaStoreRow = z.infer<typeof chamgaStoreRowSchema>
+export type ChamgaProductRow = z.infer<typeof chamgaProductRowSchema>
 export type ChamgaStandardRow = z.infer<typeof chamgaStandardRow>
 
 // 상태·본문 판정. 참가격은 resultCode가 result 밖(형제)에 있다. 네 기능이 같은 규칙을 쓴다.
