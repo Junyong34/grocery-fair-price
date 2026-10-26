@@ -4,6 +4,8 @@ Status: ready-for-agent
 Type: task
 Blocked by: 01, 02, p2-data-source-spec/12
 
+> 2026-10-26: 남은 일 중 정기 수집을 켜는 데 필요한 것을 [ingest-schedule 지도](../../ingest-schedule/map.md)로 나눴다. 재계산, 관측값 정리·보존 기간 밖 재등록 복원, `merge-product`, 원본 삭제는 품종 목록 뒤로 미뤄 이 티켓에 남는다 (지도의 Out of scope).
+
 ## 목적
 
 API 호출 → 원본 Storage 저장 → 변환 → Postgres upsert → 재계산을 하는 CLI를 만들고, GitHub Actions가 출처별 시각에 부르게 한다.

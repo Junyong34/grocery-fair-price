@@ -4,6 +4,8 @@ Status: ready-for-agent
 Type: task
 Blocked by: ingest-foundation/01, ingest-foundation/02
 
+> 2026-10-26: [ingest-schedule 지도](../../ingest-schedule/map.md)의 10(조사일 감지·완료)과 12(워크플로·빈 조사일 채우기)에서 한다.
+
 ## 목적
 
 참가격 API는 2026-06-12 이후만 주고, 그 범위가 계속 유지된다는 보장이 없다. 상품 차트에 쓸 이력을 오픈 전부터 쌓는다. 원본은 Supabase Storage, 정제 데이터는 Postgres (ADR 0002). spec.md 결정 5, 6. 구현은 `ingest-foundation/03`의 수집 패키지 안에서 한다. 늦을수록 이력을 잃으므로 01·02가 끝나면 가장 먼저 한다.

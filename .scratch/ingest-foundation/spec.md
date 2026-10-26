@@ -25,6 +25,8 @@
 | 05 | 장애 처리·알림·수집 상태 | task | ready-for-agent | 03 |
 | 06 | 웹앱이 Supabase를 읽는 방식 | research | resolved (서버 전용, 2026-10-20. 캐시·갱신 신호는 ④) | 02 |
 
+정기 수집 켜기는 [ingest-schedule 지도](../ingest-schedule/map.md)로 나눴다 (2026-10-26). 03의 남은 일 대부분과 `search-first-view/04`가 거기 있다.
+
 연결된 이슈: `p2-data-source-spec/12`(API 클라이언트·계약 테스트 → 03의 일부), `p4-canonical-model/01`(통합 스키마 → 02의 입력), `p4-canonical-model/03`(어댑터 → 03의 일부), `search-first-view/04`(참가격 정기 수집 → 03에서 함께).
 
 ## 진행 순서
