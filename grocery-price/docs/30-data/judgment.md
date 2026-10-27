@@ -43,7 +43,7 @@
 
 - 계절비율: `reference_price`에 `ref_type = 'season_index'`, `source = 'computed'`로 둔다. 지금 체크 제약에 없어 마이그레이션이 필요하다. 품종 · 규격 × 365일 ≈ 7만 행.
 - 평소가: `usual_price`. `components`에 `{ "level": 3800, "season_index": 1.10, "level_weeks": 26, "season_years": 3 }`처럼 두 값을 남긴다. `method`는 `level-x-season-1`.
-- 계절비율은 해마다(또는 분기마다) 다시 만든다. 그러려면 6개월이 지난 시세도 3년치는 어딘가 있어야 한다. `daily_quote` 보관 방식(티켓 04의 열린 질문)과 같이 정한다.
+- 계절비율은 해마다(또는 분기마다) 다시 만든다. 재료는 `daily_quote`의 `national` 범위다. 6개월이 지나면 시장 유형 · 업태 범위는 지우고 `national`만 남기므로 (2026-10-27, [pipeline.md](pipeline.md) 3-9 보관 4) KAMIS에서 다시 받지 않아도 된다.
 
 ## 2. 판정 구간
 
