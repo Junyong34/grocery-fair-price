@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   // 에이전트 지침은 루트 AGENTS.md 하나로 관리한다. 켜 두면 next dev가 apps/web/AGENTS.md를 다시 만든다.
   agentRules: false,
+  experimental: {
+    // next dev · build가 설치된 버전의 보안 권고를 확인해 안전한 버전을 알린다(기본값과 같다). 자동으로 올리지는 않는다.
+    agentUpgrade: "security",
+  },
 }
 
 export default nextConfig
