@@ -31,7 +31,7 @@ describe("빌더", () => {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "장볼날", item: "https://example.com/seasonal" },
+        { "@type": "ListItem", position: 1, name: "장볼날", item: "https://example.com/" },
         { "@type": "ListItem", position: 2, name: "3월 제철 음식", item: "https://example.com/seasonal/months/3" },
       ],
     })

@@ -3,12 +3,6 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
-import {
-  CalendarDays,
-  Leaf,
-  UtensilsCrossed,
-  type LucideIcon,
-} from "lucide-react"
 
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -16,45 +10,23 @@ import { BrandLogo } from "@/shared/brand-logo"
 import { SITE_CONFIG } from "@/shared/meta"
 import { routes } from "@/shared/routes"
 
+import { MENUS, type MenuArea } from "./menus"
 import { matchesPath, NavLink } from "./nav-link"
 
-// 주요 메뉴 3개. 모바일은 하단 떠 있는 내비, 데스크톱(≥1024)은 헤더 안에 보인다(명세 2.2, spec "내비").
-// 활성 매핑: 월별 보기 → 이달, 명절 → 계절.
-const ITEMS: readonly {
-  label: string
-  href: string
-  also?: readonly string[]
-  exact?: boolean
-  Icon: LucideIcon
-}[] = [
-  {
-    label: "이달",
-    href: routes.seasonal.root,
-    also: [routes.seasonal.months],
-    exact: true,
-    Icon: CalendarDays,
-  },
-  {
-    label: "계절",
-    href: routes.seasonal.seasons,
-    also: [routes.seasonal.festivals],
-    Icon: Leaf,
-  },
-  { label: "나의 식탁", href: routes.seasonal.myTable, Icon: UtensilsCrossed },
-]
+/** 메뉴 칸 옆에 붙는 배지(담은 개수 등). 메뉴 key → 요소. 레이아웃이 넣는다. */
+export type MenuBadges = Partial<Record<string, React.ReactNode>>
 
-/** 하단 내비 칸 하나의 폭(px). 강조 배경이 칸 단위로 미끄러진다. */
+/** 하단 내비 칸 하나의 폭(px). 강조 배경이 칸 단위로 미끄러진다. 칸이 4개여도 375px에 들어간다(288px). */
 const CELL = 72
 
 /**
  * 모바일 하단 가운데 떠 있는 내비(cojeev Action Dock 모양을 따랐다).
  * 2차 탭과 같은 크림(gold-wash) 트레이에 아이콘·라벨을 세로로 놓고, 지금 메뉴 뒤에 둥근 강조 배경이 깔린다. 메뉴를 바꾸면 배경이 옆 칸으로 미끄러진다.
  */
-export function FloatingNav() {
+export function FloatingNav({ area, badges = {} }: { area: MenuArea; badges?: MenuBadges }) {
   const pathname = usePathname()
-  const active = ITEMS.findIndex(({ href, also, exact }) =>
-    matchesPath(pathname, href, { also, exact })
-  )
+  const items = MENUS[area]
+  const active = items.findIndex(({ href, also, exact }) => matchesPath(pathname, href, { also, exact }))
   return (
     <nav
       aria-label="주요 메뉴"
@@ -68,24 +40,21 @@ export function FloatingNav() {
             style={{ width: CELL, transform: `translateX(${active * CELL}px)` }}
           />
         )}
-        {ITEMS.map(({ label, href, Icon }, i) => (
+        {items.map(({ key, label, href, Icon }, i) => (
           <Link
-            key={href}
+            key={key}
             href={href}
             aria-current={i === active ? "page" : undefined}
             className={cn(
               "relative flex h-12 flex-col items-center justify-center gap-1 text-[11px] leading-none no-underline transition-colors duration-200",
-              i === active
-                ? "font-semibold text-espresso hover:text-espresso"
-                : "text-stone hover:text-ink"
+              i === active ? "font-semibold text-espresso hover:text-espresso" : "text-stone hover:text-ink"
             )}
             style={{ width: CELL }}
           >
-            <Icon
-              aria-hidden
-              size={19}
-              strokeWidth={i === active ? 1.9 : 1.6}
-            />
+            <span className="relative">
+              <Icon aria-hidden size={19} strokeWidth={i === active ? 1.9 : 1.6} />
+              {badges[key] && <span className="absolute -top-1.5 left-3.5">{badges[key]}</span>}
+            </span>
             <span>{label}</span>
           </Link>
         ))}
@@ -120,24 +89,25 @@ function useScrolledDown() {
 }
 
 /**
- * 제철 영역 헤더: 로고 · (데스크톱) 주요 메뉴 · 검색 · 설정. 늘 위에 붙어 있다.
+ * 사이트 헤더: 로고 · (데스크톱) 주요 메뉴 · 화면별 버튼(actions). 늘 위에 붙어 있다.
  * 맨 위에서는 화면 폭에 붙은 평평한 줄이고, 내려가면 가장자리에서 떨어진 둥근 바로 떠오른다.
  * 다시 맨 위에 닿으면 탄성 있게 제자리로 붙는다(자석처럼).
  * tabs(2차 탭)는 떠 있을 때만 보인다. 본문 위 2차 탭이 스크롤로 가려져도 헤더에서 바로 옮길 수 있다.
  */
-export function SeasonalHeader({
+export function SiteHeader({
+  area,
+  badges = {},
   actions,
   tabs,
 }: {
+  area: MenuArea
+  badges?: MenuBadges
   actions?: React.ReactNode
   tabs?: React.ReactNode
 }) {
   const stuck = useScrolledDown()
   return (
-    <header
-      data-stuck={stuck ? "" : undefined}
-      className="group/header sticky top-0 z-(--z-dock) h-14"
-    >
+    <header data-stuck={stuck ? "" : undefined} className="group/header sticky top-0 z-(--z-dock) h-14">
       <div
         className={cn(
           "absolute inset-x-0 top-0 h-14 border border-transparent",
@@ -148,7 +118,7 @@ export function SeasonalHeader({
       >
         <div className="mx-auto flex h-full max-w-[1080px] items-center gap-2 px-[18px] motion-safe:transition-[padding] motion-safe:duration-500 group-data-stuck/header:px-2.5 lg:gap-8 lg:px-6 lg:group-data-stuck/header:px-4">
           <Link
-            href={routes.seasonal.root}
+            href={routes.home}
             aria-label={`${SITE_CONFIG.name} 홈`}
             className="inline-flex shrink-0 items-center rounded-sm no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
           >
@@ -157,15 +127,16 @@ export function SeasonalHeader({
             </span>
           </Link>
           <nav aria-label="주요 메뉴" className="hidden gap-6 lg:flex">
-            {ITEMS.map(({ label, href, also, exact }) => (
+            {MENUS[area].map(({ key, label, href, also, exact }) => (
               <NavLink
-                key={href}
+                key={key}
                 href={href}
                 also={also}
                 exact={exact}
-                className="text-[15px] text-stone hover:text-ink aria-[current=page]:font-semibold aria-[current=page]:text-ink"
+                className="inline-flex items-center gap-1.5 text-[15px] text-stone hover:text-ink aria-[current=page]:font-semibold aria-[current=page]:text-ink"
               >
                 {label}
+                {badges[key]}
               </NavLink>
             ))}
           </nav>
@@ -178,9 +149,7 @@ export function SeasonalHeader({
               {tabs}
             </div>
           )}
-          <div className="ml-auto flex items-center gap-1 lg:gap-2">
-            {actions}
-          </div>
+          <div className="ml-auto flex items-center gap-1 lg:gap-2">{actions}</div>
         </div>
       </div>
     </header>

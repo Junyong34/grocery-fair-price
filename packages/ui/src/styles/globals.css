@@ -73,6 +73,21 @@
     --color-holiday: #c43c2a;
     --color-holiday-wash: color-mix(in oklab, var(--color-holiday) 9%, var(--color-canvas));
 
+    /* 가격 판정색(싸요 · 보통 · 비싸요 · 판정 전). 이름만 새로 두고 값은 위 팔레트를 가리킨다.
+       기본값은 점 · 선 · 막대, -wash는 카드 · 칩 배경, -ink는 그 위 글자(캔버스 · wash 위 4.5:1 이상). */
+    --color-verdict-cheap: color-mix(in oklab, var(--color-sage) 50%, var(--color-forest));
+    --color-verdict-normal: var(--color-gold);
+    --color-verdict-pricey: var(--color-holiday);
+    --color-verdict-none: var(--color-ash);
+    --color-verdict-cheap-wash: color-mix(in oklab, var(--color-sage) 22%, var(--color-canvas));
+    --color-verdict-normal-wash: color-mix(in oklab, var(--color-gold-pale) 34%, var(--color-canvas));
+    --color-verdict-pricey-wash: color-mix(in oklab, var(--color-holiday) 11%, var(--color-canvas));
+    --color-verdict-none-wash: color-mix(in oklab, var(--color-silver) 40%, var(--color-canvas));
+    --color-verdict-cheap-ink: var(--color-forest);
+    --color-verdict-normal-ink: var(--color-gold-deep);
+    --color-verdict-pricey-ink: color-mix(in oklab, var(--color-holiday) 80%, var(--color-ink));
+    --color-verdict-none-ink: var(--color-stone);
+
     /* 선택·켜짐 상태의 연한 gold 배경 (와이어프레임 accent-100) */
     --color-gold-wash: color-mix(in oklab, var(--color-gold-pale) 30%, var(--color-canvas));
 

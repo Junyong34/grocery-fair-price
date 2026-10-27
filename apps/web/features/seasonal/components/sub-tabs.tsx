@@ -9,7 +9,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { routes } from "@/shared/routes"
 
-import { matchesPath, useIsActive } from "./nav-link"
+import { matchesPath, useIsActive } from "@/shared/shell/nav-link"
 
 // 2차 탭(명세 2.1). cojeev 탭(lenses)을 밝은 트레이에 담고, gold 선택 표시가 탭 사이를 미끄러진다.
 // 헤더가 떠 있을 때는 같은 탭을 작게 헤더 안에 접어 넣는다(HeaderSubTabs).

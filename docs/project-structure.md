@@ -152,11 +152,11 @@ import 경로:
 | `my-table/` | 1h | `my-table-view`, `food-row`, `typed-label` |
 | `food-detail/` | 1i | `food-detail`, `eat-toggle`, `festival-link` |
 | `search/` | 전역 검색 | `food-search`(헤더 버튼), `food-search-dialog`(cojeev command, 초성 검색) |
-| `components/` | 공통 | `seasonal-shell`, `main-nav`, `nav-link`, `sub-tabs`, `food-image`(그림 없으면 이름 카드), `food-sheet`, `scatter-field`·`draggable-scatter`(흩어진 배치와 드래그), `month-calendar`, `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-count`, `share-button`, `holiday-name`, `this-month-only`, `screen-stub` |
+| `components/` | 공통 | `seasonal-shell`(공통 셸에 제철 메뉴 · 검색 · ⚙를 넣는다), `sub-tabs`, `food-image`(그림 없으면 이름 카드), `food-sheet`, `scatter-field`·`draggable-scatter`(흩어진 배치와 드래그), `month-calendar`, `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-count`, `share-button`, `holiday-name`, `this-month-only`, `screen-stub` |
 | `downloads/` | PDF 내려받기 | `downloads-view`, `edition-downloads`(용지 고르기, 기기에 저장) |
 | `stores/` | 공통 | `settings-store`(⚙ 설정, 내려받기 용지), `scatter-store`(옮긴 배치와 달력 자리) |
 
-`components/seasonal-shell`은 헤더에 넣으려고 `search/`와 `this-month/settings-panel`을 import한다. 같은 feature 안이라 허용된다.
+`components/seasonal-shell`은 공통 셸(`shared/shell`)의 헤더에 넣으려고 `search/`와 `this-month/settings-panel`을 import한다. 같은 feature 안이라 허용된다.
 
 인쇄물(`.scratch/calendar-print/spec.md`)은 feature 둘로 나뉜다.
 
@@ -193,6 +193,7 @@ import 경로:
 | `today.ts` | `getSeoulToday()`: `server-only`. `connection()` 뒤에 서울 오늘을 계산하고 React `cache`로 요청당 한 번 |
 | `today-context.tsx` | `TodayProvider`, `useToday()`: 서버가 만든 Promise를 클라이언트가 `use()`로 읽는다. `<Suspense>` 안에서만 |
 | `eaten-store.ts` | 먹음 기록: 연도 → 품종 id 목록. localStorage `seasonal:eaten` |
+| `shell/` | 가격과 제철이 같이 쓰는 셸: `site-shell`(헤더 + 본문 + 하단 내비), `site-nav`(`SiteHeader`, `FloatingNav`. 내비 칸 72px), `menus`(영역별 메뉴 설정: 가격 = 시세 · 제철달력 · 담은 품종, 제철 = 시세 · 제철달력 · 계절 · 나의 식탁), `nav-link`(활성 판정). 메뉴 배지(담은 개수)는 영역 레이아웃이 `badges`로 넣는다 |
 | `brand-logo.tsx` | 고운돋움 Regular를 패스로 만든 장볼날 가로 로고. 모바일에서 접힌 헤더는 심볼만 보여준다 |
 
 ## 5. 상태와 "오늘"

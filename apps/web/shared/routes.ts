@@ -6,11 +6,21 @@ import type { Season } from "@workspace/seasonal/data/seasons"
 import { encodeSpec, type Paper, type PrintSpec } from "@workspace/seasonal/print/spec"
 
 export const routes = {
-  /**
-   * "/"가 보내는 곳. 지금은 제철 메인이다.
-   * 식재료 가격 비교 메인이 생기면 app/page.tsx를 그 화면으로 바꾸고, 이 값은 지운다.
-   */
-  home: "/seasonal",
+  /** 서비스 메인(P1 시세 메인). 로고와 하단 내비 "시세"가 여기로 간다. */
+  home: "/",
+
+  /** 가격 화면(시세 · 판정). .scratch/price-screens/spec.md */
+  price: {
+    /** P2 품종 검색. 검색어는 ?q= */
+    search: "/search",
+    searchFor: (query: string) => (query ? `/search?q=${encodeURIComponent(query)}` : "/search"),
+    /** P3 품종 상세의 접두 경로 */
+    varieties: "/prices",
+    /** P3 품종 상세 */
+    variety: (id: string) => `/prices/${id}`,
+    /** P4 담은 품종 */
+    basket: "/basket",
+  },
 
   seasonal: {
     /** 2a 이달 · 12개월 스크롤 */
