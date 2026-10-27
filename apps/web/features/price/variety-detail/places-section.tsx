@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 
+import { priceAxis } from "@workspace/price/axis"
 import { MARKET_TYPE_NAME, PRICE_COPY } from "@workspace/price/copy"
 import { won } from "@workspace/price/format"
 import { placesByType, sameEverywhere } from "@workspace/price/places"
@@ -22,10 +23,8 @@ const PLACE_COLUMNS = "grid grid-cols-[minmax(0,1fr)_minmax(4.5rem,7rem)_5.25rem
 export function PlacesSection({ detail }: { detail: VarietyDetail }) {
   const [allMarkets, setAllMarkets] = useState(false)
   const { large_retail: marts, traditional: markets } = placesByType(detail.places)
-  const prices = detail.places.map((place) => place.price)
-  const lo = Math.min(...prices, detail.price)
-  const hi = Math.max(...prices, detail.price)
-  const x = (v: number) => (hi === lo ? 50 : ((v - lo) / (hi - lo)) * 100)
+  const axis = priceAxis([...detail.places.map((place) => place.price), detail.price])
+  const x = (v: number) => axis.at(v) * 100
   const national = x(detail.price)
   const shownMarkets = allMarkets ? markets : markets.slice(0, MARKETS_SHOWN)
 

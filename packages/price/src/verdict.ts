@@ -10,8 +10,18 @@ export const DEFAULT_BAND: VerdictBand = { lower: -10, upper: 10 }
  */
 export function verdictOf(price: number, usual: number | null, band: VerdictBand): Verdict {
   if (usual == null || usual <= 0) return { kind: "none", pct: null }
-  // -0을 0으로 맞춘다.
-  const pct = Math.round((price / usual - 1) * 100) || 0
+  // 나눗셈을 마지막에 해서 정확히 .5인 차이(1105원 / 1000원)가 10.4999…%로 깎이지 않게 한다. -0은 0으로 맞춘다.
+  const pct = Math.round(((price - usual) * 100) / usual) || 0
   const kind = pct < band.lower ? "cheap" : pct > band.upper ? "pricey" : "normal"
   return { kind, pct }
+}
+
+/**
+ * 평소 범위: 판정이 "보통"인 가격의 띠(low 이상 high 미만). 화면의 띠는 모두 이 값으로 그린다.
+ * verdictOf가 반올림한 %로 비교하므로 경계는 구간 끝에서 0.5%p 바깥이다(+10.4%도 보통).
+ * 평소가가 없으면(또는 0 이하면) 없다.
+ */
+export function usualRange(usual: number | null, band: VerdictBand): { low: number; high: number } | null {
+  if (usual == null || usual <= 0) return null
+  return { low: usual + (usual * (band.lower - 0.5)) / 100, high: usual + (usual * (band.upper + 0.5)) / 100 }
 }

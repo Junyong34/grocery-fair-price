@@ -5,10 +5,12 @@ import { useEffect, useId, useRef, useState } from "react"
 import { Segmented } from "@workspace/ui/components/segmented"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { priceAxis } from "@workspace/price/axis"
 import { PRICE_COPY } from "@workspace/price/copy"
 import { daysBetween, monthDay, won } from "@workspace/price/format"
 import { spikesOf, trendWindow, type Spike } from "@workspace/price/trend"
 import type { VarietyDetail } from "@workspace/price/types"
+import { usualRange } from "@workspace/price/verdict"
 
 import { VERDICT_TONE } from "../components/verdict-tone"
 
@@ -32,12 +34,6 @@ function useWidth(initial: number) {
   return [ref, width] as const
 }
 
-/** 눈금 간격: 1 · 2 · 2.5 · 5 × 10^k 가운데 raw 이상인 가장 작은 값. */
-function niceStep(raw: number): number {
-  const power = 10 ** Math.floor(Math.log10(raw))
-  return [1, 2, 2.5, 5, 10].map((m) => m * power).find((step) => step >= raw) ?? raw
-}
-
 /**
  * P3 가격 추이(1 · 3 · 6개월): 시세 선, 평소 범위 띠, 평소가 점선, 조사일 표시, 급등 · 급락 점,
  * 평년 흐름으로 본 예상(빗금). 평소가가 없으면 시세 선과 조사일만 그린다.
@@ -55,19 +51,18 @@ export function TrendChart({ detail }: { detail: VarietyDetail }) {
   const hasUsual = detail.usual != null
   const forecast = hasUsual ? detail.forecast : []
   const spikes = hasUsual ? spikesOf(past, detail.band) : []
-  const bandOf = (usual: number) => [usual * (1 + detail.band.lower / 100), usual * (1 + detail.band.upper / 100)] as const
+  // 평소가가 0 이하인 날은 띠 없이 평소가 한 점으로 둔다.
+  const bandOf = (usual: number) => usualRange(usual, detail.band) ?? { low: usual, high: usual }
 
   const start = past[0]!.date
   const t1 = daysBetween(start, forecast.at(-1)?.date ?? last.date) + (forecast.length ? 0 : 3)
   const values = [
-    ...past.flatMap((p) => [p.price, ...(hasUsual && p.usual != null ? bandOf(p.usual) : [])]),
+    ...past.flatMap((p) => [p.price, ...(hasUsual && p.usual != null ? [bandOf(p.usual).low, bandOf(p.usual).high] : [])]),
     ...forecast.flatMap((f) => [f.low, f.high]),
   ].filter((v): v is number => v != null)
-  const step = niceStep((Math.max(...values) - Math.min(...values)) / 4 || 1)
-  const yMin = Math.floor(Math.min(...values) / step) * step
-  const yMax = Math.ceil(Math.max(...values) / step) * step
+  const axis = priceAxis(values, { ticks: 4 })
   const x = (date: string) => M.l + (daysBetween(start, date) / t1) * (W - M.l - M.r)
-  const y = (v: number) => M.t + (1 - (v - yMin) / (yMax - yMin || 1)) * (H - M.t - M.b)
+  const y = (v: number) => M.t + (1 - axis.at(v)) * (H - M.t - M.b)
 
   // 시세 선: 시세가 없는 날에서 끊는다
   const priceLine = past
@@ -76,9 +71,9 @@ export function TrendChart({ detail }: { detail: VarietyDetail }) {
   const withUsual = past.filter((p) => p.usual != null)
   const bandPath = withUsual.length
     ? "M" +
-      withUsual.map((p) => `${x(p.date)},${y(bandOf(p.usual!)[1])}`).join("L") +
+      withUsual.map((p) => `${x(p.date)},${y(bandOf(p.usual!).high)}`).join("L") +
       "L" +
-      [...withUsual].reverse().map((p) => `${x(p.date)},${y(bandOf(p.usual!)[0])}`).join("L") +
+      [...withUsual].reverse().map((p) => `${x(p.date)},${y(bandOf(p.usual!).low)}`).join("L") +
       "Z"
     : ""
   const usualLine = withUsual.length ? "M" + withUsual.map((p) => `${x(p.date)},${y(p.usual!)}`).join("L") : ""
@@ -88,8 +83,6 @@ export function TrendChart({ detail }: { detail: VarietyDetail }) {
     : ""
   const foreLine = fore.length ? "M" + fore.map((f) => `${x(f.date)},${y(f.price)}`).join("L") : ""
 
-  const ticks: number[] = []
-  for (let v = yMin; v <= yMax; v += step) ticks.push(v)
   // 날짜 눈금: 1개월은 주마다, 그보다 길면 매달 1일. 이름표가 겹치면(36px 안) 뒤 것을 뺀다.
   const dateTicks = [...past.map((p) => p.date), ...forecast.map((f) => f.date)]
     .filter((date) => {
@@ -125,7 +118,7 @@ export function TrendChart({ detail }: { detail: VarietyDetail }) {
               <line x1="0" y1="0" x2="0" y2="5" className="stroke-ash/50" strokeWidth="1.4" />
             </pattern>
           </defs>
-          {ticks.map((v) => (
+          {axis.ticks.map((v) => (
             <g key={v}>
               <line x1={M.l} x2={W - M.r} y1={y(v)} y2={y(v)} className="stroke-hairline" />
               <text x={M.l - 6} y={y(v) + 3.5} textAnchor="end" className="fill-caption">

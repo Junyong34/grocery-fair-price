@@ -1,9 +1,11 @@
 import { cn } from "@workspace/ui/lib/utils"
 
+import { priceAxis } from "@workspace/price/axis"
 import { MARKET_TYPE_NAME, PRICE_COPY } from "@workspace/price/copy"
 import { daysBetween, won } from "@workspace/price/format"
 import { placesByType } from "@workspace/price/places"
 import type { VarietyDetail } from "@workspace/price/types"
+import { usualRange } from "@workspace/price/verdict"
 
 const COPY = PRICE_COPY.detail
 
@@ -47,13 +49,9 @@ export function DotsCompare({ detail }: { detail: VarietyDetail }) {
       })()
 
   const usual = detail.usual
-  const bandLow = usual == null ? null : usual * (1 + detail.band.lower / 100)
-  const bandHigh = usual == null ? null : usual * (1 + detail.band.upper / 100)
-  const all = [...groups.flatMap((g) => g.rows.flatMap((r) => r.values)), ...[bandLow, bandHigh].filter((v): v is number => v != null)]
-  const lo = Math.min(...all)
-  const hi = Math.max(...all)
-  const pad = (hi - lo) * 0.06 || 1
-  const x = (v: number) => ((v - lo + pad) / (hi - lo + 2 * pad)) * 100
+  const usualBand = usualRange(usual, detail.band)
+  const axis = priceAxis([...groups.flatMap((g) => g.rows.flatMap((r) => r.values)), ...(usualBand ? [usualBand.low, usualBand.high] : [])], { pad: 0.06 })
+  const x = (v: number) => axis.at(v) * 100
 
   return (
     <div className="flex flex-col gap-3">
@@ -74,8 +72,11 @@ export function DotsCompare({ detail }: { detail: VarietyDetail }) {
                   {row.sub && <small className="ml-1 text-[11px] text-caption">{row.sub}</small>}
                 </span>
                 <span aria-hidden className="relative h-full">
-                  {bandLow != null && bandHigh != null && (
-                    <span className="absolute inset-y-0 bg-verdict-normal-wash" style={{ left: `${x(bandLow)}%`, width: `${x(bandHigh) - x(bandLow)}%` }} />
+                  {usualBand && (
+                    <span
+                      className="absolute inset-y-0 bg-verdict-normal-wash"
+                      style={{ left: `${x(usualBand.low)}%`, width: `${x(usualBand.high) - x(usualBand.low)}%` }}
+                    />
                   )}
                   {usual != null && <span className="absolute inset-y-0 border-l border-dashed border-ash" style={{ left: `${x(usual)}%` }} />}
                   <span className="absolute inset-x-0 top-1/2 border-t border-hairline" />
