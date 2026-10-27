@@ -22,13 +22,15 @@ const COPY = PRICE_COPY.basket
 
 /**
  * P4 담은 품종. 판정별 개수 한 줄, 담은 뒤 판정이 바뀐 품종 알림, 판정별 묶음(싸요 → 보통 → 비싸요 → 판정 전, 안은 % 오름차순).
- * 담은 목록은 기기에 저장되어 있어 불러온 뒤에 그린다.
+ * 담은 목록은 기기에 저장되어 있어 불러온 뒤에 그린다. "편집"을 누르면 행마다 × 빼기와 "모두 빼기"가 나온다.
  */
 export function BasketView({ varieties }: { varieties: readonly VarietySummary[] }) {
   const hydrated = useBasketHydrated()
   const entries = useBasketStore((state) => state.entries)
-  const [editing, setEditing] = useState(false)
+  const [editingOn, setEditing] = useState(false)
   const view = basketView(varieties, entries)
+  // 다 빼서 빈 목록이 되면 편집도 끝난다.
+  const editing = editingOn && view.count > 0
   const surveyedOn = latestSurveyedOn(view.groups.flatMap((group) => group.items.map((item) => item.variety)))
   const remove = (id: string) => useBasketStore.getState().remove(id)
 
@@ -89,7 +91,8 @@ export function BasketView({ varieties }: { varieties: readonly VarietySummary[]
                     <VarietyRow
                       key={item.variety.id}
                       variety={item.variety}
-                      action={<RemoveButton name={item.variety.name} onClick={() => remove(item.variety.id)} />}
+                      // × 빼기는 편집 중에만 보인다. 열 자리는 남겨 다른 목록과 열 폭이 같다.
+                      action={editing ? <RemoveButton name={item.variety.name} onClick={() => remove(item.variety.id)} /> : undefined}
                       footer={changedLine(item)}
                     />
                   ))}
