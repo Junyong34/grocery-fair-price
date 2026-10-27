@@ -40,6 +40,15 @@ export const SEO_PAGES: Readonly<Record<string, () => readonly SitemapEntry[]>> 
 }
 
 /**
+ * 색인 대상이지만 경로 목록을 데이터 입구(features/price/data)에서 읽어야 하는 라우트.
+ * shared는 features를 import하지 않으므로 app/sitemap.ts가 목록을 펼친다.
+ */
+export const DATA_SEO_PAGES: readonly string[] = [
+  // P3 품종 상세
+  "/prices/[variety]",
+]
+
+/**
  * 색인하지 않는 라우트(접두 경로). 페이지는 createMetadata({ noIndex: true })나 layout의 robots로 noindex를 낸다.
  * robots.txt의 Disallow로 막지 않는다. 막으면 크롤러가 noindex를 읽지 못해 주소만 색인에 남을 수 있다.
  */
@@ -62,7 +71,7 @@ export type SeoPolicy = "index" | "noindex" | "redirect"
 
 /** 라우트 패턴의 색인 정책. 어디에도 없으면 undefined(가드 테스트가 실패한다). */
 export function seoPolicyOf(pattern: string): SeoPolicy | undefined {
-  if (pattern in SEO_PAGES) return "index"
+  if (pattern in SEO_PAGES || DATA_SEO_PAGES.includes(pattern)) return "index"
   if (NOINDEX_ROUTES.some((prefix) => pattern === prefix || pattern.startsWith(`${prefix}/`))) return "noindex"
   if (REDIRECT_ROUTES.includes(pattern)) return "redirect"
   return undefined

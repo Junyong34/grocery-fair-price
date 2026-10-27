@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest"
 import { FESTIVALS } from "@workspace/seasonal/data/festivals"
 import { FOODS, isDrawn } from "@workspace/seasonal/data/foods"
 
-import { NOINDEX_ROUTES, REDIRECT_ROUTES, SEO_PAGES, seoPolicyOf } from "./pages"
+import { DATA_SEO_PAGES, NOINDEX_ROUTES, REDIRECT_ROUTES, SEO_PAGES, seoPolicyOf } from "./pages"
 import { routePatternOf } from "./route-pattern"
 
 const APP_DIR = fileURLToPath(new URL("../../app", import.meta.url))
@@ -25,7 +25,7 @@ describe("SEO 레지스트리 가드", () => {
   })
 
   it("레지스트리에 적힌 라우트는 실제 페이지가 있다", () => {
-    const registered = [...Object.keys(SEO_PAGES), ...REDIRECT_ROUTES]
+    const registered = [...Object.keys(SEO_PAGES), ...DATA_SEO_PAGES, ...REDIRECT_ROUTES]
     const orphans = registered.filter((pattern) => !pagePatterns.includes(pattern))
     expect(orphans, "지운 페이지는 pages.ts에서도 지운다").toEqual([])
     const unusedPrefixes = NOINDEX_ROUTES.filter((prefix) => !pagePatterns.some((pattern) => pattern === prefix || pattern.startsWith(`${prefix}/`)))

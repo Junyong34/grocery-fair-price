@@ -39,3 +39,8 @@ export function agoLabel(days: number): string {
 export function signedPct(pct: number): string {
   return `${pct > 0 ? "+" : ""}${pct}%`
 }
+
+/** 연 · 월 · 일 → "YYYY-MM-DD" */
+export function isoDate({ year, month, day }: { year: number; month: number; day: number }): string {
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+}

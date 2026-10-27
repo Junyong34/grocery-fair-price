@@ -100,6 +100,7 @@ import 경로:
 |---|---|---|---|
 | `/` | P1 시세 메인 | `(price)/page.tsx` | `features/price/home/home-view` |
 | `/search?q=` | P2 품종 검색 (noindex) | `(price)/search/page.tsx` | `features/price/search/search-view` |
+| `/prices/[variety]` | P3 품종 상세 (가격 품종 slug) | `(price)/prices/[variety]/page.tsx` | `features/price/variety-detail/detail-view`. 품종 목록은 `getPriceSource()`에서 읽어 `generateStaticParams` · sitemap에 쓴다 |
 | `/seasonal` | 2a 이달 · 12개월 스크롤 | `seasonal/(this-month)/page.tsx` | `this-month/this-month-view` |
 | `/seasonal/months` | 2b 열두 달 카드 목록 | `seasonal/(this-month)/months/page.tsx` | `month-timeline/months-index` |
 | `/seasonal/months/[month]` | 2b 그 달 상세 (1~12) | `seasonal/(this-month)/months/(detail)/[month]/page.tsx` | `month-timeline/month-view`, 레이아웃에 `month-timeline` |
@@ -192,6 +193,7 @@ import 경로:
 | `data/` | 데이터 경계. `price-source.ts`(`PriceSource`, `getPriceSource()`, `server-only`)만 화면이 부른다. `fixture-source.ts`와 `fixtures/`는 하드코딩 데이터이고, 다음 단계에서 `supabase-source.ts`가 대신한다. `data-boundary.test.ts`가 `data/` 밖의 `fixtures` import를 막는다 |
 | `home/` | P1 시세 메인 |
 | `search/` | P2 품종 검색. 검색어는 `history.replaceState`로 `?q=`에 맞춘다 |
+| `variety-detail/` | P3 품종 상세: `detail-header`(뒤로 · 담기, 최근 본 품종에 넣기), `verdict-card`(판정 전 · 오래됨 · 표본 적음), `range-bar`, `places-section`(장소 비교, 판정 색 없음), `why-section`(`trend-chart` SVG + `dots-compare`), `my-price`(내가 본 가격, 저장 안 함) |
 | `components/` | 품종 행(`variety-row`: 네 열 subgrid, 가격 두 줄, 설명 한 줄), 판정 칩 · 점(`verdict-chip`, 색은 `verdict-tone`), `add-button`, `search-entry`, `recent-varieties`, `price-shell` |
 | `stores/` | `basket-store`(`price:basket`, 담을 때 판정 · 조사일), `recent-store`(`price:recent`), `price-stores`(마운트 뒤 불러오기) |
 
@@ -203,7 +205,7 @@ import 경로:
 | `print-screen.ts` | `/print` 화면의 용지 둘레 여백(`PRINT_SCREEN_GUTTER`). `print.css`(CSS 변수 `--print-gutter`)와 어드민 미리보기 크기 계산이 함께 쓴다 |
 | `providers.tsx` | `TooltipProvider`, `OverlayProvider`(overlay-kit). 마운트 뒤 먹음 기록을 불러온다 |
 | `meta.ts` | `SITE_CONFIG`(사이트 이름 "장볼날"), `siteUrl()`, `absoluteUrl()`, `createMetadata()`, `ogImagePath()` |
-| `seo/` | 검색 색인: `pages.ts`(색인 레지스트리)와 가드 테스트, `indexing.ts`(색인 스위치·소유 확인), `json-ld.tsx`(구조화 데이터), `titles.ts`(검색용 제목·설명), `route-pattern.ts` |
+| `seo/` | 검색 색인: `pages.ts`(색인 레지스트리. 품종 상세처럼 목록을 데이터 입구에서 읽는 라우트는 `DATA_SEO_PAGES`에 두고 `app/sitemap.ts`가 펼친다)와 가드 테스트, `indexing.ts`(색인 스위치·소유 확인), `json-ld.tsx`(구조화 데이터), `titles.ts`(검색용 제목·설명), `route-pattern.ts` |
 | `today.ts` | `getSeoulToday()`: `server-only`. `connection()` 뒤에 서울 오늘을 계산하고 React `cache`로 요청당 한 번 |
 | `today-context.tsx` | `TodayProvider`, `useToday()`: 서버가 만든 Promise를 클라이언트가 `use()`로 읽는다. `<Suspense>` 안에서만 |
 | `eaten-store.ts` | 먹음 기록: 연도 → 품종 id 목록. localStorage `seasonal:eaten` |
@@ -265,6 +267,8 @@ import 경로:
 | `verdict.ts` | `verdictOf(price, usual, band)`: 평소가 대비 반올림 % 와 싸요 · 보통 · 비싸요. 평소가가 없으면 판정 전. "내가 본 가격"도 이 함수 |
 | `search.ts` | `searchVarieties`: 별칭 → 품목("어떤 호박인가요?") → 카테고리 → 이름 · 초성 · 품목 · 별칭 일부 → 한 글자 오타. `matchRange`(이름 강조) |
 | `list.ts` | 목록 순수 함수: 최근 조사일, id 순서로 고르기 |
+| `trend.ts` | 추이 기간 자르기(`trendWindow`), 급등 · 급락 점(`spikesOf`) |
+| `places.ts` | 장소를 업태별 · 싼 순으로(`placesByType`), 전국 같은 값(`sameEverywhere`) |
 | `format.ts` | 원 표시, 날짜 문자열("YYYY-MM-DD") 계산, "2주 전" |
 | `copy.ts` | 화면 문구, 판정 칩 · 차이 문구, 받침에 맞는 조사(`withJosa`) |
 

@@ -23,6 +23,14 @@ export function homeSeo(): PageSeo {
   }
 }
 
+/** P3 품종 상세 */
+export function varietySeo(variety: { name: string; baseUnit: string }): PageSeo {
+  return {
+    title: `${variety.name} 시세 · 평소 가격`,
+    description: `${variety.name}(${variety.baseUnit}) 오늘 시세가 평소보다 싼지 비싼지, 대형마트·전통시장은 얼마에 파는지 견줘 보세요.`,
+  }
+}
+
 /** 제철 메인(2a 이달) */
 export function seasonalHomeSeo(): PageSeo {
   return {

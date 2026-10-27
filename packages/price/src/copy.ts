@@ -174,7 +174,8 @@ export const PRICE_COPY = {
     myPriceTitle: "매장에서 본 가격",
     myPriceHint: (unit: string) => `${unit} 가격을 적으면 평소가와 견줘 볼게요. 저장하지 않아요.`,
     myPriceApply: "판정 보기",
-    myPriceClear: "지우기",
+    myPriceClear: "내가 본 가격 지우기",
+    myPriceEdit: "다시 적기",
     myPriceVerdict: (price: string) => `내가 본 ${price}원은`,
   },
   basket: {

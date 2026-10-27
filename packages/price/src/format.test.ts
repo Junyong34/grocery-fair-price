@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { addDays, agoLabel, daysBetween, monthDay, signedPct, won } from "./format"
+import { addDays, agoLabel, daysBetween, isoDate, monthDay, signedPct, won } from "./format"
 
 describe("won", () => {
   it("천 단위 쉼표, 원 단위 반올림", () => {
@@ -25,6 +25,10 @@ describe("날짜", () => {
   it("날짜 더하기", () => {
     expect(addDays("2026-10-23", -30)).toBe("2026-09-23")
     expect(addDays("2026-12-31", 1)).toBe("2027-01-01")
+  })
+
+  it("연 · 월 · 일 → 날짜 문자열", () => {
+    expect(isoDate({ year: 2026, month: 3, day: 5 })).toBe("2026-03-05")
   })
 
   it("얼마 전", () => {
