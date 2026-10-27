@@ -32,11 +32,8 @@ import {
 } from "../stores/scatter-store"
 import { useIsEaten } from "@/shared/eaten-store"
 import { FoodImage } from "./food-image"
+import { useDragGesture } from "./use-drag-gesture"
 
-/** 이만큼(px) 움직이기 전까지는 탭이다. */
-const TAP_SLOP = 6
-/** 손가락은 이만큼(ms) 누르고 있어야 끌기가 시작된다. 그 전에 움직이면 화면 스크롤이다. */
-const LONG_PRESS_MS = 250
 /** 이름표와 그림 아래 끝 사이 간격(그림 크기 대비). */
 const LABEL_GAP = 0.06
 /** 그림 아래 끝을 모르는 품종(그림 없음)의 기본값. 이름 카드(원)는 상자를 끝까지 채운다. */
@@ -44,23 +41,20 @@ const DEFAULT_BOTTOM = 1
 /** 판 위 달력의 처음 자리(오른쪽 아래): 오른쪽 끝에서 띄울 폭(판 폭 대비)과 아래 끝에서 띄울 높이(판 높이 대비). */
 const CALENDAR_INSET = { right: 0.02, bottom: 0.03 }
 
-type Gesture = {
+/** 끌고 있는 그림. 끌기 판단(탭 · 길게 누름 · 손가락 구분)은 useDragGesture가 한다. */
+type FoodDrag = {
   id: string
-  pointerId: number
   pointerType: string
-  startX: number
-  startY: number
   /** 그림 중심과 누른 점의 차이(프레임 px). 끄는 동안 그림이 손가락 아래에서 튀지 않게 한다. */
   grabX: number
   grabY: number
   from: Spots
   /** 끄는 동안 마지막으로 그린 자리. 놓을 때 이 자리를 저장한다. */
   spots: Spots
-  dragging: boolean
-  timer?: ReturnType<typeof setTimeout>
-  /** 이 제스처가 window에 건 리스너를 뗀다. 리스너는 렌더마다 새 함수라 건 쪽이 직접 들고 있는다. */
-  detach?: () => void
 }
+
+/** 끌고 있는 달력: 누를 때의 자리 · 크기(판 비율)와 누른 점(화면 px). */
+type CalendarDrag = { from: CalendarSpot; size: { width: number; height: number }; startX: number; startY: number; box: DOMRect; latest: CalendarSpot }
 
 /**
  * 흩어진 그림을 끌어 옮기는 판. 끄는 동안 주변 그림이 밀려나고(겹침 해소), 놓으면 배치를 기기에 저장한다.
@@ -113,21 +107,9 @@ export function DraggableScatter({
   const spots = live?.spots ?? rest
 
   const field = useRef<HTMLDivElement>(null)
-  const gesture = useRef<Gesture | null>(null)
+  const food = useRef<FoodDrag | null>(null)
   const suppressClick = useRef(false)
   const frameRequest = useRef(0)
-
-  // 끄는 동안 손가락 스크롤을 막는다. touchmove는 passive가 아니어야 preventDefault가 듣는다.
-  // window가 아니라 이 판에만 건다. 막는 리스너가 있는 곳의 스크롤은 메인 스레드를 기다리므로 범위를 좁힌다.
-  useEffect(() => {
-    const el = field.current
-    if (!el) return
-    const onTouchMove = (event: TouchEvent) => {
-      if (gesture.current?.dragging) event.preventDefault()
-    }
-    el.addEventListener("touchmove", onTouchMove, { passive: false })
-    return () => el.removeEventListener("touchmove", onTouchMove)
-  }, [])
 
   const toFrame = (clientX: number, clientY: number) => {
     const rect = field.current!.getBoundingClientRect()
@@ -135,97 +117,52 @@ export function DraggableScatter({
     return { x: (clientX - rect.left) / scale, y: (clientY - rect.top) / scale }
   }
 
-  const startDrag = (g: Gesture) => {
-    g.dragging = true
-    suppressClick.current = true
-    setLive({ spots: g.from, dragging: g.id })
-    if (g.pointerType === "touch") navigator.vibrate?.(8)
-  }
+  const foodGesture = useDragGesture({
+    onStart() {
+      const g = food.current!
+      suppressClick.current = true
+      setLive({ spots: g.from, dragging: g.id })
+      if (g.pointerType === "touch") navigator.vibrate?.(8)
+    },
+    onMove(clientX, clientY) {
+      const g = food.current!
+      const point = toFrame(clientX, clientY)
+      const to = { cx: (point.x - g.grabX) / frame.width, cy: (point.y - g.grabY) / frame.height }
+      // 한 프레임에 한 번만 계산한다.
+      cancelAnimationFrame(frameRequest.current)
+      frameRequest.current = requestAnimationFrame(() => {
+        g.spots = moveSpot({ seed, frame, spots: g.from, id: g.id, to })
+        setLive({ spots: g.spots, dragging: g.id })
+      })
+    },
+    onDrop() {
+      cancelAnimationFrame(frameRequest.current)
+      // 저장(스토어 갱신)은 setLive 갱신 함수 밖에서 한다. 갱신 함수 안에서 다른 상태를 바꾸면 렌더 중 갱신이 된다.
+      save(key, settleSpots({ seed, frame, spots: food.current!.spots }))
+      setLive(null)
+    },
+    onCancel() {
+      cancelAnimationFrame(frameRequest.current)
+      setLive(null)
+    },
+  })
 
-  const moveTo = (g: Gesture, clientX: number, clientY: number) => {
-    const point = toFrame(clientX, clientY)
-    const to = {
-      cx: (point.x - g.grabX) / frame.width,
-      cy: (point.y - g.grabY) / frame.height,
+  // 끄는 동안 손가락 스크롤을 막는다. touchmove는 passive가 아니어야 preventDefault가 듣는다.
+  // window가 아니라 이 판에만 건다. 막는 리스너가 있는 곳의 스크롤은 메인 스레드를 기다리므로 범위를 좁힌다.
+  useEffect(() => {
+    const el = field.current
+    if (!el) return
+    const onTouchMove = (event: TouchEvent) => {
+      if (foodGesture.isDragging()) event.preventDefault()
     }
-    // 한 프레임에 한 번만 계산한다.
-    cancelAnimationFrame(frameRequest.current)
-    frameRequest.current = requestAnimationFrame(() => {
-      g.spots = moveSpot({ seed, frame, spots: g.from, id: g.id, to })
-      setLive({ spots: g.spots, dragging: g.id })
-    })
-  }
-
-  const end = (commit: boolean) => {
-    const g = gesture.current
-    gesture.current = null
-    if (!g) return
-    clearTimeout(g.timer)
-    cancelAnimationFrame(frameRequest.current)
-    g.detach?.()
-    if (!g.dragging) return
-    // 저장(스토어 갱신)은 setLive 갱신 함수 밖에서 한다. 갱신 함수 안에서 다른 상태를 바꾸면 렌더 중 갱신이 된다.
-    if (commit) save(key, settleSpots({ seed, frame, spots: g.spots }))
-    setLive(null)
-  }
-
-  function onPointerMove(event: PointerEvent) {
-    const g = gesture.current
-    if (!g || event.pointerId !== g.pointerId) return
-    const distance = Math.hypot(
-      event.clientX - g.startX,
-      event.clientY - g.startY
-    )
-    if (!g.dragging) {
-      if (distance < TAP_SLOP) return
-      // 손가락은 길게 누르기 전에 움직이면 스크롤로 넘긴다.
-      if (g.pointerType === "touch") return end(false)
-      startDrag(g)
-    }
-    moveTo(g, event.clientX, event.clientY)
-  }
-  function onPointerUp() {
-    end(true)
-  }
-  function onPointerCancel() {
-    end(false)
-  }
-
-  const onPointerDown = (event: React.PointerEvent, id: string) => {
-    if (event.button !== 0 || gesture.current) return
-    suppressClick.current = false
-    const point = toFrame(event.clientX, event.clientY)
-    const center = spots.get(id)!
-    const g: Gesture = {
-      id,
-      pointerId: event.pointerId,
-      pointerType: event.pointerType,
-      startX: event.clientX,
-      startY: event.clientY,
-      grabX: point.x - center.cx * frame.width,
-      grabY: point.y - center.cy * frame.height,
-      from: spots,
-      spots,
-      dragging: false,
-    }
-    if (event.pointerType === "touch")
-      g.timer = setTimeout(
-        () => gesture.current === g && startDrag(g),
-        LONG_PRESS_MS
-      )
-    gesture.current = g
-    window.addEventListener("pointermove", onPointerMove)
-    window.addEventListener("pointerup", onPointerUp)
-    window.addEventListener("pointercancel", onPointerCancel)
-    g.detach = () => {
-      window.removeEventListener("pointermove", onPointerMove)
-      window.removeEventListener("pointerup", onPointerUp)
-      window.removeEventListener("pointercancel", onPointerCancel)
-    }
-  }
+    el.addEventListener("touchmove", onTouchMove, { passive: false })
+    return () => el.removeEventListener("touchmove", onTouchMove)
+  }, [foodGesture])
+  useEffect(() => () => cancelAnimationFrame(frameRequest.current), [])
 
   // 판 위 달력 끌기. 그림과 달리 겹침을 풀지 않고 판 안에만 가둔다. 그림은 항상 달력 위에 놓인다.
   const calendarRef = useRef<HTMLDivElement>(null)
+  const calendar = useRef<CalendarDrag | null>(null)
   const [calendarLive, setCalendarLive] = useState<CalendarSpot | null>(null)
   // 달력 폭은 시드가 비워 둔 오른쪽 자리(reserveRight)와 같다.
   const calendarWidth = (frame.reserveRight ?? 0) / frame.width
@@ -235,42 +172,58 @@ export function DraggableScatter({
     calendarLive ??
     (savedCalendar ? { ...savedCalendar, x: Math.min(savedCalendar.x, 1 - calendarWidth) } : null)
 
+  const calendarGesture = useDragGesture({
+    onStart() {
+      setCalendarLive(calendar.current!.from)
+    },
+    onMove(clientX, clientY) {
+      const c = calendar.current!
+      c.latest = clampCalendar({ x: c.from.x + (clientX - c.startX) / c.box.width, y: c.from.y + (clientY - c.startY) / c.box.height }, c.size)
+      setCalendarLive(c.latest)
+    },
+    onDrop() {
+      saveCalendar(key, calendar.current!.latest)
+      setCalendarLive(null)
+    },
+    onCancel() {
+      setCalendarLive(null)
+    },
+  })
+  const busy = () => foodGesture.isActive() || calendarGesture.isActive()
+
+  const onPointerDown = (event: React.PointerEvent, id: string) => {
+    if (event.button !== 0 || busy()) return
+    suppressClick.current = false
+    const point = toFrame(event.clientX, event.clientY)
+    const center = spots.get(id)!
+    food.current = {
+      id,
+      pointerType: event.pointerType,
+      grabX: point.x - center.cx * frame.width,
+      grabY: point.y - center.cy * frame.height,
+      from: spots,
+      spots,
+    }
+    foodGesture.begin(event, { waitForLongPress: true })
+  }
+
   const onCalendarPointerDown = (event: React.PointerEvent) => {
-    if (event.button !== 0 || gesture.current) return
+    if (event.button !== 0 || busy()) return
     const box = field.current!.getBoundingClientRect()
     const rect = calendarRef.current!.getBoundingClientRect()
     // 처음 자리(오른쪽 아래)에서 끌면 지금 그려진 위치를 왼쪽 위 기준 비율로 바꿔 시작한다.
-    const from = calendarSpot ?? {
-      x: (rect.left - box.left) / box.width,
-      y: (rect.top - box.top) / box.height,
+    const from = calendarSpot ?? { x: (rect.left - box.left) / box.width, y: (rect.top - box.top) / box.height }
+    calendar.current = {
+      from,
+      latest: from,
+      size: { width: calendarWidth, height: rect.height / box.height },
+      startX: event.clientX,
+      startY: event.clientY,
+      box,
     }
-    const startX = event.clientX
-    const startY = event.clientY
-    const size = { width: calendarWidth, height: rect.height / box.height }
-    let latest = from
-    const move = (e: PointerEvent) => {
-      latest = clampCalendar(
-        {
-          x: from.x + (e.clientX - startX) / box.width,
-          y: from.y + (e.clientY - startY) / box.height,
-        },
-        size
-      )
-      setCalendarLive(latest)
-    }
-    const up = () => {
-      window.removeEventListener("pointermove", move)
-      window.removeEventListener("pointerup", up)
-      window.removeEventListener("pointercancel", up)
-      saveCalendar(key, latest)
-      setCalendarLive(null)
-    }
-    window.addEventListener("pointermove", move)
-    window.addEventListener("pointerup", up)
-    window.addEventListener("pointercancel", up)
+    // 달력은 touch-none이라 손가락도 바로 끈다.
+    calendarGesture.begin(event, { waitForLongPress: false })
   }
-
-  useEffect(() => () => end(false), []) // eslint-disable-line react-hooks/exhaustive-deps -- 언마운트 정리
 
   return (
     <div
@@ -332,7 +285,7 @@ export function DraggableScatter({
               if (suppressClick.current) event.preventDefault()
             }}
             onContextMenu={(event) => {
-              if (gesture.current) event.preventDefault()
+              if (foodGesture.isActive()) event.preventDefault()
             }}
             className={cn(
               "absolute block text-ink no-underline [-webkit-touch-callout:none] hover:text-ink",
