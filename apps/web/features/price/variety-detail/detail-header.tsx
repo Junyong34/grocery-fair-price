@@ -129,7 +129,7 @@ function KeepButton({
     <button
       type="button"
       aria-pressed={added}
-      onClick={() => toggleBasket(variety, added)}
+      onClick={() => toggleBasket(variety)}
       className={cn(
         "h-9 shrink-0 rounded-full border px-3.5 text-sm font-semibold transition-colors",
         added

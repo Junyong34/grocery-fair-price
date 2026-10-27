@@ -16,7 +16,7 @@ import { routes } from "@/shared/routes"
 import { PriceHint, ROW_COLUMNS, VarietyRow } from "../components/variety-row"
 import { VerdictDot } from "../components/verdict-chip"
 import { VERDICT_TONE } from "../components/verdict-tone"
-import { useBasketHydrated, useBasketStore } from "../stores/basket-store"
+import { clearBasket, removeFromBasket, useBasketEntries, useBasketHydrated } from "../stores/basket-store"
 
 const COPY = PRICE_COPY.basket
 
@@ -26,13 +26,12 @@ const COPY = PRICE_COPY.basket
  */
 export function BasketView({ varieties }: { varieties: readonly VarietySummary[] }) {
   const hydrated = useBasketHydrated()
-  const entries = useBasketStore((state) => state.entries)
+  const entries = useBasketEntries()
   const [editingOn, setEditing] = useState(false)
   const view = basketView(varieties, entries)
   // 다 빼서 빈 목록이 되면 편집도 끝난다.
   const editing = editingOn && view.count > 0
   const surveyedOn = latestSurveyedOn(view.groups.flatMap((group) => group.items.map((item) => item.variety)))
-  const remove = (id: string) => useBasketStore.getState().remove(id)
 
   return (
     <div className="mx-auto flex max-w-[640px] flex-col gap-5 px-[18px] pt-4 lg:pt-10">
@@ -92,7 +91,7 @@ export function BasketView({ varieties }: { varieties: readonly VarietySummary[]
                       key={item.variety.id}
                       variety={item.variety}
                       // × 빼기는 편집 중에만 보인다. 열 자리는 남겨 다른 목록과 열 폭이 같다.
-                      action={editing ? <RemoveButton name={item.variety.name} onClick={() => remove(item.variety.id)} /> : undefined}
+                      action={editing ? <RemoveButton name={item.variety.name} onClick={() => removeFromBasket(item.variety.id)} /> : undefined}
                       footer={changedLine(item)}
                     />
                   ))}
@@ -104,7 +103,7 @@ export function BasketView({ varieties }: { varieties: readonly VarietySummary[]
             <button
               type="button"
               onClick={() => {
-                useBasketStore.setState({ entries: [] })
+                clearBasket()
                 setEditing(false)
               }}
               className="h-11 rounded-full border border-silver text-sm font-semibold text-verdict-pricey-ink hover:border-stone"

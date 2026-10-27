@@ -18,7 +18,7 @@ export function AddButton({ variety }: { variety: VarietySummary }) {
       type="button"
       aria-pressed={added}
       aria-label={added ? PRICE_COPY.row.remove(variety.name) : PRICE_COPY.row.add(variety.name)}
-      onClick={() => toggleBasket(variety, added)}
+      onClick={() => toggleBasket(variety)}
       className={cn(
         "grid size-9 place-items-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
         added ? "border-ink bg-ink text-canvas" : "border-silver bg-surface text-ink hover:border-stone"

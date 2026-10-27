@@ -11,7 +11,7 @@ import type { VarietySummary } from "@workspace/price/types"
 
 import { routes } from "@/shared/routes"
 
-import { useBasketStore } from "../stores/basket-store"
+import { addToBasket, basketEntries, removeFromBasket } from "../stores/basket-store"
 
 const TOAST_MS = 3200
 
@@ -77,10 +77,9 @@ function showBasketToast(message: string) {
   })
 }
 
-/** 담거나 뺀다. 담으면 토스트를 띄운다. */
-export function toggleBasket(variety: VarietySummary, added: boolean) {
-  const { add, remove } = useBasketStore.getState()
-  if (added) return remove(variety.id)
-  add(variety)
+/** 담았으면 빼고, 아니면 담고 토스트를 띄운다. 목록 행의 + 담기와 P3 헤더의 담기가 함께 쓴다. */
+export function toggleBasket(variety: VarietySummary) {
+  if (basketEntries().some((entry) => entry.id === variety.id)) return removeFromBasket(variety.id)
+  addToBasket(variety)
   showBasketToast(PRICE_COPY.toast.added(variety.name))
 }
