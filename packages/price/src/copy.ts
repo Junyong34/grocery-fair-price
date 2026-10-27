@@ -177,6 +177,9 @@ export const PRICE_COPY = {
     myPriceClear: "내가 본 가격 지우기",
     myPriceEdit: "다시 적기",
     myPriceVerdict: (price: string) => `내가 본 ${price}원은`,
+    myPriceCtaSub: "매장 가격을 평소가와 견줘 봐요",
+    myPriceLabel: (unit: string) => `내가 본 가격 · ${unit}`,
+    myPriceAgainstUsual: (diff: string, usual: string) => `${diff} · 평소가 ${usual}원`,
   },
   basket: {
     title: "담은 품종",

@@ -1,6 +1,6 @@
 "use client"
 
-import { X } from "lucide-react"
+import { ChevronRight, PencilLine, ReceiptText, X } from "lucide-react"
 import { useState } from "react"
 import { create } from "zustand"
 
@@ -8,9 +8,9 @@ import { InputAffix, InputControl, InputWrapper } from "@workspace/ui/components
 import { openBottomSheet } from "@workspace/ui/components/bottom-sheet"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { PRICE_COPY, verdictChip } from "@workspace/price/copy"
+import { PRICE_COPY, verdictChip, verdictDiff } from "@workspace/price/copy"
 import { won } from "@workspace/price/format"
-import type { VarietyDetail } from "@workspace/price/types"
+import type { VarietyDetail, Verdict } from "@workspace/price/types"
 import { verdictOf } from "@workspace/price/verdict"
 
 import { VERDICT_TONE } from "../components/verdict-tone"
@@ -26,7 +26,10 @@ export function useMyPrice(id: string): number | null {
   return useMyPriceStore((state) => (state.id === id ? state.price : null))
 }
 
-/** 하단 고정 "내가 본 가격 적기". 적은 뒤에는 그 가격의 판정을 보여 준다. */
+/**
+ * 하단 고정 "내가 본 가격 적기". 하단 내비 위에 뜬 알약 버튼이고, 가격을 적으면 같은 자리에 판정 카드가 뜬다.
+ * 카드는 흰 바탕 · 판정 색 띠 · 꽉 찬 판정 칩으로 배경(크림)과 확실히 구분한다.
+ */
 export function MyPriceBar({ detail }: { detail: VarietyDetail }) {
   const mine = useMyPrice(detail.id)
   const ask = async () => {
@@ -38,33 +41,95 @@ export function MyPriceBar({ detail }: { detail: VarietyDetail }) {
   }
   const verdict = mine == null ? null : verdictOf(mine, detail.usual, detail.band)
   return (
-    <div className="sticky bottom-[calc(max(14px,env(safe-area-inset-bottom))+66px)] z-10 lg:bottom-6">
-      <div className="flex items-center gap-2 rounded-full border border-silver/60 bg-canvas/95 p-1.5 shadow-lg shadow-ink/10 backdrop-blur-md">
-        {verdict && mine != null ? (
-          <>
-            <p className="flex min-w-0 flex-1 items-center gap-2 pl-3 text-sm text-ink">
-              <span className="truncate">{COPY.myPriceVerdict(won(mine))}</span>
-              <b className={cn("shrink-0 font-semibold", VERDICT_TONE[verdict.kind].ink)}>{verdictChip(verdict)}</b>
-            </p>
-            <button
-              type="button"
-              aria-label={COPY.myPriceClear}
-              onClick={() => useMyPriceStore.setState({ id: null, price: null })}
-              className="grid size-10 shrink-0 place-items-center rounded-full text-stone hover:text-ink"
-            >
-              <X aria-hidden size={18} />
-            </button>
-            <button type="button" onClick={ask} className="h-10 shrink-0 rounded-full bg-ink px-4 text-sm font-semibold text-canvas">
-              {COPY.myPriceEdit}
-            </button>
-          </>
-        ) : (
-          <button type="button" onClick={ask} className="h-11 flex-1 rounded-full bg-ink text-[15px] font-semibold text-canvas">
-            {COPY.myPrice}
-          </button>
-        )}
-      </div>
+    <div className="sticky bottom-[calc(max(14px,env(safe-area-inset-bottom))+70px)] z-10 flex justify-center lg:bottom-6">
+      {verdict?.pct != null && mine != null && detail.usual != null ? (
+        <MyPriceCard
+          // 값을 바꿀 때마다 다시 떠오르게
+          key={mine}
+          price={mine}
+          verdict={verdict}
+          usual={detail.usual}
+          unit={detail.baseUnit}
+          onEdit={ask}
+          onClear={() => useMyPriceStore.setState({ id: null, price: null })}
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={ask}
+          className="group flex h-14 items-center gap-3 rounded-full bg-ink py-2 pr-4 pl-2 text-left text-canvas shadow-xl shadow-ink/25 ring-1 ring-ink/5 transition-transform duration-150 ease-out active:scale-[0.97] motion-safe:animate-rise"
+        >
+          <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full bg-gold-soft text-espresso">
+            <ReceiptText size={19} strokeWidth={2} />
+          </span>
+          <span className="flex flex-col leading-tight">
+            <span className="text-[15px] font-semibold">{COPY.myPrice}</span>
+            <span className="text-xs text-canvas/65">{COPY.myPriceCtaSub}</span>
+          </span>
+          <ChevronRight
+            aria-hidden
+            size={18}
+            className="ml-1 text-canvas/50 transition-transform duration-200 group-hover:translate-x-0.5"
+          />
+        </button>
+      )}
     </div>
+  )
+}
+
+/** 적은 가격의 판정 카드: 큰 가격 · 꽉 찬 판정 칩 · 평소가 대비, 다시 적기와 지우기. */
+function MyPriceCard({
+  price,
+  verdict,
+  usual,
+  unit,
+  onEdit,
+  onClear,
+}: {
+  price: number
+  verdict: Verdict
+  usual: number
+  unit: string
+  onEdit: () => void
+  onClear: () => void
+}) {
+  const tone = VERDICT_TONE[verdict.kind]
+  return (
+    <section
+      aria-live="polite"
+      aria-label={COPY.myPriceTitle}
+      className="relative w-full overflow-hidden rounded-[22px] bg-surface shadow-xl shadow-ink/15 ring-1 ring-ink/8 motion-safe:animate-rise"
+    >
+      <span aria-hidden className={cn("absolute inset-y-0 left-0 w-1.5", tone.fill)} />
+      <div className="flex items-center gap-3 py-3 pr-3 pl-5">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <p className="text-xs font-medium text-caption">{COPY.myPriceLabel(unit)}</p>
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="font-number text-[24px] leading-none text-ink tabular-nums">{won(price)}원</span>
+            <span className={cn("rounded-full px-2.5 py-1 text-[13px] leading-none font-bold tabular-nums", tone.solid)}>
+              {verdictChip(verdict)}
+            </span>
+          </p>
+          <p className={cn("text-xs font-semibold", tone.ink)}>{COPY.myPriceAgainstUsual(verdictDiff(verdict.pct ?? 0), won(usual))}</p>
+        </div>
+        <button
+          type="button"
+          onClick={onEdit}
+          className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-ink px-3.5 text-[13px] font-semibold text-canvas transition-transform duration-150 ease-out active:scale-[0.97]"
+        >
+          <PencilLine aria-hidden size={14} />
+          {COPY.myPriceEdit}
+        </button>
+      </div>
+      <button
+        type="button"
+        aria-label={COPY.myPriceClear}
+        onClick={onClear}
+        className="absolute top-1.5 right-1.5 grid size-7 place-items-center rounded-full text-mute hover:bg-canvas hover:text-ink"
+      >
+        <X aria-hidden size={14} />
+      </button>
+    </section>
   )
 }
 

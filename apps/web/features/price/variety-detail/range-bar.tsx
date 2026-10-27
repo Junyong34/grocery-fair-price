@@ -62,7 +62,13 @@ export function RangeBar({ detail }: { detail: VarietyDetail }) {
         {/* 시세 핀 */}
         <Pin x={x(detail.price)} className={VERDICT_TONE[detail.verdict.kind].fill} label={COPY.rangePin(won(detail.price))} above />
         {mine != null && mineVerdict && (
-          <Pin x={x(mine)} ring className={VERDICT_TONE[mineVerdict.kind].border} label={COPY.rangeMine(won(mine))} />
+          <Pin
+            x={x(mine)}
+            ring
+            className={VERDICT_TONE[mineVerdict.kind].border}
+            labelClassName={VERDICT_TONE[mineVerdict.kind].solid}
+            label={COPY.rangeMine(won(mine))}
+          />
         )}
       </div>
       <div className="flex justify-between gap-2 text-xs text-caption tabular-nums">
@@ -78,7 +84,22 @@ export function RangeBar({ detail }: { detail: VarietyDetail }) {
   )
 }
 
-function Pin({ x, label, className, above, ring }: { x: number; label: string; className: string; above?: boolean; ring?: boolean }) {
+function Pin({
+  x,
+  label,
+  className,
+  labelClassName,
+  above,
+  ring,
+}: {
+  x: number
+  label: string
+  className: string
+  /** 이름표 색. 없으면 위 핀은 잉크, 아래 핀은 흰 바탕 */
+  labelClassName?: string
+  above?: boolean
+  ring?: boolean
+}) {
   return (
     <>
       <span
@@ -93,7 +114,8 @@ function Pin({ x, label, className, above, ring }: { x: number; label: string; c
       <span
         className={cn(
           "absolute -translate-x-1/2 rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap tabular-nums",
-          above ? "top-0 bg-ink text-canvas" : "top-[52px] border border-silver bg-surface text-ink"
+          above ? "top-0" : "top-[52px] shadow-sm",
+          labelClassName ?? (above ? "bg-ink text-canvas" : "border border-silver bg-surface text-ink")
         )}
         style={{ left: labelLeft(x) }}
       >
