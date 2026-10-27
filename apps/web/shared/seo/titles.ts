@@ -15,7 +15,16 @@ function names(foods: readonly Food[]): string {
   return foods.map((food) => food.name).join("·")
 }
 
+/** 서비스 메인(P1 시세 메인) */
 export function homeSeo(): PageSeo {
+  return {
+    title: "오늘 식재료 시세 · 지금 사도 될까",
+    description: "배추·삼겹살·계란, 오늘 조사한 시세를 이맘때 평소 가격과 견줘 싸요·보통·비싸요로 알려 드려요. KAMIS 전국 조사 시장 기준.",
+  }
+}
+
+/** 제철 메인(2a 이달) */
+export function seasonalHomeSeo(): PageSeo {
   return {
     title: "제철 음식 달력",
     description: "언제 뭐가 맛있을까? 이달의 제철 식재료부터 열두 달·사계절·명절 제철 음식까지 달력으로 확인해 보세요.",

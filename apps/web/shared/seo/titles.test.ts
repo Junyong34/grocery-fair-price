@@ -5,10 +5,11 @@ import { findFood, FOODS } from "@workspace/seasonal/data/foods"
 import { MONTHS } from "@workspace/seasonal/data/months"
 import { SEASONS } from "@workspace/seasonal/data/seasons"
 
-import { festivalSeo, foodSeo, homeSeo, monthSeo, monthsIndexSeo, seasonSeo, seasonsIndexSeo } from "./titles"
+import { festivalSeo, foodSeo, homeSeo, seasonalHomeSeo, monthSeo, monthsIndexSeo, seasonSeo, seasonsIndexSeo } from "./titles"
 
 const all = [
   homeSeo(),
+  seasonalHomeSeo(),
   monthsIndexSeo(),
   ...MONTHS.map(monthSeo),
   seasonsIndexSeo(),
@@ -19,7 +20,8 @@ const all = [
 
 describe("페이지 제목·설명", () => {
   it("검색어 모양의 제목을 만든다", () => {
-    expect(homeSeo().title).toBe("제철 음식 달력")
+    expect(homeSeo().title).toBe("오늘 식재료 시세 · 지금 사도 될까")
+    expect(seasonalHomeSeo().title).toBe("제철 음식 달력")
     expect(monthsIndexSeo().title).toBe("월별 제철 음식")
     expect(monthSeo(3).title).toBe("3월 제철 음식")
     expect(seasonsIndexSeo().title).toBe("계절별 제철 음식")

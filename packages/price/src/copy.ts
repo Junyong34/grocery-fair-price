@@ -58,6 +58,9 @@ export function basisLine(basis: QuoteBasis, surveyedOn: string, n: number): str
   return `${basis.scope} ${n}곳 · ${monthDay(surveyedOn)} 조사 (${basis.source})`
 }
 
+/** 목록 시세의 출처. 목록 행은 모두 KAMIS 전국 조사 시장 시세다. */
+export const LIST_BASIS: QuoteBasis = { source: "KAMIS", scope: "전국 조사 시장" }
+
 /** 목록 아래 근거 한 줄: "시세는 10/23 조사 · KAMIS 전국 조사 시장" */
 export function listBasisLine(basis: QuoteBasis, surveyedOn: string): string {
   return `시세는 ${monthDay(surveyedOn)} 조사 · ${basis.source} ${basis.scope}`

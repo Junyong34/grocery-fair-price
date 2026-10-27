@@ -11,7 +11,7 @@
 | **제철달력** (언제 뭐가 맛있을까): 열두 달·사계절·명절별 제철 품종, 먹음 기록 | MVP 화면 개발 중. `.scratch/seasonal-mvp/` 티켓 13개 가운데 11개 끝남 | `apps/web`의 `/seasonal`, `packages/seasonal` |
 | **식자재 시세 판정 서비스** (가칭, "이 애호박 2,980원, 비싼 건가?") | 로드맵 ① 수집 기반 진행 중 (Supabase + GitHub Actions). 화면 코드는 ④에서 `apps/web`에 | `grocery-price/` 문서, `.scratch/ingest-foundation`, `.scratch/p2~p4-*`, `.scratch/search-first-view` |
 
-두 제품은 같은 Next.js 앱(`apps/web`)에 들어간다. 지금은 `/`가 제철달력으로 넘어가고, 가격 비교 메인이 생기면 `/`를 그 화면으로 바꾼다.
+두 제품은 같은 Next.js 앱(`apps/web`)에 들어간다. `/`는 가격 화면의 P1 시세 메인이고(2026-10-27), 제철달력은 `/seasonal` 아래에 있다. 헤더 · 하단 내비는 둘이 같이 쓴다(`shared/shell`).
 
 전체 서비스의 브랜드 이름은 **장볼날**이다(2026-10-16 확정). ‘장볼’은 식료품을 고르는 장보기를, ‘날’은 제철·달력·계절·명절로 이어지는 시간을 뜻한다. `제철달력`은 제철 콘텐츠 이름으로 유지한다. 이름의 의미와 로고 서체 검토는 `apps/web/docs/brand-assets.md`에 기록한다.
 
@@ -98,7 +98,7 @@ import 경로:
 
 | URL | 화면 | 라우트 파일 | 화면 컴포넌트 |
 |---|---|---|---|
-| `/` | 서비스 메인 자리 | `app/page.tsx` | `routes.home`(`/seasonal`)으로 307 |
+| `/` | P1 시세 메인 | `(price)/page.tsx` | `features/price/home/home-view` |
 | `/seasonal` | 2a 이달 · 12개월 스크롤 | `seasonal/(this-month)/page.tsx` | `this-month/this-month-view` |
 | `/seasonal/months` | 2b 열두 달 카드 목록 | `seasonal/(this-month)/months/page.tsx` | `month-timeline/months-index` |
 | `/seasonal/months/[month]` | 2b 그 달 상세 (1~12) | `seasonal/(this-month)/months/(detail)/[month]/page.tsx` | `month-timeline/month-view`, 레이아웃에 `month-timeline` |
@@ -115,10 +115,11 @@ import 경로:
 | `/api/og` | 공유 미리보기 이미지 1200×630 | `app/api/og/route.tsx` | 쿼리 `title`, `subtitle`, `badge`, `season` |
 | `/sitemap.xml`, `/robots.txt` | 검색 색인 | `app/sitemap.ts`, `app/robots.ts` | `shared/seo/pages.ts` 레지스트리, 색인 스위치 |
 
-표의 화면 컴포넌트 경로는 `apps/web/features/seasonal/` 기준이다. 모든 경로는 `apps/web/shared/routes.ts`의 `routes`로 만든다. 2a의 특정 달은 해시 `routes.seasonal.rootAt(month)`(`/seasonal#month-N`)로 연다.
+표의 화면 컴포넌트 경로는 가격 화면(P1~P4)은 `apps/web/`, 제철 화면은 `apps/web/features/seasonal/` 기준이다. 가격 화면 명세는 `.scratch/price-screens/spec.md`. 모든 경로는 `apps/web/shared/routes.ts`의 `routes`로 만든다. 2a의 특정 달은 해시 `routes.seasonal.rootAt(month)`(`/seasonal#month-N`)로 연다.
 
 라우팅 장치:
 
+- **`app/(price)/layout.tsx`**: 가격 화면(`/`, `/search`, `/prices/*`, `/basket`)의 셸(`features/price/components/price-shell`: 공통 셸 + 가격 메뉴 + 기기 저장 store 불러오기). 데이터는 `features/price/data/price-source.ts`의 `getPriceSource()`로만 읽는다.
 - **`app/seasonal/layout.tsx`**: `TodayProvider`(서울 오늘 Promise)와 `SeasonalShell`(헤더, 하단 Floating Nav, 검색, ⚙ 설정. 공유 버튼은 헤더가 아니라 월별·계절·명절·품종 상세의 제목 줄과, 이달(모바일)의 월 레일 아래에 있다)을 깐다. `sheet` 슬롯을 받는다.
 - **라우트 그룹** `(this-month)`과 `(season)`: URL을 바꾸지 않고 2차 탭 바(`ThisMonthTabs`, `SeasonTabs`)를 나눠 쓴다. `(detail)` 그룹은 2b 타임라인을 그 달 상세에만 붙인다. 타임라인과 명절 칩은 레이아웃에 두어 달·명절을 바꿔도 가로 스크롤 위치가 남는다.
 - **`@sheet` 병렬 슬롯**: `(.)foods/[food]`가 품종 상세를 가로채 시트로 띄운다. `default.tsx`, `page.tsx`, `[...catchAll]`은 null을 그려 다른 곳으로 이동하면 시트가 닫힌다. 새 제철 라우트를 더해도 `@sheet`는 고칠 것이 없다.
@@ -181,6 +182,17 @@ import 경로:
 
 에디션 원본은 `apps/web/print-editions/<id>.json`, 생성 기록은 `<id>.build.json`, 결과 PDF와 매니페스트는 `apps/web/public/downloads/`에 있다. 에디션 JSON·생성 기록·매니페스트는 커밋하고, PDF는 용량이 커서 `.gitignore`로 뺀다. PDF를 둘 곳을 정하기 전까지는 에디션을 공개하지 않는다(매니페스트가 비어 있어야 운영 링크가 깨지지 않는다).
 
+### 4.3-1 features/price
+
+가격 화면(시세 · 판정). 명세 `.scratch/price-screens/spec.md`, 도메인은 `@workspace/price`.
+
+| 폴더 | 내용 |
+|---|---|
+| `data/` | 데이터 경계. `price-source.ts`(`PriceSource`, `getPriceSource()`, `server-only`)만 화면이 부른다. `fixture-source.ts`와 `fixtures/`는 하드코딩 데이터이고, 다음 단계에서 `supabase-source.ts`가 대신한다. `data-boundary.test.ts`가 `data/` 밖의 `fixtures` import를 막는다 |
+| `home/` | P1 시세 메인 |
+| `components/` | 품종 행(`variety-row`: 네 열 subgrid, 가격 두 줄, 설명 한 줄), 판정 칩 · 점(`verdict-chip`, 색은 `verdict-tone`), `add-button`, `search-entry`, `recent-varieties`, `price-shell` |
+| `stores/` | `basket-store`(`price:basket`, 담을 때 판정 · 조사일), `recent-store`(`price:recent`), `price-stores`(마운트 뒤 불러오기) |
+
 ### 4.4 shared
 
 | 파일 | 내용 |
@@ -202,6 +214,7 @@ import 경로:
 |---|---|---|---|
 | 서울 오늘 | `shared/today.ts` → `TodayProvider` → `useToday()` | 없음 (요청마다 서버 계산) | 렌더 중 `new Date()`를 부르지 않는다 |
 | 먹음 기록 | `shared/eaten-store.ts` | localStorage `seasonal:eaten` | 앱 전체가 쓴다 |
+| 담은 품종 · 최근 본 품종 | `features/price/stores/` | localStorage `price:basket` · `price:recent` | 가격 영역 레이아웃이 불러온다 |
 | ⚙ 표시 설정 (공휴일, 먹은 품종, 달력 모양) | `features/seasonal/stores/settings-store.ts` | localStorage `seasonal:settings` | |
 | 흩어진 배치·달력 자리 | `features/seasonal/stores/scatter-store.ts` | localStorage `seasonal:scatter` | 키는 `(달, 화면 구간)` |
 | 2b 열 수 | `features/seasonal/month-timeline/view-store.ts` | 없음 | 달을 바꿔도 유지 |

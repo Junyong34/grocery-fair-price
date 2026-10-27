@@ -9,7 +9,7 @@
 | `shared/seo/pages.ts` | 색인 정책의 단일 출처. 모든 페이지를 `SEO_PAGES`(색인·sitemap), `NOINDEX_ROUTES`, `REDIRECT_ROUTES` 가운데 하나에 등록한다 |
 | `shared/seo/pages.test.ts` | 가드 테스트. `app/**/page.tsx`가 위 셋 가운데 어디에도 없으면 `pnpm test`가 실패한다 |
 | `shared/seo/route-pattern.ts` | page 파일 경로 → 라우트 패턴. 라우트 그룹 `(x)`는 지우고, `@slot`·가로채기 라우트는 뺀다 |
-| `app/seasonal/(this-month)/page.tsx` | 홈의 `WebSite`·`Organization` JSON-LD. `routes.home`이 바뀌면 새 홈 페이지로 옮긴다 |
+| `app/(price)/page.tsx` | 홈(`routes.home`, P1 시세 메인)의 `WebSite`·`Organization` JSON-LD. 홈이 바뀌면 새 홈 페이지로 옮긴다 |
 | `shared/seo/indexing.ts` | 색인 스위치 `isIndexable()`, 소유 확인 메타 `searchVerification()` |
 | `shared/seo/json-ld.tsx` | `<JsonLd>`, `website()`, `organization()`, `breadcrumb()` |
 | `shared/seo/titles.ts` | 페이지 종류별 `<title>`·description 패턴(`homeSeo()`, `monthSeo()`, `foodSeo()` …). 페이지는 `createMetadata({ ...xxxSeo(), path, ogImage })`로 쓴다 |

@@ -8,9 +8,9 @@ import { isIndexable } from "./seo/indexing"
 // 주소는 여기 두지 않는다. 브라우저는 환경 변수를 서버와 똑같이 읽을 수 없어서 siteUrl()(서버)과 location.origin(브라우저)으로 나눈다.
 export const SITE_CONFIG = {
   name: "장볼날",
-  titleDefault: "장볼날 - 언제 뭐가 맛있을까",
+  titleDefault: "장볼날 - 지금 사도 될까, 언제 뭐가 맛있을까",
   titleTemplate: "%s | 장볼날",
-  description: "장볼날에서 열두 달과 사계절, 우리 땅에서 가장 맛있는 제철 식재료와 명절 절식을 찾아보세요.",
+  description: "장볼날에서 오늘 식재료 시세가 평소보다 싼지 비싼지 확인하고, 열두 달과 사계절 제철 식재료와 명절 절식을 찾아보세요.",
   locale: "ko_KR",
 } as const
 

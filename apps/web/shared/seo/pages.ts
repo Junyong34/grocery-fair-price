@@ -22,6 +22,8 @@ export type SitemapEntry = {
  * 동적 세그먼트는 generateStaticParams와 같은 목록을 펼친다. 키의 오타는 가드 테스트가 잡는다.
  */
 export const SEO_PAGES: Readonly<Record<string, () => readonly SitemapEntry[]>> = {
+  // P1 시세 메인
+  "/": () => [{ path: routes.home }],
   "/seasonal": () => [{ path: routes.seasonal.root }],
   "/seasonal/months": () => [{ path: routes.seasonal.months }],
   "/seasonal/months/[month]": () => MONTHS.map((month) => ({ path: routes.seasonal.month(month) })),
@@ -51,10 +53,8 @@ export const NOINDEX_ROUTES: readonly string[] = [
 ]
 
 /** 다른 페이지로 보내기만 하는 라우트. sitemap에 넣지 않는다. */
-export const REDIRECT_ROUTES: readonly string[] = [
-  // 서비스 메인 자리. 지금은 routes.home으로 307. 가격 비교 메인이 생기면 SEO_PAGES로 옮긴다.
-  "/",
-]
+// 지금은 없다. "/"는 2026-10-27부터 P1 시세 메인이다.
+export const REDIRECT_ROUTES: readonly string[] = []
 
 export type SeoPolicy = "index" | "noindex" | "redirect"
 

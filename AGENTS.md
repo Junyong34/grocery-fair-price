@@ -18,8 +18,8 @@ Naming or classifying foods (카테고리, 품목, 품종, 규격) anywhere in t
 
 Full map (every route, module, generated file, command, and doc): `docs/project-structure.md`. Read it before adding a route, package, script, or generated file, or when a task spans more than one package.
 
-- `apps/web`: the Next.js app, 제철달력 (seasonal food calendar). The price-comparison screens will join it later.
-- `packages/seasonal`, `packages/ui`: domain and design-system layers of the app (see "Web app UI").
+- `apps/web`: the Next.js app: the price screens (시세 · 판정, at `/`) and 제철달력 (seasonal food calendar, at `/seasonal`). Header and bottom nav are shared (`shared/shell`).
+- `packages/seasonal`, `packages/price`, `packages/ui`: domain (제철, 가격) and design-system layers of the app (see "Web app UI").
 - `supabase/`, `packages/price-db`: the price DB. Migrations (schema `price`, roles `ingest_writer`·`web_reader`, RLS) are the source of truth for table definitions; `packages/price-db` holds the DB tests, sample test data and the ERD generator.
 - `grocery-price/`: design docs and public price API research for the price service. Collection code (Supabase + GitHub Actions) starts in stage ① of the roadmap; screens join `apps/web` in stage ④.
 - `prototypes/`: illustration source, wireframes, brand originals. Gitignored, so a fresh clone lacks it. Keep it out of commits (no force-add).
@@ -61,9 +61,10 @@ Layers. Each one may import only from the layers below it:
 | Layer | Where | What goes there |
 |---|---|---|
 | App routes | `apps/web/app/` | Route files only (`page`, `layout`, `@slot`, route groups), plus `api/og` (share image), `sitemap.ts` and `robots.ts`. The `/examples/*` design comparison pages the specs cite were deleted on 2026-10-16; read them in git history (`git show 22520eb:apps/web/app/examples/<name>/page.tsx`). Keep routes thin: validate params, set metadata, render a feature component. |
-| Features | `apps/web/features/<feature>/` | One folder per screen (`seasonal/this-month`, `month-timeline`, `seasons`, `festivals`, `my-table`, `food-detail`, `search`). `components/` holds parts several screens share (shell, nav, `FoodImage`, scatter); `stores/` holds the feature's zustand stores. Features don't import each other; shared code moves down a layer. |
+| Features | `apps/web/features/<feature>/` | One folder per screen (`seasonal/this-month`, `month-timeline`, `seasons`, `festivals`, `my-table`, `food-detail`, `search`; `price/home`, `search`, `variety-detail`, `basket`). `components/` holds parts several screens share (shell, nav, `FoodImage`, scatter); `stores/` holds the feature's zustand stores. Features don't import each other; shared code moves down a layer. |
 | App shared | `apps/web/shared/` | App-wide pieces: `routes.ts`, `providers.tsx`, `meta.ts`, `today.ts` + `today-context.tsx`, `eaten-store.ts`, `brand-logo.tsx`. |
 | Domain | `packages/seasonal` (`@workspace/seasonal`) | Pure TypeScript: `data/` (품종, months, seasons, festivals, copy), `calendar/` (calendar cells, holidays, lunar, Seoul today), `layout/` (seeded scatter), `search/` (초성 match). No React, Next.js or DOM. The MVP-later print pages reuse it. |
+| Domain | `packages/price` (`@workspace/price`) | Pure TypeScript for the price screens: `types` (what screens read), `verdict` (`verdictOf`), `search`, `format`, `list`, `copy`. No React, Next.js or DOM. |
 | Design system | `packages/ui` (`@workspace/ui`) | Oura tokens, cojeev UI, and generic components such as `BottomSheet`. No domain words. |
 
 Import with package paths, such as `@workspace/ui/components/button` and `@workspace/seasonal/data/months`. Inside `apps/web`, use `@/features/...` and `@/shared/...`.
@@ -89,7 +90,7 @@ Add cojeev or shadcn components from the repo root with `pnpm ui:add <name-or-ur
 
 ### Routes
 
-- The 제철 screens live under `/seasonal`. `/` is reserved for the future price-comparison main. Today `app/page.tsx` redirects to `routes.home`. When the price main ships, replace that page and leave the seasonal routes where they are.
+- The 제철 screens live under `/seasonal`. `/` is the price main (P1, `app/(price)/page.tsx`); the price screens (`/`, `/search`, `/prices/[variety]`, `/basket`) share the route group `(price)`. Spec: `.scratch/price-screens/spec.md`. Price screens read data only through `getPriceSource()` in `features/price/data/price-source.ts`, never `fixtures/` directly.
 - Build every path with `routes` from `apps/web/shared/routes.ts`. `proxy.ts` `matcher` is the one hard-coded path, because it must be a static literal; keep it in sync with `routes`.
 - Route groups `(this-month)` and `(season)` share the second-level tab bars without changing the URL. `(this-month)/months/(detail)` adds the 2b timeline only to `/seasonal/months/[month]`.
 - `/seasonal/festivals` has no page: `proxy.ts` redirects it to the upcoming festival by Seoul date.
