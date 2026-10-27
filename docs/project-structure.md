@@ -195,7 +195,7 @@ import 경로:
 | `home/` | P1 시세 메인 |
 | `search/` | P2 품종 검색. 검색어는 `history.replaceState`로 `?q=`에 맞춘다 |
 | `basket/` | P4 담은 품종: 판정별 개수, 바뀐 판정 알림, 판정별 묶음, × 빼기, 편집(모두 빼기), 빈 목록. 기기 값을 불러온 뒤에 그린다 |
-| `variety-detail/` | P3 품종 상세: `detail-header`(뒤로 · 담기, 최근 본 품종에 넣기), `verdict-card`(판정 전 · 오래됨 · 표본 적음), `range-bar`, `places-section`(장소 비교, 판정 색 없음), `why-section`(`trend-chart` SVG + `dots-compare`), `my-price`(내가 본 가격, 저장 안 함) |
+| `variety-detail/` | P3 품종 상세: `detail-header`(뒤로 · 담기, 최근 본 품종에 넣기. 모바일에서 제목 줄이 헤더 밑으로 사라지면 `DetailHeaderBar`가 로고 자리를 "‹ 품종 · 담기"로 바꾼다), `verdict-card`(판정 전 · 오래됨 · 표본 적음), `range-bar`, `places-section`(장소 비교, 판정 색 없음), `why-section`(`trend-chart` SVG + `dots-compare`), `my-price`(내가 본 가격, 저장 안 함) |
 | `components/` | 품종 행(`variety-row`: 네 열 subgrid, 가격 두 줄, 설명 한 줄), 판정 칩 · 점(`verdict-chip`, 색은 `verdict-tone`), `add-button`, `basket-toast`(담기 토스트 "배추를 담았어요 · 목록 보기", 화면 키보드 위로), `basket-badge`(내비 담은 개수), `search-entry`, `recent-varieties`, `price-shell` |
 | `stores/` | `basket-store`(`price:basket`, 담을 때 판정 · 조사일), `recent-store`(`price:recent`), `price-stores`(마운트 뒤 불러오기) |
 
@@ -211,7 +211,7 @@ import 경로:
 | `today.ts` | `getSeoulToday()`: `server-only`. `connection()` 뒤에 서울 오늘을 계산하고 React `cache`로 요청당 한 번 |
 | `today-context.tsx` | `TodayProvider`, `useToday()`: 서버가 만든 Promise를 클라이언트가 `use()`로 읽는다. `<Suspense>` 안에서만 |
 | `eaten-store.ts` | 먹음 기록: 연도 → 품종 id 목록. localStorage `seasonal:eaten` |
-| `shell/` | 가격과 제철이 같이 쓰는 셸: `site-shell`(헤더 + 본문 + 하단 내비), `site-nav`(`SiteHeader`, `FloatingNav`. 내비 칸 72px), `menus`(영역별 메뉴 설정: 가격 = 시세 · 제철달력 · 담은 품종, 제철 = 시세 · 제철달력 · 계절 · 나의 식탁), `nav-link`(활성 판정). 메뉴 배지(담은 개수)는 영역 레이아웃이 `badges`로 넣는다 |
+| `shell/` | 가격과 제철이 같이 쓰는 셸: `site-shell`(헤더 + 본문 + 하단 내비), `site-nav`(`SiteHeader`, `FloatingNav`. 내비 칸 72px. 화면별 모바일 헤더 타입은 `HeaderBar`가 헤더의 바 자리에 포털로 그린다), `menus`(영역별 메뉴 설정: 가격 = 시세 · 제철달력 · 담은 품종, 제철 = 시세 · 제철달력 · 계절 · 나의 식탁), `nav-link`(활성 판정). 메뉴 배지(담은 개수)는 영역 레이아웃이 `badges`로 넣는다 |
 | `brand-logo.tsx` | 고운돋움 Regular를 패스로 만든 장볼날 가로 로고. 모바일에서 접힌 헤더는 심볼만 보여준다 |
 
 ## 5. 상태와 "오늘"

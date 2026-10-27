@@ -1,7 +1,7 @@
 import { basisLine } from "@workspace/price/copy"
 import type { VarietyDetail } from "@workspace/price/types"
 
-import { DetailHeader } from "./detail-header"
+import { DetailHeader, DetailHeaderBar } from "./detail-header"
 import { DotsCompare } from "./dots-compare"
 import { MyPriceBar } from "./my-price"
 import { PlacesSection } from "./places-section"
@@ -17,6 +17,7 @@ export function DetailView({ detail, today }: { detail: VarietyDetail; today: st
   return (
     <article className="mx-auto flex max-w-[640px] flex-col gap-7 px-[18px] pt-3 lg:pt-8">
       <DetailHeader variety={detail} />
+      <DetailHeaderBar variety={detail} />
       <VerdictCard detail={detail} today={today} />
       <RangeBar detail={detail} />
       <PlacesSection detail={detail} />
