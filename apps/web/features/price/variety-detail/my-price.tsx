@@ -54,12 +54,12 @@ export function MyPriceBar({ detail }: { detail: VarietyDetail }) {
         <button
           type="button"
           onClick={ask}
-          // 크림 배경과 구분되게 브랜드 초록(forest)으로 채운다. 검정은 쓰지 않는다(2026-10-27 사용자 결정).
-          className="flex h-11 w-full items-center gap-2.5 rounded-full bg-forest px-[18px] text-left text-canvas shadow-lg shadow-forest/30 transition-transform duration-150 ease-out active:scale-[0.98] motion-safe:animate-rise"
+          // 크림 배경과 구분되게 브랜드 강조색(gold)으로 채운다. 검정 · 초록은 쓰지 않는다(2026-10-27 사용자 결정).
+          className="flex h-11 w-full items-center gap-2.5 rounded-full bg-gold px-[18px] text-left text-surface shadow-lg shadow-gold/35 transition-transform duration-150 ease-out active:scale-[0.98] motion-safe:animate-rise"
         >
           <PenLine aria-hidden size={18} strokeWidth={1.9} className="shrink-0" />
           <span className="flex-1 text-[15px] font-semibold">{COPY.myPrice}</span>
-          <span className="shrink-0 text-[12.5px] text-canvas/75">{COPY.myPriceUnit(detail.baseUnit)}</span>
+          <span className="shrink-0 text-[12.5px] text-surface/85">{COPY.myPriceUnit(detail.baseUnit)}</span>
         </button>
       )}
     </div>
@@ -104,7 +104,7 @@ function MyPriceCard({
         <button
           type="button"
           onClick={onEdit}
-          className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-forest px-3.5 text-[13px] font-semibold text-canvas transition-transform duration-150 ease-out active:scale-[0.97]"
+          className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-gold px-3.5 text-[13px] font-semibold text-surface transition-transform duration-150 ease-out active:scale-[0.97]"
         >
           <PencilLine aria-hidden size={14} />
           {COPY.myPriceEdit}
