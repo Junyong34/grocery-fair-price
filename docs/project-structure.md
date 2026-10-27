@@ -350,7 +350,7 @@ grocery-price/
 │  ├─ 00-overview/           product-concept.md, roadmap.md (4단계: 수집 기반·판정 설계·화면 설계·구현)
 │  ├─ 10-research/           api-spec.md (API 실측), gov-price-sites (정부 가격 화면 대조), public-data-survey, data-sourcing-legal, content-and-taxonomy, images, supabase-skills
 │  ├─ 20-domain/             domain-model.md
-│  ├─ 30-data/               pipeline.md (저장 구조, 테이블, 수집 일정, 장애 처리), variety-list.md (품종 목록), schema-map.html (데이터 지도, ERD는 pnpm db:erd가 생성)
+│  ├─ 30-data/               pipeline.md (저장 구조, 테이블, 수집 일정, 장애 처리), judgment.md (평소가·판정 계산), variety-list.md (품종 목록), schema-map.html (데이터 지도, ERD는 pnpm db:erd가 생성)
 │  └─ adr/                   0001 공공데이터와 제보, 크롤링 안 함 · 0002 Supabase + GitHub Actions
 └─ reference/public-data/
    ├─ kamis/, ekape/         원본 API 명세·코드표
