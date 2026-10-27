@@ -10,6 +10,9 @@
       ],
       "@workspace/seasonal/*": [
         "../../packages/seasonal/src/*"
+      ],
+      "@workspace/price/*": [
+        "../../packages/price/src/*"
       ]
     },
     "plugins": [

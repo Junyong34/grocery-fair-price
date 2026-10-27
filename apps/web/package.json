@@ -13,6 +13,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@workspace/price": "workspace:*",
     "@workspace/seasonal": "workspace:*",
     "@workspace/ui": "workspace:*",
     "lucide-react": "^1.55.0",

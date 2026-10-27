@@ -24,6 +24,7 @@ grocery-fair-price/
 ├─ apps/web/                 Next.js 16.4 앱 (제철달력, 나중에 가격 비교)
 ├─ packages/
 │  ├─ seasonal/              @workspace/seasonal: 제철 도메인 (순수 TS, React 없음)
+│  ├─ price/                 @workspace/price: 가격 화면 도메인 (화면 모양, 판정, 검색, 문구. 순수 TS)
 │  ├─ ui/                    @workspace/ui: Oura 토큰, cojeev UI, 범용 컴포넌트
 │  ├─ price-db/              @workspace/price-db: 가격 DB 마이그레이션 검증 테스트, 샘플 테스트 데이터, 용량 실측, ERD 생성
 │  ├─ price-ingest/          @workspace/price-ingest: 공공 API 3개의 호출 모듈, 응답 계약 테스트, 실측 기준 (8-2)
@@ -62,6 +63,7 @@ apps/web/features   화면 컴포넌트·훅 (features끼리는 import하지 않
 apps/web/shared     앱 전역: routes, providers, meta, today, eaten-store, brand-logo
    ↓
 packages/seasonal   도메인: 품종·달·계절·명절·달력·배치·검색 (React·Next·DOM 없음)
+packages/price      가격 화면 도메인: 화면이 읽는 모양·판정·검색·문구 (React·Next·DOM 없음)
 packages/ui         디자인 시스템: 토큰, cojeev, 범용 컴포넌트 (도메인 단어 없음)
 ```
 
@@ -71,7 +73,7 @@ import 경로:
 
 - 패키지는 파일 경로로 가져온다: `@workspace/seasonal/data/foods`, `@workspace/ui/components/button`. `packages/seasonal`의 `exports`가 `"./*": "./src/*.ts"`라 배럴 파일이 없다.
 - `apps/web` 안에서는 `@/features/...`, `@/shared/...`.
-- `apps/web/next.config.ts`의 `transpilePackages`가 두 패키지를 빌드 없이 소스로 읽는다.
+- `apps/web/next.config.ts`의 `transpilePackages`가 세 패키지(`ui`, `seasonal`, `price`)를 빌드 없이 소스로 읽는다.
 
 ## 4. apps/web
 
@@ -237,6 +239,20 @@ import 경로:
 
 테스트는 `*.test.ts`가 옆에 있다(vitest, 8개 파일). `packages/seasonal/README.md`도 참고한다.
 
+## 6-1. packages/price
+
+가격 화면(시세 · 판정)의 도메인. `packages/seasonal`과 같은 모양이다(순수 TypeScript, `exports: "./*": "./src/*.ts"`). 의존성: `es-hangul`. 화면 명세는 `.scratch/price-screens/spec.md`.
+
+| 모듈 | 내용 |
+|---|---|
+| `types.ts` | 화면이 읽는 모양: `VarietySummary`(목록 행, 뷰 `current_judgment` 열), `VarietyDetail`(상세, `judgment_snapshot.payload`), `Verdict`, `VerdictBand`, `PlaceQuote`, `TrendPoint`, `SearchIndex` |
+| `verdict.ts` | `verdictOf(price, usual, band)`: 평소가 대비 반올림 % 와 싸요 · 보통 · 비싸요. 평소가가 없으면 판정 전. "내가 본 가격"도 이 함수 |
+| `search.ts` | `searchVarieties`: 별칭 → 품목("어떤 호박인가요?") → 이름 · 초성 · 품목 · 별칭 일부 → 한 글자 오타 |
+| `format.ts` | 원 표시, 날짜 문자열("YYYY-MM-DD") 계산, "2주 전" |
+| `copy.ts` | 화면 문구, 판정 칩 · 차이 문구, 받침에 맞는 조사(`withJosa`) |
+
+테스트는 `*.test.ts`가 옆에 있다(vitest).
+
 ## 7. packages/ui
 
 | 경로 | 내용 |
@@ -320,9 +336,9 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 |---|---|
 | `pnpm dev` | `next dev` (apps/web) |
 | `pnpm build` | `next build` |
-| `pnpm typecheck` | 세 패키지 `tsc --noEmit` |
+| `pnpm typecheck` | 패키지마다 `tsc --noEmit` |
 | `pnpm lint` | ESLint (2026-10-15 기준 0 오류, `packages/ui` 경고 4건) |
-| `pnpm test` | vitest: `packages/seasonal`, `packages/ui`, `packages/price-ingest`(오프라인), `apps/web`(SEO 가드 포함) |
+| `pnpm test` | vitest: `packages/seasonal`, `packages/price`, `packages/ui`, `packages/price-ingest`(오프라인), `apps/web`(SEO 가드 포함) |
 | `pnpm format` | Prettier |
 | `pnpm ui:add <name-or-url>` | cojeev·shadcn 컴포넌트를 `packages/ui`에 설치 |
 | `pnpm foods:sync` / `pnpm foods:bounds` | 일러스트 동기화 / 그림 아래 끝 재측정 |
