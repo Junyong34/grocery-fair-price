@@ -25,9 +25,12 @@ import { cn } from "@workspace/ui/lib/utils"
 import { routes } from "@/shared/routes"
 
 import {
+  resetScatter,
+  saveCalendar,
+  saveSpots,
   scatterKey,
-  useHydrateScatter,
-  useScatterStore,
+  useSavedCalendar,
+  useSavedSpots,
   type CalendarSpot,
 } from "../stores/scatter-store"
 import { useIsEaten } from "@/shared/eaten-store"
@@ -80,14 +83,10 @@ export function DraggableScatter({
   year: number
   className?: string
 }) {
-  useHydrateScatter()
   const frame: ScatterFrame = SCATTER_FRAMES[frameName]
   const key = scatterKey(month, frameName)
-  const saved = useScatterStore((state) => state.layouts[key])
-  const save = useScatterStore((state) => state.save)
-  const reset = useScatterStore((state) => state.reset)
-  const savedCalendar = useScatterStore((state) => state.calendars?.[key])
-  const saveCalendar = useScatterStore((state) => state.saveCalendar)
+  const saved = useSavedSpots(key)
+  const savedCalendar = useSavedCalendar(key)
 
   const byId = useMemo(
     () => new Map<string, Food>(foods.map((food) => [food.id, food])),
@@ -138,7 +137,7 @@ export function DraggableScatter({
     onDrop() {
       cancelAnimationFrame(frameRequest.current)
       // 저장(스토어 갱신)은 setLive 갱신 함수 밖에서 한다. 갱신 함수 안에서 다른 상태를 바꾸면 렌더 중 갱신이 된다.
-      save(key, settleSpots({ seed, frame, spots: food.current!.spots }))
+      saveSpots(key, settleSpots({ seed, frame, spots: food.current!.spots }))
       setLive(null)
     },
     onCancel() {
@@ -315,7 +314,7 @@ export function DraggableScatter({
       {(saved || (savedCalendar && !frame.reserveBottom)) && !live && (
         <button
           type="button"
-          onClick={() => reset(key)}
+          onClick={() => resetScatter(key)}
           className={cn(
             "absolute z-20 flex items-center gap-1 rounded-full border border-hairline bg-canvas/90 px-2.5 py-1 text-xs text-stone backdrop-blur hover:text-ink",
             // 달 판은 오른쪽 아래가 달력 자리라 왼쪽 아래에 둔다.

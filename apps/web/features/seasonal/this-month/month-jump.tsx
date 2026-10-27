@@ -6,7 +6,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import { formatMonthLabel, MONTHS } from "@workspace/seasonal/data/months"
 
 import { ShareButton } from "../components/share-button"
-import { useSettingsStore } from "../stores/settings-store"
+import { useSettings } from "../stores/settings-store"
 
 import { jumpToMonth, useActiveMonth } from "./active-month"
 
@@ -33,7 +33,7 @@ export function JumpButton({
  */
 export function MonthRail() {
   const active = useActiveMonth((state) => state.active)
-  const labelStyle = useSettingsStore((state) => state.monthLabel)
+  const labelStyle = useSettings((state) => state.monthLabel)
   return (
     <div className="fixed top-1/2 right-1 z-(--z-sticky) -translate-y-1/2 lg:hidden">
       <nav

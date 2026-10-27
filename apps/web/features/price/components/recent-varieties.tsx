@@ -8,12 +8,12 @@ import type { VarietySummary } from "@workspace/price/types"
 
 import { routes } from "@/shared/routes"
 
-import { useRecentStore } from "../stores/recent-store"
+import { clearRecent, useRecentIds } from "../stores/recent-store"
 import { VerdictDot } from "./verdict-chip"
 
 /** 최근 본 품종 id를 목록 행으로. 기기 저장이라 하이드레이션 뒤에 채워진다. */
 export function useRecentVarieties(varieties: readonly VarietySummary[]): VarietySummary[] {
-  const ids = useRecentStore((state) => state.ids)
+  const ids = useRecentIds()
   return pickByIds(varieties, ids)
 }
 
@@ -29,7 +29,7 @@ export function RecentPills({ varieties }: { varieties: readonly VarietySummary[
         </h2>
         <button
           type="button"
-          onClick={() => useRecentStore.getState().clear()}
+          onClick={clearRecent}
           className="text-xs text-caption underline-offset-2 hover:text-ink hover:underline"
         >
           {PRICE_COPY.home.clearRecent}

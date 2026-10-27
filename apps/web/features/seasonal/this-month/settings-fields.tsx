@@ -11,17 +11,17 @@ import { formatMonthLabel, MONTH_LABEL_STYLES } from "@workspace/seasonal/data/m
 
 import { routes } from "@/shared/routes"
 
-import { useSettingsStore } from "../stores/settings-store"
+import { setSettings, useSettings } from "../stores/settings-store"
 import { CalendarStylePicker } from "./calendar-style-picker"
 
 /** ⚙ 표시 설정 내용(명세 4절. 24절기 표시는 MVP 밖). 맨 아래에 PDF 내려받기 화면으로 가는 링크가 있다. */
 export function SettingsFields({ onNavigate }: { onNavigate?: () => void }) {
-  const { showHolidays, showEaten, calendarStyle, monthLabel, set } = useSettingsStore()
+  const { showHolidays, showEaten, calendarStyle, monthLabel } = useSettings((state) => state)
   return (
     <div className="flex flex-col divide-y divide-hairline">
       <CalendarStylePicker
         value={calendarStyle}
-        onChange={(value) => set({ calendarStyle: value })}
+        onChange={(value) => setSettings({ calendarStyle: value })}
       />
       <div className="flex items-center justify-between gap-4 py-3">
         <span className="flex flex-col">
@@ -32,20 +32,20 @@ export function SettingsFields({ onNavigate }: { onNavigate?: () => void }) {
           aria-label="달 이름"
           options={MONTH_LABEL_OPTIONS}
           value={monthLabel}
-          onValueChange={(value) => set({ monthLabel: value })}
+          onValueChange={(value) => setSettings({ monthLabel: value })}
         />
       </div>
       <SettingRow
         label="공휴일 표시"
         hint="달력의 공휴일 이름과 빨간 날짜(토·일은 늘 빨강)"
         checked={showHolidays}
-        onChange={(value) => set({ showHolidays: value })}
+        onChange={(value) => setSettings({ showHolidays: value })}
       />
       <SettingRow
         label="먹은 음식 표시"
         hint="제철 그림의 ✓"
         checked={showEaten}
-        onChange={(value) => set({ showEaten: value })}
+        onChange={(value) => setSettings({ showEaten: value })}
       />
       <Link href={routes.seasonal.downloads} onClick={onNavigate} className="flex items-center justify-between gap-4 py-3 text-[15px] text-ink">
         {DOWNLOADS_COPY.settingsLink}

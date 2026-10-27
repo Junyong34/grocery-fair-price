@@ -6,7 +6,7 @@ import { UI_COPY } from "@workspace/seasonal/data/copy"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
-import { useEatenStore, useIsEaten } from "@/shared/eaten-store"
+import { toggleEaten, useIsEaten } from "@/shared/eaten-store"
 import { useToday } from "@/shared/today-context"
 
 /**
@@ -81,7 +81,6 @@ function DetailToggle({ foodId }: { foodId: string }) {
 function Toggle({ foodId }: { foodId: string }) {
   const { year } = useToday()
   const eaten = useIsEaten(year, foodId)
-  const toggle = useEatenStore((state) => state.toggle)
   // 켤 때마다 key를 바꿔 "+1"을 다시 띄운다.
   const [pops, setPops] = useState(0)
 
@@ -93,7 +92,7 @@ function Toggle({ foodId }: { foodId: string }) {
         aria-pressed={eaten}
         onClick={() => {
           if (!eaten) setPops((n) => n + 1)
-          toggle(year, foodId)
+          toggleEaten(year, foodId)
         }}
       >
         {eaten ? UI_COPY.eatToggleOn : UI_COPY.eatToggleOff}

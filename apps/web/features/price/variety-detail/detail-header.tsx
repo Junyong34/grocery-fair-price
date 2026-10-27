@@ -15,7 +15,7 @@ import { HeaderBar } from "@/shared/shell/site-nav"
 import { toggleBasket } from "../components/basket-toast"
 import { varietySub } from "../components/variety-row"
 import { useInBasket } from "../stores/basket-store"
-import { useRecentStore } from "../stores/recent-store"
+import { visitVariety } from "../stores/recent-store"
 
 const COPY = PRICE_COPY.detail
 
@@ -24,12 +24,7 @@ const TITLE_ATTR = "data-detail-title"
 
 /** P3 본문 맨 위 줄: ‹ 뒤로 · 품종 이름 · 규격 · 기준 단위 · + 담기 / ✓ 담음. 연 품종을 최근 본 품종에 넣는다. */
 export function DetailHeader({ variety }: { variety: VarietySummary }) {
-  useEffect(() => {
-    // 기기 저장 값을 불러온 뒤에 넣어야 불러오기가 덮어쓰지 않는다.
-    const visit = () => useRecentStore.getState().visit(variety.id)
-    if (useRecentStore.persist.hasHydrated()) visit()
-    else return useRecentStore.persist.onFinishHydration(visit)
-  }, [variety.id])
+  useEffect(() => visitVariety(variety.id), [variety.id])
 
   return (
     <div {...{ [TITLE_ATTR]: "" }} className="flex items-center gap-2">

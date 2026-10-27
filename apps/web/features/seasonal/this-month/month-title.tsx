@@ -2,7 +2,7 @@
 
 import { formatMonthLabel } from "@workspace/seasonal/data/months"
 
-import { useSettingsStore } from "../stores/settings-store"
+import { useSettings } from "../stores/settings-store"
 
 /**
  * 큰 달 숫자(달 섹션 제목, 데스크톱 패널). ⚙의 달 이름 표기를 따른다.
@@ -18,7 +18,7 @@ export function MonthTitle({
   suffixClassName?: string
   englishClassName?: string
 }) {
-  const style = useSettingsStore((state) => state.monthLabel)
+  const style = useSettings((state) => state.monthLabel)
   if (style === "english") return <span className={englishClassName}>{formatMonthLabel(month, style, "long")}</span>
   if (style === "number") return formatMonthLabel(month, style)
   return (

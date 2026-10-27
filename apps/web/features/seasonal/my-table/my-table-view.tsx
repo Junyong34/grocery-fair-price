@@ -17,7 +17,7 @@ import { Segmented } from "@workspace/ui/components/segmented"
 import { cn } from "@workspace/ui/lib/utils"
 import { ScrollRow } from "@workspace/ui/components/scroll-row"
 
-import { useEatenIds, useEatenStore } from "@/shared/eaten-store"
+import { toggleEaten, useEatenIds } from "@/shared/eaten-store"
 import { useToday } from "@/shared/today-context"
 
 import { FoodRow } from "./food-row"
@@ -37,7 +37,6 @@ import {
 export function MyTableView() {
   const { year, month: thisMonth } = useToday()
   const eaten = useEatenIds(year)
-  const toggle = useEatenStore((state) => state.toggle)
 
   const [query, setQuery] = useState("")
   const [mode, setMode] = useState<FilterMode>("month")
@@ -66,7 +65,7 @@ export function MyTableView() {
   const listEaten = list.filter((food) => eaten.has(food.id)).length
 
   const onToggle = (food: Food) => {
-    toggle(year, food.id)
+    toggleEaten(year, food.id)
   }
 
   // 차트에서 다른 방식의 범위를 고르는 일은 없지만, 방식과 범위가 어긋나지 않게 함께 맞춘다.

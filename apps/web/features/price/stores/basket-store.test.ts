@@ -1,6 +1,8 @@
-import { beforeEach, describe, expect, it } from "vitest"
+import { beforeAll, beforeEach, describe, expect, it } from "vitest"
 
 import type { VarietySummary, VerdictKind } from "@workspace/price/types"
+
+import { rehydrateDeviceStores } from "@/shared/device-store"
 
 import { addToBasket, basketEntries, clearBasket, removeFromBasket } from "./basket-store"
 
@@ -21,6 +23,7 @@ const row = (id: string, kind: VerdictKind, surveyedOn = "2026-10-23"): VarietyS
 })
 
 describe("담은 품종", () => {
+  beforeAll(() => rehydrateDeviceStores())
   beforeEach(() => clearBasket())
 
   it("담은 순서대로, 담을 때의 판정과 그 판정의 조사일을 남긴다", () => {

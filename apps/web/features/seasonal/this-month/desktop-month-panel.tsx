@@ -6,7 +6,7 @@ import { OptionWheel, type OptionWheelItem } from "@workspace/ui/components/opti
 
 import { formatMonthLabel } from "@workspace/seasonal/data/months"
 
-import { useSettingsStore } from "../stores/settings-store"
+import { useSettings } from "../stores/settings-store"
 import { MonthTitle } from "./month-title"
 
 import { jumpToMonth, useActiveMonth } from "./active-month"
@@ -31,7 +31,7 @@ export function DesktopMonthPanel({
 }) {
   const active = useActiveMonth((state) => state.active)
   const shown = months[(active ?? thisMonth) - 1]!
-  const labelStyle = useSettingsStore((state) => state.monthLabel)
+  const labelStyle = useSettings((state) => state.monthLabel)
 
   const items: OptionWheelItem[] = [
     { id: "now", label: `지금 · ${formatMonthLabel(thisMonth, labelStyle)}`, description: "맨 위 이번 달 장면" },

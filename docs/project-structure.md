@@ -197,7 +197,7 @@ import 경로:
 | `basket/` | P4 담은 품종: 판정별 개수, 바뀐 판정 알림, 판정별 묶음, × 빼기, 편집(모두 빼기), 빈 목록. 기기 값을 불러온 뒤에 그린다 |
 | `variety-detail/` | P3 품종 상세: `detail-header`(뒤로 · 담기, 최근 본 품종에 넣기. 모바일에서 제목 줄이 헤더 밑으로 사라지면 `DetailHeaderBar`가 로고 자리를 "‹ 품종 · 담기"로 바꾼다), `verdict-card`(판정 전 · 오래됨 · 표본 적음), `range-bar`, `places-section`(장소 비교, 판정 색 없음), `why-section`(`trend-chart` SVG + `dots-compare`), `my-price`(내가 본 가격, 저장 안 함) |
 | `components/` | 품종 행(`variety-row`: 네 열 subgrid, 가격 두 줄, 설명 한 줄), 판정 칩 · 점(`verdict-chip`, 색은 `verdict-tone`), `add-button`, `basket-toast`(담기 토스트 "배추를 담았어요 · 목록 보기", 화면 키보드 위로), `basket-badge`(내비 담은 개수), `search-entry`, `recent-varieties`, `price-shell` |
-| `stores/` | `basket-store`(`price:basket`, 담을 때 판정 · 조사일), `recent-store`(`price:recent`), `price-stores`(마운트 뒤 불러오기) |
+| `stores/` | `basket-store`(`price:basket`, 담을 때 판정 · 조사일), `recent-store`(`price:recent`) |
 
 ### 4.4 shared
 
@@ -205,12 +205,13 @@ import 경로:
 |---|---|
 | `routes.ts` | 앱의 모든 경로 |
 | `print-screen.ts` | `/print` 화면의 용지 둘레 여백(`PRINT_SCREEN_GUTTER`). `print.css`(CSS 변수 `--print-gutter`)와 어드민 미리보기 크기 계산이 함께 쓴다 |
-| `providers.tsx` | `TooltipProvider`, `OverlayProvider`(overlay-kit). 마운트 뒤 먹음 기록을 불러온다 |
+| `providers.tsx` | `TooltipProvider`, `OverlayProvider`(overlay-kit). 마운트 뒤 기기 저장 store를 모두 불러온다(`rehydrateDeviceStores`) |
+| `device-store.ts` | `deviceStore(키, 기본값, { version, migrate })`: 기기(localStorage) 저장 store를 만든다. 불러오기 전에 쓴 값은 불러온 값 위에 얹는다. 노드(서버 · 테스트)에서는 메모리 저장소 |
 | `meta.ts` | `SITE_CONFIG`(사이트 이름 "장볼날"), `siteUrl()`, `absoluteUrl()`, `createMetadata()`, `ogImagePath()` |
 | `seo/` | 검색 색인: `pages.ts`(색인 레지스트리. 품종 상세처럼 목록을 데이터 입구에서 읽는 라우트는 `DATA_SEO_PAGES`에 두고 `app/sitemap.ts`가 펼친다)와 가드 테스트, `indexing.ts`(색인 스위치·소유 확인), `json-ld.tsx`(구조화 데이터), `titles.ts`(검색용 제목·설명), `route-pattern.ts` |
 | `today.ts` | `getSeoulToday()`: `server-only`. `connection()` 뒤에 서울 오늘을 계산하고 React `cache`로 요청당 한 번 |
 | `today-context.tsx` | `TodayProvider`, `useToday()`: 서버가 만든 Promise를 클라이언트가 `use()`로 읽는다. `<Suspense>` 안에서만 |
-| `eaten-store.ts` | 먹음 기록: 연도 → 품종 id 목록. localStorage `seasonal:eaten` |
+| `eaten-store.ts` | 먹음 기록: 연도 → 품종 id 목록. localStorage `seasonal:eaten`. `toggleEaten`, `useEatenIds`, `useIsEaten` |
 | `shell/` | 가격과 제철이 같이 쓰는 셸: `site-shell`(헤더 + 본문 + 하단 내비), `site-nav`(`SiteHeader`, `FloatingNav`. 내비 칸 72px. 화면별 모바일 헤더 타입은 `HeaderBar`가 헤더의 바 자리에 포털로 그린다), `menus`(영역별 메뉴 설정: 가격 = 시세 · 제철달력 · 담은 품종, 제철 = 시세 · 제철달력 · 계절 · 나의 식탁), `nav-link`(활성 판정). 메뉴 배지(담은 개수)는 영역 레이아웃이 `badges`로 넣는다 |
 | `brand-logo.tsx` | 고운돋움 Regular를 패스로 만든 장볼날 가로 로고. 모바일에서 접힌 헤더는 심볼만 보여준다 |
 
@@ -220,12 +221,12 @@ import 경로:
 |---|---|---|---|
 | 서울 오늘 | `shared/today.ts` → `TodayProvider` → `useToday()` | 없음 (요청마다 서버 계산) | 렌더 중 `new Date()`를 부르지 않는다 |
 | 먹음 기록 | `shared/eaten-store.ts` | localStorage `seasonal:eaten` | 앱 전체가 쓴다 |
-| 담은 품종 · 최근 본 품종 | `features/price/stores/` | localStorage `price:basket` · `price:recent` | 가격 영역 레이아웃이 불러온다 |
+| 담은 품종 · 최근 본 품종 | `features/price/stores/` | localStorage `price:basket` · `price:recent` | |
 | ⚙ 표시 설정 (공휴일, 먹은 품종, 달력 모양) | `features/seasonal/stores/settings-store.ts` | localStorage `seasonal:settings` | |
 | 흩어진 배치·달력 자리 | `features/seasonal/stores/scatter-store.ts` | localStorage `seasonal:scatter` | 키는 `(달, 화면 구간)` |
 | 2b 열 수 | `features/seasonal/month-timeline/view-store.ts` | 없음 | 달을 바꿔도 유지 |
 
-저장하는 store는 모두 zustand `persist` + `skipHydration: true`다. 서버 HTML과 첫 클라이언트 렌더는 기본값으로 같게 그리고, 마운트 뒤 `persist.rehydrate()`로 기기 값을 불러온다. 그래서 ✓와 개수는 하이드레이션 뒤에 나타난다.
+저장하는 store는 모두 `shared/device-store.ts`의 `deviceStore`로 만든다(안은 zustand `persist` + `skipHydration`). 서버 HTML과 첫 클라이언트 렌더는 기본값으로 같게 그리고, `Providers`가 마운트 뒤 한 번에 기기 값을 불러온다. 그래서 ✓와 개수는 하이드레이션 뒤에 나타난다. 자식 effect가 `Providers`보다 먼저 돌아 불러오기 전에 쓰는 일(최근 본 품종 넣기)이 있어, 그런 쓰기는 불러온 값 위에 얹는다. store 모듈은 store를 내보내지 않고 훅과 함수만 내보낸다.
 
 정적 데이터(품종, 달, 계절, 명절, 공휴일)는 모듈 상수라 빌드 때 HTML에 들어간다. 요청 시점에 그리는 것은 "오늘"에 따라 달라지는 부분(2a 히어로, 1h)뿐이다.
 
