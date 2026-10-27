@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { DEFAULT_SPECS, LAYOUTS, MONTHLY_COVERS, parsePrintSpec, PRINT_KINDS } from "@workspace/seasonal/print/spec"
+import { DEFAULT_SPECS, LAYOUTS, MONTHLY_COVERS, parsePrintSpec, PRINT_KINDS, type PrintSpec } from "@workspace/seasonal/print/spec"
 
 import { wireframeOf, wireframesOf } from "../lib/wireframe-catalog"
 
@@ -229,3 +229,18 @@ describe("구성 썸네일 표(선택지 → 와이어프레임 안)", () => {
   })
 })
 
+
+describe("품종 개수 상한", () => {
+  const foodsMax = (spec: PrintSpec) => {
+    const field = KIND_SECTIONS[spec.kind].flatMap((section) => section.fields).find((f) => f.path.join(".") === "foods.max")!
+    const shown = shownField(field, spec)
+    return shown.type === "number" ? shown.max : undefined
+  }
+
+  it("월별 포스터 원형 판·한 줄 체크는 판 크기 상한까지만 고른다(구성 정의 foodsCap)", () => {
+    const poster = DEFAULT_SPECS["month-poster"]
+    expect(foodsMax({ ...poster, layout: "cells" })).toBe(12)
+    expect(foodsMax({ ...poster, layout: "wheel" })).toBe(4)
+    expect(foodsMax({ ...poster, layout: "rows-check" })).toBe(6)
+  })
+})

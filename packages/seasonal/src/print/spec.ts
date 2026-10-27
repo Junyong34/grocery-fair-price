@@ -4,6 +4,7 @@ import { CALENDAR_VARIANTS } from "../calendar/variants"
 import { FOODS, type FoodCategory } from "../data/foods"
 import { MONTHS, type Month } from "../data/months"
 import { SEASONS } from "../data/seasons"
+import { layoutDef, LAYOUTS } from "./layouts"
 import { MONTH_LABEL_FONTS, MONTH_LABEL_FRAMES, MONTH_LABEL_PALETTES, MONTH_LABEL_SIZES, PRINT_MONTH_LABELS } from "./month-label"
 
 // PDF 인쇄 사양(.scratch/calendar-print/spec.md "데이터 모양"). 같은 사양이면 언제나 같은 PDF가 나온다.
@@ -95,16 +96,8 @@ const calendar = <H extends z.ZodEnum>(holidays: H) =>
 
 const year = z.number().int().min(2020).max(2100)
 
-// 구성(layout): 종류마다 값 하나가 와이어프레임 안 하나다(apps/web/features/admin-print/lib/wireframe-catalog.ts).
-// 용지 방향에 따라 갈리는 모양은 하위 옵션 없이 orientation으로 정한다. 안을 실제로 구현할 때마다 값을 더한다.
-
-/** 종류마다 구성(layout) 값. 편집기의 구성 썸네일 표가 이 값을 모두 덮는지 테스트한다. 값은 스키마 주석의 와이어프레임 안 하나씩이다. */
-export const LAYOUTS = {
-  monthly: ["scatter", "grid", "none", "side-check", "strip", "allover"],
-  "year-sheet": ["pairs", "hero-top", "chart"],
-  "season-poster": ["bands", "quarters", "wheel", "per-season"],
-  "month-poster": ["cells", "chart", "wheel", "rows-check"],
-} as const satisfies Record<PrintKind, readonly string[]>
+// 구성(layout) 값과 정의(이름, 와이어프레임 안, 세로 전용, 품종 상한, 읽지 않는 옵션)는 layouts.ts 한 곳에 있다.
+export { LAYOUTS } from "./layouts"
 
 /** 월간 12개월 묶음 표지 값 */
 export const MONTHLY_COVERS = ["none", "year", "months", "chart"] as const
@@ -166,14 +159,6 @@ const monthPosterSchema = z.object({
   categories,
 })
 
-/** 세로 용지에서만 되는 구성. 가로 용지에서는 칸이 너무 좁거나 낮아진다. */
-const PORTRAIT_ONLY: { [K in PrintKind]: readonly string[] } = {
-  monthly: ["side-check"],
-  "year-sheet": ["hero-top"],
-  "season-poster": [],
-  "month-poster": ["rows-check"],
-}
-
 /**
  * 1차 구현(2026-10-16) 때 저장된 월간 사양을 지금 모양으로 옮긴다. foodLayout → layout, cover 참·거짓 → "year"·"none".
  * 나머지 종류의 빠진 layout은 스키마의 default가 채운다. 저장된 JSON은 고치지 않고, 다음 저장 때 새 모양으로 써진다.
@@ -191,7 +176,7 @@ const printSpecSchema = z.preprocess(
   z.discriminatedUnion("kind", [monthlySchema, yearSheetSchema, seasonPosterSchema, monthPosterSchema]).refine((spec) => !("grid" in spec && spec.grid === "2x6" && spec.orientation === "landscape"), {
     message: "가로 용지에 2x6 배열은 칸이 너무 작다",
   })
-  .refine((spec) => spec.orientation === "portrait" || !PORTRAIT_ONLY[spec.kind].includes(spec.layout), {
+  .refine((spec) => spec.orientation === "portrait" || !layoutDef(spec).portraitOnly, {
     message: "이 구성은 세로 용지만 된다",
   }),
 )

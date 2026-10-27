@@ -181,7 +181,7 @@ import 경로:
 | `wireframes/` | `wireframe`(안 하나를 SVG로. 옵션 고르기의 미리보기로 쓸 수 있다), `wireframe-gallery`(`/admin/wireframes`) |
 | `board/` | `/admin` 목록. 서버 컴포넌트(`admin-board`, `edition-board`, `kind-group`, `edition-row`) |
 | `new-edition/` | 새 에디션 3단계 폼(`new-edition-form`, `kind-picker`, `form-step`) |
-| `editor/` | `/admin/edit`. `use-edition-editor`(편집본·저장·생성을 들고 있고, 판단은 `lib/flow`의 `editionDraft`)와 화면 조각(`editor-header`, `edition-steps`, `generated-files`, `options-panel`·`option-field`·`option-fields`(종류별 옵션 표. `option-fields.test`가 표의 값이 사양 스키마와 맞는지 본다), `listing-panel`, `preview-panel`·`print-preview`) |
+| `editor/` | `/admin/edit`. `use-edition-editor`(편집본·저장·생성을 들고 있고, 판단은 `lib/flow`의 `editionDraft`)와 화면 조각(`editor-header`, `edition-steps`, `generated-files`, `options-panel`·`option-field`·`option-fields`(종류별 옵션 표. 구성 선택지와 구성별로 숨기는 옵션 · 품종 수 상한은 `print/layouts.ts`에서 읽는다. `option-fields.test`가 표의 값이 사양 스키마와 맞는지 본다), `listing-panel`, `preview-panel`·`print-preview`) |
 
 에디션 원본은 `apps/web/print-editions/<id>.json`, 생성 기록은 `<id>.build.json`, 결과 PDF와 매니페스트는 `apps/web/public/downloads/`에 있다. 에디션 JSON·생성 기록·매니페스트는 커밋하고, PDF는 용량이 커서 `.gitignore`로 뺀다. PDF를 둘 곳을 정하기 전까지는 에디션을 공개하지 않는다(매니페스트가 비어 있어야 운영 링크가 깨지지 않는다).
 
@@ -253,6 +253,7 @@ import 경로:
 | `layout/scatter.ts` | 흩어진 배치. 시드 난수(LCG)로 같은 입력이면 같은 결과, 0..1 정규화 좌표, 화면 구간(`SCATTER_FRAMES`)별 고정 비율 |
 | `layout/arrangement.ts` | 시드 뒤의 판 위 자리: 저장된 배치 병합(`restingSpots`), 끄는 동안(`moveSpot`)·놓은 뒤(`settleSpots`) 겹침 풀기, 판 위 달력 가두기. 시드와 같은 그림+이름표 겹침 규칙 |
 | `search/match-foods.ts` | 이름·별칭·초성 검색 |
+| `print/layouts.ts` | 인쇄물 구성(layout) 정의 한 곳: 종류별 구성 값(`LAYOUTS`)과 값마다 이름 · 와이어프레임 안 코드 · 세로 전용 · 품종 판 크기 상한 · 읽지 않는 옵션(`LAYOUT_DEFS`), `layoutReads`, `foodsPerCell`. 스키마 · 어드민 편집 폼 · 품종 고르기가 여기서 읽는다. 새 구성은 이 파일과 종류별 화면에 더한다 |
 | `print/spec.ts` | 인쇄 사양 `PrintSpec`(종류별 유니언, zod 파서), `PAPERS`, `sheetSize`(방향 반영 용지 mm), `pageCount`(결과 PDF 쪽 수, 사양·용지마다 파일 하나), 종류별 기본값, URL 인코딩, 해시 |
 | `print/edition.ts` | 에디션, 다운로드 경로, 매니페스트 |
 | `print/foods.ts` | 인쇄물 칸(달·계절)에 넣을 품종 고르기 |

@@ -3,19 +3,19 @@ import { bestMonth, familiarity } from "../data/food-familiarity"
 import { FOODS, isDrawn, isPeak, type Food, type FoodCategory } from "../data/foods"
 import { MONTHS, orderSeasonMonths } from "../data/months"
 import { seasonOfMonth, startSeason, type Season } from "../data/seasons"
+import { foodsPerCell } from "./layouts"
 import type { MonthlySpec, MonthPosterSpec, SeasonPosterSpec, YearSheetSpec } from "./spec"
 
 // 인쇄물 칸(달·계절)에 넣을 품종 고르기. 화면은 칸 함수에 사양만 넘기고, 칸마다 몇 개를 어떤 차례로 넣을지, 그림이 없는 품종을 넣을지는 여기서 정한다.
 // 인쇄물에는 그림이 있는 품종만 넣는다(이름 카드는 종이에서 빈 원으로 보인다). 예외는 이름만 적는 체크 목록이다.
 
-/** 칸당 품종 상한 가운데 사양(foods.max)이 아니라 판 크기에서 정한 것. 값마다 근거는 그 판의 글자·그림 크기다. */
+/**
+ * 칸당 품종 상한 가운데 사양(foods.max)이 아니라 판 크기에서 정한 것. 값마다 근거는 그 판의 글자·그림 크기다.
+ * 사양의 foods.max와 작은 쪽을 쓰는 상한(월별 포스터 원판 P-C, 한 줄 P-D)은 구성 정의(layouts.ts foodsCap)에 있다.
+ */
 const PER_CELL = {
   /** 체크 목록(월간 M-B·메모, 월별 포스터 P-D). 한 달 제철이 최대 86개라, 넷씩 다섯 줄(A4 약 8pt)을 넘지 않게 대표만 적는다. */
   checklist: 20,
-  /** 월별 포스터 원판(P-C) 조각 하나. 조각이 좁아 넷을 넘으면 그림이 작아진다. */
-  wheelSector: 4,
-  /** 월별 포스터 P-D 한 줄의 그림. 한 줄로만 놓고, 이보다 많으면 두 줄로 접혀 그림이 작아진다. 나머지는 체크 목록에 이름으로 있다. */
-  rowPictures: 6,
   /** 월간 M-D 그림 띠. 그 달 대표부터 띠와 빈 날짜 칸에 넣고, 못 들어간 품종은 뺀다(한 달 제철이 31~86개라 띠는 늘 찬다). */
   strip: 14,
   /** 연간 Y-B 위 그림 판, 월간 표지 C-1. 달마다 둘이면 24개가 작게 흩어져 큰 그림으로 보이지 않았다. */
@@ -63,16 +63,7 @@ function byBestMonth(pick: Pick): readonly (readonly Food[])[] {
 
 /** 달 하나의 그림 칸. 월간(M-A·M-C·M-E, M-B의 그림), 월별 포스터(P-A 칸, P-C 원판 조각, P-D 줄 그림). M-A "그림 없음"은 빈 목록이다. */
 export function monthPictures(spec: MonthlySpec | MonthPosterSpec, month: number): readonly Food[] {
-  const max =
-    spec.kind === "monthly"
-      ? spec.layout === "none"
-        ? 0
-        : spec.foods.max
-      : spec.layout === "wheel"
-        ? Math.min(spec.foods.max, PER_CELL.wheelSector)
-        : spec.layout === "rows-check"
-          ? Math.min(spec.foods.max, PER_CELL.rowPictures)
-          : spec.foods.max
+  const max = spec.kind === "monthly" && spec.layout === "none" ? 0 : foodsPerCell(spec)
   return inMonth(month, { max, categories: categoriesOf(spec), drawnOnly: true })
 }
 

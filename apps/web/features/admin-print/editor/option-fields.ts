@@ -1,6 +1,7 @@
 import { CALENDAR_VARIANT_LABELS, CALENDAR_VARIANTS } from "@workspace/seasonal/calendar/variants"
 import { FOODS } from "@workspace/seasonal/data/foods"
 import { printMonthLabel, PRINT_MONTH_LABELS } from "@workspace/seasonal/print/month-label"
+import { LAYOUT_DEFS, layoutDef, layoutReads, type LayoutDef, type LayoutOption } from "@workspace/seasonal/print/layouts"
 import type { PrintKind, PrintSpec } from "@workspace/seasonal/print/spec"
 
 export const FOOD_CATEGORIES = [...new Set(FOODS.map((food) => food.category))]
@@ -21,7 +22,15 @@ export type OptionFieldSpec = (
       wireframes?: "sheet" | "cover"
     }
   | { type: "toggle"; label: string; path: readonly string[] }
-  | { type: "number"; label: string; path: readonly string[]; min: number; max: number }
+  | {
+      type: "number"
+      label: string
+      path: readonly string[]
+      min: number
+      max: number
+      /** 있으면 지금 사양에서의 최대값(구성마다 판 크기 상한이 다를 때). 패널에 보일 때 max를 이것으로 바꾼다. */
+      maxFor?: (spec: PrintSpec) => number
+    }
   | { type: "text"; label: string; path: readonly string[] }
   | { type: "categories"; label: string; path: readonly string[] }
 ) & {
@@ -36,8 +45,9 @@ export function isFieldShown(field: OptionFieldSpec, spec: PrintSpec): boolean {
   return field.when?.(spec) ?? true
 }
 
-/** 패널에 보일 모양. 선택 필드에서 이 구성에 뜻이 없는 선택지(Option.when)를 뺀다. */
+/** 패널에 보일 모양. 선택 필드에서 이 구성에 뜻이 없는 선택지(Option.when)를 빼고, 숫자 필드의 최대값을 이 구성의 상한으로 맞춘다. */
 export function shownField(field: OptionFieldSpec, spec: PrintSpec): OptionFieldSpec {
+  if (field.type === "number" && field.maxFor) return { ...field, max: field.maxFor(spec) }
   if (field.type !== "select" || !field.options.some((option) => option.when)) return field
   return { ...field, options: field.options.filter((option) => option.when?.(spec) ?? true) }
 }
@@ -100,39 +110,37 @@ const calendarSize: OptionFieldSpec = {
 }
 const categories: OptionFieldSpec = { type: "categories", label: "카테고리(비우면 전부)", path: ["categories"] }
 
-const foods = (max: number, when?: { names?: OptionFieldSpec["when"]; max?: OptionFieldSpec["when"] }): OptionSection => ({
+/** 구성이 그 옵션을 읽을 때만 보인다(layouts.ts). */
+const reads = (option: LayoutOption) => (spec: PrintSpec) => layoutReads(spec, option)
+
+/** 품종 칸. max는 종류의 상한이고, 구성에 판 크기 상한(foodsCap)이 있으면 그보다 작게 고를 수 없다. */
+const foods = (max: number): OptionSection => ({
   title: "품종",
   fields: [
-    { type: "select", label: "이름", path: ["foods", "names"], options: options({ korean: "한글 이름", hidden: "숨김" }), when: when?.names },
-    { type: "number", label: "칸마다 최대 개수", path: ["foods", "max"], min: 1, max, when: when?.max },
+    { type: "select", label: "이름", path: ["foods", "names"], options: options({ korean: "한글 이름", hidden: "숨김" }), when: reads("foods.names") },
+    {
+      type: "number",
+      label: "칸마다 최대 개수",
+      path: ["foods", "max"],
+      min: 1,
+      max,
+      maxFor: (spec) => Math.min(max, layoutDef(spec).foodsCap ?? max),
+      when: reads("foods.max"),
+    },
   ],
 })
 
-/** 구성(layout) 선택. 값마다 [이름, 와이어프레임 안 코드]다(wireframe-catalog.ts). 한 안을 여러 값이 같이 쓸 수 있다(M-A). */
-const layout = (entries: Record<string, readonly [label: string, code: string]>): OptionFieldSpec => ({
+/** 구성(layout) 선택. 이름과 와이어프레임 안 코드는 구성 정의(layouts.ts)에서 온다. */
+const layout = (kind: PrintKind): OptionFieldSpec => ({
   type: "select",
   label: "구성",
   path: ["layout"],
-  options: Object.entries(entries).map(([value, [label, code]]) => ({ value, label, code })),
+  options: Object.entries(LAYOUT_DEFS[kind] as Record<string, LayoutDef>).map(([value, def]) => ({ value, label: def.label, code: def.wireframe })),
   wireframes: "sheet",
 })
 
-const monthlyHasFoods = (spec: PrintSpec) => spec.kind === "monthly" && spec.layout !== "none"
-/** M-B는 체크 목록이 달력 옆에 있고, M-D는 달력 칸 자체가 쓰는 자리이며, M-E는 그림이 판 전체라 달력 아래 메모를 쓰지 않는다. */
-const monthlyHasMemo = (spec: PrintSpec) => spec.kind === "monthly" && !(["side-check", "strip", "allover"] as const).some((layout) => layout === spec.layout)
-/** M-E 가로는 달력 대신 날짜를 한 열로 늘어놓아 달력 모양과 주 시작이 없다. */
-const monthlyHasWeeks = (spec: PrintSpec) => spec.kind !== "monthly" || spec.layout !== "allover" || spec.orientation === "portrait"
-/** M-D는 쓰는 칸이 필요해 격자 모양으로 정해져 있고, 그림 있는 품종을 모두 띠와 빈 칸에 넣는다. */
-const monthlyNotStrip = (spec: PrintSpec) => spec.kind === "monthly" && spec.layout !== "strip"
-/** Y-B는 달 배열이 3x4로, 위 그림은 달마다 하나로 정해져 있다. Y-C는 달 배열이 방향마다 정해져 있고, 막대표 품종이 달마다 넷이다. 둘 다 그림 칸이 없어 큰 숫자를 얹을 데가 없다. */
+/** Y-A만 그림 칸이 있어 달 숫자를 그림 위에 크게 얹을 수 있다. */
 const yearSheetInPairs = (spec: PrintSpec) => spec.kind === "year-sheet" && spec.layout === "pairs"
-/** Y-C 막대표는 줄마다 이름을 늘 적는다. */
-const yearSheetNotChart = (spec: PrintSpec) => spec.kind === "year-sheet" && spec.layout !== "chart"
-/** S-C는 그림을 고리에 빽빽이 놓아 이름 자리가 없다. */
-const seasonPosterNotWheel = (spec: PrintSpec) => spec.kind === "season-poster" && spec.layout !== "wheel"
-/** P-D는 이름을 체크 목록에 늘 적고, 달을 한 줄씩 쌓는다. P-B는 줄마다 이름을 적고 그림 있는 품종을 모두 싣는다. */
-const monthPosterInCells = (spec: PrintSpec) => spec.kind === "month-poster" && spec.layout === "cells"
-const monthPosterNotChart = (spec: PrintSpec) => spec.kind === "month-poster" && spec.layout !== "chart"
 
 const look: OptionSection = {
   title: "서체·배경",
@@ -149,14 +157,7 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
     {
       title: "구성",
       fields: [
-        layout({
-          scatter: ["그림 위, 달력 아래 · 흩뿌림", "M-A"],
-          grid: ["그림 위, 달력 아래 · 줄 맞춤", "M-A"],
-          none: ["달력만(그림 없음)", "M-A"],
-          "side-check": ["달력 옆 제철 체크 목록(세로 용지)", "M-B"],
-          strip: ["쓰는 큰 칸 달력 + 그림 띠(빈 날짜 칸에도 그림)", "M-D"],
-          allover: ["그림이 판 전체, 달력은 모서리 블록(세로)·날짜 한 열(가로)", "M-E"],
-        }),
+        layout("monthly"),
         {
           type: "select",
           label: "12개월 묶음 표지",
@@ -175,21 +176,21 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
     {
       title: "달력",
       fields: [
-        { type: "select", label: "모양", path: ["calendar", "variant"], options: CALENDAR_VARIANTS.map((variant) => ({ value: variant, label: CALENDAR_VARIANT_LABELS[variant] })), when: (spec) => monthlyNotStrip(spec) && monthlyHasWeeks(spec) },
-        { ...weekStart, when: monthlyHasWeeks },
+        { type: "select", label: "모양", path: ["calendar", "variant"], options: CALENDAR_VARIANTS.map((variant) => ({ value: variant, label: CALENDAR_VARIANT_LABELS[variant] })), when: reads("calendar.variant") },
+        { ...weekStart, when: reads("calendar.weekStart") },
         weekday,
         { type: "select", label: "공휴일", path: ["calendar", "holidays"], options: options({ "mark-and-name": "날짜와 이름", mark: "빨간 날짜만", hidden: "표시 안 함" }) },
         calendarSize,
-        { type: "select", label: "달력 아래", path: ["memo"], options: options({ none: "없음", lines: "메모 줄", "eaten-check": "먹은 음식 체크 칸" }), when: monthlyHasMemo },
+        { type: "select", label: "달력 아래", path: ["memo"], options: options({ none: "없음", lines: "메모 줄", "eaten-check": "먹은 음식 체크 칸" }), when: reads("memo") },
       ],
     },
     { title: "달 표기", fields: [monthLabel, ...monthStyle] },
-    foods(40, { names: monthlyHasFoods, max: (spec) => monthlyHasFoods(spec) && monthlyNotStrip(spec) }),
+    foods(40),
     look,
   ],
   "year-sheet": [
-    { title: "구성", fields: [layout({ pairs: ["그림·달력 짝 체크무늬", "Y-A"], "hero-top": ["큰 그림 위, 열두 달 아래(세로 용지)", "Y-B"], chart: ["열두 달 달력 + 제철 막대표", "Y-C"] })] },
-    { title: "용지", fields: [orientation, margin, year, { ...grid, when: yearSheetInPairs }] },
+    { title: "구성", fields: [layout("year-sheet")] },
+    { title: "용지", fields: [orientation, margin, year, { ...grid, when: reads("grid") }] },
     {
       title: "달력",
       fields: [
@@ -200,20 +201,20 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
       ],
     },
     { title: "달 표기", fields: [{ ...monthLabel, options: [{ value: "big-number", label: "그림 위 큰 숫자", when: yearSheetInPairs }, ...monthLabel.options] } as OptionFieldSpec, ...monthStyle] },
-    foods(8, { names: yearSheetNotChart, max: yearSheetInPairs }),
+    foods(8),
     look,
   ],
   "season-poster": [
-    { title: "구성", fields: [layout({ bands: ["가로 띠 넷", "S-A"], quarters: ["사분면(가로 용지는 네 열)", "S-B"], wheel: ["사계절 원형 판", "S-C"], "per-season": ["계절마다 한 장(4쪽)", "S-D"] })] },
+    { title: "구성", fields: [layout("season-poster")] },
     { title: "용지", fields: [orientation, margin, title, { type: "select", label: "계절 표기", path: ["seasonLabel"], options: options({ "english-korean": "Spring · 봄", korean: "봄" }) }] },
-    { ...foods(30), fields: [...foods(30, { names: seasonPosterNotWheel }).fields, categories] },
+    { ...foods(30), fields: [...foods(30).fields, categories] },
     look,
   ],
   "month-poster": [
-    { title: "구성", fields: [layout({ cells: ["열두 칸", "P-A"], chart: ["품종×달 막대표", "P-B"], wheel: ["열두 달 원형 판", "P-C"], "rows-check": ["한 줄에 한 달 · 장보기 체크(세로 용지)", "P-D"] })] },
-    { title: "용지", fields: [orientation, margin, title, { ...grid, when: monthPosterInCells }] },
+    { title: "구성", fields: [layout("month-poster")] },
+    { title: "용지", fields: [orientation, margin, title, { ...grid, when: reads("grid") }] },
     { title: "달 표기", fields: [monthLabel, ...monthStyle] },
-    { ...foods(12), fields: [...foods(12, { names: monthPosterInCells, max: monthPosterNotChart }).fields, categories] },
+    { ...foods(12), fields: [...foods(12).fields, categories] },
     look,
   ],
 }
