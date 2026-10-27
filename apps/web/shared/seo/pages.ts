@@ -44,6 +44,8 @@ export const SEO_PAGES: Readonly<Record<string, () => readonly SitemapEntry[]>> 
  * robots.txt의 Disallow로 막지 않는다. 막으면 크롤러가 noindex를 읽지 못해 주소만 색인에 남을 수 있다.
  */
 export const NOINDEX_ROUTES: readonly string[] = [
+  // P2 품종 검색: 검색어마다 다른 결과라 색인할 본문이 없다.
+  "/search",
   // 1h 나의 식탁: 기기에 저장된 기록으로 채워져 크롤러에게는 빈 화면이다.
   "/seasonal/my-table",
   // PDF 인쇄 페이지. 개발 서버에서만 열리고 운영에서는 404다(.scratch/calendar-print/spec.md).

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { searchVarieties } from "./search"
+import { matchRange, searchVarieties } from "./search"
 import type { SearchIndex } from "./types"
 
 // 와이어프레임의 품종 일부. id는 이름으로 둔다.
@@ -15,6 +15,7 @@ const INDEX: SearchIndex = {
     v("단호박", "호박"),
     v("쥬키니", "호박"),
     v("대파", "양념채소"),
+    v("배", "배", "과일"),
     v("감귤", "감귤", "과일"),
     v("삼겹살(국산)", "돼지고기", "정육·계란"),
     v("한우 등심", "소고기", "정육·계란"),
@@ -85,12 +86,37 @@ describe("searchVarieties", () => {
     expect(search("대퍄")).toEqual({ kind: "typo", ids: ["대파"] })
   })
 
+  it("한 글자 이름은 오타로 제안하지 않는다", () => {
+    expect(search("배츄")).toEqual({ kind: "typo", ids: ["배추"] })
+  })
+
   it("한 글자 검색어는 오타로 제안하지 않는다", () => {
     expect(search("뷁")).toEqual({ kind: "none" })
+  })
+
+  it("카테고리 이름이면 그 카테고리의 품종", () => {
+    expect(search("과일")).toEqual({ kind: "category", category: "과일", ids: ["배", "감귤"] })
   })
 
   it("맞는 품종이 없으면 none", () => {
     expect(search("트러플")).toEqual({ kind: "none" })
     expect(search("ㅌㄹㅍ")).toEqual({ kind: "none" })
+  })
+})
+
+describe("matchRange", () => {
+  it("이름에서 검색어가 맞은 자리", () => {
+    expect(matchRange("양배추", "배추")).toEqual([1, 3])
+    expect(matchRange("배추", "무")).toBeNull()
+    expect(matchRange("배추", "")).toBeNull()
+  })
+
+  it("초성 검색어는 초성 자리로 찾는다", () => {
+    expect(matchRange("알배기배추", "ㅂㅊ")).toEqual([3, 5])
+    expect(matchRange("삼겹살(국산)", "ㄱㅅ")).toEqual([1, 3])
+  })
+
+  it("띄어쓰기를 건너뛰어 맞춘다", () => {
+    expect(matchRange("한우 등심", "우등")).toEqual([1, 4])
   })
 })

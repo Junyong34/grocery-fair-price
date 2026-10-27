@@ -99,6 +99,7 @@ import 경로:
 | URL | 화면 | 라우트 파일 | 화면 컴포넌트 |
 |---|---|---|---|
 | `/` | P1 시세 메인 | `(price)/page.tsx` | `features/price/home/home-view` |
+| `/search?q=` | P2 품종 검색 (noindex) | `(price)/search/page.tsx` | `features/price/search/search-view` |
 | `/seasonal` | 2a 이달 · 12개월 스크롤 | `seasonal/(this-month)/page.tsx` | `this-month/this-month-view` |
 | `/seasonal/months` | 2b 열두 달 카드 목록 | `seasonal/(this-month)/months/page.tsx` | `month-timeline/months-index` |
 | `/seasonal/months/[month]` | 2b 그 달 상세 (1~12) | `seasonal/(this-month)/months/(detail)/[month]/page.tsx` | `month-timeline/month-view`, 레이아웃에 `month-timeline` |
@@ -190,6 +191,7 @@ import 경로:
 |---|---|
 | `data/` | 데이터 경계. `price-source.ts`(`PriceSource`, `getPriceSource()`, `server-only`)만 화면이 부른다. `fixture-source.ts`와 `fixtures/`는 하드코딩 데이터이고, 다음 단계에서 `supabase-source.ts`가 대신한다. `data-boundary.test.ts`가 `data/` 밖의 `fixtures` import를 막는다 |
 | `home/` | P1 시세 메인 |
+| `search/` | P2 품종 검색. 검색어는 `history.replaceState`로 `?q=`에 맞춘다 |
 | `components/` | 품종 행(`variety-row`: 네 열 subgrid, 가격 두 줄, 설명 한 줄), 판정 칩 · 점(`verdict-chip`, 색은 `verdict-tone`), `add-button`, `search-entry`, `recent-varieties`, `price-shell` |
 | `stores/` | `basket-store`(`price:basket`, 담을 때 판정 · 조사일), `recent-store`(`price:recent`), `price-stores`(마운트 뒤 불러오기) |
 
@@ -261,7 +263,8 @@ import 경로:
 |---|---|
 | `types.ts` | 화면이 읽는 모양: `VarietySummary`(목록 행, 뷰 `current_judgment` 열), `VarietyDetail`(상세, `judgment_snapshot.payload`), `Verdict`, `VerdictBand`, `PlaceQuote`, `TrendPoint`, `SearchIndex` |
 | `verdict.ts` | `verdictOf(price, usual, band)`: 평소가 대비 반올림 % 와 싸요 · 보통 · 비싸요. 평소가가 없으면 판정 전. "내가 본 가격"도 이 함수 |
-| `search.ts` | `searchVarieties`: 별칭 → 품목("어떤 호박인가요?") → 이름 · 초성 · 품목 · 별칭 일부 → 한 글자 오타 |
+| `search.ts` | `searchVarieties`: 별칭 → 품목("어떤 호박인가요?") → 카테고리 → 이름 · 초성 · 품목 · 별칭 일부 → 한 글자 오타. `matchRange`(이름 강조) |
+| `list.ts` | 목록 순수 함수: 최근 조사일, id 순서로 고르기 |
 | `format.ts` | 원 표시, 날짜 문자열("YYYY-MM-DD") 계산, "2주 전" |
 | `copy.ts` | 화면 문구, 판정 칩 · 차이 문구, 받침에 맞는 조사(`withJosa`) |
 
