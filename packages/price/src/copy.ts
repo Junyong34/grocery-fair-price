@@ -189,5 +189,6 @@ export const PRICE_COPY = {
     emptyTitle: "아직 담은 품종이 없어요",
     emptyBody: "살 품종을 담아 두면 판정을 한 번에 볼 수 있어요",
     emptyAction: "품종 검색해서 담기",
+    clearAll: "모두 빼기",
   },
 } as const

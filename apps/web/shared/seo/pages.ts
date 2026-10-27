@@ -55,6 +55,8 @@ export const DATA_SEO_PAGES: readonly string[] = [
 export const NOINDEX_ROUTES: readonly string[] = [
   // P2 품종 검색: 검색어마다 다른 결과라 색인할 본문이 없다.
   "/search",
+  // P4 담은 품종: 기기에 저장된 목록으로 채워져 크롤러에게는 빈 화면이다.
+  "/basket",
   // 1h 나의 식탁: 기기에 저장된 기록으로 채워져 크롤러에게는 빈 화면이다.
   "/seasonal/my-table",
   // PDF 인쇄 페이지. 개발 서버에서만 열리고 운영에서는 404다(.scratch/calendar-print/spec.md).

@@ -12,7 +12,8 @@ import type { VarietySummary } from "@workspace/price/types"
 import { routes } from "@/shared/routes"
 
 import { varietySub } from "../components/variety-row"
-import { useBasketStore, useInBasket } from "../stores/basket-store"
+import { toggleBasket } from "../components/basket-toast"
+import { useInBasket } from "../stores/basket-store"
 import { useRecentStore } from "../stores/recent-store"
 
 const COPY = PRICE_COPY.detail
@@ -46,7 +47,7 @@ export function DetailHeader({ variety }: { variety: VarietySummary }) {
       <button
         type="button"
         aria-pressed={added}
-        onClick={() => (added ? useBasketStore.getState().remove(variety.id) : useBasketStore.getState().add(variety))}
+        onClick={() => toggleBasket(variety, added)}
         className={cn(
           "h-9 shrink-0 rounded-full border px-3.5 text-sm font-semibold transition-colors",
           added ? "border-ink bg-ink text-canvas" : "border-silver bg-surface text-ink hover:border-stone"

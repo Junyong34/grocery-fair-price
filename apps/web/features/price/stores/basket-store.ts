@@ -1,21 +1,15 @@
 "use client"
 
+import { useSyncExternalStore } from "react"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-import type { VarietySummary, VerdictKind } from "@workspace/price/types"
+import type { BasketEntry } from "@workspace/price/basket"
+import type { VarietySummary } from "@workspace/price/types"
 
 // 담은 품종(P4): 담은 순서와, 담을 때의 판정 · 그 판정의 조사일. 기기(localStorage)에 저장한다.
 // 담을 때 판정을 남겨 "10/16에 담을 때 보통 → 지금 싸요"를 보여 준다. 날짜는 시계가 아니라 그 판정의 조사일이다.
 // skipHydration이라 서버 HTML과 첫 렌더는 빈 목록이고, PriceStores가 마운트 뒤 불러온다.
-
-export type BasketEntry = {
-  id: string
-  /** 담을 때의 판정 */
-  verdict: VerdictKind
-  /** 담을 때 판정의 조사일 */
-  on: string
-}
 
 type BasketState = {
   entries: readonly BasketEntry[]
@@ -42,4 +36,18 @@ export const useBasketStore = create<BasketState>()(
 /** 그 품종을 담았는지. */
 export function useInBasket(id: string): boolean {
   return useBasketStore((state) => state.entries.some((entry) => entry.id === id))
+}
+
+/** 담은 개수. */
+export function useBasketCount(): number {
+  return useBasketStore((state) => state.entries.length)
+}
+
+/** 기기 저장 값을 불러왔는지. 불러오기 전에는 빈 목록이라 "아직 담은 품종이 없어요"를 그리지 않는다. */
+export function useBasketHydrated(): boolean {
+  return useSyncExternalStore(
+    (onChange) => useBasketStore.persist.onFinishHydration(onChange),
+    () => useBasketStore.persist.hasHydrated(),
+    () => false
+  )
 }
