@@ -7,6 +7,7 @@ import { callWithPolicy, CallBudget, classify, SourceStopped } from "../src/inge
 import { addDays, collectChamga, collectEkape, collectKamis, EKAPE_JUDGE_KINDS } from "../src/ingest/collect.ts"
 import { KAMIS_ITEMS } from "../src/ingest/kamis-items.ts"
 import type { FetchLike } from "../src/http.ts"
+import { readKamisPerDay } from "../src/sources/kamis.ts"
 import { FAKE_KEY, readSampleText } from "./helpers.ts"
 import { fakeKamis, KEY_ERROR_BODY, syntheticKamisRows, type FakeCall } from "./fixtures/fake-api.ts"
 
@@ -31,6 +32,10 @@ describe("오류 분류 (kamis.md 10장, pipeline 5-2)", () => {
     [new ApiGatewayError("kamis", "NO_OPENAPI_SERVICE_ERROR", "12"), { kind: "stop", reason: "service_missing" }],
     [new ApiGatewayError("kamis", "HTTP_ERROR", "04"), { kind: "fail" }],
     [new ApiGatewayError("kamis", "APPLICATION_ERROR", "01"), { kind: "retry" }],
+    // 게이트웨이 본문이 와도 HTTP가 5xx·429면 일시 장애다. 2026-10-28 백필에서 503이 다시 부르지 않고 실패했다
+    [new ApiGatewayError("kamis", "HTTP_ERROR", "04", 503), { kind: "retry" }],
+    [new ApiGatewayError("kamis", "UNKNOWN_CODE", "77", 429), { kind: "retry" }],
+    [new ApiGatewayError("kamis", "SERVICE_KEY_IS_NOT_REGISTERED_ERROR", "30", 503), { kind: "stop", reason: "key_invalid" }],
     [new ApiHttpError("kamis", 403), { kind: "stop", reason: "key_invalid" }],
     [new ApiHttpError("kamis", 503), { kind: "retry" }],
     [new ApiHttpError("kamis", 404), { kind: "fail" }],
@@ -38,6 +43,11 @@ describe("오류 분류 (kamis.md 10장, pipeline 5-2)", () => {
     [new ApiContractError("kamis", ["x"]), { kind: "fail" }],
   ] as const)("%s", (error, verdict) => {
     expect(classify(error)).toEqual(verdict)
+  })
+
+  it("게이트웨이 오류에 HTTP 상태를 담는다", () => {
+    const body = JSON.stringify({ OpenAPI_ServiceResponse: { cmmMsgHeader: { errMsg: "HTTP_ERROR", returnReasonCode: "04" } } })
+    expect(() => readKamisPerDay(503, body)).toThrow(expect.objectContaining({ name: "ApiGatewayError", code: "04", httpStatus: 503 }))
   })
 
   it("예상 밖 오류(코드 버그)는 그대로 던진다", () => {

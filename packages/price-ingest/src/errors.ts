@@ -16,15 +16,18 @@ export class ApiBusinessError extends Error {
   }
 }
 
-// data.go.kr 게이트웨이 오류 (OpenAPI_ServiceResponse). 인증키 오류·없는 주소 등
+// data.go.kr 게이트웨이 오류 (OpenAPI_ServiceResponse). 인증키 오류·없는 주소 등.
+// 일시 장애(HTTP 503)도 이 본문으로 온다 (2026-10-28 백필 실측). 그래서 HTTP 상태를 함께 담는다
 export class ApiGatewayError extends Error {
   source: Source
   code: string
-  constructor(source: Source, errMsg: string, code: string) {
-    super(`${LABEL[source]} 인증·요청 오류 (${errMsg}, 코드 ${code})`)
+  httpStatus: number
+  constructor(source: Source, errMsg: string, code: string, httpStatus = 200) {
+    super(`${LABEL[source]} 인증·요청 오류 (${errMsg}, 코드 ${code}, HTTP ${httpStatus})`)
     this.name = "ApiGatewayError"
     this.source = source
     this.code = code
+    this.httpStatus = httpStatus
   }
 }
 

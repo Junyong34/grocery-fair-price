@@ -60,7 +60,7 @@ export function interpret(options: {
   if (header !== undefined) {
     const errMsg = dig(header, ["errMsg"])
     const reason = dig(header, ["returnReasonCode"])
-    throw new ApiGatewayError(options.source, String(errMsg ?? "UNKNOWN"), String(reason ?? "UNKNOWN"))
+    throw new ApiGatewayError(options.source, String(errMsg ?? "UNKNOWN"), String(reason ?? "UNKNOWN"), options.status)
   }
   if (options.status !== 200) throw new ApiHttpError(options.source, options.status)
   if (options.body === undefined) throw new ApiContractError(options.source, ["응답 본문을 해석할 수 없다"])

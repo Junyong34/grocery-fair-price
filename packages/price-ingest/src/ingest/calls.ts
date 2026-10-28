@@ -34,6 +34,8 @@ const QUOTA_CODE = "22" // 일일 호출 한도 초과
 const MISSING_SERVICE_CODE = "12" // 없는 서비스 주소
 const RETRY_GATEWAY_CODES = new Set(["01", "99", "UNKNOWN"]) // 게이트웨이 내부 오류
 
+const isTransientStatus = (status: number) => status === 429 || status >= 500
+
 export type Verdict = { kind: "stop"; reason: StopReason } | { kind: "retry" } | { kind: "fail" }
 
 // 오류를 보고 다시 부를지, 이 호출만 실패로 둘지, 출처를 멈출지 정한다.
@@ -43,11 +45,12 @@ export function classify(error: unknown): Verdict {
     if (KEY_CODES.has(error.code)) return { kind: "stop", reason: "key_invalid" }
     if (error.code === QUOTA_CODE) return { kind: "stop", reason: "quota_exceeded" }
     if (error.code === MISSING_SERVICE_CODE) return { kind: "stop", reason: "service_missing" }
+    if (isTransientStatus(error.httpStatus)) return { kind: "retry" }
     return RETRY_GATEWAY_CODES.has(error.code) ? { kind: "retry" } : { kind: "fail" }
   }
   if (error instanceof ApiHttpError) {
     if (error.status === 401 || error.status === 403) return { kind: "stop", reason: "key_invalid" }
-    return error.status === 429 || error.status >= 500 ? { kind: "retry" } : { kind: "fail" }
+    return isTransientStatus(error.status) ? { kind: "retry" } : { kind: "fail" }
   }
   if (error instanceof ApiTransportError) return { kind: "retry" }
   // 응답이 계약과 다르거나 업무 오류: 다시 불러도 같다. 이 호출만 실패

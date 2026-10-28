@@ -12,7 +12,7 @@ import {
 } from "../sources/chamgagyeok.ts"
 import { EKAPE_ENDPOINT, fetchEkapeConsumerPrice } from "../sources/ekape.ts"
 import { KAMIS_ENDPOINT, fetchKamisPerDayAll } from "../sources/kamis.ts"
-import { ApiTransportError } from "../errors.ts"
+import { ApiGatewayError, ApiTransportError } from "../errors.ts"
 import { callWithPolicy, CallBudget, SourceStopped, UNREACHABLE_AFTER, type Sleep, type StopReason } from "./calls.ts"
 import { KAMIS_ITEMS, type KamisItem } from "./kamis-items.ts"
 
@@ -111,7 +111,7 @@ class FileBuilder {
       return rows
     } catch (error) {
       const took = Math.round((now() - started) / 1000)
-      const kind = error instanceof Error ? error.name : "unknown"
+      const kind = error instanceof ApiGatewayError ? `${error.name}(코드 ${error.code})` : error instanceof Error ? error.name : "unknown"
       this.ctx.log?.(`호출 실패: ${this.lastTarget()} ${kind} ${took}초, HTTP ${statuses()}`)
       if (error instanceof SourceStopped) {
         this.stop = error.reason
