@@ -53,7 +53,7 @@ Blocked by: 03
 - 셸에서 `. ./.env`로 `.env`를 읽으면 `OWNER_DATABASE_URL`이 바뀌어 비밀번호 인증이 실패했다. `node --env-file`로 읽은 값은 접속된다. 마이그레이션은 `supabase db push --db-url "$(node --env-file=.env -p process.env.OWNER_DATABASE_URL)"`로 적용했다.
 
 **남은 것**
-- 실패한 묶음 4개 다시 받기 (같은 `backfill` 명령, 약 60회).
+- ~~실패한 묶음 4개 다시 받기~~ → 같은 날 다시 돌려 4개 모두 끝냈다 (호출 45회, 재시도 고친 뒤). **KAMIS 묶음 364개 모두 done.**
 - 축평원 백필 (축산 평소가의 재료). 정기 재계산은 90일 밖의 날을 다시 계산하지 않으므로, 축평원 관측값을 넣은 뒤 그 날들의 요약을 낼 길이 따로 필요하다.
 - 보존 기간 밖 재등록 시나리오 (ingest-schedule/09와 함께).
 - 품목별 이력 시작일, 빠진 기간 목록 (품종별 national 요약이 비는 기간).
