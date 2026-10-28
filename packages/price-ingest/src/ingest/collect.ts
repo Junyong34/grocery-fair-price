@@ -12,7 +12,8 @@ import {
 } from "../sources/chamgagyeok.ts"
 import { EKAPE_ENDPOINT, fetchEkapeConsumerPrice } from "../sources/ekape.ts"
 import { KAMIS_ENDPOINT, fetchKamisPerDayAll } from "../sources/kamis.ts"
-import { callWithPolicy, CallBudget, SourceStopped, type Sleep, type StopReason } from "./calls.ts"
+import { ApiTransportError } from "../errors.ts"
+import { callWithPolicy, CallBudget, SourceStopped, UNREACHABLE_AFTER, type Sleep, type StopReason } from "./calls.ts"
 import { KAMIS_ITEMS } from "./kamis-items.ts"
 
 export type CollectedFile = {
@@ -76,6 +77,7 @@ class FileBuilder {
   }
 
   private added = 0
+  private unreachableInRow = 0
 
   // 호출 기록에서 요청을 가리키는 짧은 이름 (키 없는 파라미터 중 품목·축종·상품·날짜)
   private lastTarget(): string {
@@ -103,6 +105,7 @@ class FileBuilder {
     try {
       const rows = await callWithPolicy(() => fetchRows(this.call()), this.ctx)
       this.file.rows.push(...(rows as unknown as Json[]))
+      this.unreachableInRow = 0
       const took = now() - started
       if (took >= SLOW_CALL_MS) this.ctx.log?.(`느린 호출: ${this.lastTarget()} ${Math.round(took / 1000)}초, HTTP ${statuses()}`)
       return rows
@@ -110,8 +113,16 @@ class FileBuilder {
       const took = Math.round((now() - started) / 1000)
       const kind = error instanceof Error ? error.name : "unknown"
       this.ctx.log?.(`호출 실패: ${this.lastTarget()} ${kind} ${took}초, HTTP ${statuses()}`)
-      if (error instanceof SourceStopped) this.stop = error.reason
-      else this.failedCalls += 1
+      if (error instanceof SourceStopped) {
+        this.stop = error.reason
+        return null
+      }
+      this.failedCalls += 1
+      this.unreachableInRow = error instanceof ApiTransportError ? this.unreachableInRow + 1 : 0
+      if (this.unreachableInRow >= UNREACHABLE_AFTER) {
+        this.stop = "unreachable"
+        this.ctx.log?.(`닿지 않음: ${this.file.label} 논리 호출 ${UNREACHABLE_AFTER}개가 이어서 응답 없이 끝나 멈춘다`)
+      }
       return null
     }
   }

@@ -115,6 +115,20 @@ describe("출처별 호출 계획 (pipeline 5-1)", () => {
     expect(result.files[0]!.requests).toHaveLength(3)
   })
 
+  it("논리 호출 3개가 이어서 응답 없이 끝나면 닿지 않는 것으로 보고 멈춘다 (unreachable, 2026-10-28 러너 사례)", async () => {
+    const calls: FakeCall[] = []
+    const result = await collectKamis(ctx(fakeKamis(() => new Error("down"), calls)), "2026-10-27")
+    expect(result.stop).toBe("unreachable")
+    expect(result.failedCalls).toBe(3)
+    expect(calls).toHaveLength(3 * 4) // 품목 3개 × (첫 호출 + 다시 부르기 3번)
+  })
+
+  it("응답 없는 호출 사이에 하나라도 받으면 다시 센다", async () => {
+    const down = new Set(["111", "112", "114", "121"])
+    const result = await collectKamis(ctx(fakeKamis((item) => (down.has(item) ? new Error("down") : []))), "2026-10-27")
+    expect(result).toMatchObject({ stop: null, failedCalls: 4 })
+  })
+
   it("KAMIS 주간 다시 받기: D-14~D-1, 라벨 recheck", async () => {
     const calls: FakeCall[] = []
     const result = await collectKamis(ctx(fakeKamis(() => [], calls)), "2026-10-27", 14)

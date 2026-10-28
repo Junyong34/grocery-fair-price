@@ -2,6 +2,8 @@
 # 매일 06:30 KST에 기준일의 D-3~D-1을, 매주 월요일 07:10 KST에 D-14~D-1을 다시 받는다 (재등록 보조).
 # 월요일 실행은 끝에 보존 정리(KAMIS 90일, 참가격 6 조사일. 요약이 있는 날만)를 한다 (ingest-foundation/10).
 # 품목 140개 × 기간 호출 1회 (축산은 페이지가 늘어난다). 실행당 호출 예산 8,000 (하루 한도 10,000).
+# 매일 09:30 KST에 한 번 더 깨어, 오늘(KST) 성공한 실행이 없을 때만 다시 받는다. 러너에 따라 data.go.kr에 전혀 닿지 않는
+# 날이 있어서다 (2026-10-28. CLI는 닿지 않으면 몇 분 안에 unreachable로 멈춘다). 다시 돌면 대개 다른 러너를 받는다.
 # 수동 실행에서 date(YYYY-MM-DD, 기준일)와 recheck_days를 줄 수 있다. 비우면 오늘·매일 수집.
 name: ingest-kamis
 
@@ -9,6 +11,7 @@ on:
   schedule:
     - cron: "30 21 * * *" # KST 06:30 매일
     - cron: "10 22 * * 0" # KST 월 07:10 주간 다시 받기
+    - cron: "30 0 * * *" # KST 09:30 오늘 성공한 실행이 없으면 다시 받기. 예약 실행이 3시간가량 늦게 도는 것을 보고 06:30에서 3시간 띄운다
   workflow_dispatch:
     inputs:
       date:
@@ -22,13 +25,35 @@ on:
 
 permissions:
   contents: read
+  actions: read # 다시 받기 전에 오늘 성공한 실행이 있는지 본다
 
 concurrency:
   group: ingest-kamis
   cancel-in-progress: false
 
 jobs:
+  # 09:30 다시 받기만 본다. 오늘(KST 0시 이후) 성공한 실행이 있으면 수집을 건너뛴다. 주간 다시 받기 성공도 오늘 범위를 덮으므로 센다
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      skip: ${{ steps.today.outputs.skip }}
+    steps:
+      - id: today
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RETRY: ${{ github.event.schedule == '30 0 * * *' }}
+        run: |
+          if [ "$RETRY" != "true" ]; then echo "skip=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          since="$(TZ=Asia/Seoul date +%F)T00:00:00+09:00"
+          done=$(gh run list --workflow ingest-kamis.yml --status success --created ">=$since" --json databaseId --jq length)
+          echo "오늘 성공한 실행: ${done}개"
+          if [ "$done" -gt 0 ]; then echo "skip=true" >> "$GITHUB_OUTPUT"; else echo "skip=false" >> "$GITHUB_OUTPUT"; fi
+
   ingest:
+    needs: gate
+    if: ${{ needs.gate.outputs.skip != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30 # 약 150회 × 1초 + 다시 부르기
     steps:

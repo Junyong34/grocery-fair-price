@@ -13,7 +13,11 @@ export const RETRY_DELAYS_MS = [2_000, 4_000, 8_000] as const
 export const CALL_TIME_LIMIT_MS: Record<DbSource, number> = { kamis: 20 * 60_000, ekape: 8 * 60_000, chamga: 45 * 60_000 }
 
 // 그 출처의 이번 실행을 멈추는 이유. ingest_run.error_code에 그대로 남는다 (13이 알림을 고른다).
-export type StopReason = "key_invalid" | "quota_exceeded" | "budget_exhausted" | "service_missing" | "time_limit"
+export type StopReason = "key_invalid" | "quota_exceeded" | "budget_exhausted" | "service_missing" | "time_limit" | "unreachable"
+
+// 다시 부르기까지 응답을 하나도 받지 못한 논리 호출이 이만큼 이어지면 출처에 닿지 않는 것으로 보고 멈춘다.
+// 러너에 따라 data.go.kr에 전혀 닿지 않는 날이 있다. 시간 한도(KAMIS 20분)를 다 쓰지 않고 몇 분 안에 끝내 같은 날 다시 돌게 한다 (2026-10-28)
+export const UNREACHABLE_AFTER = 3
 
 export class SourceStopped extends Error {
   reason: StopReason
