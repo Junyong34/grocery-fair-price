@@ -11,7 +11,8 @@ export type PendingFailure = { storagePath: string; error: string }
 
 export type PendingResult = { loaded: LoadOutcome[]; failed: PendingFailure[] }
 
-export async function loadPendingFiles(input: { sql: Sql; store: ObjectStore; source: DbSource }): Promise<PendingResult> {
+// today: KST 오늘. 백필 원본(대조가 주운 것 포함)의 보존 기간을 가른다 (load-file.ts)
+export async function loadPendingFiles(input: { sql: Sql; store: ObjectStore; source: DbSource; today: string }): Promise<PendingResult> {
   const pending = await input.sql<{ id: string; storage_path: string; content_sha256: string }[]>`
     select id, storage_path, content_sha256 from price.raw_object
      where source = ${input.source} and load_status = 'pending_load'
@@ -23,7 +24,7 @@ export async function loadPendingFiles(input: { sql: Sql; store: ObjectStore; so
       const file = parseRawFile(await input.store.download(objectKeyOf(raw.storage_path)))
       if (file.header.source !== input.source) throw new Error("원본의 출처가 기록과 다르다")
       if (file.contentSha256 !== raw.content_sha256) throw new Error("원본 내용이 기록의 해시와 다르다")
-      result.loaded.push(await loadRawFile(input.sql, Number(raw.id), file))
+      result.loaded.push(await loadRawFile(input.sql, Number(raw.id), file, { today: input.today }))
     } catch (error) {
       // 오류 문구에 키·주소는 없다 (Storage·DB 오류는 상태 코드·SQL 오류만 담는다)
       result.failed.push({ storagePath: raw.storage_path, error: error instanceof Error ? error.message : String(error) })

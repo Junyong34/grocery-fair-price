@@ -42,6 +42,11 @@ export function kamisTarget(parts: KeyParts): CatalogTarget | undefined {
   return kamisIndex.get(`${parts.item_cd}-${parts.vrty_cd}-${parts.grd_cd}`) ?? kamisIndex.get(`${parts.item_cd}-*-${parts.grd_cd}`)
 }
 
+// KAMIS가 대표인 원천 키가 하나라도 있는 품목 코드 (백필이 받을 품목, ingest-foundation/04)
+export function kamisPrimaryItemCodes(): Set<string> {
+  return new Set([...kamisIndex].filter(([, target]) => target.role === "primary").map(([key]) => key.split("-")[0]!))
+}
+
 export function ekapeTarget(parts: KeyParts): CatalogTarget | undefined {
   return ekapeIndex.get(`${parts.judgeKind}-${parts.itemCd}-${parts.grdNm}`)
 }

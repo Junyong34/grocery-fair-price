@@ -300,7 +300,7 @@ describe("DB에 기록하지 못한 원본 (커밋)", () => {
     const reconciled = await reconcileRawFiles({ sql, store, source: "kamis", today })
     expect(reconciled.registered).toContain(storagePathOf(key))
 
-    const result = await loadPendingFiles({ sql, store, source: "kamis" })
+    const result = await loadPendingFiles({ sql, store, source: "kamis", today: "2026-10-23" })
     const [raw] = await sql<{ id: string; load_status: string }[]>`
       select id, load_status from price.raw_object where storage_path = ${storagePathOf(key)}`
     expect(raw?.load_status).toBe("loaded")

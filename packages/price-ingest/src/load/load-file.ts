@@ -3,6 +3,8 @@
 // → 임시 표 COPY → 품종·기준 단위 가격(variety.ts) → 정정·병합 → (축평원) 평년 행 → raw_object 상태.
 // 참가격 마스터 파일(점포·상품)은 마스터만 채운다 (chamga.ts).
 // 실패하면 파일 하나만 되돌아가고 raw_object는 pending_load로 남는다. 다음 실행이 다시 적재한다.
+// KAMIS 백필 원본(헤더 job = backfill)은 보존 기간(90일) 밖의 날을 관측값에 넣지 않고 임시 표에서 바로 시세 요약으로 낸다
+// (pipeline 3-9 보관 1, ingest-foundation/04). 대조가 주운 백필 원본도 이 길로 간다. 1년치가 관측값에 들어가면 DB가 넘친다.
 import { adaptChamgaPriceRow, chamgaPriceRowRejection } from "../adapt/chamga.ts"
 import { adaptEkapeRow, ekapeRowRejection } from "../adapt/ekape.ts"
 import { adaptKamisRow, kamisRowRejection } from "../adapt/kamis.ts"
@@ -29,6 +31,7 @@ import {
   resolvePricedProducts,
   type MasterOutcome,
 } from "./chamga.ts"
+import { aggregateStagedQuotes, type StagedQuoteResult } from "./daily-quote.ts"
 import { transaction, type Sql, type Tx } from "./db.ts"
 import {
   placeKeyOf,
@@ -307,7 +310,11 @@ export type LoadOutcome = {
   observations: MergeResult
   references: number // 새로 생기거나 고쳐 쓴 평년 행
   createdMasters: number // 참가격 마스터 파일이 새로 만든 점포·상품
+  backfill: StagedQuoteResult | null // 백필 원본이면 임시 표에서 바로 낸 시세 요약
 }
+
+// today: KST 오늘. 백필 원본은 이것으로 보존 기간을 가른다
+export type LoadOptions = { today?: string }
 
 function statusOf(total: number, rejected: number): LoadStatus {
   if (rejected === 0) return "loaded"
@@ -346,16 +353,20 @@ function loadChamgaMaster(sql: Sql | Tx, rawObjectId: number, file: RawFile): Pr
       observations: NO_CHANGE,
       references: 0,
       createdMasters: outcome.created,
+      backfill: null,
     }
   })
 }
 
 // rawObjectId: 이 파일의 raw_object.id (load_status = pending_load)
-export async function loadRawFile(sql: Sql | Tx, rawObjectId: number, file: RawFile): Promise<LoadOutcome> {
+export async function loadRawFile(sql: Sql | Tx, rawObjectId: number, file: RawFile, options: LoadOptions = {}): Promise<LoadOutcome> {
   const source: DbSource = file.header.source
   if (source === "chamga" && CHAMGA_MASTER_ENDPOINTS.includes(file.header.endpoint)) {
     return loadChamgaMaster(sql, rawObjectId, file)
   }
+  const backfillToday = file.header.job === "backfill" ? options.today : null
+  if (backfillToday === undefined) throw new Error("백필 원본은 오늘(KST)을 받아야 적재한다")
+  if (backfillToday !== null && source !== "kamis") throw new Error(`백필 원본 적재는 KAMIS만 한다 (${source})`)
   const prepared = prepare(file)
 
   return transaction(sql, async (tx) => {
@@ -392,12 +403,14 @@ export async function loadRawFile(sql: Sql | Tx, rawObjectId: number, file: RawF
     await applyMappings(tx, { onLoad: true })
 
     let observations: MergeResult = NO_CHANGE
+    let backfill: StagedQuoteResult | null = backfillToday === null ? null : { written: 0, days: 0 }
     if (accepted.length > 0) {
       const rows = accepted.map((item) =>
         toRow(item, ids, file, rawObjectId, item.goodId === null ? null : productOf.get(productKey(item))!),
       )
       await stageObservations(tx, "obs_load", lastByKey(rows))
       await mapStagedObservations(tx, "obs_load")
+      if (backfillToday !== null) backfill = await aggregateStagedQuotes(tx, "obs_load", backfillToday)
       observations = await mergeObservations(tx, source, "obs_load")
       await tx`drop table obs_load` // commit 때 사라지지만, 바깥 트랜잭션 안에서 다시 부를 수 있게 지운다
     }
@@ -406,6 +419,6 @@ export async function loadRawFile(sql: Sql | Tx, rawObjectId: number, file: RawF
     rejected.sort((a, b) => a.index - b.index)
     const status = statusOf(file.rows.length, rejected.length)
     await markLoaded(tx, rawObjectId, status, rejected)
-    return { rawObjectId, status, rejected, observations, references, createdMasters: 0 }
+    return { rawObjectId, status, rejected, observations, references, createdMasters: 0, backfill }
   })
 }

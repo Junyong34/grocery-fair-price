@@ -12,6 +12,7 @@
     "contract:baseline": "node scripts/capture-baseline.ts",
     "probe:runner": "node scripts/probe-runner.ts",
     "ingest": "node src/cli.ts",
+    "backfill": "node src/backfill/cli.ts",
     "catalog": "node src/catalog/cli.ts",
     "purge": "node src/purge.ts"
   },

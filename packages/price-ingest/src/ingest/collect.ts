@@ -14,7 +14,7 @@ import { EKAPE_ENDPOINT, fetchEkapeConsumerPrice } from "../sources/ekape.ts"
 import { KAMIS_ENDPOINT, fetchKamisPerDayAll } from "../sources/kamis.ts"
 import { ApiTransportError } from "../errors.ts"
 import { callWithPolicy, CallBudget, SourceStopped, UNREACHABLE_AFTER, type Sleep, type StopReason } from "./calls.ts"
-import { KAMIS_ITEMS } from "./kamis-items.ts"
+import { KAMIS_ITEMS, type KamisItem } from "./kamis-items.ts"
 
 export type CollectedFile = {
   endpoint: string
@@ -142,11 +142,21 @@ export async function collectKamis(ctx: CollectContext, day: string, recheckDays
   const label = recheckDays === undefined ? "daily" : "recheck"
   const builder = new FileBuilder(ctx, { endpoint: KAMIS_ENDPOINT, label, targetFrom: from, targetTo: to })
   for (const item of KAMIS_ITEMS) {
-    await builder.add((call) =>
-      fetchKamisPerDayAll(call, { fromYmd: compact(from), toYmd: compact(to), ctgryCd: item.ctgryCd, itemCd: item.itemCd, seCd: "01" }),
-    )
+    await builder.add((call) => fetchKamisRetail(call, item, from, to))
     if (builder.stop) break
   }
+  return builder.result()
+}
+
+function fetchKamisRetail(call: CallOptions, item: KamisItem, from: string, to: string) {
+  return fetchKamisPerDayAll(call, { fromYmd: compact(from), toYmd: compact(to), ctgryCd: item.ctgryCd, itemCd: item.itemCd, seCd: "01" })
+}
+
+// KAMIS 백필 묶음 하나: 품목 하나의 from~to를 기간 호출 한 번(모든 페이지)으로 받는다 (ingest-foundation/04).
+// 페이지 중간에 실패하면 다시 부르기는 첫 페이지부터 다시 받는다. 행은 묶음이 다 받아졌을 때만 파일에 든다
+export async function collectKamisRange(ctx: CollectContext, item: KamisItem, range: { from: string; to: string; label: string }): Promise<Collected> {
+  const builder = new FileBuilder(ctx, { endpoint: KAMIS_ENDPOINT, label: range.label, targetFrom: range.from, targetTo: range.to })
+  await builder.add((call) => fetchKamisRetail(call, item, range.from, range.to))
   return builder.result()
 }
 

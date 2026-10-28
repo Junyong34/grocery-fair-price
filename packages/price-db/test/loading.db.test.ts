@@ -204,6 +204,39 @@ describe("정기 적재: 바뀐 행만 고쳐 쓴다", () => {
   })
 })
 
+describe("시세 요약 보존 정리 (182일 지나면 national만, 3-9 보관 4)", () => {
+  test("182일보다 오래된 KAMIS 시세의 시장 유형 범위만 지운다. national과 참가격 판매가는 남는다", async () => {
+    await inRollback(admin, async (tx) => {
+      const [spec] = await tx`select variety_id, id from price.spec order by id limit 1`
+      const rows = [
+        { basis: "quote", scope: "national", days: 200 },
+        { basis: "quote", scope: "market_type:traditional", days: 200 },
+        { basis: "quote", scope: "market_type:large_retail", days: 182 },
+        { basis: "shelf_price", scope: "channel:large_mart", days: 200 },
+      ]
+      for (const row of rows) {
+        await tx`
+          insert into price.daily_quote (variety_id, spec_id, price_tier, basis, scope_key, obs_date, value, n, sources, calc_version, computed_at)
+          values (${spec!.variety_id}, ${spec!.id}, 'retail', ${row.basis}, ${row.scope}, date '2030-01-01' - ${row.days}::int,
+                  1000, 1, '{kamis}', 'test', now())
+          on conflict do nothing`
+      }
+      const [expected] = await tx`select count(*)::int as n from price.daily_quote
+                                  where basis = 'quote' and scope_key <> 'national' and obs_date < date '2030-01-01' - 182`
+      const [result] = await tx`select price.purge_expired_quotes('2030-01-01')::int as deleted`
+      expect(result!.deleted).toBe(expected!.n)
+      const left = await tx`select basis, scope_key from price.daily_quote
+                            where variety_id = ${spec!.variety_id} and spec_id = ${spec!.id} and calc_version = 'test'
+                            order by basis, scope_key`
+      expect(left).toEqual([
+        { basis: "quote", scope_key: "market_type:large_retail" },
+        { basis: "quote", scope_key: "national" },
+        { basis: "shelf_price", scope_key: "channel:large_mart" },
+      ])
+    })
+  })
+})
+
 describe("보존 기간 정리 (KAMIS 90일, 참가격 6 조사일)", () => {
   test("90일이 지난 KAMIS 관측값만 지운다. 참가격은 조사일이 6개 미만이라 남는다", async () => {
     await inRollback(ingest, async (tx) => {

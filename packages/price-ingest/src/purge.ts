@@ -2,6 +2,7 @@
 //   pnpm --filter @workspace/price-ingest purge [--dry-run]
 // KAMIS 관측값은 최근 90일, 참가격은 최근 6 조사일만 남긴다. 그날의 요약이 없으면 지우지 않는다
 // (price.purge_expired_observations, 마이그레이션 20261026000100). 원본(Storage)은 지우지 않는다.
+// 시세 요약(daily_quote)은 182일이 지나면 시장 유형 범위를 지우고 national만 남긴다 (price.purge_expired_quotes, 3-9 보관 4).
 // 환경변수: INGEST_DATABASE_URL. .env를 스스로 읽지 않는다.
 import { parseArgs } from "node:util"
 
@@ -26,6 +27,8 @@ async function main(): Promise<void> {
       for (const row of await tx<{ source: string; deleted: string }[]>`select source, deleted from price.purge_expired_observations()`) {
         console.log(`지움: ${row.source} ${row.deleted}행`)
       }
+      const [quotes] = await tx<{ deleted: string }[]>`select price.purge_expired_quotes() as deleted`
+      console.log(`지움: 시세 요약 시장 유형 범위 ${quotes!.deleted}행`)
       if (values["dry-run"]) throw DRY_RUN
     })
   } catch (error) {

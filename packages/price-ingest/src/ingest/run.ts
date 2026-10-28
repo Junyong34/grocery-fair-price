@@ -233,7 +233,7 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
     try {
       const reconciled = await reconcileRawFiles({ sql, store, source, today: kstDateOf(now().toISOString()) })
       if (reconciled.registered.length > 0) say(`대조: 기록 없던 원본 ${reconciled.registered.length}개를 적재 대기로`)
-      const result = await loadPendingFiles({ sql, store, source })
+      const result = await loadPendingFiles({ sql, store, source, today })
       loaded = result.loaded.length
       loadFailed = result.failed.length
       loadedIds.push(...result.loaded.map((o) => o.rawObjectId))

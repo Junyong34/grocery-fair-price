@@ -1,6 +1,7 @@
 // 샘플 테스트 데이터용 관측값 적재 (pipeline.md 3-0 "접속", 3-3 "적재와 정정", 3-9 보관 1).
 //   정기 적재: 수집 패키지의 병합(@workspace/price-ingest/load/observation)을 그대로 쓴다
-//   백필: 임시 표 COPY → daily_quote → 최근 90일만 observation에 병합 (정식 구현은 ingest-foundation/04)
+//   백필: 임시 표 COPY → daily_quote → 최근 90일만 observation에 병합. 샘플용 간이 집계다.
+//   정식 구현은 수집 패키지의 백필 원본 적재(load-file.ts, daily-quote.ts aggregateStagedQuotes, ingest-foundation/04)
 // 둘 다 원본 파일 하나 = 트랜잭션 하나이고, 출처별 advisory lock을 잡는다.
 import {
   ensureSourceDays,

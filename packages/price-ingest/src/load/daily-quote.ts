@@ -10,6 +10,7 @@
 //
 // 날짜 하나를 다시 계산하면 그날 그 기준의 행을 새 결과로 맞춘다 (없어진 품종·범위의 행은 지운다).
 // 관측값이 보존 기간으로 지워진 날은 다시 계산하지 않는다. 남은 행(축평원)만으로 계산하면 집계가 망가진다 (3-3).
+// 그런 날의 시세는 KAMIS 백필이 원본을 담은 임시 표에서 같은 표본·집계로 낸다 (aggregateStagedQuotes, ingest-foundation/04).
 import { addDays } from "../ingest/collect.ts"
 
 import type { Sql, Tx } from "./db.ts"
@@ -21,11 +22,12 @@ export const KAMIS_KEEP_DAYS = 90
 
 export type Basis = "quote" | "shelf_price"
 
-const SAMPLES: Record<Basis, string> = {
-  quote: `
+// 시세 표본: 관측값 모양의 표(관측값, 또는 백필 원본을 담은 임시 표)에서 대표 출처의 매핑된 행. where는 $1·$2를 쓴다
+function quoteSamples(table: string, where: string): string {
+  return `
     select o.variety_id, o.spec_id, o.price_tier, o.obs_date, o.price_per_base as price, false as on_promo,
            o.place_id as unit_id, si.source, sc.scope_key
-      from price.observation o
+      from ${table} o
       join price.source_item si on si.id = o.source_item_id and si.source in ('kamis', 'ekape')
       join price.source_code_map m
         on m.source_item_id = o.source_item_id and m.status = 'mapped' and m.role = 'primary'
@@ -36,9 +38,13 @@ const SAMPLES: Record<Basis, string> = {
         (case when o.obs_kind = 'quote_sample' or p.scope = 'national' then 'national' end),
         ('market_type:' || mk.market_type)
       ) sc (scope_key)
-     where o.obs_date = any($1::date[]) and o.obs_date >= $2::date
+     where ${where}
        and o.obs_kind in ('quote_sample', 'quote_aggregate')
-       and not ('outlier' = any(coalesce(o.flags, '{}')))`,
+       and not ('outlier' = any(coalesce(o.flags, '{}')))`
+}
+
+const SAMPLES: Record<Basis, string> = {
+  quote: quoteSamples("price.observation", "o.obs_date = any($1::date[]) and o.obs_date >= $2::date"),
   shelf_price: `
     select o.variety_id, o.spec_id, o.price_tier, o.obs_date, o.price_per_base as price,
            coalesce(o.promo_discount, false) or coalesce(o.promo_one_plus_one, false) as on_promo,
@@ -61,24 +67,7 @@ export async function recomputeDailyQuote(tx: Tx, basis: Basis, dates: readonly 
   // KAMIS와 축평원 실행이 같은 날의 시세를 함께 고칠 수 있다. 기준마다 한 번에 하나만
   await tx`select pg_advisory_xact_lock(hashtext(${"recompute:" + basis}))`
 
-  await tx.unsafe(
-    `create temp table dq_new on commit drop as
-     with s as (${SAMPLES[basis]}),
-     ok as (
-       select * from s
-        where s.scope_key is not null and s.variety_id is not null and s.price is not null
-     )
-     select variety_id, spec_id, price_tier, scope_key, obs_date,
-            percentile_cont(0.5) within group (order by price) filter (where not on_promo) as median,
-            min(price) filter (where not on_promo) as min, max(price) filter (where not on_promo) as max,
-            count(distinct unit_id) filter (where not on_promo)::int as n,
-            array_agg(distinct source order by source) as sources,
-            count(*) filter (where on_promo)::int as promo_excluded_n
-       from ok
-      group by variety_id, spec_id, price_tier, scope_key, obs_date
-     having count(*) filter (where not on_promo) > 0`,
-    params,
-  )
+  await stageNewQuotes(tx, SAMPLES[basis], "true", params)
   // 이번에 계산한 날 중 실제로 계산 대상이었던 날만 지운다 (보존 기간 밖·관측값 없는 날은 그대로 둔다)
   const removed = await tx.unsafe(
     `delete from price.daily_quote q
@@ -91,6 +80,35 @@ export async function recomputeDailyQuote(tx: Tx, basis: Basis, dates: readonly 
                    = (q.variety_id, q.spec_id, q.price_tier, q.scope_key, q.obs_date))`,
     [basis, dates as string[], keepFrom],
   )
+  const written = await upsertNewQuotes(tx, basis)
+  await tx.unsafe(`drop table dq_new`)
+  return { written, removed: removed.count }
+}
+
+// 표본에서 품종·규격 × 범위 × 날짜의 중앙값을 세션 임시 표 dq_new에 낸다. keep: 남길 표본 조건 (별칭 s)
+async function stageNewQuotes(tx: Tx, samples: string, keep: string, params: (string | string[])[]): Promise<void> {
+  await tx.unsafe(
+    `create temp table dq_new on commit drop as
+     with s as (${samples}),
+     ok as (
+       select * from s
+        where s.scope_key is not null and s.variety_id is not null and s.price is not null and (${keep})
+     )
+     select variety_id, spec_id, price_tier, scope_key, obs_date,
+            percentile_cont(0.5) within group (order by price) filter (where not on_promo) as median,
+            min(price) filter (where not on_promo) as min, max(price) filter (where not on_promo) as max,
+            count(distinct unit_id) filter (where not on_promo)::int as n,
+            array_agg(distinct source order by source) as sources,
+            count(*) filter (where on_promo)::int as promo_excluded_n
+       from ok
+      group by variety_id, spec_id, price_tier, scope_key, obs_date
+     having count(*) filter (where not on_promo) > 0`,
+    params,
+  )
+}
+
+// dq_new를 daily_quote에 넣는다. 값이 같은 행은 고쳐 쓰지 않는다. 돌려주는 값: 새로 넣거나 고친 행 수
+async function upsertNewQuotes(tx: Tx, basis: Basis): Promise<number> {
   const written = await tx.unsafe(
     `insert into price.daily_quote as q
        (variety_id, spec_id, price_tier, basis, scope_key, obs_date, value, median, min, max, n,
@@ -107,8 +125,31 @@ export async function recomputeDailyQuote(tx: Tx, basis: Basis, dates: readonly 
                              excluded.promo_excluded_n, excluded.calc_version)`,
     [basis, CALC_VERSION],
   )
+  return written.count
+}
+
+// 시장 유형 범위를 두는 기간 (3-9 보관 4: 최근 6개월은 모든 범위, 그보다 오래된 것은 national만)
+export const QUOTE_ALL_SCOPES_DAYS = 182
+
+export type StagedQuoteResult = { written: number; days: number }
+
+// 백필 (3-9 보관 1): 임시 표에 담은 KAMIS 행 중 보존 기간(90일) 밖의 날로 시세 요약을 내고, 그 행을 임시 표에서 뺀다.
+// 남은 행(90일 안)은 관측값에 병합되고 정기 재계산이 요약을 낸다. 시장 유형 범위는 182일 안의 날만 만든다.
+// 요약을 지우지는 않는다: 그날의 다른 품목은 이 임시 표에 없다. today: KST 오늘. 트랜잭션 안에서 부른다
+export async function aggregateStagedQuotes(tx: Tx, table: string, today: string): Promise<StagedQuoteResult> {
+  const keepFrom = addDays(today, -KAMIS_KEEP_DAYS)
+  await tx`select pg_advisory_xact_lock(hashtext('recompute:quote'))`
+  await stageNewQuotes(tx, quoteSamples(table, "o.obs_date < $1::date"), "s.scope_key = 'national' or s.obs_date >= $2::date", [
+    keepFrom,
+    addDays(today, -QUOTE_ALL_SCOPES_DAYS),
+  ])
+  const written = await upsertNewQuotes(tx, "quote")
+  const [old] = await tx.unsafe<{ days: number }[]>(`select count(distinct obs_date)::int as days from ${table} where obs_date < $1::date`, [
+    keepFrom,
+  ])
+  await tx.unsafe(`delete from ${table} where obs_date < $1::date`, [keepFrom])
   await tx.unsafe(`drop table dq_new`)
-  return { written: written.count, removed: removed.count }
+  return { written, days: old?.days ?? 0 }
 }
 
 // 원본 파일들이 담은 날. 적재가 끝난 원본의 대상 기간(target_from~target_to)을 날짜로 편다
