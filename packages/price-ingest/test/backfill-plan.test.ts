@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { parseBackfillRequest } from "../src/backfill/cli.ts"
+import { finishedThisRun, parseBackfillRequest } from "../src/backfill/cli.ts"
 import { BACKFILL_YEARS, backfillItems, backfillTasks, ekapeBackfillTasks, taskRange } from "../src/backfill/plan.ts"
 import { kamisTarget } from "../src/catalog/match.ts"
 
@@ -94,5 +94,18 @@ describe("백필 명령 인자", () => {
     expect(parseBackfillRequest(["--budget", "9000"]).budget).toBe(9000)
     expect(() => parseBackfillRequest(["--source", "ekape", "--budget", "951"])).toThrow(/950/)
     expect(() => parseBackfillRequest(["--source", "chamga"])).toThrow(/--source/)
+  })
+})
+
+describe("이번 실행이 백필을 끝냈나 (끝나면 워크플로가 평소가 6개월을 다시 낸다)", () => {
+  const result = { exitCode: 0, runId: 1, errorCode: null, done: ["ekape:4304:2023-01"], failed: [], remaining: 0, callsUsed: 31 }
+
+  it("마지막 묶음을 이번에 끝냈으면 끝냈다", () => {
+    expect(finishedThisRun(result)).toBe(true)
+  })
+
+  it("남은 묶음이 있거나, 이미 다 받아 이번에 받은 게 없으면 아니다", () => {
+    expect(finishedThisRun({ ...result, remaining: 3 })).toBe(false)
+    expect(finishedThisRun({ ...result, done: [], runId: null, callsUsed: 0 })).toBe(false)
   })
 })

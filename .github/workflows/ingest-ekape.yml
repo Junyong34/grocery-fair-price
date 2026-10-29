@@ -73,6 +73,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile --filter "@workspace/price-ingest..."
       - name: 백필
+        id: backfill
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -85,6 +86,13 @@ jobs:
           # 1(예산을 다 씀·일부 묶음 실패)은 다음 날 이어 받는 정상 진행이라 초록으로 둔다
           if [ "$code" -eq 1 ]; then exit 0; fi
           exit $code
+      # 이번 실행이 마지막 묶음을 끝냈으면 평소가 6개월과 계절비율을 다시 낸다 (매일 실행은 최근 7일만 낸다).
+      # 축산 규격은 이력이 차야 판정 전에서 벗어난다 (judgment.md 7장)
+      - name: 평소가 6개월 다시 내기
+        if: ${{ steps.backfill.outputs.finished == 'true' }}
+        env:
+          INGEST_DATABASE_URL: ${{ secrets.INGEST_DATABASE_URL }}
+        run: pnpm --filter @workspace/price-ingest usual --days 182
 
   # 실패 알림 (ingest-schedule/13): 키 오류·원본 저장 실패는 즉시, 그 밖의 실패는 직전 실행도 실패였을 때 이슈를 열거나 댓글을 단다.
   # 성공하면 이 출처의 열린 알림 이슈를 닫는다. 이슈 권한은 이 잡에만 준다. 비밀값은 넘기지 않는다

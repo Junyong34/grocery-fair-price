@@ -4,11 +4,12 @@
 //   --item: KAMIS는 품목 코드, 축평원은 축종 코드(4304 등)
 // 환경변수: DATA_GO_KR_SERVICE_KEY, SUPABASE_URL, SUPABASE_SECRET_KEY, INGEST_DATABASE_URL (수집 명령과 같다).
 // .env를 스스로 읽지 않는다. 로컬에서는 넣을 곳(로컬 DB인지 운영인지)을 정해 직접 넘긴다.
+import { appendFileSync } from "node:fs"
 import { parseArgs } from "node:util"
 
 import { EXIT } from "../ingest/run.ts"
 import { actionsMaskCommands, describeError, redactorFromEnv, SECRET_ENV } from "../secrets.ts"
-import { runBackfill, type BackfillRequest, type BackfillSource } from "./run.ts"
+import { runBackfill, type BackfillRequest, type BackfillResult, type BackfillSource } from "./run.ts"
 
 const USAGE = "사용법: backfill [--source kamis|ekape] [--years N] [--item 품목코드 ...] [--budget 호출수]"
 
@@ -41,6 +42,12 @@ export function parseBackfillRequest(argv: readonly string[]): BackfillRequest {
   return { source, years: positive("--years", values.years), items: values.item, budget }
 }
 
+// 이번 실행이 마지막 묶음을 끝냈나. 이미 다 받아 아무것도 하지 않은 실행은 아니다.
+// 워크플로가 이 값으로 평소가 6개월을 한 번 다시 낸다 (매일 실행은 최근 7일만 낸다, judgment.md 7장)
+export function finishedThisRun(result: BackfillResult): boolean {
+  return result.remaining === 0 && result.done.length > 0
+}
+
 function required(name: string): string {
   const value = process.env[name]
   if (!value) throw new Error(`환경변수 ${name}가 없다`)
@@ -60,6 +67,7 @@ async function main(): Promise<number> {
     },
     gitSha: process.env.GITHUB_SHA ?? null,
   })
+  if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `finished=${finishedThisRun(result)}\n`)
   return result.exitCode
 }
 
