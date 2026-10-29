@@ -1,6 +1,6 @@
 # 14. 주 1회 heartbeat 워크플로
 
-Status: claimed
+Status: resolved
 Type: task (AFK)
 Blocked by: 08, 11, 12, 13
 
@@ -14,7 +14,7 @@ Blocked by: 08, 11, 12, 13
 - [x] 출처별 `source_day`의 마지막 `ok`가 기대보다 2일 넘게 멈췄으면 13의 방식으로 알림 이슈. 참가격은 조사일 주기를 감안한 기대값
 - [ ] heartbeat 자신도 꺼질 수 있다: 50일째 되기 전에 사람이 확인할 일정을 정해 `## Answer`에 적는다 (달력, 또는 다른 장치)
 - [ ] 04(Supabase 일시정지)의 결과에 더할 감시가 있으면 여기 넣는다
-- [ ] `workflow_dispatch`로 수집 워크플로 하나를 꺼 둔 채 돌려 다시 켜지는지 확인
+- [x] `workflow_dispatch`로 수집 워크플로 하나를 꺼 둔 채 돌려 다시 켜지는지 확인
 
 - [x] Supabase 일시정지 확인: 비밀 키로 Storage를 한 번 조회해 540·접속 실패면 13의 방식으로 알림 (04 Answer)
 ## 완료 기준
@@ -31,6 +31,8 @@ Blocked by: 08, 11, 12, 13
   - 참가격: 감지 기록(`last_checked_at`)이 3일 넘게 없으면 수집이 멈춘 것, 마지막 ok 조사일이 35일(가장 긴 간격 3주 + 등록 10일 + 여유)보다 오래면 데이터가 안 오는 것
 - Supabase: 비밀 키로 Storage 목록을 한 번 보고, DB에 붙어 위 기준을 읽는다. 실패하면 `source:supabase`로 알림(`storage_failed`·`db_unreachable`). 둘 다 닿으면 열린 supabase 알림을 닫는다.
 - 로컬에서 운영에 대고 한 번 돌렸다: 모두 켜져 있음, KAMIS·축평원 마지막 ok 10-28, 참가격 10-09·감지 기록 10-29. 알림 없음.
+
+**2차 (2026-10-29): 운영 확인**: `ingest-ekape.yml`을 `gh workflow disable`로 끈 뒤 heartbeat를 수동 실행했다([run 40809323842](https://github.com/Junyong34/grocery-fair-price/actions/runs/40809323842)). "다시 켬: ingest-ekape.yml (disabled_manually)"가 찍히고 워크플로가 `active`로 돌아왔다. 이슈 #2(`cause:workflow_disabled`)가 열렸고, 일부러 끈 것이라 손으로 닫았다. 출처 멈춤 알림은 지금 멈춘 출처가 없어 운영에서 내지 못했다. 오프라인 테스트(`staleSources`)로만 확인했다. 그래서 완료 기준의 "멈춘 출처 알림이 생긴다"는 테스트로만 확인한 상태다.
 
 ## Answer
 
