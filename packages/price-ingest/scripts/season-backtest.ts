@@ -8,7 +8,7 @@ import { parseArgs } from "node:util"
 
 import { addDays } from "../src/ingest/collect.ts"
 import { connectIngest } from "../src/load/db.ts"
-import { chooseBand, median, SEASON_DEFAULTS, seasonIndex, seasonRatios, usualPrice, type Point } from "../src/usual/season.ts"
+import { chooseBand, median, SEASON_DEFAULTS, seasonRatios, usedSeasonIndex, usualPrice, type Point } from "../src/usual/season.ts"
 
 const { values } = parseArgs({ options: { from: { type: "string" }, to: { type: "string" }, json: { type: "string" } }, strict: true })
 const to = values.to ?? "2026-10-28"
@@ -46,6 +46,7 @@ type SpecResult = {
   p80: number | null
   share10: { cheap: number; normal: number; expensive: number } | null // ±10% 고정 구간이면
   flips: number // 판정(밴드 기준)이 전날과 바뀐 횟수
+  flat: boolean // 기간 중 한 달이라도 계절비율을 1로 썼다
 }
 
 const pct = (v: number[], p: number) => {
@@ -54,7 +55,7 @@ const pct = (v: number[], p: number) => {
 }
 
 const started = Date.now()
-type Pass = { spec: { variety: string; spec: string; category: string }; priceDays: number; deviations: { day: string; d: number }[] }
+type Pass = { spec: { variety: string; spec: string; category: string }; priceDays: number; deviations: { day: string; d: number }[]; flat: boolean }
 const passes: Pass[] = []
 for (const [, spec] of bySpec) {
   const ratios = seasonRatios(spec.points)
@@ -63,6 +64,7 @@ for (const [, spec] of bySpec) {
   let indexMonth = ""
   let index = new Map<number, number>()
   let priceDays = 0
+  let flatMonths = 0
   for (let day = from; day <= to; day = addDays(day, 1)) {
     const price = byDay.get(day)
     if (price === undefined) continue
@@ -71,13 +73,15 @@ for (const [, spec] of bySpec) {
     const asOf = addDays(day, -1)
     if (day.slice(0, 7) !== indexMonth) {
       indexMonth = day.slice(0, 7)
-      index = seasonIndex(ratios, addDays(`${indexMonth}-01`, -1))
+      const used = usedSeasonIndex(ratios, addDays(`${indexMonth}-01`, -1))
+      index = used.index
+      flatMonths += used.flat ? 1 : 0
     }
     const past = spec.points.filter((p) => p.day <= asOf)
     const usual = usualPrice(past, index, asOf, day)
     if (usual) deviations.push({ day, d: price / usual.value - 1 })
   }
-  passes.push({ spec, priceDays, deviations })
+  passes.push({ spec, priceDays, deviations, flat: flatMonths > 0 })
 }
 
 // 카테고리 공통 구간의 재료: 그 카테고리 규격들의 편차를 모두 모은다
@@ -85,7 +89,7 @@ const pooled = new Map<string, number[]>()
 for (const p of passes) pooled.set(p.spec.category, [...(pooled.get(p.spec.category) ?? []), ...p.deviations.map((x) => x.d)])
 
 const results: SpecResult[] = []
-for (const { spec, priceDays, deviations } of passes) {
+for (const { spec, priceDays, deviations, flat } of passes) {
   const ds = deviations.map((x) => x.d)
   const band = ds.length ? chooseBand(ds, pooled.get(spec.category) ?? []) : null
   const verdict = (d: number) => (band === null ? "none" : d < band.low ? "cheap" : d > band.high ? "expensive" : "normal")
@@ -113,6 +117,7 @@ for (const { spec, priceDays, deviations } of passes) {
         }
       : null,
     flips,
+    flat,
   })
 }
 
@@ -129,6 +134,7 @@ console.log(`카테고리 공통 구간: ${[...pooled].map(([c, d]) => { const b
 const s10 = judged.map((r) => r.share10!)
 console.log(`±10% 고정이면: 싸요 ${r1(median(s10.map((s) => s.cheap))!)}% · 보통 ${r1(median(s10.map((s) => s.normal))!)}% · 비싸요 ${r1(median(s10.map((s) => s.expensive))!)}% (규격별 중앙)`)
 console.log(`편향(시세 ÷ 평소가 − 1의 규격별 중앙값): 중앙 ${r1(median(judged.map((r) => r.p50!))!)}%, |편향| > 5%인 규격 ${judged.filter((r) => Math.abs(r.p50!) > 0.05).length}개`)
+console.log(`계절비율을 1로 쓴 규격 (평소가가 나온 규격 중): ${judged.filter((r) => r.flat).length}개 · ${judged.filter((r) => r.flat).map((r) => `${r.variety}/${r.spec}`).join(", ")}`)
 console.log(`판정이 바뀐 횟수(1년, 규격별 중앙): ${median(judged.map((r) => r.flips))}`)
 console.log("\n카테고리별 (규격 수, 상위 20% 폭 중앙, 편향 중앙, 평소가가 나온 비율)")
 for (const cat of [...new Set(results.map((r) => r.category))].sort()) {

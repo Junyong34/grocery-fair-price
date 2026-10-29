@@ -20,6 +20,7 @@ export const SEASON_DEFAULTS = {
   minActiveMonths: 10, // 최근 12개월 중 시세가 있어야 하는 달 수 (이보다 적으면 제철 품목, 판정 전)
   minBandDays: 365, // 품종별 판정 구간을 쓰려면 판정한 날이 이만큼. 그 전에는 카테고리 공통 구간
   minGradeShare: 0.5, // 조사 시장 수가 같은 품종에서 가장 많은 규격의 이 비율보다 적은 규격은 판정하지 않는다 (5-2 중품)
+  minSeasonConsistency: 0, // 해마다 계절 모양이 닮은 정도(상관계수 평균)가 이보다 낮으면(해마다 반대 모양) 계절비율을 1로 둔다 (5-4)
   bandPercentile: 0.2, // 판정 구간: 시세 ÷ 평소가의 하위·상위 20%
   bandFloor: 0.05, // 구간 바닥 ±5%
   bandCeiling: 0.25, // 구간 천장 ±25%
@@ -206,5 +207,69 @@ export function thinGrades(counts: ReadonlyMap<string, number | null>, params: S
   const known = [...counts.values()].filter((n): n is number => n !== null)
   const most = known.length === 0 ? 0 : Math.max(...known)
   return new Set([...counts].filter(([, n]) => n !== null && n < most * params.minGradeShare).map(([key]) => key))
+}
+
+function pearson(xs: readonly number[], ys: readonly number[]): number | null {
+  const n = xs.length
+  if (n < 3) return null
+  const mx = xs.reduce((a, b) => a + b, 0) / n
+  const my = ys.reduce((a, b) => a + b, 0) / n
+  let sxy = 0
+  let sxx = 0
+  let syy = 0
+  for (let i = 0; i < n; i++) {
+    sxy += (xs[i]! - mx) * (ys[i]! - my)
+    sxx += (xs[i]! - mx) ** 2
+    syy += (ys[i]! - my) ** 2
+  }
+  return sxx === 0 || syy === 0 ? null : sxy / Math.sqrt(sxx * syy)
+}
+
+// 계절이 해마다 반복되나 (5-4). 기준일 전 seasonYears년을 1년씩 나눠 해마다 달별 비율 중앙값(계절 모양)을 만든다.
+// 해마다 그 모양이 나머지 해 모양의 평균과 얼마나 닮았는지(달별 상관계수)를 보고 평균한다. 1이면 해마다 같은 모양, 0 근처면 우연.
+// 6달 넘게 겹치는 해가 둘보다 적으면 null (판단하지 않는다)
+export function seasonConsistency(ratios: readonly Ratio[], asOf: string, params: SeasonParams = SEASON_DEFAULTS): number | null {
+  const years: Map<number, number[]>[] = Array.from({ length: params.seasonYears }, () => new Map())
+  for (const r of ratios) {
+    const age = daysBetween(r.day, asOf)
+    if (age < 0) continue
+    const k = Math.floor(age / YEAR)
+    if (k >= params.seasonYears) continue
+    const month = Number(r.day.slice(5, 7))
+    const list = years[k]!.get(month) ?? []
+    list.push(r.ratio)
+    years[k]!.set(month, list)
+  }
+  const profiles = years.map((y) => new Map([...y].map(([m, v]) => [m, median(v)!]))).filter((p) => p.size >= 6)
+  if (profiles.length < 2) return null
+  const scores: number[] = []
+  for (let i = 0; i < profiles.length; i++) {
+    const others = profiles.filter((_, j) => j !== i)
+    const xs: number[] = []
+    const ys: number[] = []
+    for (const [m, v] of profiles[i]!) {
+      const rest = others.map((o) => o.get(m)).filter((x): x is number => x !== undefined)
+      if (rest.length === 0) continue
+      xs.push(v)
+      ys.push(rest.reduce((a, b) => a + b, 0) / rest.length)
+    }
+    if (xs.length < 6) continue
+    const r = pearson(xs, ys)
+    if (r !== null) scores.push(r)
+  }
+  return scores.length === 0 ? null : scores.reduce((a, b) => a + b, 0) / scores.length
+}
+
+// 평소가에 쓸 계절비율: 해마다 모양이 닮지 않으면(일관성 < minSeasonConsistency) 모든 날 1. 판단할 수 없으면 그대로
+export function usedSeasonIndex(
+  ratios: readonly Ratio[],
+  asOf: string,
+  params: SeasonParams = SEASON_DEFAULTS,
+): { index: Map<number, number>; flat: boolean; consistency: number | null } {
+  const consistency = seasonConsistency(ratios, asOf, params)
+  if (consistency !== null && consistency < params.minSeasonConsistency) {
+    return { index: new Map(Array.from({ length: YEAR }, (_, slot) => [slot, 1])), flat: true, consistency }
+  }
+  return { index: seasonIndex(ratios, asOf, params), flat: false, consistency }
 }
 

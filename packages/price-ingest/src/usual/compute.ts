@@ -1,5 +1,6 @@
 // 품종·규격 여럿의 계절비율과 평소가를 한 번에 낸다 (judgment.md 1·2장). DB를 모르는 순수 함수다. DB 읽기·쓰기는 cli.ts.
-//   계절비율: 기준일이 속한 달의 1일 전날을 기준으로 만든다 (달마다 다시 만든다. 백테스트와 같다)
+//   계절비율: 기준일이 속한 달의 1일 전날을 기준으로 만든다 (달마다 다시 만든다. 백테스트와 같다).
+//   해마다 계절 모양이 닮지 않은 규격(쌀 등)은 계절비율을 1로 쓰고 표에도 1을 둔다 (usedSeasonIndex, 5-4)
 //   평소가: target 날마다 그 전날까지의 시세로 낸다 (그날 시세가 평소가에 섞이지 않게)
 //   판정 구간: 가장 최근 날에만 낸다. 지난 시세 ÷ 평소가 − 1로, 판정한 날이 1년보다 적으면 카테고리 공통 구간
 //   표본이 적은 규격(같은 품종에서 조사 시장이 가장 많은 규격의 절반 미만, 5-2)은 평소가를 내지 않는다. 계절비율 표는 만든다
@@ -9,9 +10,9 @@ import {
   dayOfYear,
   recentMarketCount,
   SEASON_DEFAULTS,
-  seasonIndex,
   seasonRatios,
   thinGrades,
+  usedSeasonIndex,
   usualPrice,
   type Point,
   type SeasonParams,
@@ -30,7 +31,11 @@ export type UsualRow = {
   specId: number
   asOf: string
   value: number
-  components: UsualPrice["components"] & { band?: { low: number; high: number; basis: "variety" | "category" } }
+  components: UsualPrice["components"] & {
+    season_flat: boolean // 계절이 해마다 반복되지 않아 계절비율을 1로 썼다
+    season_consistency: number | null // 해마다 계절 모양이 닮은 정도 (상관계수 평균). 판단할 수 없으면 null
+    band?: { low: number; high: number; basis: "variety" | "category" }
+  }
 }
 
 // 계절비율의 기준일: 그 달 1일의 전날
@@ -38,14 +43,16 @@ export function seasonAsOf(day: string): string {
   return addDays(`${day.slice(0, 7)}-01`, -1)
 }
 
+type UsedIndex = ReturnType<typeof usedSeasonIndex>
+
 // 비율을 다시 세는 일 없이 기준일마다 계절비율을 만든다
-function indexFor(ratios: ReturnType<typeof seasonRatios>, cache: Map<string, Map<number, number>>, asOf: string, params: SeasonParams) {
-  let index = cache.get(asOf)
-  if (!index) {
-    index = seasonIndex(ratios, asOf, params)
-    cache.set(asOf, index)
+function indexFor(ratios: ReturnType<typeof seasonRatios>, cache: Map<string, UsedIndex>, asOf: string, params: SeasonParams): UsedIndex {
+  let used = cache.get(asOf)
+  if (!used) {
+    used = usedSeasonIndex(ratios, asOf, params)
+    cache.set(asOf, used)
   }
-  return index
+  return used
 }
 
 // 한 해의 날별 비율 수 (계절비율 표의 n)
@@ -83,7 +90,7 @@ export function computeUsual(
 
   for (const s of series) {
     const ratios = seasonRatios(s.points)
-    const cache = new Map<string, Map<number, number>>()
+    const cache = new Map<string, UsedIndex>()
     const byDay = new Map(s.points.map((p) => [p.day, p.price]))
     const rows: UsualRow[] = []
     const deviations: number[] = []
@@ -96,15 +103,22 @@ export function computeUsual(
       while (pastEnd < s.points.length && s.points[pastEnd]!.day < day) pastEnd++
       const past = s.points.slice(0, pastEnd)
       const asOf = addDays(day, -1)
-      const usual = usualPrice(past, indexFor(ratios, cache, seasonAsOf(day), params), asOf, day, params)
+      const used = indexFor(ratios, cache, seasonAsOf(day), params)
+      const usual = usualPrice(past, used.index, asOf, day, params)
       if (!usual) continue
       if (day < input.to) deviations.push(price / usual.value - 1)
-      if (day >= input.from) rows.push({ varietyId: s.varietyId, specId: s.specId, asOf: day, value: usual.value, components: usual.components })
+      if (day >= input.from) rows.push({
+          varietyId: s.varietyId,
+          specId: s.specId,
+          asOf: day,
+          value: usual.value,
+          components: { ...usual.components, season_flat: used.flat, season_consistency: used.consistency },
+        })
     }
     perSpec.push({ s, rows, deviations })
 
     const asOf = seasonAsOf(input.to)
-    const index = indexFor(ratios, cache, asOf, params)
+    const { index } = indexFor(ratios, cache, asOf, params)
     const counts = slotCounts(ratios, asOf, params)
     for (const [slot, value] of index) season.push({ varietyId: s.varietyId, specId: s.specId, slot, value, n: counts.get(slot)!, asOf })
   }

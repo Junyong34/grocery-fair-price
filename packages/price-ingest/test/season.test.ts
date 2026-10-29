@@ -14,6 +14,8 @@ import {
   seasonIndex,
   seasonRatios,
   recentMarketCount,
+  seasonConsistency,
+  usedSeasonIndex,
   thinGrades,
   usualPrice,
   type Point,
@@ -126,6 +128,40 @@ describe("수준과 평소가", () => {
   })
 })
 
+describe("계절이 해마다 반복되나", () => {
+  it("해마다 같은 모양이면 일관성이 높고 계절비율을 그대로 쓴다", () => {
+    const prices = series("2023-01-01", "2026-10-28", (day, i) => 1000 * 1.05 ** (i / 365) * wave(day, 0.2))
+    const ratios = seasonRatios(prices)
+    expect(seasonConsistency(ratios, "2026-10-28")).toBeGreaterThan(0.8)
+    const { index, flat } = usedSeasonIndex(ratios, "2026-10-28")
+    expect(flat).toBe(false)
+    expect(index.get(dayOfYear("2026-07-02"))).toBeGreaterThan(1.1)
+  })
+
+  it("해마다 모양이 반대면(올라가는 때가 해마다 봄 · 여름 · 가을로 바뀜) 계절비율을 1로 둔다", () => {
+    // 기준일 2026-10-28 앞의 세 해: 해마다 18% 오르는 달이 다르다. 쌀처럼 계절처럼 보이는 값이 우연인 품목
+    const bump = (day: string) => {
+      const m = Number(day.slice(5, 7))
+      const peak = day >= "2025-10-28" ? [9, 10, 11] : day >= "2024-10-28" ? [6, 7, 8] : [3, 4, 5]
+      return peak.includes(m) ? 1.18 : 1
+    }
+    const prices = series("2023-01-01", "2026-10-28", (day) => 2500 * bump(day))
+    const ratios = seasonRatios(prices)
+    expect(seasonConsistency(ratios, "2026-10-28")).toBeLessThan(0)
+    const { index, flat } = usedSeasonIndex(ratios, "2026-10-28")
+    expect(flat).toBe(true)
+    expect(new Set(index.values())).toEqual(new Set([1]))
+    expect(index.size).toBe(365)
+  })
+
+  it("비교할 해가 둘보다 적으면 일관성을 낼 수 없어 계절비율을 그대로 쓴다", () => {
+    const prices = series("2025-01-01", "2026-10-28", (day) => 1000 * wave(day, 0.2))
+    const ratios = seasonRatios(prices)
+    expect(seasonConsistency(ratios, "2026-10-28")).toBeNull()
+    expect(usedSeasonIndex(ratios, "2026-10-28").flat).toBe(false)
+  })
+})
+
 describe("표본이 적은 규격", () => {
   it("최근 26주 하루 조사 시장 수의 중앙값", () => {
     const points = series("2026-01-01", "2026-10-28", (_, i) => 1000).map((p, i) => ({ ...p, n: i % 2 === 0 ? 48 : 50 }))
@@ -169,6 +205,7 @@ describe("판정 구간", () => {
       minActiveMonths: 10,
       minBandDays: 365,
       minGradeShare: 0.5,
+      minSeasonConsistency: 0,
       bandPercentile: 0.2,
       bandFloor: 0.05,
       bandCeiling: 0.25,
