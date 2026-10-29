@@ -23,6 +23,8 @@ concurrency:
 jobs:
   ingest:
     runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.ingest.outputs.code }}
     timeout-minutes: 15 # 21회 + 다시 부르기
     steps:
       - uses: actions/checkout@v4
@@ -35,6 +37,7 @@ jobs:
       # 비밀값은 이 단계의 env로만 넘긴다. CLI가 인코딩 변형까지 ::add-mask::로 더한다 (ingest-schedule/02)
       # 입력값은 run 줄에 직접 넣지 않고 env로 넘긴다 (스크립트 주입 방지). 형식은 CLI가 검사한다
       - name: 수집
+        id: ingest
         env:
           DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -44,4 +47,34 @@ jobs:
         run: |
           args=()
           if [ -n "$BASE_DATE" ]; then args+=(--date "$BASE_DATE"); fi
+          set +e # 종료 코드를 알림 잡에 넘기고 그대로 끝낸다
           pnpm --filter @workspace/price-ingest ingest --source ekape "${args[@]}"
+          code=$?
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          exit $code
+
+  # 실패 알림 (ingest-schedule/13): 키 오류·원본 저장 실패는 즉시, 그 밖의 실패는 직전 실행도 실패였을 때 이슈를 열거나 댓글을 단다.
+  # 성공하면 이 출처의 열린 알림 이슈를 닫는다. 이슈 권한은 이 잡에만 준다. 비밀값은 넘기지 않는다
+  alert:
+    needs: ingest
+    if: ${{ always() && needs.ingest.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read # 직전 실행이 실패였는지 본다
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --filter "@workspace/price-ingest..."
+      - name: 알림
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EXIT_CODE: ${{ needs.ingest.outputs.code }}
+        run: pnpm --filter @workspace/price-ingest alert --source ekape --workflow ingest-ekape.yml --exit-code "$EXIT_CODE"
