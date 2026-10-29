@@ -1,6 +1,6 @@
 # 11. 수집 워크플로 (KAMIS·축평원)
 
-Status: claimed
+Status: resolved
 Type: task (AFK)
 Blocked by: 03, 08, 09
 
@@ -15,7 +15,7 @@ Blocked by: 03, 08, 09
 - [x] `permissions`는 최소(`contents: read`). Secrets 네 개만 env로
 - [x] 02 Answer의 워크플로 규칙 다섯 가지 적용 (Secret은 단계 `env:`로만, 인코딩 변형 `::add-mask::`, 덤프·`set -x`·디버그 로깅 금지, 오류 본문을 이슈에 붙이지 않음, DB 주소 비밀번호는 퍼센트 인코딩)
 - [x] 의존성 설치는 `pnpm --filter @workspace/price-ingest...`만, 캐시
-- [ ] `workflow_dispatch`로 운영에서 한 번씩 돌려 운영 DB·Storage에 들어간 것을 확인
+- [x] `workflow_dispatch`로 운영에서 한 번씩 돌려 운영 DB·Storage에 들어간 것을 확인
 
 ## 완료 기준
 
@@ -36,3 +36,12 @@ Blocked by: 03, 08, 09
 - 2026-10-28 정기 KAMIS 실패 (실행 8, 예약 06:30, 실제 09:39 KST): 품목 22개 × 4번 모두 응답 없이 끝나 20분 한도로 `partial`(`time_limit`), 0행. 같은 시각 다른 러너의 probe(09:42 KAMIS 1초 성공)·참가격(같은 `apis.data.go.kr`)·축평원은 성공했고 로컬도 정상이라, **그 러너만 data.go.kr에 닿지 않은 것**으로 본다 (원인 불명, 03의 martmemo-data 사례와 같은 모양). 10-26 1차 멈춤도 같은 원인이었을 수 있다.
   - 논리 호출 3개(`UNREACHABLE_AFTER`)가 이어서 다시 부르기까지 응답 없이 끝나면 `unreachable`(종료 코드 1)로 멈춘다. 3분 안팎에 끝난다. 세 출처 모두 해당한다.
   - `ingest-kamis.yml`에 `30 0 * * *`(KST 09:30) 다시 받기를 더했다. `gate` 잡이 오늘(KST) 성공한 실행이 있으면 건너뛴다. 예약 실행이 3시간가량 늦게 돌아(06:30 예약 → 09:39) 06:30에서 3시간 띄웠다. 늦게 돈 본 실행이 다시 받기보다 뒤에 오면 두 번 받지만, 같은 내용은 중복으로 등록만 된다.
+
+## Answer
+
+**두 워크플로가 사람 손 없이 돈다** (2026-10-29 확인).
+
+- 정기 실행: 10-27, 10-29에 KAMIS·축평원이 모두 성공했다. 운영 `source_day`의 `ok`는 KAMIS 91일(07-30~10-28, 백필 포함), 축평원 6일(10-23~10-28)이다.
+- 10-28 KAMIS는 러너 하나가 data.go.kr에 닿지 않아 실패했다. 그래서 `unreachable` 조기 종료와 KST 09:30 다시 받기를 더했다 (위 진행 기록). 10-29 09:30 실행은 `gate`가 그날 성공한 실행을 보고 10초 만에 건너뛰었다.
+- 예약 시각보다 약 3시간 늦게 돈다 (06:30 → 09:39 KST 안팎). 수집 시각을 조정할지는 [15](15-closeout.md)에서 일주일 표를 보고 정한다.
+- 남은 일은 다른 티켓에 있다: 재등록 감시는 [09](09-kamis-reregistration-watch.md), 빈 날 메우기는 [08](08-fill-gaps.md).

@@ -1,6 +1,6 @@
 # 04. KAMIS 3년 백필과 계절비율 계산 입력
 
-Status: ready-for-agent
+Status: claimed
 Type: task
 Blocked by: 03
 

@@ -1,6 +1,8 @@
 # 04. 참가격 정기 수집
 
-Status: ready-for-agent
+Status: claimed
+
+> 2026-10-29: 이 티켓의 일은 [ingest-schedule/12](../../ingest-schedule/issues/12-chamga-workflow-and-catch-up.md)에서 했다 (정기 수집 워크플로, 06-12 이후 조사일 19개 처리). 12가 닫히면 이 티켓도 닫는다. 아래 체크칸은 처음 계획이다.
 Type: task
 Blocked by: ingest-foundation/01, ingest-foundation/02
 

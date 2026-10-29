@@ -16,7 +16,9 @@ Type: task
 - [x] Project Settings → Data API의 노출 스키마(Exposed schemas)에 `price`를 넣지 않는다 (기본값 그대로 두면 된다)
 - [x] (02의 마이그레이션 적용 뒤) 02의 마이그레이션이 롤 `ingest_writer`·`web_reader`를 만든 뒤, SQL 편집기에서 비밀번호만 정하기 (`alter role ingest_writer with password '…'`, `web_reader`도). 롤과 권한은 마이그레이션이 만들고 사람은 비밀번호와 접속 주소만 넣는다
 - [x] 아래 값을 루트 `.env`에 넣기 (커밋 금지. pre-commit의 `scripts/check-no-secrets.sh`가 막는다)
-- [ ] Actions용 값은 GitHub 저장소 Settings → Secrets and variables → Actions에, 웹앱용 값은 Vercel 프로젝트 환경변수에 등록
+- [x] Actions용 값을 GitHub 저장소 Settings → Secrets and variables → Actions에 등록 (2026-10-26, `ingest-schedule/01`)
+- [ ] 웹앱용 값(`WEB_DATABASE_URL`)을 Vercel 프로젝트 환경변수에 등록 (화면 연결 때)
+- [ ] Supabase 프로젝트 소유자 계정의 메일함을 실제로 보는지 확인 (일시정지 1주 전 경고 메일이 온다, `ingest-schedule/04` Answer)
 
 | 변수 | 어디서 | 쓰는 곳 |
 |---|---|---|

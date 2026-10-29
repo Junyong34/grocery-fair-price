@@ -26,11 +26,14 @@ Label: wayfinder:map
 - [수집 CLI 한 흐름](issues/07-ingest-cli.md): `ingest --source … [--date|--survey-day]`. KAMIS 140품목 매일, 원본은 실행×기능×대상 기간 하나, 바로 전 파일과 같으면 duplicate, 종료 코드 0/1/2/3/4/9. 실제 키로 로컬 실측 통과
 - [Supabase Free 일시정지 기준](issues/04-supabase-free-pause.md): 문턱값은 비공개, 매일 수집이 막아 줄 가능성이 높지만 미확정. 정지 1주 전 메일, 540·DNS 실패는 13에서 즉시 알림, 14에서 Storage 조회로 확인
 - [원본 적재 트랜잭션 (KAMIS·축평원)](issues/05-load-kamis-ekape.md): `loadRawFile`·`loadPendingFiles`. 위치·시장은 원본 행에서, 지역·품종은 비움, 시장 시군구 불일치는 행 거부, duplicate 판정은 07로. 병합 SQL은 price-ingest 한 곳
+- [Actions Secrets와 개발계정 종료일](issues/01-actions-secrets.md): Secrets 네 개 등록, 종료일 2028-10-08 (30일 전 연장·전환). 남은 사람 확인은 ingest-foundation/01로
+- [러너 접속 실측](issues/03-runner-connectivity.md): probe 6/6 성공(각 1초 안팎), 예약보다 약 3시간 늦게 돔. 10-28에 러너 하나가 data.go.kr에 닿지 않은 반례가 있어 조기 종료와 09:30 다시 받기로 대응. 배치 위치는 그대로
+- [수집 워크플로 (KAMIS·축평원)](issues/11-workflows-kamis-ekape.md): 10-27·10-29 정기 실행이 사람 손 없이 성공. 09:30 다시 받기는 그날 성공한 실행이 있으면 건너뜀
 - [참가격 원본 적재 (상품·점포)](issues/06-load-chamga.md): 마스터는 실행마다 받아 가격보다 먼저 적재. 마스터에 없는 번호는 점포는 위치만, 상품은 임시 이름으로 넣고 다음 마스터가 채움. 상품 연결 기간은 2026-06-12부터
 
 ## Not yet specified
 
-- **러너에서 data.go.kr이 안 되면 배치를 어디서 돌릴지.** martmemo-data는 GitHub 러너에서 data.go.kr 연결 시간 초과가 2주 연속 났다. 03의 실측이 실패하면 self-hosted 러너, 다른 배치 환경(ADR 0002의 Railway 후보), 재시도 간격 늘리기 중에서 정한다. ADR 0002를 고칠 수 있다.
+- ~~**러너에서 data.go.kr이 안 되면 배치를 어디서 돌릴지.**~~ 03에서 러너가 붙는 것을 확인했다 (2026-10-29). 러너 하나만 닿지 않는 일이 다시 잦아지면 아래를 꺼낸다. martmemo-data는 GitHub 러너에서 data.go.kr 연결 시간 초과가 2주 연속 났다. 03의 실측이 실패하면 self-hosted 러너, 다른 배치 환경(ADR 0002의 Railway 후보), 재시도 간격 늘리기 중에서 정한다. ADR 0002를 고칠 수 있다.
 - **KAMIS 휴일을 어떻게 아는지.** 5-2는 공휴일 달력에 있는 날을 `empty_expected`로 본다. 달력 출처(우리 `packages/seasonal/calendar`의 공휴일, KAMIS 응답 자체)는 08을 하며 필요해지면 정한다.
 - **수집 시각 조정.** 처음 2주 `source_day.first_ok_at`으로 실제 도착 시각을 재서 cron을 앞당길지 정한다 (5-1). 수집이 2주 돈 뒤에야 물을 수 있다.
 

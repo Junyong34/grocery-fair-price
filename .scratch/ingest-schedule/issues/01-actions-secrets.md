@@ -1,6 +1,6 @@
 # 01. Actions Secrets 등록과 개발계정 종료일 확인
 
-Status: open
+Status: resolved
 Type: task (HITL)
 Blocked by: -
 
@@ -34,3 +34,4 @@ Actions가 수집에 쓸 비밀값이 저장소에 들어가 있는가? 사람�
 - **data.go.kr 개발계정 활용기간 종료일: 2028-10-08** (2026-10-29 운영자 확인. 개발계정 3개(KAMIS, 축평원, 참가격)를 같은 날로 받았다). 이날 이후 키가 막혀 세 출처 수집이 모두 멈춘다 (CLI 종료 코드 2, 13의 인증키 오류 알림이 즉시 열린다).
 - **30일 전 2028-09-08까지 연장 신청 또는 운영계정 전환.** 달력 알림은 운영자가 넣는다.
 
+완료 기준(Secrets 이름 네 개, 종료일)을 채워 닫는다 (2026-10-29). 남은 사람 확인 두 가지(DB 비밀번호 보관, Supabase 소유자 메일함 확인)는 [ingest-foundation/01](../../ingest-foundation/issues/01-supabase-setup.md)에 옮겼다.
