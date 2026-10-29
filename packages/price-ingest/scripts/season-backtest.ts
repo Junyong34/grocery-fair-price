@@ -8,7 +8,7 @@ import { parseArgs } from "node:util"
 
 import { addDays } from "../src/ingest/collect.ts"
 import { connectIngest } from "../src/load/db.ts"
-import { bandOf, median, SEASON_DEFAULTS, seasonIndex, seasonRatios, usualPrice, type Point } from "../src/usual/season.ts"
+import { chooseBand, median, SEASON_DEFAULTS, seasonIndex, seasonRatios, usualPrice, type Point } from "../src/usual/season.ts"
 
 const { values } = parseArgs({ options: { from: { type: "string" }, to: { type: "string" }, json: { type: "string" } }, strict: true })
 const to = values.to ?? "2026-10-28"
@@ -39,7 +39,8 @@ type SpecResult = {
   category: string
   priceDays: number // 기간 안에 시세가 있는 날
   judged: number // 그중 평소가가 나온 날
-  band: { low: number; high: number } | null
+  band: { low: number; high: number; basis: "variety" | "category" } | null
+  share: { cheap: number; normal: number; expensive: number } | null // 고른 구간으로 낸 판정 비율
   p20: number | null
   p50: number | null // 편향: 0에서 멀면 평소가가 한쪽으로 치우쳤다
   p80: number | null
@@ -53,7 +54,8 @@ const pct = (v: number[], p: number) => {
 }
 
 const started = Date.now()
-const results: SpecResult[] = []
+type Pass = { spec: { variety: string; spec: string; category: string }; priceDays: number; deviations: { day: string; d: number }[] }
+const passes: Pass[] = []
 for (const [, spec] of bySpec) {
   const ratios = seasonRatios(spec.points)
   const byDay = new Map(spec.points.map((p) => [p.day, p.price]))
@@ -75,11 +77,21 @@ for (const [, spec] of bySpec) {
     const usual = usualPrice(past, index, asOf, day)
     if (usual) deviations.push({ day, d: price / usual.value - 1 })
   }
+  passes.push({ spec, priceDays, deviations })
+}
+
+// 카테고리 공통 구간의 재료: 그 카테고리 규격들의 편차를 모두 모은다
+const pooled = new Map<string, number[]>()
+for (const p of passes) pooled.set(p.spec.category, [...(pooled.get(p.spec.category) ?? []), ...p.deviations.map((x) => x.d)])
+
+const results: SpecResult[] = []
+for (const { spec, priceDays, deviations } of passes) {
   const ds = deviations.map((x) => x.d)
-  const band = bandOf(ds)
+  const band = ds.length ? chooseBand(ds, pooled.get(spec.category) ?? []) : null
   const verdict = (d: number) => (band === null ? "none" : d < band.low ? "cheap" : d > band.high ? "expensive" : "normal")
   let flips = 0
   for (let i = 1; i < deviations.length; i++) if (verdict(deviations[i]!.d) !== verdict(deviations[i - 1]!.d)) flips++
+  const shareOf = (test: (d: number) => boolean) => ds.filter(test).length / ds.length
   results.push({
     variety: spec.variety,
     spec: spec.spec,
@@ -87,6 +99,9 @@ for (const [, spec] of bySpec) {
     priceDays,
     judged: ds.length,
     band,
+    share: ds.length
+      ? { cheap: shareOf((d) => verdict(d) === "cheap"), normal: shareOf((d) => verdict(d) === "normal"), expensive: shareOf((d) => verdict(d) === "expensive") }
+      : null,
     p20: ds.length ? pct(ds, 0.2) : null,
     p50: ds.length ? pct(ds, 0.5) : null,
     p80: ds.length ? pct(ds, 0.8) : null,
@@ -107,6 +122,10 @@ const r1 = (v: number) => Math.round(v * 1000) / 10
 console.log(`기간 ${from} ~ ${to}, 규격 ${results.length}개 (시세가 있는 규격 ${results.filter((r) => r.priceDays > 0).length}개), ${Date.now() - started}ms`)
 console.log(`평소가가 나온 규격 ${judged.length}개, 시세 있는 날 중 평소가가 나온 비율 ${r1(coverage)}%`)
 console.log(`구간 폭(상위 20%): 중앙 ${r1(median(judged.map((r) => r.p80!))!)}%, 바닥 5%에 걸린 규격 ${judged.filter((r) => r.band!.high === SEASON_DEFAULTS.bandFloor).length}개, 천장 25%에 걸린 규격 ${judged.filter((r) => r.band!.high === SEASON_DEFAULTS.bandCeiling).length}개`)
+const sh = judged.map((r) => r.share!)
+const all = (k: "cheap" | "normal" | "expensive") => judged.reduce((a, r) => a + r.share![k] * r.judged, 0) / judged.reduce((a, r) => a + r.judged, 0)
+console.log(`고른 구간으로: 싸요 ${r1(all("cheap"))}% · 보통 ${r1(all("normal"))}% · 비싸요 ${r1(all("expensive"))}% (판정한 날 전체), 규격별 중앙 ${r1(median(sh.map((s) => s.cheap))!)} · ${r1(median(sh.map((s) => s.normal))!)} · ${r1(median(sh.map((s) => s.expensive))!)}`)
+console.log(`카테고리 공통 구간: ${[...pooled].map(([c, d]) => { const b = chooseBand([], d); return b ? `${c} ${r1(b.low)}~${r1(b.high)}%` : `${c} -` }).join(", ")}`)
 const s10 = judged.map((r) => r.share10!)
 console.log(`±10% 고정이면: 싸요 ${r1(median(s10.map((s) => s.cheap))!)}% · 보통 ${r1(median(s10.map((s) => s.normal))!)}% · 비싸요 ${r1(median(s10.map((s) => s.expensive))!)}% (규격별 중앙)`)
 console.log(`편향(시세 ÷ 평소가 − 1의 규격별 중앙값): 중앙 ${r1(median(judged.map((r) => r.p50!))!)}%, |편향| > 5%인 규격 ${judged.filter((r) => Math.abs(r.p50!) > 0.05).length}개`)

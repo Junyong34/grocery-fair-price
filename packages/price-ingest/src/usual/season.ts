@@ -3,7 +3,9 @@
 //   연중앙값(t) = t를 끝으로 하는 365일 시세의 중앙값 (달력 해로 자르면 연말·연초에 계단이 생긴다)
 //   수준        = median{ 시세(t) ÷ 계절비율(t) : t는 기준일 전 26주 }
 //   평소가(d)   = 수준 × 계절비율(d)
-// 판정 전(평소가 없음): 계절비율 이력이 2년보다 짧거나, 최근 26주에 시세가 있는 주가 8주보다 적거나, 그날 계절비율이 없을 때 (3장).
+// 판정 전(평소가 없음): 계절비율 이력이 2년보다 짧거나, 최근 26주에 시세가 있는 주가 8주보다 적거나, 그날 계절비율이 없을 때 (3장),
+// 제철 품목일 때 (최근 12개월 중 시세가 있는 달이 10달보다 적다. 26주 수준이 지난 철 끝물·이번 철 첫물 몇 주로 정해져 크게 치우친다,
+// 5장 백테스트 2026-10-29). KAMIS 소매는 평일만 조사해 1년 내내 나오는 품목도 시세가 있는 날은 약 250일이라 날 수가 아니라 달 수로 본다.
 // 숫자(창, 26주, 20%, 바닥·천장)는 judgment.md의 가정이다. 실제 데이터로 판정 분포를 본 뒤 calc_param으로 옮긴다.
 import { addDays } from "../ingest/collect.ts"
 
@@ -15,6 +17,8 @@ export const SEASON_DEFAULTS = {
   minHistoryDays: 730, // 계절비율 이력이 이보다 짧으면 판정 전 (2년)
   levelDays: 182, // 수준을 내는 기간 (26주)
   minLevelWeeks: 8, // 수준 기간 안에 시세가 있어야 하는 주 수
+  minActiveMonths: 10, // 최근 12개월 중 시세가 있어야 하는 달 수 (이보다 적으면 제철 품목, 판정 전)
+  minBandDays: 365, // 품종별 판정 구간을 쓰려면 판정한 날이 이만큼. 그 전에는 카테고리 공통 구간
   bandPercentile: 0.2, // 판정 구간: 시세 ÷ 평소가의 하위·상위 20%
   bandFloor: 0.05, // 구간 바닥 ±5%
   bandCeiling: 0.25, // 구간 천장 ±25%
@@ -110,7 +114,32 @@ export type UsualPrice = {
   components: { level: number; season_index: number; level_weeks: number; season_years: number; window_days: number }
 }
 
-// asOf까지의 시세로 target 날의 평소가. 이력이 짧거나 수준·계절비율이 없으면 null (판정 전)
+// asOf가 속한 달까지 달력 12개월 중 시세가 있는 달 수
+export function activeMonths(points: readonly Point[], asOf: string): number {
+  const [y, m] = [Number(asOf.slice(0, 4)), Number(asOf.slice(5, 7))]
+  const first = m === 12 ? `${y}-01` : `${y - 1}-${String(m + 1).padStart(2, "0")}`
+  return new Set(points.filter((p) => p.day <= asOf && p.day.slice(0, 7) >= first).map((p) => p.day.slice(0, 7))).size
+}
+
+// 판정 전인 이유. 화면은 이유와 상관없이 "판정 전"을 보이지만, 기록·검산에 남긴다
+export type NoUsualReason = "short_history" | "seasonal_item" | "thin_level" | "off_season"
+
+export function noUsualReason(
+  points: readonly Point[],
+  index: ReadonlyMap<number, number>,
+  asOf: string,
+  target: string,
+  params: SeasonParams = SEASON_DEFAULTS,
+): NoUsualReason | null {
+  const firstRatioDay = points.length === 0 ? null : addDays(points[0]!.day, YEAR - 1)
+  if (firstRatioDay === null || daysBetween(firstRatioDay, asOf) < params.minHistoryDays) return "short_history"
+  if (activeMonths(points, asOf) < params.minActiveMonths) return "seasonal_item"
+  if (!index.has(dayOfYear(target))) return "off_season"
+  if (levelOf(points, index, asOf, params) === null) return "thin_level"
+  return null
+}
+
+// asOf까지의 시세로 target 날의 평소가. 판정 전이면 null (이유는 noUsualReason)
 export function usualPrice(
   points: readonly Point[],
   index: ReadonlyMap<number, number>,
@@ -120,6 +149,7 @@ export function usualPrice(
 ): UsualPrice | null {
   const firstRatioDay = points.length === 0 ? null : addDays(points[0]!.day, YEAR - 1)
   if (firstRatioDay === null || daysBetween(firstRatioDay, asOf) < params.minHistoryDays) return null
+  if (activeMonths(points, asOf) < params.minActiveMonths) return null
   const si = index.get(dayOfYear(target))
   const level = levelOf(points, index, asOf, params)
   if (si === undefined || level === null) return null
@@ -145,3 +175,19 @@ export function bandOf(deviations: readonly number[], params: SeasonParams = SEA
     high: round(clamp(percentile(deviations, 1 - params.bandPercentile))),
   }
 }
+
+// 판정 구간 고르기: 품종의 판정한 날이 minBandDays 이상이면 품종 구간, 아니면 카테고리 공통 구간
+// (판정한 날이 적으면 품종 분포가 한쪽에 몰려 구간이 바닥에 걸린다, 5장). 둘 다 없으면 null
+export function chooseBand(
+  own: readonly number[],
+  category: readonly number[],
+  params: SeasonParams = SEASON_DEFAULTS,
+): { low: number; high: number; basis: "variety" | "category" } | null {
+  if (own.length >= params.minBandDays) {
+    const band = bandOf(own, params)
+    return band && { ...band, basis: "variety" }
+  }
+  const band = bandOf(category, params)
+  return band && { ...band, basis: "category" }
+}
+

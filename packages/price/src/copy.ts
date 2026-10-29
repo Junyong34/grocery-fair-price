@@ -34,6 +34,38 @@ export function verdictDiff(pct: number): string {
   return `평소보다 ${Math.abs(pct)}% ${pct > 0 ? "높아요" : "낮아요"}`
 }
 
+/** "10월 말"처럼 날짜를 달의 초 · 중순 · 말로. */
+export function partOfMonth(iso: string): string {
+  const [, month, day] = iso.split("-").map(Number)
+  return `${month}월 ${day! <= 10 ? "초" : day! <= 20 ? "중순" : "말"}`
+}
+
+// 계절비율이 이 범위 안이면 "한 해 평소와 비슷한 때"로 본다 (±5%)
+const SEASON_FLAT = 0.05
+
+/**
+ * "왜 이 판정일까?"의 계절 한 줄 (judgment.md 1장). seasonIndex는 그날의 계절비율(이맘때 시세 ÷ 그해 연중앙값)이다.
+ * 예: 1.12 → "10월 말엔 한 해 평소보다 12% 비싼 때예요"
+ */
+export function seasonNote(seasonIndex: number, iso: string): string {
+  const pct = Math.round((seasonIndex - 1) * 100)
+  if (Math.abs(seasonIndex - 1) < SEASON_FLAT) return `${partOfMonth(iso)}엔 한 해 중 가격이 평소와 비슷한 때예요`
+  return `${partOfMonth(iso)}엔 한 해 평소보다 ${Math.abs(pct)}% ${pct > 0 ? "비싼" : "싼"} 때예요`
+}
+
+/**
+ * 계절 한 줄 뒤에 붙이는 판정 풀이. 평소가는 이미 계절을 감안한 값이라, 판정이 싸요 · 비싸요면 계절 말고 다른 이유가 있다.
+ * 날씨 · 작황은 데이터로 확인하지 않으므로 "있을 수 있어요"로만 쓴다. 판정 전이면 null.
+ */
+export function seasonVerdictNote(verdict: Verdict, seasonIndex: number): string | null {
+  if (verdict.kind === "none" || verdict.pct === null) return null
+  if (verdict.kind === "pricey") return `계절을 감안해도 평소보다 ${Math.abs(verdict.pct)}% 높아요. 날씨 · 작황 · 수입량처럼 계절 말고 다른 이유가 있을 수 있어요`
+  if (verdict.kind === "cheap") return `계절을 감안해도 평소보다 ${Math.abs(verdict.pct)}% 낮아요. 물량이 많은 때일 수 있어요`
+  if (seasonIndex - 1 >= SEASON_FLAT) return "비싸 보여도 이맘때 오르는 만큼 오른 가격이에요"
+  if (1 - seasonIndex >= SEASON_FLAT) return "이맘때 내리는 만큼 내린 가격이에요"
+  return null
+}
+
 type Particle = Parameters<typeof josa>[1]
 
 /** 이름의 받침에 맞는 조사만. "삼겹살(국산)"처럼 괄호가 붙은 이름은 괄호 앞 글자로 고른다. */

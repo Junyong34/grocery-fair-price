@@ -3,10 +3,13 @@ import { describe, expect, it } from "vitest"
 
 import { addDays } from "../src/ingest/collect.ts"
 import {
+  activeMonths,
   bandOf,
+  chooseBand,
   dayOfYear,
   levelOf,
   median,
+  noUsualReason,
   SEASON_DEFAULTS,
   seasonIndex,
   seasonRatios,
@@ -102,6 +105,22 @@ describe("수준과 평소가", () => {
     const short = prices.filter((p) => p.day >= "2025-01-01")
     const shortIndex = seasonIndex(seasonRatios(short), "2026-10-28")
     expect(usualPrice(short, shortIndex, "2026-10-28", "2026-10-28")).toBeNull()
+    expect(noUsualReason(short, shortIndex, "2026-10-28", "2026-10-28")).toBe("short_history")
+  })
+
+  it("최근 12개월 중 시세가 있는 달이 10달보다 적은 제철 품목은 평소가를 내지 않는다", () => {
+    // 6~10월에만 나오는 품목 (평일만 조사해도 달 수는 같다)
+    const seasonal = prices.filter((p) => p.day.slice(5, 7) >= "06" && p.day.slice(5, 7) <= "10")
+    const seasonalIndex = seasonIndex(seasonRatios(seasonal), "2026-10-28")
+    expect(activeMonths(seasonal, "2026-10-28")).toBe(5) // 2025-11~2026-10 중 6~10월
+    expect(usualPrice(seasonal, seasonalIndex, "2026-10-28", "2026-10-28")).toBeNull()
+    expect(noUsualReason(seasonal, seasonalIndex, "2026-10-28", "2026-10-28")).toBe("seasonal_item")
+    // 평일만 오는 1년 내내 품목은 판정한다
+    const weekdays = prices.filter((p) => ![0, 6].includes(new Date(`${p.day}T00:00:00Z`).getUTCDay()))
+    const weekdayIndex = seasonIndex(seasonRatios(weekdays), "2026-10-28")
+    expect(activeMonths(weekdays, "2026-10-28")).toBe(12)
+    expect(usualPrice(weekdays, weekdayIndex, "2026-10-28", "2026-10-28")).not.toBeNull()
+    expect(noUsualReason(weekdays, weekdayIndex, "2026-10-28", "2026-10-28")).toBeNull()
   })
 })
 
@@ -114,6 +133,15 @@ describe("판정 구간", () => {
     expect(bandOf([])).toBeNull()
   })
 
+  it("판정한 날이 1년보다 적으면 카테고리 공통 구간을 쓴다", () => {
+    const narrow = Array.from({ length: 101 }, (_, i) => (i - 50) / 500) // ±10%
+    const wide = narrow.map((d) => d * 2) // ±20%
+    expect(chooseBand(narrow.slice(0, 100), wide)).toEqual({ low: -0.12, high: 0.12, basis: "category" })
+    const year = Array.from({ length: 365 }, (_, i) => (i - 182) / 1820) // ±10%
+    expect(chooseBand(year, wide)).toEqual({ low: -0.06, high: 0.06, basis: "variety" })
+    expect(chooseBand([], [])).toBeNull()
+  })
+
   it("기본값은 judgment.md의 가정과 같다", () => {
     expect(SEASON_DEFAULTS).toEqual({
       windowDays: 7,
@@ -121,6 +149,8 @@ describe("판정 구간", () => {
       minHistoryDays: 730,
       levelDays: 182,
       minLevelWeeks: 8,
+      minActiveMonths: 10,
+      minBandDays: 365,
       bandPercentile: 0.2,
       bandFloor: 0.05,
       bandCeiling: 0.25,
