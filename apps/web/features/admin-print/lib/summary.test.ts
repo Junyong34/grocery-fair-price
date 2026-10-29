@@ -9,12 +9,12 @@ const edition: Edition = { id: "monthly-1", title: "크림 달력", description:
 
 describe("toEditionSummary", () => {
   it("지금 사양으로 만든 PDF가 있으면 생성일을 서울 날짜로 적는다", () => {
-    const build = { specHash: specHash(edition.spec), generatedAt: "2026-10-16T16:30:00.000Z", bytes: {} }
+    const build = { specHash: specHash(edition.spec), generatedAt: "2026-10-16T16:30:00.000Z", bytes: {}, thumbnails: [] }
     expect(toEditionSummary(edition, build)).toEqual({ id: "monthly-1", kind: "monthly", title: "크림 달력", status: "draft", currentBuildDate: "2026-10-17" })
   })
 
   it("사양이 바뀐 뒤의 옛 PDF나 PDF가 없으면 생성일이 없다", () => {
-    const old = { specHash: "old", generatedAt: "2026-10-16T00:00:00.000Z", bytes: {} }
+    const old = { specHash: "old", generatedAt: "2026-10-16T00:00:00.000Z", bytes: {}, thumbnails: [] }
     expect(toEditionSummary(edition, old).currentBuildDate).toBeNull()
     expect(toEditionSummary({ ...edition, status: "published" }, undefined)).toMatchObject({ status: "published", currentBuildDate: null })
   })

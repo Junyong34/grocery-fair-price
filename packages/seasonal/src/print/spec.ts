@@ -23,6 +23,12 @@ export const PRINT_KIND_LABELS: Record<PrintKind, string> = {
 export const PAPER_SIZES = ["A4", "A3"] as const
 export type Paper = (typeof PAPER_SIZES)[number]
 
+/** 사용자에게 내놓는 용지. 생성기는 PAPER_SIZES를 모두 만들고, A3는 수요를 본 뒤 연다(.scratch/calendar-download/spec.md). */
+export const PUBLISHED_PAPERS = ["A4"] as const satisfies readonly Paper[]
+export type PublishedPaper = (typeof PUBLISHED_PAPERS)[number]
+
+export type Orientation = "portrait" | "landscape"
+
 /** 용지 치수(mm, 세로 기준). 인쇄 CSS와 생성기가 모두 이 표를 읽는다. A3는 A4의 √2배다(ISO 216). */
 export const PAPERS = {
   A4: { width: 210, height: 297, scale: 1 },
@@ -30,7 +36,7 @@ export const PAPERS = {
 } as const satisfies Record<Paper, { width: number; height: number; scale: number }>
 
 /** 방향을 반영한 용지 크기(mm). 인쇄 시트, 어드민 미리보기, 생성기의 PDF 쪽 크기 검사가 모두 이것을 쓴다. */
-export function sheetSize(paper: Paper, orientation: "portrait" | "landscape"): { width: number; height: number } {
+export function sheetSize(paper: Paper, orientation: Orientation): { width: number; height: number } {
   const { width, height } = PAPERS[paper]
   return orientation === "portrait" ? { width, height } : { width: height, height: width }
 }

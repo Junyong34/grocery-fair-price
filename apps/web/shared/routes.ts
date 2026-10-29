@@ -3,7 +3,7 @@
 
 import type { Festival } from "@workspace/seasonal/data/festivals"
 import type { Season } from "@workspace/seasonal/data/seasons"
-import { encodeSpec, type Paper, type PrintSpec } from "@workspace/seasonal/print/spec"
+import { encodeSpec, type Paper, type PrintSpec, type PublishedPaper } from "@workspace/seasonal/print/spec"
 
 export const routes = {
   /** 서비스 메인(P1 시세 메인). 로고와 하단 내비 "시세"가 여기로 간다. */
@@ -42,6 +42,8 @@ export const routes = {
     food: (id: string) => `/seasonal/foods/${id}`,
     /** 달력·포스터 PDF 내려받기 */
     downloads: "/seasonal/downloads",
+    /** 에디션 PDF 내려받기 주소. 저장소의 짧은 서명 링크로 넘긴다(ADR 0003). */
+    downloadFile: (id: string, paper: PublishedPaper) => `/seasonal/downloads/${id}/${paper.toLowerCase()}`,
   },
 
   /** 인쇄물 어드민. 개발 서버에서만 열린다(.scratch/calendar-print/spec.md). */

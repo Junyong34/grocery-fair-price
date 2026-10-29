@@ -299,7 +299,7 @@ AGENTS.md "Generated files" 표에 `public/downloads/**`와 명령 `pnpm prints:
 |---|---|---|
 | 렌더링 | HTML 인쇄 페이지 → 헤드리스 Chrome `page.pdf()` | 앱 컴포넌트·Oura 토큰·SVG 일러스트를 그대로 쓴다. 글자와 그림이 벡터라 A3에서도 선명하다. (이전 판 결정 유지) |
 | 생성 위치 | 관리자의 컴퓨터. 개발 서버 + Playwright(`apps/web` devDependency) | 운영에 PDF 엔진이 필요 없다. Vercel 함수 크기·시간 제한, `@sparticuz/chromium` 호환 문제가 사라진다. |
-| 다운로드 폴더 | `apps/web/public/downloads/`(git에 커밋, Vercel CDN이 내려준다). 링크의 앞부분은 `DOWNLOADS_BASE` 상수 하나 | 에디션 몇 개 규모면 저장소가 견딘다. PDF 한 개 크기는 아직 모른다(SVG 벡터라 작을 것으로 추측). 합계가 100MB를 넘으면 R2·Blob으로 옮기고 `DOWNLOADS_BASE`만 바꾼다. (2026-10-23: PDF는 커밋하지 않고 Supabase Storage에 두기로 정했다. "남은 일" 1) |
+| 다운로드 폴더 | `apps/web/public/downloads/`(git에 커밋, Vercel CDN이 내려준다). 링크의 앞부분은 `DOWNLOADS_BASE` 상수 하나 | 에디션 몇 개 규모면 저장소가 견딘다. PDF 한 개 크기는 아직 모른다(SVG 벡터라 작을 것으로 추측). 합계가 100MB를 넘으면 R2·Blob으로 옮기고 `DOWNLOADS_BASE`만 바꾼다. (2026-10-23: PDF는 커밋하지 않기로 했다. 2026-10-29: 저장소는 Supabase가 아니라 비공개 Cloudflare R2, 사용자 쪽은 `.scratch/calendar-download/spec.md`와 ADR 0003이 기준이다) |
 | 접근 제한 | `/admin`, `/print`의 layout이 `process.env.NODE_ENV === "production"`이면 `notFound()` | 어드민이 운영에 없으므로 로그인·Basic Auth·비밀번호 관리가 없다. 저장 Server Action도 같은 검사를 한다(파일을 쓰므로). |
 | 색인 | `/admin`, `/print`는 `shared/seo/pages.ts`에 noindex로 등록. `/seasonal/downloads`는 색인 대상. PDF는 `robots.ts`에서 막지 않는다 | 가드 테스트가 등록을 강제한다. 운영에서 404인 경로라 sitemap에 넣지 않는다. |
 | 사양 전달 | `?spec=`에 JSON을 base64url로. 인쇄 페이지는 `<Suspense>` 안에서 `searchParams`를 읽고 `parsePrintSpec` 실패 시 `notFound()` | 저장 전 상태도 미리 볼 수 있다. 정적 프리렌더 대상이 아니다. |

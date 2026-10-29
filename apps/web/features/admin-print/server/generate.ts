@@ -1,9 +1,11 @@
 import "server-only"
 
-import { mkdir, readdir, readFile, rm } from "node:fs/promises"
+import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises"
 import path from "node:path"
 
-import { downloadDir, downloadPath, type BuildRecord, type Edition } from "@workspace/seasonal/print/edition"
+import type { Page } from "playwright-core"
+
+import { downloadDir, downloadPath, thumbnailPages, thumbnailPath, type BuildRecord, type Edition, type Thumbnail } from "@workspace/seasonal/print/edition"
 import { PAPER_SIZES, pageCount, sheetSize, specHash, type Paper } from "@workspace/seasonal/print/spec"
 
 import { routes } from "@/shared/routes"
@@ -12,12 +14,18 @@ import { editionDownloadDir, PUBLIC_DIR } from "./files"
 
 const pt = (mm: number) => Math.round((mm * 72) / 25.4)
 
+/** 썸네일 폭(px). 목록 칸 · 시트 미리보기의 2배 밀도 */
+const THUMBNAIL_WIDTH = 480
+/** 썸네일을 찍는 용지. 사용자가 받는 용지와 같다. */
+const THUMBNAIL_PAPER: Paper = "A4"
+
 export async function generatePdfs(edition: Edition, origin: string): Promise<BuildRecord> {
   const { chromium } = await import("playwright-core")
   const browser = await chromium.launch({ channel: "chrome" })
   const bytes: Record<string, number> = {}
+  let thumbnails: Thumbnail[] = []
   try {
-    const page = await browser.newPage()
+    const page = await browser.newPage({ deviceScaleFactor: 2 })
     for (const paper of PAPER_SIZES) {
       const url = `${origin}${routes.print(edition.spec, paper)}`
       const response = await page.goto(url, { waitUntil: "networkidle" })
@@ -31,18 +39,35 @@ export async function generatePdfs(edition: Edition, origin: string): Promise<Bu
       await mkdir(path.dirname(target), { recursive: true })
       await page.pdf({ path: target, preferCSSPageSize: true, printBackground: true })
       bytes[file] = checkPdf(await readFile(target, "latin1"), edition, paper)
+      if (paper === THUMBNAIL_PAPER) thumbnails = await captureThumbnails(page, edition)
     }
   } finally {
     await browser.close()
   }
-  await removeUnused(edition.id, bytes)
-  return { specHash: specHash(edition.spec), generatedAt: new Date().toISOString(), bytes }
+  await removeUnused(edition.id, new Set([...Object.keys(bytes), ...thumbnails.map((thumbnail) => thumbnail.path)]))
+  return { specHash: specHash(edition.spec), generatedAt: new Date().toISOString(), bytes, thumbnails }
 }
 
-async function removeUnused(id: string, made: Readonly<Record<string, number>>) {
+/** 화면에 그린 인쇄 페이지의 시트를 찍어 WebP로 줄인다. 목록 · 상세의 미리보기다. */
+async function captureThumbnails(page: Page, edition: Edition): Promise<Thumbnail[]> {
+  const { default: sharp } = await import("sharp")
+  const sheets = page.locator(".print-sheet")
+  return Promise.all(
+    thumbnailPages(edition.spec).map(async (sheet, index) => {
+      const png = await sheets.nth(sheet).screenshot({ animations: "disabled" })
+      const { data, info } = await sharp(png).resize({ width: THUMBNAIL_WIDTH }).webp({ quality: 80 }).toBuffer({ resolveWithObject: true })
+      const file = thumbnailPath(edition.id, index)
+      await writeFile(path.join(PUBLIC_DIR, file), data)
+      return { path: file, width: info.width, height: info.height }
+    }),
+  )
+}
+
+async function removeUnused(id: string, made: ReadonlySet<string>) {
   const root = editionDownloadDir(id)
   const files = await readdir(root, { recursive: true }).catch(() => [])
-  await Promise.all(files.filter((file) => file.endsWith(".pdf") && !(`${downloadDir(id)}/${file}` in made)).map((file) => rm(path.join(root, file), { force: true })))
+  const generated = (file: string) => file.endsWith(".pdf") || file.endsWith(".webp")
+  await Promise.all(files.filter((file) => generated(file) && !made.has(`${downloadDir(id)}/${file}`)).map((file) => rm(path.join(root, file), { force: true })))
 }
 
 function checkPdf(pdf: string, edition: Edition, paper: Paper): number {

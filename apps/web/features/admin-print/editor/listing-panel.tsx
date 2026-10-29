@@ -2,9 +2,13 @@
 
 import { Field, FieldControl, FieldLabel } from "@workspace/ui/components/field"
 import { Input } from "@workspace/ui/components/input"
-import { Switch } from "@workspace/ui/components/switch"
+import { Segmented } from "@workspace/ui/components/segmented"
 
-import { EDITION_LIMITS, type EditionStatus } from "@workspace/seasonal/print/edition"
+import { EDITION_LIMITS, EDITION_STATUSES, type EditionStatus } from "@workspace/seasonal/print/edition"
+
+import { EDITION_STATUS_LABELS } from "../constants"
+
+const STATUS_OPTIONS = EDITION_STATUSES.map((status) => ({ value: status, label: EDITION_STATUS_LABELS[status] }))
 
 type Props = {
   description: string
@@ -25,13 +29,13 @@ export function ListingPanel({ description, status, onDescriptionChange, onStatu
           <Input value={description} maxLength={EDITION_LIMITS.description} placeholder="내려받기 화면에 한 줄로 보여요" onChange={(event) => onDescriptionChange(event.target.value)} />
         </FieldControl>
       </Field>
-      <label className="flex items-center justify-between gap-4 text-sm">
+      <div className="flex items-center justify-between gap-4 text-sm">
         <span className="flex flex-col gap-0.5">
-          <span className="text-ink">사용자에게 공개</span>
-          <span className="text-[13px] text-stone">PDF 저장 위치를 정하기 전에는 끄세요</span>
+          <span className="text-ink">상태</span>
+          <span className="text-[13px] text-stone">공개하려면 설명이 있어야 해요. 내리면 옛 링크에 새 에디션을 안내해요</span>
         </span>
-        <Switch checked={status === "published"} onCheckedChange={(on) => onStatusChange(on ? "published" : "draft")} />
-      </label>
+        <Segmented aria-label="상태" options={STATUS_OPTIONS} value={status} onValueChange={onStatusChange} />
+      </div>
     </section>
   )
 }

@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest"
 
-import { buildManifest, downloadPath, EDITION_LIMITS, isBuildCurrent, nextEditionId, parseEdition, type Edition } from "./edition"
+import { buildManifest, downloadPath, EDITION_LIMITS, isBuildCurrent, nextEditionId, parseEdition, thumbnailPages, thumbnailPath, type BuildRecord, type Edition } from "./edition"
 import { DEFAULT_SPECS, specHash } from "./spec"
 
 const edition = (id: string, status: Edition["status"]): Edition => ({
   id,
   title: id,
-  description: "",
+  description: status === "published" ? `${id} 설명` : "",
   status,
   spec: DEFAULT_SPECS.monthly,
 })
@@ -38,7 +38,7 @@ describe("parseEdition 글자 수", () => {
 
 describe("isBuildCurrent", () => {
   const spec = DEFAULT_SPECS.monthly
-  const build = { specHash: specHash(spec), generatedAt: "2026-10-16T12:00:00.000Z", bytes: {} }
+  const build = { specHash: specHash(spec), generatedAt: "2026-10-16T12:00:00.000Z", bytes: {}, thumbnails: [] }
 
   it("같은 사양으로 만든 기록만 최신이다", () => {
     expect(isBuildCurrent(spec, build)).toBe(true)
@@ -69,17 +69,64 @@ describe("downloadPath", () => {
   })
 })
 
+describe("parseEdition 공개 조건", () => {
+  it("공개하려면 설명이 있어야 한다(카드에 보이는 한 줄)", () => {
+    expect(parseEdition({ ...edition("monthly-1", "published"), description: " " })).toBeInstanceOf(Error)
+    expect(parseEdition({ ...edition("monthly-1", "draft"), description: "" })).not.toBeInstanceOf(Error)
+    expect(parseEdition({ ...edition("monthly-1", "withdrawn"), description: "" })).not.toBeInstanceOf(Error)
+  })
+})
+
+describe("thumbnailPages", () => {
+  it("월간 달력은 표지가 있으면 표지와 첫 달, 없으면 첫 달 한 장", () => {
+    expect(thumbnailPages({ ...DEFAULT_SPECS.monthly, cover: "year" })).toEqual([0, 1])
+    expect(thumbnailPages({ ...DEFAULT_SPECS.monthly, cover: "none" })).toEqual([0])
+  })
+
+  it("나머지 종류는 첫 쪽 한 장", () => {
+    expect(thumbnailPages(DEFAULT_SPECS["year-sheet"])).toEqual([0])
+    expect(thumbnailPages(DEFAULT_SPECS["season-poster"])).toEqual([0])
+    expect(thumbnailPages(DEFAULT_SPECS["month-poster"])).toEqual([0])
+  })
+})
+
+describe("thumbnailPath", () => {
+  it("에디션 폴더 안에 쪽 순서대로 webp 하나", () => {
+    expect(thumbnailPath("monthly-cream", 0)).toBe("/downloads/monthly-cream/thumb-1.webp")
+    expect(thumbnailPath("monthly-cream", 1)).toBe("/downloads/monthly-cream/thumb-2.webp")
+  })
+})
+
 describe("buildManifest", () => {
-  it("공개된 에디션만, id 순서로 담고 용지마다 파일 하나와 크기를 적는다", () => {
-    const manifest = buildManifest(
-      [edition("b", "published"), edition("a", "published"), edition("c", "draft")],
-      { a: { specHash: "aa", generatedAt: "2026-10-16", bytes: { "/downloads/a/a4.pdf": 120 } }, b: { specHash: "bb", generatedAt: "2026-10-15", bytes: {} } },
-    )
-    expect(manifest.editions.map((entry) => entry.id)).toEqual(["a", "b"])
-    expect(manifest.editions[0]!.files).toEqual({
-      A4: { path: "/downloads/a/a4.pdf", bytes: 120 },
-      A3: { path: "/downloads/a/a3.pdf", bytes: 0 },
+  const thumb = (id: string) => [{ path: thumbnailPath(id, 0), width: 480, height: 679 }]
+  const build = (id: string, bytes: Record<string, number> = {}): BuildRecord => ({ specHash: `${id}-hash`, generatedAt: "2026-10-16", bytes, thumbnails: thumb(id) })
+
+  it("공개된 에디션 가운데 생성 기록이 있는 것만, id 순서로 담는다", () => {
+    const manifest = buildManifest([edition("b", "published"), edition("a", "published"), edition("c", "draft"), edition("d", "published")], {
+      a: build("a"),
+      b: build("b"),
+      c: build("c"),
     })
-    expect(manifest.editions[0]!.specHash).toBe("aa")
+    expect(manifest.editions.map((entry) => entry.id)).toEqual(["a", "b"])
+  })
+
+  it("공개 용지(A4)만 담는다. A3는 만들어도 내놓지 않는다", () => {
+    const manifest = buildManifest([edition("a", "published")], { a: build("a", { "/downloads/a/a4.pdf": 120, "/downloads/a/a3.pdf": 240 }) })
+    expect(manifest.editions[0]!.files).toEqual({ A4: { bytes: 120 } })
+  })
+
+  it("카드에 쓸 값(썸네일·연도·방향·쪽 수)을 옮긴다", () => {
+    const monthly = { ...edition("a", "published"), spec: { ...DEFAULT_SPECS.monthly, year: 2027, cover: "year" as const } }
+    const poster = { ...edition("p", "published"), spec: DEFAULT_SPECS["month-poster"] }
+    const [a, p] = buildManifest([monthly, poster], { a: build("a"), p: build("p") }).editions
+    expect(a).toMatchObject({ kind: "monthly", year: 2027, orientation: monthly.spec.orientation, pages: 13, thumbnails: thumb("a"), description: "a 설명" })
+    expect(p!.year).toBeUndefined()
+    expect(p!.pages).toBe(1)
+  })
+
+  it("내린 에디션은 목록에서 빠지고 withdrawn에 남는다(옛 링크 안내용). 생성 기록이 없어도 된다", () => {
+    const manifest = buildManifest([edition("a", "published"), edition("old", "withdrawn")], { a: build("a") })
+    expect(manifest.editions.map((entry) => entry.id)).toEqual(["a"])
+    expect(manifest.withdrawn).toEqual([{ id: "old", kind: "monthly", title: "old", year: DEFAULT_SPECS.monthly.year }])
   })
 })

@@ -1,11 +1,12 @@
 import { z } from "zod"
 
-import { PAPER_SIZES, parsePrintSpec, specHash, type Paper, type PrintKind, type PrintSpec } from "./spec"
+import { pageCount, parsePrintSpec, PUBLISHED_PAPERS, specHash, type Orientation, type Paper, type PrintKind, type PrintSpec, type PublishedPaper } from "./spec"
 
-// 에디션: 이름이 붙은 인쇄 사양 하나. 원본은 apps/web/print-editions/<id>.json(git), 결과 PDF는 public/downloads/.
-// 사용자 다운로드 화면은 생성기가 쓰는 public/downloads/manifest.json만 읽는다.
+// 에디션: 이름이 붙은 인쇄 사양 하나. 원본은 apps/web/print-editions/<id>.json(git), 결과 PDF·썸네일은 public/downloads/<id>/.
+// 사용자 다운로드 화면은 생성기가 쓰는 public/downloads/manifest.json만 읽는다(.scratch/calendar-download/spec.md).
 
-export const EDITION_STATUSES = ["draft", "published"] as const
+/** withdrawn: 내린 에디션. 목록에서 빠지고, 옛 링크로 오면 같은 종류의 최신 에디션을 안내한다. */
+export const EDITION_STATUSES = ["draft", "published", "withdrawn"] as const
 export type EditionStatus = (typeof EDITION_STATUSES)[number]
 
 /** 에디션 글자 수 제한. 스키마와 입력 칸이 같은 값을 쓴다. */
@@ -17,7 +18,7 @@ export type Edition = {
   title: string
   description: string
   spec: PrintSpec
-  /** published만 매니페스트에 들어가 사용자에게 보인다. */
+  /** published만 사용자 목록에 보인다. published면 설명이 있어야 한다. */
   status: EditionStatus
 }
 
@@ -27,6 +28,9 @@ const editionSchema = z.object({
   description: z.string().trim().max(EDITION_LIMITS.description),
   status: z.enum(EDITION_STATUSES),
   spec: z.unknown(),
+}).refine((edition) => edition.status !== "published" || edition.description.length > 0, {
+  path: ["description"],
+  message: "공개하려면 설명을 적어 주세요.",
 })
 
 export function parseEdition(value: unknown): Edition | Error {
@@ -48,55 +52,77 @@ export function downloadDir(editionId: string): string {
   return `/downloads/${editionId}`
 }
 
-/** public 기준 다운로드 경로. 에디션·용지마다 파일 하나다. 해시가 없어 다시 만들어도 사용자 링크가 그대로다. */
+/** 생성기가 PDF를 쓰는 public 기준 경로. 에디션·용지마다 파일 하나다. 사용자 링크는 이 경로가 아니라 다운로드 주소(routes)다. */
 export function downloadPath(editionId: string, paper: Paper): string {
   return `${downloadDir(editionId)}/${paper.toLowerCase()}.pdf`
 }
 
-export type DownloadFile = { path: string; bytes: number }
+/** 썸네일로 찍을 쪽(0부터). 월간 달력은 표지와 첫 달을 같이 보여 표지만 보고 고르지 않게 한다. */
+export function thumbnailPages(spec: PrintSpec): number[] {
+  return spec.kind === "monthly" && spec.cover !== "none" ? [0, 1] : [0]
+}
+
+/** public 기준 썸네일 경로. index는 thumbnailPages의 순서다. */
+export function thumbnailPath(editionId: string, index: number): string {
+  return `${downloadDir(editionId)}/thumb-${index + 1}.webp`
+}
+
+export type Thumbnail = { path: string; width: number; height: number }
 
 export type ManifestEntry = {
   id: string
   kind: PrintKind
   title: string
   description: string
+  /** 날짜가 있는 종류(월간·연간 달력)만 */
+  year?: number
+  orientation: Orientation
+  pages: number
   /** 이 파일을 만든 사양의 해시. 어드민이 "다시 생성 필요"를 가린다. */
   specHash: string
   generatedAt: string
-  files: Record<Paper, DownloadFile>
+  files: Record<PublishedPaper, { bytes: number }>
+  thumbnails: Thumbnail[]
 }
 
-export type DownloadManifest = { editions: ManifestEntry[] }
+export type WithdrawnEntry = Pick<ManifestEntry, "id" | "kind" | "title" | "year">
+
+export type DownloadManifest = { editions: ManifestEntry[]; withdrawn: WithdrawnEntry[] }
 
 /** 생성 기록. 생성기가 에디션마다 남긴다. bytes 키는 downloadPath다. */
-export type BuildRecord = { specHash: string; generatedAt: string; bytes: Record<string, number> }
+export type BuildRecord = { specHash: string; generatedAt: string; bytes: Record<string, number>; thumbnails: Thumbnail[] }
 
 /** 이 생성 기록이 지금 사양으로 만든 것인가. 없거나 사양이 바뀌었으면 false. */
 export function isBuildCurrent(spec: PrintSpec, build: BuildRecord | undefined): build is BuildRecord {
   return build !== undefined && build.specHash === specHash(spec)
 }
 
-/** 공개된 에디션 가운데 생성 기록이 있는 것으로 매니페스트를 만든다. 같은 입력이면 같은 결과다. */
+const yearOf = (spec: PrintSpec) => ("year" in spec ? spec.year : undefined)
+
+/** 공개된 에디션 가운데 생성 기록이 있는 것과, 내린 에디션으로 매니페스트를 만든다. 같은 입력이면 같은 결과다. */
 export function buildManifest(editions: readonly Edition[], builds: Readonly<Record<string, BuildRecord>>): DownloadManifest {
+  const sorted = [...editions].sort((a, b) => a.id.localeCompare(b.id))
   return {
-    editions: editions
+    editions: sorted
       .filter((edition) => edition.status === "published" && builds[edition.id])
-      .sort((a, b) => a.id.localeCompare(b.id))
       .map((edition) => {
         const build = builds[edition.id]!
-        const fileFor = (paper: Paper): DownloadFile => {
-          const path = downloadPath(edition.id, paper)
-          return { path, bytes: build.bytes[path] ?? 0 }
-        }
         return {
           id: edition.id,
           kind: edition.spec.kind,
           title: edition.title,
           description: edition.description,
+          year: yearOf(edition.spec),
+          orientation: edition.spec.orientation,
+          pages: pageCount(edition.spec),
           specHash: build.specHash,
           generatedAt: build.generatedAt,
-          files: Object.fromEntries(PAPER_SIZES.map((paper) => [paper, fileFor(paper)])) as ManifestEntry["files"],
+          files: Object.fromEntries(PUBLISHED_PAPERS.map((paper) => [paper, { bytes: build.bytes[downloadPath(edition.id, paper)] ?? 0 }])) as ManifestEntry["files"],
+          thumbnails: build.thumbnails,
         }
       }),
+    withdrawn: sorted
+      .filter((edition) => edition.status === "withdrawn")
+      .map((edition) => ({ id: edition.id, kind: edition.spec.kind, title: edition.title, year: yearOf(edition.spec) })),
   }
 }

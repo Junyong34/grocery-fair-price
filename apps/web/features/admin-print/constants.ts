@@ -24,7 +24,7 @@ export const KIND_LOOKS: Record<PrintKind, KindLook> = {
   "month-poster": { shape: "daisy-12", selector: "flower", tone: "yellow" },
 }
 
-export const EDITION_STATUS_LABELS: Record<EditionStatus, string> = { draft: "초안", published: "공개" }
+export const EDITION_STATUS_LABELS: Record<EditionStatus, string> = { draft: "초안", published: "공개", withdrawn: "내림" }
 
 export const COPY_FEEDBACK_MS = 1200
 

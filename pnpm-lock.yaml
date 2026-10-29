@@ -93,6 +93,9 @@ importers:
       schema-dts:
         specifier: ^2.1.0
         version: 2.1.0
+      sharp:
+        specifier: 0.35.5
+        version: 0.35.5(@types/node@20.19.43)
       typescript:
         specifier: ^5
         version: 5.9.3

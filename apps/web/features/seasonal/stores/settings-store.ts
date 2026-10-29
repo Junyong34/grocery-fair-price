@@ -2,7 +2,6 @@
 
 import type { CalendarVariant } from "@workspace/seasonal/calendar/variants"
 import type { MonthLabelStyle } from "@workspace/seasonal/data/months"
-import type { Paper } from "@workspace/seasonal/print/spec"
 
 import { deviceStore } from "@/shared/device-store"
 
@@ -15,8 +14,6 @@ type Settings = {
   calendarStyle: CalendarVariant
   /** 2a 달 제목과 달 이동(모바일 월 레일, 데스크톱 휠)의 달 이름 표기. 기본은 "1월". */
   monthLabel: MonthLabelStyle
-  /** PDF 내려받기 화면에서 고른 용지. 기본은 A4. */
-  paper: Paper
 }
 
 const settingsStore = deviceStore<Settings>("seasonal:settings", {
@@ -24,7 +21,6 @@ const settingsStore = deviceStore<Settings>("seasonal:settings", {
   showEaten: true,
   calendarStyle: "plain",
   monthLabel: "korean",
-  paper: "A4",
 })
 
 export const useSettings = settingsStore.use

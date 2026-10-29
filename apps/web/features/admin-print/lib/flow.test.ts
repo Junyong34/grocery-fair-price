@@ -48,7 +48,7 @@ describe("editionFlow", () => {
 })
 
 const edition: Edition = { id: "monthly-1", title: "2027 달력", description: "", status: "draft", spec: DEFAULT_SPECS.monthly }
-const buildOf = (spec: PrintSpec): BuildRecord => ({ specHash: specHash(spec), generatedAt: "2026-10-20T00:00:00.000Z", bytes: {} })
+const buildOf = (spec: PrintSpec): BuildRecord => ({ specHash: specHash(spec), generatedAt: "2026-10-20T00:00:00.000Z", bytes: {}, thumbnails: [] })
 
 describe("editionDraft", () => {
   it("편집본이 저장본과 같으면 바뀐 게 없다", () => {

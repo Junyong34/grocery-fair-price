@@ -128,11 +128,10 @@ export function hashString(value: string): number {
 /** 달력·포스터 PDF 내려받기 화면(/seasonal/downloads). */
 export const DOWNLOADS_COPY = {
   title: "달력·포스터 내려받기",
-  intro: "제철 달력과 포스터를 PDF로 내려받아 인쇄해 보세요. A4는 집 프린터로, A3는 벽에 걸기 좋은 크기예요.",
+  intro: "제철 달력과 포스터를 A4 PDF로 내려받아 집에서 인쇄해 보세요.",
   empty: "아직 준비된 인쇄물이 없어요. 곧 올려 둘게요.",
   calendars: "달력",
   posters: "포스터",
-  paperHint: { A4: "A4 · 집 프린터", A3: "A3 · 벽걸이" },
   all: (kind: "monthly" | "single") => (kind === "monthly" ? "12개월 전체" : "내려받기"),
   settingsLink: "달력·포스터 PDF 내려받기",
 } as const
