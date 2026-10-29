@@ -16,7 +16,12 @@ import { actionsMaskCommands, describeError, redactorFromEnv, SECRET_ENV } from 
 
 const USAGE =
   "사용법: ingest --source kamis|ekape [--date YYYY-MM-DD] [--recheck-days N (kamis)] | ingest --source chamga [--survey-day YYYY-MM-DD ...]"
-const YMD = /^\d{4}-\d{2}-\d{2}$/
+// 형식과 실제 날짜를 함께 본다. 2026-13-40 같은 날을 받으면 날짜 계산이 Invalid Date가 되어 수집이 시간 초과까지 멈춘다 (2026-10-29)
+export function isYmd(day: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return false
+  const date = new Date(`${day}T00:00:00Z`)
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === day
+}
 
 export function parseRequest(argv: readonly string[], today: string): CollectRequest {
   const { values } = parseArgs({
@@ -32,7 +37,7 @@ export function parseRequest(argv: readonly string[], today: string): CollectReq
   const source = values.source
   if (source === "kamis" || source === "ekape") {
     const day = values.date ?? today
-    if (!YMD.test(day)) throw new Error(`--date는 YYYY-MM-DD다. ${USAGE}`)
+    if (!isYmd(day)) throw new Error(`--date는 YYYY-MM-DD다. ${USAGE}`)
     const recheck = values["recheck-days"]
     if (recheck === undefined) return { source, day }
     // 기간이 길면 축산 품목이 여러 페이지가 된다(소 14일 약 4회). 실행 예산(8,000) 안에 들게 31일까지만
@@ -44,7 +49,7 @@ export function parseRequest(argv: readonly string[], today: string): CollectReq
   if (source === "chamga") {
     const surveyDays = values["survey-day"]
     if (surveyDays === undefined) return { source }
-    if (!surveyDays.every((day) => YMD.test(day))) throw new Error(`--survey-day는 YYYY-MM-DD다. ${USAGE}`)
+    if (!surveyDays.every(isYmd)) throw new Error(`--survey-day는 YYYY-MM-DD다. ${USAGE}`)
     return { source, surveyDays }
   }
   throw new Error(USAGE)
