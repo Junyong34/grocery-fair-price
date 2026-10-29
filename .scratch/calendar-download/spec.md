@@ -24,7 +24,7 @@ Phase: MVP 이후.
 |---|---|---|
 | 저장소 | 비공개 Cloudflare R2 버킷. 커스텀 도메인 없음 | ADR 0003. 월간 달력 A4 7.45MB(실측), Supabase 무료 쿼터는 가격 DB와 나눠 써 여유가 없다. R2 egress 무료 |
 | 전달 | Route Handler가 R2 presigned URL(수명 60초)을 만들어 302 | 링크가 퍼져도 곧 무효. 광고 검사·다운로드 집계·저장소 교체의 자리 |
-| 색인 | PDF 응답 `X-Robots-Tag: noindex`, `robots.ts`에서 파일 경로 Disallow. 목록·에디션 페이지는 색인 | 검색 유입이 반드시 우리 화면을 거친다 |
+| 색인 | 내려받기 주소 응답 `X-Robots-Tag: noindex`(Disallow는 쓰지 않는다: 이 저장소는 noindex로만 막는다). 목록·에디션 페이지는 색인 | 검색 유입이 반드시 우리 화면을 거친다 |
 | rate limit | 처음엔 없음 | R2 읽기 요청 무료 한도가 넉넉하다. 악용이 보이면 Route Handler에 더한다 |
 | 용지 | 생성은 A4·A3 둘 다, **공개(업로드)는 A4만**. 사용자 화면에 용지 고르기 없음 | A3 수요를 모른다. "A3도 원해요" 버튼 클릭 수(GA)로 판단한다 |
 | 에디션 목록 | `public/downloads/manifest.json`을 git에 커밋, 배포로 반영 | 1년에 몇 번 바뀐다. 목록이 정적이라 빠르고 색인된다 |
@@ -100,7 +100,7 @@ Phase: MVP 이후.
 | 03 | 어드민 게시: R2 업로드·manifest 갱신·설명 필수 | ready-for-agent | 01, 02 |
 | 04 | 내려받기 흐름 와이어프레임(375, 안 비교) | resolved | — |
 | 05 | 목록(종류별 줄)·에디션 상세(바텀시트/페이지) | resolved | 02, 04 |
-| 06 | 다운로드 Route Handler(presigned 302, noindex, robots) | ready-for-agent | 01, 02 |
-| 07 | 완료 상태·공유, 내려간 에디션 안내, 2a·2b 입구 카드 | ready-for-agent | 04, 05, 06 |
+| 06 | 다운로드 Route Handler(presigned 302, noindex) | 개발 경로 완료, R2 서명 남음 | 01, 02 |
+| 07 | 완료 상태·공유, 내려간 에디션 안내, 2a·2b 입구 카드, A3 요청 버튼 | resolved | 04, 05, 06 |
 | 08 | GA4 연결과 이벤트(내려받기, A3 요청) | ready-for-agent | 05 |
 | 09 | PDF 크기 조사(A3가 A4의 약 2배인 이유) | needs-triage | — |

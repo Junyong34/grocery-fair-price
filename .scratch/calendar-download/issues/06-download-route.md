@@ -19,3 +19,11 @@ Blocked by: 01, 02
 ## 완료 조건
 
 - 루트 검사 통과. 로컬에서 버튼 → R2에서 PDF가 받아진다. 60초 뒤 같은 presigned URL은 거부된다.
+
+## Comments
+
+2026-10-29 R2 없이 할 수 있는 부분을 먼저 했다.
+
+- `app/seasonal/downloads/[edition]/[paper]/route.ts`: `resolveDownload`(순수, 테스트)로 게시 에디션 · 공개 용지만 302, 내린 에디션은 상세(6-1)로 302, 나머지 404. 모든 응답 `Cache-Control: no-store`, `X-Robots-Tag: noindex`. 광고 확인이 들어갈 자리에 주석.
+- `features/seasonal/downloads/server/download-url.ts`의 `downloadUrl`: 개발 서버는 로컬 `public/downloads/<id>/a4.pdf`, 운영은 지금 null(503). **남은 일: R2 presign 분기**(수명 60초, `ResponseContentDisposition`에 `downloadFileName`을 RFC 5987 `filename*`로). 지금 파일 이름은 링크의 `download` 속성으로 정해지는데, 다른 출처(R2)로 302되면 브라우저가 이 속성을 무시하므로 presign 쪽에서 넣어야 한다.
+- robots.txt Disallow는 하지 않기로 바꿨다(이 저장소는 noindex로만 막는다). 스펙 · ADR 0003을 고쳤다.

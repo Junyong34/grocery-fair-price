@@ -12,6 +12,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { routes } from "@/shared/routes"
 
+import { DownloadsCard } from "../components/downloads-card"
 import { ScatterField } from "../components/scatter-field"
 import { HERO_ID, monthSectionId } from "./active-month"
 import { DesktopMonthPanel } from "./desktop-month-panel"
@@ -83,6 +84,7 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
                   월별 제철 타임라인 →
                 </Link>
               </div>
+              <DownloadsCard className="mt-6 lg:max-w-[420px]" />
             </div>
           </section>
 

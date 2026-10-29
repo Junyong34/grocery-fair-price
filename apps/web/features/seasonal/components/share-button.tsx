@@ -32,6 +32,31 @@ function showShareToast(message: string) {
   ))
 }
 
+/** 공유 시트(Web Share API)로 지금 주소를 넘긴다. 공유 시트가 없거나 실패하면 false, 사용자가 닫았으면 true. */
+export async function sharePage(): Promise<boolean> {
+  if (typeof navigator.share !== "function") return false
+  try {
+    await navigator.share({ title: document.title || SITE_CONFIG.titleDefault, text: SITE_CONFIG.description, url: window.location.href })
+    return true
+  } catch (error) {
+    // 사용자가 공유 창을 닫았으면 아무것도 하지 않는다. 다른 실패는 복사로 넘어간다.
+    return error instanceof Error && error.name === "AbortError"
+  }
+}
+
+/** 지금 주소를 복사하고 토스트로 알린다. */
+export async function copyPageLink(): Promise<boolean> {
+  try {
+    // clipboard는 https(또는 localhost)에서만 있다. 없으면 아래 실패 안내로 간다.
+    await navigator.clipboard.writeText(window.location.href)
+    showShareToast("링크를 복사했어요")
+    return true
+  } catch {
+    showShareToast("링크를 복사하지 못했어요. 주소창의 주소를 복사해 주세요")
+    return false
+  }
+}
+
 /**
  * 공유 버튼. 공유할 대상이 뚜렷한 화면의 제목 줄 오른쪽에 둔다(월별·계절·명절 상세, 품종 상세 시트).
  * 이달(모바일)은 제목 줄이 없어 월 레일 아래에 둔다(MonthRail). 월별·계절 목록과 나의 식탁(먹음 기록은 기기에만 있어 링크를 받은 사람은 빈 식탁을 본다)에는 두지 않는다.
@@ -47,24 +72,8 @@ export function ShareButton({ className, label }: { className?: string; /** 있�
   }, [copied])
 
   const share = async () => {
-    const url = window.location.href
-    if (typeof navigator.share === "function") {
-      try {
-        await navigator.share({ title: document.title || SITE_CONFIG.titleDefault, text: SITE_CONFIG.description, url })
-        return
-      } catch (error) {
-        // 사용자가 공유 창을 닫았으면 아무것도 하지 않는다. 다른 실패는 복사로 넘어간다.
-        if (error instanceof Error && error.name === "AbortError") return
-      }
-    }
-    try {
-      // clipboard는 https(또는 localhost)에서만 있다. 없으면 아래 실패 안내로 간다.
-      await navigator.clipboard.writeText(url)
-      setCopied(true)
-      showShareToast("링크를 복사했어요")
-    } catch {
-      showShareToast("링크를 복사하지 못했어요. 주소창의 주소를 복사해 주세요")
-    }
+    if (await sharePage()) return
+    if (await copyPageLink()) setCopied(true)
   }
 
   const icon = copied ? <Check aria-hidden size={20} strokeWidth={2} /> : <Share2 aria-hidden size={20} strokeWidth={1.6} />

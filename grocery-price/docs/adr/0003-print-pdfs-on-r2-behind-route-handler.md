@@ -1,6 +1,6 @@
 # 인쇄물 PDF는 비공개 Cloudflare R2에 두고, 우리 주소의 짧은 서명 링크로만 내준다
 
-운영자가 어드민에서 만든 에디션 PDF는 **비공개 Cloudflare R2 버킷**에 올린다. 사용자는 R2 주소를 직접 보지 못한다. `/seasonal/downloads/[에디션]/[용지]` 같은 우리 Route Handler가 수명 약 60초의 presigned URL을 만들어 302로 넘긴다. PDF 응답은 `X-Robots-Tag: noindex`이고 `robots.ts`에서도 막는다. 색인되는 것은 다운로드 목록과 에디션 페이지뿐이다.
+운영자가 어드민에서 만든 에디션 PDF는 **비공개 Cloudflare R2 버킷**에 올린다. 사용자는 R2 주소를 직접 보지 못한다. `/seasonal/downloads/[에디션]/[용지]` 같은 우리 Route Handler가 수명 약 60초의 presigned URL을 만들어 302로 넘긴다. 우리 주소의 응답은 `X-Robots-Tag: noindex`다(robots.txt Disallow는 쓰지 않는다: 이 저장소는 noindex로만 막는다, `shared/seo/pages.ts`). 색인되는 것은 다운로드 목록과 에디션 페이지뿐이다.
 
 이유:
 

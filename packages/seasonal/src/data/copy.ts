@@ -1,6 +1,8 @@
 // 초안 — 사용자 검토 전. 화면 문구를 이 파일 한 곳에 모은다. 화면 코드는 문구를 직접 쓰지 않고 여기서 읽는다.
 // 달별 문구는 그 달 검증 품종(foods.generated.ts)에 맞춰 썼다.
 
+import { josa } from "es-hangul"
+
 import type { Festival } from "./festivals"
 import type { Month } from "./months"
 import type { Season } from "./seasons"
@@ -144,4 +146,24 @@ export const DOWNLOADS_COPY = {
   seeAll: "전체 보기 ›",
   thumbnailAlt: (name: string, index: number) => (index === 0 ? `${name} 미리보기` : `${name} 미리보기 ${index + 1}쪽`),
   settingsLink: "달력·포스터 PDF 내려받기",
+  /** 내려받기를 누른 뒤(5-a). 브라우저 다운로드가 끝났는지는 알 수 없어 "누른 뒤" 상태다. */
+  done: {
+    title: "내려받았어요",
+    where: "휴대폰은 \"파일\" 또는 \"다운로드\"에 있어요.",
+    pcTitle: "휴대폰으로 받으셨나요?",
+    pcBody: "인쇄는 PC에서 하는 게 편해요. 링크를 PC로 보내 보세요.",
+    copyLink: "링크 복사",
+    share: "공유하기",
+    again: "다시 내려받기",
+  },
+  a3: { ask: "A3로 크게 뽑고 싶다면 · A3도 원해요", thanks: "알려 주셔서 고마워요. 원하는 분이 많으면 A3도 열어 둘게요." },
+  /** 내린 에디션 주소(6-1) */
+  withdrawn: {
+    title: "이 인쇄물은 내려갔어요",
+    body: (name: string) => `${josa(name, "은/는")} 더 받을 수 없어요.`,
+    replacement: "같은 종류의 새 인쇄물을 받아 보세요.",
+    seeAll: "다른 인쇄물 모두 보기",
+  },
+  /** 2a · 2b 입구 카드(1-a) */
+  entry: { title: "제철 달력 · 포스터 PDF 받기", hint: "집에서 인쇄해 냉장고에 붙여 보세요" },
 } as const

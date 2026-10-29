@@ -8,7 +8,8 @@ import { editionName } from "@workspace/seasonal/print/listing"
 
 import { EditionShelf } from "@/features/seasonal/downloads/downloads-view"
 import { EditionDetail } from "@/features/seasonal/downloads/edition-detail"
-import { DOWNLOADS, findEdition } from "@/shared/downloads-manifest"
+import { WithdrawnNotice } from "@/features/seasonal/downloads/withdrawn-notice"
+import { DOWNLOADS, findEdition, findWithdrawn } from "@/shared/downloads-manifest"
 import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
 
@@ -17,13 +18,17 @@ type Params = PageProps<"/seasonal/downloads/[edition]">["params"]
 /** 게시된 에디션이 없을 때 넣는 자리. Cache Components는 빈 목록을 빌드 오류로 막는다. 에디션 id는 "종류-번호"라 겹치지 않는다. */
 const NO_EDITION = "none"
 
+// 내린 에디션도 만든다. 옛 링크로 오면 안내 페이지(6-1)를 보인다.
 export function generateStaticParams() {
-  const ids = DOWNLOADS.editions.map((edition) => edition.id)
+  const ids = [...DOWNLOADS.editions, ...DOWNLOADS.withdrawn].map((edition) => edition.id)
   return (ids.length > 0 ? ids : [NO_EDITION]).map((edition) => ({ edition }))
 }
 
 export async function generateMetadata(props: PageProps<"/seasonal/downloads/[edition]">): Promise<Metadata> {
-  const edition = findEdition((await props.params).edition)
+  const id = (await props.params).edition
+  const withdrawn = findWithdrawn(id)
+  if (withdrawn) return createMetadata({ title: DOWNLOADS_COPY.withdrawn.title, description: DOWNLOADS_COPY.withdrawn.body(editionName(withdrawn)), path: routes.seasonal.download(id), noIndex: true })
+  const edition = findEdition(id)
   if (!edition) return {}
   const name = editionName(edition)
   return createMetadata({
@@ -44,7 +49,10 @@ export default function Page(props: PageProps<"/seasonal/downloads/[edition]">) 
 }
 
 async function Edition({ params }: { params: Params }) {
-  const edition = findEdition((await params).edition)
+  const id = (await params).edition
+  const withdrawn = findWithdrawn(id)
+  if (withdrawn) return <WithdrawnNotice edition={withdrawn} />
+  const edition = findEdition(id)
   if (!edition) notFound()
   const others = DOWNLOADS.editions.filter((other) => other.id !== edition.id)
   return (

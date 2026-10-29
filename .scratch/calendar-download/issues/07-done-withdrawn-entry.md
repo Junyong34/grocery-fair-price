@@ -1,6 +1,6 @@
 # 07. 완료 상태·공유, 내려간 에디션 안내, 입구 카드
 
-Status: ready-for-agent
+Status: resolved
 Blocked by: 04, 05, 06
 
 ## 할 일
@@ -12,3 +12,15 @@ Blocked by: 04, 05, 06
 ## 완료 조건
 
 - 루트 검사 통과. `next-dev-loop` 375·1280, 콘솔 오류·hydration 경고 없음.
+
+## Answer
+
+2026-10-29 완료(06의 개발용 경로와 함께).
+
+- 5-a: `edition-actions.tsx`(클라이언트). 내려받기를 누르면 버튼 줄 자리가 "내려받았어요 ✓ · 휴대폰으로 받으셨나요?(PC로 보내기) · [링크 복사][공유하기] · 다시 내려받기"로 바뀌고 그 자리로 스크롤한다. 공유하기는 `navigator.share`가 있을 때만. 링크는 에디션 페이지 주소(`share-button.tsx`의 `sharePage` · `copyPageLink`로 나눴다). 와이어프레임처럼 시트 전체를 바꾸지 않고 버튼 줄만 바꿨다(그림 · 설명이 남아 무엇을 받았는지 보인다).
+- A3 요청(3-B에서 빠졌던 것): 글자 버튼 "A3로 크게 뽑고 싶다면 · A3도 원해요" → "알려 주셔서 고마워요 …". `seasonal:a3-requests`(deviceStore)에 에디션 id를 남겨 같은 기기에서 다시 세지 않는다. `requestA3`가 처음일 때만 true를 돌려주므로 08은 그때 이벤트를 보내면 된다.
+- 6-1: 내린 에디션도 `generateStaticParams`에 넣고, 주소로 오면 `WithdrawnNotice`(같은 종류 최신 에디션 카드 `replacementFor` + 목록 버튼, noindex). 문구의 은/는은 `es-hangul` josa로 고른다.
+- 1-a: `components/downloads-card.tsx`. 2a는 첫 화면(지금 달) 그림 · 링크 아래, 2b는 품종 목록 아래. 대표 썸네일은 `featuredEdition`(월간 달력 줄 첫째). 게시 에디션이 없으면 그리지 않는다.
+- 썸네일 컴포넌트를 `components/edition-thumbnail.tsx`로 옮겼다(입구 카드와 공용).
+- 6-2 연도 묶음 제목은 만들지 않았다(05 Answer: 날짜로 거르지 않음). 6-3 빈 그림 · 503 토스트는 만들지 않았다. 다운로드는 `<a download>` 이동이라 실패를 화면에서 알 수 없다. 저장소 장애 때는 브라우저 다운로드 목록에 실패로 뜬다.
+- 확인: 루트 typecheck · lint · test, `next build` 통과. 에디션 4개 공개 + 1개 내림을 임시로 만들어 375 · 1280에서 2a · 2b 카드 → 목록 → 시트 → 내려받기(파일 "2027 크림 월간 달력 A4.pdf" 받아짐) → 완료 상태 → A3 요청(새로고침 뒤에도 유지) → 내린 에디션 주소(안내 · noindex)를 확인했다. 가로 넘침 · 새 콘솔 오류 없음(2b의 LCP 이미지 안내는 원래 있던 것). 임시 데이터는 되돌렸다.

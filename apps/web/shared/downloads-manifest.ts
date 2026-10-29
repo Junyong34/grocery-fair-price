@@ -1,4 +1,4 @@
-import type { DownloadManifest, ManifestEntry } from "@workspace/seasonal/print/edition"
+import type { DownloadManifest, ManifestEntry, WithdrawnEntry } from "@workspace/seasonal/print/edition"
 
 import manifest from "@/public/downloads/manifest.json"
 
@@ -10,3 +10,7 @@ export function findEdition(id: string): ManifestEntry | undefined {
   return DOWNLOADS.editions.find((edition) => edition.id === id)
 }
 
+
+export function findWithdrawn(id: string): WithdrawnEntry | undefined {
+  return DOWNLOADS.withdrawn.find((edition) => edition.id === id)
+}

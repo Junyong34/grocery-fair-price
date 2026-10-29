@@ -3,9 +3,8 @@ import type { ManifestEntry } from "@workspace/seasonal/print/edition"
 import { editionMeta, editionName } from "@workspace/seasonal/print/listing"
 import { PRINT_KIND_LABELS } from "@workspace/seasonal/print/spec"
 
-import { ShareButton } from "../components/share-button"
-import { EditionDownloadLink } from "./edition-download-link"
-import { EditionThumbnail } from "./edition-thumbnail"
+import { EditionThumbnail } from "../components/edition-thumbnail"
+import { EditionActions } from "./edition-actions"
 
 /**
  * 에디션 상세(3-B). 시트와 전체 페이지가 같이 쓴다. 미리보기(월간 달력은 표지와 1월) 아래에 정보와 버튼.
@@ -38,10 +37,7 @@ export function EditionDetail({ edition, title }: { edition: ManifestEntry; titl
         <p>{DOWNLOADS_COPY.printTips.size}</p>
         {edition.kind === "monthly" && <p>{DOWNLOADS_COPY.printTips.oneMonth}</p>}
       </div>
-      <div className="grid grid-cols-[1fr_2fr] gap-2">
-        <ShareButton label={DOWNLOADS_COPY.share} className="h-11" />
-        <EditionDownloadLink edition={edition} />
-      </div>
+      <EditionActions edition={edition} />
     </div>
   )
 }

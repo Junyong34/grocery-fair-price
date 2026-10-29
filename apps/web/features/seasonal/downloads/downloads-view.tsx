@@ -8,7 +8,7 @@ import { PRINT_KIND_LABELS } from "@workspace/seasonal/print/spec"
 import { DOWNLOADS } from "@/shared/downloads-manifest"
 import { routes } from "@/shared/routes"
 
-import { EditionThumbnail } from "./edition-thumbnail"
+import { EditionThumbnail } from "../components/edition-thumbnail"
 
 /** 내려받기 목록(2-C): 종류별 가로 줄. 칸을 누르면 상세가 시트로 뜬다(@sheet/(.)downloads/[edition]). */
 export function DownloadsView() {
