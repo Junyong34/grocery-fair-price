@@ -17,7 +17,8 @@
     "purge": "node src/purge.ts",
     "summary": "node src/summary.ts",
     "alert": "node src/alert/cli.ts",
-    "heartbeat": "node src/alert/heartbeat.ts"
+    "heartbeat": "node src/alert/heartbeat.ts",
+    "usual": "node src/usual/cli.ts"
   },
   "dependencies": {
     "fast-xml-parser": "5.11.2",

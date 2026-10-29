@@ -57,9 +57,9 @@
 
 ### 1-4. 저장
 
-- 계절비율: `reference_price`에 `ref_type = 'season_index'`, `source = 'computed'`로 둔다. 지금 체크 제약에 없어 마이그레이션이 필요하다. 품종 · 규격 × 365일 ≈ 7만 행.
-- 평소가: `usual_price`. `components`에 `{ "level": 3800, "season_index": 1.10, "level_weeks": 26, "season_years": 3 }`처럼 두 값을 남긴다. `method`는 `level-x-season-1`.
-- 계절비율은 해마다(또는 분기마다) 다시 만든다. 재료는 `daily_quote`의 `national` 범위다. 6개월이 지나면 시장 유형 · 업태 범위는 지우고 `national`만 남기므로 (2026-10-27, [pipeline.md](pipeline.md) 3-9 보관 4) KAMIS에서 다시 받지 않아도 된다.
+- 계절비율: **`season_index`** (품종 · 규격 × 한 해의 날 0~364, 비율 소수 넷째 자리, 비율 수 `n`, 기준일 `as_of`). 처음에는 `reference_price`(`ref_type = 'season_index'`)에 두려 했다. 하지만 그 표의 값은 원 단위(소수 둘째 자리)이고 키가 날짜라 따로 뒀다 (2026-10-29, 마이그레이션 `20261029000200`). 지금 쓰는 판 하나만 두고, 다시 만들면 표 전체를 바꾼다. 약 4.8만 행.
+- 평소가: `usual_price`. `as_of`는 평소가가 가리키는 날(시세가 있는 날)이고, 그 전날까지의 시세로 낸다. `components`는 `{ "level": 3800, "season_index": 1.10, "level_weeks": 26, "season_years": 3, "window_days": 7 }`이고, 가장 최근 행에만 `band`(`low`, `high`, `basis` variety · category)가 있다. `method`는 `level-x-season-1`.
+- 계산: `pnpm --filter @workspace/price-ingest usual [--to] [--days 7]` (`src/usual/`). KAMIS 워크플로가 수집 뒤에 최근 7일을 다시 낸다. 계절비율은 그 달 1일의 전날을 기준으로 만들어서 달마다 바뀐다. 재료는 `daily_quote`의 `national` 범위다. 6개월이 지나면 시장 유형 · 업태 범위는 지우고 `national`만 남기므로 (2026-10-27, [pipeline.md](pipeline.md) 3-9 보관 4) KAMIS에서 다시 받지 않아도 된다.
 
 ## 2. 판정 구간
 
@@ -131,5 +131,5 @@
 
 - [ ] 백필(04) 뒤 실제 데이터로 판정 분포 확인 (싸요 · 보통 · 비싸요가 20 · 60 · 20 근처인지)
 - [ ] 창 크기(±7일, 26주), 백분위(20%), 바닥 · 천장 값 확정 → `calc_param`
-- [ ] `reference_price.ref_type`에 `season_index`를 더하는 마이그레이션
+- [x] 계절비율 표 (`season_index`, 1-4)와 평소가 계산 명령. 운영에 6개월치를 채웠다 (2026-10-29)
 - [ ] 신뢰도 계산식, 최소 표본 수(`aggregate.min_n`), 갱신 지연(`carried_over_days`)

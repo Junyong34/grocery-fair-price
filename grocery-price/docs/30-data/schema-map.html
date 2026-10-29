@@ -155,7 +155,7 @@ footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--li
     <span class="src c">참가격 생필품 가격</span>
   </div>
   <div class="facts">
-    <span><!-- erd:counts -->스키마 <code>price</code> · 테이블 <b>40</b>개 + 뷰 <b>1</b> · 묶음 <b>6</b>개<!-- /erd:counts --></span>
+    <span><!-- erd:counts -->스키마 <code>price</code> · 테이블 <b>41</b>개 + 뷰 <b>1</b> · 묶음 <b>6</b>개<!-- /erd:counts --></span>
     <span>1년차 DB 실측 기반 <b>465~525MB</b> / 무료 500MB</span>
     <span>1년차 원본 파일 추정 <b>250~330MB</b> / 무료 1GB</span>
     <span>근거 문서 <code>grocery-price/docs/30-data/pipeline.md</code> 3장</span>
@@ -619,6 +619,7 @@ erDiagram
   spec ||--o{ daily_quote : "(variety_id, spec_id)"
   product ||--o{ product_daily_summary : ""
   spec ||--o{ reference_price : "(variety_id, spec_id)"
+  spec ||--o{ season_index : "(variety_id, spec_id)"
   spec ||--o{ usual_price : "(variety_id, spec_id)"
   judgment_batch ||--o{ judgment_current : "batch_id"
   judgment_batch ||--o{ judgment_snapshot : "batch_id"
@@ -645,6 +646,11 @@ erDiagram
     text source PK "ekape computed"
     text scope_key PK
     date ref_date PK
+  }
+  season_index {
+    int variety_id PK, FK
+    int spec_id PK, FK
+    smallint slot PK
   }
   usual_price {
     int variety_id PK, FK

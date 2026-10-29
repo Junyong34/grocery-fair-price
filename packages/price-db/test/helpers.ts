@@ -30,7 +30,7 @@ export const PRICE_TABLES = [
   "region", "region_code_map", "seller", "obs_place", "store", "store_link", "store_seller", "market",
   "source_master_change",
   "observation", "observation_revision", "reference_observation",
-  "daily_quote", "product_daily_summary", "reference_price", "usual_price",
+  "daily_quote", "product_daily_summary", "reference_price", "season_index", "usual_price",
   "judgment_batch", "judgment_current", "judgment_snapshot", "calc_param",
   "ingest_run", "source_day", "source_day_part", "backfill_task",
   "product", "product_source_key", "product_attr_history", "product_variety_map", "al_variety_rule",
