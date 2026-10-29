@@ -15,19 +15,19 @@ const USAGE = "사용법: usual [--to YYYY-MM-DD] [--days N] [--dry-run]"
 const DRY_RUN = Symbol("dry-run")
 
 export async function readSeries(sql: Sql | Tx, to: string): Promise<SpecSeries[]> {
-  const rows = await sql<{ variety_id: number; spec_id: number; category: string; day: string; price: string }[]>`
-    select q.variety_id, q.spec_id, c.slug as category, q.obs_date::text as day, q.value::text as price
+  const rows = await sql<{ variety_id: number; spec_id: number; category: string; day: string; price: string; n: number }[]>`
+    select q.variety_id, q.spec_id, c.slug as category, q.obs_date::text as day, q.value::text as price, q.n
       from price.daily_quote q
       join price.variety v on v.id = q.variety_id
       join price.item i on i.id = v.item_id
       join price.category c on c.id = i.category_id
      where q.basis = 'quote' and q.price_tier = 'retail' and q.scope_key = 'national' and q.obs_date <= ${to}
      order by q.variety_id, q.spec_id, q.obs_date`
-  const out = new Map<string, SpecSeries & { points: { day: string; price: number }[] }>()
+  const out = new Map<string, SpecSeries & { points: { day: string; price: number; n: number }[] }>()
   for (const r of rows) {
     const key = `${r.variety_id}|${r.spec_id}`
     const s = out.get(key) ?? { varietyId: r.variety_id, specId: r.spec_id, category: r.category, points: [] }
-    s.points.push({ day: r.day, price: Number(r.price) })
+    s.points.push({ day: r.day, price: Number(r.price), n: r.n })
     out.set(key, s)
   }
   return [...out.values()]

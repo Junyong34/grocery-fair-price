@@ -9,7 +9,7 @@
 // 숫자(창, 26주, 20%, 바닥·천장)는 judgment.md의 가정이다. 실제 데이터로 판정 분포를 본 뒤 calc_param으로 옮긴다.
 import { addDays } from "../ingest/collect.ts"
 
-export type Point = { day: string; price: number } // day: YYYY-MM-DD, 날짜 순, 하루 하나
+export type Point = { day: string; price: number; n?: number } // day: YYYY-MM-DD, 날짜 순, 하루 하나. n: 그날 조사 시장 수
 
 export const SEASON_DEFAULTS = {
   windowDays: 7, // 계절비율을 모으는 앞뒤 날 수
@@ -19,6 +19,7 @@ export const SEASON_DEFAULTS = {
   minLevelWeeks: 8, // 수준 기간 안에 시세가 있어야 하는 주 수
   minActiveMonths: 10, // 최근 12개월 중 시세가 있어야 하는 달 수 (이보다 적으면 제철 품목, 판정 전)
   minBandDays: 365, // 품종별 판정 구간을 쓰려면 판정한 날이 이만큼. 그 전에는 카테고리 공통 구간
+  minGradeShare: 0.5, // 조사 시장 수가 같은 품종에서 가장 많은 규격의 이 비율보다 적은 규격은 판정하지 않는다 (5-2 중품)
   bandPercentile: 0.2, // 판정 구간: 시세 ÷ 평소가의 하위·상위 20%
   bandFloor: 0.05, // 구간 바닥 ±5%
   bandCeiling: 0.25, // 구간 천장 ±25%
@@ -122,7 +123,7 @@ export function activeMonths(points: readonly Point[], asOf: string): number {
 }
 
 // 판정 전인 이유. 화면은 이유와 상관없이 "판정 전"을 보이지만, 기록·검산에 남긴다
-export type NoUsualReason = "short_history" | "seasonal_item" | "thin_level" | "off_season"
+export type NoUsualReason = "short_history" | "seasonal_item" | "thin_level" | "off_season" | "thin_grade"
 
 export function noUsualReason(
   points: readonly Point[],
@@ -189,5 +190,21 @@ export function chooseBand(
   }
   const band = bandOf(category, params)
   return band && { ...band, basis: "category" }
+}
+
+// 규격마다 최근 levelDays의 하루 조사 시장 수 중앙값. 시장 수를 모르는 규격은 빠진다
+export function recentMarketCount(points: readonly Point[], asOf: string, params: SeasonParams = SEASON_DEFAULTS): number | null {
+  const from = addDays(asOf, -params.levelDays)
+  return median(points.filter((p) => p.day > from && p.day <= asOf && p.n !== undefined).map((p) => p.n!))
+}
+
+// 표본이 적은 규격 (5-2): 같은 품종에서 조사 시장이 가장 많은 규격의 minGradeShare보다 적다.
+// 등급마다 조사하는 시장이 달라, 적은 등급의 national 중앙값은 다른 등급과도 자기 과거와도 비교할 수 없다
+// (감자 중품: 같은 시장에선 상품의 0.69배인데 중품을 조사하는 시장이 비싼 곳에 몰려 national 중앙값은 상품보다 비쌌다).
+// counts: 규격 키 → recentMarketCount. 돌려주는 값: 판정하지 않을 규격 키
+export function thinGrades(counts: ReadonlyMap<string, number | null>, params: SeasonParams = SEASON_DEFAULTS): Set<string> {
+  const known = [...counts.values()].filter((n): n is number => n !== null)
+  const most = known.length === 0 ? 0 : Math.max(...known)
+  return new Set([...counts].filter(([, n]) => n !== null && n < most * params.minGradeShare).map(([key]) => key))
 }
 

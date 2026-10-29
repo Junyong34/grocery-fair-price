@@ -36,6 +36,14 @@ describe("computeUsual", () => {
     expect(Math.abs(today.price / usual.at(-1)!.value - 1)).toBeLessThan(0.05)
   })
 
+  it("같은 품종에서 조사 시장이 절반보다 적은 규격은 평소가를 내지 않는다", () => {
+    const top = { ...yearRound, points: yearRound.points.map((p) => ({ ...p, n: 48 })) }
+    const mid = { ...yearRound, specId: 11, points: yearRound.points.map((p) => ({ ...p, price: p.price * 0.7, n: 17 })) }
+    const { usual, season } = computeUsual([top, mid], { from: "2026-10-28", to: "2026-10-28" })
+    expect(usual.map((r) => r.specId)).toEqual([10])
+    expect(season.filter((r) => r.specId === 11)).toHaveLength(365)
+  })
+
   it("제철 품목은 평소가를 내지 않지만 계절비율 표는 만든다", () => {
     const { usual, season } = computeUsual([yearRound, seasonal], { from: "2026-09-01", to: "2026-09-30" })
     expect(usual.every((r) => r.specId === 10)).toBe(true)

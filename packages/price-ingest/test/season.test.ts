@@ -13,6 +13,8 @@ import {
   SEASON_DEFAULTS,
   seasonIndex,
   seasonRatios,
+  recentMarketCount,
+  thinGrades,
   usualPrice,
   type Point,
 } from "../src/usual/season.ts"
@@ -124,6 +126,21 @@ describe("수준과 평소가", () => {
   })
 })
 
+describe("표본이 적은 규격", () => {
+  it("최근 26주 하루 조사 시장 수의 중앙값", () => {
+    const points = series("2026-01-01", "2026-10-28", (_, i) => 1000).map((p, i) => ({ ...p, n: i % 2 === 0 ? 48 : 50 }))
+    expect(recentMarketCount(points, "2026-10-28")).toBe(49)
+    expect(recentMarketCount(series("2026-01-01", "2026-10-28", () => 1), "2026-10-28")).toBeNull()
+  })
+
+  it("같은 품종에서 조사 시장이 가장 많은 규격의 절반보다 적은 규격은 판정하지 않는다 (감자 상품 48곳, 중품 17곳)", () => {
+    expect(thinGrades(new Map([["상품", 48], ["중품", 17]]))).toEqual(new Set(["중품"]))
+    expect(thinGrades(new Map([["상품", 50], ["중품", 25]]))).toEqual(new Set())
+    expect(thinGrades(new Map([["기본", 3]]))).toEqual(new Set()) // 규격이 하나면 비교하지 않는다
+    expect(thinGrades(new Map([["상품", 40], ["중품", null]]))).toEqual(new Set())
+  })
+})
+
 describe("판정 구간", () => {
   it("지난 시세 ÷ 평소가의 하위·상위 20%, 바닥 ±5%·천장 ±25%", () => {
     const deviations = Array.from({ length: 101 }, (_, i) => (i - 50) / 500) // -10% ~ +10%
@@ -151,6 +168,7 @@ describe("판정 구간", () => {
       minLevelWeeks: 8,
       minActiveMonths: 10,
       minBandDays: 365,
+      minGradeShare: 0.5,
       bandPercentile: 0.2,
       bandFloor: 0.05,
       bandCeiling: 0.25,
