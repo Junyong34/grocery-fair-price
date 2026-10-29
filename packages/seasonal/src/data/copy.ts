@@ -130,8 +130,18 @@ export const DOWNLOADS_COPY = {
   title: "달력·포스터 내려받기",
   intro: "제철 달력과 포스터를 A4 PDF로 내려받아 집에서 인쇄해 보세요.",
   empty: "아직 준비된 인쇄물이 없어요. 곧 올려 둘게요.",
-  calendars: "달력",
-  posters: "포스터",
-  all: (kind: "monthly" | "single") => (kind === "monthly" ? "12개월 전체" : "내려받기"),
+  download: "PDF 내려받기",
+  share: "공유",
+  shelfMeta: (count: number) => `${count}개`,
+  printTips: {
+    title: "인쇄 팁",
+    size: "A4 용지에 \"실제 크기\"로 인쇄하세요.",
+    /** 월간 달력만 */
+    oneMonth: "한 달만 뽑을 땐 인쇄 창에서 그 달 쪽 번호를 고르세요.",
+  },
+  backToList: "‹ 달력·포스터",
+  others: "다른 인쇄물",
+  seeAll: "전체 보기 ›",
+  thumbnailAlt: (name: string, index: number) => (index === 0 ? `${name} 미리보기` : `${name} 미리보기 ${index + 1}쪽`),
   settingsLink: "달력·포스터 PDF 내려받기",
 } as const

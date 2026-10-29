@@ -26,10 +26,10 @@ function useIsDesktop() {
 }
 
 /**
- * 제철 화면 안에서 품종을 누르면 뜨는 상세 껍데기. 모바일은 하단 시트, 데스크톱은 오른쪽 패널이다.
- * 닫으면 뒤로 가서 원래 화면(스크롤 위치 그대로)으로 돌아간다.
+ * 제철 화면 안에서 품종이나 에디션을 누르면 뜨는 상세 껍데기(인터셉팅 라우트). 모바일은 하단 시트, 데스크톱은 오른쪽 패널이다.
+ * 닫으면 뒤로 가서 원래 화면(스크롤 위치 그대로)으로 돌아간다. action은 제목 줄 오른쪽이고 기본은 공유 버튼이다.
  */
-export function FoodSheet({ title, children }: { title: string; children: React.ReactNode }) {
+export function DetailSheet({ title, action = <ShareButton />, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
   const router = useRouter()
   const close = () => router.back()
 
@@ -47,7 +47,7 @@ export function FoodSheet({ title, children }: { title: string; children: React.
         >
           <SheetHeader className="flex flex-row items-center justify-between gap-4">
             <SheetTitle className="font-heading text-[32px] font-bold">{title}</SheetTitle>
-            <ShareButton className="shrink-0" />
+            {action && <div className="shrink-0">{action}</div>}
           </SheetHeader>
           {children}
         </SheetContent>
@@ -59,7 +59,7 @@ export function FoodSheet({ title, children }: { title: string; children: React.
       open
       onClose={close}
       title={<span className="font-heading text-[28px] font-bold">{title}</span>}
-      action={<ShareButton />}
+      action={action}
     >
       <div className="overflow-y-auto pb-4">{children}</div>
     </BottomSheet>

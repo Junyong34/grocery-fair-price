@@ -2,7 +2,7 @@ import { Suspense } from "react"
 
 import { findFood } from "@workspace/seasonal/data/foods"
 
-import { FoodSheet } from "@/features/seasonal/components/food-sheet"
+import { DetailSheet } from "@/features/seasonal/components/detail-sheet"
 import { FoodDetail } from "@/features/seasonal/food-detail/food-detail"
 
 // 메타데이터도 전체 페이지와 같다. 없으면 시트를 열었을 때 탭 제목·설명·canonical이 사이트 기본값으로 바뀐다.
@@ -24,8 +24,8 @@ async function Sheet({ params }: { params: Params }) {
   // 없는 품종이면 시트를 띄우지 않는다. 주소로 직접 열면 전체 페이지가 404를 낸다.
   if (!food) return null
   return (
-    <FoodSheet title={food.name}>
+    <DetailSheet title={food.name}>
       <FoodDetail food={food} />
-    </FoodSheet>
+    </DetailSheet>
   )
 }

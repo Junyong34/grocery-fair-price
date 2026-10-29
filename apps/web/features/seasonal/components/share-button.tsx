@@ -37,7 +37,7 @@ function showShareToast(message: string) {
  * 이달(모바일)은 제목 줄이 없어 월 레일 아래에 둔다(MonthRail). 월별·계절 목록과 나의 식탁(먹음 기록은 기기에만 있어 링크를 받은 사람은 빈 식탁을 본다)에는 두지 않는다.
  * 공유 시트(Web Share API)가 있으면 그것을, 없으면 주소를 복사하고 토스트로 알린다.
  */
-export function ShareButton({ className }: { className?: string }) {
+export function ShareButton({ className, label }: { className?: string; /** 있으면 아이콘 옆에 글자를 쓰는 테두리 버튼이 된다(에디션 상세). */ label?: string }) {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -67,6 +67,14 @@ export function ShareButton({ className }: { className?: string }) {
     }
   }
 
+  const icon = copied ? <Check aria-hidden size={20} strokeWidth={2} /> : <Share2 aria-hidden size={20} strokeWidth={1.6} />
+  if (label)
+    return (
+      <Button variant="outline" onClick={share} className={cn("gap-1.5", copied ? "text-gold hover:text-gold" : "text-ink", className)}>
+        {icon}
+        {label}
+      </Button>
+    )
   return (
     <Button
       variant="ghost"
@@ -75,7 +83,7 @@ export function ShareButton({ className }: { className?: string }) {
       onClick={share}
       className={cn("size-10 px-0", copied ? "text-gold hover:text-gold" : "text-ink", className)}
     >
-      {copied ? <Check aria-hidden size={20} strokeWidth={2} /> : <Share2 aria-hidden size={20} strokeWidth={1.6} />}
+      {icon}
     </Button>
   )
 }

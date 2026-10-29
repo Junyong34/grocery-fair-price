@@ -42,6 +42,8 @@ export const routes = {
     food: (id: string) => `/seasonal/foods/${id}`,
     /** 달력·포스터 PDF 내려받기 */
     downloads: "/seasonal/downloads",
+    /** 에디션 상세. 제철 화면 안에서 누르면 하단 시트로, 주소로 직접 열면 전체 페이지로 뜬다. */
+    download: (id: string) => `/seasonal/downloads/${id}`,
     /** 에디션 PDF 내려받기 주소. 저장소의 짧은 서명 링크로 넘긴다(ADR 0003). */
     downloadFile: (id: string, paper: PublishedPaper) => `/seasonal/downloads/${id}/${paper.toLowerCase()}`,
   },

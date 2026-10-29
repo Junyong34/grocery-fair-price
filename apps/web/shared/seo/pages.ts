@@ -6,6 +6,7 @@ import { FOODS, isDrawn } from "@workspace/seasonal/data/foods"
 import { MONTHS } from "@workspace/seasonal/data/months"
 import { SEASONS } from "@workspace/seasonal/data/seasons"
 
+import { DOWNLOADS } from "@/shared/downloads-manifest"
 import { routes } from "@/shared/routes"
 
 /** sitemap의 한 줄. 경로는 routes로 만든 상대 경로이고, sitemap.ts가 절대 주소로 바꾼다. */
@@ -29,6 +30,9 @@ export const SEO_PAGES: Readonly<Record<string, () => readonly SitemapEntry[]>> 
   "/seasonal/months/[month]": () => MONTHS.map((month) => ({ path: routes.seasonal.month(month) })),
   "/seasonal/seasons": () => [{ path: routes.seasonal.seasons }],
   "/seasonal/downloads": () => [{ path: routes.seasonal.downloads }],
+  // 게시된 에디션 상세. 썸네일을 이미지 sitemap으로 알린다. PDF 파일 주소는 색인하지 않는다(ADR 0003).
+  "/seasonal/downloads/[edition]": () =>
+    DOWNLOADS.editions.map((edition) => ({ path: routes.seasonal.download(edition.id), images: edition.thumbnails.map((thumbnail) => thumbnail.path) })),
   "/seasonal/seasons/[season]": () => SEASONS.map((season) => ({ path: routes.seasonal.season(season) })),
   "/seasonal/festivals/[festival]": () => FESTIVALS.map(({ slug }) => ({ path: routes.seasonal.festival(slug) })),
   // 그림이 있는 품종은 일러스트를 이미지 sitemap으로 알린다(FoodImage가 그리는 그 파일).
