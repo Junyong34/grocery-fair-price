@@ -3,6 +3,7 @@
 // 소매 national 시세(daily_quote, basis quote)를 읽고, to(기본: 시세가 있는 마지막 날)까지 days일(기본 7)의 평소가를 usual_price에,
 // to 기준 계절비율을 season_index에 쓴다. 차트에 쓸 6개월을 처음 채울 때는 --days 182.
 // 기간 안의 평소가 행은 새 결과로 맞춘다 (판정 전이 된 날의 행은 지운다). 계절비율은 표 전체를 새 판으로 바꾼다.
+// 숫자(창, 수준 기간, 구간 등)는 calc_param의 usual.*에서 읽는다 (judgment.md 6장).
 // 환경변수: INGEST_DATABASE_URL. .env를 스스로 읽지 않는다.
 import { parseArgs } from "node:util"
 
@@ -10,6 +11,7 @@ import { addDays } from "../ingest/collect.ts"
 import { connectIngest, type Sql, type Tx } from "../load/db.ts"
 import { actionsMaskCommands, describeError, redactorFromEnv, SECRET_ENV } from "../secrets.ts"
 import { computeUsual, SEASON_METHOD, USUAL_METHOD, type SpecSeries } from "./compute.ts"
+import { SEASON_DEFAULTS, type SeasonParams } from "./season.ts"
 
 const USAGE = "사용법: usual [--to YYYY-MM-DD] [--days N] [--dry-run]"
 const DRY_RUN = Symbol("dry-run")
@@ -33,6 +35,23 @@ export async function readSeries(sql: Sql | Tx, to: string): Promise<SpecSeries[
   return [...out.values()]
 }
 
+// calc_param 키(usual.window_days)와 상수 이름(windowDays)
+const paramKey = (name: string) => `usual.${name.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`)}`
+
+// calc_param의 usual.*. 하나라도 없거나 정하지 않았으면 멈춘다 (기본값으로 조용히 돌지 않는다)
+export async function readUsualParams(sql: Sql | Tx): Promise<SeasonParams> {
+  const rows = await sql<{ key: string; value: unknown; status: string }[]>`
+    select key, value, status from price.calc_param where key like 'usual.%'`
+  const byKey = new Map(rows.map((r) => [r.key, r]))
+  const params = {} as SeasonParams
+  for (const name of Object.keys(SEASON_DEFAULTS) as (keyof SeasonParams)[]) {
+    const row = byKey.get(paramKey(name))
+    if (row?.status !== "decided" || typeof row.value !== "number") throw new Error(`calc_param ${paramKey(name)}가 정한 숫자가 아니다`)
+    params[name] = row.value
+  }
+  return params
+}
+
 export type UsualResult = { from: string; to: string; specs: number; usualRows: number; removed: number; seasonRows: number }
 
 // 트랜잭션 안에서 부른다
@@ -44,7 +63,7 @@ export async function writeUsual(tx: Tx, input: { to?: string; days: number }): 
   if (!to) throw new Error("소매 national 시세가 없다")
   const from = addDays(to, -(input.days - 1))
   const series = await readSeries(tx, to)
-  const { usual, season } = computeUsual(series, { from, to })
+  const { usual, season } = computeUsual(series, { from, to }, await readUsualParams(tx))
 
   const removed = await tx`
     delete from price.usual_price where method = ${USUAL_METHOD} and as_of between ${from} and ${to}`

@@ -6,13 +6,14 @@
 // 판정 전(평소가 없음): 계절비율 이력이 2년보다 짧거나, 최근 26주에 시세가 있는 주가 8주보다 적거나, 그날 계절비율이 없을 때 (3장),
 // 제철 품목일 때 (최근 12개월 중 시세가 있는 달이 10달보다 적다. 26주 수준이 지난 철 끝물·이번 철 첫물 몇 주로 정해져 크게 치우친다,
 // 5장 백테스트 2026-10-29). KAMIS 소매는 평일만 조사해 1년 내내 나오는 품목도 시세가 있는 날은 약 250일이라 날 수가 아니라 달 수로 본다.
-// 숫자(창, 26주, 20%, 바닥·천장)는 judgment.md의 가정이다. 실제 데이터로 판정 분포를 본 뒤 calc_param으로 옮긴다.
+// 숫자는 표본 밖 백테스트(scripts/judgment-sweep.ts)로 정했다 (judgment.md 6장, 2026-10-29). 운영 값은 calc_param의 usual.*이고
+// usual 명령이 읽는다. 여기 기본값은 calc_param과 같아야 한다 (test/db/usual.db.test.ts가 맞춰 본다).
 import { addDays } from "../ingest/collect.ts"
 
 export type Point = { day: string; price: number; n?: number } // day: YYYY-MM-DD, 날짜 순, 하루 하나. n: 그날 조사 시장 수
 
 export const SEASON_DEFAULTS = {
-  windowDays: 7, // 계절비율을 모으는 앞뒤 날 수
+  windowDays: 14, // 계절비율을 모으는 앞뒤 날 수 (±7일보다 평소가 오차 7.7% → 6.9%, 6장)
   seasonYears: 3, // 계절비율을 만드는 기간
   minHistoryDays: 730, // 계절비율 이력이 이보다 짧으면 판정 전 (2년)
   levelDays: 182, // 수준을 내는 기간 (26주)
@@ -24,6 +25,7 @@ export const SEASON_DEFAULTS = {
   bandPercentile: 0.2, // 판정 구간: 시세 ÷ 평소가의 하위·상위 20%
   bandFloor: 0.05, // 구간 바닥 ±5%
   bandCeiling: 0.25, // 구간 천장 ±25%
+  verdictDays: 3, // 판정 차이 = 최근 이만큼의 시세 있는 날 편차의 중앙값 (판정이 바뀌는 횟수 1년 37 → 26번, 6장)
 } as const
 
 export type SeasonParams = { -readonly [K in keyof typeof SEASON_DEFAULTS]: number }
@@ -165,6 +167,12 @@ export function usualPrice(
       window_days: params.windowDays,
     },
   }
+}
+
+// 판정에 쓰는 차이: 최근 verdictDays개 (시세 ÷ 평소가 − 1)의 중앙값. deviations는 날짜 순, 마지막이 그날이다.
+// 하루만 튀는 시세에 판정이 뒤집히지 않게 한다. 편차가 없으면 null
+export function verdictDeviation(deviations: readonly number[], params: SeasonParams = SEASON_DEFAULTS): number | null {
+  return median(deviations.slice(-params.verdictDays))
 }
 
 // 판정 구간: 지난 (시세 ÷ 평소가 − 1)의 하위·상위 bandPercentile, 바닥·천장으로 자른다. 소수 둘째 자리(1%p)까지

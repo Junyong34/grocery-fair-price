@@ -718,8 +718,10 @@ calc_param   key text pk, value jsonb null,
 | `chamga.disappear_streak` | `3` | decided | 연속 3개 조사일 결측이면 "조사 안 됨" ([chamgagyeok.md 9장](sources/chamgagyeok.md)) |
 | `chamga.partial.day_ratio` · `seller_ratio` · `store_ratio` | `0.8` · `0.5` · `0.5` | decided | 같은 곳 9장 |
 | `kamis.partial.item_ratio` | `0.5` | decided | 5-2 "일부만 옴" |
-| `aggregate.min_n` (범위별 최소 표본 수) | `null` | placeholder | ② 판정 설계. 정해지면 `meets_min_n`을 채운다 |
-| `kamis.carried_over_days`, `ekape.carried_over_days` | `null` | placeholder | ② ([kamis.md 6-4](sources/kamis.md), [ekape.md 9장](sources/ekape.md)) |
+| `aggregate.min_n` (표본 충분 기준) | `{"share": 0.5, "days": 182}` | decided | 최근 182일 관측 수 중앙값의 절반 이상이면 `meets_min_n` ([judgment.md 6-3](judgment.md)) |
+| `ekape.carried_over_days` | `7` | decided | 같은 값이 7 조사일 이상이면 갱신 지연 (`stale_days`, judgment.md 6-3) |
+| `kamis.carried_over_days` | `null` | decided | 쓰지 않는다. 시장 표본 중앙값은 세지 않는다 ([kamis.md 6-4](sources/kamis.md)) |
+| `usual.*` (창, 수준 기간, 판정 구간 등 13개) | 숫자 | decided | 평소가 · 판정 ([judgment.md 6장](judgment.md)). `usual` 명령이 읽는다 |
 | `outlier.day_over_day`, `outlier.vs_median` | `0.5`, `3` | placeholder | 5-2 이상치. ②에서 다시 본다 |
 
 ### 3-5. 수집 상태 (장애 대응의 핵심)

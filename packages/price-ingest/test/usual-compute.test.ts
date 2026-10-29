@@ -36,6 +36,17 @@ describe("computeUsual", () => {
     expect(Math.abs(today.price / usual.at(-1)!.value - 1)).toBeLessThan(0.05)
   })
 
+  it("가장 최근 행에 판정 차이(최근 3일 편차의 중앙값)를 남긴다. 마지막 하루만 튀면 판정 차이는 따라가지 않는다", () => {
+    const spike = { ...yearRound, points: yearRound.points.map((p) => (p.day === "2026-10-28" ? { ...p, price: p.price * 1.3 } : p)) }
+    const { usual } = computeUsual([spike], { from: "2026-10-20", to: "2026-10-28" })
+    const priceOf = new Map(spike.points.map((p) => [p.day, p.price]))
+    const devs = usual.slice(-3).map((r) => priceOf.get(r.asOf)! / r.value - 1)
+    expect(devs[2]).toBeGreaterThan(0.2)
+    expect(usual.at(-1)!.components.deviation).toBeCloseTo([...devs].sort((a, b) => a - b)[1]!, 10)
+    expect(usual.at(-1)!.components.deviation).toBeLessThan(0.05)
+    expect(usual.slice(0, -1).every((r) => r.components.deviation === undefined)).toBe(true)
+  })
+
   it("같은 품종에서 조사 시장이 절반보다 적은 규격은 평소가를 내지 않는다", () => {
     const top = { ...yearRound, points: yearRound.points.map((p) => ({ ...p, n: 48 })) }
     const mid = { ...yearRound, specId: 11, points: yearRound.points.map((p) => ({ ...p, price: p.price * 0.7, n: 17 })) }
@@ -62,12 +73,11 @@ describe("computeUsual", () => {
     const { usual, season } = computeUsual([yearRound, seasonal], { from: "2026-09-01", to: "2026-09-30" })
     expect(usual.every((r) => r.specId === 10)).toBe(true)
     const seasonalRows = season.filter((r) => r.specId === 20)
-    expect(seasonalRows.length).toBeGreaterThan(100) // 6~9월 앞뒤 7일
-    expect(seasonalRows.length).toBeLessThan(150)
+    expect(seasonalRows).toHaveLength(122 + 2 * 14) // 6~9월(122일) 앞뒤 14일
     expect(season.filter((r) => r.specId === 10)).toHaveLength(365)
     expect(season.every((r) => r.asOf === "2026-08-31")).toBe(true)
-    // 3년 × 15일 = 45. 윤년의 2월 29일은 28일 칸에 더해져 46까지
-    expect(Math.max(...season.map((r) => r.n))).toBe(46)
+    // 3년 × 29일 = 87. 윤년의 2월 29일은 28일 칸에 더해져 88까지
+    expect(Math.max(...season.map((r) => r.n))).toBe(88)
     expect(Math.min(...season.map((r) => r.n))).toBeGreaterThan(0)
   })
 })

@@ -4,9 +4,9 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest"
 import { addDays } from "../../src/ingest/collect.ts"
 import type { Sql, Tx } from "../../src/load/db.ts"
 import { USUAL_METHOD } from "../../src/usual/compute.ts"
-import { writeUsual } from "../../src/usual/cli.ts"
-import { dayOfYear } from "../../src/usual/season.ts"
-import { connectLocalIngest, inRollback } from "./local.ts"
+import { readUsualParams, writeUsual } from "../../src/usual/cli.ts"
+import { dayOfYear, SEASON_DEFAULTS } from "../../src/usual/season.ts"
+import { connectLocalAdmin, connectLocalIngest, inRollback } from "./local.ts"
 
 let sql: Sql
 
@@ -43,11 +43,12 @@ describe("평소가 쓰기", () => {
       const spec = await seed(tx)
       const first = await writeUsual(tx, { to: TO, days: 7 })
       expect(first).toMatchObject({ from: "2096-10-22", to: TO, usualRows: 7, removed: 0 })
-      const rows = await tx<{ as_of: string; value: string; components: { band?: unknown; season_index: number } }[]>`
+      const rows = await tx<{ as_of: string; value: string; components: { band?: unknown; season_index: number; deviation?: number } }[]>`
         select as_of::text, value::text, components from price.usual_price
          where variety_id = ${spec.variety_id} and spec_id = ${spec.spec_id} and method = ${USUAL_METHOD} order by as_of`
       expect(rows.map((r) => r.as_of)).toEqual(Array.from({ length: 7 }, (_, i) => addDays("2096-10-22", i)))
       expect(rows.at(-1)!.components.band).toMatchObject({ basis: "variety" }) // 판정한 날이 1년을 넘는다 (2094-12-30부터)
+      expect(rows.at(-1)!.components).toHaveProperty("deviation")
       expect(rows[0]!.components.band).toBeUndefined()
       const [season] = await tx<{ n: number; as_of: string }[]>`
         select count(*)::int as n, min(as_of)::text as as_of from price.season_index where variety_id = ${spec.variety_id} and spec_id = ${spec.spec_id}`
@@ -56,5 +57,23 @@ describe("평소가 쓰기", () => {
       const again = await writeUsual(tx, { to: TO, days: 7 })
       expect(again).toMatchObject({ usualRows: 7, removed: 7, seasonRows: first.seasonRows })
     })
+  })
+})
+
+describe("판정 숫자 (calc_param usual.*)", () => {
+  it("운영 값이 코드의 기본값과 같다 (judgment.md 6장)", async () => {
+    expect(await readUsualParams(sql)).toEqual(SEASON_DEFAULTS)
+  })
+
+  it("하나라도 정하지 않았으면 평소가를 내지 않는다", async () => {
+    const admin = connectLocalAdmin() // calc_param은 운영자가 바꾼다 (ingest_writer는 읽기만)
+    try {
+      await inRollback(admin, async (tx) => {
+        await tx`update price.calc_param set status = 'placeholder' where key = 'usual.window_days'`
+        await expect(readUsualParams(tx)).rejects.toThrow(/usual.window_days/)
+      })
+    } finally {
+      await admin.end()
+    }
   })
 })

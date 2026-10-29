@@ -7,6 +7,7 @@
 //   판매가(shelf_price): 참가격. national, channel:<업태>. 행사(true)는 값에서 빼고 promo_excluded_n으로 센다.
 //     점포 수(n)는 재등록 사슬(lineage) 기준
 //   이상치(flags outlier)와 기준 단위 가격이 없는 행은 세지 않는다.
+// 표본 충분(meets_min_n)과 같은 값이 이어진 날 수(stale_days)는 요약을 쓴 뒤 refreshQuoteQuality가 채운다 (judgment.md 6장).
 //
 // 날짜 하나를 다시 계산하면 그날 그 기준의 행을 새 결과로 맞춘다 (없어진 품종·범위의 행은 지운다).
 // 관측값이 보존 기간으로 지워진 날은 다시 계산하지 않는다. 남은 행(축평원)만으로 계산하면 집계가 망가진다 (3-3).
@@ -82,7 +83,63 @@ export async function recomputeDailyQuote(tx: Tx, basis: Basis, dates: readonly 
   )
   const written = await upsertNewQuotes(tx, basis)
   await tx.unsafe(`drop table dq_new`)
+  await refreshQuoteQuality(tx, basis, dates.filter((d) => d >= keepFrom))
   return { written, removed: removed.count }
+}
+
+// 같은 값이 이어진 날 수를 세는 출처: 전국 값 하나로 오는 시세 (judgment.md 6장, calc_param ekape.carried_over_days).
+// KAMIS 시장 표본 중앙값은 여러 시장이 실제로 같은 값을 내 이어질 수 있어 세지 않는다 (kamis.md 6-4)
+export const STALE_TRACKED_SOURCES = ["ekape"] as const
+
+// 앞의 날이 바뀌면 그 뒤로 이어진 날 수도 바뀐다. 실측 최장 34 조사일이라 31일 뒤까지 다시 센다
+const STALE_FOLLOW_DAYS = 31
+
+// dates 날의 meets_min_n과, dates부터 31일 뒤까지의 stale_days를 다시 낸다. 값이 같으면 고쳐 쓰지 않는다.
+// meets_min_n: n ≥ 최근 days일(이날 포함) n 중앙값 × share (calc_param aggregate.min_n). 기준이 없으면 null.
+// 백필처럼 오래된 날이 나중에 들어오면 그 뒤 날의 meets_min_n은 다시 내지 않는다. 백필 뒤에는 전체 날짜로 한 번 부른다
+export async function refreshQuoteQuality(tx: Tx, basis: Basis, dates: readonly string[]): Promise<void> {
+  if (dates.length === 0) return
+  const staleDates = [...new Set(dates.flatMap((d) => Array.from({ length: STALE_FOLLOW_DAYS + 1 }, (_, k) => addDays(d, k))))]
+  await tx.unsafe(
+    `with rule as (
+       select (value->>'share')::numeric as share, (value->>'days')::int as days
+         from price.calc_param where key = 'aggregate.min_n'
+     ), t as (
+       select q.variety_id, q.spec_id, q.price_tier, q.scope_key, q.obs_date, q.n,
+              q.n >= r.share * (
+                select percentile_cont(0.5) within group (order by p.n) from price.daily_quote p
+                 where (p.variety_id, p.spec_id, p.price_tier, p.basis, p.scope_key) = (q.variety_id, q.spec_id, q.price_tier, q.basis, q.scope_key)
+                   and p.obs_date > q.obs_date - r.days and p.obs_date <= q.obs_date) as ok
+         from price.daily_quote q left join rule r on true
+        where q.basis = $1 and q.obs_date = any($2::date[])
+     )
+     update price.daily_quote q set meets_min_n = t.ok
+       from t
+      where (q.variety_id, q.spec_id, q.price_tier, q.basis, q.scope_key, q.obs_date) = (t.variety_id, t.spec_id, t.price_tier, $1, t.scope_key, t.obs_date)
+        and q.meets_min_n is distinct from t.ok`,
+    [basis, dates as string[]],
+  )
+  await tx.unsafe(
+    `with t as (
+       select q.variety_id, q.spec_id, q.price_tier, q.scope_key, q.obs_date,
+              case when q.sources <@ $3::text[] then (
+                select count(*)::int from price.daily_quote p
+                 where (p.variety_id, p.spec_id, p.price_tier, p.basis, p.scope_key) = (q.variety_id, q.spec_id, q.price_tier, q.basis, q.scope_key)
+                   and p.obs_date <= q.obs_date
+                   and p.obs_date > coalesce((
+                         select max(c.obs_date) from price.daily_quote c
+                          where (c.variety_id, c.spec_id, c.price_tier, c.basis, c.scope_key) = (q.variety_id, q.spec_id, q.price_tier, q.basis, q.scope_key)
+                            and c.obs_date < q.obs_date and c.value <> q.value), '-infinity'::date)
+              ) end as days
+         from price.daily_quote q
+        where q.basis = $1 and q.obs_date = any($2::date[])
+     )
+     update price.daily_quote q set stale_days = t.days
+       from t
+      where (q.variety_id, q.spec_id, q.price_tier, q.basis, q.scope_key, q.obs_date) = (t.variety_id, t.spec_id, t.price_tier, $1, t.scope_key, t.obs_date)
+        and q.stale_days is distinct from t.days`,
+    [basis, staleDates, [...STALE_TRACKED_SOURCES]],
+  )
 }
 
 // 표본에서 품종·규격 × 범위 × 날짜의 중앙값을 세션 임시 표 dq_new에 낸다. keep: 남길 표본 조건 (별칭 s)
@@ -150,12 +207,12 @@ export async function aggregateStagedQuotes(
     addDays(today, -QUOTE_ALL_SCOPES_DAYS),
   ])
   const written = await upsertNewQuotes(tx, "quote")
-  const [old] = await tx.unsafe<{ days: number }[]>(`select count(distinct obs_date)::int as days from ${table} where obs_date < $1::date`, [
-    keepFrom,
-  ])
+  const oldDates = await tx.unsafe<{ day: string }[]>(`select distinct obs_date::text as day from ${table} where obs_date < $1::date`, [keepFrom])
+  await refreshQuoteQuality(tx, "quote", oldDates.map((r) => r.day))
+  const old = { days: oldDates.length }
   if (!options.keepRows) await tx.unsafe(`delete from ${table} where obs_date < $1::date`, [keepFrom])
   await tx.unsafe(`drop table dq_new`)
-  return { written, days: old?.days ?? 0 }
+  return { written, days: old.days }
 }
 
 // 원본 파일들이 담은 날. 적재가 끝난 원본의 대상 기간(target_from~target_to)을 날짜로 편다

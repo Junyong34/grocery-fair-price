@@ -114,7 +114,7 @@ import 경로:
 | `/seasonal/downloads` | 달력·포스터 PDF 내려받기 | `seasonal/downloads/page.tsx` | `downloads/downloads-view`. `public/downloads/manifest.json`을 빌드 때 읽는다 |
 | `/admin`, `/admin/edit?id=`, `/admin/wireframes` | 인쇄물 어드민 (개발 서버 전용, 운영 404). `wireframes`는 인쇄물 구조 안 모음 | `app/admin/` | `features/admin-print/` |
 | `/print?spec=&paper=&page=` | 인쇄 전용 페이지 (개발 서버 전용, 운영 404) | `app/print/page.tsx` | `features/print/print-document` |
-| (제철 화면 안에서 이동) | 1i 품종 상세 (하단 시트) | `seasonal/@sheet/(.)foods/[food]/page.tsx` | `components/food-sheet` + `food-detail` |
+| (제철 화면 안에서 이동) | 1i 품종 상세 (하단 시트) | `seasonal/@sheet/(.)foods/[food]/page.tsx` | `components/detail-sheet` + `food-detail` |
 | `/api/og` | 공유 미리보기 이미지 1200×630 | `app/api/og/route.tsx` | 쿼리 `title`, `subtitle`, `badge`, `season` |
 | `/sitemap.xml`, `/robots.txt` | 검색 색인 | `app/sitemap.ts`, `app/robots.ts` | `shared/seo/pages.ts` 레지스트리, 색인 스위치 |
 
@@ -156,7 +156,7 @@ import 경로:
 | `my-table/` | 1h | `my-table-view`, `food-row`, `typed-label` |
 | `food-detail/` | 1i | `food-detail`, `eat-toggle`, `festival-link` |
 | `search/` | 전역 검색 | `food-search`(헤더 버튼), `food-search-dialog`(cojeev command, 초성 검색) |
-| `components/` | 공통 | `seasonal-shell`(공통 셸에 제철 메뉴 · 검색 · ⚙를 넣는다), `sub-tabs`, `food-image`(그림 없으면 이름 카드), `food-sheet`, `scatter-field`·`draggable-scatter`(흩어진 배치와 드래그), `month-calendar`, `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-count`, `share-button`, `holiday-name`, `this-month-only`, `screen-stub` |
+| `components/` | 공통 | `seasonal-shell`(공통 셸에 제철 메뉴 · 검색 · ⚙를 넣는다), `sub-tabs`, `food-image`(그림 없으면 이름 카드), `detail-sheet`(품종 · 에디션 상세 시트), `scatter-field`·`draggable-scatter`(흩어진 배치와 드래그), `month-calendar`, `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-count`, `share-button`, `holiday-name`, `this-month-only`, `screen-stub` |
 | `downloads/` | PDF 내려받기 | `downloads-view`, `edition-downloads`(용지 고르기, 기기에 저장) |
 | `stores/` | 공통 | `settings-store`(⚙ 설정, 내려받기 용지), `scatter-store`(옮긴 배치와 달력 자리) |
 
@@ -352,7 +352,7 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `packages/price-ingest/src/backfill/` | KAMIS 소매·축평원 3년 백필 (ingest-foundation/04): 묶음 목록(`plan.ts`, KAMIS는 품목 × 해로 카탈로그에서 KAMIS가 대표인 품목만, 축평원은 축종 × 달, 둘 다 최근부터), 실행 한 번(`run.ts`: 묶음마다 호출 → 원본 업로드 → 백필 원본 적재 → 90일 안 재계산 → `backfill_task`, 예산·DB 400MB에서 멈춤, 출처마다 세션 lock으로 한 번에 하나), 명령 진입점(`cli.ts`) |
 | `packages/price-ingest/scripts/probe-runner.ts` | 공공 API 3개·Supabase DB·Storage에 한 번씩 붙어 성공과 걸린 시간만 찍는다 (러너 접속 실측) |
 | `packages/price-ingest/src/alert/` | 수집 알림과 heartbeat (ingest-schedule/13·14): 알릴지 정하기(`decide.ts`: 키 오류·원본 저장 실패·예상 못한 실패는 즉시, 일부 실패·DB 접속 실패·시간 초과는 2회 연속), 이슈 묶기(`issues.ts`: 라벨 `ingest-alert`·`source:`·`cause:`로 열린 이슈에 댓글, 성공하면 그 출처의 알림을 닫음, 본문에 키·주소 없음, `gh` CLI), 수집 워크플로의 알림 잡 진입점(`cli.ts`), 주 1회 점검(`heartbeat.ts`: 꺼진 수집 워크플로 다시 켜기, 출처별 멈춤, Supabase Storage·DB 접속) |
-| `packages/price-ingest/src/usual/` | 평소가 (judgment.md): 수준 × 계절비율 순수 함수(`season.ts`: 계절비율, 수준, 평소가, 판정 전 이유, 판정 구간, 카테고리 공통 구간), 여러 규격 한 번에(`compute.ts`), 명령(`cli.ts`: `daily_quote` national → `usual_price`·`season_index`). 백테스트는 `scripts/season-backtest.ts` |
+| `packages/price-ingest/src/usual/` | 평소가 (judgment.md): 수준 × 계절비율 순수 함수(`season.ts`: 계절비율, 수준, 평소가, 판정 전 이유, 판정 구간, 카테고리 공통 구간), 여러 규격 한 번에(`compute.ts`), 명령(`cli.ts`: `daily_quote` national → `usual_price`·`season_index`, 숫자는 `calc_param usual.*`에서 읽음). 백테스트는 `scripts/season-backtest.ts`, 숫자 정하기(표본 밖, 창·수준·구간을 바꿔 가며)는 `scripts/judgment-sweep.ts` |
 | `packages/price-ingest/src/catalog/` | 품종 카탈로그 (ingest-foundation/08): 분류 표와 매핑의 원본 데이터(`varieties.ts`, 사람이 읽는 표는 `grocery-price/docs/30-data/variety-list.md`이고 `test/catalog.test.ts`가 둘과 실측 코드표가 맞는지 본다), 원천 키 → 품종·규격·대표 여부(`match.ts`), DB 적용(`apply.ts`), 명령 진입점(`cli.ts`) |
 
 수집 CLI와 GitHub Actions 워크플로는 `ingest-foundation/03`에서 이 패키지에 더한다.

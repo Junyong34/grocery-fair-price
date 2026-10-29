@@ -18,6 +18,7 @@ import {
   usedSeasonIndex,
   thinGrades,
   usualPrice,
+  verdictDeviation,
   type Point,
 } from "../src/usual/season.ts"
 
@@ -197,7 +198,7 @@ describe("판정 구간", () => {
 
   it("기본값은 judgment.md의 가정과 같다", () => {
     expect(SEASON_DEFAULTS).toEqual({
-      windowDays: 7,
+      windowDays: 14,
       seasonYears: 3,
       minHistoryDays: 730,
       levelDays: 182,
@@ -209,6 +210,15 @@ describe("판정 구간", () => {
       bandPercentile: 0.2,
       bandFloor: 0.05,
       bandCeiling: 0.25,
+      verdictDays: 3,
     })
+  })
+
+  it("판정 차이는 최근 verdictDays개 편차의 중앙값이다 (하루 튀는 값에 판정이 뒤집히지 않게, 6장)", () => {
+    expect(verdictDeviation([0.02, 0.03, 0.15])).toBe(0.03) // 마지막 하루만 튀면 그대로 보통 쪽
+    expect(verdictDeviation([0.01, 0.15, 0.16])).toBe(0.15) // 이틀 이어지면 따라간다
+    expect(verdictDeviation([-0.4, 0.02, 0.03, 0.15])).toBe(0.03) // 앞의 날은 보지 않는다
+    expect(verdictDeviation([0.08])).toBe(0.08) // 편차가 모자라면 있는 것으로
+    expect(verdictDeviation([])).toBeNull()
   })
 })

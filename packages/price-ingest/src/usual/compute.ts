@@ -3,6 +3,7 @@
 //   해마다 계절 모양이 닮지 않은 규격(쌀 등)은 계절비율을 1로 쓰고 표에도 1을 둔다 (usedSeasonIndex, 5-4)
 //   평소가: target 날마다 그 전날까지의 시세로 낸다 (그날 시세가 평소가에 섞이지 않게)
 //   판정 구간: 가장 최근 날에만 낸다. 지난 시세 ÷ 평소가 − 1로, 판정한 날이 1년보다 적으면 카테고리 공통 구간
+//   판정 차이: 가장 최근 날에만 낸다. 최근 verdictDays개 편차의 중앙값 (verdictDeviation). 판정은 이 값을 구간에 견준다
 //   표본이 적은 규격(같은 품종에서 조사 시장이 가장 많은 규격의 절반 미만, 5-2)은 평소가를 내지 않는다. 계절비율 표는 만든다
 import { addDays } from "../ingest/collect.ts"
 import {
@@ -14,12 +15,13 @@ import {
   thinGrades,
   usedSeasonIndex,
   usualPrice,
+  verdictDeviation,
   type Point,
   type SeasonParams,
   type UsualPrice,
 } from "./season.ts"
 
-export const SEASON_METHOD = "median-ratio-3y-7d-1"
+export const SEASON_METHOD = "median-ratio-3y-14d-1"
 export const USUAL_METHOD = "level-x-season-1"
 
 export type SpecSeries = { varietyId: number; specId: number; category: string; points: readonly Point[] }
@@ -36,6 +38,7 @@ export type UsualRow = {
     season_flat: boolean // 계절이 해마다 반복되지 않아 계절비율을 1로 썼다
     season_consistency: number | null // 해마다 계절 모양이 닮은 정도 (상관계수 평균). 판단할 수 없으면 null
     band?: { low: number; high: number; basis: "variety" | "category" }
+    deviation?: number // 판정 차이 (최근 verdictDays개 시세 ÷ 평소가 − 1의 중앙값). 가장 최근 행에만
   }
 }
 
@@ -78,7 +81,7 @@ export function computeUsual(
   params: SeasonParams = SEASON_DEFAULTS,
 ): { usual: UsualRow[]; season: SeasonRow[] } {
   const historyFrom = addDays(input.to, -365 * params.seasonYears)
-  const perSpec: { s: SpecSeries; rows: UsualRow[]; deviations: number[] }[] = []
+  const perSpec: { s: SpecSeries; rows: UsualRow[]; deviations: number[]; recent: number[] }[] = []
   const season: SeasonRow[] = []
   const key = (s: SpecSeries) => `${s.varietyId}|${s.specId}`
   const byVariety = new Map<number, Map<string, number | null>>()
@@ -95,6 +98,7 @@ export function computeUsual(
     const byDay = new Map(s.points.map((p) => [p.day, p.price]))
     const rows: UsualRow[] = []
     const deviations: number[] = []
+    const recent: number[] = [] // to까지의 편차 (판정 차이 재료)
     // 판정 구간 재료는 from보다 앞에서도 모은다
     const start = historyFrom < input.from ? historyFrom : input.from
     let pastEnd = 0
@@ -108,6 +112,7 @@ export function computeUsual(
       const usual = usualPrice(past, used.index, asOf, day, params)
       if (!usual) continue
       if (day < input.to) deviations.push(price / usual.value - 1)
+      recent.push(price / usual.value - 1)
       if (day >= input.from) rows.push({
           varietyId: s.varietyId,
           specId: s.specId,
@@ -116,7 +121,7 @@ export function computeUsual(
           components: { ...usual.components, season_flat: used.flat, season_consistency: used.consistency },
         })
     }
-    perSpec.push({ s, rows, deviations })
+    perSpec.push({ s, rows, deviations, recent })
 
     const asOf = seasonAsOf(input.to)
     const { index, flat } = indexFor(ratios, cache, asOf, params)
@@ -130,11 +135,12 @@ export function computeUsual(
 
   const pooled = new Map<string, number[]>()
   for (const { s, deviations } of perSpec) pooled.set(s.category, [...(pooled.get(s.category) ?? []), ...deviations])
-  for (const { s, rows, deviations } of perSpec) {
+  for (const { s, rows, deviations, recent } of perSpec) {
     const last = rows.at(-1)
     if (!last) continue
     const band = chooseBand(deviations, pooled.get(s.category) ?? [], params)
     if (band) last.components = { ...last.components, band }
+    last.components = { ...last.components, deviation: verdictDeviation(recent, params)! }
   }
   return { usual: perSpec.flatMap((x) => x.rows), season }
 }
