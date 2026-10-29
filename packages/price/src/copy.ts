@@ -68,6 +68,14 @@ export function seasonVerdictNote(verdict: Verdict, seasonIndex: number): string
 
 type Particle = Parameters<typeof josa>[1]
 
+/**
+ * 품종 · 브랜드마다 값이 크게 다른 품종(쌀 등)의 판정 아래 한 줄 (judgment.md 5-3).
+ * 판정은 그대로 두고, 가격 하나로 이 상품이 싸다 · 비싸다를 정할 필요는 없다는 느낌을 준다.
+ */
+export function brandSpreadNote(name: string): string {
+  return `${withJosa(name, "은/는")} 품종 · 브랜드 · 도정일마다 값이 꽤 달라요. 판정은 ${name}값 흐름을 보는 참고로 봐 주세요`
+}
+
 /** 이름의 받침에 맞는 조사만. "삼겹살(국산)"처럼 괄호가 붙은 이름은 괄호 앞 글자로 고른다. */
 export function josaOf(name: string, particle: Particle): string {
   const head = name.replace(/\s*\([^)]*\)$/, "")

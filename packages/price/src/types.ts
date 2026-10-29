@@ -103,6 +103,8 @@ export interface QuoteBasis {
 /** 품종 상세 하나(P3). judgment_snapshot.payload 한 행에 해당한다. */
 export interface VarietyDetail extends VarietySummary {
   band: VerdictBand
+  /** brand: 같은 품종 안에서도 품종 · 브랜드마다 값이 크게 달라 판정 아래 안내 한 줄을 붙인다(쌀 등). 없으면 붙이지 않는다 */
+  priceSpread?: "brand"
   /** 조사일의 시세 범위 */
   range: { min: number; max: number; n: number }
   /** 업태별 중간값 */

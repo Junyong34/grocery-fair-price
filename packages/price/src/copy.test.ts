@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { basisLine, partOfMonth, PRICE_COPY, seasonNote, seasonVerdictNote, verdictChip, verdictDiff, withJosa } from "./copy"
+import { basisLine, brandSpreadNote, partOfMonth, PRICE_COPY, seasonNote, seasonVerdictNote, verdictChip, verdictDiff, withJosa } from "./copy"
 
 describe("판정 문구", () => {
   it("칩은 판정과 %를 함께 쓴다", () => {
@@ -41,6 +41,13 @@ describe("계절 문구", () => {
     expect(seasonVerdictNote({ kind: "normal", pct: -3 }, 0.88)).toBe("이맘때 내리는 만큼 내린 가격이에요")
     expect(seasonVerdictNote({ kind: "normal", pct: 1 }, 1.02)).toBeNull()
     expect(seasonVerdictNote({ kind: "none", pct: null }, 1.2)).toBeNull()
+  })
+})
+
+describe("브랜드 편차 안내", () => {
+  it("판정은 흐름을 보는 참고라고 한 줄로 쓴다", () => {
+    expect(brandSpreadNote("쌀")).toBe("쌀은 품종 · 브랜드 · 도정일마다 값이 꽤 달라요. 판정은 쌀값 흐름을 보는 참고로 봐 주세요")
+    expect(brandSpreadNote("현미")).toBe("현미는 품종 · 브랜드 · 도정일마다 값이 꽤 달라요. 판정은 현미값 흐름을 보는 참고로 봐 주세요")
   })
 })
 

@@ -27,6 +27,9 @@ export type VarietyDef = {
   unit: BaseUnit
   specs: readonly SpecDef[] // 첫째가 기본 규격
   seasonal?: readonly string[] // packages/seasonal의 품종 id
+  // brand: 매장의 같은 품종 안에서도 품종(쌀의 신동진 · 고시히카리 등) · 브랜드 · 도정일마다 값이 크게 달라
+  // 시세 하나로 "이 쌀이 싸다"를 말할 수 없다. 판정은 그대로 두고 화면이 안내 한 줄을 붙인다 (judgment.md 5-3)
+  spread?: "brand"
 }
 
 export const BASE_UNITS: Record<BaseUnit, { base_unit: "g" | "ea" | "ml"; base_unit_qty: number }> = {
@@ -106,13 +109,13 @@ const hanwoo = (cut: string, chamga?: { plus: number; one: number }): SpecDef[] 
 
 export const VARIETIES: readonly VarietyDef[] = [
   // 쌀·잡곡·견과
-  { slug: "rice", name: "쌀", item: "rice", unit: "1kg", seasonal: ["rice"], specs: [
+  { slug: "rice", name: "쌀", item: "rice", unit: "1kg", spread: "brand", seasonal: ["rice"], specs: [
     { slug: "regular", name: "일반", kamis: ["111-01-04", "111-10-04"], chamga: [1568, 1569, 1570, 1571, 1572, 1739, 1782, 1783, 1784, 1785] },
     { slug: "new-crop", name: "햅쌀", kamis: ["111-05-04", "111-11-04"] },
   ] },
-  { slug: "glutinous-rice", name: "찹쌀", item: "rice", unit: "1kg", seasonal: ["glutinous-rice"], specs: one({ kamis: ["112-01-04"] }) },
-  { slug: "brown-rice", name: "현미", item: "rice", unit: "1kg", specs: one({ kamis: ["115-01-04"], chamga: [1576, 1578, 1819] }) },
-  { slug: "mixed-grains", name: "혼합곡", item: "grains", unit: "1kg", specs: one({ kamis: ["113-01-04"] }) },
+  { slug: "glutinous-rice", name: "찹쌀", item: "rice", unit: "1kg", spread: "brand", seasonal: ["glutinous-rice"], specs: one({ kamis: ["112-01-04"] }) },
+  { slug: "brown-rice", name: "현미", item: "rice", unit: "1kg", spread: "brand", specs: one({ kamis: ["115-01-04"], chamga: [1576, 1578, 1819] }) },
+  { slug: "mixed-grains", name: "혼합곡", item: "grains", unit: "1kg", spread: "brand", specs: one({ kamis: ["113-01-04"] }) },
   { slug: "barley", name: "보리쌀", item: "grains", unit: "1kg", seasonal: ["barley"], specs: one({ kamis: ["121-04-04"] }) },
   { slug: "soybean", name: "콩", item: "grains", unit: "100g", specs: one({ kamis: ["141-01-04"] }) },
   { slug: "red-bean", name: "팥", item: "grains", unit: "100g", seasonal: ["red-bean"], specs: one({ kamis: ["142-00-04"] }) },
