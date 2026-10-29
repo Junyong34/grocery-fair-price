@@ -1,13 +1,14 @@
-// KAMIS 소매 백필 실행 한 번 (ingest-foundation/04, pipeline 3-9 보관 1).
-// 묶음(품목 × 해)마다: 호출 → 원본 Storage 업로드 → raw_object(pending_load) → 적재 한 트랜잭션 → 90일 안의 날 재계산 → backfill_task.
-// 적재는 정기 수집과 같은 loadRawFile이다. 헤더 job = backfill이라 90일 밖의 날은 관측값에 넣지 않고 임시 표에서 바로 시세 요약으로 낸다.
+// 백필 실행 한 번 (ingest-foundation/04, pipeline 3-9 보관 1). KAMIS 소매(품목 × 해)와 축평원(축종 × 달).
+// 묶음마다: 호출 → 원본 Storage 업로드 → raw_object(pending_load) → 적재 한 트랜잭션 → 90일 안의 날 재계산 → backfill_task.
+// 적재는 정기 수집과 같은 loadRawFile이다. 헤더 job = backfill이라 90일 밖의 날은 임시 표에서 바로 시세 요약으로 낸다
+// (KAMIS는 그 날을 관측값에 넣지 않고, 축평원은 관측값이 영구라 넣는다).
 // 묶음 진행은 backfill_task에 남아 중간에 끊겨도 다음 실행이 done이 아닌 묶음부터 이어 받는다.
-// 같은 키의 일일 한도(10,000)를 정기 수집과 함께 쓴다. 정기 수집이 끝난 뒤에 돌리고 실행마다 예산을 둔다.
+// 출처의 일일 한도(KAMIS 10,000, 축평원 1,000)를 정기 수집과 함께 쓴다. 정기 수집이 끝난 뒤에 돌리고 실행마다 예산을 둔다.
 import { ADAPTER_VERSION } from "../adapt/draft.ts"
 import { contractBaselineVersion } from "../contract/probes.ts"
 import type { FetchLike } from "../http.ts"
 import { CallBudget, realSleep, type Sleep, type StopReason } from "../ingest/calls.ts"
-import { collectKamisRange, type CollectContext } from "../ingest/collect.ts"
+import { collectEkapeRange, collectKamisRange, type Collected, type CollectContext } from "../ingest/collect.ts"
 import { EXIT, type IngestEnv } from "../ingest/run.ts"
 import { datesOfRawObjects, recomputeDailyQuote } from "../load/daily-quote.ts"
 import { connectIngest, transaction, type Sql } from "../load/db.ts"
@@ -17,17 +18,21 @@ import { buildRawFile, callKeyOf, rawObjectKey, storagePathOf } from "../load/ra
 import { createObjectStore, type ObjectStore } from "../load/storage.ts"
 import { kstDateOf } from "../load/window.ts"
 import { createRedactor, errorSummary } from "../secrets.ts"
-import { backfillTasks, taskRange, type BackfillTask } from "./plan.ts"
+import { backfillTasks, ekapeBackfillTasks, taskRange } from "./plan.ts"
 
-// 실행 한 번의 기본 호출 예산. 일일 한도 10,000에서 정기 수집 몫(KAMIS 약 150~300, 참가격 최대 1,500, 축평원 21)을 뺀다
-export const BACKFILL_BUDGET = 6_000
+export type BackfillSource = "kamis" | "ekape"
+
+// 실행 한 번의 기본 호출 예산. 일일 한도에서 정기 수집 몫을 뺀다.
+// KAMIS 10,000 − (KAMIS 약 150~300, 참가격 최대 1,500). 축평원 1,000 − (매일 21과 다시 부르기 여유)
+export const BACKFILL_BUDGET: Record<BackfillSource, number> = { kamis: 6_000, ekape: 900 }
 
 // 묶음을 시작하기 전에 이보다 크면 멈춘다. 무료 500MB를 넘으면 DB가 읽기 전용이 된다 (pipeline 3-9 보관 1, MB = 10⁶B)
 export const MAX_DB_BYTES = 400_000_000
 
 export type BackfillRequest = {
+  source?: BackfillSource // 없으면 kamis
   years?: number
-  items?: readonly string[] // 품목 코드. 없으면 백필 대상 전부
+  items?: readonly string[] // KAMIS 품목 코드 또는 축평원 축종 코드. 없으면 백필 대상 전부
   budget?: number
 }
 
@@ -56,11 +61,29 @@ export type BackfillResult = {
 
 type TaskStatus = "pending" | "running" | "done" | "failed"
 
+// 출처와 관계없는 묶음 하나. label은 원본 파일 이름의 묶음 라벨이다
+type Task = { taskKey: string; label: string; collect: (ctx: CollectContext) => Promise<Collected> }
+
+function plannedTasks(source: BackfillSource, today: string, request: BackfillRequest): Task[] {
+  if (source === "ekape") {
+    return ekapeBackfillTasks(today, { years: request.years, kinds: request.items }).map((task) => {
+      const label = `backfill-${task.judgeKind}-${task.month}`
+      return { taskKey: task.taskKey, label, collect: (ctx) => collectEkapeRange(ctx, task.judgeKind, { from: task.from, to: task.to, label }) }
+    })
+  }
+  return backfillTasks(today, { years: request.years, items: request.items }).map((task) => {
+    const label = `backfill-01-${task.item.itemCd}-${task.year}`
+    const range = taskRange(task.year, today)!
+    return { taskKey: task.taskKey, label, collect: (ctx) => collectKamisRange(ctx, task.item, { ...range, label }) }
+  })
+}
+
 // 이 실행이 멈춘 이유: 호출 정책의 멈춤, DB 크기, 원본 업로드 실패
 type Stop = StopReason | "db_size_limit" | "storage_failed"
 
 async function setTask(
   sql: Sql,
+  source: BackfillSource,
   taskKey: string,
   update: { status: TaskStatus; rows?: number; calls?: number; errorCode?: string | null },
 ): Promise<void> {
@@ -69,7 +92,7 @@ async function setTask(
     update price.backfill_task
        set status = ${update.status}, rows = ${update.rows ?? null}, calls = ${update.calls ?? null},
            finished_at = ${finished ? sql`now()` : null}, last_error_code = ${update.errorCode ?? null}
-     where source = 'kamis' and task_key = ${taskKey}`
+     where source = ${source} and task_key = ${taskKey}`
 }
 
 export async function runBackfill(request: BackfillRequest, deps: BackfillDeps): Promise<BackfillResult> {
@@ -77,40 +100,47 @@ export async function runBackfill(request: BackfillRequest, deps: BackfillDeps):
   const log = deps.log ?? ((line: string) => console.log(line))
   const redact = createRedactor([deps.env.serviceKey, deps.env.secretKey, deps.env.databaseUrl])
   const say = (line: string) => log(redact(line))
+  const source = request.source ?? "kamis"
   const startedAt = now().toISOString()
   const today = kstDateOf(startedAt)
-  const budget = new CallBudget(request.budget ?? BACKFILL_BUDGET)
+  const budget = new CallBudget(request.budget ?? BACKFILL_BUDGET[source])
   const store = deps.store ?? createObjectStore({ url: deps.env.supabaseUrl, secretKey: deps.env.secretKey })
-  const tasks = backfillTasks(today, { years: request.years, items: request.items })
+  const tasks = plannedTasks(source, today, request)
   const result: BackfillResult = { exitCode: EXIT.ok, runId: null, errorCode: null, done: [], failed: [], remaining: 0, callsUsed: 0 }
 
   // 원본 업로드보다 DB가 먼저다: 진행 기록 없이 받으면 다음 실행이 같은 묶음을 또 받는다
   let sql: Sql
+  let todo: Task[]
   try {
     sql = (deps.connect ?? connectIngest)(deps.env.databaseUrl)
-    // 백필은 한 번에 하나만. 세션 lock이라 접속이 끊기면 풀린다 (접속은 하나, db.ts)
-    const [lock] = await sql<{ ok: boolean }[]>`select pg_try_advisory_lock(hashtext('backfill:kamis')) as ok`
+    // 출처마다 한 번에 하나만. 세션 lock이라 접속이 끊기면 풀린다 (접속은 하나, db.ts)
+    const [lock] = await sql<{ ok: boolean }[]>`select pg_try_advisory_lock(hashtext(${"backfill:" + source})) as ok`
     if (!lock?.ok) {
       say("다른 백필이 돌고 있어 끝낸다")
       await sql.end({ timeout: 5 })
       return { ...result, exitCode: EXIT.partial, errorCode: "already_running" }
     }
-    result.runId = await registerRun(sql, { source: "kamis", job: "backfill", callBudget: budget.limit, startedAt })
     await sql`
       insert into price.backfill_task (source, task_key, status)
-      select 'kamis', k, 'pending' from jsonb_array_elements_text(${sql.json(tasks.map((t) => t.taskKey))}) k
+      select ${source}, k, 'pending' from jsonb_array_elements_text(${sql.json(tasks.map((t) => t.taskKey))}) k
       on conflict do nothing`
+    const statusRows = await sql<{ task_key: string; status: TaskStatus }[]>`
+      select task_key, status from price.backfill_task where source = ${source}`
+    const status = new Map(statusRows.map((row) => [row.task_key, row.status]))
+    todo = tasks.filter((task) => status.get(task.taskKey) !== "done")
+    // 다 받았으면 실행 기록을 남기지 않는다. 워크플로가 백필이 끝난 뒤에도 매일 부른다
+    if (todo.length === 0) {
+      say(`백필 끝: ${source} 묶음 ${tasks.length}개를 모두 받았다`)
+      await sql.end({ timeout: 5 })
+      return result
+    }
+    result.runId = await registerRun(sql, { source, job: "backfill", callBudget: budget.limit, startedAt })
   } catch (error) {
     say(`DB 접속·실행 기록 실패: ${errorSummary(error, redact)}`)
     return { ...result, exitCode: EXIT.dbUnreachable, errorCode: "db_unreachable" }
   }
   const runId = result.runId
-
-  const statusRows = await sql<{ task_key: string; status: TaskStatus }[]>`
-    select task_key, status from price.backfill_task where source = 'kamis'`
-  const status = new Map(statusRows.map((row) => [row.task_key, row.status]))
-  const todo = tasks.filter((task) => status.get(task.taskKey) !== "done")
-  say(`백필 시작: 묶음 ${tasks.length}개 중 남은 것 ${todo.length}개, 예산 ${budget.limit}회, 실행 ${runId}`)
+  say(`백필 시작: ${source} 묶음 ${tasks.length}개 중 남은 것 ${todo.length}개, 예산 ${budget.limit}회, 실행 ${runId}`)
 
   const ctx: CollectContext = {
     serviceKey: deps.env.serviceKey,
@@ -148,17 +178,17 @@ export async function runBackfill(request: BackfillRequest, deps: BackfillDeps):
   }
 
   // 묶음 하나: 받기 → 올리기 → 기록 → 적재 → 재계산 → done. 받기·올리기·적재가 실패하면 failed로 두고 다음 실행이 다시 받는다
-  async function runTask(task: BackfillTask): Promise<{ done: boolean; stop: Stop | null }> {
-    const range = taskRange(task.year, today)!
-    const label = `backfill-01-${task.item.itemCd}-${task.year}`
-    await setTask(sql, task.taskKey, { status: "running" })
-    const collected = await collectKamisRange(ctx, task.item, { ...range, label })
+  async function runTask(task: Task): Promise<{ done: boolean; stop: Stop | null }> {
+    const { label } = task
+    await setTask(sql, source, task.taskKey, { status: "running" })
+    const collected = await task.collect(ctx)
     const part = collected.files[0]!
     if (collected.stop || collected.failedCalls > 0) {
       // 한 번도 부르지 못하고 멈췄으면(예산·시간) 실패가 아니다. 다음 실행이 그대로 받는다
       const untouched = collected.stop !== null && part.requests.length === 0
       await setTask(
         sql,
+        source,
         task.taskKey,
         untouched ? { status: "pending" } : { status: "failed", calls: part.requests.length, errorCode: collected.stop ?? "calls_failed" },
       )
@@ -168,7 +198,7 @@ export async function runBackfill(request: BackfillRequest, deps: BackfillDeps):
     const fetchedAt = now().toISOString()
     const file = buildRawFile(
       {
-        source: "kamis",
+        source,
         endpoint: part.endpoint,
         job: "backfill",
         ingestRunId: runId,
@@ -182,12 +212,12 @@ export async function runBackfill(request: BackfillRequest, deps: BackfillDeps):
       },
       part.rows,
     )
-    const key = rawObjectKey("kamis", kstDateOf(fetchedAt), callKeyOf(label, fetchedAt))
+    const key = rawObjectKey(source, kstDateOf(fetchedAt), callKeyOf(label, fetchedAt))
     try {
       await store.upload(key, file.bytes)
     } catch (error) {
       say(`원본 업로드 실패: ${label} ${errorSummary(error, redact)}`)
-      await setTask(sql, task.taskKey, { status: "failed", calls: part.requests.length, errorCode: "storage_failed" })
+      await setTask(sql, source, task.taskKey, { status: "failed", calls: part.requests.length, errorCode: "storage_failed" })
       return { done: false, stop: "storage_failed" }
     }
     const storagePath = storagePathOf(key)
@@ -214,10 +244,10 @@ export async function runBackfill(request: BackfillRequest, deps: BackfillDeps):
     } catch (error) {
       // 원본은 pending_load로 남아 다음 정기 실행의 적재가 백필 경로로 다시 적재한다
       say(`적재 실패: ${label} ${errorSummary(error, redact)}`)
-      await setTask(sql, task.taskKey, { status: "failed", rows: part.rows.length, calls: part.requests.length, errorCode: "load_failed" })
+      await setTask(sql, source, task.taskKey, { status: "failed", rows: part.rows.length, calls: part.requests.length, errorCode: "load_failed" })
       return { done: false, stop: null }
     }
-    await setTask(sql, task.taskKey, { status: "done", rows: part.rows.length, calls: part.requests.length })
+    await setTask(sql, source, task.taskKey, { status: "done", rows: part.rows.length, calls: part.requests.length })
     return { done: true, stop: null }
   }
 

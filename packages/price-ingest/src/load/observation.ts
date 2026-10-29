@@ -46,13 +46,13 @@ export async function stageObservations(tx: Tx, table: string, rows: readonly Ob
   await copyInto(tx, table, COLUMNS, rows)
 }
 
-// 그날 source_day 행을 먼저 만든다 (없으면 pending, 3-5).
-export async function ensureSourceDays(tx: Tx, source: DbSource, table: string): Promise<void> {
+// 그날 source_day 행을 먼저 만든다 (없으면 pending, 3-5). daysFrom보다 오래된 날은 만들지 않는다
+export async function ensureSourceDays(tx: Tx, source: DbSource, table: string, daysFrom = "0001-01-01"): Promise<void> {
   await tx.unsafe(
     `insert into price.source_day (source, target_date, status)
-     select distinct $1, obs_date, 'pending' from ${table}
+     select distinct $1, obs_date, 'pending' from ${table} where obs_date >= $2::date
      on conflict do nothing`,
-    [source],
+    [source, daysFrom],
   )
 }
 
@@ -60,8 +60,15 @@ export async function ensureSourceDays(tx: Tx, source: DbSource, table: string):
 export type MergeResult = { inserted: number; changed: number; corrections: number }
 
 // 정정 비교 → 정정 이력과 source_day 정정 표시 → 바뀐 행만 덮는 병합 → source_day 갱신.
-export async function mergeObservations(tx: Tx, source: DbSource, table: string): Promise<MergeResult> {
-  await ensureSourceDays(tx, source, table)
+// sourceDaysFrom: 이보다 오래된 날은 source_day를 만들지 않는다. 축평원 백필은 축종 묶음 하나로 그날을 ok로 둘 수 없다
+// (KAMIS 백필은 90일 밖의 행을 관측값에 넣지 않아 같은 결과다, ingest-foundation/04)
+export async function mergeObservations(
+  tx: Tx,
+  source: DbSource,
+  table: string,
+  options: { sourceDaysFrom?: string } = {},
+): Promise<MergeResult> {
+  await ensureSourceDays(tx, source, table, options.sourceDaysFrom)
 
   // 가격·행사가 바뀐 행은 바뀌기 전 값을 남기고, 그날의 corrected_at·correction_count를 올린다.
   // 상태(status)는 바꾸지 않는다: partial인 날이 정정돼도 partial로 남는다 (3-5).

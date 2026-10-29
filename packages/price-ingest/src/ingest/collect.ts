@@ -180,6 +180,20 @@ export async function collectEkape(ctx: CollectContext, day: string): Promise<Co
   return builder.result()
 }
 
+// 축평원 백필 묶음 하나: 축종 하나의 from~to를 하루씩 부른다 (ingest-foundation/04, 기간 조회가 없다)
+export async function collectEkapeRange(
+  ctx: CollectContext,
+  judgeKind: string,
+  range: { from: string; to: string; label: string },
+): Promise<Collected> {
+  const builder = new FileBuilder(ctx, { endpoint: EKAPE_ENDPOINT, label: range.label, targetFrom: range.from, targetTo: range.to })
+  for (let day = range.from; day <= range.to; day = addDays(day, 1)) {
+    await builder.add((call) => fetchEkapeConsumerPrice(call, { standYmd: compact(day), judgeKind }))
+    if (builder.stop) break
+  }
+  return builder.result()
+}
+
 // 참가격: 점포·상품 마스터를 먼저 받고(06 Answer 1), 조사일마다 식품 상품 가격을 상품마다 받는다 (chamgagyeok.md 8장).
 // 조사일 하나가 가격 파일 하나다. 어느 조사일을 받을지는 chamga-schedule.ts가 정한다 (10).
 export async function collectChamga(ctx: CollectContext, surveyDays: readonly string[]): Promise<Collected> {

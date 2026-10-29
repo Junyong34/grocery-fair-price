@@ -1,14 +1,19 @@
-// KAMIS 소매 백필 명령 (ingest-foundation/04). 정기 수집이 끝난 뒤 사람이 부른다. 하루 예산을 다 쓰면 멈추고 다음 날 이어 받는다.
-//   pnpm --filter @workspace/price-ingest backfill [--years 3] [--item 211 ...] [--budget 6000]
+// 백필 명령 (ingest-foundation/04). 정기 수집이 끝난 뒤 부른다. 하루 예산을 다 쓰면 멈추고 다음 날 이어 받는다.
+// KAMIS는 사람이, 축평원은 ingest-ekape.yml이 매일 정기 수집 뒤에 부른다 (하루 한도 1,000이라 열흘 남짓 걸린다).
+//   pnpm --filter @workspace/price-ingest backfill [--source kamis|ekape] [--years 3] [--item 211 ...] [--budget 6000]
+//   --item: KAMIS는 품목 코드, 축평원은 축종 코드(4304 등)
 // 환경변수: DATA_GO_KR_SERVICE_KEY, SUPABASE_URL, SUPABASE_SECRET_KEY, INGEST_DATABASE_URL (수집 명령과 같다).
 // .env를 스스로 읽지 않는다. 로컬에서는 넣을 곳(로컬 DB인지 운영인지)을 정해 직접 넘긴다.
 import { parseArgs } from "node:util"
 
 import { EXIT } from "../ingest/run.ts"
 import { actionsMaskCommands, describeError, redactorFromEnv, SECRET_ENV } from "../secrets.ts"
-import { runBackfill, type BackfillRequest } from "./run.ts"
+import { runBackfill, type BackfillRequest, type BackfillSource } from "./run.ts"
 
-const USAGE = "사용법: backfill [--years N] [--item 품목코드 ...] [--budget 호출수]"
+const USAGE = "사용법: backfill [--source kamis|ekape] [--years N] [--item 품목코드 ...] [--budget 호출수]"
+
+// 실행 한 번의 예산 상한. 일일 한도(KAMIS 10,000, 축평원 1,000)를 넘기면 정기 수집까지 막힌다
+const MAX_BUDGET: Record<BackfillSource, number> = { kamis: 9_000, ekape: 950 }
 
 const positive = (name: string, value: string | undefined): number | undefined => {
   if (value === undefined) return undefined
@@ -20,16 +25,20 @@ export function parseBackfillRequest(argv: readonly string[]): BackfillRequest {
   const { values } = parseArgs({
     args: [...argv],
     options: {
+      source: { type: "string" },
       years: { type: "string" },
       item: { type: "string", multiple: true },
       budget: { type: "string" },
     },
     strict: true,
   })
-  // 일일 한도(10,000)를 넘는 예산은 받지 않는다. 한도를 넘기면 정기 수집까지 막힌다
+  const source = values.source ?? "kamis"
+  if (source !== "kamis" && source !== "ekape") throw new Error(`--source는 kamis 또는 ekape다. ${USAGE}`)
   const budget = positive("--budget", values.budget)
-  if (budget !== undefined && budget > 9_000) throw new Error(`--budget은 9,000까지다. ${USAGE}`)
-  return { years: positive("--years", values.years), items: values.item, budget }
+  if (budget !== undefined && budget > MAX_BUDGET[source]) {
+    throw new Error(`${source} --budget은 ${MAX_BUDGET[source].toLocaleString("en-US")}까지다. ${USAGE}`)
+  }
+  return { source, years: positive("--years", values.years), items: values.item, budget }
 }
 
 function required(name: string): string {

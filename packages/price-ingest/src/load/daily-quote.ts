@@ -10,7 +10,7 @@
 //
 // 날짜 하나를 다시 계산하면 그날 그 기준의 행을 새 결과로 맞춘다 (없어진 품종·범위의 행은 지운다).
 // 관측값이 보존 기간으로 지워진 날은 다시 계산하지 않는다. 남은 행(축평원)만으로 계산하면 집계가 망가진다 (3-3).
-// 그런 날의 시세는 KAMIS 백필이 원본을 담은 임시 표에서 같은 표본·집계로 낸다 (aggregateStagedQuotes, ingest-foundation/04).
+// 그런 날의 시세는 백필이 원본을 담은 임시 표에서 같은 표본·집계로 낸다 (aggregateStagedQuotes, ingest-foundation/04).
 import { addDays } from "../ingest/collect.ts"
 
 import type { Sql, Tx } from "./db.ts"
@@ -133,10 +133,16 @@ export const QUOTE_ALL_SCOPES_DAYS = 182
 
 export type StagedQuoteResult = { written: number; days: number }
 
-// 백필 (3-9 보관 1): 임시 표에 담은 KAMIS 행 중 보존 기간(90일) 밖의 날로 시세 요약을 내고, 그 행을 임시 표에서 뺀다.
-// 남은 행(90일 안)은 관측값에 병합되고 정기 재계산이 요약을 낸다. 시장 유형 범위는 182일 안의 날만 만든다.
+// 백필 (3-9 보관 1): 임시 표에 담은 행 중 보존 기간(90일) 밖의 날로 시세 요약을 낸다.
+// KAMIS는 그 행을 임시 표에서 빼 관측값에 넣지 않는다. 축평원은 관측값이 영구라 그대로 두고(keepRows) 함께 병합한다.
+// 90일 안의 날은 관측값에 병합되고 정기 재계산이 요약을 낸다. 시장 유형 범위는 182일 안의 날만 만든다.
 // 요약을 지우지는 않는다: 그날의 다른 품목은 이 임시 표에 없다. today: KST 오늘. 트랜잭션 안에서 부른다
-export async function aggregateStagedQuotes(tx: Tx, table: string, today: string): Promise<StagedQuoteResult> {
+export async function aggregateStagedQuotes(
+  tx: Tx,
+  table: string,
+  today: string,
+  options: { keepRows?: boolean } = {},
+): Promise<StagedQuoteResult> {
   const keepFrom = addDays(today, -KAMIS_KEEP_DAYS)
   await tx`select pg_advisory_xact_lock(hashtext('recompute:quote'))`
   await stageNewQuotes(tx, quoteSamples(table, "o.obs_date < $1::date"), "s.scope_key = 'national' or s.obs_date >= $2::date", [
@@ -147,7 +153,7 @@ export async function aggregateStagedQuotes(tx: Tx, table: string, today: string
   const [old] = await tx.unsafe<{ days: number }[]>(`select count(distinct obs_date)::int as days from ${table} where obs_date < $1::date`, [
     keepFrom,
   ])
-  await tx.unsafe(`delete from ${table} where obs_date < $1::date`, [keepFrom])
+  if (!options.keepRows) await tx.unsafe(`delete from ${table} where obs_date < $1::date`, [keepFrom])
   await tx.unsafe(`drop table dq_new`)
   return { written, days: old?.days ?? 0 }
 }

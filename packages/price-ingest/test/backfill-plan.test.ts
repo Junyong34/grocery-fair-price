@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { BACKFILL_YEARS, backfillItems, backfillTasks, taskRange } from "../src/backfill/plan.ts"
+import { parseBackfillRequest } from "../src/backfill/cli.ts"
+import { BACKFILL_YEARS, backfillItems, backfillTasks, ekapeBackfillTasks, taskRange } from "../src/backfill/plan.ts"
 import { kamisTarget } from "../src/catalog/match.ts"
 
 describe("KAMIS 백필 작업 목록 (ingest-foundation/04)", () => {
@@ -42,5 +43,56 @@ describe("KAMIS 백필 작업 목록 (ingest-foundation/04)", () => {
     const tasks = backfillTasks("2026-10-28", { items: ["211", "411"] })
     expect(new Set(tasks.map((task) => task.item.itemCd))).toEqual(new Set(["211", "411"]))
     expect(() => backfillTasks("2026-10-28", { items: ["351"] })).toThrow(/351/)
+  })
+})
+
+describe("축평원 백필 작업 목록 (ingest-foundation/04)", () => {
+  it("축종 × 달 묶음을 최근 달부터 늘어놓고, 한 달의 축종 7개가 붙어 있다", () => {
+    const tasks = ekapeBackfillTasks("2026-10-29")
+    expect(tasks.slice(0, 8).map((task) => task.taskKey)).toEqual([
+      "ekape:4301:2026-10",
+      "ekape:4304:2026-10",
+      "ekape:4401:2026-10",
+      "ekape:4402:2026-10",
+      "ekape:9901:2026-10",
+      "ekape:9903:2026-10",
+      "ekape:9908:2026-10",
+      "ekape:4301:2026-09",
+    ])
+    // 2023-01 ~ 2026-10 = 46달
+    expect(tasks.length).toBe(46 * 7)
+    expect(tasks.at(-1)).toEqual({ taskKey: "ekape:9908:2023-01", judgeKind: "9908", month: "2023-01", from: "2023-01-01", to: "2023-01-31" })
+  })
+
+  it("이번 달 묶음은 어제까지, 지난 달은 말일까지다 (윤년 2월 포함)", () => {
+    const tasks = ekapeBackfillTasks("2026-10-29", { kinds: ["4304"] })
+    const range = (month: string) => tasks.find((task) => task.month === month)
+    expect(range("2026-10")).toMatchObject({ from: "2026-10-01", to: "2026-10-28" })
+    expect(range("2026-09")).toMatchObject({ from: "2026-09-01", to: "2026-09-30" })
+    expect(range("2024-02")).toMatchObject({ from: "2024-02-01", to: "2024-02-29" })
+    expect(range("2023-12")).toMatchObject({ from: "2023-12-01", to: "2023-12-31" })
+  })
+
+  it("1일에는 이번 달 묶음이 없다", () => {
+    expect(ekapeBackfillTasks("2026-11-01", { kinds: ["4304"] })[0]).toMatchObject({ month: "2026-10", to: "2026-10-31" })
+  })
+
+  it("축종을 고르면 그 축종만 준다", () => {
+    const tasks = ekapeBackfillTasks("2026-10-29", { kinds: ["4304", "9903"] })
+    expect(new Set(tasks.map((task) => task.judgeKind))).toEqual(new Set(["4304", "9903"]))
+    expect(() => ekapeBackfillTasks("2026-10-29", { kinds: ["4300"] })).toThrow(/4300/)
+  })
+})
+
+describe("백필 명령 인자", () => {
+  it("출처를 고르지 않으면 KAMIS다", () => {
+    expect(parseBackfillRequest(["--item", "211"])).toEqual({ source: "kamis", years: undefined, items: ["211"], budget: undefined })
+    expect(parseBackfillRequest(["--source", "ekape", "--budget", "900"])).toMatchObject({ source: "ekape", budget: 900 })
+  })
+
+  it("예산은 출처의 일일 한도 안이어야 한다", () => {
+    expect(parseBackfillRequest(["--budget", "9000"]).budget).toBe(9000)
+    expect(() => parseBackfillRequest(["--source", "ekape", "--budget", "951"])).toThrow(/950/)
+    expect(() => parseBackfillRequest(["--source", "chamga"])).toThrow(/--source/)
   })
 })

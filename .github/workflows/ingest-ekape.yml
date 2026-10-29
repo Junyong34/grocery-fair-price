@@ -53,6 +53,39 @@ jobs:
           echo "code=$code" >> "$GITHUB_OUTPUT"
           exit $code
 
+  # 3년 백필 (ingest-foundation/04): 정기 수집이 성공한 정기 실행에서만 하루 예산 900회씩 이어 받는다.
+  # 축평원 한도는 하루 1,000회라 다 받는 데 열흘 남짓 걸린다. 다 받은 뒤에는 실행 기록 없이 바로 끝난다.
+  # 수동 실행에서는 돌지 않는다 (같은 날 두 번 돌면 한도를 넘겨 다음 날 정기 수집까지 막힌다).
+  # 실패해도 워크플로를 실패로 두지 않는다: 알림 잡이 "직전 실행이 실패였나"를 워크플로 결과로 본다.
+  # 키·DB·Storage 장애는 앞의 정기 수집이 먼저 알린다. 진행은 price.backfill_task로 본다
+  backfill:
+    needs: ingest
+    if: ${{ github.event_name == 'schedule' && needs.ingest.result == 'success' }}
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 60 # 900회 × 약 1초 + 묶음 적재
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --filter "@workspace/price-ingest..."
+      - name: 백필
+        env:
+          DATA_GO_KR_SERVICE_KEY: ${{ secrets.DATA_GO_KR_SERVICE_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          INGEST_DATABASE_URL: ${{ secrets.INGEST_DATABASE_URL }}
+        run: |
+          set +e
+          pnpm --filter @workspace/price-ingest backfill --source ekape --budget 900
+          code=$?
+          # 1(예산을 다 씀·일부 묶음 실패)은 다음 날 이어 받는 정상 진행이라 초록으로 둔다
+          if [ "$code" -eq 1 ]; then exit 0; fi
+          exit $code
+
   # 실패 알림 (ingest-schedule/13): 키 오류·원본 저장 실패는 즉시, 그 밖의 실패는 직전 실행도 실패였을 때 이슈를 열거나 댓글을 단다.
   # 성공하면 이 출처의 열린 알림 이슈를 닫는다. 이슈 권한은 이 잡에만 준다. 비밀값은 넘기지 않는다
   alert:

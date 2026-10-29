@@ -5,6 +5,7 @@
 // 실패하면 파일 하나만 되돌아가고 raw_object는 pending_load로 남는다. 다음 실행이 다시 적재한다.
 // KAMIS 백필 원본(헤더 job = backfill)은 보존 기간(90일) 밖의 날을 관측값에 넣지 않고 임시 표에서 바로 시세 요약으로 낸다
 // (pipeline 3-9 보관 1, ingest-foundation/04). 대조가 주운 백필 원본도 이 길로 간다. 1년치가 관측값에 들어가면 DB가 넘친다.
+// 축평원 백필 원본은 관측값이 영구라 모두 관측값에 넣고, 90일 밖의 날은 시세 요약도 임시 표에서 함께 낸다.
 import { adaptChamgaPriceRow, chamgaPriceRowRejection } from "../adapt/chamga.ts"
 import { adaptEkapeRow, ekapeRowRejection } from "../adapt/ekape.ts"
 import { adaptKamisRow, kamisRowRejection } from "../adapt/kamis.ts"
@@ -13,6 +14,7 @@ import type { RejectedRow } from "../adapt/batch.ts"
 import type { AdaptContext } from "../adapt/mapping.ts"
 import { applyMappings } from "../catalog/apply.ts"
 import type { CallRecord } from "../http.ts"
+import { addDays } from "../ingest/collect.ts"
 import {
   CHAMGA_ENDPOINT,
   chamgaPriceRowSchema,
@@ -33,7 +35,7 @@ import {
   type MasterOutcome,
   type SellerOutcome,
 } from "./chamga.ts"
-import { aggregateStagedQuotes, type StagedQuoteResult } from "./daily-quote.ts"
+import { aggregateStagedQuotes, KAMIS_KEEP_DAYS, type StagedQuoteResult } from "./daily-quote.ts"
 import { transaction, type Sql, type Tx } from "./db.ts"
 import {
   placeKeyOf,
@@ -432,7 +434,9 @@ export async function loadRawFile(sql: Sql | Tx, rawObjectId: number, file: RawF
   }
   const backfillToday = file.header.job === "backfill" ? options.today : null
   if (backfillToday === undefined) throw new Error("백필 원본은 오늘(KST)을 받아야 적재한다")
-  if (backfillToday !== null && source !== "kamis") throw new Error(`백필 원본 적재는 KAMIS만 한다 (${source})`)
+  if (backfillToday !== null && source === "chamga") throw new Error("백필 원본 적재는 KAMIS·축평원만 한다 (chamga)")
+  // 축평원 관측값은 영구라(3-9) 90일 밖의 날도 관측값에 넣는다. 그날들의 시세 요약은 임시 표에서 함께 낸다
+  const keepOldRows = source === "ekape"
   const prepared = prepare(file)
 
   return transaction(sql, async (tx) => {
@@ -447,8 +451,10 @@ export async function loadRawFile(sql: Sql | Tx, rawObjectId: number, file: RawF
     if (rows.length > 0) {
       await stageObservations(tx, "obs_load", lastByKey(rows))
       await mapStagedObservations(tx, "obs_load")
-      if (backfillToday !== null) backfill = await aggregateStagedQuotes(tx, "obs_load", backfillToday)
-      observations = await mergeObservations(tx, source, "obs_load")
+      if (backfillToday !== null) backfill = await aggregateStagedQuotes(tx, "obs_load", backfillToday, { keepRows: keepOldRows })
+      observations = await mergeObservations(tx, source, "obs_load", {
+        sourceDaysFrom: backfillToday === null ? undefined : addDays(backfillToday, -KAMIS_KEEP_DAYS),
+      })
       await tx`drop table obs_load` // commit 때 사라지지만, 바깥 트랜잭션 안에서 다시 부를 수 있게 지운다
     }
     const references = await upsertReferences(tx, prepared.references, ids, file, rawObjectId)
