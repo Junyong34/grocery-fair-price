@@ -458,14 +458,8 @@ async function loadChamgaMasters(ctx: Context, priceRows: ChamgaPriceRow[]): Pro
       as r (place_id int, name text, channel text, region_scope text, area text, area_detail text, region text, road text, jibun text)
     on conflict (place_id) do nothing`
 
-  // 판매처: 점포 이름 앞부분이 가장 긴 판매처 이름과 맞으면 잇는다 (운영자 확정을 대신하는 자동 제안).
-  await sql`
-    insert into price.store_seller (place_id, seller_id, valid_from)
-    select distinct on (st.place_id) st.place_id, se.id, ${CHAMGA_SINCE}::date
-    from price.store st
-    join price.seller se on replace(st.name, ' ', '') like se.name || '%' and se.channel = st.channel
-    order by st.place_id, length(se.name) desc
-    on conflict do nothing`
+  // 판매처: 수집과 같은 자동 연결 (점포 이름 앞부분 + 업태, ingest-foundation/07)
+  await sql`select * from price.assign_store_sellers(${CHAMGA_SINCE}::date)`
 
   // 상품 마스터: 가격이 온 상품만 상품으로 만든다.
   const productFile = readSample(CHAMGA_PRODUCT_FILE)

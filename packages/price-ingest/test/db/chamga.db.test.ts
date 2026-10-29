@@ -135,6 +135,44 @@ describe("마스터를 먼저, 가격을 나중에 받는다 (정상 순서)", (
   })
 })
 
+describe("점포 마스터가 판매처를 잇는다 (ingest-foundation/07)", () => {
+  async function sellersOf(tx: Tx) {
+    return tx<{ name: string; seller: string | null; channel: string }[]>`
+      select st.name, se.name as seller, st.channel
+        from price.store st join price.obs_place p on p.id = st.place_id
+        left join price.store_seller ss on ss.place_id = st.place_id
+        left join price.seller se on se.id = ss.seller_id
+       where p.source_place_code like '77%'`
+  }
+
+  it("모든 점포가 업태 + 이름 앞부분으로 판매처에 이어지고, 다시 받아도 그대로다", async () => {
+    await inRollback(sql, async (tx) => {
+      const first = await load(tx, chamgaFile(CHAMGA_ENDPOINT.store, stores))
+      expect(first.sellers).toEqual({ assigned: stores.length, unassigned: 0 })
+      const rows = await sellersOf(tx)
+      expect(rows.filter((r) => r.seller === null)).toEqual([])
+      // 이마트24 본사는 편의점이라 이마트(대형마트)로 묶이지 않는다
+      expect(rows.find((r) => r.name.startsWith("이마트24"))).toMatchObject({ seller: "이마트24", channel: "convenience" })
+      // 농협은 법인 둘로 나뉜다 ('(주)'와 공백을 빼고 맞춘다)
+      const nh = rows.filter((r) => r.name.includes("농협"))
+      expect(new Set(nh.map((r) => `${r.name.startsWith("(주)농협유통") ? "유통" : "하나로"}:${r.seller}`))).toEqual(
+        new Set(["유통:농협유통", "하나로:농협하나로유통"]),
+      )
+
+      const again = await load(tx, chamgaFile(CHAMGA_ENDPOINT.store, stores, "2026-10-23T22:00:05.000Z"))
+      expect(again.sellers).toEqual({ assigned: 0, unassigned: 0 })
+    })
+  })
+
+  it("규칙에 맞지 않는 점포는 잇지 않고 미연결로 센다", async () => {
+    await inRollback(sql, async (tx) => {
+      const unknown = { ...stores.find((s) => s.entpTypeCode === "LM")!, entpId: entpId("999999"), entpName: "새마트강남점" }
+      const outcome = await load(tx, chamgaFile(CHAMGA_ENDPOINT.store, [unknown]))
+      expect(outcome.sellers).toEqual({ assigned: 0, unassigned: 1 })
+    })
+  })
+})
+
 describe("마스터에 아직 없는 번호가 가격에 온다", () => {
   it("점포는 위치만, 상품은 임시 이름으로 먼저 넣고, 다음 마스터가 이름과 상세를 채운다", async () => {
     await inRollback(sql, async (tx) => {

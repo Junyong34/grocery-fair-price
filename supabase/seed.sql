@@ -115,7 +115,8 @@ join price.variety va on va.slug = m.variety_slug;
 insert into price.unit_rule (rule_code, version, price_tier, kind, params, note) values
   ('same_unit', 1, 'retail', 'same_unit', '{}', '원천 단위 = 기준 단위. 수량만 나눈다');
 
--- ── 판매처 (참가격 점포 이름 앞부분으로 자동 제안하는 대상) ────────────────────
+-- ── 판매처 (참가격 점포 이름 앞부분으로 자동 연결하는 대상) ────────────────────
+-- 운영 판매처는 마이그레이션 20261029000100이 넣는다. 여기는 로컬에만 두는 나머지 (같은 이름은 건너뛴다)
 
 insert into price.seller (name, channel) values
   ('이마트', 'large_mart'),
@@ -131,7 +132,8 @@ insert into price.seller (name, channel) values
   ('CU', 'convenience'),
   ('GS25', 'convenience'),
   ('세븐일레븐', 'convenience'),
-  ('이마트24', 'convenience');
+  ('이마트24', 'convenience')
+on conflict (name) do nothing;
 
 -- ── 검사: 기본 규격이 없는 활성 품종 (pipeline.md 3-1) ───────────────────────
 

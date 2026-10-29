@@ -4,7 +4,8 @@
 // 점포는 위치만, 상품은 임시 이름으로 먼저 만들고 가격을 넣는다. 다음 마스터 적재가 이름·상세를 채운다.
 //
 // 하지 않는 것 (ingest-schedule 지도 Out of scope): 마스터 변경 감지(이름·용량 바뀜, goodId 재사용, 점포 재등록),
-// 사라진 상품 판정, 판매처 연결(store_seller, 운영자 매핑), 상품 → 품종 매핑(pending으로만 둔다).
+// 사라진 상품 판정, 상품 → 품종 매핑(pending으로만 둔다).
+// 판매처 연결(store_seller)은 운영자가 정한 판매처 이름으로 자동으로 한다 (price.assign_store_sellers, ingest-foundation/07).
 import type { RejectedRow } from "../adapt/batch.ts"
 import type { ChamgaProductRow, ChamgaStoreRow } from "../sources/chamgagyeok.ts"
 import type { Tx } from "./db.ts"
@@ -32,6 +33,16 @@ export function placeholderProductName(goodId: string): string {
 const CHANNEL: Record<string, string> = { LM: "large_mart", DP: "department", SM: "ssm", CS: "convenience" }
 
 export type MasterOutcome = { rows: number; created: number; rejected: RejectedRow[] }
+
+// 판매처 연결 결과. unassigned: 판매처 규칙에 맞지 않아 연결이 없는 점포 수 (0이 아니면 운영자가 판매처를 더한다)
+export type SellerOutcome = { assigned: number; unassigned: number }
+
+// 판매처 연결이 없는 점포를 판매처에 잇는다. 마스터로 새 점포가 생긴 뒤 부른다
+export async function assignStoreSellers(tx: Tx): Promise<SellerOutcome> {
+  const [row] = await tx<{ assigned: string; unassigned: string }[]>`
+    select assigned, unassigned from price.assign_store_sellers(${CHAMGA_SINCE}::date)`
+  return { assigned: Number(row!.assigned), unassigned: Number(row!.unassigned) }
+}
 
 // 점포 마스터: 처음 보는 점포의 위치(obs_place)와 상세(store)를 만든다. 가격으로 위치만 먼저 생긴 점포는 상세를 채운다.
 // 이미 상세가 있는 점포는 다시 쓰지 않는다 (변경 감지는 Out of scope).

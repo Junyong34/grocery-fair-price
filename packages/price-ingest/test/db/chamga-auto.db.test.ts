@@ -94,6 +94,7 @@ afterAll(async () => {
     await tx`delete from price.product where id in (select (jsonb_array_elements_text(${tx.json(ids.map((r) => r.product_id))}))::int)`
     await tx`delete from price.source_item where source = 'chamga' and source_key ~ '^chamga:9[0-9]{6}$'`
     const places = tx`select id from price.obs_place where source = 'chamga' and source_place_code like '77%'`
+    await tx`delete from price.store_seller where place_id in (${places})`
     await tx`delete from price.store where place_id in (${places})`
     await tx`delete from price.obs_place where source = 'chamga' and source_place_code like '77%'`
     await tx`delete from price.source_day where source = 'chamga' and target_date >= '2090-01-01'`

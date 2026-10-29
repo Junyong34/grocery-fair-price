@@ -25,11 +25,13 @@ import {
 import { ekapeRowSchema, type EkapeRow } from "../sources/ekape.ts"
 import { kamisRowSchema, type KamisRow } from "../sources/kamis.ts"
 import {
+  assignStoreSellers,
   chamgaSourceKey,
   loadProductMaster,
   loadStoreMaster,
   resolvePricedProducts,
   type MasterOutcome,
+  type SellerOutcome,
 } from "./chamga.ts"
 import { aggregateStagedQuotes, type StagedQuoteResult } from "./daily-quote.ts"
 import { transaction, type Sql, type Tx } from "./db.ts"
@@ -311,6 +313,7 @@ export type LoadOutcome = {
   references: number // 새로 생기거나 고쳐 쓴 평년 행
   createdMasters: number // 참가격 마스터 파일이 새로 만든 점포·상품
   backfill: StagedQuoteResult | null // 백필 원본이면 임시 표에서 바로 낸 시세 요약
+  sellers?: SellerOutcome // 참가격 점포 마스터면 판매처 연결 결과
 }
 
 // today: KST 오늘. 백필 원본은 이것으로 보존 기간을 가른다
@@ -335,10 +338,12 @@ function loadChamgaMaster(sql: Sql | Tx, rawObjectId: number, file: RawFile): Pr
   return transaction(sql, async (tx) => {
     await lockSource(tx, "chamga")
     let outcome: MasterOutcome
+    let sellers: SellerOutcome | undefined
     if (file.header.endpoint === CHAMGA_ENDPOINT.store) {
       const { parsed, rejected } = parseRows<ChamgaStoreRow>(file.rows, chamgaStoreRowSchema)
       const loaded = await loadStoreMaster(tx, parsed)
       outcome = { ...loaded, rejected: [...rejected, ...loaded.rejected] }
+      sellers = await assignStoreSellers(tx)
     } else {
       const { parsed, rejected } = parseRows<ChamgaProductRow>(file.rows, chamgaProductRowSchema)
       const loaded = await loadProductMaster(tx, parsed, { collectedOn: kstDateOf(file.header.fetchedAt), rawObjectId })
@@ -354,6 +359,7 @@ function loadChamgaMaster(sql: Sql | Tx, rawObjectId: number, file: RawFile): Pr
       references: 0,
       createdMasters: outcome.created,
       backfill: null,
+      ...(sellers && { sellers }),
     }
   })
 }

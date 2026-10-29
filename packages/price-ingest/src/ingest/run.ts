@@ -241,8 +241,12 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
         const o = outcome.observations
         say(
           `적재: 원본 ${outcome.rawObjectId} ${outcome.status}, 새 행 ${o.inserted}, 고친 행 ${o.changed}, 정정 ${o.corrections}` +
-            `, 거부 ${outcome.rejected.length}, 평년 ${outcome.references}, 새 마스터 ${outcome.createdMasters}`,
+            `, 거부 ${outcome.rejected.length}, 평년 ${outcome.references}, 새 마스터 ${outcome.createdMasters}` +
+            (outcome.sellers ? `, 판매처 새 연결 ${outcome.sellers.assigned}, 미연결 점포 ${outcome.sellers.unassigned}` : ""),
         )
+        if (outcome.sellers && outcome.sellers.unassigned > 0) {
+          say(`경고: 판매처에 잇지 못한 점포 ${outcome.sellers.unassigned}곳. seller에 판매처를 더한다 (ingest-foundation/07)`)
+        }
       }
       for (const failure of result.failed) say(`적재 실패: ${failure.storagePath} ${redact(failure.error).slice(0, 160)}`)
     } catch (error) {

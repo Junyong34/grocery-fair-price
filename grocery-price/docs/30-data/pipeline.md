@@ -396,7 +396,7 @@ store_seller                                        -- 점포 → 판매처. 운
 
 - 인덱스: `store_seller(seller_id)`, `store(lineage_id)`, `store(region_code)`, `store_link(new_place_id)`.
 - **점포 재등록.** 광주·전남 15곳이 새 `entpId`(2220~2235)와 새 지역 코드로 다시 등록되었다 (예: 신세계백화점광주점 `13` → `2228`, [chamgagyeok.md 7-1](sources/chamgagyeok.md)). 새 점포는 새 `obs_place`·`store` 행이 되고, `store_link(13 → 2228, re_registered)`를 남긴 뒤 새 점포의 `lineage_id`를 옛 점포의 `lineage_id`로 바꾼다. 옛 점포는 `superseded`다. 이름·주소가 같은 동시 등록(GS더프레시 3쌍)은 `duplicate`로 잇는다.
-- **판매처 매핑.** `entpName` 앞부분으로 자동 제안하고 운영자가 확정한다. 업태와 함께 정한다 (이마트24(본사)가 이마트로 잘못 묶이지 않게, [chamgagyeok.md 11장](sources/chamgagyeok.md)). **유효 기간을 둔다** (2026-10-20 결정). 판매처가 바뀌면 이전 기간을 닫고 새 기간을 연다. 집계는 조사일이 속한 기간의 판매처로 센다. 그래서 과거 평균은 당시 판매처 기준으로 남는다. 변경은 `source_master_change`에도 남긴다.
+- **판매처 매핑.** 운영자가 판매처 목록(`seller`, 마이그레이션 기준 데이터)을 정하고, 점포는 수집이 자동으로 잇는다 (2026-10-29 결정, ingest-foundation/07). 판매처 이름이 규칙이다: `entpName`에서 `(주)`·공백을 뺀 것이 판매처 이름으로 시작하고 업태가 같으면 잇는다 (가장 긴 이름 우선, `price.assign_store_sellers()`). 점포 마스터를 적재할 때마다 연결이 없는 점포에만 부르므로 재등록으로 생긴 새 점포도 사람 손 없이 이어진다. 규칙에 맞지 않는 점포는 연결 없이 두고 실행 로그에 경고한다. 업태와 함께 정한다 (이마트24(본사)가 이마트로 잘못 묶이지 않게, [chamgagyeok.md 11장](sources/chamgagyeok.md)). **유효 기간을 둔다** (2026-10-20 결정). 판매처가 바뀌면 이전 기간을 닫고 새 기간을 연다. 집계는 조사일이 속한 기간의 판매처로 센다. 그래서 과거 평균은 당시 판매처 기준으로 남는다. 변경은 `source_master_change`에도 남긴다.
 - **활동 여부**는 마스터가 아니라 가격 응답의 `obs_place.first_seen_on`·`last_seen_on`과 `missing_streak`로 정한다. 마스터에 있어도 가격이 오지 않는 점포가 184곳이다.
 
 ```sql

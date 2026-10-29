@@ -327,7 +327,7 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 |---|---|
 | `supabase/config.toml` | 로컬 Supabase 설정. 포트는 5532x대(API 55321, DB 55322), `raw` 버킷(비공개) |
 | `supabase/migrations/` | `price_foundation`(확장·스키마·롤), `price_tables`(표 40개·뷰), `price_grants_rls`(GRANT·RLS 정책), `price_calc_param_retention`(계산 상수 초기값, 보존 정리 함수), `price_comments`(모든 표·열·함수의 DB 주석: 뜻, 단위·형식, null의 뜻, 원천 필드명). 표 정의의 기준이다 (pipeline.md 3장은 설계 이유) |
-| `supabase/seed.sql` | `supabase db reset` 때만 들어가는 로컬 기준 데이터: 지역(전국·시도), 샘플 품종 임시 목록, 환산 규칙, 판매처. 끝에서 기본 규격 검사를 돌린다 |
+| `supabase/seed.sql` | `supabase db reset` 때만 들어가는 로컬 기준 데이터: 지역(전국·시도), 샘플 품종 임시 목록, 환산 규칙, 운영에 없는 판매처(운영 판매처는 마이그레이션 `20261029000100`). 끝에서 기본 규격 검사를 돌린다 |
 | `packages/price-db/src/` | 로컬 접속(`db.ts`), 샘플 응답 파서(`samples.ts`), 샘플용 관측값 적재·백필(`observation-load.ts`, 병합은 `@workspace/price-ingest/load/observation`을 쓴다), 간이 집계(`aggregate.ts`), 샘플 테스트 데이터(`load-samples.ts`) |
 | `packages/price-db/test/*.db.test.ts` | 권한·RLS·제약·적재 시나리오·DB 주석 빠짐·ERD 최신 여부. 로컬 DB가 떠 있어야 해서 루트 `pnpm test`에는 들어가지 않는다 |
 | `packages/price-db/scripts/` | `load-samples.ts`, `measure-size.ts`(행당 크기 실측), `build-erd.ts`(`grocery-price/docs/30-data/schema-map.html`의 ERD 생성) |
