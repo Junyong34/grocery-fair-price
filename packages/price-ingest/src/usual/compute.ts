@@ -24,6 +24,7 @@ export const USUAL_METHOD = "level-x-season-1"
 
 export type SpecSeries = { varietyId: number; specId: number; category: string; points: readonly Point[] }
 
+// n: 그 칸의 값을 낸 비율 수. 계절비율을 1로 둔 규격은 3년 비율 전체 수
 export type SeasonRow = { varietyId: number; specId: number; slot: number; value: number; n: number; asOf: string }
 
 export type UsualRow = {
@@ -118,9 +119,13 @@ export function computeUsual(
     perSpec.push({ s, rows, deviations })
 
     const asOf = seasonAsOf(input.to)
-    const { index } = indexFor(ratios, cache, asOf, params)
+    const { index, flat } = indexFor(ratios, cache, asOf, params)
     const counts = slotCounts(ratios, asOf, params)
-    for (const [slot, value] of index) season.push({ varietyId: s.varietyId, specId: s.specId, slot, value, n: counts.get(slot)!, asOf })
+    // 1로 둔 계절비율은 3년 비율 전체가 근거다 (시세가 없던 날의 칸에도 1이 있다)
+    const total = ratios.filter((r) => r.day > addDays(asOf, -365 * params.seasonYears) && r.day <= asOf).length
+    for (const [slot, value] of index) {
+      season.push({ varietyId: s.varietyId, specId: s.specId, slot, value, n: flat ? total : counts.get(slot)!, asOf })
+    }
   }
 
   const pooled = new Map<string, number[]>()

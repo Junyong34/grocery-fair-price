@@ -44,6 +44,20 @@ describe("computeUsual", () => {
     expect(season.filter((r) => r.specId === 11)).toHaveLength(365)
   })
 
+  it("계절비율을 1로 둔 규격은 시세가 없던 날의 칸에도 1과 3년 비율 수를 둔다", () => {
+    // 해마다 18% 오르는 때가 다르고, 해마다 2월은 시세가 없다
+    const peak = (day: string) => (day >= "2025-10-28" ? [9, 10, 11] : day >= "2024-10-28" ? [6, 7, 8] : [3, 4, 5])
+    const points = series("2023-01-01", "2026-10-28", (day) => 2500 * (peak(day).includes(Number(day.slice(5, 7))) ? 1.18 : 1)).filter(
+      (p) => p.day.slice(5, 7) !== "02",
+    )
+    const { season, usual } = computeUsual([{ varietyId: 3, specId: 30, category: "grain", points }], { from: "2026-10-28", to: "2026-10-28" })
+    expect(season).toHaveLength(365)
+    expect(new Set(season.map((r) => r.value))).toEqual(new Set([1]))
+    expect(new Set(season.map((r) => r.n)).size).toBe(1)
+    expect(season[0]!.n).toBeGreaterThan(900)
+    expect(usual[0]!.components).toMatchObject({ season_flat: true, season_index: 1 })
+  })
+
   it("제철 품목은 평소가를 내지 않지만 계절비율 표는 만든다", () => {
     const { usual, season } = computeUsual([yearRound, seasonal], { from: "2026-09-01", to: "2026-09-30" })
     expect(usual.every((r) => r.specId === 10)).toBe(true)
