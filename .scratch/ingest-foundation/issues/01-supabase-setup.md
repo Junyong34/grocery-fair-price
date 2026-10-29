@@ -30,7 +30,7 @@ Type: task
 - Actions에서 Supabase CLI를 쓰게 되면(지금은 계획 없음) 이 프로젝트 하나로 범위를 좁힌 개인 액세스 토큰을 `SUPABASE_ACCESS_TOKEN`으로 넣는다 ([scoped PAT](https://supabase.com/changelog/scoped-personal-access-tokens-ga)).
 - 2026-10-20 결정에 맞춰 표를 바꿨다 (웹앱 서버 전용 읽기, 새 키, 롤 접속. [pipeline.md 3-0](../../../grocery-price/docs/30-data/pipeline.md)). 예전의 `DATABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_ANON_KEY`는 쓰지 않는다.
 
-- [ ] 개발계정 3개의 활용기간 종료일을 확인해 이 파일 아래 `## Answer`에 적기 (운영계정 전환 알림에 쓴다, 05)
+- [x] 개발계정 3개의 활용기간 종료일을 확인해 이 파일 아래 `## Answer`에 적기 (운영계정 전환 알림에 쓴다, 05) → 2028-10-08, `ingest-schedule/01` Answer
 
 ## 완료 기준
 
