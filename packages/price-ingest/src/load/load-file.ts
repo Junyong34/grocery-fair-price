@@ -267,10 +267,70 @@ function lastByKey(rows: readonly ObservationRow[]): ObservationRow[] {
   return [...new Map(rows.map((row) => [`${row.source_item_id}|${row.obs_date}|${row.place_id}`, row])).values()]
 }
 
+type PlaceIds = { sourceItem: ReadonlyMap<string, number>; place: ReadonlyMap<string, number> }
+
+// 준비한 행을 DB 번호로 바꾼다: 원천 키·위치(없으면 만든다), 시장 시군구 검사, 참가격 상품 ID.
+// 관측값 표는 건드리지 않는다. 적재(loadRawFile)와 원본에서 다시 계산(stageRawPriceFiles)이 함께 쓴다
+async function observationRowsOf(
+  tx: Tx,
+  source: DbSource,
+  rawObjectId: number,
+  file: RawFile,
+  prepared: Prepared,
+): Promise<{ ids: PlaceIds; rows: ObservationRow[]; rejected: RejectedRow[] }> {
+  const ids = {
+    sourceItem: await upsertSourceItems(tx, source, prepared.items),
+    place: await upsertPlaces(tx, source, prepared.places),
+  }
+  const rejected = [...prepared.rejected]
+
+  // 시장의 sgg_cd는 시장이 정한다. 처음 본 값과 다른 행은 거부하고 경보 대상으로 남긴다 (3-3).
+  const marketSgg = await upsertMarkets(tx, ids.place, prepared.markets)
+  let accepted = prepared.observations.filter((item) => {
+    if (item.marketSgg === null || marketSgg.get(item.marketSgg.code) === item.marketSgg.sgg) return true
+    rejected.push({ index: item.index, reason: "시장의 시군구 코드가 처음 본 값과 다르다" })
+    return false
+  })
+
+  // 참가격: 상품 번호 → 상품 ID. 마스터에 없는 상품은 임시 이름으로 만든다 (chamga.ts).
+  const productKey = (item: PreparedObservation) => `${ids.sourceItem.get(item.sourceKey)}|${item.draft.obsDate}`
+  const priced = accepted.filter((item) => item.goodId !== null)
+  const productOf = await resolvePricedProducts(
+    tx,
+    priced.map((item) => ({ goodId: item.goodId!, sourceItemId: ids.sourceItem.get(item.sourceKey)!, obsDate: item.draft.obsDate })),
+    kstDateOf(file.header.fetchedAt),
+  )
+  accepted = accepted.filter((item) => {
+    if (item.goodId === null || productOf.has(productKey(item))) return true
+    rejected.push({ index: item.index, reason: "조사일에 유효한 상품 연결이 없다" })
+    return false
+  })
+  const rows = accepted.map((item) => toRow(item, ids, file, rawObjectId, item.goodId === null ? null : productOf.get(productKey(item))!))
+  return { ids, rows, rejected }
+}
+
+// 참가격 가격 원본 여러 개를 관측값 모양의 임시 표 table에 담는다. 관측값 표는 건드리지 않는다.
+// files는 받은 순서대로 준다: 같은 키는 뒤의 것이 남는다 (적재의 병합과 같은 결과). 트랜잭션 안에서 부른다
+export async function stageRawPriceFiles(
+  tx: Tx,
+  table: string,
+  files: readonly { rawObjectId: number; file: RawFile }[],
+): Promise<number> {
+  await lockSource(tx, "chamga")
+  const rows: ObservationRow[] = []
+  for (const { rawObjectId, file } of files) {
+    if (file.header.source !== "chamga") throw new Error(`참가격 원본이 아니다 (${file.header.source})`)
+    rows.push(...(await observationRowsOf(tx, "chamga", rawObjectId, file, prepare(file))).rows)
+  }
+  const staged = lastByKey(rows)
+  await stageObservations(tx, table, staged)
+  return staged.length
+}
+
 async function upsertReferences(
   tx: Tx,
   refs: readonly PreparedReference[],
-  ids: { sourceItem: ReadonlyMap<string, number>; place: ReadonlyMap<string, number> },
+  ids: PlaceIds,
   file: RawFile,
   rawObjectId: number,
 ): Promise<number> {
@@ -377,43 +437,14 @@ export async function loadRawFile(sql: Sql | Tx, rawObjectId: number, file: RawF
 
   return transaction(sql, async (tx) => {
     await lockSource(tx, source)
-    const ids = {
-      sourceItem: await upsertSourceItems(tx, source, prepared.items),
-      place: await upsertPlaces(tx, source, prepared.places),
-    }
-    const rejected = [...prepared.rejected]
-
-    // 시장의 sgg_cd는 시장이 정한다. 처음 본 값과 다른 행은 거부하고 경보 대상으로 남긴다 (3-3).
-    const marketSgg = await upsertMarkets(tx, ids.place, prepared.markets)
-    let accepted = prepared.observations.filter((item) => {
-      if (item.marketSgg === null || marketSgg.get(item.marketSgg.code) === item.marketSgg.sgg) return true
-      rejected.push({ index: item.index, reason: "시장의 시군구 코드가 처음 본 값과 다르다" })
-      return false
-    })
-
-    // 참가격: 상품 번호 → 상품 ID. 마스터에 없는 상품은 임시 이름으로 만든다 (chamga.ts).
-    const productKey = (item: PreparedObservation) => `${ids.sourceItem.get(item.sourceKey)}|${item.draft.obsDate}`
-    const priced = accepted.filter((item) => item.goodId !== null)
-    const productOf = await resolvePricedProducts(
-      tx,
-      priced.map((item) => ({ goodId: item.goodId!, sourceItemId: ids.sourceItem.get(item.sourceKey)!, obsDate: item.draft.obsDate })),
-      kstDateOf(file.header.fetchedAt),
-    )
-    accepted = accepted.filter((item) => {
-      if (item.goodId === null || productOf.has(productKey(item))) return true
-      rejected.push({ index: item.index, reason: "조사일에 유효한 상품 연결이 없다" })
-      return false
-    })
+    const { ids, rows, rejected } = await observationRowsOf(tx, source, rawObjectId, file, prepared)
 
     // 처음 본 원천 키·상품이 카탈로그에 있으면 바로 잇는다. 없으면 pending으로 남아 운영자가 본다 (09)
     await applyMappings(tx, { onLoad: true })
 
     let observations: MergeResult = NO_CHANGE
     let backfill: StagedQuoteResult | null = backfillToday === null ? null : { written: 0, days: 0 }
-    if (accepted.length > 0) {
-      const rows = accepted.map((item) =>
-        toRow(item, ids, file, rawObjectId, item.goodId === null ? null : productOf.get(productKey(item))!),
-      )
+    if (rows.length > 0) {
       await stageObservations(tx, "obs_load", lastByKey(rows))
       await mapStagedObservations(tx, "obs_load")
       if (backfillToday !== null) backfill = await aggregateStagedQuotes(tx, "obs_load", backfillToday)

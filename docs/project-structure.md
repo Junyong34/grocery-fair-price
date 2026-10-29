@@ -379,6 +379,7 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `pnpm --filter @workspace/price-ingest catalog --classes\|--mappings [--dry-run]` | 품종 카탈로그를 DB에 넣는다. `--classes`는 분류 표(소유자 접속 `OWNER_DATABASE_URL`, 로컬에서만), `--mappings`는 pending 매핑을 카탈로그대로 잇고 이미 쌓인 관측값을 다시 매핑한다(`INGEST_DATABASE_URL`). 분류 표가 먼저다. `.env`를 읽지 않는다 |
 | `pnpm --filter @workspace/price-ingest backfill [--years 3] [--item 품목코드 ...] [--budget 6000]` | KAMIS 소매 백필. 환경변수는 수집과 같은 4개. 정기 수집이 끝난 뒤 사람이 부른다. 예산(기본 6,000, 최대 9,000)을 다 쓰면 멈추고 다음 실행이 `backfill_task`에서 이어 받는다 |
 | `pnpm --filter @workspace/price-ingest purge [--dry-run]` | 주 1회 보존 정리 (`INGEST_DATABASE_URL`): KAMIS 관측값 90일, 참가격 6 조사일. 그날 요약이 없으면 지우지 않는다. 시세 요약은 182일이 지나면 시장 유형 범위를 지우고 national만 남긴다. KAMIS 워크플로 월요일 실행이 부른다 |
+| `pnpm --filter @workspace/price-ingest summary [--from-raw \| --check] [--day YYYY-MM-DD ...] [--dry-run]` | 참가격 상품 요약 (`INGEST_DATABASE_URL`, 원본을 읽으면 `SUPABASE_URL`·`SUPABASE_SECRET_KEY`). 기본은 관측값에서 다시 계산(날을 안 주면 요약 없는 조사일), `--from-raw`는 관측값을 지운 조사일을 Storage 원본에서, `--check`는 두 길의 결과가 같은지 보고 되돌린다. 정기 수집은 적재 뒤에 스스로 계산한다 |
 | `pnpm --filter @workspace/price-ingest probe:runner` | 접속 실측 (루트 `.env`를 읽는다. API 3회) |
 | `scripts/check-no-secrets.sh [--tree]` | `.env` 값이 커밋 대상에 들어갔는지 검사 (pre-commit) |
 

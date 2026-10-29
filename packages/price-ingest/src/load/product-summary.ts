@@ -9,8 +9,13 @@
 //   이상치(flags outlier)는 세지 않는다. 상품 → 품종 연결과 무관하게 만든다
 //
 // 조사일 하나를 다시 계산하면 그날의 행을 새 결과로 맞춘다 (없어진 상품·범위의 행은 지운다).
-// 관측값이 보존 정리로 지워진 조사일은 건드리지 않는다. 그날은 요약만 남아 있다.
+// 관측값이 보존 정리로 지워진 조사일은 관측값으로 계산하지 않는다. 그날은 원본(Storage)에서 다시 만든다
+// (rebuildProductSummaryFromRaw, pipeline 3-3 "원본에서 표본 전체를 다시 만든다"와 같은 방식).
 import type { Sql, Tx } from "./db.ts"
+import { stageRawPriceFiles } from "./load-file.ts"
+import { objectKeyOf, parseRawFile } from "./raw-file.ts"
+import type { ObjectStore } from "./storage.ts"
+import { CHAMGA_ENDPOINT } from "../sources/chamgagyeok.ts"
 
 export type SummaryResult = { written: number; removed: number; days: number }
 
@@ -24,24 +29,67 @@ export async function surveyDaysWithoutSummary(tx: Sql | Tx): Promise<string[]> 
   return rows.map((r) => r.day)
 }
 
-// dates: 다시 계산할 조사일 (YYYY-MM-DD). 트랜잭션 안에서 부른다
+// dates: 다시 계산할 조사일 (YYYY-MM-DD). 관측값이 있는 날만 계산한다. 트랜잭션 안에서 부른다
 export async function recomputeProductSummary(tx: Tx, dates: readonly string[]): Promise<SummaryResult> {
   if (dates.length === 0) return { written: 0, removed: 0, days: 0 }
-  await tx`select pg_advisory_xact_lock(hashtext('recompute:product_summary'))`
+  await lockSummary(tx)
   const days = await tx<{ day: string }[]>`
     select distinct o.obs_date::text as day
       from price.observation o
      where o.obs_date = any(${dates as string[]}::date[]) and o.obs_kind = 'shelf_price'`
   if (days.length === 0) return { written: 0, removed: 0, days: 0 }
-  const live = days.map((d) => d.day)
+  return writeSummary(tx, "price.observation", days.map((d) => d.day))
+}
 
+export class IncompleteRawError extends Error {
+  constructor(day: string, reason: string) {
+    super(`조사일 ${day}의 원본으로 다시 계산할 수 없다: ${reason}`)
+    this.name = "IncompleteRawError"
+  }
+}
+
+// 조사일 하나의 요약을 원본(Storage의 참가격 가격 파일)에서 다시 만든다. 관측값 표는 읽지도 쓰지도 않는다.
+// 그 조사일을 담은 적재된 가격 원본을 받은 순서대로 모두 읽는다 (중복 원본은 앞 원본과 내용이 같아 건너뛴다).
+// 원본이 하나라도 지워졌거나(purged_at) 내용이 기록과 다르면 아무것도 바꾸지 않고 IncompleteRawError (3-3).
+// 트랜잭션 안에서 부른다
+export async function rebuildProductSummaryFromRaw(tx: Tx, store: ObjectStore, day: string): Promise<SummaryResult & { files: number; rows: number }> {
+  await lockSummary(tx)
+  const raws = await tx<{ id: string; storage_path: string; content_sha256: string; purged_at: string | null }[]>`
+    select id, storage_path, content_sha256, purged_at::text
+      from price.raw_object
+     where source = 'chamga' and endpoint = ${CHAMGA_ENDPOINT.price}
+       and target_from <= ${day}::date and target_to >= ${day}::date
+       and load_status in ('loaded', 'partially_rejected')
+     order by fetched_at, id`
+  if (raws.length === 0) throw new IncompleteRawError(day, "적재된 가격 원본이 없다")
+  if (raws.some((r) => r.purged_at !== null)) throw new IncompleteRawError(day, "지워진 원본이 있다")
+
+  const files = []
+  for (const raw of raws) {
+    const file = parseRawFile(await store.download(objectKeyOf(raw.storage_path)))
+    if (file.contentSha256 !== raw.content_sha256) throw new IncompleteRawError(day, `원본 ${raw.id}의 내용이 기록의 해시와 다르다`)
+    files.push({ rawObjectId: Number(raw.id), file })
+  }
+  const rows = await stageRawPriceFiles(tx, "pds_raw", files)
+  await tx.unsafe(`delete from pds_raw where obs_date <> $1::date`, [day])
+  const result = await writeSummary(tx, "pds_raw", [day])
+  await tx.unsafe(`drop table pds_raw`)
+  return { ...result, files: files.length, rows }
+}
+
+async function lockSummary(tx: Tx): Promise<void> {
+  await tx`select pg_advisory_xact_lock(hashtext('recompute:product_summary'))`
+}
+
+// table: 관측값 모양의 표 (price.observation, 또는 원본을 담은 임시 표). days의 요약 행을 table로 낸 결과에 맞춘다
+async function writeSummary(tx: Tx, table: string, live: readonly string[]): Promise<SummaryResult> {
   await tx.unsafe(
     `create temp table pds_new on commit drop as
      with obs as (
        select o.product_id, o.obs_date, o.price_raw, st.lineage_id, st.channel, ss.seller_id,
               coalesce(o.promo_discount, false) or coalesce(o.promo_one_plus_one, false) as on_promo,
               o.promo_discount is null and o.promo_one_plus_one is null as promo_unknown
-         from price.observation o
+         from ${table} o
          join price.store st on st.place_id = o.place_id
          left join price.store_seller ss
            on ss.place_id = o.place_id and daterange(ss.valid_from, ss.valid_to) @> o.obs_date
@@ -84,14 +132,14 @@ export async function recomputeProductSummary(tx: Tx, dates: readonly string[]):
        from scoped s
        left join two_level t using (product_id, obs_date, scope_key)
       group by s.product_id, s.scope_key, s.obs_date, t.seller_avg`,
-    [live],
+    [live as string[]],
   )
 
   const removed = await tx.unsafe(
     `delete from price.product_daily_summary p
       where p.obs_date = any($1::date[])
         and not exists (select 1 from pds_new n where (n.product_id, n.scope_key, n.obs_date) = (p.product_id, p.scope_key, p.obs_date))`,
-    [live],
+    [live as string[]],
   )
   // 값이 같은 행은 고쳐 쓰지 않는다
   const written = await tx.unsafe(
@@ -112,4 +160,51 @@ export async function recomputeProductSummary(tx: Tx, dates: readonly string[]):
   )
   await tx.unsafe(`drop table pds_new`)
   return { written: written.count, removed: removed.count, days: live.length }
+}
+
+export type RawCheck = { day: string; files: number; rows: number; summaryRows: number; differing: number; onlyObservation: number; onlyRaw: number }
+
+const SUMMARY_VALUES = "min, median, max, median_excl_promo, seller_avg, n_stores, n_sellers, promo_n, promo_unknown_n"
+
+// 조사일 하나를 관측값으로 낸 요약과 원본으로 낸 요약이 같은지 본다. 보존 정리로 관측값을 지우기 전의 확인이다 (07).
+// savepoint 안에서 두 번 계산하고 되돌리므로 DB에는 아무것도 남지 않는다. 트랜잭션 안에서 부른다
+export async function checkRawSummary(tx: Tx, store: ObjectStore, day: string): Promise<RawCheck> {
+  let check: RawCheck | undefined
+  const ROLLBACK = new Error("rollback")
+  await tx
+    .savepoint(async (sp) => {
+      await recomputeProductSummary(sp, [day])
+      await sp.unsafe(
+        `create temp table pds_obs on commit drop as select product_id, scope_key, obs_date, ${SUMMARY_VALUES}
+           from price.product_daily_summary where obs_date = $1::date`,
+        [day],
+      )
+      const raw = await rebuildProductSummaryFromRaw(sp, store, day)
+      const [diff] = await sp.unsafe<{ total: number; differing: number; only_obs: number; only_raw: number }[]>(
+        `with r as (select product_id, scope_key, obs_date, ${SUMMARY_VALUES} from price.product_daily_summary where obs_date = $1::date)
+         select count(*)::int as total,
+                count(*) filter (where o.product_id is not null and r.product_id is not null
+                                   and (o.min, o.median, o.max, o.median_excl_promo, o.seller_avg, o.n_stores, o.n_sellers, o.promo_n, o.promo_unknown_n)
+                                       is distinct from
+                                       (r.min, r.median, r.max, r.median_excl_promo, r.seller_avg, r.n_stores, r.n_sellers, r.promo_n, r.promo_unknown_n))::int as differing,
+                count(*) filter (where r.product_id is null)::int as only_obs,
+                count(*) filter (where o.product_id is null)::int as only_raw
+           from pds_obs o full join r using (product_id, scope_key, obs_date)`,
+        [day],
+      )
+      check = {
+        day,
+        files: raw.files,
+        rows: raw.rows,
+        summaryRows: diff!.total,
+        differing: diff!.differing,
+        onlyObservation: diff!.only_obs,
+        onlyRaw: diff!.only_raw,
+      }
+      throw ROLLBACK
+    })
+    .catch((error: unknown) => {
+      if (error !== ROLLBACK) throw error
+    })
+  return check!
 }

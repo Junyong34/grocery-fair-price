@@ -14,7 +14,8 @@
     "ingest": "node src/cli.ts",
     "backfill": "node src/backfill/cli.ts",
     "catalog": "node src/catalog/cli.ts",
-    "purge": "node src/purge.ts"
+    "purge": "node src/purge.ts",
+    "summary": "node src/summary.ts"
   },
   "dependencies": {
     "fast-xml-parser": "5.11.2",
