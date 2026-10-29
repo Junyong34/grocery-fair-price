@@ -7,6 +7,7 @@ import { ADAPTER_VERSION } from "../adapt/draft.ts"
 import { contractBaselineVersion } from "../contract/probes.ts"
 import type { FetchLike } from "../http.ts"
 import { datesOfRawObjects, recomputeDailyQuote } from "../load/daily-quote.ts"
+import { recomputeProductSummary, surveyDaysWithoutSummary } from "../load/product-summary.ts"
 import { connectIngest, transaction, type Sql } from "../load/db.ts"
 import { finishRun, previousRawFile, registerDuplicate, registerPending, registerRun } from "../load/ledger.ts"
 import { loadPendingFiles } from "../load/load-pending.ts"
@@ -263,6 +264,21 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
       say(`일자 요약: ${basis} ${days.length}일, 고친 행 ${quotes.written}, 지운 행 ${quotes.removed}`)
     } catch (error) {
       say(`일자 요약 실패: ${errorSummary(error, redact)}`)
+      loadFailed += 1
+    }
+  }
+
+  // 참가격 상품 요약: 적재한 조사일과, 관측값은 있는데 요약이 없는 조사일 (ingest-foundation/07)
+  if (sql && source === "chamga") {
+    try {
+      const loadedDays = await datesOfRawObjects(sql, loadedIds)
+      const days = [...new Set([...loadedDays, ...(await surveyDaysWithoutSummary(sql))])].sort()
+      if (days.length > 0) {
+        const summary = await transaction(sql, (tx) => recomputeProductSummary(tx, days))
+        say(`상품 요약: 조사일 ${summary.days}개 (${days.join(", ")}), 고친 행 ${summary.written}, 지운 행 ${summary.removed}`)
+      }
+    } catch (error) {
+      say(`상품 요약 실패: ${errorSummary(error, redact)}`)
       loadFailed += 1
     }
   }

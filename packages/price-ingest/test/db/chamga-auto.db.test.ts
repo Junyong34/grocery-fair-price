@@ -80,6 +80,13 @@ async function dayState(day: string) {
   return row
 }
 
+// 그 조사일 상품 요약의 전국 범위 점포 수 합 (요약이 사람 손 없이 생기는지, ingest-foundation/07)
+async function summaryStores(day: string): Promise<number> {
+  const [row] = await sql<{ n: number }[]>`
+    select coalesce(sum(n_stores), 0)::int as n from price.product_daily_summary where obs_date = ${day} and scope_key = 'national'`
+  return row!.n
+}
+
 afterAll(async () => {
   const keys = (await Promise.all(["10", "11"].flatMap((m) => Array.from({ length: 31 }, (_, d) => `2096-${m}-${String(d + 1).padStart(2, "0")}`)).map((day) => store.list(dayPrefix("chamga", day))))).flat()
   await store.remove(keys)
@@ -87,6 +94,7 @@ afterAll(async () => {
     const items = tx`select id from price.source_item where source = 'chamga' and source_key ~ '^chamga:9[0-9]{6}$'`
     const products = tx`select product_id from price.product_source_key where source_item_id in (${items})`
     await tx`delete from price.observation where source_item_id in (${items})`
+    await tx`delete from price.product_daily_summary where product_id in (${products})`
     await tx`delete from price.product_variety_map where product_id in (${products})`
     await tx`delete from price.product_attr_history where product_id in (${products})`
     const ids = await tx<{ product_id: number }[]>`select product_id from price.product_source_key where source_item_id in (${items})`
@@ -123,12 +131,14 @@ describe("참가격 조사일의 생애 (커밋, 순서대로)", () => {
     expect(calls).toBe(1 + 2 + 457 + 3) // 감지 1(첫 상품에서 찾음), 마스터 2, 가격 457, 그 전 금요일 감지 3
     expect(await dayState(F)).toMatchObject({ status: "ok", row_count: 300, stable_checks: 0, closed: false })
     expect(await dayState(PREV)).toMatchObject({ status: "empty_expected", closed: true })
+    expect(await summaryStores(F)).toBe(300) // 상품 하나가 점포 300곳에서 왔다
   })
 
   it("화요일: 더 들어옴 → 다시 받고, 행 수가 바뀌어 안정 횟수는 0", async () => {
     surveyed = BASE_ROWS.length
     await runOn("2096-10-16")
     expect(await dayState(F)).toMatchObject({ row_count: BASE_ROWS.length, stable_checks: 0 })
+    expect(await summaryStores(F)).toBe(BASE_ROWS.length)
   })
 
   it("수요일: 그대로 → 가격 원본은 중복으로만 기록, 행 수가 같아 안정 1 (마지막 등록이 하루 넘게 지나 완료)", async () => {
