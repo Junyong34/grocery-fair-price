@@ -5,15 +5,74 @@ Blocked by: —
 
 ## 목적
 
-PDF를 둘 비공개 R2 버킷을 만든다(ADR 0003). 운영자가 직접 해야 하는 일이다(계정, 결제 수단 등록).
+PDF를 둘 비공개 R2 버킷을 만든다(ADR 0003). 운영자가 직접 해야 하는 일이다(계정, 결제 수단).
 
-## 할 일
+근거: Cloudflare 공식 문서(2026-10-29 확인) — [Get started](https://developers.cloudflare.com/r2/get-started/), [API tokens](https://developers.cloudflare.com/r2/api/tokens/), [Presigned URLs](https://developers.cloudflare.com/r2/api/s3/presigned-urls/), [Pricing](https://developers.cloudflare.com/r2/pricing/).
 
-- [ ] Cloudflare 계정 만들기, R2 활성화(무료 범위도 결제 수단 등록이 필요하다).
-- [ ] 비공개 버킷 하나(예: `seasonal-prints`). 공개 접근·커스텀 도메인은 켜지 않는다.
-- [ ] R2 API 토큰 두 벌: **쓰기**(Object Read & Write, 이 버킷만) → 운영자 로컬 `.env`. **읽기**(Object Read only) → 운영 환경변수.
-- [ ] 키 이름을 정해 `.env.example`류 문서에 이름만 적는다(값은 적지 않는다, pre-commit 훅이 막는다). 후보: `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_READ_ACCESS_KEY_ID`/`_SECRET`, `R2_WRITE_ACCESS_KEY_ID`/`_SECRET`.
+## 체크리스트
+
+### 1. 계정과 R2 구독 (약 10분)
+
+- [ ] https://dash.cloudflare.com 에서 계정을 만든다(이메일 인증까지). 도메인을 연결할 필요는 없다.
+- [ ] 대시보드 **Storage & databases → R2 → Overview**로 가서 결제 흐름(checkout)을 끝내 R2 구독을 켠다. 무료 사용량 안에서는 청구되지 않지만 결제 수단을 넣는 단계가 나올 수 있다.
+  - 무료 사용량(Standard 저장, 매달): 저장 10GB-month, 쓰기 계열(Class A) 100만 회, 읽기 계열(Class B) 1,000만 회, **egress 무료**. 에디션 15개(A4만 약 45MB)면 저장은 0.5%도 안 쓴다.
+  - Infrequent Access 저장 등급은 무료 사용량이 없다. 버킷은 **Standard**로 만든다.
+- [ ] (권장) 결제 알림: 대시보드 **Billing → Billable usage / Notifications**에서 사용량 알림을 걸어 둔다. 무료 사용량을 넘을 일이 거의 없지만 악용 요청이 몰릴 때 바로 알 수 있다.
+
+### 2. 버킷 (2분)
+
+- [ ] **R2 → Create bucket**. 이름: `seasonal-prints`(영문 소문자 · 숫자 · 하이픈). 이 이름은 코드에서 환경 변수로 읽으므로 다르게 지어도 된다.
+- [ ] Location은 Automatic(기본). 관할(EU 등)은 고르지 않는다. 고르면 주소가 달라진다.
+- [ ] Default storage class: **Standard**.
+- [ ] 만든 뒤 **Settings**에서 **Public access(r2.dev 주소, Custom Domains)가 꺼져 있는지** 확인한다. 켜면 PDF 주소가 영구 공개가 되어 ADR 0003이 깨진다. 서명 링크(presigned URL)는 커스텀 도메인에서 동작하지 않고 `r2.cloudflarestorage.com`에서만 동작하므로 도메인도 연결하지 않는다.
+- [ ] CORS는 설정하지 않는다. 사용자는 링크 이동(302)으로 받고, 어드민은 서버에서 올리므로 브라우저의 교차 출처 요청이 없다.
+
+### 3. 계정 ID 적어 두기
+
+- [ ] R2 Overview 오른쪽 **Account Details**의 **Account ID**를 복사한다. S3 주소는 `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`이고 코드가 이 값으로 만든다.
+
+### 4. API 토큰 두 벌 (5분)
+
+같은 **Account Details → API Tokens → Manage**에서 만든다. **Create Account API token**을 고른다(사람이 아니라 계정에 묶여, 운영자가 바뀌어도 유지된다).
+
+- [ ] **쓰기 토큰**(어드민 게시용, 운영자 컴퓨터에만)
+  - 이름: `seasonal-prints-write`
+  - Permissions: **Object Read & Write**
+  - Specify bucket(s): **`seasonal-prints`만**
+  - TTL: Forever(또는 1년 뒤 갱신)
+- [ ] **읽기 토큰**(운영 서버가 서명 링크를 만드는 용도)
+  - 이름: `seasonal-prints-read`
+  - Permissions: **Object Read only**
+  - Specify bucket(s): **`seasonal-prints`만**
+- [ ] 만들 때마다 화면에 **Access Key ID**와 **Secret Access Key**가 한 번만 나온다. 다시 볼 수 없으니 바로 아래 5에 넣는다. Admin 권한이나 "Cloudflare API token value"는 쓰지 않는다(S3 키 두 개만 쓴다).
+
+### 5. 키 넣기 (값은 대화나 커밋에 붙이지 않는다)
+
+키 이름(코드가 읽는 이름):
+
+| 이름 | 값 | 어디에 |
+|---|---|---|
+| `R2_ACCOUNT_ID` | 3의 Account ID | 로컬 + 운영 |
+| `R2_BUCKET` | `seasonal-prints` | 로컬 + 운영 |
+| `R2_READ_ACCESS_KEY_ID`, `R2_READ_SECRET_ACCESS_KEY` | 읽기 토큰 | 운영 환경 변수(로컬은 R2로 실제 받아 볼 때만) |
+| `R2_WRITE_ACCESS_KEY_ID`, `R2_WRITE_SECRET_ACCESS_KEY` | 쓰기 토큰 | **로컬만**. 운영에는 넣지 않는다 |
+
+- [ ] **정할 것(내일 작업 시작 때)**: Next 개발 서버는 `apps/web/.env*`만 읽고 루트 `.env`는 읽지 않는다. 그런데 pre-commit 비밀 검사(`scripts/check-no-secrets.sh`)는 루트 `.env`만 본다. 추천: 값은 `apps/web/.env.local`(gitignore됨)에 넣고, 검사 스크립트가 이 파일도 읽게 고친다.
+- [ ] 운영 호스팅이 정해지면 그 환경 변수에 읽기 키 넣기(쓰기 키는 넣지 않는다).
+
+### 6. 확인 (내일 06 · 03과 함께, 에이전트가 한다)
+
+- [ ] 쓰기 키로 테스트 파일 하나 올리기 → 성공.
+- [ ] 읽기 키로 서명 링크(60초) 만들어 받기 → 성공. 61초 뒤 같은 링크 → 거부.
+- [ ] 읽기 키로 올리기 → 거부(권한 확인).
+- [ ] 버킷 공개 주소로 직접 접근 → 거부.
+
+## 미리 알아 둔 것(06에 영향)
+
+- 리전 값은 `"auto"`(SDK가 요구하지만 R2는 쓰지 않는다). 서명 수명은 1초 ~ 7일.
+- 서명은 서버에서만 계산하고 R2를 부르지 않는다. 그래서 다운로드 요청마다 R2 쓰기 계열 비용이 생기지 않고, 받을 때 읽기 1회만 센다.
+- **확인 필요**: 서명 링크에 `response-content-disposition`(저장 파일 이름)을 넣을 수 있는지 R2 S3 호환 문서에 나와 있지 않다. 안 되면 업로드할 때 객체에 `Content-Disposition` 메타데이터를 넣는 방식으로 바꾼다(03). 내일 실제로 시험해 본다.
 
 ## 완료 조건
 
-- 쓰기 키로 파일 하나를 올리고, 읽기 키로 만든 presigned URL로 받을 수 있다. 읽기 키로는 올릴 수 없다.
+- 위 6의 확인이 모두 통과한다.
