@@ -11,7 +11,13 @@ export const DEFAULT_BAND: VerdictBand = { lower: -10, upper: 10 }
 export function verdictOf(price: number, usual: number | null, band: VerdictBand): Verdict {
   if (usual == null || usual <= 0) return { kind: "none", pct: null }
   // 나눗셈을 마지막에 해서 정확히 .5인 차이(1105원 / 1000원)가 10.4999…%로 깎이지 않게 한다. -0은 0으로 맞춘다.
-  const pct = Math.round(((price - usual) * 100) / usual) || 0
+  return verdictOfPct(Math.round(((price - usual) * 100) / usual) || 0, band)
+}
+
+/**
+ * 이미 낸 차이(반올림한 정수 %)를 구간에 견준 판정. 판정 배치가 최근 3 조사일 편차의 중앙값(judgment.md 2장)으로 부른다.
+ */
+export function verdictOfPct(pct: number, band: VerdictBand): Verdict {
   const kind = pct < band.lower ? "cheap" : pct > band.upper ? "pricey" : "normal"
   return { kind, pct }
 }

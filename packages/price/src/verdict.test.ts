@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { DEFAULT_BAND, usualRange, verdictOf } from "./verdict"
+import { DEFAULT_BAND, usualRange, verdictOf, verdictOfPct } from "./verdict"
 
 describe("verdictOf", () => {
   it("평소가 대비 차이를 반올림한 %로 낸다", () => {
@@ -31,6 +31,23 @@ describe("verdictOf", () => {
   it("평소가가 없으면 판정 전", () => {
     expect(verdictOf(1250, null, DEFAULT_BAND)).toEqual({ kind: "none", pct: null })
     expect(verdictOf(1250, 0, DEFAULT_BAND)).toEqual({ kind: "none", pct: null })
+  })
+})
+
+describe("verdictOfPct", () => {
+  it("이미 낸 차이(%)를 구간에 견준다. 경계는 보통이다", () => {
+    const band = { lower: -12, upper: 8 }
+    expect(verdictOfPct(-13, band)).toEqual({ kind: "cheap", pct: -13 })
+    expect(verdictOfPct(-12, band)).toEqual({ kind: "normal", pct: -12 })
+    expect(verdictOfPct(8, band)).toEqual({ kind: "normal", pct: 8 })
+    expect(verdictOfPct(9, band)).toEqual({ kind: "pricey", pct: 9 })
+  })
+
+  it("verdictOf와 같은 판정을 낸다", () => {
+    for (let price = 850; price <= 1150; price++) {
+      const { pct } = verdictOf(price, 1000, DEFAULT_BAND)
+      expect(verdictOfPct(pct!, DEFAULT_BAND)).toEqual(verdictOf(price, 1000, DEFAULT_BAND))
+    }
   })
 })
 

@@ -52,6 +52,18 @@ jobs:
           code=$?
           echo "code=$code" >> "$GITHUB_OUTPUT"
           exit $code
+      # 평소가 (judgment.md 1·2장): KAMIS 실행이 먼저 끝나 축평원 시세의 그날 평소가가 비므로 여기서도 최근 7일을 다시 낸다
+      - name: 평소가
+        if: ${{ !cancelled() }}
+        env:
+          INGEST_DATABASE_URL: ${{ secrets.INGEST_DATABASE_URL }}
+        run: pnpm --filter @workspace/price-ingest usual
+      # 판정 묶음 (ingest-foundation/11): 평소가와 시세로 판정을 새로 만들고, 검사를 넘으면 화면이 읽는 포인터를 바꾼다
+      - name: 판정
+        if: ${{ !cancelled() }}
+        env:
+          INGEST_DATABASE_URL: ${{ secrets.INGEST_DATABASE_URL }}
+        run: pnpm --filter @workspace/price-ingest judgment --trigger ekape
 
   # 3년 백필 (ingest-foundation/04): 정기 수집이 성공한 정기 실행에서만 하루 예산 900회씩 이어 받는다.
   # 축평원 한도는 하루 1,000회라 다 받는 데 열흘 남짓 걸린다. 다 받은 뒤에는 실행 기록 없이 바로 끝난다.
@@ -60,7 +72,8 @@ jobs:
   # 키·DB·Storage 장애는 앞의 정기 수집이 먼저 알린다. 진행은 price.backfill_task로 본다
   backfill:
     needs: ingest
-    if: ${{ github.event_name == 'schedule' && needs.ingest.result == 'success' }}
+    # 수집 단계의 종료 코드로 본다. 뒤의 평소가 · 판정 단계가 실패해도 백필은 이어 받는다
+    if: ${{ github.event_name == 'schedule' && needs.ingest.outputs.code == '0' }}
     continue-on-error: true
     runs-on: ubuntu-latest
     timeout-minutes: 60 # 900회 × 약 1초 + 묶음 적재
@@ -93,6 +106,12 @@ jobs:
         env:
           INGEST_DATABASE_URL: ${{ secrets.INGEST_DATABASE_URL }}
         run: pnpm --filter @workspace/price-ingest usual --days 182
+      # 판정 묶음 (ingest-foundation/11): 평소가와 시세로 판정을 새로 만들고, 검사를 넘으면 화면이 읽는 포인터를 바꾼다
+      - name: 판정
+        if: ${{ steps.backfill.outputs.finished == 'true' }}
+        env:
+          INGEST_DATABASE_URL: ${{ secrets.INGEST_DATABASE_URL }}
+        run: pnpm --filter @workspace/price-ingest judgment --trigger ekape-backfill
 
   # 실패 알림 (ingest-schedule/13): 키 오류·원본 저장 실패는 즉시, 그 밖의 실패는 직전 실행도 실패였을 때 이슈를 열거나 댓글을 단다.
   # 성공하면 이 출처의 열린 알림 이슈를 닫는다. 이슈 권한은 이 잡에만 준다. 비밀값은 넘기지 않는다
@@ -117,5 +136,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          EXIT_CODE: ${{ needs.ingest.outputs.code }}
+          # 수집은 성공했는데 뒤 단계(평소가·판정)가 실패하면 예상하지 못한 실패(9)로 알린다
+          EXIT_CODE: ${{ needs.ingest.outputs.code == '0' && needs.ingest.result == 'failure' && '9' || needs.ingest.outputs.code }}
         run: pnpm --filter @workspace/price-ingest alert --source ekape --workflow ingest-ekape.yml --exit-code "$EXIT_CODE"

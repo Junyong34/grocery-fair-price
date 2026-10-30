@@ -1,5 +1,8 @@
 // ③ 집계·판정을 테스트 데이터로 채운다 (pipeline.md 3-4). 값의 모양만 맞춘 간이 계산이다.
 // 대표값·평소가·판정 계산식은 로드맵 ②에서 정하고 수집 패키지의 recompute가 만든다.
+import { writeJudgment } from "@workspace/price-ingest/judgment/cli"
+import type postgres from "postgres"
+
 import { transaction, type Sql } from "./db.ts"
 
 const CALC_VERSION = "fixture-1"
@@ -101,28 +104,19 @@ async function aggregateUsualPrice(tx: Sql): Promise<void> {
     on conflict do nothing`
 }
 
-// 판정 묶음: building으로 만들고 행을 다 넣은 뒤 한 트랜잭션에서 ready와 포인터를 바꾼다 (3-4).
-async function buildJudgmentBatch(tx: Sql): Promise<void> {
-  const [batch] = await tx<{ id: string }[]>`
-    insert into price.judgment_batch (started_at, status, trigger) values (now(), 'building', 'fixture')
-    returning id`
+// 판정 묶음: 운영과 같은 판정 배치(수집 패키지 judgment)를 쓴다. 간이 평소가에는 판정 차이 · 구간이 없으므로
+// 가장 최근 행에 그날 편차와 ±10% 구간을 넣는다 (운영은 usual 명령이 최근 3 조사일 편차의 중앙값과 품종별 구간을 낸다)
+async function buildJudgmentBatch(tx: postgres.TransactionSql): Promise<void> {
   await tx`
-    insert into price.judgment_snapshot
-      (batch_id, variety_id, spec_id, as_of, today_price, usual, verdict, diff_pct, payload)
-    select ${batch!.id}, u.variety_id, u.spec_id, u.as_of, q.value, u.value,
-           case when q.value < u.value * 0.9 then 'cheap' when q.value > u.value * 1.1 then 'expensive' else 'normal' end,
-           round((q.value / u.value - 1) * 100, 2),
-           jsonb_build_object('variety', v.slug, 'spec', s.slug, 'as_of', u.as_of, 'today', q.value, 'usual', u.value)
-    from price.usual_price u
-    join price.daily_quote q
-      on (q.variety_id, q.spec_id, q.obs_date) = (u.variety_id, u.spec_id, u.as_of)
-     and q.scope_key = 'national' and q.price_tier = 'retail'
-    join price.spec s on s.id = u.spec_id
-    join price.variety v on v.id = u.variety_id`
-  await tx`update price.judgment_batch set status = 'ready', finished_at = now() where id = ${batch!.id}`
-  await tx`
-    insert into price.judgment_current (batch_id, swapped_at) values (${batch!.id}, now())
-    on conflict (singleton) do update set batch_id = excluded.batch_id, swapped_at = excluded.swapped_at`
+    update price.usual_price u
+       set components = u.components || jsonb_build_object(
+             'deviation', q.value / u.value - 1,
+             'band', jsonb_build_object('low', -0.1, 'high', 0.1, 'basis', 'variety'))
+      from price.daily_quote q
+     where (q.variety_id, q.spec_id, q.obs_date) = (u.variety_id, u.spec_id, u.as_of)
+       and q.basis = 'quote' and q.price_tier = 'retail' and q.scope_key = 'national'
+       and u.method = 'fixture_median'`
+  await writeJudgment(tx, { trigger: "fixture" })
 }
 
 // recompute 자리: 정기 적재가 끝난 뒤 ③을 다시 만든다.

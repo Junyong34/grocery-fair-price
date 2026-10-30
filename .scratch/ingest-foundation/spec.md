@@ -28,6 +28,7 @@
 | 08 | 품종 카탈로그를 운영 DB에 넣기 | task | resolved (운영 적용 2026-10-26) | p3-variety-catalog/01 |
 | 09 | 적재 때 품종 매핑 적용과 기존 관측값 다시 매핑 | task | resolved (운영 다시 매핑 2026-10-26) | 08 |
 | 10 | KAMIS 일별 시세 재계산과 90일 보존 정리 | task | resolved (운영 적용 2026-10-26) | 09, ingest-schedule/11 |
+| 11 | 판정 배치: 평소가와 시세로 판정 묶음을 만들어 바꿔 끼우기 | task | resolved (운영 적용 2026-10-30, 판정 127행) | - |
 
 정기 수집 켜기는 [ingest-schedule 지도](../ingest-schedule/map.md)로 나눴다 (2026-10-26). 03의 남은 일 대부분과 `search-first-view/04`가 거기 있다.
 

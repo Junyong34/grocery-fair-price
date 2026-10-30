@@ -92,6 +92,12 @@ jobs:
         env:
           INGEST_DATABASE_URL: ${{ secrets.INGEST_DATABASE_URL }}
         run: pnpm --filter @workspace/price-ingest usual
+      # 판정 묶음 (ingest-foundation/11): 평소가와 시세로 판정을 새로 만들고, 검사를 넘으면 화면이 읽는 포인터를 바꾼다
+      - name: 판정
+        if: ${{ !cancelled() }}
+        env:
+          INGEST_DATABASE_URL: ${{ secrets.INGEST_DATABASE_URL }}
+        run: pnpm --filter @workspace/price-ingest judgment --trigger kamis
       # 주 1회 보존 정리. 수집이 부분 실패해도 정리는 한다 (요약이 없는 날은 함수가 지우지 않는다)
       - name: 보존 정리
         if: ${{ !cancelled() && github.event.schedule == '10 22 * * 0' }}
@@ -122,6 +128,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          # 수집은 성공했는데 뒤 단계(평소가·보존 정리)가 실패하면 예상하지 못한 실패(9)로 알린다
+          # 수집은 성공했는데 뒤 단계(평소가·판정·보존 정리)가 실패하면 예상하지 못한 실패(9)로 알린다
           EXIT_CODE: ${{ needs.ingest.outputs.code == '0' && needs.ingest.result == 'failure' && '9' || needs.ingest.outputs.code }}
         run: pnpm --filter @workspace/price-ingest alert --source kamis --workflow ingest-kamis.yml --exit-code "$EXIT_CODE"

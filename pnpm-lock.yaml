@@ -203,6 +203,9 @@ importers:
 
   packages/price-ingest:
     dependencies:
+      '@workspace/price':
+        specifier: workspace:*
+        version: link:../price
       fast-xml-parser:
         specifier: 5.11.2
         version: 5.11.2

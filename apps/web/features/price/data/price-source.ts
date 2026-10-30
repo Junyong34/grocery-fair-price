@@ -12,7 +12,7 @@ import { fixtureSource } from "./fixture-source"
 //   ingest-foundation/06, pipeline.md 3-0 "접속".
 // - listVarieties  ← 뷰 price.current_judgment의 목록 열(variety_id, spec_id, as_of, today_price, usual, verdict, diff_pct)
 //                    + variety · item · category · spec 이름, daily_quote national의 n · stale_days · meets_min_n. 가벼운 목록 쿼리 하나.
-// - getVariety     ← current_judgment.payload 한 행(pipeline.md 4-1 모양)을 VarietyDetail로 옮긴다.
+// - getVariety     ← current_judgment.payload 한 행. payload가 VarietyDetail 그대로다(pipeline.md 4-1, ingest-foundation/11).
 //                    장소 목록은 daily_quote market_type:* 와 KAMIS 시장별 관측값(judgment.md 0장 ①).
 // - searchIndex    ← variety(status = 'active') · item · category · alias. 바뀌는 일이 드물어 길게 캐시한다.
 // - featuredIds    ← 운영자가 정한 고정 목록. 지금은 상수, 검색 기록을 모으게 되면 바꾼다.

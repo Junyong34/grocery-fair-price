@@ -18,9 +18,11 @@
     "summary": "node src/summary.ts",
     "alert": "node src/alert/cli.ts",
     "heartbeat": "node src/alert/heartbeat.ts",
-    "usual": "node src/usual/cli.ts"
+    "usual": "node src/usual/cli.ts",
+    "judgment": "node src/judgment/cli.ts"
   },
   "dependencies": {
+    "@workspace/price": "workspace:*",
     "fast-xml-parser": "5.11.2",
     "postgres": "3.4.9",
     "zod": "4.4.3"

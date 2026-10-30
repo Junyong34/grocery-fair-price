@@ -272,7 +272,7 @@ import 경로:
 | 모듈 | 내용 |
 |---|---|
 | `types.ts` | 화면이 읽는 모양: `VarietySummary`(목록 행, 뷰 `current_judgment` 열), `VarietyDetail`(상세, `judgment_snapshot.payload`), `Verdict`, `VerdictBand`, `PlaceQuote`, `TrendPoint`, `SearchIndex` |
-| `verdict.ts` | `verdictOf(price, usual, band)`: 평소가 대비 반올림 % 와 싸요 · 보통 · 비싸요. 평소가가 없으면 판정 전. "내가 본 가격"도 이 함수 |
+| `verdict.ts` | `verdictOf(price, usual, band)`: 평소가 대비 반올림 % 와 싸요 · 보통 · 비싸요. 평소가가 없으면 판정 전. "내가 본 가격"도 이 함수. `verdictOfPct(pct, band)`: 이미 낸 %를 구간에 견줌(판정 배치가 판정 차이로 부름) |
 | `search.ts` | `searchVarieties`: 별칭 → 품목("어떤 호박인가요?") → 카테고리 → 이름 · 초성 · 품목 · 별칭 일부 → 한 글자 오타. `matchRange`(이름 강조) |
 | `list.ts` | 목록 순수 함수: 최근 조사일, id 순서로 고르기 |
 | `trend.ts` | 추이 기간 자르기(`trendWindow`), 급등 · 급락 점(`spikesOf`) |
@@ -357,6 +357,7 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `packages/price-ingest/scripts/probe-runner.ts` | 공공 API 3개·Supabase DB·Storage에 한 번씩 붙어 성공과 걸린 시간만 찍는다 (러너 접속 실측) |
 | `packages/price-ingest/src/alert/` | 수집 알림과 heartbeat (ingest-schedule/13·14): 알릴지 정하기(`decide.ts`: 키 오류·원본 저장 실패·예상 못한 실패는 즉시, 일부 실패·DB 접속 실패·시간 초과는 2회 연속), 이슈 묶기(`issues.ts`: 라벨 `ingest-alert`·`source:`·`cause:`로 열린 이슈에 댓글, 성공하면 그 출처의 알림을 닫음, 본문에 키·주소 없음, `gh` CLI), 수집 워크플로의 알림 잡 진입점(`cli.ts`), 주 1회 점검(`heartbeat.ts`: 꺼진 수집 워크플로 다시 켜기, 출처별 멈춤, Supabase Storage·DB 접속) |
 | `packages/price-ingest/src/usual/` | 평소가 (judgment.md): 수준 × 계절비율 순수 함수(`season.ts`: 계절비율, 수준, 평소가, 판정 전 이유, 판정 구간, 카테고리 공통 구간), 여러 규격 한 번에(`compute.ts`), 명령(`cli.ts`: `daily_quote` national → `usual_price`·`season_index`, 숫자는 `calc_param usual.*`에서 읽음). 백테스트는 `scripts/season-backtest.ts`, 숫자 정하기(표본 밖, 창·수준·구간을 바꿔 가며)는 `scripts/judgment-sweep.ts` |
+| `packages/price-ingest/src/judgment/` | 판정 배치 (pipeline.md 4-1 · 4-3): 판정 한 행 순수 함수(`build.ts`: 시세 · 평소가 행 · 시장 표본 · 판매가 → `VarietyDetail` payload와 목록 열), 명령(`cli.ts`: 활성 품종의 대표 규격마다 `judgment_snapshot`을 새 묶음에 쓰고 검사를 넘으면 `judgment_current`를 바꿈, 묶음은 최근 7개) |
 | `packages/price-ingest/src/catalog/` | 품종 카탈로그 (ingest-foundation/08): 분류 표와 매핑의 원본 데이터(`varieties.ts`, 사람이 읽는 표는 `grocery-price/docs/30-data/variety-list.md`이고 `test/catalog.test.ts`가 둘과 실측 코드표가 맞는지 본다), 원천 키 → 품종·규격·대표 여부(`match.ts`), DB 적용(`apply.ts`), 명령 진입점(`cli.ts`) |
 
 수집 CLI와 GitHub Actions 워크플로는 `ingest-foundation/03`에서 이 패키지에 더한다.
@@ -389,6 +390,7 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `pnpm --filter @workspace/price-ingest alert --source <출처> --workflow <파일> [--exit-code N]` | 수집 워크플로의 `alert` 잡이 부른다 (`GH_TOKEN`·`GH_REPO`, 비밀값 없음). 실패면 알림 이슈를 열거나 댓글, 성공이면 그 출처의 알림 이슈를 닫는다 |
 | `pnpm --filter @workspace/price-ingest heartbeat` | `.github/workflows/heartbeat.yml`(수 11:00 KST)이 부른다: 꺼진 수집 워크플로를 켜고, 멈춘 출처·Supabase 일시정지를 알린다 |
 | `pnpm --filter @workspace/price-ingest usual [--to YYYY-MM-DD] [--days N] [--dry-run]` | 평소가와 계절비율 (`INGEST_DATABASE_URL`). 기본은 시세가 있는 마지막 날까지 7일. KAMIS 워크플로가 수집 뒤에 부른다. 6개월을 처음 채울 때 `--days 182` |
+| `pnpm --filter @workspace/price-ingest judgment [--trigger 이름] [--dry-run]` | 판정 묶음을 만들고 포인터를 바꾼다 (`INGEST_DATABASE_URL`). 행이 없거나 지금 묶음보다 20% 넘게 줄면 `failed`로 두고 종료 코드 1. 세 수집 워크플로가 부른다 |
 | `pnpm --filter @workspace/price-ingest probe:runner` | 접속 실측 (루트 `.env`를 읽는다. API 3회) |
 | `scripts/check-no-secrets.sh [--tree]` | `.env` 값이 커밋 대상에 들어갔는지 검사 (pre-commit) |
 

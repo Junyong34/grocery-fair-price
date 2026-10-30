@@ -1068,59 +1068,27 @@ raw_object
 
 ### 4-1. 품종 판정 payload (`/seasonal`과 같은 앱의 품종 가격 화면이 읽음)
 
-예: 국산 삼겹살. 값은 10/6 실측에서 가져왔고, 평소가와 판정은 예시다.
+**payload는 화면 타입 `VarietyDetail`(`packages/price/src/types.ts`) 그대로다** (2026-10-30, ingest-foundation/11). 처음 이 절에 둔 JSON 예시(`judgment.label`, `confidence.level`, `quotes[]` 등)는 화면을 만들기 전에 쓴 것이라, 화면 계약이 정해진 뒤 타입 하나로 맞췄다. 신뢰도는 점수로 만들지 않고 표본 부족 · 갱신 지연 두 표시로 둔다 ([judgment.md](judgment.md) 6-3). 웹앱은 옮겨 담기 없이 payload를 돌려준다.
 
-```json
-{
-  "variety": { "slug": "pork-belly-kr", "name": "국산 삼겹살", "item": "돼지고기", "category": "정육·계란" },
-  "spec": { "id": "default", "name": "구분없음", "options": [] },
-  "base_unit": { "label": "100g", "examples": [ { "qty": "200g", "price": 6054 }, { "qty": "300g", "price": 9081 } ] },
+판정 배치(`pnpm --filter @workspace/price-ingest judgment`, `src/judgment/`)가 활성 품종마다 대표 규격(`spec.is_default`) 한 행을 만든다. 숫자는 다시 계산하지 않고 모은다:
 
-  "judgment": {
-    "as_of": "2026-10-06",
-    "price": 3027,
-    "usual": 2724,
-    "diff_pct": 11.1,
-    "verdict": "expensive",
-    "label": "평소보다 11% 비싸요",
-    "confidence": { "level": 3, "max": 4, "reasons": ["공공 조사", "17개 시도 평균", "2일 전"] }
-  },
+| 필드 | 읽는 곳 |
+|---|---|
+| `price`, `surveyedOn`, `sampleSize`, `meetsMinN`, `range` | 대표 규격의 가장 최근 `daily_quote` 소매 `national` (`value`, `obs_date`, `n`, `meets_min_n`, `min`·`max`) |
+| `usual` | 같은 날의 `usual_price.value`. 그날 행이 없으면 판정 전 |
+| `verdict.pct`, `band` | 같은 행 `components.deviation`(최근 3 조사일 편차의 중앙값)과 `components.band`를 정수 %로. 판정은 `verdictOfPct` (judgment.md 2장) |
+| `stale` | `stale_days` ≥ `ekape.carried_over_days`, 또는 조사일이 전체에서 가장 최근 조사일보다 그만큼 앞 (judgment.md 6-3) |
+| `marketTypes` | 그날 `daily_quote` `market_type:*` |
+| `places` | 그날 KAMIS 시장 표본(`observation`, 대표 출처 · 매핑된 행, 이상치 제외). 대형마트는 체인 기호(`C-유통` → "대형마트 C")로 묶고, 지역은 KAMIS 시군구 코드 이름 |
+| `trend` | 최근 182일 `daily_quote` `national` + 같은 날 `usual_price`. 판정 전이면 평소가를 비운다 |
+| `shelf` | 최근 42일 안 가장 최근 참가격 조사일의 관측값을 판매처(`store_seller`)별로: 행사 아닌 값의 중간값, 행사 값뿐이면 행사가와 끝나는 날 |
+| `priceSpread` | 카탈로그 `spread: brand` (judgment.md 5-3) |
+| `basis` | KAMIS 시세면 "KAMIS · 전국 조사 시장", 축평원이면 "축평원 · 전국 평균" |
+| `forecast` | 아직 계산하지 않는다 (빈 배열이면 화면이 그리지 않는다) |
 
-  "range": { "min": 2856, "usual": 2724, "max": 3216, "basis": "10/06 시도별 소매 시세" },
+목록 열(`current_judgment`의 `as_of`, `today_price`, `usual`, `verdict`, `diff_pct`)도 같은 행에서 채운다. `verdict`는 DB 이름(`cheap` · `normal` · `expensive`, 판정 전은 `null`)이고 화면 이름(`pricey`, `none`)은 payload에 있다. `confidence`는 쓰지 않는다(`null`).
 
-  "quotes": [
-    { "kind": "retail_quote", "source": "ekape", "scope": "national", "date": "2026-10-06", "price": 3027,
-      "also_reported_by": ["kamis"] },
-    { "kind": "shelf_price", "source": "chamga", "date": "2026-09-25", "n_stores": 8,
-      "by_channel": { "large_mart": 3280, "ssm": 3067, "department": 4941 }, "promo_excluded": 0 }
-  ],
-
-  "trend": {
-    "period": "3m",
-    "series": [
-      { "key": "retail_national", "label": "전국 평균 시세", "points": [["2026-10-06", 3027], ["2026-10-07", 2990]] },
-      { "key": "usual", "label": "평소 가격", "points": [["2026-10-06", 2724]] }
-    ],
-    "promo_periods": []
-  },
-
-  "freshness": [
-    { "source": "ekape", "latest": "2026-10-07", "status": "ok" },
-    { "source": "kamis", "latest": "2026-10-07", "status": "ok" },
-    { "source": "chamga", "latest": "2026-09-25", "status": "ok", "next_expected": "2026-10-09" }
-  ],
-  "notices": [],
-  "attribution": [
-    "축산물품질평가원 축산물유통정보",
-    "한국농수산식품유통공사 KAMIS",
-    "한국소비자원 참가격"
-  ]
-}
-```
-
-- `also_reported_by`: 1장에서 본 출처 중복을 화면에서 한 번만 세려고 둔다.
-- `freshness`와 `notices`: 5장의 장애 상황을 화면에 알리는 통로다. 예: `{"type": "stale", "source": "kamis", "message": "어제 시세가 아직 들어오지 않아 10/06 기준이에요"}`
-- `attribution`: 공공누리 출처표시 의무를 지키려고 둔다.
+아직 payload에 없는 것: 출처별 최신 상태(`freshness`)와 장애 알림(`notices`, 5장). 웹앱 연결 때 정한다 (ingest-foundation/06 "아직 열림"). 출처는 상세 화면이 `basis`로, 목록은 `LIST_BASIS`(`packages/price/src/copy.ts`, "KAMIS 전국 조사 시장" 고정)로 단다. 목록에 축평원 시세 품종(삼겹살 등)이 섞이므로 웹앱 연결 때 목록 근거 문구를 고친다.
 
 ### 4-2. 진열대 앞 즉시 판정 (클라이언트 계산)
 
@@ -1136,7 +1104,7 @@ raw_object
 
 ### 4-3. 응답을 만드는 시점
 
-- 배치가 끝날 때 품종별 `judgment_snapshot.payload`를 4-1 모양으로 **미리 만들어 둔다.** 화면은 그것을 그대로 읽는다.
+- 배치가 끝날 때 품종별 `judgment_snapshot.payload`를 4-1 모양으로 **미리 만들어 둔다.** 화면은 그것을 그대로 읽는다. 수집 워크플로(KAMIS·축평원은 평소가 다음, 참가격은 적재 다음)가 `judgment`를 부르고, 새 묶음이 검사(행이 없거나 지금 묶음보다 20% 넘게 줄면 `failed`)를 넘으면 `judgment_current`를 바꾼다. 묶음은 최근 7개만 남긴다.
 - 웹앱은 이 값을 캐시하고, 수집·재계산이 끝나면 갱신 신호를 받아 캐시를 버린다 (`ingest-foundation/06`).
 
 ---
