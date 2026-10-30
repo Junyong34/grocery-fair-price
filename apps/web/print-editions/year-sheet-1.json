@@ -1,14 +1,14 @@
 {
   "id": "year-sheet-1",
-  "title": "222",
-  "description": "",
-  "status": "draft",
+  "title": "2026년 연간 달력",
+  "description": "연간 제철 달력!",
+  "status": "published",
   "spec": {
     "version": 1,
     "orientation": "portrait",
     "type": {
-      "heading": "gowun-batang",
-      "number": "pretendard",
+      "heading": "pretendard",
+      "number": "gowun-batang",
       "scale": 1
     },
     "surface": "white",
@@ -18,8 +18,14 @@
       "max": 4
     },
     "kind": "year-sheet",
-    "year": 2027,
+    "year": 2026,
     "monthLabel": "big-number",
+    "monthStyle": {
+      "palette": "season",
+      "size": "medium",
+      "frame": "none",
+      "font": "auto"
+    },
     "calendar": {
       "weekStart": 0,
       "weekday": "korean",

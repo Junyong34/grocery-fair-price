@@ -1,8 +1,8 @@
 {
   "id": "monthly-1",
-  "title": "000",
-  "description": "",
-  "status": "draft",
+  "title": "2026년도 달력",
+  "description": "2026년도 월간 달력",
+  "status": "published",
   "spec": {
     "version": 1,
     "orientation": "portrait",
@@ -15,18 +15,24 @@
     "margin": "safe",
     "foods": {
       "names": "korean",
-      "max": 8
+      "max": 40
     },
     "kind": "monthly",
-    "year": 2027,
+    "year": 2026,
     "cover": "year",
     "monthLabel": "number",
+    "monthStyle": {
+      "palette": "season",
+      "size": "medium",
+      "frame": "none",
+      "font": "auto"
+    },
     "calendar": {
       "weekStart": 0,
       "weekday": "korean",
       "holidays": "mark-and-name",
       "size": "medium",
-      "variant": "plain"
+      "variant": "editorial"
     },
     "layout": "scatter",
     "memo": "none"
