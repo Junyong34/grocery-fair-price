@@ -81,7 +81,7 @@ P0 기획·조사 ✅ ── P1 도메인 모델링 ✅
 - **목표**: `apps/web`에 가격 화면을 만들고 배포한다.
 - **할 일**
   - `packages/ui`에 판정·차트 색 토큰 추가 (Oura 팔레트 안에서, 라이트 모드 전용)
-  - 웹앱이 DB를 읽는 경로: 접속은 정해졌다(서버 컴포넌트 + `web_reader`, `WEB_DATABASE_URL`). 캐시 단위와 갱신 신호는 여기서 정한다 (`ingest-foundation/06`)
+  - 웹앱이 DB를 읽는 경로: 접속은 정해졌다(서버 컴포넌트 + `web_reader`, `WEB_DATABASE_URL`). 캐시 단위는 정했다(목록 hours · 검색 days · 상세 캐시 없음). 갱신 신호는 여기서 정한다 (`ingest-foundation/06`, 읽기 경로 스펙 `.scratch/price-db-read/spec.md`)
   - 가격 페이지를 `apps/web/shared/seo/pages.ts`에 등록, 메타데이터는 `createMetadata`
   - `/` 가격 메인으로 교체 (`app/page.tsx`의 리다이렉트를 대체, 제철 경로는 그대로)
 - **선행 작업 (사용자)**: 운영계정 전환 신청(개발계정 활용기간 만료 전), 도메인, Search Console

@@ -33,6 +33,6 @@ Blocked by: 02
 - 상품 화면의 점포별 가격도 같은 롤로 읽는다. 블록이 ③에서 정해지면 `observation`(참가격 행만, RLS `using (product_id is not null)`), `obs_place`, `store`에 `select`를 더한다. 익명용 공개 요약 표는 만들지 않는다.
 
 **아직 열림 (④ 구현에서 정한다).** 위 접속 방식과 무관하게 남은 것들이다. 화면 코드는 ④에서만 쓰므로 그때 정한다 (로드맵 ④ "웹앱이 Supabase를 읽는 경로").
-- [ ] 캐시: `cacheLife`·`cacheTag`로 판정 payload를 캐시하는 단위 (품종별 태그)
-- [ ] 갱신 신호: 수집·재계산이 끝나면 Actions가 웹앱의 갱신 엔드포인트(비밀 토큰, 01에 변수 추가)를 불러 태그를 버리게 하는 경로
-- [ ] 수집이 멈췄을 때 화면이 받는 값 (`freshness`, `notices`): payload에 미리 넣는 방향 (pipeline.md 4-1, 5-2)
+- [x] 캐시: `cacheLife`·`cacheTag`로 판정 payload를 캐시하는 단위. 2026-10-30 [`price-db-read` 스펙](../../price-db-read/spec.md) 2절에서 정했다. 목록(`listVarieties`)은 `"use cache"` + `cacheLife("hours")`, 검색 색인(`searchIndex`)은 `"use cache"` + `cacheLife("days")`, 상세(`getVariety`)는 캐시 없이 요청마다 읽고 React `cache()`로 한 요청 안에서만 한 번 읽는다. 품종별 `cacheTag`는 달지 않았다(아래 갱신 신호와 함께 범위 밖).
+- [ ] 갱신 신호: 수집·재계산이 끝나면 Actions가 웹앱의 갱신 엔드포인트(비밀 토큰, 01에 변수 추가)를 불러 태그를 버리게 하는 경로. 위 스펙의 "범위 밖"으로 남았다. 느린 화면이 보이면 그때 따로 잡는다.
+- [ ] 수집이 멈췄을 때 화면이 받는 값 (`freshness`, `notices`): payload에 미리 넣는 방향 (pipeline.md 4-1, 5-2). 위 스펙의 "범위 밖"으로 남았다.
