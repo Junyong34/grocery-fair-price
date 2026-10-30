@@ -9,7 +9,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "es-hangul": "^2.4.0"
+    "es-hangul": "^2.4.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

@@ -1,4 +1,5 @@
 // 판정 한 행 만들기 (ingest-foundation/11). 순수 함수.
+import { varietyDetailSchema } from "@workspace/price/schema"
 import { describe, expect, it } from "vitest"
 
 import { buildJudgment, type JudgmentInput } from "../src/judgment/build.ts"
@@ -142,5 +143,13 @@ describe("buildJudgment", () => {
     const rice = buildJudgment(input({ variety: { ...input().variety, slug: "rice", spread: "brand" } }), PARAMS)
     expect(rice.payload.priceSpread).toBe("brand")
     expect(rice.payload.id).toBe("rice")
+  })
+
+  it("payload는 웹이 읽는 varietyDetailSchema를 통과한다(ADR 0004)", () => {
+    const shelf = { day: DAY, sellers: [{ seller: "이마트", prices: [{ price: 4980, promo: true, promoTo: "2026-10-31" }] }] }
+    for (const over of [{}, { usual: null }, { shelf }, { variety: { ...input().variety, spec: null, spread: "brand" as const } }]) {
+      const { payload } = buildJudgment(input(over), PARAMS)
+      expect(varietyDetailSchema.parse(payload)).toEqual(payload)
+    }
   })
 })
