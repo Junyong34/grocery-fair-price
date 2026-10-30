@@ -28,7 +28,7 @@ Cache Components에서는 DB 읽기가 `"use cache"` 안이거나 `<Suspense>` �
 | 메서드 | 캐시 | 비고 |
 |---|---|---|
 | `listVarieties` | `"use cache"` + `cacheLife("hours")` | 시세 · 판정은 하루 1~2번 바뀐다 |
-| `searchIndex` | `"use cache"` + `cacheLife("days")` | 카탈로그는 드물게 바뀐다 |
+| `searchIndex` | `"use cache"` + `cacheLife("hours")`, 안의 별칭 · 카테고리 읽기만 `cacheLife("days")` | 카탈로그는 드물게 바뀌지만 품종은 목록(hours)에서 뽑는다. 중첩 캐시는 바깥 `cacheLife`가 이기므로 바깥을 days로 두면 품종이 며칠 묵는다(03에서 고침) |
 | `getVariety` | 캐시 없음. React `cache()`로 한 요청 안에서만 한 번 읽는다 | 상세는 그때그때 조회. `generateMetadata`와 본문이 같은 요청에서 두 번 부른다 |
 | `featuredIds` | 코드 상수 | |
 | "오늘"(서울 날짜) | 지금처럼 요청 때 계산 | `getSeoulToday()` |

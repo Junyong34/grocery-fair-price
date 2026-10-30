@@ -29,15 +29,23 @@ async function listVarieties(): Promise<readonly VarietySummary[]> {
 }
 
 // 품종은 목록에서 뽑는다. 판정이 없는 품종이 검색에 나와 상세가 404가 되는 일을 막는다(spec 4장).
+// 중첩된 "use cache"는 바깥의 cacheLife가 이기므로, 바깥을 목록과 같은 hours로 둬야 품종이 며칠씩 묵지 않는다.
 async function searchIndex(): Promise<SearchIndex> {
   "use cache"
-  cacheLife("days")
-  const [varieties, extras] = await Promise.all([listVarieties(), getSearchExtrasRow()])
+  cacheLife("hours")
+  const [varieties, extras] = await Promise.all([listVarieties(), searchExtras()])
   return searchIndexSchema.parse({
     varieties: varieties.map(({ id, name, item, category }) => ({ id, name, item, category })),
     aliases: extras.aliases,
     categories: extras.categories,
   })
+}
+
+// 별칭 · 카테고리는 드물게 바뀐다.
+async function searchExtras() {
+  "use cache"
+  cacheLife("days")
+  return getSearchExtrasRow()
 }
 
 // 상세는 캐시하지 않고 요청마다 읽는다. generateMetadata와 본문이 같은 요청에서 부르므로 cache()로 한 번만 읽는다.

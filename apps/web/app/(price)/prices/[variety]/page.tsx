@@ -14,10 +14,11 @@ import { getSeoulToday } from "@/shared/today"
 
 type Params = PageProps<"/prices/[variety]">["params"]
 
-// 모든 품종을 빌드 때 만든다. 목록 밖 id는 notFound()로 막는다(Cache Components에서는 dynamicParams를 쓸 수 없다).
+// 빌드 때는 자주 사는 품종만 만든다(Cache Components는 최소 1개를 요구한다). 나머지 품종은 요청 때 그린다.
+// 판정이 없는 id는 notFound()로 막는다.
 export async function generateStaticParams() {
-  const varieties = await getPriceSource().listVarieties()
-  return varieties.map((variety) => ({ variety: variety.id }))
+  const ids = await getPriceSource().featuredIds()
+  return ids.map((variety) => ({ variety }))
 }
 
 export async function generateMetadata(props: PageProps<"/prices/[variety]">): Promise<Metadata> {
