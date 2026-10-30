@@ -56,7 +56,7 @@
 
 ## 나중에 할 것
 
-- 쿠키 동의 배너(국내 이용자 대상이라 넣지 않았다). GA4는 `shared/analytics/`에 있다(`.scratch/calendar-download/issues/08-ga4.md`).
+- 쿠키 동의 배너(국내 이용자 대상이라 넣지 않았다). GA4는 `shared/analytics/`에 있다. 운영 절차: `apps/web/docs/analytics.md`.
 - IndexNow(네이버·Bing 지원). 페이지 수가 늘어 sitemap만으로 반영이 늦을 때.
 - 다음 웹마스터도구. robots.txt에 `#DaumWebMasterTool:<PIN>` 주석 줄이 필요해 `app/robots.ts`를 Route Handler(`app/robots.txt/route.ts`)로 바꿔야 한다.
 - `manifest`.
