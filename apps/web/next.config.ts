@@ -1,4 +1,12 @@
+import { existsSync } from "node:fs"
+import { resolve } from "node:path"
+
 import type { NextConfig } from "next"
+
+// 키는 루트 .env 한 곳에 둔다(수집 스크립트와 같은 파일, pre-commit 비밀 검사 대상). Next는 apps/web/.env*만 읽으므로 여기서 불러온다.
+// 이미 있는 환경 변수는 덮어쓰지 않는다. 운영에는 이 파일이 없고 호스팅의 환경 변수를 쓴다.
+const rootEnv = resolve(import.meta.dirname, "../../.env")
+if (existsSync(rootEnv)) process.loadEnvFile(rootEnv)
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@workspace/ui", "@workspace/seasonal", "@workspace/price"],

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import { DOWNLOADS_COPY } from "../data/copy"
 import type { ManifestEntry } from "./edition"
-import { downloadFileName, editionMeta, editionName, featuredEdition, megabytes, replacementFor, resolveDownload, shelvesOf } from "./listing"
+import { attachmentDisposition, downloadFileName, editionMeta, editionName, featuredEdition, megabytes, replacementFor, resolveDownload, shelvesOf } from "./listing"
 
 const entry = (id: string, kind: ManifestEntry["kind"], extra: Partial<ManifestEntry> = {}): ManifestEntry => ({
   id,
@@ -85,6 +85,18 @@ describe("replacementFor", () => {
 describe("downloadFileName", () => {
   it("이름과 용지로 저장 파일 이름을 만든다", () => {
     expect(downloadFileName({ kind: "monthly", title: "2027 크림" }, "A4")).toBe("2027 크림 월간 달력 A4.pdf")
+  })
+})
+
+describe("attachmentDisposition", () => {
+  it("한글 이름은 filename*(RFC 5987)에, 영문 대체 이름은 filename에 넣는다", () => {
+    expect(attachmentDisposition({ id: "monthly-1", kind: "monthly", title: "2027 크림" }, "A4")).toBe(
+      `attachment; filename="monthly-1-a4.pdf"; filename*=UTF-8''2027%20%ED%81%AC%EB%A6%BC%20%EC%9B%94%EA%B0%84%20%EB%8B%AC%EB%A0%A5%20A4.pdf`,
+    )
+  })
+
+  it("encodeURIComponent가 남기는 ' ( ) *도 인코딩한다", () => {
+    expect(attachmentDisposition({ id: "m", kind: "monthly", title: "it's (봄)*" }, "A4")).toContain("filename*=UTF-8''it%27s%20%28%EB%B4%84%29%2A%20")
   })
 })
 

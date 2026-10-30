@@ -57,6 +57,11 @@ export function downloadPath(editionId: string, paper: Paper): string {
   return `${downloadDir(editionId)}/${paper.toLowerCase()}.pdf`
 }
 
+/** 비공개 R2 버킷의 객체 키(ADR 0003). 로컬 경로와 같은 규칙이라 다시 생성하면 같은 키에 덮어쓴다. */
+export function objectKey(editionId: string, paper: Paper): string {
+  return downloadPath(editionId, paper).slice(1)
+}
+
 /** 썸네일로 찍을 쪽(0부터). 월간 달력은 표지와 첫 달을 같이 보여 표지만 보고 고르지 않게 한다. */
 export function thumbnailPages(spec: PrintSpec): number[] {
   return spec.kind === "monthly" && spec.cover !== "none" ? [0, 1] : [0]

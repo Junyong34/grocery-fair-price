@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { buildManifest, downloadPath, EDITION_LIMITS, isBuildCurrent, nextEditionId, parseEdition, thumbnailPages, thumbnailPath, type BuildRecord, type Edition } from "./edition"
+import { buildManifest, downloadPath, EDITION_LIMITS, isBuildCurrent, nextEditionId, objectKey, parseEdition, thumbnailPages, thumbnailPath, type BuildRecord, type Edition } from "./edition"
 import { DEFAULT_SPECS, specHash } from "./spec"
 
 const edition = (id: string, status: Edition["status"]): Edition => ({
@@ -66,6 +66,13 @@ describe("downloadPath", () => {
   it("에디션·용지마다 해시 없는 고정 경로 하나를 만든다", () => {
     expect(downloadPath("monthly-cream", "A4")).toBe("/downloads/monthly-cream/a4.pdf")
     expect(downloadPath("monthly-cream", "A3")).toBe("/downloads/monthly-cream/a3.pdf")
+  })
+})
+
+describe("objectKey", () => {
+  it("R2 키는 로컬 경로에서 앞의 /만 뺀 것이다", () => {
+    expect(objectKey("monthly-1", "A4")).toBe("downloads/monthly-1/a4.pdf")
+    expect(objectKey("monthly-1", "A4")).toBe(downloadPath("monthly-1", "A4").slice(1))
   })
 })
 

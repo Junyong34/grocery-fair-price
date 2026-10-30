@@ -10,10 +10,11 @@ Blocked by: 01, 02
 ## 할 일
 
 - [ ] 게시 동작: 사양이 바뀌지 않은 생성 기록(`isBuildCurrent`)이 있는지 확인 → 공개 용지 PDF를 R2에 올린다(쓰기 키, `features/admin-print/server/`만) → manifest 갱신.
-- [ ] 객체 키에 사양 해시를 넣을지 정한다(다시 생성해도 우리 주소는 같고, R2 쪽은 덮어쓰기 vs 새 키). 덮어쓰기면 단순하다.
+- [x] 객체 키는 `objectKey(id, paper)` = `downloads/<id>/<paper>.pdf`, 사양 해시 없이 덮어쓴다(06 Comments, 2026-10-30).
+- [ ] 쓰기 키 클라이언트는 `features/admin-print/server/`에 둔다. 읽기 쪽(`features/seasonal/downloads/server/download-url.ts`)과 엔드포인트 규칙(`https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com`, region `auto`)을 맞춘다.
 - [ ] 설명이 비었거나 생성 기록이 낡았으면 게시 버튼을 막고 이유를 보인다.
 - [ ] 내리기: 상태 변경 → R2 객체 삭제 → manifest의 `withdrawn`으로.
-- [ ] S3 클라이언트: `@aws-sdk/client-s3` 등. 쓰기 키가 없으면 게시 버튼이 이유를 보이고 꺼진다.
+- [ ] S3 클라이언트: `@aws-sdk/client-s3`(06에서 `apps/web`에 추가함). 쓰기 키가 없으면 게시 버튼이 이유를 보이고 꺼진다.
 - [ ] `.scratch/calendar-print/spec.md` 운영 흐름(283줄 부근)을 새 흐름으로 고친다.
 
 ## 완료 조건

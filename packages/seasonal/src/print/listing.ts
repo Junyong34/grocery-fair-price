@@ -49,6 +49,15 @@ export function downloadFileName(edition: Pick<ManifestEntry, "kind" | "title">,
   return `${editionName(edition)} ${paper}.pdf`
 }
 
+/**
+ * 저장소 서명 링크에 넣는 Content-Disposition. 링크의 download 속성은 다른 출처로 302되면 무시되므로 여기서 이름을 정한다.
+ * 한글 이름은 filename*(RFC 5987), 이를 못 읽는 클라이언트용 영문 이름은 filename에 둔다.
+ */
+export function attachmentDisposition(edition: Pick<ManifestEntry, "id" | "kind" | "title">, paper: PublishedPaper): string {
+  const encoded = encodeURIComponent(downloadFileName(edition, paper)).replace(/['()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`)
+  return `attachment; filename="${edition.id}-${paper.toLowerCase()}.pdf"; filename*=UTF-8''${encoded}`
+}
+
 /** 2a · 2b 입구 카드의 대표 에디션. 첫 줄(월간 달력이 있으면 그 줄)의 첫째. */
 export function featuredEdition(editions: readonly ManifestEntry[]): ManifestEntry | undefined {
   return shelvesOf(editions)[0]?.editions[0]
