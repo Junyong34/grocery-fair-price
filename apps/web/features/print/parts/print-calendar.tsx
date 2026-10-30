@@ -12,14 +12,14 @@ export const WEEKDAYS = {
 
 /** 날짜 숫자 크기(dayFont 대비). editorial은 숫자를 크게 쓴다. */
 const digitRatio = (variant: CalendarVariant) => (variant === "editorial" ? 1.4 : 1)
-/** 요일 글자는 실제 날짜 숫자 크기에 비례한다(숫자의 0.62). */
-const WEEKDAY_RATIO = 0.62
+/** 요일 글자 크기(dayFont 대비). 모양과 상관없이 같다. 큰 숫자(editorial) 숫자의 0.62이고, 다른 모양에서는 숫자보다 조금 작다. */
+const WEEKDAY_RATIO = 0.87
 
 /**
- * 요일 줄 높이(dayFont 대비). 요일 글자 + 아래 여백(0.45) + 줄 높이 몫. 보통 숫자면 1.3이다.
+ * 요일 줄 높이(dayFont 대비). 요일 글자 + 아래 여백(0.45) + 줄 높이 몫.
  * 달력 높이를 미리 정하는 쪽(M-E 모서리 블록)이 같은 값을 쓴다.
  */
-export const weekdayRowRatio = (variant: CalendarVariant) => digitRatio(variant) * WEEKDAY_RATIO + 0.68
+export const WEEKDAY_ROW_RATIO = WEEKDAY_RATIO + 0.68
 
 /** 인쇄에는 오늘 표시가 없다. 어느 날과도 같지 않은 날짜를 넘긴다. */
 const NO_TODAY = { year: 0, month: 0, day: 0 }
@@ -63,7 +63,7 @@ export function PrintCalendar({
   const columns = Array.from({ length: 7 }, (_, i) => (weekStart + i) % 7)
   const weekend = (day: number) => day === 0 || day === 6
   const digitFont = dayFont * digitRatio(variant)
-  const rowHeight = (height - dayFont * weekdayRowRatio(variant)) / weeks.length
+  const rowHeight = (height - dayFont * WEEKDAY_ROW_RATIO) / weeks.length
   const cellPadding = variant === "grid" || variant === "editorial" ? u(dayFont * 0.25) : 0
   let blank = 0
 
@@ -72,7 +72,7 @@ export function PrintCalendar({
       <thead>
         <tr>
           {columns.map((day) => (
-            <th key={day} className={weekend(day) ? "is-red" : undefined} style={{ fontSize: t(digitFont * WEEKDAY_RATIO), paddingBottom: u(dayFont * 0.45), paddingLeft: cellPadding }}>
+            <th key={day} className={weekend(day) ? "is-red" : undefined} style={{ fontSize: t(dayFont * WEEKDAY_RATIO), paddingBottom: u(dayFont * 0.45), paddingLeft: cellPadding }}>
               {WEEKDAYS[weekday][day]}
             </th>
           ))}

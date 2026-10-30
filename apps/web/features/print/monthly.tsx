@@ -10,7 +10,7 @@ import { FoodArea, flowSize } from "./parts/food-area"
 import { FoodFigure } from "./parts/food-figure"
 import { MonthLabel } from "./parts/month-label"
 import { PeriodChartColumns } from "./parts/period-chart"
-import { PrintCalendar, weekdayRowRatio } from "./parts/print-calendar"
+import { PrintCalendar, WEEKDAY_ROW_RATIO } from "./parts/print-calendar"
 import { Sheet } from "./parts/sheet"
 import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
 
@@ -207,14 +207,14 @@ function AlloverSheet({ spec, paper, month }: { spec: MonthlySpec; paper: Paper;
 
 /**
  * M-E 모서리 블록의 날짜 크기. 보통은 4.6(A4 약 13pt) × 달력 글자 배율이지만, 블록이 작아 6주짜리 달에 공휴일 이름까지 들어간 줄이
- * 칸을 넘지 않게 상한을 둔다. 줄 하나 = 날짜(editorial은 1.4배) + 공휴일 이름(0.48) + 위아래 여백(약 0.65), 요일 줄은 PrintCalendar와 같은 weekdayRowRatio.
+ * 칸을 넘지 않게 상한을 둔다. 줄 하나 = 날짜(editorial은 1.4배) + 공휴일 이름(0.48) + 위아래 여백(약 0.65), 요일 줄은 PrintCalendar와 같은 WEEKDAY_ROW_RATIO.
  */
 function blockDayFont(spec: MonthlySpec, height: number): number {
   const digit = spec.calendar.variant === "editorial" ? 1.4 : 1
   const row = spec.type.scale * (digit + 0.48) + 0.65
   // tiles는 칸 사이 간격(0.8)이 줄마다 더 든다.
   const spacing = spec.calendar.variant === "tiles" ? 0.8 * 7 : 0
-  return Math.min(4.6 * CALENDAR_TEXT_SCALE[spec.calendar.size], (height - spacing) / (6 * row + weekdayRowRatio(spec.calendar.variant)))
+  return Math.min(4.6 * CALENDAR_TEXT_SCALE[spec.calendar.size], (height - spacing) / (6 * row + WEEKDAY_ROW_RATIO))
 }
 
 /** 빈 날짜 칸 하나에 그림 하나. 칸 가운데에 놓는다. */

@@ -9,7 +9,7 @@ import { FoodArea } from "./parts/food-area"
 import { gridSize } from "./parts/grid"
 import { MonthLabel, monthColor } from "./parts/month-label"
 import { PeriodChartColumns } from "./parts/period-chart"
-import { PrintCalendar } from "./parts/print-calendar"
+import { PrintCalendar, WEEKDAY_ROW_RATIO } from "./parts/print-calendar"
 import { Sheet } from "./parts/sheet"
 import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
 
@@ -178,7 +178,7 @@ function MonthCell({ spec, month, foods, width, height, flip }: { spec: YearShee
 function CalendarBlock({ spec, month, width, height, label }: { spec: YearSheetSpec; month: Month; width: number; height: number; label: PrintMonthLabel | undefined }) {
   const labelHeight = label ? LABEL : 0
   // 칸에 맞춘 크기에 달력 글자 배율을 곱한다. 키워도 두 자리 날짜가 옆 날짜와 붙지 않게, 인쇄 크기(t()가 type.scale을 곱한 값)가 칸 폭의 절반을 넘지 않는다.
-  const fit = Math.min((width / 7) * 0.42, ((height - labelHeight) / 7.3) * 0.62)
+  const fit = Math.min((width / 7) * 0.42, ((height - labelHeight) / (6 + WEEKDAY_ROW_RATIO)) * 0.62)
   const dayFont = Math.min(fit * CALENDAR_TEXT_SCALE[spec.calendar.size], ((width / 7) * 0.5) / spec.type.scale)
   return (
     <div style={{ width: u(width), height: u(height), padding: `0 ${u(1)}`, boxSizing: "border-box", display: "flex", flexDirection: "column", justifyContent: "center" }}>
