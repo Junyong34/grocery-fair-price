@@ -1,9 +1,9 @@
 # 제철 달력·포스터 시장 조사
 
-조사일: 2026-10-22. 목적: 인쇄물 4종(`monthly`, `year-sheet`, `season-poster`, `month-poster`, `.scratch/calendar-print/spec.md`)의 디자인을 고도화하기 전에, 실제로 팔리는 제철 달력·포스터가 어떤 구조인지 본다. 와이어프레임 초안: `wireframes.html`(같은 폴더).
+조사일: 2026-10-22. 목적: 인쇄물 4종(`monthly`, `year-sheet`, `season-poster`, `month-poster`, `.scratch/calendar-print/spec.md`)의 디자인을 고도화하기 전에, 실제로 팔리는 제철 달력·포스터가 어떤 구조인지 본다. 와이어프레임은 `/admin/wireframes`에 있다.
 
 - 사례: 국내 14개(K1~K14), 해외 10개(G1~G10), 해외 참고 14개(R1~R14).
-- 사례별 긴 기록(검색어, 판독 근거, 리뷰 인용)은 원자료 `_raw-kr.md`, `_raw-global.md`에 있다. 이 문서는 그것을 합친 요약이다.
+- 사례별 긴 기록(검색어, 판독 근거, 리뷰 인용)은 원자료 `_raw-kr.md`, `_raw-global.md`에 있었고 지웠다(git 기록 `dfa7a65`). 이 문서는 그것을 합친 요약이다.
 - 이미지는 내려받거나 복제하지 않았다. 브라우저에서 보기만 하고 링크와 구조만 적었다.
 - 그림:달력 비율은 상세 이미지를 눈으로 잰 값이라 모두 추정이다. 확인 못 한 값은 "확인 못 함", 추론은 "(추정)".
 
@@ -128,7 +128,7 @@
 
 ## 와이어프레임 안과 유형
 
-안의 원본은 앱의 `apps/web/features/admin-print/lib/wireframe-catalog.ts`이고 어드민 `/admin/wireframes`에서 본다. `wireframes.html`은 조사 시점의 사본이다.
+안의 원본은 앱의 `apps/web/features/admin-print/lib/wireframe-catalog.ts`이고 어드민 `/admin/wireframes`에서 본다. 조사 시점의 사본 `wireframes.html`은 지웠다(git 기록 `dfa7a65`).
 
 | 안 | 유형 | 비고 |
 |---|---|---|
