@@ -1,6 +1,23 @@
 @import "@workspace/ui/globals.css";
 @import "@workspace/ui/cojeev.css";
 
+/* 한글 줄바꿈. 기본값은 음절 사이에서도 끊어 "기름 / 진 달"처럼 낱말이 갈라지므로 어절 단위로 끊는다.
+   한 어절이 칸보다 길 때만 어절 안에서 끊는다(overflow-wrap). 제목은 줄 길이를 고르게, 문단은 끝줄에 한 낱말만 남지 않게 한다. */
+@layer base {
+  body {
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+}
+
 /* 페이지 전환(React <ViewTransition>). apps/web/node_modules/next/dist/docs/01-app/02-guides/view-transitions.md */
 /* 전환 중에도 클릭이 페이지로 가게 한다. */
 ::view-transition {
