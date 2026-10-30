@@ -1,7 +1,6 @@
-import { describe, expect, expectTypeOf, it } from "vitest"
-import type { z } from "zod"
+import { describe, expect, it } from "vitest"
 
-import { searchIndexSchema, varietyDetailSchema, varietySummarySchema } from "./schema"
+import { searchIndexSchema, VARIETY_SUMMARY_KEYS, varietyDetailSchema, varietySummarySchema } from "./schema"
 import type { SearchIndex, VarietyDetail, VarietySummary } from "./types"
 
 const SUMMARY: VarietySummary = {
@@ -122,13 +121,9 @@ describe("searchIndexSchema", () => {
   })
 })
 
-describe("스키마와 types.ts", () => {
-  it("z.infer와 손으로 쓴 타입이 서로 대입된다", () => {
-    expectTypeOf<z.infer<typeof varietySummarySchema>>().toExtend<VarietySummary>()
-    expectTypeOf<VarietySummary>().toExtend<z.infer<typeof varietySummarySchema>>()
-    expectTypeOf<z.infer<typeof varietyDetailSchema>>().toExtend<VarietyDetail>()
-    expectTypeOf<VarietyDetail>().toExtend<z.infer<typeof varietyDetailSchema>>()
-    expectTypeOf<z.infer<typeof searchIndexSchema>>().toExtend<SearchIndex>()
-    expectTypeOf<SearchIndex>().toExtend<z.infer<typeof searchIndexSchema>>()
+describe("VARIETY_SUMMARY_KEYS", () => {
+  it("목록 행의 키와 같고, 상세 전용 키는 없다", () => {
+    expect([...VARIETY_SUMMARY_KEYS].sort()).toEqual(Object.keys(SUMMARY).sort())
+    for (const key of ["trend", "places", "shelf", "band"]) expect(VARIETY_SUMMARY_KEYS).not.toContain(key)
   })
 })

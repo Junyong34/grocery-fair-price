@@ -1,11 +1,16 @@
-import { db } from "../db"
+import type { Sql, TransactionSql } from "postgres"
 
-/** 검색 재료 중 DB에서 읽는 부분: 별칭과 카테고리. 품종 부분은 db-source가 목록에서 뽑는다. */
-export type SearchExtrasRow = { aliases: unknown; categories: unknown }
+import { searchIndexSchema } from "@workspace/price/schema"
+import type { SearchIndex } from "@workspace/price/types"
+
+/** 검색 재료 중 DB에서 읽는 부분: 별칭과 카테고리. 품종 부분은 판정 목록에서 뽑는다(db-source). */
+export type SearchExtras = Pick<SearchIndex, "aliases" | "categories">
+
+const searchExtrasSchema = searchIndexSchema.pick({ aliases: true, categories: true })
 
 // 별칭은 품종(slug) 아니면 품목(이름) 하나를 가리킨다(alias의 check). 카테고리는 보여 줄 순서대로.
-export async function getSearchExtrasRow(): Promise<SearchExtrasRow> {
-  const [row] = await db()<SearchExtrasRow[]>`
+export async function readSearchExtras(sql: Sql | TransactionSql): Promise<SearchExtras> {
+  const [row] = await sql<{ aliases: unknown; categories: unknown }[]>`
     select
       (
         select coalesce(jsonb_agg(
@@ -22,5 +27,5 @@ export async function getSearchExtrasRow(): Promise<SearchExtrasRow> {
         from price.category c
       ) as categories
   `
-  return row!
+  return searchExtrasSchema.parse(row)
 }

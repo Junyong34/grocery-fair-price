@@ -1,6 +1,6 @@
 # 판정 payload는 화면 모양(`VarietyDetail`) 그대로 저장한다
 
-판정 배치는 품종마다 `judgment_snapshot.payload`(jsonb)를 쓰고, 웹 화면은 그것을 옮겨 담지 않고 그대로 그린다. 그래서 payload의 모양은 원천 데이터의 모양이 아니라 화면 타입 `VarietyDetail`(`packages/price/src/types.ts`)이다. 웹은 읽을 때 `packages/price`의 zod 스키마로 모양을 검사한다. 2026-10-30에 정했다 (`.scratch/ingest-foundation/issues/11-judgment-batch.md`, `.scratch/price-db-read/spec.md`).
+판정 배치는 품종마다 `judgment_snapshot.payload`(jsonb)를 쓰고, 웹 화면은 그것을 옮겨 담지 않고 그대로 그린다. 그래서 payload의 모양은 원천 데이터의 모양이 아니라 화면 타입 `VarietyDetail`이다. 그 모양은 `packages/price/src/schema.ts`의 zod 스키마 한 곳에 정의하고(타입은 `z.infer`), 웹은 읽을 때 같은 스키마로 검사한다. 2026-10-30에 정했다 (`.scratch/ingest-foundation/issues/11-judgment-batch.md`, `.scratch/price-db-read/spec.md`).
 
 이유:
 

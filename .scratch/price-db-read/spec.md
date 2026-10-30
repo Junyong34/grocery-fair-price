@@ -43,19 +43,20 @@ app/(price)/**/page.tsx         params 검증 · getPriceSource() · View에 pro
 features/price/data/
   price-source.ts               PriceSource 인터페이스 + getPriceSource(). 화면이 부르는 유일한 입구
   db.ts                         postgres 클라이언트 하나 (server-only, prepare:false, 개발 중 HMR에도 하나)
-  db-source.ts                  PriceSource 구현. 메서드마다 캐시 정책 + queries/ 호출 + zod 파싱
-  queries/<메서드>.ts           SQL 하나와 행 타입. 메서드마다 파일 하나
-packages/price/src/schema.ts    zod 스키마 (VarietySummary · VarietyDetail · SearchIndex). types.ts의 타입과 같은 모양
+  db-source.ts                  PriceSource 구현. 메서드마다 캐시 정책만 정하고 queries/에 db()를 넘긴다
+  queries/<메서드>.ts           판정 읽기 module. sql을 받아 SQL 실행 · 모양 검사 · 어긋난 행 처리까지 하고 검사된 값을 돌려준다
+  queries/*.db.test.ts          위 interface를 로컬 DB(샘플 판정 묶음, web_reader)로 확인한다. pnpm db:test
+packages/price/src/schema.ts    가격 화면 모양의 유일한 정의(zod). types.ts는 여기서 z.infer로 만든 타입을 내보낸다
 features/price/<화면>/          그리기만. 데이터를 직접 부르지 않는다
 ```
 
-고칠 곳 찾기: 화면이 이상하면 View, 값의 모양이 어긋나면 `schema.ts`와 배치(`packages/price-ingest/src/judgment/build.ts`), 어떤 행을 읽는지가 이상하면 `queries/`, 캐시 정책은 `db-source.ts`.
+고칠 곳 찾기: 화면이 이상하면 View, 값의 모양이 어긋나거나 필드를 더할 때는 `schema.ts` 한 곳과 배치(`packages/price-ingest/src/judgment/build.ts`), 어떤 행을 읽는지가 이상하면 `queries/`, 캐시 정책은 `db-source.ts`.
 
 경계 검사(`data-boundary.test.ts`): `data/` 밖에서는 `db`, `db-source`, `queries/`를 import하지 않는다.
 
 ## 4. 쿼리
 
-- `listVarieties`: `current_judgment`의 `payload`에서 무거운 키(`trend`, `forecast`, `places`, `shelf`, `marketTypes`, `range`, `band`)를 뺀 jsonb를 읽고 `VarietySummary` 스키마로 파싱한다. 어긋난 행은 빼고 서버 로그에 품종 id를 남긴다. 순서는 SQL에서 카테고리 · 품종 이름 순으로 고정한다(화면은 받은 순서대로 그린다).
+- `listVarieties`: `current_judgment`의 `payload`에서 목록 행의 키(`VARIETY_SUMMARY_KEYS`, 요약 스키마의 키)만 골라 읽고 `VarietySummary` 스키마로 파싱한다. 상세 전용 필드를 더해도 목록에는 들어가지 않는다(2026-10-30 구조 검토 A). 어긋난 행은 빼고 서버 로그에 품종 id를 남긴다. 순서는 SQL에서 카테고리 · 품종 이름 순으로 고정한다(화면은 받은 순서대로 그린다).
 - `getVariety(id)`: `payload->>'id' = $1`인 한 행의 `payload`를 `VarietyDetail` 스키마로 파싱한다. 없으면 `null`, 모양이 어긋나면 던진다.
 - `searchIndex`: 품종(`id` · `name` · `item` · `category`)은 `listVarieties` 결과에서 뽑는다(판정이 없는 품종이 검색에 나와 상세가 404가 되는 일을 막는다). 별칭은 `price.alias`, 카테고리는 `price.category`에서 읽는다.
 - `featuredIds`: `data/featured.ts` 상수(지금 `FEATURED_IDS`를 옮긴다). 목록에 없는 id는 화면의 `pickByIds`(`packages/price/src/list.ts`)가 이미 건너뛴다.

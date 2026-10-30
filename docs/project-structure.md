@@ -193,7 +193,7 @@ import 경로:
 
 | 폴더 | 내용 |
 |---|---|
-| `data/` | 데이터 경계(명세 `.scratch/price-db-read/spec.md`). `price-source.ts`(`PriceSource`, `getPriceSource()`, `server-only`)만 화면이 부른다. 운영 DB `price.current_judgment`를 읽는다: `db.ts`(postgres 클라이언트 하나, `web_reader`, `WEB_DATABASE_URL`, `prepare: false`), `queries/`(메서드마다 SQL 하나와 행 타입), `db-source.ts`(캐시 정책: 목록 `hours` · 검색 `days` · 상세는 React `cache()`만, `@workspace/price/schema`로 zod 검사), `featured.ts`(자주 사는 품종 상수). `data-boundary.test.ts`가 `data/` 밖의 `db` · `db-source` · `queries/` import를 막는다 |
+| `data/` | 데이터 경계(명세 `.scratch/price-db-read/spec.md`). `price-source.ts`(`PriceSource`, `getPriceSource()`, `server-only`)만 화면이 부른다. 운영 DB `price.current_judgment`를 읽는다: `db.ts`(postgres 클라이언트 하나, `web_reader`, `WEB_DATABASE_URL`, `prepare: false`), `queries/`(판정 읽기 module: 메서드마다 파일 하나, `sql`을 받아 SQL · `@workspace/price/schema` 검사 · 어긋난 행 처리까지 하고 검사된 값을 돌려준다. `queries.db.test.ts`가 로컬 DB로 확인, `pnpm db:test`), `db-source.ts`(캐시 정책만: 목록 `hours` · 검색 `hours`(별칭 · 카테고리는 `days`) · 상세는 React `cache()`만), `featured.ts`(자주 사는 품종 상수). `data-boundary.test.ts`가 `data/` 밖의 `db` · `db-source` · `queries/` import를 막는다 |
 | `home/` | P1 시세 메인 |
 | `search/` | P2 품종 검색. 검색어는 `history.replaceState`로 `?q=`에 맞춘다 |
 | `basket/` | P4 담은 품종: 판정별 개수, 바뀐 판정 알림, 판정별 묶음, × 빼기, 편집(모두 빼기), 빈 목록. 기기 값을 불러온 뒤에 그린다 |
@@ -271,7 +271,8 @@ import 경로:
 
 | 모듈 | 내용 |
 |---|---|
-| `types.ts` | 화면이 읽는 모양: `VarietySummary`(목록 행, 뷰 `current_judgment` 열), `VarietyDetail`(상세, `judgment_snapshot.payload`), `Verdict`, `VerdictBand`, `PlaceQuote`, `TrendPoint`, `SearchIndex` |
+| `schema.ts` | 화면이 읽는 모양의 유일한 정의(zod, ADR 0004): `varietySummarySchema`(목록 행), `varietyDetailSchema`(상세, `judgment_snapshot.payload`), `searchIndexSchema`, 목록이 읽는 키 `VARIETY_SUMMARY_KEYS`. 필드 설명 주석도 여기 있다 |
+| `types.ts` | `schema.ts`에서 `z.infer`로 만든 타입(`VarietySummary`, `VarietyDetail`, `Verdict`, `VerdictBand`, `PlaceQuote`, `TrendPoint`, `SearchIndex`, …)을 이름 붙여 내보낸다 |
 | `verdict.ts` | `verdictOf(price, usual, band)`: 평소가 대비 반올림 % 와 싸요 · 보통 · 비싸요. 평소가가 없으면 판정 전. "내가 본 가격"도 이 함수. `verdictOfPct(pct, band)`: 이미 낸 %를 구간에 견줌(판정 배치가 판정 차이로 부름) |
 | `search.ts` | `searchVarieties`: 별칭 → 품목("어떤 호박인가요?") → 카테고리 → 이름 · 초성 · 품목 · 별칭 일부 → 한 글자 오타. `matchRange`(이름 강조) |
 | `list.ts` | 목록 순수 함수: 최근 조사일, id 순서로 고르기 |
@@ -379,7 +380,7 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 | `pnpm --filter @workspace/seasonal build:foods` | 품종 목록 생성 |
 | `pnpm db:start` / `pnpm db:stop` | 로컬 Supabase (Docker). 쓰지 않는 서비스는 끄고 띄운다. DB 어드민은 Studio http://127.0.0.1:55323 (Table Editor에서 schema `price`) |
 | `pnpm db:reset` | 로컬 DB를 지우고 마이그레이션·시드를 다시 적용 |
-| `pnpm db:test` | DB 테스트 (`db reset` → 샘플 적재 → 권한·RLS·적재 검사). `pnpm db:start` 뒤에 |
+| `pnpm db:test` | DB 테스트 (`db reset` → 샘플 적재 → 권한·RLS·적재 검사, 이어서 `apps/web`의 가격 읽기 module 테스트 `pnpm --filter web test:db`). `pnpm db:start` 뒤에 |
 | `pnpm db:erd` | `schema-map.html`의 ERD를 로컬 DB에서 다시 만든다 |
 | `pnpm --filter @workspace/price-db load:samples` / `measure` | 샘플 테스트 데이터 넣기 / 행당 크기 실측 |
 | `pnpm --filter @workspace/price-ingest ingest --source kamis\|ekape [--date YYYY-MM-DD]` / `--source chamga [--survey-day YYYY-MM-DD ...]` (조사일 없으면 자동 모드) | 수집 한 번. 환경변수 4개(`DATA_GO_KR_SERVICE_KEY`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `INGEST_DATABASE_URL`)를 넘긴다. `.env`를 스스로 읽지 않으므로 운영에 넣을지 로컬에 넣을지 직접 정한다. 종료 코드 0 성공, 1 부분, 2 키 오류, 3 DB 실패, 4 업로드 실패, 9 예상 밖 |

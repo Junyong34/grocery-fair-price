@@ -10,7 +10,8 @@
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:db": "vitest run --config vitest.db.config.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1159.0",
@@ -40,6 +41,7 @@
     "schema-dts": "^2.1.0",
     "sharp": "0.35.5",
     "typescript": "^5",
-    "vitest": "^5.0.4"
+    "vitest": "^5.0.4",
+    "@workspace/price-db": "workspace:*"
   }
 }

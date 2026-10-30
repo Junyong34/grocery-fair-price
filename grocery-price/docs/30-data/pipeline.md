@@ -1068,7 +1068,7 @@ raw_object
 
 ### 4-1. 품종 판정 payload (`/seasonal`과 같은 앱의 품종 가격 화면이 읽음)
 
-**payload는 화면 타입 `VarietyDetail`(`packages/price/src/types.ts`) 그대로다** (2026-10-30, ingest-foundation/11). 처음 이 절에 둔 JSON 예시(`judgment.label`, `confidence.level`, `quotes[]` 등)는 화면을 만들기 전에 쓴 것이라, 화면 계약이 정해진 뒤 타입 하나로 맞췄다. 신뢰도는 점수로 만들지 않고 표본 부족 · 갱신 지연 두 표시로 둔다 ([judgment.md](judgment.md) 6-3). 웹앱은 옮겨 담기 없이 payload를 돌려주고, 읽을 때 zod 스키마 `packages/price/src/schema.ts`(`varietyDetailSchema`, 목록은 무거운 키를 뺀 jsonb를 `varietySummarySchema`)로 모양만 검사한다 (ADR 0004, `.scratch/price-db-read/spec.md`). payload 모양을 바꾸면 `types.ts`와 이 스키마를 같이 고친다.
+**payload는 화면 타입 `VarietyDetail` 그대로다** (2026-10-30, ingest-foundation/11). 처음 이 절에 둔 JSON 예시(`judgment.label`, `confidence.level`, `quotes[]` 등)는 화면을 만들기 전에 쓴 것이라, 화면 계약이 정해진 뒤 타입 하나로 맞췄다. 신뢰도는 점수로 만들지 않고 표본 부족 · 갱신 지연 두 표시로 둔다 ([judgment.md](judgment.md) 6-3). 웹앱은 옮겨 담기 없이 payload를 돌려주고, 읽을 때 zod 스키마 `packages/price/src/schema.ts`(`varietyDetailSchema`, 목록은 요약 키 `VARIETY_SUMMARY_KEYS`만 고른 jsonb를 `varietySummarySchema`)로 모양만 검사한다 (ADR 0004, `.scratch/price-db-read/spec.md`). payload 모양은 이 스키마 한 곳에 정의하고, `types.ts`는 여기서 만든 타입이다. 모양을 바꾸면 이 스키마와 배치(`build.ts`)를 고친다.
 
 판정 배치(`pnpm --filter @workspace/price-ingest judgment`, `src/judgment/`)가 활성 품종마다 대표 규격(`spec.is_default`) 한 행을 만든다. 숫자는 다시 계산하지 않고 모은다:
 

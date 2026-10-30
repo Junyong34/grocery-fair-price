@@ -15,7 +15,7 @@
     "db:start": "supabase start -x realtime,edge-runtime,logflare,vector,imgproxy,mailpit",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset --local",
-    "db:test": "pnpm --filter @workspace/price-db test:db",
+    "db:test": "pnpm --filter @workspace/price-db test:db && pnpm --filter web test:db",
     "db:erd": "pnpm --filter @workspace/price-db erd"
   },
   "devDependencies": {

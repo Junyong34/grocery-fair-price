@@ -1,12 +1,12 @@
-import { db } from "../db"
+import type { Sql, TransactionSql } from "postgres"
 
-/** 상세 행: 판정 payload 그대로(VarietyDetail 모양, ADR 0004). 모양 검사는 db-source가 한다. */
-export type VarietyDetailRow = { payload: unknown }
+import { varietyDetailSchema } from "@workspace/price/schema"
+import type { VarietyDetail } from "@workspace/price/types"
 
-/** 품종 id(variety.slug)로 현재 판정 한 행. 없으면 undefined. */
-export async function getVarietyRow(id: string): Promise<VarietyDetailRow | undefined> {
-  const [row] = await db()<VarietyDetailRow[]>`
+/** 품종 id(variety.slug)로 현재 판정 payload 한 행(ADR 0004). 없으면 null, 모양이 어긋나면 던진다. */
+export async function readVariety(sql: Sql | TransactionSql, id: string): Promise<VarietyDetail | null> {
+  const [row] = await sql<{ payload: unknown }[]>`
     select payload from price.current_judgment where payload ->> 'id' = ${id} limit 1
   `
-  return row
+  return row ? varietyDetailSchema.parse(row.payload) : null
 }
