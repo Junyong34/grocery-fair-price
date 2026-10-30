@@ -20,6 +20,7 @@ const row = (id: string, kind: VerdictKind, surveyedOn = "2026-10-23"): VarietyS
   sampleSize: 45,
   stale: false,
   meetsMinN: true,
+  basis: { source: "KAMIS", scope: "전국 조사 시장" },
 })
 
 describe("담은 품종", () => {

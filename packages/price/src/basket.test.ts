@@ -17,6 +17,7 @@ const row = (id: string, kind: VerdictKind, pct: number | null): VarietySummary 
   sampleSize: 45,
   stale: false,
   meetsMinN: true,
+  basis: { source: "KAMIS", scope: "전국 조사 시장" },
 })
 const VARIETIES = [
   row("배추", "normal", 8),

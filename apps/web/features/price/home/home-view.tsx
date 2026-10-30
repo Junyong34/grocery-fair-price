@@ -1,4 +1,4 @@
-import { LIST_BASIS, listBasisLine, PRICE_COPY } from "@workspace/price/copy"
+import { listBasisLine, PRICE_COPY } from "@workspace/price/copy"
 import { monthDay } from "@workspace/price/format"
 import { latestSurveyedOn, pickByIds } from "@workspace/price/list"
 import type { VarietySummary } from "@workspace/price/types"
@@ -18,6 +18,7 @@ export function HomeView({
 }) {
   const featured = pickByIds(varieties, featuredIds)
   const surveyedOn = latestSurveyedOn(varieties)
+  const basisLine = listBasisLine(varieties)
   return (
     <div className="mx-auto flex max-w-[640px] flex-col gap-9 px-[18px] pt-6 lg:pt-12">
       <div className="flex flex-col gap-5">
@@ -43,7 +44,7 @@ export function HomeView({
           ))}
         </ul>
       </section>
-      {surveyedOn && <p className="text-xs text-caption">{listBasisLine(LIST_BASIS, surveyedOn)}</p>}
+      {basisLine && <p className="text-xs text-caption">{basisLine}</p>}
     </div>
   )
 }

@@ -18,6 +18,7 @@ const SUMMARY: VarietySummary = {
   sampleSize: 45,
   stale: false,
   meetsMinN: true,
+  basis: { source: "KAMIS", scope: "전국 조사 시장" },
 }
 
 const DETAIL: VarietyDetail = {
@@ -38,7 +39,6 @@ const DETAIL: VarietyDetail = {
   ],
   forecast: [{ date: "2026-10-30", price: 4500, low: 4300, high: 4700 }],
   shelf: { surveyedOn: "2026-10-24", prices: [{ seller: "이마트", price: 4980, promo: "행사 ~10/29" }] },
-  basis: { source: "KAMIS", scope: "전국 조사 시장" },
 }
 
 const BEFORE_JUDGMENT: VarietyDetail = { ...DETAIL, usual: null, verdict: { kind: "none", pct: null }, forecast: [] }

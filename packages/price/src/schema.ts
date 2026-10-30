@@ -21,6 +21,7 @@ export const varietySummarySchema = z.object({
   sampleSize: z.number(),
   stale: z.boolean(),
   meetsMinN: z.boolean().nullable(),
+  basis: z.object({ source: z.string(), scope: z.string() }),
 })
 
 const marketTypeSchema = z.enum(["large_retail", "traditional"])
@@ -49,7 +50,6 @@ export const varietyDetailSchema = varietySummarySchema.extend({
       prices: z.array(z.object({ seller: z.string(), price: z.number(), promo: z.string().nullable() })).readonly(),
     })
     .nullable(),
-  basis: z.object({ source: z.string(), scope: z.string() }),
 })
 
 export const searchIndexSchema = z.object({

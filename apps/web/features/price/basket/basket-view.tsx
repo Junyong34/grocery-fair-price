@@ -7,8 +7,7 @@ import { useState } from "react"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { basketView, type BasketItem } from "@workspace/price/basket"
-import { LIST_BASIS, listBasisLine, PRICE_COPY, VERDICT_WORD } from "@workspace/price/copy"
-import { latestSurveyedOn } from "@workspace/price/list"
+import { listBasisLine, PRICE_COPY, VERDICT_WORD } from "@workspace/price/copy"
 import type { VarietySummary } from "@workspace/price/types"
 
 import { routes } from "@/shared/routes"
@@ -31,7 +30,7 @@ export function BasketView({ varieties }: { varieties: readonly VarietySummary[]
   const view = basketView(varieties, entries)
   // 다 빼서 빈 목록이 되면 편집도 끝난다.
   const editing = editingOn && view.count > 0
-  const surveyedOn = latestSurveyedOn(view.groups.flatMap((group) => group.items.map((item) => item.variety)))
+  const basisLine = listBasisLine(view.groups.flatMap((group) => group.items.map((item) => item.variety)))
 
   return (
     <div className="mx-auto flex max-w-[640px] flex-col gap-5 px-[18px] pt-4 lg:pt-10">
@@ -117,7 +116,7 @@ export function BasketView({ varieties }: { varieties: readonly VarietySummary[]
           >
             {COPY.addMore}
           </Link>
-          {surveyedOn && <p className="text-xs text-caption">{listBasisLine(LIST_BASIS, surveyedOn)}</p>}
+          {basisLine && <p className="text-xs text-caption">{basisLine}</p>}
         </>
       )}
     </div>

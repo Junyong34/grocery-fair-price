@@ -40,6 +40,8 @@ export interface VarietySummary {
   stale: boolean
   /** 최소 표본 수를 넘었나. 기준이 정해지기 전이면 null */
   meetsMinN: boolean | null
+  /** 시세의 출처와 범위. 목록 아래 근거 한 줄도 행마다 이것을 모아 쓴다 */
+  basis: QuoteBasis
 }
 
 /** 업태(시세에서는 KAMIS 시장 유형). */
@@ -117,7 +119,6 @@ export interface VarietyDetail extends VarietySummary {
   forecast: readonly ForecastPoint[]
   /** 판매처별 판매가. 판매가가 없는 품종은 null */
   shelf: { surveyedOn: string; prices: readonly ShelfPrice[] } | null
-  basis: QuoteBasis
 }
 
 /** 검색이 찾는 품종 하나. */

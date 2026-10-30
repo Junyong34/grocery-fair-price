@@ -4,6 +4,7 @@
 import { josa } from "es-hangul"
 
 import { monthDay, signedPct } from "./format"
+import { latestSurveyedOn } from "./list"
 import type { MarketType, QuoteBasis, Verdict, VerdictKind } from "./types"
 
 /** 판정 한 마디. */
@@ -98,12 +99,15 @@ export function basisLine(basis: QuoteBasis, surveyedOn: string, n: number): str
   return `${basis.scope} ${n}곳 · ${monthDay(surveyedOn)} 조사 (${basis.source})`
 }
 
-/** 목록 시세의 출처. 목록 행은 모두 KAMIS 전국 조사 시장 시세다. */
-export const LIST_BASIS: QuoteBasis = { source: "KAMIS", scope: "전국 조사 시장" }
-
-/** 목록 아래 근거 한 줄: "시세는 10/23 조사 · KAMIS 전국 조사 시장" */
-export function listBasisLine(basis: QuoteBasis, surveyedOn: string): string {
-  return `시세는 ${monthDay(surveyedOn)} 조사 · ${basis.source} ${basis.scope}`
+/**
+ * 목록 아래 근거 한 줄: "시세는 10/29 조사 · KAMIS 전국 조사 시장 · 축평원 전국 평균".
+ * 조사일은 가장 최근 것, 출처는 행들에 처음 나온 순서대로 한 번씩 쓴다. 빈 목록이면 null.
+ */
+export function listBasisLine(rows: readonly { surveyedOn: string; basis: QuoteBasis }[]): string | null {
+  const surveyedOn = latestSurveyedOn(rows)
+  if (surveyedOn == null) return null
+  const sources = [...new Set(rows.map(({ basis }) => `${basis.source} ${basis.scope}`))]
+  return `시세는 ${monthDay(surveyedOn)} 조사 · ${sources.join(" · ")}`
 }
 
 export const PRICE_COPY = {

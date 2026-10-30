@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { basisLine, brandSpreadNote, partOfMonth, PRICE_COPY, seasonNote, seasonVerdictNote, verdictChip, verdictDiff, withJosa } from "./copy"
+import { basisLine, brandSpreadNote, listBasisLine, partOfMonth, PRICE_COPY, seasonNote, seasonVerdictNote, verdictChip, verdictDiff, withJosa } from "./copy"
 
 describe("판정 문구", () => {
   it("칩은 판정과 %를 함께 쓴다", () => {
@@ -68,6 +68,30 @@ describe("basisLine", () => {
     expect(basisLine({ source: "KAMIS", scope: "전국 조사 시장" }, "2026-10-23", 45)).toBe(
       "전국 조사 시장 45곳 · 10/23 조사 (KAMIS)"
     )
+  })
+})
+
+describe("listBasisLine", () => {
+  const kamis = { source: "KAMIS", scope: "전국 조사 시장" }
+  const ekape = { source: "축평원", scope: "전국 평균" }
+
+  it("가장 최근 조사일과 출처 하나", () => {
+    expect(listBasisLine([{ surveyedOn: "2026-10-23", basis: kamis }, { surveyedOn: "2026-10-29", basis: kamis }])).toBe(
+      "시세는 10/29 조사 · KAMIS 전국 조사 시장"
+    )
+  })
+
+  it("출처가 여럿이면 처음 나온 순서대로 한 번씩 쓴다", () => {
+    const rows = [
+      { surveyedOn: "2026-10-29", basis: kamis },
+      { surveyedOn: "2026-10-28", basis: ekape },
+      { surveyedOn: "2026-10-29", basis: kamis },
+    ]
+    expect(listBasisLine(rows)).toBe("시세는 10/29 조사 · KAMIS 전국 조사 시장 · 축평원 전국 평균")
+  })
+
+  it("빈 목록이면 null", () => {
+    expect(listBasisLine([])).toBeNull()
   })
 })
 
