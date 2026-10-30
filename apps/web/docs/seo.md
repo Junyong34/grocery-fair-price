@@ -41,6 +41,8 @@
 | `SITE_INDEXABLE` | 운영만 | `true`일 때만 색인을 허용한다. 없으면 robots가 전체를 막고 모든 페이지에 `noindex`가 붙는다. 프리뷰·스테이징에는 넣지 않는다 |
 | `GOOGLE_SITE_VERIFICATION` | 운영 | Search Console URL 접두어 속성의 HTML 태그 값. DNS로 확인하면 필요 없다 |
 | `NAVER_SITE_VERIFICATION` | 운영 | 서치어드바이저 HTML 태그 값(`naver-site-verification`) |
+| `GA_MEASUREMENT_ID` | 운영 | GA4 측정 ID(`G-…`). 있을 때만 운영 빌드에 GA 스크립트가 붙는다(`shared/analytics/config.ts`). 공개 값이다 |
+| `GA_DEBUG` | 로컬만 | `true`면 개발 서버에서도 GA를 붙이고 DebugView로 보낸다. 운영에는 넣지 않는다 |
 
 `/sitemap.xml`은 스위치와 상관없이 열려 있다. 로컬에서 목록을 확인하는 데 쓴다.
 
@@ -54,7 +56,7 @@
 
 ## 나중에 할 것
 
-- GA4 등 분석 도구. 동의 배너와 스크립트 성능을 함께 정한다.
+- 쿠키 동의 배너(국내 이용자 대상이라 넣지 않았다). GA4는 `shared/analytics/`에 있다(`.scratch/calendar-download/issues/08-ga4.md`).
 - IndexNow(네이버·Bing 지원). 페이지 수가 늘어 sitemap만으로 반영이 늦을 때.
 - 다음 웹마스터도구. robots.txt에 `#DaumWebMasterTool:<PIN>` 주석 줄이 필요해 `app/robots.ts`를 Route Handler(`app/robots.txt/route.ts`)로 바꿔야 한다.
 - `manifest`.

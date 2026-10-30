@@ -6,7 +6,7 @@
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"],
-      "env": ["SITE_INDEXABLE", "GOOGLE_SITE_VERIFICATION", "NAVER_SITE_VERIFICATION"]
+      "env": ["SITE_INDEXABLE", "GOOGLE_SITE_VERIFICATION", "NAVER_SITE_VERIFICATION", "GA_MEASUREMENT_ID", "GA_DEBUG"]
     },
     "lint": {
       "dependsOn": ["^lint"]

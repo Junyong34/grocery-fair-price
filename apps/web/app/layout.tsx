@@ -3,6 +3,7 @@ import { Gowun_Batang } from "next/font/google"
 
 import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css"
 import "./globals.css"
+import { AnalyticsTag } from "@/shared/analytics/analytics-tag"
 import { createMetadata, SITE_CONFIG, siteUrl } from "@/shared/meta"
 import { Providers } from "@/shared/providers"
 import { searchVerification } from "@/shared/seo/indexing"
@@ -36,6 +37,7 @@ export default function RootLayout({
       <body>
         <Providers>{children}</Providers>
       </body>
+      <AnalyticsTag />
     </html>
   )
 }

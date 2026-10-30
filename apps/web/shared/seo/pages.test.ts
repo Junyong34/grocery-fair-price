@@ -58,7 +58,7 @@ describe("SEO_PAGES", () => {
   })
 
   it("정적 생성되는 상세 페이지를 모두 담는다", () => {
-    // P1 1 + 2a 1 + 2b 목록 1 + 월 12 + 3a 목록 1 + 계절 4 + PDF 내려받기 1 + 게시된 에디션 + 명절 + 품종
-    expect(paths).toHaveLength(1 + 1 + 1 + 12 + 1 + 4 + 1 + DOWNLOADS.editions.length + FESTIVALS.length + FOODS.length)
+    // P1 1 + 2a 1 + 2b 목록 1 + 월 12 + 3a 목록 1 + 계절 4 + PDF 내려받기 1 + 개인정보 처리방침 1 + 게시된 에디션 + 명절 + 품종
+    expect(paths).toHaveLength(1 + 1 + 1 + 12 + 1 + 4 + 1 + 1 + DOWNLOADS.editions.length + FESTIVALS.length + FOODS.length)
   })
 })

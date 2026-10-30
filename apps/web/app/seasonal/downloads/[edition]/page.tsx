@@ -62,7 +62,7 @@ async function Edition({ params }: { params: Params }) {
         {DOWNLOADS_COPY.backToList}
       </Link>
       <div className="px-[18px]">
-        <EditionDetail edition={edition} title={<h1 className="font-heading text-[28px] leading-tight font-bold text-ink">{editionName(edition)}</h1>} />
+        <EditionDetail edition={edition} placement="page" title={<h1 className="font-heading text-[28px] leading-tight font-bold text-ink">{editionName(edition)}</h1>} />
       </div>
       {others.length > 0 && (
         <section aria-labelledby="others" className="mt-4 flex flex-col gap-3">

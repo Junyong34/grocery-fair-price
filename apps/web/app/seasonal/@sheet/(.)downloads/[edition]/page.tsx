@@ -26,7 +26,7 @@ async function Sheet({ params }: { params: Params }) {
   // 공유는 아래 버튼 줄에 있어 제목 줄에는 두지 않는다.
   return (
     <DetailSheet title={editionName(edition)} action={null}>
-      <EditionDetail edition={edition} />
+      <EditionDetail edition={edition} placement="sheet" />
     </DetailSheet>
   )
 }

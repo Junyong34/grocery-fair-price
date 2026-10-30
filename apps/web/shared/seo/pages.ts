@@ -30,6 +30,7 @@ export const SEO_PAGES: Readonly<Record<string, () => readonly SitemapEntry[]>> 
   "/seasonal/months/[month]": () => MONTHS.map((month) => ({ path: routes.seasonal.month(month) })),
   "/seasonal/seasons": () => [{ path: routes.seasonal.seasons }],
   "/seasonal/downloads": () => [{ path: routes.seasonal.downloads }],
+  "/privacy": () => [{ path: routes.privacy }],
   // 게시된 에디션 상세. 썸네일을 이미지 sitemap으로 알린다. PDF 파일 주소는 색인하지 않는다(ADR 0003).
   "/seasonal/downloads/[edition]": () =>
     DOWNLOADS.editions.map((edition) => ({ path: routes.seasonal.download(edition.id), images: edition.thumbnails.map((thumbnail) => thumbnail.path) })),

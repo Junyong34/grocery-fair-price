@@ -9,6 +9,7 @@ import { downloadFileName, megabytes } from "@workspace/seasonal/print/listing"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { track } from "@/shared/analytics/track"
 import { routes } from "@/shared/routes"
 
 import { copyPageLink, ShareButton, sharePage } from "../components/share-button"
@@ -22,8 +23,9 @@ const useCanShare = () => useSyncExternalStore(noop, () => typeof navigator.shar
  * 상세의 버튼 줄(3-B)과 내려받은 뒤 상태(5-a). 공유하는 것은 에디션 페이지 주소다(PDF 주소가 아니다).
  * 휴대폰으로 받은 사람은 PC에서 인쇄하는 경우가 많아, 받은 뒤에 링크 보내기를 앞에 둔다.
  */
-export function EditionActions({ edition }: { edition: ManifestEntry }) {
+export function EditionActions({ edition, placement }: { edition: ManifestEntry; placement: "sheet" | "page" }) {
   const [done, setDone] = useState(false)
+  const shared = (method: "copy" | "share") => track("print_share", { edition_id: edition.id, method })
   const canShare = useCanShare()
   const doneRef = useRef<HTMLDivElement>(null)
   // 시트 아래쪽에서 바뀌므로 바뀐 자리가 보이게 한다.
@@ -34,7 +36,10 @@ export function EditionActions({ edition }: { edition: ManifestEntry }) {
     <a
       href={routes.seasonal.downloadFile(edition.id, "A4")}
       download={downloadFileName(edition, "A4")}
-      onClick={() => setDone(true)}
+      onClick={() => {
+        setDone(true)
+        track("print_download", { edition_id: edition.id, edition_kind: edition.kind, paper: "A4", placement })
+      }}
       className={className}
     >
       {label}
@@ -57,11 +62,11 @@ export function EditionActions({ edition }: { edition: ManifestEntry }) {
             <p>{DOWNLOADS_COPY.done.pcBody}</p>
           </div>
           <div className={cn("grid gap-2", canShare && "grid-cols-2")}>
-            <Button variant="outline" className="h-11" onClick={() => void copyPageLink()}>
+            <Button variant="outline" className="h-11" onClick={async () => (await copyPageLink()) && shared("copy")}>
               {DOWNLOADS_COPY.done.copyLink}
             </Button>
             {canShare && (
-              <Button variant="outline" className="h-11" onClick={() => void sharePage()}>
+              <Button variant="outline" className="h-11" onClick={async () => (await sharePage()) === "shared" && shared("share")}>
                 {DOWNLOADS_COPY.done.share}
               </Button>
             )}
@@ -70,7 +75,7 @@ export function EditionActions({ edition }: { edition: ManifestEntry }) {
         </div>
       ) : (
         <div className="grid grid-cols-[1fr_2fr] gap-2">
-          <ShareButton label={DOWNLOADS_COPY.share} className="h-11" />
+          <ShareButton label={DOWNLOADS_COPY.share} className="h-11" onShared={shared} />
           {link(
             "inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-ink px-5 text-[15px] font-semibold text-canvas no-underline",
             <>
@@ -80,17 +85,17 @@ export function EditionActions({ edition }: { edition: ManifestEntry }) {
           )}
         </div>
       )}
-      <A3Request id={edition.id} />
+      <A3Request edition={edition} />
     </div>
   )
 }
 
-/** A3 수요 확인. 누르면 고마움 문구로 바뀐다. 이벤트 전송은 08(GA4). */
-function A3Request({ id }: { id: string }) {
-  const requested = useA3Requested(id)
+/** A3 수요 확인. 누르면 고마움 문구로 바뀐다. 이벤트는 이 기기에서 처음 누를 때만 보낸다. */
+function A3Request({ edition }: { edition: ManifestEntry }) {
+  const requested = useA3Requested(edition.id)
   if (requested) return <p className="text-center text-xs text-caption">{DOWNLOADS_COPY.a3.thanks}</p>
   return (
-    <button type="button" onClick={() => requestA3(id)} className="self-center text-xs text-caption underline underline-offset-4 hover:text-stone">
+    <button type="button" onClick={() => requestA3(edition.id) && track("print_a3_request", { edition_id: edition.id, edition_kind: edition.kind })} className="self-center text-xs text-caption underline underline-offset-4 hover:text-stone">
       {DOWNLOADS_COPY.a3.ask}
     </button>
   )

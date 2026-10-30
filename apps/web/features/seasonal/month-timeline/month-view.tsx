@@ -91,7 +91,7 @@ export function MonthView({ month }: { month: Month }) {
               <FoodCard key={food.id} food={food} />
             ))}
           </FoodGrid>
-          <DownloadsCard className="mt-4 lg:max-w-[420px]" />
+          <DownloadsCard placement="month-timeline" className="mt-4 lg:max-w-[420px]" />
         </section>
 
         <footer className="mt-8 flex flex-col gap-4 lg:hidden">

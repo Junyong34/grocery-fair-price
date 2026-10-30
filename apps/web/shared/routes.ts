@@ -48,6 +48,9 @@ export const routes = {
     downloadFile: (id: string, paper: PublishedPaper) => `/seasonal/downloads/${id}/${paper.toLowerCase()}`,
   },
 
+  /** 개인정보 처리방침 */
+  privacy: "/privacy",
+
   /** 인쇄물 어드민. 개발 서버에서만 열린다(.scratch/calendar-print/spec.md). */
   admin: {
     root: "/admin",

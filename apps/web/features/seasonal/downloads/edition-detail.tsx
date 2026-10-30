@@ -10,7 +10,7 @@ import { EditionActions } from "./edition-actions"
  * 에디션 상세(3-B). 시트와 전체 페이지가 같이 쓴다. 미리보기(월간 달력은 표지와 1월) 아래에 정보와 버튼.
  * title을 넘기면 그 제목을 쓴다(전체 페이지의 h1). 시트는 시트 제목 줄이 이름을 보여 준다.
  */
-export function EditionDetail({ edition, title }: { edition: ManifestEntry; title?: React.ReactNode }) {
+export function EditionDetail({ edition, title, placement }: { edition: ManifestEntry; title?: React.ReactNode; placement: "sheet" | "page" }) {
   const name = editionName(edition)
   return (
     <div className="flex flex-col gap-4">
@@ -37,7 +37,7 @@ export function EditionDetail({ edition, title }: { edition: ManifestEntry; titl
         <p>{DOWNLOADS_COPY.printTips.size}</p>
         {edition.kind === "monthly" && <p>{DOWNLOADS_COPY.printTips.oneMonth}</p>}
       </div>
-      <EditionActions edition={edition} />
+      <EditionActions edition={edition} placement={placement} />
     </div>
   )
 }

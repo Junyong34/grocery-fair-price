@@ -117,6 +117,7 @@ import 경로:
 | `/print?spec=&paper=&page=` | 인쇄 전용 페이지 (개발 서버 전용, 운영 404) | `app/print/page.tsx` | `features/print/print-document` |
 | (제철 화면 안에서 이동) | 1i 품종 상세 (하단 시트) | `seasonal/@sheet/(.)foods/[food]/page.tsx` | `components/detail-sheet` + `food-detail` |
 | `/api/og` | 공유 미리보기 이미지 1200×630 | `app/api/og/route.tsx` | 쿼리 `title`, `subtitle`, `badge`, `season` |
+| `/privacy` | 개인정보 처리방침 (가격 셸) | `(price)/privacy/page.tsx` | `features/legal/privacy/` (본문 `privacy-content.ts`) |
 | `/sitemap.xml`, `/robots.txt` | 검색 색인 | `app/sitemap.ts`, `app/robots.ts` | `shared/seo/pages.ts` 레지스트리, 색인 스위치 |
 
 표의 화면 컴포넌트 경로는 가격 화면(P1~P4)은 `apps/web/`, 제철 화면은 `apps/web/features/seasonal/` 기준이다. 가격 화면 명세는 `.scratch/price-screens/spec.md`. 모든 경로는 `apps/web/shared/routes.ts`의 `routes`로 만든다. 2a의 특정 달은 해시 `routes.seasonal.rootAt(month)`(`/seasonal#month-N`)로 연다.
@@ -214,6 +215,8 @@ import 경로:
 | `today-context.tsx` | `TodayProvider`, `useToday()`: 서버가 만든 Promise를 클라이언트가 `use()`로 읽는다. `<Suspense>` 안에서만 |
 | `eaten-store.ts` | 먹음 기록: 연도 → 품종 id 목록. localStorage `seasonal:eaten`. `toggleEaten`, `useEatenIds`, `useIsEaten` |
 | `shell/` | 가격과 제철이 같이 쓰는 셸: `site-shell`(헤더 + 본문 + 하단 내비), `site-nav`(`SiteHeader`, `FloatingNav`. 내비 칸 72px. 화면별 모바일 헤더 타입은 `HeaderBar`가 헤더의 바 자리에 포털로 그린다), `menus`(영역별 메뉴 설정: 가격 = 시세 · 제철달력 · 담은 품종, 제철 = 시세 · 제철달력 · 계절 · 나의 식탁), `nav-link`(활성 판정). 메뉴 배지(담은 개수)는 영역 레이아웃이 `badges`로 넣는다 |
+| `analytics/` | GA4: `events.ts`(이벤트 카탈로그. 이벤트를 더하고 지우는 곳은 여기 하나, `REGISTERED_PARAMS`는 GA에 등록한 매개변수)와 규칙 테스트, `config.ts`(`GA_MEASUREMENT_ID` · `GA_DEBUG`를 읽는 곳), `analytics-tag.tsx`(루트 layout이 그린다), `track.ts`(`track(이름, 매개변수)`, 화면은 이것만 부른다), `tracked-link.tsx`(서버 컴포넌트 링크에 이벤트) |
+| `downloads-manifest.ts` | 게시된 인쇄물 매니페스트(`DOWNLOADS`, `findEdition`, `findWithdrawn`). 내려받기 화면과 sitemap이 같이 읽는다 |
 | `brand-logo.tsx` | 고운돋움 Regular를 패스로 만든 장볼날 가로 로고. 모바일에서 접힌 헤더는 심볼만 보여준다 |
 
 ## 5. 상태와 "오늘"

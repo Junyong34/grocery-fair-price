@@ -14,7 +14,7 @@ import { routes } from "@/shared/routes"
 import { setSettings, useSettings } from "../stores/settings-store"
 import { CalendarStylePicker } from "./calendar-style-picker"
 
-/** ⚙ 표시 설정 내용(명세 4절. 24절기 표시는 MVP 밖). 맨 아래에 PDF 내려받기 화면으로 가는 링크가 있다. */
+/** ⚙ 표시 설정 내용(명세 4절. 24절기 표시는 MVP 밖). 맨 아래에 PDF 내려받기 화면과 개인정보 처리방침으로 가는 링크가 있다. */
 export function SettingsFields({ onNavigate }: { onNavigate?: () => void }) {
   const { showHolidays, showEaten, calendarStyle, monthLabel } = useSettings((state) => state)
   return (
@@ -50,6 +50,9 @@ export function SettingsFields({ onNavigate }: { onNavigate?: () => void }) {
       <Link href={routes.seasonal.downloads} onClick={onNavigate} className="flex items-center justify-between gap-4 py-3 text-[15px] text-ink">
         {DOWNLOADS_COPY.settingsLink}
         <ChevronRight aria-hidden size={18} strokeWidth={1.6} className="text-stone" />
+      </Link>
+      <Link href={routes.privacy} onClick={onNavigate} className="py-3 text-[13px] text-stone">
+        개인정보 처리방침
       </Link>
     </div>
   )
