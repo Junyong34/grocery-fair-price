@@ -5,9 +5,13 @@ import { DEFAULT_SPECS, LAYOUTS, MONTHLY_COVERS, parsePrintSpec, PRINT_KINDS, ty
 import { wireframeOf, wireframesOf } from "../lib/wireframe-catalog"
 
 import { getAt, setAt } from "../lib/spec-path"
-import { FOOD_CATEGORIES, isFieldShown, KIND_SECTIONS, shownField, type OptionFieldSpec } from "./option-fields"
+import { printYearChoices } from "../lib/year-range"
+import { FOOD_CATEGORIES, isFieldShown, KIND_SECTIONS, shownField, type FieldContext, type OptionFieldSpec } from "./option-fields"
 
 // 폼(KIND_SECTIONS)과 사양 스키마(parsePrintSpec)가 어긋나지 않는지 본다. 폼이 내는 값은 모두 사양으로 읽혀야 하고, 사양의 값은 모두 폼에서 바꿀 수 있어야 한다.
+
+/** 패널이 넘기는 바깥 값. 올해 2026 기준 연도 선택지(2021~2027). */
+const CONTEXT: FieldContext = { years: printYearChoices(2026) }
 
 /** 고정값이라 폼에 없는 경로. */
 const FIXED = new Set(["version", "kind"])
@@ -31,6 +35,8 @@ function samples(field: OptionFieldSpec): unknown[] {
       return ["제목"]
     case "categories":
       return [[], FOOD_CATEGORIES]
+    case "year":
+      return [...CONTEXT.years]
   }
 }
 
@@ -186,7 +192,7 @@ describe("구성마다 숨는 옵션", () => {
 
   it("연간 달 표기의 '그림 위 큰 숫자'는 그림 칸이 있는 짝 체크무늬에서만 고를 수 있다", () => {
     const values = (layout: "pairs" | "hero-top" | "chart") => {
-      const shown = shownField(field("year-sheet", "monthLabel"), { ...DEFAULT_SPECS["year-sheet"], layout })
+      const shown = shownField(field("year-sheet", "monthLabel"), { ...DEFAULT_SPECS["year-sheet"], layout }, CONTEXT)
       return shown.type === "select" ? shown.options.map((option) => option.value) : []
     }
     expect(values("pairs")).toContain("big-number")
@@ -233,7 +239,7 @@ describe("구성 썸네일 표(선택지 → 와이어프레임 안)", () => {
 describe("품종 개수 상한", () => {
   const foodsMax = (spec: PrintSpec) => {
     const field = KIND_SECTIONS[spec.kind].flatMap((section) => section.fields).find((f) => f.path.join(".") === "foods.max")!
-    const shown = shownField(field, spec)
+    const shown = shownField(field, spec, CONTEXT)
     return shown.type === "number" ? shown.max : undefined
   }
 
@@ -242,5 +248,21 @@ describe("품종 개수 상한", () => {
     expect(foodsMax({ ...poster, layout: "cells" })).toBe(12)
     expect(foodsMax({ ...poster, layout: "wheel" })).toBe(4)
     expect(foodsMax({ ...poster, layout: "rows-check" })).toBe(6)
+  })
+})
+
+describe("연도", () => {
+  const yearField = (kind: "monthly" | "year-sheet") => KIND_SECTIONS[kind].flatMap((section) => section.fields).find((f) => f.path.join(".") === "year")!
+
+  it.each(["monthly", "year-sheet"] as const)("%s: 연도 필드는 넘겨받은 연도만 선택지로 보인다", (kind) => {
+    const shown = shownField(yearField(kind), DEFAULT_SPECS[kind], { years: printYearChoices(2026, 2019) })
+    expect(shown.type).toBe("select")
+    expect(shown.type === "select" && shown.options.map((option) => option.value)).toEqual([2019, 2021, 2022, 2023, 2024, 2025, 2026, 2027])
+    expect(shown.type === "select" && shown.options[0]!.label).toBe("2019년")
+  })
+
+  it("연도가 없는 종류에는 연도 필드가 없다", () => {
+    for (const kind of ["season-poster", "month-poster"] as const)
+      expect(KIND_SECTIONS[kind].flatMap((section) => section.fields).some((f) => f.type === "year"), kind).toBe(false)
   })
 })

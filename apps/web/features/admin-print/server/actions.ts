@@ -5,11 +5,13 @@ import { refresh } from "next/cache"
 import { redirect } from "next/navigation"
 
 import { EDITION_LIMITS, nextEditionId, parseEdition, type BuildRecord, type Edition } from "@workspace/seasonal/print/edition"
-import { DEFAULT_SPECS, PRINT_KINDS, type PrintKind } from "@workspace/seasonal/print/spec"
+import { DEFAULT_SPECS, PRINT_KINDS, type PrintKind, type PrintSpec } from "@workspace/seasonal/print/spec"
 
 import { routes } from "@/shared/routes"
+import { getSeoulToday } from "@/shared/today"
 
 import { savePlan } from "../lib/publish"
+import { kindHasYear, printYearError, specYear } from "../lib/year-range"
 import type { ActionResult, FormState } from "../types"
 import { listEditions, readBuild, readEdition, removeEdition, writeBuild, writeEdition } from "./files"
 import { generatePdfs } from "./generate"
@@ -24,13 +26,21 @@ export async function createEdition(_state: FormState, formData: FormData): Prom
   assertAdmin()
   const kind = formData.get("kind")
   if (!isPrintKind(kind)) return { error: "종류를 고르세요." }
+  let spec: PrintSpec = DEFAULT_SPECS[kind]
+  if (kindHasYear(kind)) {
+    // 폼은 범위 안 연도만 내놓지만, 자정을 넘겨 범위가 바뀌었거나 값을 손댄 요청도 여기서 막는다.
+    const year = Number(formData.get("year"))
+    const yearError = printYearError(year, (await getSeoulToday()).year)
+    if (yearError) return { error: yearError }
+    spec = { ...spec, year } as PrintSpec
+  }
   const existing = (await listEditions()).map((edition) => edition.id)
   const edition = parseEdition({
     id: nextEditionId(kind, existing),
     title: String(formData.get("title") ?? ""),
     description: "",
     status: "draft",
-    spec: DEFAULT_SPECS[kind],
+    spec,
   })
   if (edition instanceof Error) return { error: `이름은 1~${EDITION_LIMITS.title}자로 적어 주세요.` }
   await writeEdition(edition)
@@ -43,6 +53,10 @@ export async function saveEdition(value: Edition): Promise<ActionResult> {
   if (edition instanceof Error) return { ok: false, error: edition.message }
   const saved = await readEdition(edition.id)
   if (!saved) return missing(edition.id)
+  // 연도는 범위(lib/year-range.ts) 안에서만 바꾼다. 범위 밖이어도 저장된 그 연도 그대로면 받는다.
+  const year = specYear(edition.spec)
+  const yearError = year === undefined ? undefined : printYearError(year, (await getSeoulToday()).year, specYear(saved.spec))
+  if (yearError) return { ok: false, error: yearError }
   const plan = savePlan(saved, edition, { build: await readBuild(edition.id), storageReady: storageReady() })
   if ("error" in plan) return { ok: false, error: plan.error }
   try {

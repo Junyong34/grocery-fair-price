@@ -6,7 +6,8 @@ import type { EditionSummary } from "../types"
 import { BOARD_COLUMNS } from "./columns"
 import { EditionRow } from "./edition-row"
 
-export function KindGroup({ kind, editions }: { kind: PrintKind; editions: readonly EditionSummary[] }) {
+/** yearLabel: 연도 필터를 고른 상태면 그 이름("2026년", "연도 없음"). 빈 목록 문구가 필터 때문이라고 알려 준다. */
+export function KindGroup({ kind, editions, yearLabel }: { kind: PrintKind; editions: readonly EditionSummary[]; yearLabel?: string }) {
   const headingId = `kind-${kind}`
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-4">
@@ -20,7 +21,9 @@ export function KindGroup({ kind, editions }: { kind: PrintKind; editions: reado
         </div>
       </header>
       {editions.length === 0 ? (
-        <p className="rounded-2xl bg-hairline/50 px-5 py-4 text-sm text-stone">이 종류의 에디션이 없어요. “새 에디션”에서 만들 수 있어요.</p>
+        <p className="rounded-2xl bg-hairline/50 px-5 py-4 text-sm text-stone">
+          {yearLabel ? `${yearLabel}에 해당하는 이 종류의 에디션이 없어요. 연도를 “전체 연도”로 바꾸면 모두 보여요.` : "이 종류의 에디션이 없어요. “새 에디션”에서 만들 수 있어요."}
+        </p>
       ) : (
         <div role="table" aria-labelledby={headingId} className="overflow-hidden rounded-2xl bg-surface ring-1 ring-hairline">
           <div role="row" className={`hidden bg-hairline/60 px-5 py-2.5 text-[13px] font-semibold text-stone sm:grid ${BOARD_COLUMNS}`}>

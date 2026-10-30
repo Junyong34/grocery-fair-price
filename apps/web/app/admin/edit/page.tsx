@@ -7,6 +7,7 @@ import { Skeleton } from "@workspace/ui/components/skeleton"
 import { EditionEditor } from "@/features/admin-print/editor/edition-editor"
 import { getEditionEditor } from "@/features/admin-print/server/queries"
 import { routes } from "@/shared/routes"
+import { getSeoulToday } from "@/shared/today"
 
 export default function Page(props: PageProps<"/admin/edit">) {
   return (
@@ -25,7 +26,7 @@ export default function Page(props: PageProps<"/admin/edit">) {
 
 async function Editor({ searchParams }: { searchParams: PageProps<"/admin/edit">["searchParams"] }) {
   const { id } = await searchParams
-  const data = typeof id === "string" ? await getEditionEditor(id) : undefined
+  const [data, today] = await Promise.all([typeof id === "string" ? getEditionEditor(id) : undefined, getSeoulToday()])
   if (!data) notFound()
-  return <EditionEditor key={data.edition.id} saved={data.edition} build={data.build} storageReady={data.storageReady} />
+  return <EditionEditor key={data.edition.id} saved={data.edition} build={data.build} storageReady={data.storageReady} currentYear={today.year} />
 }

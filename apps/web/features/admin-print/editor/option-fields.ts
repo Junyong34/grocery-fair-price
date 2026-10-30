@@ -32,6 +32,8 @@ export type OptionFieldSpec = (
       maxFor?: (spec: PrintSpec) => number
     }
   | { type: "text"; label: string; path: readonly string[] }
+  /** 달력 연도. 선택지는 올해에 따라 달라 패널에 보일 때(shownField) 선택 필드로 바꾼다(lib/year-range.ts). */
+  | { type: "year"; label: string; path: readonly string[] }
   | { type: "categories"; label: string; path: readonly string[] }
 ) & {
   hint?: string
@@ -45,8 +47,16 @@ export function isFieldShown(field: OptionFieldSpec, spec: PrintSpec): boolean {
   return field.when?.(spec) ?? true
 }
 
-/** 패널에 보일 모양. 선택 필드에서 이 구성에 뜻이 없는 선택지(Option.when)를 빼고, 숫자 필드의 최대값을 이 구성의 상한으로 맞춘다. */
-export function shownField(field: OptionFieldSpec, spec: PrintSpec): OptionFieldSpec {
+/** 패널이 아는 바깥 값. years는 고를 수 있는 연도(올해 기준 범위 + 저장된 연도, printYearChoices)다. */
+export type FieldContext = { years: readonly number[] }
+
+/**
+ * 패널에 보일 모양. 선택 필드에서 이 구성에 뜻이 없는 선택지(Option.when)를 빼고, 숫자 필드의 최대값을 이 구성의 상한으로 맞춘다.
+ * 연도 필드는 context.years를 선택지로 하는 선택 필드가 된다.
+ */
+export function shownField(field: OptionFieldSpec, spec: PrintSpec, context: FieldContext): OptionFieldSpec {
+  if (field.type === "year")
+    return { type: "select", label: field.label, path: field.path, hint: field.hint, when: field.when, options: context.years.map((year) => ({ value: year, label: `${year}년` })) }
   if (field.type === "number" && field.maxFor) return { ...field, max: field.maxFor(spec) }
   if (field.type !== "select" || !field.options.some((option) => option.when)) return field
   return { ...field, options: field.options.filter((option) => option.when?.(spec) ?? true) }
@@ -62,7 +72,7 @@ const margin: OptionFieldSpec = {
   options: options({ safe: "기본 여백", none: "좁은 여백" }),
   hint: "좁은 여백은 그림과 달력을 넓게 써요. 바탕색은 어느 쪽이든 용지 끝까지 칠해져요.",
 }
-const year: OptionFieldSpec = { type: "number", label: "연도", path: ["year"], min: 2020, max: 2100 }
+const year: OptionFieldSpec = { type: "year", label: "연도", path: ["year"], hint: "올해 기준 5년 전부터 1년 뒤까지 고를 수 있어요." }
 const title: OptionFieldSpec = { type: "text", label: "제목", path: ["title"] }
 /** 선택지 이름은 1월로 적은 그 표기다(두 자리가 숫자와 구별되게). 곁들이는 영문은 한 칸 띄워 붙인다. */
 const monthLabel: OptionFieldSpec = {

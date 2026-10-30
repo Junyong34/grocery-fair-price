@@ -11,6 +11,7 @@ export function toEditionSummary(edition: Edition, build: BuildRecord | undefine
     title: edition.title,
     status: edition.status,
     currentBuildDate: isBuildCurrent(edition.spec, build) ? formatBuildDate(build.generatedAt) : null,
+    year: "year" in edition.spec ? edition.spec.year : null,
   }
 }
 

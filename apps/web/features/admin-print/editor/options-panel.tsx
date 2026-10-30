@@ -9,14 +9,15 @@ import type { PrintSpec } from "@workspace/seasonal/print/spec"
 import { useScrollStrip } from "../hooks/use-scroll-strip"
 import { getAt } from "../lib/spec-path"
 import { OptionField } from "./option-field"
-import { isFieldShown, KIND_SECTIONS, shownField } from "./option-fields"
+import { isFieldShown, KIND_SECTIONS, shownField, type FieldContext } from "./option-fields"
 
-type Props = { spec: PrintSpec; error: string | undefined; onChange: (path: readonly string[], value: unknown) => void }
+/** context는 연도 선택지처럼 사양 밖에서 정해지는 값이다(option-fields.ts FieldContext). */
+type Props = { spec: PrintSpec; context: FieldContext; error: string | undefined; onChange: (path: readonly string[], value: unknown) => void }
 
-export function OptionsPanel({ spec, error, onChange }: Props) {
+export function OptionsPanel({ spec, context, error, onChange }: Props) {
   // 고른 구성에서 뜻이 없는 옵션·선택지는 숨긴다. 모두 숨겨진 묶음은 탭째 뺀다.
   const sections = KIND_SECTIONS[spec.kind]
-    .map((section) => ({ ...section, fields: section.fields.filter((field) => isFieldShown(field, spec)).map((field) => shownField(field, spec)) }))
+    .map((section) => ({ ...section, fields: section.fields.filter((field) => isFieldShown(field, spec)).map((field) => shownField(field, spec, context)) }))
     .filter((section) => section.fields.length > 0)
   const [tab, setTab] = useState(sections[0]!.title)
   const strip = useScrollStrip<HTMLDivElement>(tab)
