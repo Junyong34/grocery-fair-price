@@ -1,6 +1,7 @@
 // 카탈로그를 DB에 넣는다 (ingest-foundation/08).
 //   분류 표(applyClasses): 운영자 표라 소유자(postgres) 접속으로만 쓴다
-//   매핑(applyMappings): ingest_writer가 쓴다. pending만 바꾸고, 이미 다르게 정한 매핑은 고치지 않고 알린다.
+//   매핑(applyMappings): ingest_writer가 쓴다. pending과 카탈로그가 정한 매핑(note 'catalog')은 카탈로그대로 고치고,
+//     운영자가 다르게 정한 매핑은 고치지 않고 알린다.
 //     적재도 파일마다 부른다(onLoad, 09): 처음 본 키를 카탈로그대로 바로 잇는다
 import type { Tx } from "../load/db.ts"
 
@@ -90,6 +91,7 @@ export type MappingConflict = { key: string; current: string; catalog: string }
 
 export type MappingsResult = {
   mapped: number // pending → mapped (원천 키·상품)
+  changed: number // 카탈로그가 바뀌어 고친 카탈로그 매핑 (원천 키)
   ignored: number // 참가격 pending → ignored
   pending: number // 남은 pending (카탈로그에 없는 키)
   conflicts: MappingConflict[] // 이미 다르게 정해져 있어 고치지 않은 것
@@ -129,8 +131,8 @@ export async function applyMappings(tx: Tx, { onLoad = false }: { onLoad?: boole
   }
 
   // ── KAMIS·축평원: source_code_map의 열린 행 (valid_to null)
-  const sourceRows = await tx<(OpenMap & { source: string; key_parts: Record<string, string> })[]>`
-    select si.source, si.source_key as key, si.key_parts, m.id as map_id, m.status, m.role,
+  const sourceRows = await tx<(OpenMap & { source: string; key_parts: Record<string, string>; note: string | null })[]>`
+    select si.source, si.source_key as key, si.key_parts, m.id as map_id, m.status, m.role, m.note,
            v.slug as variety, s.slug as spec
       from price.source_item si
       left join price.source_code_map m on m.source_item_id = si.id and m.valid_to is null
@@ -138,6 +140,7 @@ export async function applyMappings(tx: Tx, { onLoad = false }: { onLoad?: boole
       left join price.spec s on s.id = m.spec_id
      where si.source in ('kamis', 'ekape')`
   const toMap: MapRow[] = []
+  let changed = 0
   let pending = 0
   for (const row of sourceRows) {
     const target = row.source === "kamis" ? kamisTarget(row.key_parts) : ekapeTarget(row.key_parts)
@@ -149,7 +152,13 @@ export async function applyMappings(tx: Tx, { onLoad = false }: { onLoad?: boole
       if (usable(target)) toMap.push({ id: row.map_id, variety: target.variety, spec: target.spec, unit_rule: target.unitRule, role: target.role })
       else pending += 1
     } else if (describe(row) !== describeTarget(target)) {
-      conflicts.push({ key: row.key, current: describe(row), catalog: describeTarget(target) })
+      // 카탈로그가 정한 매핑은 분류를 고친 것이라 기간을 끊지 않고 그 행을 고친다. 관측값은 다시 매핑이 옮긴다
+      if (row.status === "mapped" && row.note === "catalog" && usable(target)) {
+        toMap.push({ id: row.map_id!, variety: target.variety, spec: target.spec, unit_rule: target.unitRule, role: target.role })
+        changed += 1
+      } else {
+        conflicts.push({ key: row.key, current: describe(row), catalog: describeTarget(target) })
+      }
     }
   }
 
@@ -211,5 +220,5 @@ export async function applyMappings(tx: Tx, { onLoad = false }: { onLoad?: boole
       from jsonb_to_recordset(${tx.json(productIgnore)}) as r (product_id int, valid_from date)
      where m.product_id = r.product_id and m.valid_from = r.valid_from`
 
-  return { mapped: toMap.length + productMap.length, ignored: productIgnore.length, pending, conflicts }
+  return { mapped: toMap.length - changed + productMap.length, changed, ignored: productIgnore.length, pending, conflicts }
 }

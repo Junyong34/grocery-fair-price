@@ -60,7 +60,7 @@ describe("적재 때 품종 매핑", () => {
       await applyClasses(tx)
       await load(tx, asKamis({ ctgry_cd: "400", item_cd: "411", vrty_cd: "08", unit: "개", unit_sz: "10" }))
       for (const row of await observationsOf(tx, "kamis:01-400-411-08-04")) {
-        expect(row).toMatchObject({ variety: "apple", spec: "top" })
+        expect(row).toMatchObject({ variety: "apple", spec: "shinano-top" })
         expect(Number(row.per_base)).toBeCloseTo(row.price_raw / 10, 2)
       }
       await load(tx, asKamis({ ctgry_cd: "600", item_cd: "611", vrty_cd: "03", grd_cd: "30", unit: "손", unit_sz: "1" }))

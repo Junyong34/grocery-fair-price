@@ -101,7 +101,7 @@ describe("매핑", () => {
 
       const result = await applyMappings(tx)
 
-      expect(await mapOf(tx, "kamis:01-400-411-08-05")).toEqual({ status: "mapped", variety: "apple", spec: "mid", role: "primary", unit_rule: "retail-ea" })
+      expect(await mapOf(tx, "kamis:01-400-411-08-05")).toEqual({ status: "mapped", variety: "apple", spec: "shinano-mid", role: "primary", unit_rule: "retail-ea" })
       // 배추는 철마다 품종 코드가 바뀐다 (`211-*`)
       expect(await mapOf(tx, "kamis:01-200-211-04-04")).toMatchObject({ status: "mapped", variety: "napa-cabbage", spec: "top" })
       // 한우 안심 1+등급은 축평원에도 있어 KAMIS는 secondary (pipeline 6-1)
@@ -120,6 +120,28 @@ describe("매핑", () => {
       const again = await applyMappings(tx)
       expect(again.mapped).toBe(0)
       expect(again.ignored).toBe(0)
+    })
+  })
+
+  it("카탈로그가 정한 매핑은 카탈로그가 바뀌면 고치고, 운영자가 정한 매핑은 그대로 둔다", async () => {
+    await inRollback(admin, async (tx) => {
+      await applyClasses(tx)
+      await pendingKey(tx, "kamis", "kamis:01-400-411-08-05", { se_cd: "01", ctgry_cd: "400", item_cd: "411", vrty_cd: "08", grd_cd: "05" })
+      // 예전 카탈로그가 시나노골드를 다른 규격에 이었던 상태
+      await tx`
+        update price.source_code_map m
+           set status = 'mapped', note = 'catalog', role = 'primary',
+               variety_id = s.variety_id, spec_id = s.id, unit_rule_id = (select id from price.unit_rule where rule_code = 'retail-ea' order by version desc limit 1)
+          from price.source_item si, price.spec s join price.variety v on v.id = s.variety_id
+         where m.source_item_id = si.id and si.source_key = 'kamis:01-400-411-08-05' and v.slug = 'apple' and s.slug = 'hongro-mid'`
+
+      const result = await applyMappings(tx)
+      expect(result.changed).toBe(1)
+      expect(result.conflicts.map((c) => c.key)).not.toContain("kamis:01-400-411-08-05")
+      expect(await mapOf(tx, "kamis:01-400-411-08-05")).toEqual({ status: "mapped", variety: "apple", spec: "shinano-mid", role: "primary", unit_rule: "retail-ea" })
+      // 샘플 시드의 매핑(note가 catalog 아님)은 운영자가 정한 것으로 본다
+      expect(await mapOf(tx, "ekape:9903-23-일반란")).toMatchObject({ variety: "egg", spec: "xl" })
+      expect((await applyMappings(tx)).changed).toBe(0)
     })
   })
 

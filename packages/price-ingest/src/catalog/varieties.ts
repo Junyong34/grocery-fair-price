@@ -179,7 +179,15 @@ export const VARIETIES: readonly VarietyDef[] = [
   { slug: "bean-sprouts", name: "콩나물", item: "namul", unit: "100g", specs: one({ chamga: [1395, 1623] }) },
 
   // 과일
-  { slug: "apple", name: "사과", item: "apple", unit: "1개", seasonal: ["apple"], specs: grades(["411-07", "411-08"]) },
+  // 사과는 KAMIS 품종마다 규격을 나눈다 (2026-10-30). 부사(후지)는 1년 내내, 홍로는 8~11월, 시나노골드는 10월부터 온다
+  { slug: "apple", name: "사과", item: "apple", unit: "1개", seasonal: ["apple"], specs: [
+    { slug: "fuji-top", name: "부사 상품", kamis: ["411-05-04"] },
+    { slug: "fuji-mid", name: "부사 중품", kamis: ["411-05-05"] },
+    { slug: "hongro-top", name: "홍로 상품", kamis: ["411-07-04"] },
+    { slug: "hongro-mid", name: "홍로 중품", kamis: ["411-07-05"] },
+    { slug: "shinano-top", name: "시나노골드 상품", kamis: ["411-08-04"] },
+    { slug: "shinano-mid", name: "시나노골드 중품", kamis: ["411-08-05"] },
+  ] },
   { slug: "pear", name: "배", item: "pear", unit: "1개", seasonal: ["pear"], specs: grades(["412-01"]) },
   { slug: "peach", name: "복숭아", item: "peach", unit: "1개", seasonal: ["peach"], specs: grades(["413-01"]) },
   { slug: "campbell-grape", name: "캠벨얼리", item: "grape", unit: "100g", seasonal: ["green-grape"], specs: one({ kamis: ["414-01-24"] }) },

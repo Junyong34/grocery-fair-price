@@ -61,11 +61,16 @@ describe("카탈로그 모양", () => {
   })
 })
 
+// 실측한 날(10-19)에는 소매로 오지 않았지만 운영 관측값에 있는 키. 사과 부사는 철이 바뀌는 10월 중순에 잠깐 빠진다
+// (운영 source_item 2023-01-02 ~ 2026-10-29, 2026-10-30 확인)
+const KAMIS_SEEN_LATER = new Set(["411-05-04", "411-05-05"])
+
 describe("실측 코드표 (samples/inventory, 2026-10-19)", () => {
   // 품종 `*`(배추·무)는 철마다 오는 코드가 달라 그 품목이 있는지만 본다
   it("KAMIS 키는 소매로 오는 품목·품종·등급이다", () => {
     const matches = (key: string) => {
       const [item, vrty, grd] = key.split("-")
+      if (KAMIS_SEEN_LATER.has(key)) return true
       if (vrty === "*") return kamisRetail.some((r) => r.item_cd === item)
       return kamisRetail.some((r) => r.item_cd === item && r.vrty_cd === vrty && r.grd_cd === grd)
     }
