@@ -20,20 +20,22 @@ export type ScatterFrame = {
   reserveBottom?: number
   /** 그림·이름표를 놓지 않을 사각형(px, 왼쪽 위 기준). 인쇄 월간 M-E의 모서리 달력 블록처럼 판 안쪽 한 곳을 비울 때 쓴다. */
   avoid?: readonly Box[]
+  /** 화면 판처럼 품종을 많이(SCATTER_MAX_FOODS개까지) 그려 판을 꽉 채운다. 틈이 좁고(SCATTER_DENSE_GAP) 그림이 판 넓이를 더 차지하며, 그림의 최소 크기도 작다. 인쇄 판은 쓰지 않는다. */
+  dense?: boolean
 }
 
 export const SCATTER_FRAMES = {
-  mobile: { width: 339, height: 200, big: false },
-  // 모바일 달 판: 위쪽에 그림, 아래 340px에는 달력이 바닥에 붙어 고정된다(6주짜리 달까지 들어가는 높이). 그림은 달력 위에도 놓을 수 있다.
-  mobileMonth: { width: 339, height: 520, big: false, reserveBottom: 340 },
+  mobile: { width: 339, height: 200, big: false, dense: true },
+  // 모바일 달 판: 위쪽 240px에 그림을 그리고, 아래 360px에는 달력이 바닥에 붙어 고정된다(375 폭에서 5주 달력 + 아래 여백). 그림은 달력 위에도 놓을 수 있다.
+  mobileMonth: { width: 339, height: 600, big: false, reserveBottom: 360, dense: true },
   // 6주짜리 달은 달력이 한 줄 더 길어 판도 그만큼 길다.
-  mobileMonthTall: { width: 339, height: 600, big: false, reserveBottom: 420 },
+  mobileMonthTall: { width: 339, height: 680, big: false, reserveBottom: 440, dense: true },
   // 데스크톱은 품종 판(왼쪽)과 달력(오른쪽)이 한 줄에 놓인다. 판의 가로·세로 비는 그 칸 크기를 따른다.
   desktop: { width: 440, height: 300, big: true },
   // 맨 위 히어로 판: 본문 폭 전체를 쓴다(달력 없음).
-  desktopHero: { width: 752, height: 440, big: true },
+  desktopHero: { width: 752, height: 440, big: true, dense: true },
   // 달 섹션 판: 판 전체가 끌기 범위이고, 오른쪽 52%에는 달력이 얹힌다. 처음 배치는 달력 자리를 피한다.
-  desktopMonth: { width: 752, height: 600, big: true, reserveRight: 391 },
+  desktopMonth: { width: 752, height: 640, big: true, reserveRight: 391, dense: true },
 } as const satisfies Record<string, ScatterFrame>
 
 /** 배치된 품종 하나. 좌표와 크기는 프레임 대비 비율이다. */
@@ -61,17 +63,24 @@ export type ScatterLayout = {
 
 /** 새 그림 하나를 놓을 때 "이미 놓인 그림 하나당" 보는 후보 수. 후보를 개수에 비례해 늘린다(Mitchell 1991, m·n+1). */
 const CANDIDATES_PER_POINT = 10
-/** 그림·이름표 묶음 사이에 남길 틈(프레임 px). 시드 배치와 끌어 옮긴 배치(arrangement)가 같은 값을 쓴다. */
+/** 그림·이름표 묶음 사이에 남길 틈(프레임 px). 시드 배치와 끌어 옮긴 배치(arrangement)가 같은 값을 쓴다. dense 판은 SCATTER_DENSE_GAP. */
 export const SCATTER_GAP = 8
+const SCATTER_DENSE_GAP = 4
+
+/** 프레임의 묶음 사이 틈(px). */
+export function scatterGap(frame: ScatterFrame): number {
+  return frame.dense ? SCATTER_DENSE_GAP : SCATTER_GAP
+}
 const SEED_RELAX_ITERATIONS = 60
 /** 후보 선택 뒤 빈 곳을 고르게 메우는 Lloyd 완화 횟수와 한 번에 가는 비율. 0이면 쓰지 않는다. */
 const LLOYD_ITERATIONS = 10
 const LLOYD_STEP = 0.7
-/** 판 하나에 흩뿌리는 품종 수의 상한. 이보다 많으면 그림·이름표가 서로 겹친다(테스트가 이 수로 확인한다). 나머지는 화면이 이름 목록으로 보인다. */
-export const SCATTER_MAX_FOODS = 20
+/** 화면 판에 흩뿌리는 대표 품종 수의 상한. 한 달 제철은 최대 86개라 다 그리면 너무 빽빽하다(테스트가 12달 모두 이 수로 겹치지 않음을 확인한다). 나머지는 화면이 이름 목록으로 보인다. */
+export const SCATTER_MAX_FOODS = 30
 
 /** 그림이 판 넓이에서 차지하는 비율. 낮을수록 그림이 작고 사이가 넓다. */
 const COVERAGE = 0.45
+const DENSE_COVERAGE = 0.5
 
 /** fill에서 그림을 키워 보는 배율 범위와 이분 탐색 횟수. 배율 1(기본 크기)에서도 겹치면 기본 크기 그대로 둔다. */
 const FILL_GROW = { max: 3, steps: 6 } as const
@@ -103,8 +112,8 @@ export function scatterLayout({
   const open = (W - (frame.reserveRight ?? 0)) * (H - (frame.reserveBottom ?? 0)) - avoid.reduce((sum, box) => sum + box.width * box.height, 0)
   const base = Math.min(
     Math.max(
-      Math.sqrt((Math.max(open, 0) * COVERAGE) / Math.max(n, 1)) - label * 0.5,
-      big ? 34 : 24
+      Math.sqrt((Math.max(open, 0) * (frame.dense ? DENSE_COVERAGE : COVERAGE)) / Math.max(n, 1)) - label * 0.5,
+      frame.dense ? (big ? 26 : 18) : big ? 34 : 24
     ),
     big ? 120 : 96
   )
@@ -115,7 +124,7 @@ export function scatterLayout({
     height: H - (frame.reserveBottom ?? 0) - label,
   }
   // 이름표까지 영역 안에 남도록, 이름표 높이를 포함한 전체 높이를 준다.
-  const relaxOptions = { bounds: { width: area.width, height: area.height + label }, gap: SCATTER_GAP, obstacles: avoid }
+  const relaxOptions = { bounds: { width: area.width, height: area.height + label }, gap: scatterGap(frame), obstacles: avoid }
 
   /** 기본 크기에 grow를 곱해 놓아 본다. 같은 grow면 같은 결과다(난수열을 매번 새로 시작). */
   const arrange = (grow: number) => {

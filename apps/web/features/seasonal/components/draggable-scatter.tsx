@@ -43,6 +43,11 @@ const LABEL_GAP = 0.06
 const DEFAULT_BOTTOM = 1
 /** 판 위 달력의 처음 자리(오른쪽 아래): 오른쪽 끝에서 띄울 폭(판 폭 대비)과 아래 끝에서 띄울 높이(판 높이 대비). */
 const CALENDAR_INSET = { right: 0.02, bottom: 0.03 }
+/**
+ * 모바일 달 판(reserveBottom)의 달력을 이 판 폭(375 화면의 판 폭, css px)으로 그린 뒤 실제 판 폭에 맞춰 확대·축소한다.
+ * 판은 폭에 비례해 커지지만 달력 글자는 고정 크기라, 그대로 두면 넓은 화면에서 비워 둔 달력 자리 위에 빈 띠가 남는다.
+ */
+const MOBILE_CALENDAR_BASE_WIDTH = 309
 
 /** 끌고 있는 그림. 끌기 판단(탭 · 길게 누름 · 손가락 구분)은 useDragGesture가 한다. */
 type FoodDrag = {
@@ -106,6 +111,7 @@ export function DraggableScatter({
   const spots = live?.spots ?? rest
 
   const field = useRef<HTMLDivElement>(null)
+  const calendarScale = useCalendarScale(field, Boolean(children && frame.reserveBottom))
   const food = useRef<FoodDrag | null>(null)
   const suppressClick = useRef(false)
   const frameRequest = useRef(0)
@@ -244,7 +250,11 @@ export function DraggableScatter({
       />
       {children && frame.reserveBottom && (
         // 모바일 달 판: 달력은 판 바닥에 붙어 고정이고 끌 수 없다. 그림만 그 위에 놓을 수 있다.
-        <div className="absolute inset-x-0 bottom-0 z-0 px-2 pb-2">
+        // 375 화면 크기로 그리고 판 폭에 맞춰 키워, 어느 폭에서나 비워 둔 자리(reserveBottom)를 채운다.
+        <div
+          className="absolute bottom-0 left-0 z-0 origin-bottom-left px-2 pb-2"
+          style={{ width: MOBILE_CALENDAR_BASE_WIDTH, scale: calendarScale }}
+        >
           {children}
         </div>
       )}
@@ -327,6 +337,19 @@ export function DraggableScatter({
       )}
     </div>
   )
+}
+
+/** 판 폭 / MOBILE_CALENDAR_BASE_WIDTH. 재기 전(서버 HTML·첫 렌더)은 1이다. */
+function useCalendarScale(field: React.RefObject<HTMLDivElement | null>, enabled: boolean) {
+  const [scale, setScale] = useState(1)
+  useEffect(() => {
+    const el = field.current
+    if (!enabled || !el) return
+    const observer = new ResizeObserver(([entry]) => entry && setScale(entry.contentRect.width / MOBILE_CALENDAR_BASE_WIDTH))
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [field, enabled])
+  return scale
 }
 
 /**

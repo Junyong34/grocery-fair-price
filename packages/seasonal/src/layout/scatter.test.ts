@@ -146,36 +146,35 @@ describe("scatterLayout Lloyd 완화", () => {
 })
 
 describe("scatterLayout 이름표", () => {
-  it("실제 품종으로 그림과 이름표가 서로 겹치지 않는다(원 ↔ 이름표 포함)", () => {
-    for (const frame of [SCATTER_FRAMES.desktopMonth, SCATTER_FRAMES.desktopHero, SCATTER_FRAMES.mobileMonth]) {
-      for (const month of [1, 4, 8, 10, 11]) {
-        const foods = monthHighlights(month, SCATTER_MAX_FOODS)
-        const { items } = scatterLayout({ month, ids: foods.map((food) => food.id), frame })
-        const parts = items.map((item) => {
-          const r = (item.size * frame.width) / 2
-          const x = item.cx * frame.width
-          const y = item.cy * frame.height
-          const w = labelWidth(foods.find((food) => food.id === item.id)!.name, frame)
-          const h = labelHeight(frame)
-          return { x, y, r, rect: { x0: x - w / 2, x1: x + w / 2, y0: y + r, y1: y + r + h } }
-        })
-        const circleHitsRect = (c: (typeof parts)[number], other: (typeof parts)[number]) => {
-          const nx = Math.min(Math.max(c.x, other.rect.x0), other.rect.x1)
-          const ny = Math.min(Math.max(c.y, other.rect.y0), other.rect.y1)
-          return Math.hypot(nx - c.x, ny - c.y) < c.r - 0.5
-        }
-        for (let i = 0; i < parts.length; i++) {
-          for (let j = i + 1; j < parts.length; j++) {
-            const a = parts[i]!
-            const b = parts[j]!
-            const label = `${month}월 ${foods[i]!.name}-${foods[j]!.name}`
-            expect(Math.hypot(a.x - b.x, a.y - b.y) >= a.r + b.r - 0.5, `${label} 원-원`).toBe(true)
-            expect(circleHitsRect(a, b), `${label} 원-이름표`).toBe(false)
-            expect(circleHitsRect(b, a), `${label} 이름표-원`).toBe(false)
-            const overlapX = Math.min(a.rect.x1, b.rect.x1) - Math.max(a.rect.x0, b.rect.x0)
-            const overlapY = Math.min(a.rect.y1, b.rect.y1) - Math.max(a.rect.y0, b.rect.y0)
-            expect(overlapX > 0.5 && overlapY > 0.5, `${label} 이름표-이름표`).toBe(false)
-          }
+  // 화면 판(dense)은 대표 품종을 SCATTER_MAX_FOODS개까지 그린다. 12달 모두 확인한다.
+  it.each(Object.entries(SCATTER_FRAMES as Record<string, ScatterFrame>).filter(([, frame]) => frame.dense))("%s: 실제 품종으로 그림과 이름표가 서로 겹치지 않는다(원 ↔ 이름표 포함)", (_, frame) => {
+    for (let month = 1; month <= 12; month++) {
+      const foods = monthHighlights(month, SCATTER_MAX_FOODS)
+      const { items } = scatterLayout({ month, ids: foods.map((food) => food.id), frame })
+      const parts = items.map((item) => {
+        const r = (item.size * frame.width) / 2
+        const x = item.cx * frame.width
+        const y = item.cy * frame.height
+        const w = labelWidth(foods.find((food) => food.id === item.id)!.name, frame)
+        const h = labelHeight(frame)
+        return { x, y, r, rect: { x0: x - w / 2, x1: x + w / 2, y0: y + r, y1: y + r + h } }
+      })
+      const circleHitsRect = (c: (typeof parts)[number], other: (typeof parts)[number]) => {
+        const nx = Math.min(Math.max(c.x, other.rect.x0), other.rect.x1)
+        const ny = Math.min(Math.max(c.y, other.rect.y0), other.rect.y1)
+        return Math.hypot(nx - c.x, ny - c.y) < c.r - 0.5
+      }
+      for (let i = 0; i < parts.length; i++) {
+        for (let j = i + 1; j < parts.length; j++) {
+          const a = parts[i]!
+          const b = parts[j]!
+          const label = `${month}월 ${foods[i]!.name}-${foods[j]!.name}`
+          expect(Math.hypot(a.x - b.x, a.y - b.y) >= a.r + b.r - 0.5, `${label} 원-원`).toBe(true)
+          expect(circleHitsRect(a, b), `${label} 원-이름표`).toBe(false)
+          expect(circleHitsRect(b, a), `${label} 이름표-원`).toBe(false)
+          const overlapX = Math.min(a.rect.x1, b.rect.x1) - Math.max(a.rect.x0, b.rect.x0)
+          const overlapY = Math.min(a.rect.y1, b.rect.y1) - Math.max(a.rect.y0, b.rect.y0)
+          expect(overlapX > 0.5 && overlapY > 0.5, `${label} 이름표-이름표`).toBe(false)
         }
       }
     }

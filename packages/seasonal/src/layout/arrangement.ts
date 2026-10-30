@@ -2,7 +2,7 @@ import { relaxShapes, type Shape } from "../geometry/relax-shapes"
 import {
   findOpenSpot,
   labelBox,
-  SCATTER_GAP,
+  scatterGap,
   scatterRandom,
   type PlacedCircle,
   type ScatterFrame,
@@ -11,7 +11,7 @@ import {
 
 // 판 위 그림의 자리. 시드 배치(scatter) 뒤에 오는 단계를 모두 맡는다:
 // 저장된 배치를 덧입힌 쉬는 자리(restingSpots), 끄는 동안의 자리(moveSpot), 놓은 뒤의 자리(settleSpots), 판 위 달력 자리(clampCalendar).
-// 모든 단계가 시드 배치와 같은 겹침 규칙(그림 원 + 아래 이름표, SCATTER_GAP)을 쓴다. 끌기 범위는 프레임 전체다.
+// 모든 단계가 시드 배치와 같은 겹침 규칙(그림 원 + 아래 이름표, scatterGap)을 쓴다. 끌기 범위는 프레임 전체다.
 // 좌표는 프레임 대비 비율(0..1)이다. DOM·React와 무관한 순수 함수다.
 
 /** 그림 중심(프레임 대비 비율). */
@@ -104,6 +104,6 @@ function relax(spots: Spots, seed: ScatterLayout, frame: ScatterFrame, pinned?: 
       ...labelBox(item.id, frame),
     }
   })
-  const relaxed = relaxShapes(shapes, { bounds: frame, pinned, gap: SCATTER_GAP })
+  const relaxed = relaxShapes(shapes, { bounds: frame, pinned, gap: scatterGap(frame) })
   return new Map(relaxed.map((shape) => [shape.id, { cx: shape.x / frame.width, cy: shape.y / frame.height }]))
 }

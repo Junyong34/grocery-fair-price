@@ -94,7 +94,7 @@ describe("moveSpot", () => {
 
   it("실제 품종을 끌어 놓아도 그림과 이름표가 겹치지 않는다", () => {
     for (const frame of [SCATTER_FRAMES.desktopMonth, SCATTER_FRAMES.mobileMonth]) {
-      for (const month of [1, 4, 8, 10, 11]) {
+      for (const month of [1, 4, 8, 9, 10, 11]) {
         const ids = monthHighlights(month, SCATTER_MAX_FOODS).map((food) => food.id)
         const seed = scatterLayout({ month, ids, frame })
         let spots = restingSpots({ month, seed, saved: undefined, frame })

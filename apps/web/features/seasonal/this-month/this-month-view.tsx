@@ -29,7 +29,7 @@ import { YearEnd } from "./year-end"
  */
 export function ThisMonthView({ today }: { today: CalendarDate }) {
   const { year, month: thisMonth } = today
-  // 판에는 그 달 대표 품종만 그린다(한 달 제철이 최대 86개라 다 그리면 그림과 이름표가 겹친다). 나머지는 판 아래 이름 목록이다.
+  // 판에는 그 달 대표 품종을 SCATTER_MAX_FOODS개까지 그린다(한 달 제철이 최대 86개라 다 그리면 너무 빽빽하다). 나머지는 판 아래 이름 목록이다.
   const months = MONTHS.map((month) => ({ month, foods: foodsInMonth(month), pictured: monthHighlights(month, SCATTER_MAX_FOODS), note: MONTH_NOTES[month] }))
   const current = months[thisMonth - 1]!
 
