@@ -1088,7 +1088,7 @@ raw_object
 
 목록 열(`current_judgment`의 `as_of`, `today_price`, `usual`, `verdict`, `diff_pct`)도 같은 행에서 채운다. `verdict`는 DB 이름(`cheap` · `normal` · `expensive`, 판정 전은 `null`)이고 화면 이름(`pricey`, `none`)은 payload에 있다. `confidence`는 쓰지 않는다(`null`).
 
-아직 payload에 없는 것: 출처별 최신 상태(`freshness`)와 장애 알림(`notices`, 5장). 웹앱 연결 때 정한다 (ingest-foundation/06 "아직 열림"). 출처는 상세 화면이 `basis`로, 목록은 `LIST_BASIS`(`packages/price/src/copy.ts`, "KAMIS 전국 조사 시장" 고정)로 단다. 목록에 축평원 시세 품종(삼겹살 등)이 섞이므로 웹앱 연결 때 목록 근거 문구를 고친다.
+아직 payload에 없는 것: 출처별 최신 상태(`freshness`)와 장애 알림(`notices`, 5장). 웹앱 연결 때 정한다 (ingest-foundation/06 "아직 열림"). 출처는 상세 화면과 목록 모두 행의 `basis`로 단다. 목록 아래 한 줄은 `listBasisLine`(`packages/price/src/copy.ts`)이 행들의 출처를 처음 나온 순서대로 한 번씩 쓴다 ("KAMIS 전국 조사 시장 · 축평원 전국 평균").
 
 ### 4-2. 진열대 앞 즉시 판정 (클라이언트 계산)
 
@@ -1097,7 +1097,7 @@ raw_object
 { "variety": "pork-belly-kr", "spec": "default", "price": 15900, "qty": 500, "unit": "g", "promo": null }
 // 응답
 { "price_per_base": 3180, "usual": 2724, "diff_pct": 16.7, "verdict": "expensive",
-  "label": "평소보다 17% 비싸요", "converted": "500g → 100g당 3,180원", "confidence": { "level": 3, "max": 4 } }
+  "label": "평소보다 17% 비싸요", "converted": "500g → 100g당 3,180원" }
 ```
 
 사용자가 본 가격을 입력하면 화면에 이미 받은 평소가로 브라우저에서 계산한다. 위 모양은 그 계산의 입력·출력 예시다. 서버 호출도, 공공 API 호출도 없다.
@@ -1162,7 +1162,7 @@ KAMIS `orgnl_reg_dt`는 재등록 때 덮어쓰이므로, 처음 받은 시각�
 - **정기 실행 꺼짐.** 공개 저장소는 60일 동안 저장소 활동이 없으면 GitHub가 정기 실행(schedule) 워크플로를 끈다. 수집이 매일 돌아도 커밋이 없으면 꺼진다. 그래서 (1) 주 1회 도는 점검(heartbeat) 워크플로가 수집 워크플로들이 켜져 있는지 보고 꺼졌으면 다시 켠다(`gh workflow enable`, `actions: write` 권한). (2) 같은 점검이 출처별 `source_day`의 마지막 `ok` 날짜를 보고 기대보다 2일 넘게 멈췄으면 알림 이슈를 연다 (5-3). (3) 점검 워크플로 자신도 같은 규칙으로 꺼질 수 있으므로, 50일째 되기 전에 사람에게 알리는 일정(달력)을 함께 둔다 (`ingest-foundation/05`).
 - 비밀값은 Actions Secrets에만 둔다: `DATA_GO_KR_SERVICE_KEY`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`(Storage 업로드 전용), `INGEST_DATABASE_URL`(`ingest_writer`, Supavisor 세션 모드 5432). 로그에 찍지 않는다. 옛 `SUPABASE_SERVICE_ROLE_KEY`·`DATABASE_URL`은 쓰지 않는다 (3-0 "키"). 공개 저장소라 로그를 누구나 보고, GitHub는 URL 인코딩된 값과 주소 안의 비밀번호를 가리지 못한다. 그래서 CLI는 모든 오류를 인코딩 변형까지 지운 뒤 찍고(`price-ingest/src/secrets.ts`), 워크플로는 Secret을 단계 `env:`로만 넘기며 환경변수 덤프·`set -x`를 쓰지 않는다. `INGEST_DATABASE_URL`의 비밀번호는 퍼센트 인코딩해서 넣는다. 형식이 잘못된 주소는 postgres 오류에 주소 전체가 담겨 새므로 접속 전에 막는다 (`ingest-schedule/02`, 2026-10-26).
 - 로컬 탐색(`fetch-samples.sh`, 계약 테스트)과 Actions가 **같은 키, 같은 일일 한도**를 쓴다. 수집 시각 앞뒤로 로컬에서 대량 호출하지 않는다.
-- Supabase Free는 활동이 없으면 일시정지된다. 매일 도는 수집이 막아 주는지 확인한다.
+- Supabase Free는 활동이 없으면 일시정지된다. 기준은 공개돼 있지 않다("지난 1주 동안 충분한 사용자 DB 활동"). 매일 `ingest_writer`가 쓰는 것이 막아 줄 가능성이 높지만 확인된 사실은 아니라서, 막는 장치보다 **빨리 아는 장치**를 둔다: 소유자가 경고 메일(약 1주 전)을 받고, 수집 실패를 일시정지로 분류하고, heartbeat가 상태를 본다. 일시정지되면 대시보드 Resume 한 번으로 데이터가 돌아온다 (2026-10-26, `.scratch/ingest-schedule/research/supabase-free-pause.md`).
 - **백업은 정식 서비스 전으로 미룬다** (2026-10-20). 무료 플랜에는 자동 백업이 없다. 지금은 시제품이라 관측값·집계는 ① 원본에서 다시 만들고, 운영자 매핑은 잃을 위험을 받아들인다 (7장). 나중 계획: 주 1회 `pg_dump --schema=price`를 Actions 아티팩트(최근 몇 주)로 남기고, 달마다 한 벌을 비공개 Storage 버킷에 둔다.
 
 ### 5-4. 과거분 채우기 (최초 1회)
@@ -1189,7 +1189,7 @@ GitHub Actions (cron) ──ingest_writer, Supavisor 5432──▶ Supabase Post
 
 | 역할 | 선택 | 무료 조건 | 주의 |
 |---|---|---|---|
-| DB | Supabase Free | DB 500MB, 파일 1GB, egress 5GB, 무료 프로젝트 2개 (supabase.com/pricing, 2026-10-08 확인) | **1주일 동안 활동이 없으면 일시정지된다.** 매일 도는 배치가 막아 줄 것으로 보이지만, 무엇을 활동으로 치는지 확인해야 한다. **무료 플랜에는 자동 백업이 없다** → ① 원본 파일이 관측값·집계의 백업 역할. 운영자 매핑은 원본으로 되살릴 수 없고, `pg_dump` 백업은 정식 서비스 전으로 미뤘다 (5-3-1) |
+| DB | Supabase Free | DB 500MB, 파일 1GB, egress 5GB, 무료 프로젝트 2개 (supabase.com/pricing, 2026-10-08 확인) | **1주일 동안 활동이 없으면 일시정지된다.** 기준이 비공개라 매일 배치가 막아 준다고 단정하지 않고 빨리 알아채는 쪽으로 둔다 (5-3). **무료 플랜에는 자동 백업이 없다** → ① 원본 파일이 관측값·집계의 백업 역할. 운영자 매핑은 원본으로 되살릴 수 없고, `pg_dump` 백업은 정식 서비스 전으로 미뤘다 (5-3-1) |
 | 배치 | GitHub Actions | 공개 저장소는 무료. 비공개 저장소는 월 무료 분량 안에서 | Vercel 크론보다 실행 시간 제한이 넉넉하다 (참가격 457회 호출에 몇 분 걸림). GitHub 서버 → data.go.kr 연결 시간 초과 사례가 있음 (5-3) |
 | 화면 | Vercel Hobby | (이 네트워크에서 vercel.com 접속이 차단되어 직접 확인 못 함) | **확인 필요:** Hobby 플랜이 개인·비상업용으로 제한되는지. 광고나 제휴 링크로 수익을 내면 Pro로 바꿔야 할 수 있다 |
 | 원본 파일 | Supabase Storage 1GB | 위와 같음 | 약 3년치(추정). 실측 후 보존 기간을 정한다 |
@@ -1252,16 +1252,13 @@ docs.railway.com/pricing/plans (2026-10-08 확인) 기준이다.
 
 ## 7. 열린 질문
 
-"추천"은 `p4/01`(2026-10-19)이 스키마를 짜며 낸 의견이다. 결정이 아니다. 정해지면 이 표에서 지우고 해당 문서에 결정으로 옮긴다.
+"추천"은 `p4/01`(2026-10-19)이 스키마를 짜며 낸 의견이다. 결정이 아니다. 정해지면 이 표에서 지우고 해당 문서에 결정으로 옮긴다. 정해서 지운 것 (2026-10-30): 평소가 계산식 · 최소 표본 수 · 갱신 지연 → [judgment.md](judgment.md), 재계산 시점 → 4-3(수집 직후마다), Supabase 일시정지 → 5-3.
 
 | 질문 | 추천 | 다룰 곳 |
 |---|---|---|
 | DB 용량이 무료 500MB에 닿는다 (실측 뒤 1년차 465~525MB, 이후 연 약 +120MB, 3-9) | 참가격 6 조사일은 적용했다 (2026-10-21). 남은 순서: `reference_price`·`usual_price`를 화면이 쓰는 날짜만(③에서 화면이 정해지면, 약 −40MB·연 −55MB), `daily_quote.sources` 열을 빼거나 작게(약 −30MB, 대표 출처는 `source_code_map.role`로 다시 알 수 있다), Pro 플랜 | ① `ingest-foundation/05`, ②·③ |
 | 백업을 언제 시작할지 (6-1 "백업": 추후) | 정식 서비스 전, 늦어도 운영자 매핑을 손으로 많이 고치기 시작할 때. 그 전까지는 매핑을 고친 뒤 SQL로 내보내 두는 것만으로도 위험이 준다 | ④ 선행 |
 | KAMIS 친환경·중도매를 저장할지 (도매는 MVP 이후, E3) | | 확장 E3 |
-| 평소가 계산식 (KAMIS 5년 평년, 축평원 평년, 최근 N주 중앙값을 섞는 방식) | | ② |
-| 최소 표본 수, 갱신 지연(이월) 기준 일수, 이상치 기준 | `calc_param`에 자리만 두었다 (3-4) | ② |
-| 판정 스냅샷 재계산 주기 (하루 1번 vs 수집 직후마다) | | ① `ingest-foundation/05` |
+| 이상치 기준 | 최소 표본 수 · 갱신 지연은 정했다 ([judgment.md](judgment.md) 6-3). 이상치는 아직 | ② |
 | Vercel Hobby 상업 이용 제한 여부 | | ④ (사용자 확인) |
-| Supabase Free 일시정지 기준과 수집으로 막을 수 있는지 | | ① `ingest-foundation/05` |
 | 축평원 D일분 등록 시각 (D일 16:30 이후 ~ D+1 10:10 이전까지만 앎) | | ① `p2/03` (실측) |

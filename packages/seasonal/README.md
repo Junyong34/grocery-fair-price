@@ -7,9 +7,11 @@
 |---|---|
 | `src/data/` | 품종(`foods`), 월·계절·명절, 화면 문구(`copy`) |
 | `src/calendar/` | 달력 칸·공휴일(`month-calendar`), 서울 기준 오늘(`today`) |
+| `src/layout/` | 흩어진 이미지 배치(`scatter`, 시드 고정이라 같은 입력이면 같은 결과), 끌어 옮기기(`gesture`, `arrangement`) |
+| `src/geometry/` | 배치가 쓰는 기하 계산(Lloyd 이완 `lloyd`, 겹침 풀기 `relax-shapes`) |
+| `src/search/` | 초성 검색(`match-foods`) |
+| `src/print/` | 인쇄 에디션: 스펙 · 구성(`layouts`) · 기간 차트 · 원형 달력 |
 | `scripts/` | 생성 스크립트 |
-
-앞으로 넣을 것: 흩어진 이미지 배치(`layout/`, 시드 고정이라 같은 입력이면 같은 결과), 초성 검색(`search/`).
 
 품종 목록 `src/data/foods.generated.ts`는 생성 파일이다. 직접 고치지 않고 `pnpm --filter @workspace/seasonal build:foods`로 다시 만든다. 원천이 `prototypes/`(Git 밖)에 있어 그 폴더가 있는 기기에서만 돌릴 수 있다. 일러스트가 없는 품종의 id는 스크립트의 `NEW_IDS`에서 정한다.
 

@@ -1,6 +1,6 @@
 # 프로젝트 구조
 
-2026-10-15 기준 저장소 전체 지도. 에이전트가 지킬 규칙은 루트 `AGENTS.md`에 있고, 이 문서는 무엇이 어디에 왜 있는지를 기록한다. 폴더나 라우트, 패키지, 생성 파일이 바뀌면 이 문서도 고친다.
+2026-10-30 기준 저장소 전체 지도. 에이전트가 지킬 규칙은 루트 `AGENTS.md`에 있고, 이 문서는 무엇이 어디에 왜 있는지를 기록한다. 폴더나 라우트, 패키지, 생성 파일이 바뀌면 이 문서도 고친다.
 
 ## 1. 한눈에
 
@@ -8,8 +8,8 @@
 
 | 제품 | 상태 | 위치 |
 |---|---|---|
-| **제철달력** (언제 뭐가 맛있을까): 열두 달·사계절·명절별 제철 품종, 먹음 기록 | MVP 화면 개발 중. `.scratch/seasonal-mvp/` 티켓 13개 가운데 11개 끝남 | `apps/web`의 `/seasonal`, `packages/seasonal` |
-| **식자재 시세 판정 서비스** (가칭, "이 애호박 2,980원, 비싼 건가?") | 로드맵 ① 수집 기반 진행 중 (Supabase + GitHub Actions). 화면 코드는 ④에서 `apps/web`에 | `grocery-price/` 문서, `.scratch/ingest-foundation`, `.scratch/p2~p4-*`, `.scratch/search-first-view` |
+| **제철달력** (언제 뭐가 맛있을까): 열두 달·사계절·명절별 제철 품종, 먹음 기록 | MVP 화면 완료. 남은 것은 태블릿 폭 다듬기(`.scratch/seasonal-mvp/` 12)와 인쇄 달력 다운로드 마무리(`.scratch/calendar-download`) | `apps/web`의 `/seasonal`, `packages/seasonal` |
+| **식자재 시세 판정 서비스** (가칭, "이 애호박 2,980원, 비싼 건가?") | 매일 수집 · 판정하고, 가격 화면이 운영 DB를 읽는다. 백필 · 장애 처리 마무리와 운영 배포가 남음 (단계별 상태는 `grocery-price/README.md`) | `grocery-price/` 문서, `apps/web`의 `/`, `packages/price*`, `supabase/` |
 
 두 제품은 같은 Next.js 앱(`apps/web`)에 들어간다. `/`는 가격 화면의 P1 시세 메인이고(2026-10-27), 제철달력은 `/seasonal` 아래에 있다. 헤더 · 하단 내비는 둘이 같이 쓴다(`shared/shell`).
 
@@ -405,27 +405,18 @@ grocery-price/
 ├─ GLOSSARY.md               용어집 (카테고리·품목·품종·규격, 제철, 먹음 기록 …). 저장소 전체가 따른다
 ├─ docs/
 │  ├─ 00-overview/           product-concept.md, roadmap.md (4단계: 수집 기반·판정 설계·화면 설계·구현)
-│  ├─ 10-research/           api-spec.md (API 실측), gov-price-sites (정부 가격 화면 대조), public-data-survey, data-sourcing-legal, content-and-taxonomy, images, supabase-skills
+│  ├─ 10-research/           api-spec.md (API 실측), gov-price-sites (정부 가격 화면 대조), public-data-survey, data-sourcing-legal, content-and-taxonomy, images, scatter-layout-algorithms, traditional-foods
 │  ├─ 20-domain/             domain-model.md
-│  ├─ 30-data/               pipeline.md (저장 구조, 테이블, 수집 일정, 장애 처리), judgment.md (평소가·판정 계산), variety-list.md (품종 목록), schema-map.html (데이터 지도, ERD는 pnpm db:erd가 생성)
-│  └─ adr/                   0001 공공데이터와 제보, 크롤링 안 함 · 0002 Supabase + GitHub Actions
+│  ├─ 30-data/               pipeline.md (저장 구조, 테이블, 수집 일정, 장애 처리), judgment.md (평소가·판정 계산), variety-list.md (품종 목록), sources/ (출처별 실측: kamis·ekape·chamgagyeok, item-inventory), schema-map.html (데이터 지도, ERD는 pnpm db:erd가 생성)
+│  └─ adr/                   0001 공공데이터와 제보, 크롤링 안 함 · 0002 Supabase + GitHub Actions · 0003 인쇄 PDF는 비공개 R2 · 0004 판정 payload는 화면 모양
 └─ reference/public-data/
    ├─ kamis/, ekape/         원본 API 명세·코드표
-   └─ samples/               실호출 응답 샘플, fetch-samples.sh, viewer/(api-explorer.html, build.py, smoke.sh)
+   └─ samples/               실호출 응답 샘플, fetch-samples.sh, viewer/(template.html → build.py → api-explorer.html, smoke.sh)
 ```
 
 ## 11. 작업 관리 (.scratch)
 
-| 폴더 | 내용 | 상태 |
-|---|---|---|
-| `seasonal-mvp/` | 제철달력 MVP 화면 13개 티켓 | 01~11 resolved, 12 ready-for-agent(데스크톱·태블릿), 13 needs-info(디자인 다듬기) |
-| `calendar-print/` | 달력 PDF 어드민(에디션 생성·공개)과 다운로드 | 1차 구현됨(인쇄물 4종, 어드민, 내려받기). 배치 끌어 옮기기·명절·음력 옵션은 남음 |
-| `seo/` | 검색 색인(SEO) 기반: 레지스트리·sitemap·robots·JSON-LD·색인 스위치 | 01~07 resolved, 08 needs-triage(품종 본문 보강) |
-| `ingest-foundation/` | 가격 서비스 ① 수집 기반: Supabase 설정, 스키마, 수집 패키지·Actions, 백필, 장애 처리, 웹앱 읽기 | 01 ready-for-human(Supabase 계정), 02 resolved (스키마·마이그레이션·RLS, 로컬 검증), 03~05 ready-for-agent, 06 resolved (서버 전용 읽기) |
-| `p2-data-source-spec/` | 가격 서비스 ① 요청·응답 분석 (이전 번호 P2) | 진행 중. 01 resolved, 05 wontfix, 08~10 후순위 |
-| `p3-variety-catalog/` | ② 품종 목록, 점포 데이터가 없는 품종의 대응 (이전 번호 P3) | ready-for-human |
-| `p4-canonical-model/` | ① 통합 스키마·어댑터 (이전 번호 P4) | 01·03 ready-for-agent, 02 resolved (ADR 0002) |
-| `search-first-view/` | 검색 한 번에 보는 가격: 정부 화면 벤치마킹, 검색 결과 결정 | 01~03 resolved, 04·05·07 ready-for-agent, 06 ready-for-human |
+기능마다 `.scratch/<기능>/`에 `spec.md`와 `issues/NN-*.md`를 둔다. 상태는 각 티켓의 `Status:` 줄이 원본이다. 한눈에 보려면 `grep -H '^Status' .scratch/*/issues/*.md`.
 
 형식은 `docs/agents/issue-tracker.md`, 라벨은 `docs/agents/triage-labels.md`를 따른다.
 

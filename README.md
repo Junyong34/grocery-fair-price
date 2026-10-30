@@ -6,6 +6,10 @@ pnpm + Turborepo monorepo.
 apps/web/              Next.js app (routes in app/, screens in features/, app-wide code in shared/)
 packages/ui/           @workspace/ui: Oura tokens, cojeev UI, generic components
 packages/seasonal/     @workspace/seasonal: 제철 data and date calculations (no React)
+packages/price/        @workspace/price: price-screen domain (screen shapes, verdict, search, copy; no React)
+packages/price-db/     @workspace/price-db: price DB tests, sample data, ERD generator
+packages/price-ingest/ @workspace/price-ingest: public price API clients, ingest CLI used by GitHub Actions
+supabase/              price DB migrations (source of truth for tables)
 packages/eslint-config, packages/typescript-config
 grocery-price/         price-service docs and research
 ```
