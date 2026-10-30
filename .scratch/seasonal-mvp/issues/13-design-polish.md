@@ -1,6 +1,6 @@
 # 13. 디자인 다듬기
 
-Status: needs-info
+Status: resolved
 Blocked by: 09, 10, 11
 
 ## 목적
@@ -28,3 +28,7 @@ Blocked by: 09, 10, 11
 12. **달력 공휴일 이름이 잘리면 툴팁(마우스 올림·터치)** (2026-10-15) → 반영. cojeev tooltip을 설치하고(`TooltipProvider`는 `shared/providers.tsx`) `HolidayName`이 잘린 이름에만 툴팁을 띄운다. 마우스는 Radix가 올림·벗어남으로 여닫고, 터치·펜은 눌러 여닫는다. 이름 바깥을 누르거나 스크롤하면 닫힌다.
 13. **맨 위에서 헤더·탭·본문 구분이 없다 / 트레이 색이 칙칙하다** (2026-10-15) → 반영. `/examples/header-styles` 비교에서 C(트레이 탭 + 아래 여백)로 정했다. 트레이는 크림 바탕(`gold-wash`, 흰 `surface`는 어색하다고 해 바꿈), 선택 칸은 `gold-soft`·글자 `espresso`(하단 내비의 지금 메뉴와 같은 색). `LinkTabs tray`와 `Segmented`가 같은 `TRAY_CLASS`를 쓴다(2차 탭, 헤더 안 2차 탭, 2·4·6열, 월별·계절별).
 14. **공유하기와 메타데이터·OG 이미지** (2026-10-15) → 반영. 공유 버튼은 "지금 보는 화면의 맨 위 오른쪽" 하나의 규칙: 일반 화면은 헤더, 품종 상세 시트는 시트 제목 줄. 나의 식탁은 기록이 기기에만 있어 숨긴다. 메타데이터는 `shared/meta.ts` `createMetadata`(제목 꼬리는 루트 레이아웃 template, 주소는 metadataBase=`siteUrl()`), OG 이미지는 `/api/og`(title·subtitle·badge·season 쿼리, 길이 제한, sunwash 바탕·크림 트레이 배지·로고 원본 SVG). 남은 것: OG 제목은 Pretendard다(앱 제목 명조 Gowun Batang 파일이 저장소에 없음). 운영 주소는 `NEXT_PUBLIC_SITE_URL`로 정한다.
+
+## Comments
+
+2026-10-30: 모은 의견 14개를 모두 반영해 닫는다. 새 디자인 의견은 새 티켓으로 연다. 14의 남은 것(OG 제목 서체)은 Gowun Batang 파일을 저장소에 넣을 때 다룬다.

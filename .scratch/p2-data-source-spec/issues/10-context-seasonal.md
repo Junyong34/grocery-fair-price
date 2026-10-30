@@ -1,6 +1,6 @@
 # 10. 보조 출처: 제철
 
-Status: ready-for-agent
+Status: resolved
 Type: research
 Blocked by: -
 
@@ -21,3 +21,7 @@ Blocked by: -
 ## 완료 기준
 
 - 제철 데이터를 가져올 경로(API/파일/수작업)가 하나로 정해져 있다.
+
+## Answer
+
+2026-10-30 정리: **수작업 입력 + 출처 표기**로 정해졌다. 제철 달은 정보누리 생산시기와 FSIS 자료를 보고 사람이 정리해 `packages/seasonal`의 품종 데이터에 넣었다 (2026-10-23, `.scratch/food-months/proposal.md` "반영 결과", 품종별 출처는 `.scratch/food-months/sources.md`). 갱신이 연 1회 수준이라 API를 붙일 이유가 없다. 해수부 · 농진청 보조 후보는 따로 평가하지 않았다.

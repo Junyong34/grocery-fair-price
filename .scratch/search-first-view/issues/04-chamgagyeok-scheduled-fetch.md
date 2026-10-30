@@ -1,6 +1,6 @@
 # 04. 참가격 정기 수집
 
-Status: claimed
+Status: resolved (ingest-schedule/12로 옮김)
 
 > 2026-10-29: 이 티켓의 일은 [ingest-schedule/12](../../ingest-schedule/issues/12-chamga-workflow-and-catch-up.md)에서 했다 (정기 수집 워크플로, 06-12 이후 조사일 19개 처리). 12가 닫히면 이 티켓도 닫는다. 아래 체크칸은 처음 계획이다.
 Type: task
@@ -26,3 +26,7 @@ Blocked by: ingest-foundation/01, ingest-foundation/02
 
 - 06-12 이후 모든 조사일의 원본이 Storage에, 관측값이 Postgres에 있다.
 - 다음 조사일에 사람 손 없이 저장된다.
+
+## Comments
+
+2026-10-30: 같은 일을 두 곳에서 추적하지 않도록 닫는다. 남은 완료 기준(다음 조사일에 사람 손 없이 저장)은 [ingest-schedule/12](../../ingest-schedule/issues/12-chamga-workflow-and-catch-up.md)의 기준 2에서 본다.
