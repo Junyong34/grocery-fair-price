@@ -41,6 +41,8 @@ read_file() { # 검사 대상 내용을 stdout 으로
 fail=0
 while IFS='=' read -r name value; do
   [[ "$name" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
+  # 비밀이 아닌 이름 값: 문서와 코드에 그대로 쓴다
+  [[ "$name" == "R2_BUCKET" ]] && continue
   value="${value%\"}"; value="${value#\"}"; value="${value%\'}"; value="${value#\'}"
   [[ ${#value} -ge 12 ]] || continue
   while IFS= read -r f; do
