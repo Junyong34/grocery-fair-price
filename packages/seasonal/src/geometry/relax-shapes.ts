@@ -59,6 +59,24 @@ export function relaxShapes(shapes: readonly Shape[], { bounds, pinned, gap = 0,
 }
 
 /**
+ * 완화가 끝난 뒤에도 남은 겹침이 있는지. 묶음끼리, 묶음과 피할 영역, 영역 밖으로 나간 묶음을 본다(반올림 몫으로 0.5까지 봐준다).
+ * 묶음끼리는 gap 없이 실제로 닿는지만 본다.
+ */
+export function shapesOverlap(shapes: readonly Shape[], { bounds, obstacles = [] }: Pick<RelaxShapesOptions, "bounds" | "obstacles">): boolean {
+  const tolerance = 0.5
+  for (let i = 0; i < shapes.length; i++) {
+    const a = shapes[i]!
+    const half = Math.max(a.r, a.labelW / 2)
+    const box = { left: a.x - half, right: a.x + half, top: a.y - a.r, bottom: a.y + a.r + a.labelH }
+    if (box.left < -tolerance || box.top < -tolerance || box.right > bounds.width + tolerance || box.bottom > bounds.height + tolerance) return true
+    for (const o of obstacles)
+      if (box.right > o.x + tolerance && box.left < o.x + o.width - tolerance && box.bottom > o.y + tolerance && box.top < o.y + o.height - tolerance) return true
+    for (let j = i + 1; j < shapes.length; j++) if (depth(a, shapes[j]!, 0) > tolerance) return true
+  }
+  return false
+}
+
+/**
  * 묶음(원과 이름표를 감싸는 상자)이 피할 영역과 겹치면 네 방향 중 영역 안에 남는 가장 짧은 쪽으로 옮긴다.
  * 옮겼으면 true. 어느 쪽으로도 영역 안에 남을 수 없으면 그대로 둔다.
  */

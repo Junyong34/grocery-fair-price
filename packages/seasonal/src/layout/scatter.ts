@@ -1,6 +1,6 @@
 import { foodScale } from "../data/food-sizes"
 import { lloydRelax } from "../geometry/lloyd"
-import { relaxShapes, type Box } from "../geometry/relax-shapes"
+import { relaxShapes, shapesOverlap, type Box } from "../geometry/relax-shapes"
 import { findFood } from "../data/foods"
 
 // 흩어진 이미지 배치(와이어프레임 3.1 scat). 격자 없이 빈 자리를 찾아 촘촘히 흩뿌린다.
@@ -73,21 +73,31 @@ export const SCATTER_MAX_FOODS = 20
 /** 그림이 판 넓이에서 차지하는 비율. 낮을수록 그림이 작고 사이가 넓다. */
 const COVERAGE = 0.45
 
+/** fill에서 그림을 키워 보는 배율 범위와 이분 탐색 횟수. 배율 1(기본 크기)에서도 겹치면 기본 크기 그대로 둔다. */
+const FILL_GROW = { max: 3, steps: 6 } as const
+/** fill에서 촘촘한 배치가 풀리도록 완화를 더 돌린다. */
+const FILL_RELAX_ITERATIONS = 240
+
 export function scatterLayout({
   month,
   ids,
   frame,
   lloydIterations = LLOYD_ITERATIONS,
+  fill = false,
 }: {
   month: number
   ids: readonly string[]
   frame: ScatterFrame
   /** Lloyd 완화 횟수. 테스트에서 비교하려고 열어 둔다. */
   lloydIterations?: number
+  /**
+   * 그림·이름표가 서로(그리고 avoid와) 겹치지 않는 한에서 그림을 가장 크게 키운다. 인쇄처럼 끌기 없이 한 번 놓고 끝나는 판에 쓴다.
+   * 기본 크기의 상한도 풀린다. 배율을 이분 탐색하므로 계산이 몇 배 든다.
+   */
+  fill?: boolean
 }): ScatterLayout {
   const { width: W, height: H, big } = frame
   const n = ids.length
-  const rand = scatterRandom({ month, count: n, frame })
   const label = labelHeight(frame)
   const avoid = frame.avoid ?? []
   const open = (W - (frame.reserveRight ?? 0)) * (H - (frame.reserveBottom ?? 0)) - avoid.reduce((sum, box) => sum + box.width * box.height, 0)
@@ -98,42 +108,58 @@ export function scatterLayout({
     ),
     big ? 120 : 96
   )
-
-  const placed: PlacedCircle[] = []
-  const drafts = ids.map((id) => {
-    // 기본 크기에 ±10% 변동을 주고, 품종별 배율(data/food-sizes)을 곱한다.
-    const size = Math.round(base * (0.9 + rand() * 0.2) * foodScale(id))
-    const spot = findOpenSpot({ placed, size, frame, rand })
-    placed.push(spot)
-    const rotate = (rand() - 0.5) * 22
-    return { id, size, rotate }
-  })
-
   // 후보 선택은 모퉁이·가장자리에 빈 곳을 남기고 겹침도 보장하지 않는다.
   // Lloyd 완화로 빈 곳을 고르게 메운 뒤, 그림과 이름표가 서로 겹치지 않게 풀어 최소 틈을 확보한다.
   const area = {
     width: W - (frame.reserveRight ?? 0),
     height: H - (frame.reserveBottom ?? 0) - label,
   }
-  const circles = placed.map((spot, i) => ({ id: drafts[i]!.id, x: spot.x, y: spot.y, r: spot.r }))
-  const spread = lloydIterations
-    ? lloydRelax(circles, { bounds: area, iterations: lloydIterations, step: LLOYD_STEP, avoid })
-    : circles
-  const relaxed = relaxShapes(
-    spread.map((circle) => ({ ...circle, ...labelBox(circle.id, frame) })),
-    {
-      // 이름표까지 영역 안에 남도록, 이름표 높이를 포함한 전체 높이를 준다.
-      bounds: { width: area.width, height: area.height + label },
-      gap: SCATTER_GAP,
-      iterations: SEED_RELAX_ITERATIONS,
-      obstacles: avoid,
-    }
-  )
+  // 이름표까지 영역 안에 남도록, 이름표 높이를 포함한 전체 높이를 준다.
+  const relaxOptions = { bounds: { width: area.width, height: area.height + label }, gap: SCATTER_GAP, obstacles: avoid }
 
-  const items = drafts.map(({ id, size, rotate }, i) => ({
+  /** 기본 크기에 grow를 곱해 놓아 본다. 같은 grow면 같은 결과다(난수열을 매번 새로 시작). */
+  const arrange = (grow: number) => {
+    const rand = scatterRandom({ month, count: n, frame })
+    const placed: PlacedCircle[] = []
+    const drafts = ids.map((id) => {
+      // 기본 크기에 ±10% 변동을 주고, 품종별 배율(data/food-sizes)을 곱한다.
+      const size = Math.round(base * grow * (0.9 + rand() * 0.2) * foodScale(id))
+      const spot = findOpenSpot({ placed, size, frame, rand })
+      placed.push(spot)
+      const rotate = (rand() - 0.5) * 22
+      return { id, size, rotate }
+    })
+    const circles = placed.map((spot, i) => ({ id: drafts[i]!.id, x: spot.x, y: spot.y, r: spot.r }))
+    const spread = lloydIterations
+      ? lloydRelax(circles, { bounds: area, iterations: lloydIterations, step: LLOYD_STEP, avoid })
+      : circles
+    const relaxed = relaxShapes(
+      spread.map((circle) => ({ ...circle, ...labelBox(circle.id, frame) })),
+      { ...relaxOptions, iterations: fill ? FILL_RELAX_ITERATIONS : SEED_RELAX_ITERATIONS }
+    )
+    return { drafts, relaxed }
+  }
+
+  let best = arrange(1)
+  if (fill && !shapesOverlap(best.relaxed, relaxOptions)) {
+    // 겹치지 않는 가장 큰 배율을 찾는다. 배율과 겹침이 꼭 단조롭지는 않아, 겹치지 않은 결과 중 가장 큰 것을 남긴다.
+    let low = 1
+    let high: number = FILL_GROW.max
+    for (let step = 0; step < FILL_GROW.steps; step++) {
+      const grow = (low + high) / 2
+      const tried = arrange(grow)
+      if (shapesOverlap(tried.relaxed, relaxOptions)) high = grow
+      else {
+        low = grow
+        best = tried
+      }
+    }
+  }
+
+  const items = best.drafts.map(({ id, size, rotate }, i) => ({
     id,
-    cx: relaxed[i]!.x / W,
-    cy: relaxed[i]!.y / H,
+    cx: best.relaxed[i]!.x / W,
+    cy: best.relaxed[i]!.y / H,
     size: size / W,
     rotate: Math.round(rotate * 10) / 10,
     z: i % 4,

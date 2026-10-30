@@ -10,6 +10,17 @@ export const WEEKDAYS = {
   "english-initial": ["S", "M", "T", "W", "T", "F", "S"],
 } as const
 
+/** 날짜 숫자 크기(dayFont 대비). editorial은 숫자를 크게 쓴다. */
+const digitRatio = (variant: CalendarVariant) => (variant === "editorial" ? 1.4 : 1)
+/** 요일 글자는 실제 날짜 숫자 크기에 비례한다(숫자의 0.62). */
+const WEEKDAY_RATIO = 0.62
+
+/**
+ * 요일 줄 높이(dayFont 대비). 요일 글자 + 아래 여백(0.45) + 줄 높이 몫. 보통 숫자면 1.3이다.
+ * 달력 높이를 미리 정하는 쪽(M-E 모서리 블록)이 같은 값을 쓴다.
+ */
+export const weekdayRowRatio = (variant: CalendarVariant) => digitRatio(variant) * WEEKDAY_RATIO + 0.68
+
 /** 인쇄에는 오늘 표시가 없다. 어느 날과도 같지 않은 날짜를 넘긴다. */
 const NO_TODAY = { year: 0, month: 0, day: 0 }
 
@@ -51,7 +62,8 @@ export function PrintCalendar({
   })
   const columns = Array.from({ length: 7 }, (_, i) => (weekStart + i) % 7)
   const weekend = (day: number) => day === 0 || day === 6
-  const rowHeight = (height - dayFont * 1.3) / weeks.length
+  const digitFont = dayFont * digitRatio(variant)
+  const rowHeight = (height - dayFont * weekdayRowRatio(variant)) / weeks.length
   const cellPadding = variant === "grid" || variant === "editorial" ? u(dayFont * 0.25) : 0
   let blank = 0
 
@@ -60,7 +72,7 @@ export function PrintCalendar({
       <thead>
         <tr>
           {columns.map((day) => (
-            <th key={day} className={weekend(day) ? "is-red" : undefined} style={{ fontSize: t(dayFont * 0.62), paddingBottom: u(dayFont * 0.45), paddingLeft: cellPadding }}>
+            <th key={day} className={weekend(day) ? "is-red" : undefined} style={{ fontSize: t(digitFont * WEEKDAY_RATIO), paddingBottom: u(dayFont * 0.45), paddingLeft: cellPadding }}>
               {WEEKDAYS[weekday][day]}
             </th>
           ))}
@@ -80,7 +92,7 @@ export function PrintCalendar({
                   {!cell && renderBlank?.(blank++, rowHeight)}
                   {cell && (
                     <>
-                      <span className={`day print-number ${red ? "is-red" : ""}`} style={{ fontSize: t(variant === "editorial" ? dayFont * 1.4 : dayFont), lineHeight: 1 }}>
+                      <span className={`day print-number ${red ? "is-red" : ""}`} style={{ fontSize: t(digitFont), lineHeight: 1 }}>
                         {cell.day}
                       </span>
                       {holidays === "mark-and-name" && cell.holidays.length > 0 && (

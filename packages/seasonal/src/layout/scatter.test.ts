@@ -221,3 +221,47 @@ describe("scatterLayout avoid", () => {
     }
   })
 })
+
+describe("scatterLayout fill", () => {
+  // 인쇄 월간 세로 그림 판(A4 약 180×112 용지 단위, 단위당 4px).
+  const frame: ScatterFrame = { width: 720, height: 448, big: true }
+
+  /** 원-원, 원-이름표, 이름표-이름표 겹침과 판 밖으로 나간 묶음을 모은다. */
+  function collisions(month: number, fill: boolean) {
+    const foods = monthHighlights(month, 40)
+    const { items } = scatterLayout({ month, ids: foods.map((food) => food.id), frame, fill })
+    const parts = items.map((item) => {
+      const r = (item.size * frame.width) / 2
+      const x = item.cx * frame.width
+      const y = item.cy * frame.height
+      const w = labelWidth(foods.find((food) => food.id === item.id)!.name, frame)
+      return { x, y, r, rect: { x0: x - w / 2, x1: x + w / 2, y0: y + r, y1: y + r + labelHeight(frame) } }
+    })
+    const hits: string[] = []
+    const circleHitsRect = (c: (typeof parts)[number], other: (typeof parts)[number]) => {
+      const nx = Math.min(Math.max(c.x, other.rect.x0), other.rect.x1)
+      const ny = Math.min(Math.max(c.y, other.rect.y0), other.rect.y1)
+      return Math.hypot(nx - c.x, ny - c.y) < c.r - 0.5
+    }
+    parts.forEach((a, i) => {
+      if (a.x - a.r < -0.5 || a.x + a.r > frame.width + 0.5 || a.y - a.r < -0.5 || a.rect.y1 > frame.height + 0.5) hits.push(`${foods[i]!.name} 판 밖`)
+      for (let j = i + 1; j < parts.length; j++) {
+        const b = parts[j]!
+        const label = `${foods[i]!.name}-${foods[j]!.name}`
+        if (Math.hypot(a.x - b.x, a.y - b.y) < a.r + b.r - 0.5) hits.push(`${label} 원-원`)
+        if (circleHitsRect(a, b) || circleHitsRect(b, a)) hits.push(`${label} 원-이름표`)
+        const overlapX = Math.min(a.rect.x1, b.rect.x1) - Math.max(a.rect.x0, b.rect.x0)
+        const overlapY = Math.min(a.rect.y1, b.rect.y1) - Math.max(a.rect.y0, b.rect.y0)
+        if (overlapX > 0.5 && overlapY > 0.5) hits.push(`${label} 이름표-이름표`)
+      }
+    })
+    return { hits, total: items.reduce((sum, item) => sum + item.size, 0) }
+  }
+
+  it.each([1, 4, 8, 11])("%s월: 품종이 많아도 겹치지 않는 한에서 그림을 기본보다 크게 키운다", (month) => {
+    const plain = collisions(month, false)
+    const filled = collisions(month, true)
+    expect(filled.hits).toEqual([])
+    expect(filled.total).toBeGreaterThan(plain.total * 1.15)
+  })
+})

@@ -21,6 +21,7 @@ export function FoodArea({
   nameSize,
   maxSize,
   avoid,
+  fill = false,
   style,
 }: {
   foods: readonly Food[]
@@ -36,6 +37,8 @@ export function FoodArea({
   maxSize?: number
   /** scatter에서 그림을 놓지 않을 사각형(판 왼쪽 위 기준 용지 단위). 그 자리에 달력 블록 같은 것이 얹힌다. */
   avoid?: readonly { x: number; y: number; width: number; height: number }[]
+  /** scatter에서 겹치지 않는 한 그림을 가장 크게 키운다(scatterLayout fill). 품종이 많아 그림이 작아지는 월간 판에 쓴다. */
+  fill?: boolean
   style?: React.CSSProperties
 }) {
   const box = { position: "relative", width: u(width), height: u(height), flex: "none", ...style } as const
@@ -48,7 +51,7 @@ export function FoodArea({
       big: true,
       avoid: avoid?.map((box) => ({ x: box.x * PX_PER_UNIT, y: box.y * PX_PER_UNIT, width: box.width * PX_PER_UNIT, height: box.height * PX_PER_UNIT })),
     }
-    const { items } = scatterLayout({ month, ids: foods.map((food) => food.id), frame })
+    const { items } = scatterLayout({ month, ids: foods.map((food) => food.id), frame, fill })
     const label = labelFontPx(frame) / PX_PER_UNIT
     return (
       <div style={box}>
