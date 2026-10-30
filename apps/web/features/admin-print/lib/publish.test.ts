@@ -25,9 +25,9 @@ describe("savePlan", () => {
     expect(savePlan(edition("published"), edition("published", 2030), ready)).toEqual({ storage: "none" })
   })
 
-  it("공개를 내리거나 초안으로 돌리면 저장소에서 지운다", () => {
-    expect(savePlan(edition("published"), edition("withdrawn"), ready)).toEqual({ storage: "delete" })
-    expect(savePlan(edition("published"), edition("draft"), ready)).toEqual({ storage: "delete" })
+  it("공개를 내리거나 초안으로 돌려도 저장소는 그대로 둔다(배포 뒤 R2 정리로 지운다)", () => {
+    expect(savePlan(edition("published"), edition("withdrawn"), { build, storageReady: false })).toEqual({ storage: "none" })
+    expect(savePlan(edition("published"), edition("draft"), { build, storageReady: false })).toEqual({ storage: "none" })
   })
 
   it("공개와 상관없는 저장은 저장소를 건드리지 않는다", () => {
@@ -35,9 +35,7 @@ describe("savePlan", () => {
     expect(savePlan(edition("draft"), edition("withdrawn"), { build: undefined, storageReady: false })).toEqual({ storage: "none" })
   })
 
-  it("저장소를 건드려야 하는데 쓰기 키가 없으면 막는다", () => {
-    const error = "R2 쓰기 키(R2_WRITE_*)가 없어 공개 상태를 바꿀 수 없어요."
-    expect(savePlan(edition("draft"), edition("published"), { ...ready, storageReady: false })).toEqual({ error })
-    expect(savePlan(edition("published"), edition("withdrawn"), { ...ready, storageReady: false })).toEqual({ error })
+  it("공개할 때 쓰기 키가 없으면 막는다", () => {
+    expect(savePlan(edition("draft"), edition("published"), { ...ready, storageReady: false })).toEqual({ error: "R2 쓰기 키(R2_WRITE_*)가 없어 공개할 수 없어요." })
   })
 })

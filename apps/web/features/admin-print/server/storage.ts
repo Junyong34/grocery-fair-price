@@ -1,13 +1,15 @@
 import "server-only"
 
+import { execFile } from "node:child_process"
 import { readFile } from "node:fs/promises"
 import path from "node:path"
+import { promisify } from "node:util"
 
-import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
-import { downloadPath, objectKey } from "@workspace/seasonal/print/edition"
-import { PAPER_SIZES, PUBLISHED_PAPERS } from "@workspace/seasonal/print/spec"
+import { DeleteObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
+import { downloadPath, objectKey, staleObjectKeys, type DownloadManifest } from "@workspace/seasonal/print/edition"
+import { PUBLISHED_PAPERS } from "@workspace/seasonal/print/spec"
 
-import { PUBLIC_DIR } from "./files"
+import { MANIFEST, PUBLIC_DIR } from "./files"
 
 // 비공개 R2 버킷에 공개 에디션의 PDF를 올리고 지운다(ADR 0003). 쓰기 키는 운영자 로컬 .env에만 있다.
 // 엔드포인트 · 리전은 읽기 쪽(features/seasonal/downloads/server/download-url.ts)과 같다.
@@ -25,10 +27,43 @@ export async function uploadEdition(id: string) {
   }
 }
 
-/** 이 에디션의 객체를 모두 지운다. 공개하지 않은 용지 키도 지운다(없으면 그냥 넘어간다). */
-export async function removeEditionObjects(id: string) {
+/**
+ * 지워도 되는 키. 이 컴퓨터의 매니페스트와 푸시한 매니페스트(origin/main) 어느 쪽에도 공개로 없는 객체다.
+ * 배포가 끝났는지는 알 수 없으므로, 확인 창이 "배포가 끝난 뒤" 누르라고 안내한다.
+ */
+export async function staleKeys(): Promise<string[]> {
+  const [local, pushed, keys] = await Promise.all([readFile(MANIFEST, "utf8").then(JSON.parse) as Promise<DownloadManifest>, pushedManifest(), listKeys()])
+  return staleObjectKeys(keys, { editions: [...local.editions, ...pushed.editions] })
+}
+
+export async function deleteObjects(keys: readonly string[]) {
   const r2 = required()
-  await Promise.all(PAPER_SIZES.map((paper) => r2.client.send(new DeleteObjectCommand({ Bucket: r2.bucket, Key: objectKey(id, paper) }))))
+  for (const key of keys) await r2.client.send(new DeleteObjectCommand({ Bucket: r2.bucket, Key: key }))
+}
+
+async function listKeys(): Promise<string[]> {
+  const r2 = required()
+  const keys: string[] = []
+  let token: string | undefined
+  do {
+    const page = await r2.client.send(new ListObjectsV2Command({ Bucket: r2.bucket, ContinuationToken: token }))
+    keys.push(...(page.Contents ?? []).flatMap((object) => (object.Key ? [object.Key] : [])))
+    token = page.NextContinuationToken
+  } while (token)
+  return keys
+}
+
+const git = promisify(execFile)
+
+/** 푸시한 매니페스트. 아직 푸시한 적이 없으면 빈 목록이다. */
+async function pushedManifest(): Promise<DownloadManifest> {
+  const file = path.relative(await gitRoot(), MANIFEST)
+  const shown = await git("git", ["show", `origin/main:${file}`], { cwd: path.dirname(MANIFEST) }).catch(() => undefined)
+  return shown ? JSON.parse(shown.stdout) : { editions: [], withdrawn: [] }
+}
+
+async function gitRoot() {
+  return (await git("git", ["rev-parse", "--show-toplevel"], { cwd: path.dirname(MANIFEST) })).stdout.trim()
 }
 
 let cached: { client: S3Client; bucket: string } | null | undefined

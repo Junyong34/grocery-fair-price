@@ -8,7 +8,7 @@ import { buildManifest, downloadDir, parseEdition, type BuildRecord, type Editio
 const ROOT = process.cwd()
 export const EDITIONS_DIR = path.join(ROOT, "print-editions")
 export const PUBLIC_DIR = path.join(ROOT, "public")
-const MANIFEST = path.join(PUBLIC_DIR, "downloads", "manifest.json")
+export const MANIFEST = path.join(PUBLIC_DIR, "downloads", "manifest.json")
 
 export const editionDownloadDir = (id: string) => path.join(PUBLIC_DIR, downloadDir(id))
 

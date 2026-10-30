@@ -14,7 +14,7 @@ import type { ActionResult, FormState } from "../types"
 import { listEditions, readBuild, readEdition, removeEdition, writeBuild, writeEdition } from "./files"
 import { generatePdfs } from "./generate"
 import { assertAdmin } from "./guard"
-import { removeEditionObjects, storageReady, uploadEdition } from "./storage"
+import { deleteObjects, staleKeys, storageReady, uploadEdition } from "./storage"
 
 const isPrintKind = (value: unknown): value is PrintKind => PRINT_KINDS.includes(value as PrintKind)
 const missing = (id: string): ActionResult<never> => ({ ok: false, error: `없는 에디션: ${id}` })
@@ -46,10 +46,9 @@ export async function saveEdition(value: Edition): Promise<ActionResult> {
   const plan = savePlan(saved, edition, { build: await readBuild(edition.id), storageReady: storageReady() })
   if ("error" in plan) return { ok: false, error: plan.error }
   try {
-    // 올린 뒤에 매니페스트에 넣고, 매니페스트에서 뺀 뒤에 지운다. 그래서 목록에 있는 에디션은 늘 받을 수 있다.
+    // 올린 뒤에 매니페스트에 넣는다. 그래서 목록에 있는 에디션은 늘 받을 수 있다.
     if (plan.storage === "upload") await uploadEdition(edition.id)
     await writeEdition(edition)
-    if (plan.storage === "delete") await removeEditionObjects(edition.id)
   } catch (error) {
     return failure(error)
   }
@@ -74,14 +73,32 @@ export async function generateEdition(id: string): Promise<ActionResult<BuildRec
 
 export async function deleteEdition(id: string): Promise<ActionResult> {
   assertAdmin()
-  const edition = await readEdition(id)
-  if (!edition) return missing(id)
+  if (!(await readEdition(id))) return missing(id)
+  // R2 객체는 남긴다. 배포 뒤 "R2 정리"가 지운다(lib/publish.ts).
+  await removeEdition(id)
+  refresh()
+  return { ok: true, data: undefined }
+}
+
+/** R2 정리 전에 지울 키를 보여 준다. */
+export async function previewCleanup(): Promise<ActionResult<string[]>> {
+  assertAdmin()
   try {
-    await removeEdition(id)
-    if (edition.status === "published") await removeEditionObjects(id)
+    return { ok: true, data: await staleKeys() }
   } catch (error) {
     return failure(error)
   }
-  refresh()
-  return { ok: true, data: undefined }
+}
+
+/** 배포된 공개 목록에 없는 R2 객체를 지운다. 확인 창에서 본 키만 지운다(그 사이 공개된 것은 남는다). */
+export async function cleanStorage(keys: readonly string[]): Promise<ActionResult<string[]>> {
+  assertAdmin()
+  try {
+    const stale = new Set(await staleKeys())
+    const targets = keys.filter((key) => stale.has(key))
+    await deleteObjects(targets)
+    return { ok: true, data: targets }
+  } catch (error) {
+    return failure(error)
+  }
 }

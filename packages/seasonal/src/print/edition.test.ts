@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { buildManifest, downloadPath, EDITION_LIMITS, isBuildCurrent, nextEditionId, objectKey, parseEdition, thumbnailPages, thumbnailPath, type BuildRecord, type Edition } from "./edition"
+import { buildManifest, downloadPath, EDITION_LIMITS, isBuildCurrent, nextEditionId, objectKey, parseEdition, staleObjectKeys, thumbnailPages, thumbnailPath, type BuildRecord, type Edition } from "./edition"
 import { DEFAULT_SPECS, specHash } from "./spec"
 
 const edition = (id: string, status: Edition["status"]): Edition => ({
@@ -66,6 +66,24 @@ describe("downloadPath", () => {
   it("에디션·용지마다 해시 없는 고정 경로 하나를 만든다", () => {
     expect(downloadPath("monthly-cream", "A4")).toBe("/downloads/monthly-cream/a4.pdf")
     expect(downloadPath("monthly-cream", "A3")).toBe("/downloads/monthly-cream/a3.pdf")
+  })
+})
+
+describe("staleObjectKeys", () => {
+  const manifest = (ids: string[]) => ({ editions: ids.map((id) => ({ id }) as never), withdrawn: [] })
+
+  it("공개 목록에 없는 에디션의 객체를 고른다", () => {
+    const keys = ["downloads/monthly-1/a4.pdf", "downloads/monthly-2/a4.pdf"]
+    expect(staleObjectKeys(keys, manifest(["monthly-1"]))).toEqual(["downloads/monthly-2/a4.pdf"])
+  })
+
+  it("공개 에디션이라도 공개하지 않는 용지나 모르는 파일은 고른다", () => {
+    const keys = ["downloads/monthly-1/a4.pdf", "downloads/monthly-1/a3.pdf", "downloads/monthly-1/old.pdf", "_check/hello.txt"]
+    expect(staleObjectKeys(keys, manifest(["monthly-1"]))).toEqual(["downloads/monthly-1/a3.pdf", "downloads/monthly-1/old.pdf", "_check/hello.txt"])
+  })
+
+  it("모두 공개 중이면 비어 있다", () => {
+    expect(staleObjectKeys(["downloads/monthly-1/a4.pdf"], manifest(["monthly-1"]))).toEqual([])
   })
 })
 

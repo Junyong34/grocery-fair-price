@@ -62,6 +62,15 @@ export function objectKey(editionId: string, paper: Paper): string {
   return downloadPath(editionId, paper).slice(1)
 }
 
+/**
+ * 버킷에서 지워도 되는 키: 배포된 공개 목록의 공개 용지 키가 아닌 것 전부.
+ * 내리거나 지울 때 바로 지우지 않고(배포 전에는 운영 목록에 아직 있다), 배포 뒤 이것으로 정리한다.
+ */
+export function staleObjectKeys(keys: readonly string[], manifest: Pick<DownloadManifest, "editions">): string[] {
+  const live = new Set(manifest.editions.flatMap((edition) => PUBLISHED_PAPERS.map((paper) => objectKey(edition.id, paper))))
+  return keys.filter((key) => !live.has(key))
+}
+
 /** 썸네일로 찍을 쪽(0부터). 월간 달력은 표지와 첫 달을 같이 보여 표지만 보고 고르지 않게 한다. */
 export function thumbnailPages(spec: PrintSpec): number[] {
   return spec.kind === "monthly" && spec.cover !== "none" ? [0, 1] : [0]

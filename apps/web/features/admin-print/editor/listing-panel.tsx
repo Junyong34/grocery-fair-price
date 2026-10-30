@@ -34,7 +34,7 @@ export function ListingPanel({ description, status, statusError, onDescriptionCh
       <div className="flex flex-wrap items-center justify-between gap-4 text-sm">
         <span className="flex max-w-[34ch] flex-col gap-0.5">
           <span className="text-ink">상태</span>
-          <span className="text-[13px] text-stone">공개하려면 설명과 지금 옵션으로 만든 PDF가 있어야 해요. 공개하면 R2에 올리고, 내리면 지운 뒤 옛 링크에 새 에디션을 안내해요</span>
+          <span className="text-[13px] text-stone">공개하려면 설명과 지금 옵션으로 만든 PDF가 있어야 해요. 공개하면 R2에 올려요. 내리면 옛 링크에 새 에디션을 안내해요</span>
         </span>
         <Segmented aria-label="상태" options={STATUS_OPTIONS} value={status} onValueChange={onStatusChange} className="shrink-0" />
       </div>
