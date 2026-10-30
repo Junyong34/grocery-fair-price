@@ -193,7 +193,7 @@ import 경로:
 
 | 폴더 | 내용 |
 |---|---|
-| `data/` | 데이터 경계. `price-source.ts`(`PriceSource`, `getPriceSource()`, `server-only`)만 화면이 부른다. `fixture-source.ts`와 `fixtures/`는 하드코딩 데이터이고, 다음 단계에서 `supabase-source.ts`가 대신한다. `data-boundary.test.ts`가 `data/` 밖의 `fixtures` import를 막는다 |
+| `data/` | 데이터 경계(명세 `.scratch/price-db-read/spec.md`). `price-source.ts`(`PriceSource`, `getPriceSource()`, `server-only`)만 화면이 부른다. 운영 DB `price.current_judgment`를 읽는다: `db.ts`(postgres 클라이언트 하나, `web_reader`, `WEB_DATABASE_URL`, `prepare: false`), `queries/`(메서드마다 SQL 하나와 행 타입), `db-source.ts`(캐시 정책: 목록 `hours` · 검색 `days` · 상세는 React `cache()`만, `@workspace/price/schema`로 zod 검사), `featured.ts`(자주 사는 품종 상수). `data-boundary.test.ts`가 `data/` 밖의 `db` · `db-source` · `queries/` import를 막는다 |
 | `home/` | P1 시세 메인 |
 | `search/` | P2 품종 검색. 검색어는 `history.replaceState`로 `?q=`에 맞춘다 |
 | `basket/` | P4 담은 품종: 판정별 개수, 바뀐 판정 알림, 판정별 묶음, × 빼기, 편집(모두 빼기), 빈 목록. 기기 값을 불러온 뒤에 그린다 |

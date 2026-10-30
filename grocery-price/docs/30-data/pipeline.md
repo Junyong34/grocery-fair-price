@@ -1068,7 +1068,7 @@ raw_object
 
 ### 4-1. 품종 판정 payload (`/seasonal`과 같은 앱의 품종 가격 화면이 읽음)
 
-**payload는 화면 타입 `VarietyDetail`(`packages/price/src/types.ts`) 그대로다** (2026-10-30, ingest-foundation/11). 처음 이 절에 둔 JSON 예시(`judgment.label`, `confidence.level`, `quotes[]` 등)는 화면을 만들기 전에 쓴 것이라, 화면 계약이 정해진 뒤 타입 하나로 맞췄다. 신뢰도는 점수로 만들지 않고 표본 부족 · 갱신 지연 두 표시로 둔다 ([judgment.md](judgment.md) 6-3). 웹앱은 옮겨 담기 없이 payload를 돌려준다.
+**payload는 화면 타입 `VarietyDetail`(`packages/price/src/types.ts`) 그대로다** (2026-10-30, ingest-foundation/11). 처음 이 절에 둔 JSON 예시(`judgment.label`, `confidence.level`, `quotes[]` 등)는 화면을 만들기 전에 쓴 것이라, 화면 계약이 정해진 뒤 타입 하나로 맞췄다. 신뢰도는 점수로 만들지 않고 표본 부족 · 갱신 지연 두 표시로 둔다 ([judgment.md](judgment.md) 6-3). 웹앱은 옮겨 담기 없이 payload를 돌려주고, 읽을 때 zod 스키마 `packages/price/src/schema.ts`(`varietyDetailSchema`, 목록은 무거운 키를 뺀 jsonb를 `varietySummarySchema`)로 모양만 검사한다 (ADR 0004, `.scratch/price-db-read/spec.md`). payload 모양을 바꾸면 `types.ts`와 이 스키마를 같이 고친다.
 
 판정 배치(`pnpm --filter @workspace/price-ingest judgment`, `src/judgment/`)가 활성 품종마다 대표 규격(`spec.is_default`) 한 행을 만든다. 숫자는 다시 계산하지 않고 모은다:
 
@@ -1105,7 +1105,8 @@ raw_object
 ### 4-3. 응답을 만드는 시점
 
 - 배치가 끝날 때 품종별 `judgment_snapshot.payload`를 4-1 모양으로 **미리 만들어 둔다.** 화면은 그것을 그대로 읽는다. 수집 워크플로(KAMIS·축평원은 평소가 다음, 참가격은 적재 다음)가 `judgment`를 부르고, 새 묶음이 검사(행이 없거나 지금 묶음보다 20% 넘게 줄면 `failed`)를 넘으면 `judgment_current`를 바꾼다. 묶음은 최근 7개만 남긴다.
-- 웹앱은 이 값을 캐시하고, 수집·재계산이 끝나면 갱신 신호를 받아 캐시를 버린다 (`ingest-foundation/06`).
+- 웹앱은 `apps/web/features/price/data/db-source.ts`에서 이 값을 읽어 `packages/price/src/schema.ts`로 검사한다. 모양이 어긋난 행은 목록에서 빠지고(서버 로그에 품종 id), 상세는 오류 화면이 된다. 배치보다 웹이 먼저 배포돼 옛 payload를 읽는 동안 생기는 일이다.
+- 캐시는 목록 `hours` · 검색 재료 `days`이고 상세는 캐시하지 않는다 (`.scratch/price-db-read/spec.md` 2장). 수집·재계산이 끝나면 갱신 신호로 캐시를 버리는 일은 아직 열려 있다 (`ingest-foundation/06`).
 
 ---
 

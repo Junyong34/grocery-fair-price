@@ -90,7 +90,7 @@ Add cojeev or shadcn components from the repo root with `pnpm ui:add <name-or-ur
 
 ### Routes
 
-- The 제철 screens live under `/seasonal`. `/` is the price main (P1, `app/(price)/page.tsx`); the price screens (`/`, `/search`, `/prices/[variety]`, `/basket`) share the route group `(price)`. Spec: `.scratch/price-screens/spec.md`. Price screens read data only through `getPriceSource()` in `features/price/data/price-source.ts`, never `fixtures/` directly.
+- The 제철 screens live under `/seasonal`. `/` is the price main (P1, `app/(price)/page.tsx`); the price screens (`/`, `/search`, `/prices/[variety]`, `/basket`) share the route group `(price)`. Spec: `.scratch/price-screens/spec.md`. Price screens read data only through `getPriceSource()` in `features/price/data/price-source.ts`, never `db`, `db-source` or `queries/` directly. It reads the remote DB (`WEB_DATABASE_URL` in the root `.env`, also when running locally); spec `.scratch/price-db-read/spec.md`.
 - Build every path with `routes` from `apps/web/shared/routes.ts`. `proxy.ts` `matcher` is the one hard-coded path, because it must be a static literal; keep it in sync with `routes`.
 - Route groups `(this-month)` and `(season)` share the second-level tab bars without changing the URL. `(this-month)/months/(detail)` adds the 2b timeline only to `/seasonal/months/[month]`.
 - `/seasonal/festivals` has no page: `proxy.ts` redirects it to the upcoming festival by Seoul date.
