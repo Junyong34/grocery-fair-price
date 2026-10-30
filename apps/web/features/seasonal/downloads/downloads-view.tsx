@@ -8,7 +8,7 @@ import { PRINT_KIND_LABELS } from "@workspace/seasonal/print/spec"
 import { DOWNLOADS } from "@/shared/downloads-manifest"
 import { routes } from "@/shared/routes"
 
-import { EditionThumbnail } from "../components/edition-thumbnail"
+import { EditionThumbnail, ThumbnailMat } from "../components/edition-thumbnail"
 
 /** 내려받기 목록(2-C): 종류별 가로 줄. 칸을 누르면 상세가 시트로 뜬다(@sheet/(.)downloads/[edition]). */
 export function DownloadsView() {
@@ -43,7 +43,12 @@ export function EditionShelf({ editions, fullNames = false }: { editions: readon
       {editions.map((edition) => (
         <li key={edition.id} className="w-[38%] max-w-[180px] shrink-0 snap-start lg:w-auto lg:max-w-none">
           <Link href={routes.seasonal.download(edition.id)} className="flex flex-col gap-2 text-ink no-underline">
-            {edition.thumbnails[0] && <EditionThumbnail thumbnail={edition.thumbnails[0]} name={editionName(edition)} />}
+            {edition.thumbnails[0] && (
+              // 세로·가로 용지가 섞여도 칸 높이가 같도록 받침 비율을 고정하고 종이를 가운데에 둔다.
+              <ThumbnailMat className="aspect-[4/5] p-[12%]">
+                <EditionThumbnail thumbnail={edition.thumbnails[0]} name={editionName(edition)} className="max-h-full w-auto max-w-full" />
+              </ThumbnailMat>
+            )}
             <span className="text-[13px] leading-snug font-semibold">{fullNames ? editionName(edition) : edition.title}</span>
           </Link>
         </li>

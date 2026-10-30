@@ -73,6 +73,9 @@
     --color-holiday: #c43c2a;
     --color-holiday-wash: color-mix(in oklab, var(--color-holiday) 9%, var(--color-canvas));
 
+    /* 인쇄물 썸네일 받침. 크림(canvas)·흰(surface) 용지가 모두 떠 보이도록 캔버스보다 한 톤 진한 베이지 */
+    --color-mat: color-mix(in oklab, var(--color-stone) 8%, var(--color-canvas));
+
     /* 가격 판정색(싸요 · 보통 · 비싸요 · 판정 전). 이름만 새로 두고 값은 위 팔레트를 가리킨다.
        기본값은 점 · 선 · 막대, -wash는 카드 · 칩 배경, -ink는 그 위 글자(캔버스 · wash 위 4.5:1 이상). */
     --color-verdict-cheap: color-mix(in oklab, var(--color-sage) 50%, var(--color-forest));

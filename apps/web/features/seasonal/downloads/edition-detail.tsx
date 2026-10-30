@@ -3,7 +3,7 @@ import type { ManifestEntry } from "@workspace/seasonal/print/edition"
 import { editionMeta, editionName } from "@workspace/seasonal/print/listing"
 import { PRINT_KIND_LABELS } from "@workspace/seasonal/print/spec"
 
-import { EditionThumbnail } from "../components/edition-thumbnail"
+import { EditionThumbnail, ThumbnailMat } from "../components/edition-thumbnail"
 import { EditionActions } from "./edition-actions"
 
 /**
@@ -14,11 +14,11 @@ export function EditionDetail({ edition, title, placement }: { edition: Manifest
   const name = editionName(edition)
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-3">
+      <ThumbnailMat className="gap-3 p-5">
         {edition.thumbnails.map((thumbnail, index) => (
           <EditionThumbnail key={thumbnail.path} thumbnail={thumbnail} name={name} index={index} priority={index === 0} className="w-[140px] lg:w-[160px]" />
         ))}
-      </div>
+      </ThumbnailMat>
       <div className="flex flex-col gap-1">
         <span className="self-start rounded-full bg-surface px-2.5 py-0.5 text-xs text-stone">{PRINT_KIND_LABELS[edition.kind]}</span>
         {title}
