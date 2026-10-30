@@ -102,5 +102,5 @@ Phase: MVP 이후.
 | 05 | 목록(종류별 줄)·에디션 상세(바텀시트/페이지) | resolved | 02, 04 |
 | 06 | 다운로드 Route Handler(presigned 302, noindex) | 개발 경로 완료, R2 서명 남음 | 01, 02 |
 | 07 | 완료 상태·공유, 내려간 에디션 안내, 2a·2b 입구 카드, A3 요청 버튼 | resolved | 04, 05, 06 |
-| 08 | GA4 연결과 이벤트(내려받기, A3 요청) | ready-for-agent | 05 |
+| 08 | GA4 연결과 이벤트(내려받기, A3 요청, 공유, 입구) — 계획 정리됨 | ready-for-agent (사람 단계 A · B 먼저) | 05 |
 | 09 | PDF 크기 조사(A3가 A4의 약 2배인 이유) | needs-triage | — |
