@@ -13,8 +13,8 @@ import { OptionsPanel } from "./options-panel"
 import { PreviewPanel } from "./preview-panel"
 import { useEditionEditor } from "./use-edition-editor"
 
-export function EditionEditor({ saved, build }: { saved: Edition; build: BuildRecord | undefined }) {
-  const editor = useEditionEditor(saved, build)
+export function EditionEditor({ saved, build, storageReady }: { saved: Edition; build: BuildRecord | undefined; storageReady: boolean }) {
+  const editor = useEditionEditor(saved, build, storageReady)
   return (
     <div className="flex flex-col gap-8">
       <header className="flex flex-col gap-4">
@@ -37,7 +37,13 @@ export function EditionEditor({ saved, build }: { saved: Edition; build: BuildRe
         <Card className="lg:sticky lg:top-6">
           <CardContent className="flex flex-col gap-8">
             <OptionsPanel spec={editor.draft.spec} error={editor.specError} onChange={editor.setOption} />
-            <ListingPanel description={editor.draft.description} status={editor.draft.status} onDescriptionChange={editor.setDescription} onStatusChange={editor.setStatus} />
+            <ListingPanel
+              description={editor.draft.description}
+              status={editor.draft.status}
+              statusError={editor.statusError}
+              onDescriptionChange={editor.setDescription}
+              onStatusChange={editor.setStatus}
+            />
           </CardContent>
         </Card>
         <PreviewPanel spec={editor.previewSpec} dirty={editor.dirty} />

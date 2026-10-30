@@ -44,7 +44,7 @@ export function DeleteEditionButton({ id, title, trigger, onDeleted }: Props) {
       <DialogContent appearance="confirmation" className="bg-canvas">
         <DialogHeader>
           <DialogTitle>“{title}” 에디션을 지울까요?</DialogTitle>
-          <DialogDescription>사양 파일과 이 컴퓨터에 만든 PDF가 모두 지워져요. 되돌릴 수 없어요.</DialogDescription>
+          <DialogDescription>사양 파일과 이 컴퓨터에 만든 PDF가 모두 지워져요. 공개 중이면 R2의 PDF도 지워요. 되돌릴 수 없어요.</DialogDescription>
         </DialogHeader>
         {error && (
           <p role="alert" className="text-sm text-error">

@@ -27,5 +27,5 @@ async function Editor({ searchParams }: { searchParams: PageProps<"/admin/edit">
   const { id } = await searchParams
   const data = typeof id === "string" ? await getEditionEditor(id) : undefined
   if (!data) notFound()
-  return <EditionEditor key={data.edition.id} saved={data.edition} build={data.build} />
+  return <EditionEditor key={data.edition.id} saved={data.edition} build={data.build} storageReady={data.storageReady} />
 }

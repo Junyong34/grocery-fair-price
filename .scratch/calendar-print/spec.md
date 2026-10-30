@@ -284,8 +284,9 @@ packages/seasonal/src/print/
 2. **PDF 생성**: 생성 버튼(또는 같은 일을 하는 `pnpm prints:build [id]`)이 Playwright Chromium으로 `/print?spec=…&paper=…`를 열고 `page.pdf({ preferCSSPageSize: true, printBackground: true })`로 저장한다. 용지마다 하나씩, 에디션마다 2개를 만든다.
 3. 파일은 `apps/web/public/downloads/{editionId}/{a4|a3}.pdf`에 쓴다. 경로에 해시가 없어 다시 생성해도 사용자 링크가 그대로다. 이전 파일은 git 기록에 남는다.
 4. 생성기는 끝에 `public/downloads/manifest.json`을 `status: "published"`인 에디션으로 다시 쓴다. 같은 사양이면 같은 파일과 같은 매니페스트가 나온다(멱등). `generatedAt`은 사양 해시가 바뀐 에디션만 갱신한다.
-5. 생성이 끝나면 편집기에 파일 링크가 뜬다. 관리자가 PDF를 열어 보고, 괜찮으면 상태를 `published`로 바꾼 뒤 사양·PDF·매니페스트를 한 커밋으로 올린다. 배포되면 사용자 링크가 살아난다.
-6. 내리기: 상태를 `draft`로 돌리고 생성기를 다시 돌리면 매니페스트에서 빠진다. PDF 파일은 남겨 둔다(이미 공유된 링크가 깨지지 않게). 지울 때는 손으로 지운다.
+5. 생성이 끝나면 편집기에 파일 링크가 뜬다. 관리자가 PDF를 열어 보고, 괜찮으면 상태를 `published`로 바꿔 저장한다. 저장이 공개 용지(A4) PDF를 비공개 R2(`downloads/<id>/a4.pdf`, ADR 0003)에 올린 뒤 매니페스트에 넣는다. 지금 옵션으로 만든 PDF가 없거나 R2 쓰기 키가 없으면 저장이 막히고 이유가 뜬다. 사양 · 매니페스트 · 썸네일을 커밋해 배포하면 목록에 보인다(PDF는 git에 넣지 않는다).
+6. 공개 중에 옵션을 바꾸면 저장만 하고, PDF를 다시 만들 때 같은 키에 덮어쓴다.
+7. 내리기: 상태를 `withdrawn`(또는 `draft`)으로 저장하면 매니페스트에서 뺀 뒤 R2 객체를 지운다. 옛 링크는 에디션 상세로 302해 새 에디션을 안내한다. 공개 중인 에디션을 삭제해도 R2 객체를 지운다. 2026-10-30 calendar-download 03에서 바꿨다.
 
 AGENTS.md "Generated files" 표에 `public/downloads/**`와 명령 `pnpm prints:build`를 더한다.
 
