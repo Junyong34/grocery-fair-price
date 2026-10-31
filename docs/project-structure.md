@@ -87,7 +87,7 @@ import 경로:
 | `app/globals.css` | `@workspace/ui/globals.css`와 `cojeev.css`를 불러오고, ViewTransition 키프레임과 reduced-motion 처리 |
 | `components.json` | shadcn 설정. 실제 설치는 `packages/ui`에서 한다(`pnpm ui:add`) |
 | `DESIGN.md` | Oura 디자인 언어 분석(색, 서체, 간격, 컴포넌트) |
-| `docs/nextjs-16-patterns.md` | Next 16 렌더링·캐시 판단 근거(2026-10-14). 화면 개발 전에 쓴 문서라 예시 코드 일부(`lib/` 경로, eaten store 구현)는 실제 코드와 다르다 |
+| `docs/nextjs-16-patterns.md` | Next 16 렌더링·캐시 판단 근거(2026-10-14 조사, 2026-10-31 실제 코드에 맞춰 줄임) |
 | `docs/brand-assets.md` | 로고·파비콘 파일과 교체 방법 |
 | `docs/seo.md` | 검색 색인: 새 페이지 연결 체크리스트, 환경 변수, 운영 전환 절차 |
 | `vitest.config.ts` | `shared/` 순수 함수 테스트. tsconfig paths를 따르고 JSX만 여기서 변환한다 |
@@ -263,7 +263,7 @@ import 경로:
 | `print/edition.ts` | 에디션, 다운로드 경로, 매니페스트 |
 | `print/foods.ts` | 인쇄물 칸(달·계절)에 넣을 품종 고르기 |
 
-테스트는 `*.test.ts`가 옆에 있다(vitest, 8개 파일). `packages/seasonal/README.md`도 참고한다.
+테스트는 `*.test.ts`가 옆에 있다(vitest, 23개 파일). 배치 알고리즘 비교와 명절 전통 음식 조사는 `packages/seasonal/docs/`에 있다. `packages/seasonal/README.md`도 참고한다.
 
 ## 6-1. packages/price
 
@@ -405,7 +405,7 @@ grocery-price/
 ├─ GLOSSARY.md               용어집 (카테고리·품목·품종·규격, 제철, 먹음 기록 …). 저장소 전체가 따른다
 ├─ docs/
 │  ├─ 00-overview/           product-concept.md, roadmap.md (4단계: 수집 기반·판정 설계·화면 설계·구현)
-│  ├─ 10-research/           api-spec.md (API 실측), gov-price-sites (정부 가격 화면 대조), public-data-survey, data-sourcing-legal, content-and-taxonomy, images, scatter-layout-algorithms, traditional-foods
+│  ├─ 10-research/           api-spec.md (API 실측), gov-price-sites (정부 가격 화면 대조), public-data-survey, data-sourcing-legal, content-and-taxonomy, images
 │  ├─ 20-domain/             domain-model.md
 │  ├─ 30-data/               pipeline.md (저장 구조, 테이블, 수집 일정, 장애 처리), judgment.md (평소가·판정 계산), variety-list.md (품종 목록), sources/ (출처별 실측: kamis·ekape·chamgagyeok, item-inventory), schema-map.html (데이터 지도, ERD는 pnpm db:erd가 생성)
 │  └─ adr/                   0001 공공데이터와 제보, 크롤링 안 함 · 0002 Supabase + GitHub Actions · 0003 인쇄 PDF는 비공개 R2 · 0004 판정 payload는 화면 모양

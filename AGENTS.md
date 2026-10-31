@@ -111,7 +111,7 @@ Add cojeev or shadcn components from the repo root with `pnpm ui:add <name-or-ur
 
 ## Next.js docs
 
-`apps/web` runs Next.js 16.4. APIs, conventions, and file structure may differ from your training data. Before writing Next.js code, read the relevant guide in `apps/web/node_modules/next/dist/docs/`. The repo root has no `next` package, so resolve it from `apps/web`. Heed deprecation notices. Rendering and caching rationale for this app: `apps/web/docs/nextjs-16-patterns.md`. It predates the screens, so where its sketches differ from the code (`lib/` paths, a `useSyncExternalStore` eaten store), the code and this file win.
+`apps/web` runs Next.js 16.4. APIs, conventions, and file structure may differ from your training data. Before writing Next.js code, read the relevant guide in `apps/web/node_modules/next/dist/docs/`. The repo root has no `next` package, so resolve it from `apps/web`. Heed deprecation notices. Rendering and caching rationale for this app: `apps/web/docs/nextjs-16-patterns.md`.
 
 `next dev` would normally write this as a managed block in `apps/web/AGENTS.md`. That is off (`agentRules: false` in `apps/web/next.config.ts`) so this file stays the single source of agent instructions.
 
