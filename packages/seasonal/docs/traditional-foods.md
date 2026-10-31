@@ -2,7 +2,7 @@
 
 조사일: 2026-10-15 (Asia/Seoul)  
 상태: 도메인 리서치 및 데이터 모델 확장안  
-참조: [GLOSSARY.md](../../GLOSSARY.md), [SEASONAL-FOODS.md](../../../prototypes/seasonal-food/docs/SEASONAL-FOODS.md), [festivals.ts](../../../packages/seasonal/src/data/festivals.ts)
+참조: [GLOSSARY.md](../../../grocery-price/GLOSSARY.md), [SEASONAL-FOODS.md](../../../prototypes/seasonal-food/docs/SEASONAL-FOODS.md), [festivals.ts](../../../packages/seasonal/src/data/festivals.ts)
 
 ---
 
@@ -11,7 +11,7 @@
 한국의 식문화에서 **명절**과 **전통 음식**은 농경 사회의 세시풍속 및 기후 순환(24절기와 음력 달력)에 밀접하게 맞닿아 있다. 조상들은 특정 계절과 명절마다 그 시기에 수확되는 신선한 제철 식재료를 취해 음식을 만들고, 이를 통해 조상께 감사하는 차례를 올리거나 이웃과 나누며 한 해의 무병장수·풍농·벽사(辟邪, 사악한 기운을 물리침)를 기원했다.
 
 이 문서는 저장소의 제철음식 서비스(`apps/web`) 및 향후 장보기 시세 판정 서비스(`grocery-price`)를 뒷받침하기 위해 다음 목적을 수행한다:
-1. **도메인 용어 체계 정립**: [`GLOSSARY.md`](../../GLOSSARY.md) 규칙에 따라 명절과 전통 음식의 정의를 일관되게 적용한다.
+1. **도메인 용어 체계 정립**: [`GLOSSARY.md`](../../../grocery-price/GLOSSARY.md) 규칙에 따라 명절과 전통 음식의 정의를 일관되게 적용한다.
 2. **6대 핵심 명절 전통 음식 전수 조사**: 현재 서비스에 구현된 6대 명절(설날, 정월대보름, 단오, 삼복, 추석, 동지)의 대표 전통 음식 20종에 대해 유래, 상징성, 조리 특성, 지역 변형을 심층 분석한다.
 3. **저장소 제철 품종(`FoodId`)과의 연계 매핑**: 전통 음식을 구성하는 핵심 재료가 저장소의 79개 검증 품종 카탈로그([`foods.generated.ts`](../../../packages/seasonal/src/data/foods.generated.ts))와 어떻게 교차하는지 명확히 추적한다.
 4. **향후 서비스 확장 가이드**: 단순 텍스트 배열(`string[]`)로 머물러 있는 코드 데이터를 구조화된 모델(`TraditionalDish`)로 확장하기 위한 스키마 설계안을 제공한다.
@@ -20,7 +20,7 @@
 
 ## 2. 도메인 용어 및 매핑 원칙
 
-### 2.1. 용어 준수 원칙 ([`GLOSSARY.md`](../../GLOSSARY.md))
+### 2.1. 용어 준수 원칙 ([`GLOSSARY.md`](../../../grocery-price/GLOSSARY.md))
 - **명절**: 해마다 정해진 때에 음식을 차려 먹는 전통 기념일 (예: 설날, 추석, 동지).  
   _주의 (Avoid)_: 단순 '기념일'로 통칭하거나 천문 궤도 기준인 '24절기'와 혼동하지 않는다.
 - **전통 음식**: 명절에 차려 먹는 요리. 단일 품종이 아니라 품종과 가공재료로 조리한 복합 음식이다 (예: 떡국, 송편).  

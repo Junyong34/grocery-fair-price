@@ -34,7 +34,7 @@
 
 **조사 (P0)**
 - [data-sourcing-legal.md](docs/10-research/data-sourcing-legal.md): 크롤링 법적 리스크, 판례, 약관, 합법적 데이터 확보 전략
-- [public-data-survey.md](docs/10-research/public-data-survey.md): 참가격·KAMIS·축평원·수산물 공공데이터 개요와 배치 초안
+- [public-data-survey.md](docs/10-research/public-data-survey.md): 참가격·KAMIS·축평원·수산물 공공데이터를 한 장에 비교한 개요
 - [images.md](docs/10-research/images.md): 이미지 저작권, 무료 소스 (AI 생성 계획은 손그림 SVG로 대체됨)
 - [content-and-taxonomy.md](docs/10-research/content-and-taxonomy.md): 레시피·제철 데이터, 분류 체계, 단위가격 표시제, 해외 사례
 

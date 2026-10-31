@@ -12,6 +12,7 @@
 | `src/search/` | 초성 검색(`match-foods`) |
 | `src/print/` | 인쇄 에디션: 스펙 · 구성(`layouts`) · 기간 차트 · 원형 달력 |
 | `scripts/` | 생성 스크립트 |
+| `docs/` | 조사 기록: 흩어진 배치 알고리즘 비교(`scatter-layout-algorithms.md`, `layout/`과 `geometry/`의 근거), 명절 전통 음식(`traditional-foods.md`) |
 
 품종 목록 `src/data/foods.generated.ts`는 생성 파일이다. 직접 고치지 않고 `pnpm --filter @workspace/seasonal build:foods`로 다시 만든다. 원천이 `prototypes/`(Git 밖)에 있어 그 폴더가 있는 기기에서만 돌릴 수 있다. 일러스트가 없는 품종의 id는 스크립트의 `NEW_IDS`에서 정한다.
 
