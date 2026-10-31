@@ -430,6 +430,7 @@ grocery-price/
 | SEO 결정(색인 정책, 구조화 데이터, 제목 패턴) | `.scratch/seo/spec.md` |
 | 색·서체 | `apps/web/DESIGN.md`, `packages/ui/src/styles/globals.css` |
 | Next 16 렌더링·캐시 근거 | `apps/web/docs/nextjs-16-patterns.md` |
+| 라우트별 렌더링 흐름(정적 셸·스트리밍·하이드레이션 실측) | `apps/web/docs/rendering-flow/` |
 | 로고·파비콘 | `apps/web/docs/brand-assets.md` |
 | 새 페이지의 검색 색인 연결 | `apps/web/docs/seo.md` |
 | 분석 이벤트 더하기 · 지우기, GA 설정, 개인정보 처리방침 | `apps/web/docs/analytics.md` |
