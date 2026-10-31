@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
+import { dishNames } from "@workspace/seasonal/data/dishes"
 import { festivalOf, FESTIVALS, isFestival } from "@workspace/seasonal/data/festivals"
 import { seasonOfMonth } from "@workspace/seasonal/data/seasons"
 
@@ -28,7 +29,7 @@ export async function generateMetadata(
     path: routes.seasonal.festival(slug),
     ogImage: {
       title: `${item.name} 제철 절식`,
-      subtitle: `${item.traditionalDishes.join(" · ")}`,
+      subtitle: dishNames(item.traditionalDishes).join(" · "),
       badge: "명절 절식",
       season: seasonOfMonth(item.month),
     },

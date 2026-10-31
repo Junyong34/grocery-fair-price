@@ -1,17 +1,15 @@
 import { lunarToSolar, winterSolstice } from "../calendar/lunar"
 import type { CalendarDate } from "../calendar/month-calendar"
+import type { DishId } from "./dishes"
 import type { FoodId } from "./foods"
 
 /** 양력 날짜를 구하는 규칙. 음력 [월, 일] 또는 동지. */
 type FestivalDateRule = { lunar: readonly [month: number, day: number] } | "solstice"
 
-/** 명절에 차려 먹는 요리. 품종이 아니므로 품종 상세로 연결하지 않는다. */
-export type TraditionalDish = string
-
 /**
  * 명절 목록. month는 대표 양력 월로, 다가오는 명절을 고를 때 쓴다.
  * date는 양력 날짜를 구하는 규칙이다(calendar/lunar). 음력이면 [월, 일], 동지는 "solstice"다. 해마다 계산하므로 연도별 표를 손으로 고치지 않는다.
- * 삼복처럼 하루로 정할 수 없으면 비워 둔다. 전통 음식 출처: prototypes/seasonal-food/scripts/build_seasonal_lists.py의 HOLIDAYS.
+ * 삼복처럼 하루로 정할 수 없으면 비워 둔다. traditionalDishes는 전통 음식 id(dishes.ts)다. 전통 음식 출처: prototypes/seasonal-food/scripts/build_seasonal_lists.py의 HOLIDAYS.
  */
 export const FESTIVALS = [
   {
@@ -20,7 +18,7 @@ export const FESTIVALS = [
     month: 2,
     period: "음력 1월 1일",
     date: { lunar: [1, 1] },
-    traditionalDishes: ["떡국", "만두", "식혜", "수정과"],
+    traditionalDishes: ["tteokguk", "mandu", "sikhye", "sujeonggwa"],
     seasonalFoodIds: ["spinach", "snow-crab", "hallabong", "bomdong"],
   },
   {
@@ -29,7 +27,7 @@ export const FESTIVALS = [
     month: 3,
     period: "음력 1월 15일",
     date: { lunar: [1, 15] },
-    traditionalDishes: ["오곡밥", "묵은 나물", "부럼", "귀밝이술"],
+    traditionalDishes: ["ogokbap", "mugeun-namul", "bureom", "gwibalgi-sul"],
     seasonalFoodIds: ["shepherds-purse", "wild-chive", "mugwort", "water-dropwort"],
   },
   {
@@ -38,7 +36,7 @@ export const FESTIVALS = [
     month: 6,
     period: "음력 5월 5일",
     date: { lunar: [5, 5] },
-    traditionalDishes: ["수리취떡", "제호탕"],
+    traditionalDishes: ["surichwi-tteok", "jeho-tang"],
     seasonalFoodIds: ["green-plum", "potato", "black-raspberry", "apricot"],
   },
   {
@@ -46,7 +44,7 @@ export const FESTIVALS = [
     name: "삼복",
     month: 7,
     period: "초복(하지 뒤 셋째 경일)부터 말복(입추 뒤 첫 경일)까지, 7월 중순~8월 중순",
-    traditionalDishes: ["삼계탕", "육개장", "팥죽"],
+    traditionalDishes: ["samgyetang", "yukgaejang", "patjuk"],
     seasonalFoodIds: ["corn", "watermelon", "croaker", "conger-eel"],
   },
   {
@@ -55,7 +53,7 @@ export const FESTIVALS = [
     month: 9,
     period: "음력 8월 15일",
     date: { lunar: [8, 15] },
-    traditionalDishes: ["송편", "토란탕", "화양적", "닭찜"],
+    traditionalDishes: ["songpyeon", "toran-tang", "hwayangjeok", "dakjjim"],
     seasonalFoodIds: ["gizzard-shad", "pear", "apple", "chestnut"],
   },
   {
@@ -64,7 +62,7 @@ export const FESTIVALS = [
     month: 12,
     period: "양력 12월 22일 무렵",
     date: "solstice",
-    traditionalDishes: ["팥죽", "동치미"],
+    traditionalDishes: ["patjuk", "dongchimi"],
     seasonalFoodIds: ["yellowtail", "mandarin", "oyster", "napa-cabbage"],
   },
 ] as const satisfies readonly {
@@ -73,7 +71,7 @@ export const FESTIVALS = [
   month: number
   period: string
   date?: FestivalDateRule
-  traditionalDishes: readonly TraditionalDish[]
+  traditionalDishes: readonly DishId[]
   seasonalFoodIds: readonly FoodId[]
 }[]
 

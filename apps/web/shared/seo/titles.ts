@@ -3,6 +3,7 @@
 // 설명은 페이지마다 달라야 하므로 그 페이지에만 있는 품종·음식 이름을 넣는다. 근거: .scratch/seo/spec.md "검색어에 맞춘 제목"
 
 import { SEASON_COPY } from "@workspace/seasonal/data/copy"
+import { dishNames } from "@workspace/seasonal/data/dishes"
 import { type Festival, festivalOf, festivalsWithFood } from "@workspace/seasonal/data/festivals"
 import { type Food, foodsInSeasonWith, monthHighlights, seasonHighlights } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
@@ -72,7 +73,7 @@ export function festivalSeo(slug: Festival): PageSeo {
   const { name, period, traditionalDishes } = festivalOf(slug)
   return {
     title: `${name} 음식`,
-    description: `${name}(${period})에 먹는 전통 음식 ${traditionalDishes.join("·")}, 그리고 ${name} 무렵 제철 식재료를 소개해요.`,
+    description: `${name}(${period})에 먹는 전통 음식 ${dishNames(traditionalDishes).join("·")}, 그리고 ${name} 무렵 제철 식재료를 소개해요.`,
   }
 }
 

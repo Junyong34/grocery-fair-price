@@ -1,7 +1,7 @@
 import Link from "next/link"
-import { Soup } from "lucide-react"
 
 import { FESTIVAL_BACKGROUNDS } from "@workspace/seasonal/data/copy"
+import { findDish, type TraditionalDish } from "@workspace/seasonal/data/dishes"
 import { festivalOf, type Festival } from "@workspace/seasonal/data/festivals"
 import { findFood, type Food } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
@@ -10,6 +10,7 @@ import { routes } from "@/shared/routes"
 
 import { FoodImage } from "../components/food-image"
 import { ShareButton } from "../components/share-button"
+import { DishImage } from "./dish-image"
 import { CalendarLink, FestivalPeriod } from "./festival-date"
 
 /**
@@ -21,6 +22,9 @@ export function FestivalView({ slug }: { slug: Festival }) {
   const foods = festival.seasonalFoodIds
     .map((id) => findFood(id))
     .filter((food): food is Food => !!food)
+  const dishes = festival.traditionalDishes
+    .map((id) => findDish(id))
+    .filter((dish): dish is TraditionalDish => !!dish)
 
   return (
     <article className="mx-auto flex max-w-[720px] flex-col gap-6 px-[18px] pt-4 pb-8 lg:pt-8">
@@ -47,18 +51,14 @@ export function FestivalView({ slug }: { slug: Festival }) {
           <span className="font-normal text-stone">— 차려 먹는 것</span>
         </h2>
         <ul className="grid grid-cols-2 gap-2.5 lg:grid-cols-3">
-          {festival.traditionalDishes.map((dish) => (
+          {dishes.map((dish) => (
             <li
-              key={dish}
-              className="flex items-center gap-3 rounded-md border-[1.5px] border-ink px-3 py-2.5"
+              key={dish.id}
+              className="flex items-center gap-3 rounded-md border-[1.5px] border-ink px-2.5 py-2"
             >
-              <span
-                aria-hidden
-                className="grid size-10 shrink-0 place-items-center rounded-full bg-surface text-stone"
-              >
-                <Soup size={20} strokeWidth={1.6} />
-              </span>
-              <span className="text-[15px] font-semibold">{dish}</span>
+              {/* 와이어프레임 3.4: 이미지 56 + 이름. 이름이 곁에 있으니 그림은 장식(alt 없음)이다. */}
+              <DishImage dish={dish} sizes="56px" className="size-14 shrink-0" />
+              <span className="text-[15px] font-semibold">{dish.name}</span>
             </li>
           ))}
         </ul>

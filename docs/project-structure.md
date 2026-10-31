@@ -154,7 +154,7 @@ import 경로:
 | `this-month/` | 2a | `this-month-view`, `desktop-month-panel`(option-wheel), `month-jump`, `month-scroll-spy`, `active-month`, `settings-panel`·`settings-fields`·`settings-scope`(⚙ 표시 설정), `calendar-style-picker` |
 | `month-timeline/` | 2b | `month-timeline`, `month-view`, `months-index`, `food-grid`, `food-card`, `month-food-fold`, `eaten-summary`, `view-store`(열 수, 저장 안 함) |
 | `seasons/` | 3a | `seasons-hero`, `season-card`, `season-detail`, `season-background`, `season-style`, `now-tag` |
-| `festivals/` | 1g | `festival-view`, `festival-chips`, `festival-date` |
+| `festivals/` | 1g | `festival-view`, `festival-chips`, `festival-date`, `dish-image`(전통 음식 그림 또는 옅은 원) |
 | `my-table/` | 1h | `my-table-view`, `food-row`, `typed-label` |
 | `food-detail/` | 1i | `food-detail`, `eat-toggle`, `festival-link` |
 | `search/` | 전역 검색 | `food-search`(헤더 버튼), `food-search-dialog`(cojeev command, 초성 검색) |
@@ -247,7 +247,10 @@ import 경로:
 | `data/food-sizes.ts` | `FOOD_SCALE`: 작아 보이는 품종의 그림 배율. 손으로 조정 |
 | `data/months.ts` | `MONTHS`, `isMonth`, `formatSeasonMonths`, `orderSeasonMonths` |
 | `data/seasons.ts` | `SEASONS`, `SEASON_MONTHS`, `isSeason`, `seasonOfMonth` |
-| `data/festivals.ts` | `FESTIVALS`(전통 음식 포함), `festivalOf`(slug로 찾기), 연도별 날짜, `upcomingFestival`, `festivalsInMonth`, `festivalsWithFood` |
+| `data/dishes.ts` | 전통 음식 `TRADITIONAL_DISHES`(품종과 따로), `DishId`, `findDish`, `dishNames`, `isDishDrawn` |
+| `data/dish-rows.ts` | 전통 음식 행(`id`, `name`). import가 없어 `foods:sync`가 Node로 바로 읽는다 |
+| `data/drawn-dishes.generated.ts` | 생성 파일. 그림이 있는 전통 음식 id |
+| `data/festivals.ts` | `FESTIVALS`(전통 음식 id 포함), `festivalOf`(slug로 찾기), 연도별 날짜, `upcomingFestival`, `festivalsInMonth`, `festivalsWithFood` |
 | `data/copy.ts` | 화면 문구: 달별 문구, 계절 설명, 명절 배경, UI 문구, 먹음 라벨 |
 | `calendar/today.ts` | `TIME_ZONE`(Asia/Seoul), `seoulNow`, `seoulToday`, `currentMonth` |
 | `calendar/month-calendar.ts` | 달력 칸 계산(일·월요일 시작), `CalendarDate` |
@@ -311,18 +314,22 @@ prototypes/seasonal-food/build/catalog.json (일러스트 id)
         ▼
 packages/seasonal/src/data/foods.generated.ts
         │
-prototypes/seasonal-food/{foods,styles/watercolor,kit}
+prototypes/seasonal-food/{foods,dishes,styles/watercolor,kit}
         │  pnpm foods:sync  (scripts/sync-food-images.mjs, 끝에 measure-food-bounds.mjs)
         ▼
 apps/web/public/foods/<id>/color.svg, motion.svg
 apps/web/public/foods/PROVENANCE.md         그림체 버전·sha·품종 목록
 packages/seasonal/src/data/drawn-foods.generated.ts
 packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따로도)
+apps/web/public/dishes/<id>/color.svg        명절 전통 음식 (dish-rows.ts에 있는 것만)
+apps/web/public/dishes/PROVENANCE.md
+packages/seasonal/src/data/drawn-dishes.generated.ts
 ```
 
 - 출력은 모두 커밋한다. 원천이 `prototypes/`(Git 밖)에 있어 새 클론에서는 다시 만들 수 없기 때문이다.
 - 일러스트가 없는 품종의 id는 `build-foods.mjs`의 `NEW_IDS`에서 정한다. 그림이 없으면 화면은 이름 카드를 보인다.
 - 그림체는 `watercolor`, 변형은 `color`(모든 화면)와 `motion`(1i 큰 그림, SVG 안 CSS 키프레임), 바닥 그림자는 끈다.
+- 전통 음식(`prototypes/seasonal-food/dishes/<id>`)은 움직임이 없어 `color`만 만든다. 그림 폴더 이름이 `dish-rows.ts`의 id와 같아야 나온다. sync가 그림이 없는 음식을 로그로 알려 준다. 그릴 목록과 체크리스트는 `prototypes/seasonal-food/scripts/build_seasonal_lists.py`의 `DISHES`다.
 - 새 일러스트는 프로젝트 스킬 `/seasonal-food-illustrator`로 그린다.
 - 브랜드 파일(`apps/web/public/images/brand/`, `app/favicon.ico`, `app/icon.svg`, `app/apple-icon.png`)은 `prototypes/branding/`에서 손으로 복사한다(`apps/web/docs/brand-assets.md`). `logo-lockup.svg`·`logo-lockup-ivory.svg`는 고운돋움 Regular의 글자 윤곽을 포함한 가로 로고이며, `GowunDodum-OFL.txt`는 서체 라이선스다.
 

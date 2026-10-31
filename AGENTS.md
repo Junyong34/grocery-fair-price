@@ -39,7 +39,7 @@ Regenerate these with their command and commit the output. Hand edits are overwr
 | Output | Command | Run it when |
 |---|---|---|
 | `packages/seasonal/src/data/foods.generated.ts` | `pnpm --filter @workspace/seasonal build:foods` | the 품종 list in `prototypes/` changes. A 품종 without an illustration gets its id in `NEW_IDS` in `packages/seasonal/scripts/build-foods.mjs`. |
-| `apps/web/public/foods/<id>/{color,motion}.svg`, `PROVENANCE.md`, `drawn-foods.generated.ts`, `food-bounds.generated.ts` | `pnpm foods:sync` | an illustration is drawn or changed (`/seasonal-food-illustrator`). |
+| `apps/web/public/foods/<id>/{color,motion}.svg`, `apps/web/public/dishes/<id>/color.svg`, both `PROVENANCE.md`, `drawn-foods.generated.ts`, `drawn-dishes.generated.ts`, `food-bounds.generated.ts` | `pnpm foods:sync` | an illustration (품종 or 전통 음식) is drawn or changed (`/seasonal-food-illustrator`). A 전통 음식 shows only if its `dishes/<id>` folder name is an id in `packages/seasonal/src/data/dish-rows.ts`. |
 | ERD blocks in `grocery-price/docs/30-data/schema-map.html` | `pnpm db:erd` (local DB up, migrations applied) | a migration changes tables, keys or checks. `pnpm db:test` fails while they differ. |
 | `grocery-price/reference/public-data/samples/viewer/api-explorer.html` | `python3 -I build.py` in that folder | `template.html`, `build.py` or the saved samples change. Then run `smoke.sh --quick`. |
 | `food-bounds.generated.ts` alone | `pnpm foods:bounds` | the SVGs changed without a sync. Needs no `prototypes/`. |
