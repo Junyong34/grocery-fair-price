@@ -1,6 +1,6 @@
 # 06. 검색 결과 화면 구성안
 
-Status: ready-for-human
+Status: wontfix (price-screens로 대체됨)
 Type: grilling
 
 ## 목적
@@ -22,3 +22,7 @@ spec.md 결정 1~3, 7, 10을 화면 하나로 묶은 구성안을 만들고 사�
 ## 완료 기준
 
 - 375·1280 폭 와이어프레임과 정한 내용이 이 파일 아래 `## Answer`에 있다.
+
+## Comments
+
+2026-10-31: 닫는다 (운영자). 검색 결과와 품종 상세 화면은 `.scratch/price-screens/spec.md`와 그 티켓 05(검색 P2) · 06(품종 상세 P3)에서 이 티켓의 Answer 없이 설계하고 만들었다. 화면 구성의 기준은 price-screens spec이다.
