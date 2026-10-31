@@ -56,9 +56,9 @@ API ──▶ ① 원본 보관 (raw) ──▶ ② 정제 관측값 (observatio
 
 ---
 
-## 3. 테이블 설계 (논리 스키마)
+## 3. 테이블 설계 (설계 이유)
 
-세 출처의 가격을 같은 모양으로 담는 통합 스키마다 (`p4-canonical-model/01`, 2026-10-19). Postgres 기준으로 쓰고 Supabase 전용 기능에는 기대지 않는다. 나중에 다른 Postgres로 옮길 때 `pg_dump` 한 번이면 되게 하려는 것이다. 실제 DDL·역할·권한·RLS는 `ingest-foundation/02`가 `supabase/migrations/`에 만든다. 아래 SQL 모양의 블록은 설명용 스케치이고 그대로 실행하는 코드가 아니다. 표 이름은 모두 스키마 `price` 안이다 (3-0, 아래에서는 `price.`를 생략한다). 2026-10-20에 `supabase-postgres-best-practices` 기준으로 검토해 고쳤다. 출처별 근거는 출처 문서의 "스키마에 넘길 사실" 절이다 ([kamis.md 13장](sources/kamis.md), [ekape.md 13장](sources/ekape.md), [chamgagyeok.md 14장](sources/chamgagyeok.md), [item-inventory.md 7장](sources/item-inventory.md)).
+세 출처의 가격을 같은 모양으로 담는 통합 스키마다 (`p4-canonical-model/01`, 2026-10-19). Postgres 기준으로 쓰고 Supabase 전용 기능에는 기대지 않는다. 나중에 다른 Postgres로 옮길 때 `pg_dump` 한 번이면 되게 하려는 것이다. 실제 DDL·역할·권한·RLS는 `ingest-foundation/02`가 `supabase/migrations/`에 만든다. **열 정의는 어디에:** 표 · 열 · 제약 · 인덱스는 `supabase/migrations/`가 원본이고(열 뜻 · 단위 · `null`의 뜻은 `comment on`), 한눈에 보려면 [schema-map.html](schema-map.html)의 ERD(`pnpm db:erd`)를 본다. 이 장은 **왜 그렇게 정했는지**만 적는다. 예전에 여기 있던 표 스케치는 마이그레이션과 어긋나기 쉬워 지웠다(2026-10-31, git 기록에 있다). 남은 SQL 블록은 규칙 · 질의를 보여 주는 예시이고 그대로 실행하는 코드가 아니다. 표 이름은 모두 스키마 `price` 안이다 (3-0, 아래에서는 `price.`를 생략한다). 2026-10-20에 `supabase-postgres-best-practices` 기준으로 검토해 고쳤다. 출처별 근거는 출처 문서의 "스키마에 넘길 사실" 절이다 ([kamis.md 13장](sources/kamis.md), [ekape.md 13장](sources/ekape.md), [chamgagyeok.md 14장](sources/chamgagyeok.md), [item-inventory.md 7장](sources/item-inventory.md)).
 
 ### 3-0. 공통 규칙
 
@@ -236,25 +236,7 @@ create policy web_select on price.<표> for select to web_reader    using (true)
 
 가격 품종 ID(`variety.id`, URL용 `variety.slug`)는 제철 패키지(`packages/seasonal`)의 품종 ID와 **별도 체계**로 둔다. 두 체계는 매핑표 `variety_seasonal_map`으로 잇는다 (2026-10-19 결정). 다대다다. 제철 품종 하나가 가격 품종 여럿(한우 등심, 호주산 등심)에 이어질 수 있다.
 
-```sql
-category  id int pk, slug text unique not null, name text not null, sort smallint
-item      id int pk, category_id int not null fk category, slug text unique not null, name text not null
-variety   id int pk, item_id int not null fk item,
-          slug text unique not null,                 -- 가격 품종 ID의 바깥 이름 (URL, payload)
-          name text not null,
-          base_unit text not null check (base_unit in ('g','ml','ea')),
-          base_unit_qty numeric not null,            -- 기준 단위: 100 g, 1 ea, 30 ea(계란) …
-          status text not null check (status in ('active','hidden'))
-spec      id int pk, variety_id int not null fk variety, slug text not null, name text not null,
-          is_default boolean not null, sort smallint,
-          unique (variety_id, slug),
-          unique (variety_id, id)                    -- 복합 FK (variety_id, spec_id)의 대상 (3-0)
-create unique index spec_one_default on spec (variety_id) where is_default;   -- 품종마다 기본 규격 하나
-alias     id int pk, text text not null, item_id int null fk item, variety_id int null fk variety,
-          check (num_nonnulls(item_id, variety_id) = 1)
-variety_seasonal_map  variety_id int not null fk variety, seasonal_food_id text not null,   -- packages/seasonal의 품종 id
-          primary key (variety_id, seasonal_food_id)
-```
+표 정의: `category`, `item`, `variety`, `spec`, `alias`, `variety_seasonal_map` (열은 마이그레이션이 원본, 3장 첫머리).
 
 인덱스: `item(category_id)`, `variety(item_id)`, `alias(item_id)`, `alias(variety_id)`, `alias(lower(text))`, `variety_seasonal_map(seasonal_food_id)`. `spec(variety_id)`는 unique가 덮는다. 부분 unique는 표 제약으로 쓸 수 없어 `create unique index … where`로 만든다.
 
@@ -270,13 +252,7 @@ where v.status = 'active'
 
 **코드표.** 출처가 준 코드 목록을 종류와 함께 저장한다. 같은 글자가 종류마다 다르기 때문이다 (참가격 `UT:CS` 캡슐과 `BU:CS` 편의점, 축평원 `itemCd 68`은 돼지 목심이면서 수입 소고기 척아이롤).
 
-```sql
-source_code_table
-  source text not null, code_class text not null, code text not null, primary key (source, code_class, code),
-  name text not null, parent_code text null,       -- 참가격 highCode, KAMIS 품종의 품목
-  in_official_table boolean not null,               -- 코드표에 있나 (KAMIS는 응답에만 있는 코드가 온다)
-  first_seen_on date not null, last_seen_on date not null, retired_on date null, attrs jsonb null
-```
+표 정의: `source_code_table` (열은 마이그레이션이 원본, 3장 첫머리).
 
 | 출처 | `code_class` | `code` 형식 | 예 |
 |---|---|---|---|
@@ -290,52 +266,19 @@ source_code_table
 
 **원천 키.** 가격 행 하나가 "무엇의 값인지"를 가리키는 원천 키를 등록부에 한 번만 둔다. 관측값은 이 등록부의 `id`만 들고 있어 원천 키 문자열을 행마다 반복하지 않는다.
 
-```sql
-source_item
-  id int pk
-  source text not null check (source in ('kamis','ekape','chamga')),
-  source_key text not null,          -- 'kamis:01-200-224-01-04' (구분-부류-품목-품종-등급)
-                                     -- 'ekape:4304-27-구분없음'  (축종-품목코드-구분명)
-                                     -- 'chamga:1000'             (goodId)
-  unique (source, source_key),
-  key_parts jsonb not null,          -- {"se_cd":"01","ctgry_cd":"200","item_cd":"224","vrty_cd":"01","grd_cd":"04"}
-  label text,                        -- 운영자 화면용 (item_nm/vrty_nm/grd_nm, itemNm/grdNm, goodName)
-  first_seen_on date not null, last_seen_on date not null
-```
+표 정의: `source_item` (열은 마이그레이션이 원본, 3장 첫머리).
 
 KAMIS 키에 `se_cd`를 넣는다. 구분이 다르면 단위도 다르다. 시장·지역은 원천 키가 아니라 관측 위치(3-2)다.
 
 **원천 키 → 품종·규격 (KAMIS·축평원).** 다대일이고 기간을 가진다. KAMIS 품목 코드가 바뀌고(참다래 `419` → 키위 `437`, 2026-09-01 전후), 배추처럼 작형마다 원천 품종 코드가 바뀌기 때문이다 ([item-inventory.md 7장](sources/item-inventory.md)). 참가격 상품은 상품(3-6)을 거쳐 품종에 이어지므로 이 표를 쓰지 않는다.
 
-```sql
-source_code_map
-  id int pk
-  source_item_id int not null fk source_item,
-  valid_from date not null, valid_to date null,
-  status text not null check (status in ('pending','mapped','ignored')),
-  variety_id int null, spec_id int null,
-  foreign key (variety_id, spec_id) references spec (variety_id, id),
-  unit_rule_id int null fk unit_rule,
-  role text not null default 'primary' check (role in ('primary','secondary')),  -- 출처 중복 시 대표 여부 (6-1)
-  note text, updated_at timestamptz not null,
-  check (status <> 'mapped' or (variety_id is not null and spec_id is not null and unit_rule_id is not null)),
-  check ((variety_id is null) = (spec_id is null)),
-  check (valid_to is null or valid_to > valid_from),
-  exclude using gist (source_item_id with =, daterange(valid_from, valid_to) with &&)
-```
+표 정의: `source_code_map` (열은 마이그레이션이 원본, 3장 첫머리).
 
 인덱스: `(variety_id, spec_id)` (복합 FK), `(status) where status = 'pending'` (운영자 처리 목록). 원천 키를 처음 본 순간 `pending`으로 자동 등록한다. 매핑이 없는 키도 버리지 않고 ②까지는 저장한다. 나중에 매핑하면 보존 기간 안의 관측값은 DB에서, 그 밖은 원본에서 다시 계산한다.
 
 **환산 규칙.** 기준 단위 가격을 만드는 규칙이다. 행을 고치지 않고 새 버전을 추가한다. 관측값은 계산에 쓴 규칙의 `id`를 남긴다 (`observation.unit_rule_id`). 환산 기준(애호박 1개 ≈ 300g 같은 값)도 규칙의 값으로 두어, 값이 바뀌면 새 버전이 된다.
 
-```sql
-unit_rule
-  id int pk, rule_code text not null, version smallint not null, unique (rule_code, version),
-  price_tier text not null check (price_tier in ('retail','wholesale')),
-  kind text not null check (kind in ('same_unit','weight_to_ea','ea_to_weight')),
-  params jsonb not null,   -- {"from_unit":"g"} / {"from_unit":"ea","g_per_ea":300} / {"from_unit":"g","g_per_ea":300}
-  note text, created_at timestamptz not null
-```
+표 정의: `unit_rule` (열은 마이그레이션이 원본, 3장 첫머리).
 
 계산: `price_per_base = price_raw ÷ (원천 수량을 기준 단위로 바꾼 값) × base_unit_qty`. 예: KAMIS 애호박 `개`·`1` 1,830원 → 1개 1,830원. 참가격 `G`·`110` 1,500원 → 100g당 1,363.64원. 단위가 맞지 않고 환산 기준도 없으면 `null`이다.
 
@@ -345,82 +288,26 @@ unit_rule
 
 **관측 위치(`obs_place`).** 가격 행이 "어디의 값인지"를 하나의 키로 가리킨다. 점포(참가격), 조사 시장(KAMIS), 지역 평균(KAMIS 축산 시도·전국, 축평원 전국) 중 하나다. 도메인 용어가 아니라 키를 하나로 만들려는 기술적 표다. 관측값 PK를 `null` 없는 세 열로 만들 수 있고, 점포·조사 시장의 원천 ID가 바뀌지 않는 한 우리 지역 매핑이 바뀌어도 키가 변하지 않는다.
 
-```sql
-obs_place
-  id int pk
-  source text not null,
-  kind text not null check (kind in ('store','market','region_avg')),
-  scope text not null check (scope in ('store','market','sigungu','sido','national')),
-                                     -- 위치가 정한다: 점포 store, 시장 market, 축산 sgg_cd 1000 national, 시도 코드 sido
-  source_place_code text not null,   -- 참가격 entpId / KAMIS mrkt_cd / KAMIS 축산 sgg_cd / 축평원 'national'
-  unique (source, kind, source_place_code),
-  unique (id, kind),                 -- 하위 표 복합 FK의 대상
-  check ((kind = 'store') = (scope = 'store') and (kind = 'market') = (scope = 'market')),
-  region_code text null fk region,   -- region_code_map으로 붙인 우리 지역 (매핑 전 null)
-  first_seen_on date null, last_seen_on date null   -- 가격 응답에서 처음·마지막으로 본 조사일. 마스터로만 아는 점포는 null (2026-10-21)
-```
+표 정의: `obs_place` (열은 마이그레이션이 원본, 3장 첫머리).
 
 인덱스: `(region_code)`. 관측값의 범위(`scope`)와 지역은 위치마다 고정이라 관측값 행에 복사하지 않고 여기에만 둔다 (3-3).
 
 **점포(참가격).** `obs_place`의 하위 표다 (PK를 공유). 하위 표는 상수 `kind` 열을 들고 `(place_id, kind)`를 `obs_place(id, kind)`에 복합 FK로 잇는다. 그래서 `kind = 'market'`인 위치에 점포 행이 붙지 않는다 (`market`도 같다).
 
-```sql
-store
-  place_id int pk,
-  kind text not null default 'store' check (kind = 'store'),
-  foreign key (place_id, kind) references obs_place (id, kind),
-  name text not null,                     -- entpName
-  channel text not null check (channel in ('large_mart','department','ssm','convenience')),  -- BU LM·DP·SM·CS
-  region_scope text not null check (region_scope in ('local','national_only')),  -- 편의점 본사 4곳 = national_only
-  area_code_raw text, area_detail_code_raw text,   -- AR 원천값 (entpAreaCode, areaDetailCode)
-  region_code text null fk region,        -- 우리 시군구 코드 (옛 광주·전남 코드는 새 코드로)
-  lat numeric(9,6) null, lng numeric(9,6) null,     -- xMapCoord = 위도, yMapCoord = 경도. 630곳 중 100곳만
-  road_addr text null, jibun_addr text null,        -- 재등록 판별 입력
-  status text not null check (status in ('active','inactive','superseded')),
-  missing_streak smallint not null default 0,       -- 연속으로 0행인 조사일 수 (3이면 inactive)
-  lineage_id int not null fk store(place_id)        -- 재등록 사슬의 첫 점포. 집계·추이·점포 수는 이것으로 센다
-
-store_link                                          -- 점포 이력 연결 (재등록, 중복 등록)
-  old_place_id int fk store, new_place_id int fk store, primary key (old_place_id, new_place_id),
-  reason text not null check (reason in ('re_registered','duplicate')),
-  evidence jsonb not null,                          -- 이름(띄어쓰기 무시)·도로명 주소 일치 등
-  linked_on date not null, linked_by text not null  -- 'auto' | 운영자
-
-store_seller                                        -- 점포 → 판매처. 운영자 매핑, 기간 있음 (참가격 2단 평균, 판매처 단위 누락·행사)
-  place_id int not null fk store, seller_id int not null fk seller,
-  valid_from date not null, valid_to date null,     -- null = 지금까지
-  primary key (place_id, valid_from),
-  check (valid_to is null or valid_to > valid_from),
-  exclude using gist (place_id with =, daterange(valid_from, valid_to, '[)') with &&)  -- 같은 점포의 기간 겹침 거부
-```
+표 정의: `store`, `store_link`, `store_seller` (열은 마이그레이션이 원본, 3장 첫머리).
 
 - 인덱스: `store_seller(seller_id)`, `store(lineage_id)`, `store(region_code)`, `store_link(new_place_id)`.
 - **점포 재등록.** 광주·전남 15곳이 새 `entpId`(2220~2235)와 새 지역 코드로 다시 등록되었다 (예: 신세계백화점광주점 `13` → `2228`, [chamgagyeok.md 7-1](sources/chamgagyeok.md)). 새 점포는 새 `obs_place`·`store` 행이 되고, `store_link(13 → 2228, re_registered)`를 남긴 뒤 새 점포의 `lineage_id`를 옛 점포의 `lineage_id`로 바꾼다. 옛 점포는 `superseded`다. 이름·주소가 같은 동시 등록(GS더프레시 3쌍)은 `duplicate`로 잇는다.
 - **판매처 매핑.** 운영자가 판매처 목록(`seller`, 마이그레이션 기준 데이터)을 정하고, 점포는 수집이 자동으로 잇는다 (2026-10-29 결정, ingest-foundation/07). 판매처 이름이 규칙이다: `entpName`에서 `(주)`·공백을 뺀 것이 판매처 이름으로 시작하고 업태가 같으면 잇는다 (가장 긴 이름 우선, `price.assign_store_sellers()`). 점포 마스터를 적재할 때마다 연결이 없는 점포에만 부르므로 재등록으로 생긴 새 점포도 사람 손 없이 이어진다. 규칙에 맞지 않는 점포는 연결 없이 두고 실행 로그에 경고한다. 업태와 함께 정한다 (이마트24(본사)가 이마트로 잘못 묶이지 않게, [chamgagyeok.md 11장](sources/chamgagyeok.md)). **유효 기간을 둔다** (2026-10-20 결정). 판매처가 바뀌면 이전 기간을 닫고 새 기간을 연다. 집계는 조사일이 속한 기간의 판매처로 센다. 그래서 과거 평균은 당시 판매처 기준으로 남는다. 변경은 `source_master_change`에도 남긴다.
 - **활동 여부**는 마스터가 아니라 가격 응답의 `obs_place.first_seen_on`·`last_seen_on`과 `missing_streak`로 정한다. 마스터에 있어도 가격이 오지 않는 점포가 184곳이다.
 
-```sql
-seller   id int pk, name text unique not null,
-         channel text not null check (channel in ('large_mart','department','ssm','convenience','traditional_market','online_mall')),
-         note text
-```
+표 정의: `seller` (열은 마이그레이션이 원본, 3장 첫머리).
 
 업태 값은 GLOSSARY 업태(대형마트, 백화점, 기업형 슈퍼, 편의점, 전통시장, 온라인몰)에 맞춘 우리 코드다. 참가격 BU `LM`→`large_mart`, `DP`→`department`, `SM`→`ssm`, `CS`→`convenience`.
 
 **조사 시장(KAMIS).**
 
-```sql
-market
-  place_id int pk,
-  kind text not null default 'market' check (kind = 'market'),
-  foreign key (place_id, kind) references obs_place (id, kind),
-  name text not null,                    -- mrkt_nm
-  sgg_code_raw text not null,            -- 시장 행의 sgg_cd. 시장이 정한다
-  market_type text not null check (market_type in
-    ('traditional','large_retail','wholesale','eco_channel','online','other')),
-  type_source text not null check (type_source in ('name_rule','operator')),
-  in_official_table boolean not null
-```
+표 정의: `market` (열은 마이그레이션이 원본, 3장 첫머리).
 
 - 시장 유형은 `mrkt_nm` 이름 규칙으로 가르고 결과를 코드에 붙여 저장한다 ([kamis.md 5-1](sources/kamis.md)). `traditional` 실명 전통시장(경동, 부전 …), `large_retail` 익명 대형유통(`X-유통`), `wholesale` 도매시장(`…도매`, 02 중도매), `eco_channel` 07 친환경의 익명 업태 조사처(`A-생협` …), `online` 온라인몰 코드(데이터 없음), `other` 그 밖(`가락소매` `1000006`, 도시 이름만인 코드). 운영자가 고치면 `type_source = 'operator'`다.
 - 익명 대형유통은 판매처를 알 수 없다. **판매처로 매핑하지 않는다** (`seller_id` 열이 없다).
@@ -429,23 +316,7 @@ market
 
 **지역.** 우리 지역 코드 하나로 세 출처의 지역 코드를 잇는다.
 
-```sql
-region
-  code text pk,                       -- 우리 코드. 체계는 7장 (제안: 법정동 코드 앞 2·5자리, 전국 '00')
-  name text not null,
-  level text not null check (level in ('nation','sido','sigungu')),
-  parent_code text null fk region,
-  valid_from date null, valid_to date null, successor_code text null fk region,
-  check (valid_to is null or valid_from is null or valid_to > valid_from)
-
-region_code_map
-  source text not null, code_class text not null, source_region_code text not null, valid_from date not null,
-  primary key (source, code_class, source_region_code, valid_from),
-  valid_to date null, region_code text null fk region, note text,
-  check (valid_to is null or valid_to > valid_from),
-  exclude using gist (source with =, code_class with =, source_region_code with =,
-                      daterange(valid_from, valid_to) with &&)    -- 같은 원천 코드의 기간 겹침 거부 (2026-10-20)
-```
+표 정의: `region`, `region_code_map` (열은 마이그레이션이 원본, 3장 첫머리).
 
 | 원천 코드 | 예 | 매핑 |
 |---|---|---|
@@ -458,16 +329,7 @@ region_code_map
 
 **마스터 변경 기록.** 참가격 마스터는 이력을 주지 않아 월 1회 받아 비교한다 ([chamgagyeok.md 10장](sources/chamgagyeok.md)). 비교에 쓴 원본은 Storage에 날짜별로 남고, 바뀐 것만 행으로 남긴다.
 
-```sql
-source_master_change
-  id bigint pk, source text not null, entity text not null check (entity in ('product','store','code')),
-  source_key text not null,           -- goodId / entpId / 'AR:021800000'
-  change_kind text not null check (change_kind in ('added','removed','changed')),
-  field text null, old_value text null, new_value text null,
-  detected_on date not null, raw_object_id bigint null fk raw_object,
-  action text not null check (action in ('recorded','mapping_reset','linked','attr_versioned','merged')),
-  check (action = 'merged' or raw_object_id is not null)   -- 상품 병합(3-6)은 운영자 작업이라 원본 파일이 없다
-```
+표 정의: `source_master_change` (열은 마이그레이션이 원본, 3장 첫머리).
 
 인덱스: `(source, entity, source_key)`, `(raw_object_id)`.
 
@@ -475,43 +337,7 @@ source_master_change
 
 **가격 관측(`observation`)** 은 한 번의 조사에서 나온 가격 한 건이다. 세 출처가 같은 표에 들어간다. 출처에 없는 값은 `null`이다.
 
-```sql
-observation
-  source_item_id  int  not null fk source_item,   -- 무엇의 값인가 (원천 키)
-  obs_date        date not null,                  -- 조사일
-  place_id        int  not null fk obs_place,     -- 어디의 값인가 (점포 / 조사 시장 / 지역 평균)
-  primary key (source_item_id, obs_date, place_id),
-
-  price_tier      text not null check (price_tier in ('retail','wholesale')),  -- 가격 단계: 소매 / 도매 (KAMIS se_cd)
-  obs_kind        text not null check (obs_kind in ('quote_sample','quote_aggregate','shelf_price')),
-                  -- quote_sample 시세 표본 (조사 시장 한 곳의 값, KAMIS 시장 행)
-                  -- quote_aggregate 이미 집계된 시세 (KAMIS 축산 시도·전국, 축평원 전국)
-                  -- shelf_price 판매가 (점포 한 곳의 개별 관측, 참가격)
-  product_id      int  null fk product,           -- 참가격만 (3-6)
-  variety_id      int  null,                      -- 적재 시점의 매핑. 매핑 전이면 null
-  spec_id         int  null,
-  foreign key (variety_id, spec_id) references spec (variety_id, id),
-
-  price_raw       integer not null check (price_raw > 0),  -- 원천 가격 (원). 참가격 goodPrice는 행사가 반영된 값
-  qty_raw         numeric null,                   -- 원천 수량 (KAMIS unit_sz, 축평원 unit의 수량). 참가격은 상품 속성에서
-  unit_raw        text null,                      -- 원천 단위 ('개', 'kg(그물망 3포기)', '원/100g')
-  price_per_base  numeric(12,2) null,             -- 기준 단위 가격. 환산 실패·매핑 전이면 null
-  unit_rule_id    int null fk unit_rule,          -- 환산에 쓴 규칙 버전
-
-  promo_discount      boolean null,               -- 행사(할인): 참가격 goodDcYn Y=true, N=false, 필드 없음=null(모름)
-  promo_one_plus_one  boolean null,               -- 행사(1+1): plusoneYn 같은 규칙
-  promo_from date null, promo_to date null,       -- goodDcStartDay·EndDay. 표시용 (조사일과 어긋날 수 있다)
-  flags           text[] null,                    -- 'carried_over' 'outlier' 'duplicate_of_ekape' 'unit_mismatch' 'one_plus_one_unverified'
-
-  source_registered_at timestamptz null,          -- 3-0
-  first_seen_at   timestamptz not null,           -- last_seen_at은 두지 않는다 (3-0)
-  revision        smallint not null default 0,    -- 값이 바뀐 횟수 (정정)
-  raw_object_id   bigint not null fk raw_object,  -- 지금 값을 준 원본 파일 (값이 바뀔 때만 바뀐다)
-
-  check (obs_kind <> 'shelf_price' or product_id is not null),
-  check ((variety_id is null) = (spec_id is null))
-  with (fillfactor = 90, autovacuum_vacuum_scale_factor = 0.05)   -- 표 저장 설정 (아래 "적재 설정")
-```
+표 정의: `observation` (열은 마이그레이션이 원본, 3장 첫머리).
 
 **행에서 뺀 열 (2026-10-20).** 행 크기를 줄이려고 조인으로 얻을 수 있는 열을 뺐다.
 - `source`: `source_item.source`와 같다. 출처별 보존 정리는 `source_item_id in (select id from source_item where source = …)`로 한다. `source_item`은 1,400행 남짓이라 비용이 없다.
@@ -567,34 +393,13 @@ on conflict (source_item_id, obs_date, place_id) do update
   4. **완전할 때만 바꾼다.** 필요한 파일 중 하나라도 `purged_at`이 있거나 Storage에서 읽지 못했거나, 복원한 표본 수가 지금 집계의 `n`보다 적으면 불완전이다. 완전하면 한 트랜잭션(`recompute` lock)에서 그 (품종, 규격, 단계, 기준, 조사일)의 `daily_quote` 행을 지우고 새로 넣는다. 값이 바뀌었으면 그날 `source_day.corrected_at`·`correction_count`를 올린다. 불완전하면 기존 집계를 그대로 둔다.
   5. 어느 경우든 `observation_revision`에 한 줄 남기고(`rebuild_result` = `rebuilt` | `kept` | `not_aggregated`, 이전 값은 복원한 원본의 값, 모르면 `null`), `kept`이면 경보를 남긴다 (5-3). KAMIS 원본은 1년 두므로(3-9 보관 5) 249일 안의 재등록은 대개 복원된다.
 
-```sql
-observation_revision                -- 정정 이력. 바뀌기 전 값을 남긴다
-  id bigint pk,
-  source_item_id int not null, obs_date date not null, place_id int not null,
-                                    -- 관측값 PK. FK는 두지 않는다 (관측값이 보존 기간으로 지워져도 이력은 남긴다)
-  revision smallint not null,       -- 바뀐 뒤 번호
-  old_price_raw integer, new_price_raw integer,
-  old_promo jsonb null, new_promo jsonb null,      -- {"discount":true,"one_plus_one":null,"from":…,"to":…}
-  old_source_registered_at timestamptz, new_source_registered_at timestamptz,
-  rebuild_result text null check (rebuild_result in ('rebuilt','kept','not_aggregated')),
-                                    -- 보존 기간 밖 재등록일 때만 (위): 원본 전체로 집계 교체 / 원본 불완전이라 유지 / 집계 대상 아님
-  detected_at timestamptz not null, raw_object_id bigint not null fk raw_object
-```
+표 정의: `observation_revision` (열은 마이그레이션이 원본, 3장 첫머리).
 
 인덱스: `(source_item_id, obs_date)`, `(raw_object_id)`.
 
 **평년 행(축평원)은 관측값이 아니다.** 날짜 없이 `standYmd = 평년`으로 오고, 당일 행이 없는 날(오늘, 미래, 휴일)에도 온다 ([ekape.md 4장](sources/ekape.md)). 요청 기준일을 붙여 따로 둔다.
 
-```sql
-reference_observation               -- 원천이 준 비교값
-  source_item_id int not null fk source_item, ref_date date not null,   -- 요청 standYmd
-  place_id int not null fk obs_place,                                    -- 축평원 전국
-  ref_type text not null check (ref_type in ('normal_year')),
-  primary key (source_item_id, place_id, ref_type, ref_date),   -- 같음 조건 열 먼저, 날짜 끝 (3-0)
-  value_raw integer not null, unit_raw text not null,
-  first_seen_at timestamptz not null,              -- last_seen_at은 두지 않는다 (3-0)
-  revision smallint not null default 0, raw_object_id bigint not null fk raw_object
-```
+표 정의: `reference_observation` (열은 마이그레이션이 원본, 3장 첫머리).
 
 인덱스: `(raw_object_id)` (FK, 원본 하나에서 다시 적재). 적재는 관측값과 같이 값이 바뀐 행만 덮는다.
 
@@ -611,25 +416,7 @@ reference_observation               -- 원천이 준 비교값
 
 **품종·규격별 일자 요약.**
 
-```sql
-daily_quote
-  variety_id int not null, spec_id int not null, obs_date date not null,
-  foreign key (variety_id, spec_id) references spec (variety_id, id),
-  price_tier text not null check (price_tier in ('retail','wholesale')),
-  basis text not null check (basis in ('quote','shelf_price')),   -- 시세에서 냈나, 판매가에서 냈나
-  scope_key text not null,    -- 'national' | 'market_type:traditional' | 'market_type:large_retail'
-                              -- | 'channel:large_mart' … | 'region:<code>'
-  primary key (variety_id, spec_id, price_tier, basis, scope_key, obs_date),   -- 날짜는 끝 (3-0)
-  value numeric(12,2) not null,      -- 대표값. 집계된 시세는 원천 값, 시세 표본·판매가는 중앙값
-  median numeric(12,2), min numeric(12,2), max numeric(12,2),
-  n int not null,                    -- 관측 수 (조사 시장 수, 점포 수(lineage 기준), 지역 평균이면 1)
-  n_sellers int null,                -- 판매가일 때 판매처 수
-  sources text[] not null,           -- 값을 낸 출처 (대표 출처만)
-  promo_excluded_n int not null default 0,   -- 행사(true)라 뺀 관측 수
-  stale_days smallint null,          -- 같은 값이 이어진 날 수 (갱신 지연)
-  meets_min_n boolean null,          -- 최소 표본 수 기준(②)을 넘었나. 기준이 정해지기 전에는 null
-  flags text[] null, calc_version text not null, computed_at timestamptz not null
-```
+표 정의: `daily_quote` (열은 마이그레이션이 원본, 3장 첫머리).
 
 - 인덱스: PK가 품종 화면의 기간 질의(품종 × 규격 × 단계 × 기준 × 범위 고정, 날짜 범위)와 복합 FK를 덮는다. `(obs_date)`: 날짜 단위 재계산 (정정된 날의 모든 품종).
 - 업태별·시장 유형별 `daily_quote`는 **최근 6개월만** 둔다 (2026-10-27). 화면 차트가 6개월까지라서다. 6개월이 지나면 `national` 범위만 남는다 (3-9 보관 4).
@@ -638,18 +425,7 @@ daily_quote
 
 **상품별 일자 요약.** 검색 화면의 상품 목록·상품 화면이 읽는다. 가격 관측(조사일 × 상품 × 점포) 원본은 쌓기만 하고, 화면은 이 요약을 읽는다. 점포별 가격은 보조 정보다.
 
-```sql
-product_daily_summary
-  product_id int not null fk product, obs_date date not null,
-  scope_key text not null,    -- 'national' | 'channel:<업태>' | 'seller:<seller_id>' | 'region:<code>'
-  primary key (product_id, scope_key, obs_date),   -- 날짜는 끝 (3-0)
-  min integer, median numeric(12,2), max integer,
-  median_excl_promo numeric(12,2),   -- 행사 제외 중앙값
-  seller_avg numeric(12,2),          -- 판매처별 평균을 다시 평균 낸 2단 평균 (정부 화면과 같은 값, search-first-view 결정 4)
-  n_stores int not null,             -- lineage 기준 점포 수
-  n_sellers int null, promo_n int not null, promo_unknown_n int not null,
-  meets_min_n boolean null, computed_at timestamptz not null
-```
+표 정의: `product_daily_summary` (열은 마이그레이션이 원본, 3장 첫머리).
 
 인덱스: PK가 상품 화면의 기간 질의와 `product_id` FK를 덮는다. `(obs_date)`: 조사일 단위 재계산.
 
@@ -657,47 +433,13 @@ product_daily_summary
 
 **평년·평소가.**
 
-```sql
-reference_price             -- 품종·규격 단위 비교값
-  variety_id int not null, spec_id int not null,
-  foreign key (variety_id, spec_id) references spec (variety_id, id),
-  ref_date date not null,
-  ref_type text not null check (ref_type in ('normal_year','year_ago','month_ago')),
-  source text not null check (source in ('ekape','computed')),   -- 축평원 평년(응답) / KAMIS 5년 이력으로 계산
-  scope_key text not null,
-  primary key (variety_id, spec_id, ref_type, source, scope_key, ref_date),   -- 날짜는 끝 (3-0)
-  value numeric(12,2) not null, method text not null, computed_at timestamptz not null
-
-usual_price                 -- 평소가 (계산식은 로드맵 ②)
-  variety_id int not null, spec_id int not null, as_of date not null,
-  foreign key (variety_id, spec_id) references spec (variety_id, id),
-  primary key (variety_id, spec_id, as_of),
-  value numeric(12,2) not null, method text not null, components jsonb not null, confidence smallint null
-```
+표 정의: `reference_price`, `usual_price` (열은 마이그레이션이 원본, 3장 첫머리).
 
 두 표 모두 PK가 복합 FK를 덮는다.
 
 **판정 스냅샷.** 새 계산이 모두 성공했을 때만 바꾼다. 재계산이 실패하면 직전 스냅샷이 그대로 남는다. 한 묶음을 다 만든 뒤 포인터 한 줄을 바꾸는 방식으로, 읽는 쪽은 반쯤 만든 묶음을 볼 수 없다.
 
-```sql
-judgment_batch     id bigint pk, started_at timestamptz not null, finished_at timestamptz null,
-                   status text not null check (status in ('building','ready','failed')),
-                   trigger text not null, note text null
-judgment_current   singleton boolean pk default true check (singleton),   -- 한 줄짜리 포인터
-                   batch_id bigint not null fk judgment_batch, swapped_at timestamptz not null
-judgment_snapshot  batch_id bigint not null fk judgment_batch on delete cascade,
-                   variety_id int not null, spec_id int not null,
-                   foreign key (variety_id, spec_id) references spec (variety_id, id),
-                   primary key (batch_id, variety_id, spec_id),
-                   as_of date not null, today_price numeric(12,2) null, usual numeric(12,2) null,
-                   verdict text null check (verdict in ('cheap','normal','expensive')),   -- 판정 못 하면 null
-                   diff_pct numeric(6,2) null, confidence smallint null,
-                   payload jsonb not null      -- 4-1 모양 그대로
-
-create view price.current_judgment with (security_invoker = true) as   -- 화면이 읽는 현재 판정
-  select s.* from price.judgment_snapshot s
-  join price.judgment_current c on c.batch_id = s.batch_id;
-```
+표 정의: `judgment_batch`, `judgment_current`, `judgment_snapshot` (열은 마이그레이션이 원본, 3장 첫머리).
 
 1. `judgment_batch`를 `building`으로 만들고 모든 품종·규격의 행을 넣는다.
 2. 행 수와 필수 값을 검사한다.
@@ -708,10 +450,7 @@ create view price.current_judgment with (security_invoker = true) as   -- 화면
 
 **계산 상수.** 판정 설계(②)에서 정할 값의 자리를 미리 둔다. 계산 코드는 상수를 이 표에서 읽고, 결과 행의 `calc_version`에 쓴 값을 남긴다.
 
-```sql
-calc_param   key text pk, value jsonb null,
-             status text not null check (status in ('decided','placeholder')), decided_in text null, note text null
-```
+표 정의: `calc_param` (열은 마이그레이션이 원본, 3장 첫머리).
 
 | `key` | 값 | 상태 | 근거 |
 |---|---|---|---|
@@ -726,47 +465,7 @@ calc_param   key text pk, value jsonb null,
 
 ### 3-5. 수집 상태 (장애 대응의 핵심)
 
-```sql
-ingest_run
-  id bigint pk, source text not null,
-  job text not null check (job in ('daily','recheck','reregistration_watch','master','backfill','recompute')),
-  started_at timestamptz not null, finished_at timestamptz null,
-  status text not null check (status in ('running','ok','partial','failed')),
-  calls_used int not null default 0, call_budget int not null,
-  error_code text null, error_detail text null,   -- 인증키·원천 오류 문구(ORA-… 등)는 남기지 않는다
-  git_sha text
-
-source_day                              -- 출처 × 대상 날짜(조사일)마다 한 줄
-  source text not null, target_date date not null, primary key (source, target_date),
-  status text not null check (status in
-    ('pending','ok','partial','empty_expected','empty_unexpected','failed')),   -- 수집이 얼마나 됐나만 뜻한다
-  corrected_at timestamptz null,        -- 받은 뒤 값이 마지막으로 바뀐 시각 (정정, 3-3)
-  correction_count int not null default 0,
-  expected_rows int null,               -- 기준 행 수 (KAMIS 최근 4주 같은 요일 중앙값, 참가격 최근 4 조사일 중앙값)
-  row_count int not null default 0, item_count int null, place_count int null,
-  attempts smallint not null default 0,
-  first_ok_at timestamptz null,         -- 처음 정상으로 받은 시각 (도착 시각 측정)
-  last_checked_at timestamptz null, last_changed_at timestamptz null,
-  max_source_registered_at timestamptz null,   -- KAMIS orgnl_reg_dt 최대, 참가격 inputDttm 최대
-  stable_checks smallint not null default 0,   -- 행 수가 연속으로 같았던 횟수 (참가격 완료 판단)
-  closed_at timestamptz null,           -- 더 다시 받지 않기로 한 시각 (참가격: 금요일 뒤 10일, 완료 후 다음 주 월요일)
-  last_error_code text null, checksum text null, note text null
-
-source_day_part                         -- 부분 누락을 판정하는 단위
-  source text not null, target_date date not null,
-  part_kind text not null check (part_kind in ('item','seller','store','fresh_panel')),
-  part_key text not null,               -- KAMIS item_cd / seller_id / entpId / 'chamga-fresh-9'
-  primary key (source, target_date, part_kind, part_key),   -- 날짜 단위로 읽어 날짜가 둘째다
-  foreign key (source, target_date) references source_day (source, target_date),   -- PK 앞 두 열이 FK 인덱스를 덮는다
-  row_count int not null, baseline int null,
-  status text not null check (status in ('ok','partial','missing'))
-
-backfill_task                           -- 과거분 채우기 진행 (중간에 끊겨도 이어 받는다)
-  source text not null, task_key text not null,   -- 'kamis:01-211:2023', 'ekape:4304:2024-03-01'
-  primary key (source, task_key),
-  status text not null check (status in ('pending','running','done','failed')),
-  rows int null, calls int null, finished_at timestamptz null, last_error_code text null
-```
+표 정의: `ingest_run`, `source_day`, `source_day_part`, `backfill_task` (열은 마이그레이션이 원본, 3장 첫머리).
 
 - `source_day`는 출처 × 날짜마다 한 줄이다. 배치는 매번 이 표를 보고 **비어 있거나 실패한 날짜를 다시 채운다.** 마지막으로 성공한 날짜 하나만 기억하는 방식은 쓰지 않는다. 중간에 빠진 날을 놓치기 때문이다.
 - 상태의 뜻: `pending` 아직 안 옴 | `ok` | `partial` 일부 누락 | `empty_expected` 휴일·격주 비는 날·확인된 조사 없음 | `empty_unexpected` 와야 하는데 없음 | `failed` 호출 실패. 판정 기준은 5-2. 상태는 수집 완결성만 뜻한다. **받은 뒤 값이 바뀐 것(정정)은 상태가 아니라 `corrected_at`·`correction_count`로 남긴다** (2026-10-21). 예전의 `corrected` 상태는 `partial`인 날이 정정되면 "일부 누락"을 덮어 지웠다.
@@ -779,59 +478,7 @@ backfill_task                           -- 과거분 채우기 진행 (중간에
 
 상품 중심 검색을 위한 구조다 (2026-10-12 논의). 상품 ID는 **참가격(그리고 나중의 제보, 온라인몰)용**이다. KAMIS·축평원은 상품 ID가 없고 품종·규격 단위 시세를 주므로 상품이 아니라 품종·규격에 이어진다(`source_code_map`). 한 ID로 세 출처를 통합하는 구조가 아니다.
 
-```sql
-product                            -- 우리가 발급하는 상품 ID
-  id int pk,                       -- identity. 재사용하지 않는다. 지우지 않는다
-  name text not null,              -- 현재 이름 (속성 이력의 최신 값을 복사)
-  status text not null check (status in ('surveyed','not_surveyed','merged')),   -- 조사 중 / 조사 안 됨 / 다른 상품에 병합됨
-  registered_on date not null,     -- 등록일: 마스터나 가격 응답에서 이 상품을 처음 본 날 (2026-10-21 나눔)
-  first_price_on date null,        -- 최초 확인일: 처음 가격이 관측된 조사일. 첫 관측 전 null
-  last_price_on date null,         -- 마지막 확인일: 마지막으로 가격이 관측된 조사일
-  missing_streak smallint not null default 0,   -- 연속 결측 조사일 수 (partial 조사일은 세지 않음)
-  status_changed_on date null,
-  merged_into int null fk product, -- 병합된 상품이면 이어받은 상품 (아래 "상품 병합")
-  check ((first_price_on is null) = (last_price_on is null) and first_price_on <= last_price_on),
-  check ((status = 'merged') = (merged_into is not null) and merged_into <> id)
-
-product_source_key                 -- (출처, 출처 키, 유효 시작일, 유효 종료일) → 상품
-  source_item_id int not null fk source_item,   -- 'chamga:<goodId>'
-  valid_from date not null, valid_to date null,
-  product_id int not null fk product,
-  primary key (source_item_id, valid_from),
-  check (valid_to is null or valid_to > valid_from),
-  exclude using gist (source_item_id with =, daterange(valid_from, valid_to) with &&)
-
-product_attr_history               -- (상품, 유효 시작일) → 이름·용량·분류
-  product_id int not null fk product, valid_from date not null, valid_to date null,
-  primary key (product_id, valid_from),
-  check (valid_to is null or valid_to > valid_from),
-  exclude using gist (product_id with =, daterange(valid_from, valid_to) with &&),   -- 2026-10-20 추가
-  name text not null,              -- goodName
-  total_qty numeric not null,      -- goodTotalCnt
-  total_unit text not null,        -- goodTotalDivCode (UT 코드)
-  al_code text not null,           -- goodSmlclsCode (AL 소분류)
-  maker_code text null,            -- productEntpCode. 이름은 API에 없다 (p2/06 미결)
-  detail_mean text null,           -- 환산 기준·규격 판별 근거. 운영자가 읽는다
-  raw_object_id bigint not null fk raw_object
-
-product_variety_map                -- 상품 → 품종·규격 (기간별)
-  product_id int not null fk product, valid_from date not null, valid_to date null,
-  primary key (product_id, valid_from),
-  status text not null check (status in ('pending','mapped','ignored')),
-  variety_id int null, spec_id int null,
-  foreign key (variety_id, spec_id) references spec (variety_id, id),
-  unit_rule_id int null fk unit_rule,
-  origin text not null check (origin in ('al_rule','operator')),
-  check (status <> 'mapped' or (variety_id is not null and spec_id is not null and unit_rule_id is not null)),
-  check ((variety_id is null) = (spec_id is null)),
-  check (valid_to is null or valid_to > valid_from),
-  exclude using gist (product_id with =, daterange(valid_from, valid_to) with &&)
-
-al_variety_rule                    -- AL 소분류 → 품종 기본값 (search-first-view 결정 8)
-  al_code text pk, variety_id int not null, spec_id int not null,   -- 규격을 가르지 않으면 기본 규격
-  foreign key (variety_id, spec_id) references spec (variety_id, id),
-  unit_rule_id int not null fk unit_rule, note text null
-```
+표 정의: `product`, `product_source_key`, `product_attr_history`, `product_variety_map`, `al_variety_rule` (열은 마이그레이션이 원본, 3장 첫머리).
 
 - 인덱스: `product_source_key(product_id)`, `product_attr_history(raw_object_id)`, `product_variety_map(variety_id, spec_id)`, `al_variety_rule(variety_id, spec_id)` (복합 FK). 나머지 FK는 3-0 생략 목록.
 - 가격 관측·요약·URL은 **상품 내부 ID만 참조**한다. 출처 키(`goodId`)를 URL에 노출하지 않는다. 바깥 ID 형식은 로드맵 ③④에서 정한다.
@@ -851,27 +498,7 @@ al_variety_rule                    -- AL 소분류 → 품종 기본값 (search-
 
 원문은 Supabase Storage(`raw` 버킷)에 gzip NDJSON으로 두고, DB에는 파일 하나마다 한 줄을 둔다. 관측값은 `raw_object_id`로 자기 값을 준 파일을 가리킨다.
 
-```sql
-raw_object
-  id bigint pk,
-  source text not null,
-  endpoint text not null,          -- 'perDay/price' | 'consumerPriceDaily' | 'getProductPriceInfoSvc'
-                                   -- | 'getStoreInfoSvc.do' | 'getProductInfoSvc.do' | 'getStandardInfoSvc.do'
-  storage_path text unique not null,   -- raw/{source}/{YYYY}/{MM}/{DD}/{call-key}.ndjson.gz (DD = KST 수집일)
-  requests jsonb not null,         -- 호출마다 파라미터(serviceKey 제외), pageNo, HTTP 상태, resultCode, 행 수
-  call_count smallint not null, row_count int not null, bytes_gz int not null,
-  content_sha256 text not null,
-  target_from date null, target_to date null,   -- 담긴 조사일 범위
-  fetched_at timestamptz not null, ingest_run_id bigint not null fk ingest_run,
-  contract_baseline text not null, -- 계약 테스트 baseline 버전 (p2/12). 응답 모양이 baseline과 같은지 본 기준
-  adapter_version text not null,   -- 이 파일을 ②로 바꾼 어댑터 버전
-  load_status text not null check (load_status in
-    ('pending_load','loaded','partially_rejected','rejected','duplicate')),
-  rejected_rows int not null default 0,     -- 행 단위 검증에서 ②로 못 넘긴 행 수
-  duplicate_of bigint null fk raw_object,   -- 직전 파일과 해시가 같아 올리지 않았을 때
-  loaded_at timestamptz null,
-  purged_at timestamptz null                -- Storage 파일을 지운 시각. 행은 남긴다 (2026-10-20)
-```
+표 정의: `raw_object` (열은 마이그레이션이 원본, 3장 첫머리).
 
 - 인덱스: `(source, target_from)`, `(ingest_run_id)`, `(load_status) where load_status = 'pending_load'`, `(duplicate_of)`.
 - **원본을 지울 때 행은 지우지 않는다** (2026-10-20). 보존 기간(3-9 권장 5)이 지난 KAMIS·축평원 원본은 Storage 파일만 지우고 `purged_at`을 채운다. 관측값·정정 이력·평년 행·상품 속성 이력·마스터 변경 기록이 `raw_object_id`로 이 행을 FK로 가리키므로, 행을 지우면 FK가 막거나(관측값이 남아 있을 때) 출처 기록이 사라진다. 행 하나는 약 300B라 연 수천 행이면 1MB 남짓이다. 다시 계산할 때 `purged_at`이 있는 파일은 API에서 다시 받는다.
