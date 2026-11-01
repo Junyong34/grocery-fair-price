@@ -55,7 +55,6 @@ export const FESTIVAL_BACKGROUNDS: Record<Festival, string> = {
   seollal: "새해 첫날. 흰 떡국을 먹으며 한 살을 더한다.",
   daeboreum:
     "새해 첫 보름달이 뜨는 날. 오곡밥과 묵은 나물을 먹고, 부럼을 깨물어 한 해의 부스럼을 막는다고 여겼다.",
-  dano: "한 해 중 양기가 가장 센 날. 수리취로 떡을 빚고 매실로 제호탕을 끓였다.",
   sambok:
     "여름 가운데 가장 더운 때. 삼계탕과 팥죽으로 몸을 보하며 더위를 났다.",
   chuseok:

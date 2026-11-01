@@ -16,7 +16,7 @@
 |---|---|---|
 | `bureom` | 부럼 | `7f5f4465e65e184d` |
 | `dakjjim` | 닭찜 | `9dfb92aee7219966` |
-| `dongchimi` | 동치미 | `58769c929289cb5b` |
+| `dongchimi` | 동치미 | `d46912b0a0433310` |
 | `mandu` | 만두 | `7b15e8ffdc96ff70` |
 | `mugeun-namul` | 묵은 나물 | `9cdb00e58b8e9359` |
 | `ogokbap` | 오곡밥 | `0079e05682e44dc0` |
