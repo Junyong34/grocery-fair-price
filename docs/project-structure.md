@@ -200,7 +200,7 @@ import 경로:
 | `home/` | P1 시세 메인 |
 | `search/` | P2 품종 검색. 검색어는 `history.replaceState`로 `?q=`에 맞춘다 |
 | `basket/` | P4 담은 품종: 판정별 개수, 바뀐 판정 알림, 판정별 묶음, × 빼기, 편집(모두 빼기), 빈 목록. 기기 값을 불러온 뒤에 그린다 |
-| `variety-detail/` | P3 품종 상세: `detail-header`(뒤로 · 담기, 최근 본 품종에 넣기. 모바일에서 제목 줄이 헤더 밑으로 사라지면 `DetailHeaderBar`가 로고 자리를 "‹ 품종 · 담기"로 바꾼다), `verdict-card`(판정 전 · 오래됨 · 표본 적음), `range-bar`, `places-section`(장소 비교, 판정 색 없음), `why-section`(`trend-chart` SVG + `dots-compare`), `my-price`(내가 본 가격, 저장 안 함) |
+| `variety-detail/` | P3 품종 상세: `detail-header`(본문 제목 줄, 최근 본 품종에 넣기. 모바일은 `DetailHeaderBar`가 처음부터 하위 헤더 "‹ 품종 · 담기"를 그리고, 데스크톱은 본문 줄에 뒤로 · 담기가 있다), `verdict-card`(판정 전 · 오래됨 · 표본 적음), `range-bar`, `places-section`(장소 비교, 판정 색 없음), `why-section`(`trend-chart` SVG + `dots-compare`), `my-price`(내가 본 가격, 저장 안 함) |
 | `components/` | 품종 행(`variety-row`: 네 열 subgrid, 가격 두 줄, 설명 한 줄), 판정 칩 · 점(`verdict-chip`, 색은 `verdict-tone`), `add-button`, `basket-toast`(담기 토스트 "배추를 담았어요 · 목록 보기", 화면 키보드 위로), `basket-badge`(내비 담은 개수), `search-entry`, `recent-varieties`, `price-shell` |
 | `settings/` | 설정 화면 "내 기록"의 담은 품종 · 최근 본 품종 지우기(`price-record-settings`) |
 | `stores/` | `basket-store`(`price:basket`, 담을 때 판정 · 조사일), `recent-store`(`price:recent`) |
@@ -220,7 +220,7 @@ import 경로:
 | `today.ts` | `getSeoulToday()`: `server-only`. `connection()` 뒤에 서울 오늘을 계산하고 React `cache`로 요청당 한 번 |
 | `today-context.tsx` | `TodayProvider`, `useToday()`: 서버가 만든 Promise를 클라이언트가 `use()`로 읽는다. `<Suspense>` 안에서만 |
 | `eaten-store.ts` | 먹음 기록: 연도 → 품종 id 목록. localStorage `seasonal:eaten`. `toggleEaten`, `useEatenIds`, `useIsEaten` |
-| `shell/` | 가격과 제철이 같이 쓰는 셸: `site-shell`(헤더 + 본문 + 하단 내비), `site-nav`(`SiteHeader`, `FloatingNav`. 내비 칸 72px. 화면별 모바일 헤더 타입은 `HeaderBar`가 헤더의 바 자리에 포털로 그린다), `menus`(어디서나 같은 4칸: 시세 · 제철달력 · 담은 품종 · 나의 식탁, `activeMenuKey`), `match-path`(활성 판정 순수 함수), `nav-link`(활성 링크). 메뉴 배지(담은 개수)는 라우트 레이아웃이 `badges`로 넣는다. 셸 규칙은 `.scratch/shell-unify/spec.md` |
+| `shell/` | 가격과 제철이 같이 쓰는 셸: `site-shell`(헤더 + 본문 + 하단 내비), `site-nav`(`SiteHeader`, `FloatingNav`. 내비 칸 72px. 화면별 모바일 헤더 타입은 `HeaderBar`가 헤더의 바 자리에 포털로 그린다), `menus`(어디서나 같은 4칸: 시세 · 제철달력 · 담은 품종 · 나의 식탁, `activeMenuKey`), `match-path`(활성 판정 순수 함수), `nav-link`(활성 링크). `screens`(화면별 헤더 타입 root · sub · search와 스크롤 동작 표, `screenOf`), `sub-header`(하위 헤더 ‹ · 제목 · 액션, `HeaderBar` 포털로 그림), `search-link` · `settings-link`(루트 헤더 🔍 · ⚙). 메뉴 배지(담은 개수)는 라우트 레이아웃이 `badges`로 넣는다. 셸 규칙은 `.scratch/shell-unify/spec.md` |
 | `analytics/` | GA4(절차: `apps/web/docs/analytics.md`): `events.ts`(이벤트 카탈로그. 이벤트를 더하고 지우는 곳은 여기 하나, `REGISTERED_PARAMS`는 GA에 등록한 매개변수)와 규칙 테스트, `config.ts`(`GA_MEASUREMENT_ID` · `GA_DEBUG`를 읽는 곳), `analytics-tag.tsx`(루트 layout이 그린다), `track.ts`(`track(이름, 매개변수)`, 화면은 이것만 부른다), `tracked-link.tsx`(서버 컴포넌트 링크에 이벤트) |
 | `downloads-manifest.ts` | 게시된 인쇄물 매니페스트(`DOWNLOADS`, `findEdition`, `findWithdrawn`). 내려받기 화면과 sitemap이 같이 읽는다 |
 | `brand-logo.tsx` | 고운돋움 Regular를 패스로 만든 장볼날 가로 로고. 모바일에서 접힌 헤더는 심볼만 보여준다 |

@@ -7,6 +7,7 @@ import { PRINT_KIND_LABELS } from "@workspace/seasonal/print/spec"
 
 import { DOWNLOADS } from "@/shared/downloads-manifest"
 import { routes } from "@/shared/routes"
+import { SubHeader } from "@/shared/shell/sub-header"
 
 import { EditionThumbnail, ThumbnailMat } from "../components/edition-thumbnail"
 
@@ -16,7 +17,8 @@ export function DownloadsView() {
   return (
     <div className="mx-auto flex max-w-[900px] flex-col gap-8 pt-6 pb-12 lg:pt-10">
       <header className="flex flex-col gap-2 px-[18px] lg:px-6">
-        <h1 className="font-heading text-2xl font-bold text-ink lg:text-3xl">{DOWNLOADS_COPY.title}</h1>
+        <SubHeader title={DOWNLOADS_COPY.title} fallbackHref={routes.seasonal.root} />
+        <h1 className="font-heading text-2xl font-bold text-ink max-lg:sr-only lg:text-3xl">{DOWNLOADS_COPY.title}</h1>
         <p className="text-sm text-stone">{DOWNLOADS_COPY.intro}</p>
       </header>
       {shelves.length === 0 && <p className="px-[18px] text-sm text-caption lg:px-6">{DOWNLOADS_COPY.empty}</p>}

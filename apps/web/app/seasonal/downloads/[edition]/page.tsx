@@ -12,6 +12,7 @@ import { WithdrawnNotice } from "@/features/seasonal/downloads/withdrawn-notice"
 import { DOWNLOADS, findEdition, findWithdrawn } from "@/shared/downloads-manifest"
 import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
+import { SubHeader } from "@/shared/shell/sub-header"
 
 type Params = PageProps<"/seasonal/downloads/[edition]">["params"]
 
@@ -58,7 +59,8 @@ async function Edition({ params }: { params: Params }) {
   return (
     <article className="mx-auto flex max-w-[560px] flex-col gap-4 pt-6 pb-12 lg:pt-10">
       {/* 공유는 본문 버튼 줄에 있어 맨 위 줄에는 두지 않는다. */}
-      <Link href={routes.seasonal.downloads} className="self-start px-[18px] text-sm text-stone">
+      <SubHeader title={editionName(edition)} fallbackHref={routes.seasonal.downloads} />
+      <Link href={routes.seasonal.downloads} className="self-start px-[18px] text-sm text-stone max-lg:hidden">
         {DOWNLOADS_COPY.backToList}
       </Link>
       <div className="px-[18px]">

@@ -2,7 +2,7 @@ import type { MenuBadges } from "@/shared/shell/site-nav"
 import { SiteShell } from "@/shared/shell/site-shell"
 
 import { DesktopSearchButton, MobileSearchButton } from "../search/food-search"
-import { SettingsLink } from "./settings-link"
+import { SettingsLink } from "@/shared/shell/settings-link"
 
 /**
  * 제철 영역 셸. 사이트 공통 셸(헤더 · 하단 내비)에 헤더 버튼(검색 · 설정)을 넣는다. 메뉴 배지(담은 개수)는 라우트 레이아웃이 badges로 넣는다.

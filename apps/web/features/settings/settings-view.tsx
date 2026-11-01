@@ -3,6 +3,7 @@ import Link from "next/link"
 
 import { routes } from "@/shared/routes"
 import { SettingSection } from "@/shared/settings/setting-section"
+import { SubHeader } from "@/shared/shell/sub-header"
 
 import packageJson from "../../package.json"
 import { SETTINGS_COPY } from "./copy"
@@ -14,7 +15,8 @@ import { SETTINGS_COPY } from "./copy"
 export function SettingsView({ display, records }: { display: React.ReactNode; records: React.ReactNode }) {
   return (
     <div className="mx-auto flex max-w-[680px] flex-col gap-7 px-[18px] pt-4 pb-12 lg:px-6 lg:pt-10">
-      <h1 className="font-heading text-2xl font-bold text-ink">{SETTINGS_COPY.title}</h1>
+      <SubHeader title={SETTINGS_COPY.title} fallbackHref={routes.home} />
+      <h1 className="font-heading text-2xl font-bold text-ink max-lg:sr-only">{SETTINGS_COPY.title}</h1>
       <SettingSection title={SETTINGS_COPY.sections.display}>{display}</SettingSection>
       <SettingSection title={SETTINGS_COPY.sections.records}>{records}</SettingSection>
       <SettingSection title={SETTINGS_COPY.sections.info}>

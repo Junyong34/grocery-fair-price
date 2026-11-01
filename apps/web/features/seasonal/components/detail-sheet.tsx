@@ -1,5 +1,6 @@
 "use client"
 
+import { X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useSyncExternalStore } from "react"
 
@@ -59,7 +60,20 @@ export function DetailSheet({ title, action = <ShareButton />, children }: { tit
       open
       onClose={close}
       title={<span className="font-heading text-[28px] font-bold">{title}</span>}
-      action={action}
+      action={
+        <div className="flex items-center gap-1">
+          {action}
+          {/* 전체 높이로 올릴 수 있는 시트라 닫기 버튼을 둔다(M3 Bottom sheets). 손잡이 · Esc · 바깥 누르기로도 닫힌다. */}
+          <button
+            type="button"
+            aria-label="닫기"
+            onClick={close}
+            className="-mr-2 grid size-10 place-items-center rounded-full text-ink hover:bg-gold-wash"
+          >
+            <X aria-hidden size={22} strokeWidth={1.7} />
+          </button>
+        </div>
+      }
     >
       <div className="overflow-y-auto pb-4">{children}</div>
     </BottomSheet>

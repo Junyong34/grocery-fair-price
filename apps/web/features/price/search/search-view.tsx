@@ -47,8 +47,13 @@ export function SearchView({
   }
 
   return (
-    <div className="mx-auto flex max-w-[640px] flex-col gap-4 px-[18px] pt-3 lg:pt-8">
-      <form role="search" onSubmit={(event) => event.preventDefault()} className="flex items-center gap-3">
+    <div className="mx-auto flex max-w-[640px] flex-col gap-4 px-[18px] pt-1 lg:pt-8">
+      {/* 모바일은 사이트 헤더 대신 이 검색 줄이 맨 위에 붙는다(검색 헤더, .scratch/shell-unify/spec.md 3장). */}
+      <form
+        role="search"
+        onSubmit={(event) => event.preventDefault()}
+        className="flex items-center gap-3 max-lg:sticky max-lg:top-0 max-lg:z-(--z-dock) max-lg:-mx-[18px] max-lg:bg-canvas/94 max-lg:px-[18px] max-lg:py-2 max-lg:backdrop-blur-md"
+      >
         <InputWrapper as="label" variant="cream" className="flex-1">
           <InputAffix>
             <Search aria-hidden size={18} />

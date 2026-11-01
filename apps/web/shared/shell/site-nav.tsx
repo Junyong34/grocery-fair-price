@@ -13,6 +13,7 @@ import { routes } from "@/shared/routes"
 
 import { activeMenuKey, MENUS } from "./menus"
 import { NavLink } from "./nav-link"
+import { screenOf } from "./screens"
 
 /** 메뉴 칸 옆에 붙는 배지(담은 개수 등). 메뉴 key → 요소. 레이아웃이 넣는다. */
 export type MenuBadges = Partial<Record<string, React.ReactNode>>
@@ -125,8 +126,13 @@ export function SiteHeader({
   actions?: React.ReactNode
 }) {
   const stuck = useScrolledDown()
+  // 검색 타입 화면(P2)은 모바일에서 화면의 검색 입력이 헤더 자리를 맡는다(.scratch/shell-unify/spec.md 3장).
+  const { header } = screenOf(usePathname())
   return (
-    <header data-stuck={stuck ? "" : undefined} className="group/header sticky top-0 z-(--z-dock) h-14">
+    <header
+      data-stuck={stuck ? "" : undefined}
+      className={cn("group/header sticky top-0 z-(--z-dock) h-14", header === "search" && "max-lg:hidden")}
+    >
       <div
         className={cn(
           "absolute inset-x-0 top-0 h-14 border border-transparent",

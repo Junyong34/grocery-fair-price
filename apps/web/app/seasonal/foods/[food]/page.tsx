@@ -9,6 +9,7 @@ import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 import { ShareButton } from "@/features/seasonal/components/share-button"
 import { FoodDetail } from "@/features/seasonal/food-detail/food-detail"
 import { createMetadata } from "@/shared/meta"
+import { SubHeader } from "@/shared/shell/sub-header"
 import { routes } from "@/shared/routes"
 import { breadcrumb, JsonLd } from "@/shared/seo/json-ld"
 import { foodSeo } from "@/shared/seo/titles"
@@ -50,7 +51,9 @@ async function Food({ params }: { params: Params }) {
     <article className="mx-auto flex max-w-[560px] flex-col gap-4 px-[18px] pt-6 lg:pt-10">
       {/* 시트(@sheet)에는 넣지 않는다. 크롤러는 주소를 직접 열어 이 전체 페이지를 본다. */}
       <JsonLd data={breadcrumb([{ name: foodSeo(food).title, path: routes.seasonal.food(food.id) }])} />
-      <div className="flex items-center justify-between gap-3">
+      <SubHeader title={food.name} fallbackHref={routes.seasonal.root} actions={<ShareButton className="size-10" />} />
+      {/* 데스크톱 맨 위 줄. 모바일은 하위 헤더가 뒤로 · 공유를 맡는다. */}
+      <div className="flex items-center justify-between gap-3 max-lg:hidden">
         <Link href={routes.seasonal.root} className="text-sm text-stone">
           ‹ 이달의 제철
         </Link>
