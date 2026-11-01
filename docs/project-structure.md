@@ -117,6 +117,8 @@ import 경로:
 | `/print?spec=&paper=&page=` | 인쇄 전용 페이지 (개발 서버 전용, 운영 404) | `app/print/page.tsx` | `features/print/print-document` |
 | (제철 화면 안에서 이동) | 1i 품종 상세 (하단 시트) | `seasonal/@sheet/(.)foods/[food]/page.tsx` | `components/detail-sheet` + `food-detail` |
 | `/api/og` | 공유 미리보기 이미지 1200×630 | `app/api/og/route.tsx` | 쿼리 `title`, `subtitle`, `badge`, `season` |
+| `/settings` | 설정: 화면 표시 · 내 기록 · 정보 (noindex) | `(price)/settings/page.tsx` | `features/settings/settings-view`. 제철 · 시세 항목은 라우트가 각 feature에서 넣는다(`seasonal/settings/display-settings`, `price/settings/price-record-settings`) |
+| `/settings/sources` | 데이터 출처 (noindex) | `(price)/settings/sources/page.tsx` | `features/settings/sources-view` |
 | `/privacy` | 개인정보 처리방침 (가격 셸) | `(price)/privacy/page.tsx` | `features/legal/privacy/` (본문 `privacy-content.ts`) |
 | `/sitemap.xml`, `/robots.txt` | 검색 색인 | `app/sitemap.ts`, `app/robots.ts` | `shared/seo/pages.ts` 레지스트리, 색인 스위치 |
 
@@ -125,7 +127,7 @@ import 경로:
 라우팅 장치:
 
 - **`app/(price)/layout.tsx`**: 가격 화면(`/`, `/search`, `/prices/*`, `/basket`)의 셸(`features/price/components/price-shell`: 공통 셸 + 가격 메뉴 + 기기 저장 store 불러오기). 데이터는 `features/price/data/price-source.ts`의 `getPriceSource()`로만 읽는다.
-- **`app/seasonal/layout.tsx`**: `TodayProvider`(서울 오늘 Promise)와 `SeasonalShell`(헤더, 하단 Floating Nav, 검색, ⚙ 설정. 공유 버튼은 헤더가 아니라 월별·계절·명절·품종 상세의 제목 줄과, 이달(모바일)의 월 레일 아래에 있다)을 깐다. `sheet` 슬롯을 받는다.
+- **`app/seasonal/layout.tsx`**: `TodayProvider`(서울 오늘 Promise)와 `SeasonalShell`(헤더, 하단 Floating Nav, 검색, ⚙(→ `/settings`). 공유 버튼은 헤더가 아니라 월별·계절·명절·품종 상세의 제목 줄과, 이달(모바일)의 월 레일 아래에 있다)을 깐다. `sheet` 슬롯을 받는다.
 - **라우트 그룹** `(this-month)`과 `(season)`: URL을 바꾸지 않고 같은 제철달력 탭 줄(`SeasonalTabs`: 이달 · 월별 · 계절 · 명절, 헤더 아래 고정)을 그린다. `(detail)` 그룹은 2b 타임라인을 그 달 상세에만 붙인다. 타임라인과 명절 칩은 레이아웃에 두어 달·명절을 바꿔도 가로 스크롤 위치가 남는다.
 - **`@sheet` 병렬 슬롯**: `(.)foods/[food]`가 품종 상세를 가로채 시트로 띄운다. `default.tsx`, `page.tsx`, `[...catchAll]`은 null을 그려 다른 곳으로 이동하면 시트가 닫힌다. 새 제철 라우트를 더해도 `@sheet`는 고칠 것이 없다.
 - **정적 생성**: 동적 라우트는 모두 `generateStaticParams`로 전부 만든다(12달, 4계절, 명절, 품종). Cache Components에서는 `dynamicParams`를 못 쓰므로 목록 밖 값은 `notFound()`로 막고, `params`는 `<Suspense>` 안에서 읽는다.
@@ -151,16 +153,17 @@ import 경로:
 
 | 폴더 | 화면 | 주요 파일 |
 |---|---|---|
-| `this-month/` | 2a | `this-month-view`, `desktop-month-panel`(option-wheel), `month-jump`, `month-scroll-spy`, `active-month`, `settings-panel`·`settings-fields`·`settings-scope`(⚙ 표시 설정), `calendar-style-picker` |
+| `this-month/` | 2a | `this-month-view`, `desktop-month-panel`(option-wheel), `month-jump`, `month-scroll-spy`, `active-month`, `settings-scope`(표시 설정을 data 속성으로), `calendar-style-picker` |
 | `month-timeline/` | 2b | `month-timeline`, `month-view`, `months-index`, `food-grid`, `food-card`, `month-food-fold`, `eaten-summary`, `view-store`(열 수, 저장 안 함) |
 | `seasons/` | 3a | `seasons-hero`, `season-card`, `season-detail`, `season-background`, `season-style`, `now-tag` |
 | `festivals/` | 1g | `festival-view`, `festival-chips`, `festival-background`, `festival-style`, `festival-date`, `dish-image`(전통 음식 그림 또는 한지 인장) |
 | `my-table/` | 1h | `my-table-view`, `food-row`, `typed-label` |
 | `food-detail/` | 1i | `food-detail`, `eat-toggle`, `festival-link` |
 | `search/` | 전역 검색 | `food-search`(헤더 버튼), `food-search-dialog`(cojeev command, 초성 검색) |
-| `components/` | 공통 | `seasonal-shell`(공통 셸에 제철 메뉴 · 검색 · ⚙를 넣는다), `sub-tabs`, `food-image`(그림 없으면 이름 카드), `detail-sheet`(품종 · 에디션 상세 시트), `scatter-field`·`draggable-scatter`(흩어진 배치와 드래그), `month-calendar`, `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-count`, `share-button`, `holiday-name`, `this-month-only`, `screen-stub` |
+| `components/` | 공통 | `seasonal-shell`(공통 셸에 제철 메뉴 · 검색 · ⚙를 넣는다), `sub-tabs`, `food-image`(그림 없으면 이름 카드), `detail-sheet`(품종 · 에디션 상세 시트), `scatter-field`·`draggable-scatter`(흩어진 배치와 드래그), `month-calendar`, `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-count`, `share-button`, `holiday-name`, `screen-stub` |
 | `downloads/` | PDF 내려받기(.scratch/calendar-download) | `downloads-view`(목록: 종류별 가로 줄 `EditionShelf`), `edition-detail`(상세: 시트 · 페이지 공용), `edition-thumbnail`, `edition-download-link`(A4 내려받기 주소) |
-| `stores/` | 공통 | `settings-store`(⚙ 설정, 내려받기 용지), `scatter-store`(옮긴 배치와 달력 자리) |
+| `settings/` | 설정 화면 항목 | `display-settings`(화면 표시 섹션, 먹음 기록 지우기) |
+| `stores/` | 공통 | `settings-store`(표시 설정), `scatter-store`(옮긴 배치와 달력 자리) |
 
 `components/seasonal-shell`은 공통 셸(`shared/shell`)의 헤더에 넣으려고 `search/`와 `this-month/settings-panel`을 import한다. 같은 feature 안이라 허용된다.
 
@@ -199,7 +202,10 @@ import 경로:
 | `basket/` | P4 담은 품종: 판정별 개수, 바뀐 판정 알림, 판정별 묶음, × 빼기, 편집(모두 빼기), 빈 목록. 기기 값을 불러온 뒤에 그린다 |
 | `variety-detail/` | P3 품종 상세: `detail-header`(뒤로 · 담기, 최근 본 품종에 넣기. 모바일에서 제목 줄이 헤더 밑으로 사라지면 `DetailHeaderBar`가 로고 자리를 "‹ 품종 · 담기"로 바꾼다), `verdict-card`(판정 전 · 오래됨 · 표본 적음), `range-bar`, `places-section`(장소 비교, 판정 색 없음), `why-section`(`trend-chart` SVG + `dots-compare`), `my-price`(내가 본 가격, 저장 안 함) |
 | `components/` | 품종 행(`variety-row`: 네 열 subgrid, 가격 두 줄, 설명 한 줄), 판정 칩 · 점(`verdict-chip`, 색은 `verdict-tone`), `add-button`, `basket-toast`(담기 토스트 "배추를 담았어요 · 목록 보기", 화면 키보드 위로), `basket-badge`(내비 담은 개수), `search-entry`, `recent-varieties`, `price-shell` |
+| `settings/` | 설정 화면 "내 기록"의 담은 품종 · 최근 본 품종 지우기(`price-record-settings`) |
 | `stores/` | `basket-store`(`price:basket`, 담을 때 판정 · 조사일), `recent-store`(`price:recent`) |
+
+`features/settings/`는 설정 화면 틀(`settings-view`), 데이터 출처(`sources-view`), 문구(`copy.ts`)다. 다른 feature를 import하지 않고, 행 부품(`SettingSection`, `ClearRow`)은 `shared/settings/`에 있다.
 
 ### 4.4 shared
 
@@ -226,7 +232,7 @@ import 경로:
 | 서울 오늘 | `shared/today.ts` → `TodayProvider` → `useToday()` | 없음 (요청마다 서버 계산) | 렌더 중 `new Date()`를 부르지 않는다 |
 | 먹음 기록 | `shared/eaten-store.ts` | localStorage `seasonal:eaten` | 앱 전체가 쓴다 |
 | 담은 품종 · 최근 본 품종 | `features/price/stores/` | localStorage `price:basket` · `price:recent` | |
-| ⚙ 표시 설정 (공휴일, 먹은 품종, 달력 모양) | `features/seasonal/stores/settings-store.ts` | localStorage `seasonal:settings` | |
+| 표시 설정 (공휴일, 먹은 품종, 달력 모양, 달 이름. `/settings`에서 바꿈) | `features/seasonal/stores/settings-store.ts` | localStorage `seasonal:settings` | |
 | 흩어진 배치·달력 자리 | `features/seasonal/stores/scatter-store.ts` | localStorage `seasonal:scatter` | 키는 `(달, 화면 구간)` |
 | 2b 열 수 | `features/seasonal/month-timeline/view-store.ts` | 없음 | 달을 바꿔도 유지 |
 

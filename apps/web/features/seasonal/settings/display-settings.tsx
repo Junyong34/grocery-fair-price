@@ -1,21 +1,19 @@
 "use client"
 
-import { ChevronRight } from "lucide-react"
-import Link from "next/link"
-
 import { Segmented } from "@workspace/ui/components/segmented"
 import { Switch } from "@workspace/ui/components/switch"
 
-import { DOWNLOADS_COPY } from "@workspace/seasonal/data/copy"
 import { formatMonthLabel, MONTH_LABEL_STYLES } from "@workspace/seasonal/data/months"
 
-import { routes } from "@/shared/routes"
+import { ClearRow } from "@/shared/settings/clear-row"
+import { SettingWhere } from "@/shared/settings/setting-section"
+import { clearEaten, useEatenHydrated, useEatenTotal } from "@/shared/eaten-store"
 
 import { setSettings, useSettings } from "../stores/settings-store"
-import { CalendarStylePicker } from "./calendar-style-picker"
+import { CalendarStylePicker } from "../this-month/calendar-style-picker"
 
-/** ⚙ 표시 설정 내용(명세 4절. 24절기 표시는 MVP 밖). 맨 아래에 PDF 내려받기 화면과 개인정보 처리방침으로 가는 링크가 있다. */
-export function SettingsFields({ onNavigate }: { onNavigate?: () => void }) {
+/** 설정 화면 "화면 표시" 섹션의 제철달력 항목(.scratch/shell-unify/spec.md 5장. 24절기 표시는 MVP 밖). */
+export function SeasonalDisplaySettings() {
   const { showHolidays, showEaten, calendarStyle, monthLabel } = useSettings((state) => state)
   return (
     <div className="flex flex-col divide-y divide-hairline">
@@ -25,7 +23,10 @@ export function SettingsFields({ onNavigate }: { onNavigate?: () => void }) {
       />
       <div className="flex items-center justify-between gap-4 py-3">
         <span className="flex flex-col">
-          <span className="text-[15px] text-ink">달 이름</span>
+          <span className="text-[15px] text-ink">
+            달 이름
+            <SettingWhere>제철달력</SettingWhere>
+          </span>
           <span className="text-xs text-stone">달 제목과 달 이동 목록의 표기</span>
         </span>
         <Segmented
@@ -47,13 +48,6 @@ export function SettingsFields({ onNavigate }: { onNavigate?: () => void }) {
         checked={showEaten}
         onChange={(value) => setSettings({ showEaten: value })}
       />
-      <Link href={routes.seasonal.downloads} onClick={onNavigate} className="flex items-center justify-between gap-4 py-3 text-[15px] text-ink">
-        {DOWNLOADS_COPY.settingsLink}
-        <ChevronRight aria-hidden size={18} strokeWidth={1.6} className="text-stone" />
-      </Link>
-      <Link href={routes.privacy} onClick={onNavigate} className="py-3 text-[13px] text-stone">
-        개인정보 처리방침
-      </Link>
     </div>
   )
 }
@@ -78,15 +72,25 @@ function SettingRow({
   return (
     <label className="flex items-center justify-between gap-4 py-3">
       <span className="flex flex-col">
-        <span className="text-[15px] text-ink">{label}</span>
+        <span className="text-[15px] text-ink">
+          {label}
+          <SettingWhere>제철달력</SettingWhere>
+        </span>
         <span className="text-xs text-stone">{hint}</span>
       </span>
       {/* cojeev 스위치는 64×44로 커서 줄여 쓴다. */}
       <Switch
         checked={checked}
         onCheckedChange={onChange}
-        className="-my-2 -mr-2.5 origin-right scale-[.68]"
+        className="-my-2 origin-right scale-[.68]"
       />
     </label>
   )
+}
+
+/** 설정 화면 "내 기록" 섹션의 먹음 기록 지우기. */
+export function EatenRecordSetting() {
+  const total = useEatenTotal()
+  const hydrated = useEatenHydrated()
+  return <ClearRow label="먹음 기록" where="나의 식탁" count={hydrated ? total : null} onClear={clearEaten} />
 }

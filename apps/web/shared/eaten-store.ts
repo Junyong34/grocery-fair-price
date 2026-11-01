@@ -50,3 +50,18 @@ export function useEatenIds(year: number): ReadonlySet<string> {
 export function useIsEaten(year: number, foodId: string): boolean {
   return eatenStore.use((state) => (state.byYear[year] ?? NONE).includes(foodId))
 }
+
+/** 모든 연도의 먹음 기록 수(설정 화면 "먹음 기록 지우기"). */
+export function useEatenTotal(): number {
+  return eatenStore.use((state) => Object.values(state.byYear).reduce((sum, ids) => sum + ids.length, 0))
+}
+
+/** 모든 연도의 먹음 기록을 지운다. */
+export function clearEaten(): void {
+  eatenStore.set({ byYear: {} })
+}
+
+/** 기기 값을 불러왔는지. 불러오기 전에는 개수를 보이지 않는다. */
+export function useEatenHydrated(): boolean {
+  return eatenStore.useHydrated()
+}

@@ -62,6 +62,8 @@ export const NOINDEX_ROUTES: readonly string[] = [
   "/search",
   // P4 담은 품종: 기기에 저장된 목록으로 채워져 크롤러에게는 빈 화면이다.
   "/basket",
+  // 설정 · 데이터 출처: 기기 값으로 채워지는 화면이고 검색으로 찾아올 내용이 아니다.
+  "/settings",
   // 1h 나의 식탁: 기기에 저장된 기록으로 채워져 크롤러에게는 빈 화면이다.
   "/seasonal/my-table",
   // PDF 인쇄 페이지. 개발 서버에서만 열리고 운영에서는 404다(.scratch/calendar-print/spec.md).

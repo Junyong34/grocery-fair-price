@@ -48,6 +48,13 @@ export const routes = {
     downloadFile: (id: string, paper: PublishedPaper) => `/seasonal/downloads/${id}/${paper.toLowerCase()}`,
   },
 
+  /** 설정. ⚙를 어디서 눌러도 여기로 온다(.scratch/shell-unify/spec.md 5장). */
+  settings: {
+    root: "/settings",
+    /** 데이터 출처 */
+    sources: "/settings/sources",
+  },
+
   /** 개인정보 처리방침 */
   privacy: "/privacy",
 

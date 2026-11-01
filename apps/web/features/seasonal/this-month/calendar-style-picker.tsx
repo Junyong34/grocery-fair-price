@@ -1,11 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo } from "react"
 
 import { holidaysInMonth } from "@workspace/seasonal/calendar/holidays"
-import { seoulToday } from "@workspace/seasonal/calendar/today"
 import { CALENDAR_VARIANT_LABELS, CALENDAR_VARIANTS, type CalendarVariant } from "@workspace/seasonal/calendar/variants"
 import { cn } from "@workspace/ui/lib/utils"
+
+import { SettingWhere } from "@/shared/settings/setting-section"
+import { useToday } from "@/shared/today-context"
 
 import { MonthCalendar } from "../components/month-calendar"
 
@@ -14,7 +16,7 @@ const PREVIEW_WIDTH = 336
 const PREVIEW_ZOOM = 0.22
 
 /**
- * ⚙ 달력 모양 고르기. 네 모양을 실제 달력(이번 달)을 줄인 미리보기로 보여 준다.
+ * 설정 화면의 달력 모양 고르기. 네 모양을 실제 달력(이번 달)을 줄인 미리보기로 보여 준다.
  * 화살표 키로 옆 모양을 고른다.
  */
 export function CalendarStylePicker({
@@ -24,10 +26,10 @@ export function CalendarStylePicker({
   value: CalendarVariant
   onChange: (value: CalendarVariant) => void
 }) {
-  // 시트·패널은 열릴 때만 그려지므로(클라이언트) 이번 달을 바로 잡는다. 날짜는 서울 기준이다.
-  const [today] = useState(seoulToday)
-  // 이 피커는 설정을 열 때 따로 불러오는 묶음(settings-fields)에 있어 공휴일 데이터를 여기서 구해도 첫 화면 번들에 들지 않는다.
-  const [holidays] = useState(() => holidaysInMonth(today.year, today.month))
+  // 미리보기는 서울 기준 이번 달이다. 서버가 계산한 오늘을 받으므로 <Suspense> 안에서 그린다.
+  const today = useToday()
+  // 설정 화면에만 있어 공휴일 데이터를 여기서 구해도 다른 화면 번들에 들지 않는다.
+  const holidays = useMemo(() => holidaysInMonth(today.year, today.month), [today.year, today.month])
   const index = CALENDAR_VARIANTS.indexOf(value)
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -41,8 +43,9 @@ export function CalendarStylePicker({
 
   return (
     <div className="flex flex-col gap-2.5 py-3">
-      <span id="calendar-style-label" className="text-[15px] text-ink">
-        달력 모양
+      <span className="text-[15px] text-ink">
+        <span id="calendar-style-label">달력 모양</span>
+        <SettingWhere>제철달력</SettingWhere>
       </span>
       <div
         role="radiogroup"

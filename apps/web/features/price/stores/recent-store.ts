@@ -21,3 +21,8 @@ export function clearRecent(): void {
 export function useRecentIds(): readonly string[] {
   return recentStore.use((state) => state.ids)
 }
+
+/** 저장값을 불러왔는지. 불러오기 전에는 개수를 보이지 않는다. */
+export function useRecentHydrated(): boolean {
+  return recentStore.useHydrated()
+}

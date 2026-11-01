@@ -144,7 +144,6 @@ export const DOWNLOADS_COPY = {
   others: "다른 인쇄물",
   seeAll: "전체 보기 ›",
   thumbnailAlt: (name: string, index: number) => (index === 0 ? `${name} 미리보기` : `${name} 미리보기 ${index + 1}쪽`),
-  settingsLink: "달력·포스터 PDF 내려받기",
   /** 내려받기를 누른 뒤(5-a). 브라우저 다운로드가 끝났는지는 알 수 없어 "누른 뒤" 상태다. */
   done: {
     title: "내려받았어요",
