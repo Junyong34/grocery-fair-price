@@ -154,7 +154,7 @@ import 경로:
 | `this-month/` | 2a | `this-month-view`, `desktop-month-panel`(option-wheel), `month-jump`, `month-scroll-spy`, `active-month`, `settings-panel`·`settings-fields`·`settings-scope`(⚙ 표시 설정), `calendar-style-picker` |
 | `month-timeline/` | 2b | `month-timeline`, `month-view`, `months-index`, `food-grid`, `food-card`, `month-food-fold`, `eaten-summary`, `view-store`(열 수, 저장 안 함) |
 | `seasons/` | 3a | `seasons-hero`, `season-card`, `season-detail`, `season-background`, `season-style`, `now-tag` |
-| `festivals/` | 1g | `festival-view`, `festival-chips`, `festival-date`, `dish-image`(전통 음식 그림 또는 옅은 원) |
+| `festivals/` | 1g | `festival-view`, `festival-chips`, `festival-background`, `festival-style`, `festival-date`, `dish-image`(전통 음식 그림 또는 한지 인장) |
 | `my-table/` | 1h | `my-table-view`, `food-row`, `typed-label` |
 | `food-detail/` | 1i | `food-detail`, `eat-toggle`, `festival-link` |
 | `search/` | 전역 검색 | `food-search`(헤더 버튼), `food-search-dialog`(cojeev command, 초성 검색) |
