@@ -14,6 +14,7 @@ import { routes } from "@/shared/routes"
 import { DishImage } from "./dish-image"
 import { FestivalBackground } from "./festival-background"
 import { FESTIVAL_STYLE } from "./festival-style"
+import { FESTIVAL_CHIPS_ID } from "./festival-chip-row"
 
 /**
  * 1g 명절 선택 카드 바(명세 3.4).
@@ -36,7 +37,7 @@ export function FestivalChips() {
   }, [selected])
 
   return (
-    <nav aria-label="명절 고르기" className="mx-auto max-w-[840px]">
+    <nav id={FESTIVAL_CHIPS_ID} aria-label="명절 고르기" className="mx-auto max-w-[840px]">
       <ScrollRow
         ref={scroller}
         className="gap-2 px-[18px] py-3 lg:grid lg:grid-cols-5 lg:gap-2.5 lg:px-6"

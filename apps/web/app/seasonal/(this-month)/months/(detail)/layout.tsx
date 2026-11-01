@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import { MonthChipRow } from "@/features/seasonal/month-timeline/month-chip-row"
 import { MonthTimeline } from "@/features/seasonal/month-timeline/month-timeline"
 import { routes } from "@/shared/routes"
 
@@ -16,6 +17,7 @@ export default function MonthsLayout({
         </Link>
       </div>
       <MonthTimeline />
+      <MonthChipRow />
       {children}
     </>
   )

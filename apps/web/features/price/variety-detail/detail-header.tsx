@@ -14,6 +14,7 @@ import { toggleBasket } from "../components/basket-toast"
 import { varietySub } from "../components/variety-row"
 import { useInBasket } from "../stores/basket-store"
 import { visitVariety } from "../stores/recent-store"
+import { P3_SECTIONS } from "./section-ids"
 
 const COPY = PRICE_COPY.detail
 
@@ -22,7 +23,7 @@ export function DetailHeader({ variety }: { variety: VarietySummary }) {
   useEffect(() => visitVariety(variety.id), [variety.id])
 
   return (
-    <div className="flex items-center gap-2">
+    <div id={P3_SECTIONS.title} className="flex items-center gap-2">
       <BackButton fallbackHref={routes.home} className="-ml-2 max-lg:hidden" />
       <div className="flex min-w-0 flex-1 items-baseline gap-2">
         <h1 className="truncate font-heading text-[26px] leading-tight font-bold text-ink">

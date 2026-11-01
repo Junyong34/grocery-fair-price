@@ -13,6 +13,7 @@ import { ScrollRow } from "@workspace/ui/components/scroll-row"
 import { useEatenIds } from "@/shared/eaten-store"
 import { routes } from "@/shared/routes"
 import { useToday } from "@/shared/today-context"
+import { MONTH_TIMELINE_ID } from "./month-chip-row"
 
 const SEASON_BG: Record<Season, string> = {
   spring: "bg-season-spring",
@@ -38,7 +39,7 @@ const SEASON_BAND: readonly { season: Season; label: string; span: number }[] =
 export function MonthTimeline() {
   const selected = Number(useParams<{ month: string }>().month)
   return (
-    <nav aria-label="달 고르기" className="mx-auto max-w-[1080px] lg:px-6">
+    <nav id={MONTH_TIMELINE_ID} aria-label="달 고르기" className="mx-auto max-w-[1080px] lg:px-6">
       <MobileChips selected={selected} />
       <DesktopColumns selected={selected} />
     </nav>

@@ -6,6 +6,8 @@ import type { VarietySummary } from "@workspace/price/types"
 import { AddButton } from "../components/add-button"
 import { RecentPills } from "../components/recent-varieties"
 import { SearchEntry } from "../components/search-entry"
+import { HOME_SEARCH_ID } from "./search-id"
+import { HomeSearchRow } from "./search-row"
 import { PriceHint, VarietyRow } from "../components/variety-row"
 
 /** P1 시세 메인: 큰 제목과 검색창, 최근 본 품종, 자주 사는 품종, 근거 한 줄. */
@@ -27,7 +29,10 @@ export function HomeView({
           <br />
           {PRICE_COPY.home.title[1]}
         </h1>
-        <SearchEntry />
+        <div id={HOME_SEARCH_ID}>
+          <SearchEntry />
+        </div>
+        <HomeSearchRow />
       </div>
       <RecentPills varieties={varieties} />
       <section aria-labelledby="featured-title" className="flex flex-col gap-2">
