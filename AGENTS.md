@@ -142,7 +142,7 @@ Add with `pnpm ui:add <name-or-url>`. It answers "no" to overwrites so our edite
 
 - 제철 screens live under `/seasonal`. `/` is the price main (`app/(price)/page.tsx`); `/`, `/search`, `/prices/[variety]`, `/basket` share route group `(price)`.
 - Build every path with `routes` from `apps/web/shared/routes.ts`. `proxy.ts` `matcher` is the one hard-coded path (must be a static literal); keep it in sync.
-- Route groups `(this-month)` and `(season)` share second-level tab bars without changing the URL. `(this-month)/months/(detail)` adds the 2b timeline only to `/seasonal/months/[month]`.
+- Route groups `(this-month)` and `(season)` both render the one 제철달력 tab row (이달 · 월별 · 계절 · 명절, `SeasonalTabs`) without changing the URL. `(this-month)/months/(detail)` adds the 2b timeline only to `/seasonal/months/[month]`.
 - `/seasonal/festivals` has no page: `proxy.ts` redirects to the upcoming festival by Seoul date.
 - `@sheet/(.)foods/[food]` intercepts `/seasonal/foods/[food]` as a bottom sheet; a direct load renders the full page. `@sheet/[...catchAll]` and `@sheet/page.tsx` render null so the sheet closes on other navigation; new `/seasonal` routes need nothing in `@sheet`.
 - Cache Components is on, so `dynamicParams` is a build error. List params with `generateStaticParams` (at least one entry), validate with `notFound()`, read `params` inside `<Suspense>`.

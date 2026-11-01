@@ -114,18 +114,15 @@ function useScrolledDown() {
  * 사이트 헤더: 로고 · (데스크톱) 주요 메뉴 · 화면별 버튼(actions). 늘 위에 붙어 있다.
  * 맨 위에서는 화면 폭에 붙은 평평한 줄이고, 내려가면 가장자리에서 떨어진 둥근 바로 떠오른다.
  * 다시 맨 위에 닿으면 탄성 있게 제자리로 붙는다(자석처럼).
- * tabs(2차 탭)는 떠 있을 때만 보인다. 본문 위 2차 탭이 스크롤로 가려져도 헤더에서 바로 옮길 수 있다.
  * 모바일 헤더 타입: 화면이 HeaderBar로 넣는 바(예: 품종 상세의 "‹ 계란 · 담기")가 data-header-bar를 달면
  * 로고 · 버튼 자리를 그 바가 차지한다. 데스크톱(≥1024)은 바 자리를 그리지 않는다.
  */
 export function SiteHeader({
   badges = {},
   actions,
-  tabs,
 }: {
   badges?: MenuBadges
   actions?: React.ReactNode
-  tabs?: React.ReactNode
 }) {
   const stuck = useScrolledDown()
   return (
@@ -165,15 +162,6 @@ export function SiteHeader({
               </NavLink>
             ))}
           </nav>
-          {tabs && (
-            // 맨 위에서는 본문 위 2차 탭이 보이므로 숨기고(inert로 초점도 막는다) 떠 있을 때만 나타난다.
-            <div
-              inert={!stuck}
-              className="min-w-0 translate-y-1 opacity-0 empty:hidden motion-safe:transition-[opacity,translate] motion-safe:duration-300 group-data-stuck/header:translate-y-0 group-data-stuck/header:opacity-100 lg:border-l lg:border-hairline lg:pl-6"
-            >
-              {tabs}
-            </div>
-          )}
           <div className={cn("ml-auto flex items-center gap-1 lg:gap-2", BAR_HIDES)}>{actions}</div>
           {/* 모바일 헤더 바 자리(HeaderBar가 포털로 채운다). 비어 있을 때 로고 클릭을 막지 않게 보이는 바만 클릭을 받는다. */}
           <div

@@ -2,17 +2,15 @@ import { FloatingNav, SiteHeader, type MenuBadges } from "./site-nav"
 
 /**
  * 가격과 제철이 같이 쓰는 셸: 위에 붙은 헤더, 모바일 하단 Floating Nav, 데스크톱 헤더 안 주요 메뉴.
- * 메뉴는 어디서나 같고, 화면별 헤더 버튼(actions) · 2차 탭(tabs) · 메뉴 배지(badges)는 영역 레이아웃이 넣는다.
+ * 메뉴는 어디서나 같고, 화면별 헤더 버튼(actions) · 메뉴 배지(badges)는 영역 레이아웃이 넣는다.
  */
 export function SiteShell({
   badges,
   actions,
-  tabs,
   children,
 }: {
   badges?: MenuBadges
   actions?: React.ReactNode
-  tabs?: React.ReactNode
   children: React.ReactNode
 }) {
   return (
@@ -24,7 +22,7 @@ export function SiteShell({
       >
         본문으로 건너뛰기
       </a>
-      <SiteHeader badges={badges} actions={actions} tabs={tabs} />
+      <SiteHeader badges={badges} actions={actions} />
       <main id="main" tabIndex={-1} className="flex-1 pb-28 outline-none lg:pb-12">
         {children}
       </main>
