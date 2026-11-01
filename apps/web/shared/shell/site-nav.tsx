@@ -11,8 +11,8 @@ import { BrandLogo } from "@/shared/brand-logo"
 import { SITE_CONFIG } from "@/shared/meta"
 import { routes } from "@/shared/routes"
 
-import { MENUS, type MenuArea } from "./menus"
-import { matchesPath, NavLink } from "./nav-link"
+import { activeMenuKey, MENUS } from "./menus"
+import { NavLink } from "./nav-link"
 
 /** 메뉴 칸 옆에 붙는 배지(담은 개수 등). 메뉴 key → 요소. 레이아웃이 넣는다. */
 export type MenuBadges = Partial<Record<string, React.ReactNode>>
@@ -24,10 +24,10 @@ const CELL = 72
  * 모바일 하단 가운데 떠 있는 내비(cojeev Action Dock 모양을 따랐다).
  * 2차 탭과 같은 크림(gold-wash) 트레이에 아이콘·라벨을 세로로 놓고, 지금 메뉴 뒤에 둥근 강조 배경이 깔린다. 메뉴를 바꾸면 배경이 옆 칸으로 미끄러진다.
  */
-export function FloatingNav({ area, badges = {} }: { area: MenuArea; badges?: MenuBadges }) {
-  const pathname = usePathname()
-  const items = MENUS[area]
-  const active = items.findIndex(({ href, also, exact }) => matchesPath(pathname, href, { also, exact }))
+export function FloatingNav({ badges = {} }: { badges?: MenuBadges }) {
+  const activeKey = activeMenuKey(usePathname())
+  const items = MENUS
+  const active = items.findIndex(({ key }) => key === activeKey)
   return (
     <nav
       aria-label="주요 메뉴"
@@ -119,12 +119,10 @@ function useScrolledDown() {
  * 로고 · 버튼 자리를 그 바가 차지한다. 데스크톱(≥1024)은 바 자리를 그리지 않는다.
  */
 export function SiteHeader({
-  area,
   badges = {},
   actions,
   tabs,
 }: {
-  area: MenuArea
   badges?: MenuBadges
   actions?: React.ReactNode
   tabs?: React.ReactNode
@@ -154,7 +152,7 @@ export function SiteHeader({
             </span>
           </Link>
           <nav aria-label="주요 메뉴" className="hidden gap-6 lg:flex">
-            {MENUS[area].map(({ key, label, href, also, exact }) => (
+            {MENUS.map(({ key, label, href, also, exact }) => (
               <NavLink
                 key={key}
                 href={href}

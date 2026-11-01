@@ -1,7 +1,6 @@
 import {
   CalendarDays,
   ChartLine,
-  Leaf,
   ShoppingBasket,
   UtensilsCrossed,
   type LucideIcon,
@@ -9,7 +8,9 @@ import {
 
 import { routes } from "@/shared/routes"
 
-// 주요 메뉴. 헤더와 하단 내비는 가격과 제철이 같이 쓰고, 메뉴만 영역에 따라 바뀐다(.scratch/price-screens/spec.md 2장).
+import { matchesPath } from "./match-path"
+
+// 주요 메뉴. 어느 화면에서나 같은 4칸이다(.scratch/shell-unify/spec.md 1장).
 // 모바일은 하단 떠 있는 내비, 데스크톱(≥1024)은 헤더 안에 같은 목록이 보인다.
 
 export type MenuItem = {
@@ -24,39 +25,36 @@ export type MenuItem = {
   Icon: LucideIcon
 }
 
-/** 메뉴 영역. 셸을 그리는 레이아웃이 고른다. */
-export type MenuArea = "price" | "seasonal"
+export const MENUS: readonly MenuItem[] = [
+  {
+    key: "price",
+    // 판정 화면 메뉴 이름은 "판정"이 아니라 "시세"다.
+    label: "시세",
+    href: routes.home,
+    also: [routes.price.search, routes.price.varieties],
+    exact: true,
+    Icon: ChartLine,
+  },
+  {
+    // 제철 화면 전체(이달 · 월별 · 계절 · 명절 · 품종 상세 · 내려받기). 나의 식탁만 따로 칸이 있다.
+    key: "seasonal",
+    label: "제철달력",
+    href: routes.seasonal.root,
+    also: [
+      routes.seasonal.months,
+      routes.seasonal.seasons,
+      routes.seasonal.festivals,
+      routes.seasonal.food("").slice(0, -1),
+      routes.seasonal.downloads,
+    ],
+    exact: true,
+    Icon: CalendarDays,
+  },
+  { key: "basket", label: "담은 품종", href: routes.price.basket, Icon: ShoppingBasket },
+  { key: "my-table", label: "나의 식탁", href: routes.seasonal.myTable, Icon: UtensilsCrossed },
+]
 
-const PRICE: MenuItem = {
-  key: "price",
-  // 판정 화면 메뉴 이름은 "판정"이 아니라 "시세"다.
-  label: "시세",
-  href: routes.home,
-  also: [routes.price.search, routes.price.varieties],
-  exact: true,
-  Icon: ChartLine,
-}
-// 지금의 "이달". 월별 보기도 활성이다.
-const SEASONAL: MenuItem = {
-  key: "seasonal",
-  label: "제철달력",
-  href: routes.seasonal.root,
-  also: [routes.seasonal.months],
-  exact: true,
-  Icon: CalendarDays,
-}
-
-export const MENUS: Record<MenuArea, readonly MenuItem[]> = {
-  price: [
-    PRICE,
-    SEASONAL,
-    { key: "basket", label: "담은 품종", href: routes.price.basket, Icon: ShoppingBasket },
-  ],
-  seasonal: [
-    PRICE,
-    SEASONAL,
-    // 명절도 계절 메뉴 아래다.
-    { key: "seasons", label: "계절", href: routes.seasonal.seasons, also: [routes.seasonal.festivals], Icon: Leaf },
-    { key: "my-table", label: "나의 식탁", href: routes.seasonal.myTable, Icon: UtensilsCrossed },
-  ],
+/** 지금 경로에서 활성인 메뉴의 key. 설정 · 개인정보처럼 어느 칸도 아니면 null. */
+export function activeMenuKey(pathname: string): string | null {
+  return MENUS.find(({ href, also, exact }) => matchesPath(pathname, href, { also, exact }))?.key ?? null
 }
