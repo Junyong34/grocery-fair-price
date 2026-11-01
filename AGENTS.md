@@ -1,119 +1,186 @@
-## Agent skills
+# AGENTS.md
 
-### Issue tracker
+제철달력과 장보기 가격 판정 서비스. pnpm + Turborepo 모노레포, Next.js 16.4 (`apps/web`), Supabase(Postgres) 가격 DB.
 
-Issues and specs are local markdown in `.scratch/<feature>/` (`spec.md`, `issues/NN-slug.md`). Read `docs/agents/issue-tracker.md` before creating or triaging one.
-
-### Triage labels
-
-Five roles: needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix. Mapping: `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Glossary `grocery-price/GLOSSARY.md`, ADRs `grocery-price/docs/adr/`. How skills consume them: `docs/agents/domain.md`.
-
-Naming or classifying foods (카테고리, 품목, 품종, 규격) anywhere in the repo, including `prototypes/`: use the terms in `grocery-price/GLOSSARY.md`.
-
-## Repo map
+## Project map
 
 Full map (every route, module, generated file, command, and doc): `docs/project-structure.md`. Read it before adding a route, package, script, or generated file, or when a task spans more than one package.
 
-- `apps/web`: the Next.js app: the price screens (시세 · 판정, at `/`) and 제철달력 (seasonal food calendar, at `/seasonal`). Header and bottom nav are shared (`shared/shell`).
-- `packages/seasonal`, `packages/price`, `packages/ui`: domain (제철, 가격) and design-system layers of the app (see "Web app UI").
-- `supabase/`, `packages/price-db`: the price DB. Migrations (schema `price`, roles `ingest_writer`·`web_reader`, RLS) are the source of truth for table definitions; `packages/price-db` holds the DB tests, sample test data and the ERD generator.
-- `grocery-price/`: design docs and public price API research for the price service. Collection code (Supabase + GitHub Actions) starts in stage ① of the roadmap; screens join `apps/web` in stage ④.
+- `apps/web`: the Next.js app: price screens (시세 · 판정, at `/`) and 제철달력 (at `/seasonal`). Header and bottom nav are shared (`shared/shell`).
+- `packages/seasonal`, `packages/price`: pure-TypeScript domain layers (제철, 가격). `packages/ui`: design system.
+- `supabase/`, `packages/price-db`: the price DB. Migrations (schema `price`, roles `ingest_writer`·`web_reader`, RLS) are the source of truth for tables; `packages/price-db` holds DB tests, sample data and the ERD generator.
+- `grocery-price/`: design docs and public price API research for the price service. Glossary `grocery-price/GLOSSARY.md`, ADRs `grocery-price/docs/adr/` (how skills use them: `docs/agents/domain.md`).
 - `prototypes/`: illustration source, wireframes, brand originals. Gitignored, so a fresh clone lacks it. Keep it out of commits (no force-add).
+- Current work: `.scratch/*/spec.md` (app spec: `.scratch/seasonal-mvp/spec.md`). Price-service stages (① 수집 기반 → ② 판정 설계 → ③ 화면 설계 → ④ 구현): `grocery-price/docs/00-overview/roadmap.md`.
 
-## Workflow
+Code comments and docs are written in Korean.
 
-- Current work: `.scratch/*/spec.md`. The app's spec is `.scratch/seasonal-mvp/spec.md`. Price-service stages (① 수집 기반 → ② 판정 설계 → ③ 화면 설계 → ④ 구현) and completion criteria: `grocery-price/docs/00-overview/roadmap.md`.
-- Commit each verified ticket straight to `main`, no PR. Message: `feat: …` in Korean. Code comments and docs are Korean too.
-- A change is done when `pnpm typecheck`, `pnpm lint` (0 errors) and `pnpm test` pass at the repo root. A screen change is done when `next-dev-loop` (dev server MCP in `.mcp.json` + browser) shows it at widths 375 and 1280 with no console errors or hydration warnings.
-- Pure functions (layout, calendar, search, geometry): write the vitest test first, as `*.test.ts` beside the code.
-- Fresh clone: run `git config core.hooksPath .githooks` once. The pre-commit hook runs `scripts/check-no-secrets.sh` and blocks commits that contain a value from `.env`.
+<important if="you need to run commands to build, test, lint, typecheck, start the dev server or DB, or regenerate files">
 
-## Generated files
+Run from the repo root unless noted.
 
-Regenerate these with their command and commit the output. Hand edits are overwritten.
+| Command | What it does |
+|---|---|
+| `pnpm dev` | Dev server (`turbo dev`) |
+| `pnpm build` | Build all packages |
+| `pnpm typecheck` | Typecheck all packages |
+| `pnpm lint` | Lint all packages (must be 0 errors) |
+| `pnpm format` | Prettier |
+| `pnpm test` | All vitest tests |
+| `pnpm ui:add <name-or-url>` | Add a cojeev/shadcn component into `packages/ui` (never `shadcn add` directly) |
+| `pnpm db:start` / `pnpm db:stop` | Start / stop local Supabase |
+| `pnpm db:reset` | Reset local DB and reapply migrations |
+| `pnpm db:test` | DB tests (`@workspace/price-db` and `web`) |
+| `pnpm db:erd` | Regenerate ERD blocks in `grocery-price/docs/30-data/schema-map.html` |
+| `pnpm foods:sync` | Sync food illustrations into `apps/web/public/foods/` and regenerate bounds |
+| `pnpm foods:bounds` | Regenerate `food-bounds.generated.ts` only |
+| `pnpm --filter @workspace/seasonal build:foods` | Regenerate `foods.generated.ts` from `prototypes/` |
+| `python3 -I build.py` (in `grocery-price/reference/public-data/samples/viewer/`) | Rebuild `api-explorer.html` |
+| `grocery-price/reference/public-data/samples/viewer/smoke.sh --quick` | Viewer smoke test |
+| `git config core.hooksPath .githooks` | Once per fresh clone; enables the pre-commit secret check (`scripts/check-no-secrets.sh`) |
+</important>
+
+<important if="you are finishing, verifying, or committing a change">
+
+- Done means `pnpm typecheck`, `pnpm lint` (0 errors) and `pnpm test` pass at the repo root.
+- A screen change is done when `next-dev-loop` (dev server MCP in `.mcp.json` + browser) shows it at widths 375 and 1280 with no console errors or hydration warnings.
+- Commit each verified ticket straight to `main`, no PR. Message: `feat: …` in Korean.
+</important>
+
+<important if="you are writing or changing a pure function (layout, calendar, search, geometry)">
+Write the vitest test first, as `*.test.ts` beside the code.
+</important>
+
+<important if="you are creating, triaging, or labeling an issue or spec">
+Issues and specs are local markdown in `.scratch/<feature>/` (`spec.md`, `issues/NN-slug.md`). Read `docs/agents/issue-tracker.md` first. Five triage roles (needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix): `docs/agents/triage-labels.md`.
+</important>
+
+<important if="you are naming or classifying foods (카테고리, 품목, 품종, 규격) anywhere, including prototypes/">
+Use the terms in `grocery-price/GLOSSARY.md`.
+</important>
+
+<important if="you are editing a generated file or changing what feeds one (품종 list, illustrations, migrations, viewer samples, print editions)">
+
+Regenerate with the command and commit the output. Hand edits are overwritten.
 
 | Output | Command | Run it when |
 |---|---|---|
 | `packages/seasonal/src/data/foods.generated.ts` | `pnpm --filter @workspace/seasonal build:foods` | the 품종 list in `prototypes/` changes. A 품종 without an illustration gets its id in `NEW_IDS` in `packages/seasonal/scripts/build-foods.mjs`. |
-| `apps/web/public/foods/<id>/{color,motion}.svg`, `apps/web/public/dishes/<id>/color.svg`, both `PROVENANCE.md`, `drawn-foods.generated.ts`, `drawn-dishes.generated.ts`, `food-bounds.generated.ts` | `pnpm foods:sync` | an illustration (품종 or 전통 음식) is drawn or changed (`/seasonal-food-illustrator`). A 전통 음식 shows only if its `dishes/<id>` folder name is an id in `packages/seasonal/src/data/dish-rows.ts`. |
+| `apps/web/public/foods/<id>/{color,motion}.svg`, `PROVENANCE.md`, `drawn-foods.generated.ts`, `food-bounds.generated.ts` | `pnpm foods:sync` | an illustration is drawn or changed (`/seasonal-food-illustrator`). |
 | ERD blocks in `grocery-price/docs/30-data/schema-map.html` | `pnpm db:erd` (local DB up, migrations applied) | a migration changes tables, keys or checks. `pnpm db:test` fails while they differ. |
 | `grocery-price/reference/public-data/samples/viewer/api-explorer.html` | `python3 -I build.py` in that folder | `template.html`, `build.py` or the saved samples change. Then run `smoke.sh --quick`. |
 | `food-bounds.generated.ts` alone | `pnpm foods:bounds` | the SVGs changed without a sync. Needs no `prototypes/`. |
-| `apps/web/public/downloads/**` (PDFs, `manifest.json`), `apps/web/print-editions/<id>.build.json` | the admin's "PDF 생성" button at `/admin` (`pnpm dev`, uses the local Google Chrome) | an edition's spec changes, or anything a print page draws changes (foods, illustrations, holidays). Saving an edition rewrites `manifest.json`. Exception to the commit rule: the PDFs are gitignored (too large). Publishing an edition in the admin uploads its A4 PDF to the private R2 bucket (ADR 0003, write keys in the root `.env`); withdrawing or deleting it leaves the object, and the admin's "R2 정리" button removes unlisted objects once the deploy is live. Commit `manifest.json`, the thumbnails and the edition files. |
+| `apps/web/public/downloads/**` (PDFs, `manifest.json`), `apps/web/print-editions/<id>.build.json` | the admin's "PDF 생성" button at `/admin` (`pnpm dev`, uses local Google Chrome) | an edition's spec changes, or anything a print page draws changes (foods, illustrations, holidays). Saving an edition rewrites `manifest.json`. |
 
-The first two read `prototypes/`, so they run only on a machine that has it. Per-품종 drawing scale (`FOOD_SCALE` in `packages/seasonal/src/data/food-sizes.ts`) is hand-tuned. Brand files are copied by hand: `apps/web/docs/brand-assets.md`.
+- The first two read `prototypes/`, so they run only on a machine that has it.
+- Print PDFs are gitignored (too large); commit `manifest.json`, the thumbnails and the edition files. Publishing an edition uploads its A4 PDF to the private R2 bucket (ADR 0003, write keys in root `.env`); withdrawing or deleting leaves the object, and the admin's "R2 정리" button removes unlisted objects once the deploy is live.
+- Per-품종 drawing scale (`FOOD_SCALE` in `packages/seasonal/src/data/food-sizes.ts`) is hand-tuned. Brand files are copied by hand: `apps/web/docs/brand-assets.md`.
+</important>
 
-## Public price APIs
+<important if="you are calling a public price API (KAMIS, 축평원, 참가격, data.go.kr) or writing collection or schema code for one">
 
-- Before calling a public price API (KAMIS, 축평원, 참가격) or writing collection/schema code for it, read that source's doc in `grocery-price/docs/30-data/sources/` (`kamis.md`, `ekape.md`, `chamgagyeok.md`). They record measured behavior the official specs omit. `grocery-price/docs/10-research/api-spec.md` is the summary and maps each data.go.kr dataset ID to its endpoint; check it before treating a data.go.kr dataset as a new source. Schema and collection design: `grocery-price/docs/30-data/pipeline.md`. Saved responses and the browser viewer: `grocery-price/reference/public-data/samples/`.
-- DB changes go in a new file in `supabase/migrations/` (never edit an applied one). Verify locally: `pnpm db:start` once, then `pnpm db:test` must pass. A new `price` table or column needs `comment on` (meaning, unit or format, what `null` means, source field name; written in Korean with GLOSSARY terms) in the same file; `pnpm db:test` fails without it. A new `price` table also needs its RLS policies, a group in `packages/price-db/scripts/build-erd.ts`, and the lists in `packages/price-db/test/helpers.ts`. A new `price` function needs `revoke execute … from public, anon, authenticated` in the same file.
-- Viewer changes (`grocery-price/reference/public-data/samples/viewer/`): run `grocery-price/reference/public-data/samples/viewer/smoke.sh --quick` before finishing.
+- First read that source's doc in `grocery-price/docs/30-data/sources/` (`kamis.md`, `ekape.md`, `chamgagyeok.md`); they record measured behavior the official specs omit.
+- `grocery-price/docs/10-research/api-spec.md` summarizes and maps each data.go.kr dataset ID to its endpoint; check it before treating a dataset as a new source.
+- Schema and collection design: `grocery-price/docs/30-data/pipeline.md`. Saved responses and browser viewer: `grocery-price/reference/public-data/samples/`.
+</important>
 
-## Web app UI (`apps/web`)
+<important if="you are adding or changing a database migration, table, column, or function in supabase/">
 
-Screen spec: `prototypes/seasonal-food/wireframes/WIREFRAME-SPEC.md`. Where it and `.scratch/seasonal-mvp/spec.md` differ, the `.scratch` spec wins. Code and comments name screens by their spec codes: 2a 이달 (`/seasonal`), 2b 월별, 3a 계절, 1g 명절, 1h 나의 식탁, 1i 품종 상세. Color and type reference: `apps/web/DESIGN.md` (Oura).
+- New file in `supabase/migrations/`; never edit an applied one. Verify with `pnpm db:start` once, then `pnpm db:test`.
+- A new `price` table or column needs `comment on` in the same file (meaning, unit or format, what `null` means, source field name; Korean, GLOSSARY terms). `pnpm db:test` fails without it.
+- A new `price` table also needs RLS policies, a group in `packages/price-db/scripts/build-erd.ts`, and the lists in `packages/price-db/test/helpers.ts`.
+- A new `price` function needs `revoke execute … from public, anon, authenticated` in the same file.
+</important>
 
-Layers. Each one may import only from the layers below it:
+<important if="you are changing files in grocery-price/reference/public-data/samples/viewer/">
+Run `grocery-price/reference/public-data/samples/viewer/smoke.sh --quick` before finishing.
+</important>
+
+<important if="you are adding or moving code in apps/web or packages/{seasonal,price,ui}, or adding imports between them">
+
+Each layer may import only from the layers below it:
 
 | Layer | Where | What goes there |
 |---|---|---|
-| App routes | `apps/web/app/` | Route files only (`page`, `layout`, `@slot`, route groups), plus `api/og` (share image), `sitemap.ts` and `robots.ts`. The `/examples/*` design comparison pages the specs cite were deleted on 2026-10-16; read them in git history (`git show 22520eb:apps/web/app/examples/<name>/page.tsx`). Keep routes thin: validate params, set metadata, render a feature component. |
-| Features | `apps/web/features/<feature>/` | One folder per screen (`seasonal/this-month`, `month-timeline`, `seasons`, `festivals`, `my-table`, `food-detail`, `search`; `price/home`, `search`, `variety-detail`, `basket`). `components/` holds parts several screens share (shell, nav, `FoodImage`, scatter); `stores/` holds the feature's zustand stores. Features don't import each other; shared code moves down a layer. |
+| App routes | `apps/web/app/` | Route files only (`page`, `layout`, `@slot`, route groups), plus `api/og`, `sitemap.ts`, `robots.ts`. Keep routes thin: validate params, set metadata, render a feature component. |
+| Features | `apps/web/features/<feature>/` | One folder per screen (`seasonal/this-month`, `month-timeline`, `seasons`, `festivals`, `my-table`, `food-detail`, `search`; `price/home`, `search`, `variety-detail`, `basket`). `components/` holds parts several screens share; `stores/` holds zustand stores. Features don't import each other; shared code moves down a layer. |
 | App shared | `apps/web/shared/` | App-wide pieces: `routes.ts`, `providers.tsx`, `meta.ts`, `today.ts` + `today-context.tsx`, `eaten-store.ts`, `brand-logo.tsx`. |
-| Domain | `packages/seasonal` (`@workspace/seasonal`) | Pure TypeScript: `data/` (품종, months, seasons, festivals, copy), `calendar/` (calendar cells, holidays, lunar, Seoul today), `layout/` (seeded scatter), `search/` (초성 match). No React, Next.js or DOM. The MVP-later print pages reuse it. |
-| Domain | `packages/price` (`@workspace/price`) | Pure TypeScript for the price screens: `types` (what screens read), `verdict` (`verdictOf`), `search`, `format`, `list`, `copy`. No React, Next.js or DOM. |
-| Design system | `packages/ui` (`@workspace/ui`) | Oura tokens, cojeev UI, and generic components such as `BottomSheet`. No domain words. |
+| Domain | `packages/seasonal` | Pure TS: `data/`, `calendar/`, `layout/` (seeded scatter), `search/` (초성 match). No React, Next.js or DOM. |
+| Domain | `packages/price` | Pure TS for price screens: `types`, `verdict` (`verdictOf`), `search`, `format`, `list`, `copy`. No React, Next.js or DOM. |
+| Design system | `packages/ui` | Oura tokens, cojeev UI, generic components such as `BottomSheet`. No domain words. |
 
-Import with package paths, such as `@workspace/ui/components/button` and `@workspace/seasonal/data/months`. Inside `apps/web`, use `@/features/...` and `@/shared/...`.
+Import with package paths (`@workspace/ui/components/button`, `@workspace/seasonal/data/months`); inside `apps/web`, `@/features/...` and `@/shared/...`.
+</important>
 
-Longer screen copy (month notes, season and festival text, empty states, toasts) lives in `packages/seasonal/src/data/copy.ts`.
+<important if="you are building or changing a screen in apps/web, or need its spec">
+Screen spec: `prototypes/seasonal-food/wireframes/WIREFRAME-SPEC.md`; where it and `.scratch/seasonal-mvp/spec.md` differ, the `.scratch` spec wins. Name screens by spec code: 2a 이달 (`/seasonal`), 2b 월별, 3a 계절, 1g 명절, 1h 나의 식탁, 1i 품종 상세. Price screens spec: `.scratch/price-screens/spec.md`. The `/examples/*` comparison pages the specs cite were deleted; read them with `git show 22520eb:apps/web/app/examples/<name>/page.tsx`.
+</important>
 
-### Components
+<important if="you are writing longer screen copy (month notes, season or festival text, empty states, toasts)">
+Put it in `packages/seasonal/src/data/copy.ts`.
+</important>
 
-When you need a component, effect, or element, look in this order:
+<important if="you need a new UI component, effect, or element">
 
-1. **cojeev UI** — https://cojeev.com/ui/docs/ (full list: https://cojeev.com/ui/r/registry.json). If it exists there, use it.
-2. **shadcn/ui** — only if cojeev has nothing that fits. Search the shadcn registry and add it.
-3. **Build it yourself** — only if neither has it. A generic piece goes in `packages/ui/src/components/`. A piece for one screen goes in that screen's folder; one shared by a feature's screens goes in `apps/web/features/<feature>/components/`. Use the existing tokens either way.
+Look in this order:
+1. cojeev UI: https://cojeev.com/ui/docs/ (full list: https://cojeev.com/ui/r/registry.json).
+2. shadcn/ui, only if cojeev has nothing that fits.
+3. Build it yourself: generic → `packages/ui/src/components/`; one screen → that screen's folder; a feature's screens → `apps/web/features/<feature>/components/`. Use existing tokens.
 
-Add cojeev or shadcn components from the repo root with `pnpm ui:add <name-or-url>` (for example `pnpm ui:add https://cojeev.com/ui/r/tabs.json`), never `shadcn add` directly. It installs into `packages/ui`, answers "no" to every overwrite so our edited files stay (`bottom-sheet`, `option-wheel`, `dialog`, `link-tabs`, `segmented`, ...), and `packages/ui/scripts/fix-ui-css.mjs` appends new `src/styles/cojeev/*.css` imports to `src/styles/cojeev.css` in name order. If a new file depends on another (toggle before toggle-group), fix the order by hand.
+Add with `pnpm ui:add <name-or-url>`. It answers "no" to overwrites so our edited files stay (`bottom-sheet`, `option-wheel`, `dialog`, `link-tabs`, `segmented`, ...), and `packages/ui/scripts/fix-ui-css.mjs` appends new `src/styles/cojeev/*.css` imports to `src/styles/cojeev.css` in name order. If a new file depends on another (toggle before toggle-group), fix the order by hand.
+</important>
 
-### Colors and type
+<important if="you are choosing colors, fonts, or theme styles">
 
-- The only color source is the Oura palette in `packages/ui/src/styles/globals.css` (`--color-canvas`, `--color-stone`, `--color-gold`, ..., `--color-season-*`). cojeev's own palette (`--v-*`) is overridden with Oura values in `packages/ui/src/styles/cojeev.css`. Components use tokens, never hex values.
-- One exception: `apps/web/app/api/og/route.tsx` copies palette hex values into `OG_COLORS` because the image renderer can't read CSS variables. Update it when the palette changes.
-- Light mode only. `<html data-mode="light">` is fixed in `apps/web/app/layout.tsx`. Write no dark tokens, theme toggle, or `dark:` classes.
+- Only color source: the Oura palette in `packages/ui/src/styles/globals.css` (`--color-canvas`, `--color-gold`, `--color-season-*`, ...). cojeev's `--v-*` palette is overridden in `packages/ui/src/styles/cojeev.css`. Use tokens, never hex. Reference: `apps/web/DESIGN.md`.
+- Exception: `apps/web/app/api/og/route.tsx` copies hex values into `OG_COLORS` (the renderer can't read CSS variables). Update it when the palette changes.
+- Light mode only (`<html data-mode="light">` in `apps/web/app/layout.tsx`). No dark tokens, theme toggle, or `dark:` classes.
 - Fonts: body Pretendard, headings Gowun Batang (`font-heading`), big numbers cojeev display (`font-number`).
+</important>
 
-### Routes
+<important if="you are adding or changing a route, link, redirect, page metadata, or proxy.ts">
 
-- The 제철 screens live under `/seasonal`. `/` is the price main (P1, `app/(price)/page.tsx`); the price screens (`/`, `/search`, `/prices/[variety]`, `/basket`) share the route group `(price)`. Spec: `.scratch/price-screens/spec.md`. Price screens read data only through `getPriceSource()` in `features/price/data/price-source.ts`, never `db`, `db-source` or `queries/` directly. It reads the remote DB (`WEB_DATABASE_URL` in the root `.env`, also when running locally); spec `.scratch/price-db-read/spec.md`.
-- Build every path with `routes` from `apps/web/shared/routes.ts`. `proxy.ts` `matcher` is the one hard-coded path, because it must be a static literal; keep it in sync with `routes`.
-- Route groups `(this-month)` and `(season)` share the second-level tab bars without changing the URL. `(this-month)/months/(detail)` adds the 2b timeline only to `/seasonal/months/[month]`.
-- `/seasonal/festivals` has no page: `proxy.ts` redirects it to the upcoming festival by Seoul date.
-- `@sheet/(.)foods/[food]` intercepts `/seasonal/foods/[food]` and shows it as a bottom sheet inside the seasonal area. Loading that URL directly renders the full page. `@sheet/[...catchAll]` and `@sheet/page.tsx` render null so the sheet closes on any other navigation; new `/seasonal` routes need nothing in `@sheet`.
-- Cache Components is on, so `dynamicParams` is a build error. List params with `generateStaticParams` (at least one entry), validate them with `notFound()`, and read `params` inside `<Suspense>`.
-- Page metadata: return `createMetadata({ title, description, path, ogImage })` from `apps/web/shared/meta.ts`. It wires canonical, OpenGraph and the `/api/og` image.
-- Search indexing: register every new page in `apps/web/shared/seo/pages.ts` (indexed, noindex, or redirect); `pnpm test` fails otherwise. Checklist, env vars and go-live steps: `apps/web/docs/seo.md`.
+- 제철 screens live under `/seasonal`. `/` is the price main (`app/(price)/page.tsx`); `/`, `/search`, `/prices/[variety]`, `/basket` share route group `(price)`.
+- Build every path with `routes` from `apps/web/shared/routes.ts`. `proxy.ts` `matcher` is the one hard-coded path (must be a static literal); keep it in sync.
+- Route groups `(this-month)` and `(season)` share second-level tab bars without changing the URL. `(this-month)/months/(detail)` adds the 2b timeline only to `/seasonal/months/[month]`.
+- `/seasonal/festivals` has no page: `proxy.ts` redirects to the upcoming festival by Seoul date.
+- `@sheet/(.)foods/[food]` intercepts `/seasonal/foods/[food]` as a bottom sheet; a direct load renders the full page. `@sheet/[...catchAll]` and `@sheet/page.tsx` render null so the sheet closes on other navigation; new `/seasonal` routes need nothing in `@sheet`.
+- Cache Components is on, so `dynamicParams` is a build error. List params with `generateStaticParams` (at least one entry), validate with `notFound()`, read `params` inside `<Suspense>`.
+- Metadata: return `createMetadata({ title, description, path, ogImage })` from `apps/web/shared/meta.ts`.
+- Register every new page in `apps/web/shared/seo/pages.ts` (indexed, noindex, or redirect); `pnpm test` fails otherwise. Checklist and go-live: `apps/web/docs/seo.md`.
+</important>
 
-### Rendering and state
+<important if="you are reading price data in a price screen">
+Read only through `getPriceSource()` in `features/price/data/price-source.ts`, never `db`, `db-source` or `queries/` directly. It reads the remote DB (`WEB_DATABASE_URL` in root `.env`, also locally). Spec: `.scratch/price-db-read/spec.md`.
+</important>
 
-- Server Components by default. Put `'use client'` on interactive leaves and pass static content in as `children`.
-- "Today" is Seoul time computed once per request on the server: `getSeoulToday()` (`shared/today.ts`) → `TodayProvider` in `app/seasonal/layout.tsx` → `useToday()` inside `<Suspense>`. Rendering code takes today from there instead of calling `new Date()`.
-- Device-saved state is made with `deviceStore(key, defaults)` from `shared/device-store.ts` (key `seasonal:<name>` or `price:<name>`; never rename a key in use). Server HTML and the first client render use the defaults; `Providers` loads every store once after mount, and writes made before that are applied on top of the loaded value. Store modules keep the store private and export hooks and functions (`toggleEaten`, `addToBasket`, ...). Read localStorage only through them.
-- Analytics: add an event to the catalog in `shared/analytics/events.ts` and send it only with `track()` from `shared/analytics/track.ts`. A new parameter must also be registered in GA (the catalog test lists it). Procedures (add, change, remove, GA admin settings, privacy page): `apps/web/docs/analytics.md`.
-- Motion: CSS keyframes for small effects, `motion` for drag, spring and layout animation, React `<ViewTransition>` only for the three spec'd transitions (CSS in `apps/web/app/globals.css`). Every animation ends instantly under `prefers-reduced-motion`.
-- Sheets and dialogs: open them with `overlay-kit` (`<OverlayProvider>` is in `apps/web/shared/providers.tsx`). For bottom sheets, use `@workspace/ui/components/bottom-sheet` (`BottomSheet`, `openBottomSheet`). Examples: `features/seasonal/components/detail-sheet.tsx`, `features/seasonal/this-month/settings-panel.tsx`.
+<important if="you are deciding between server and client components, or adding 'use client'">
+Server Components by default. Put `'use client'` on interactive leaves and pass static content as `children`.
+</important>
 
-## Next.js docs
+<important if="your code needs today's date">
+"Today" is Seoul time computed once per request: `getSeoulToday()` (`shared/today.ts`) → `TodayProvider` in `app/seasonal/layout.tsx` → `useToday()` inside `<Suspense>`. Never call `new Date()` in rendering code.
+</important>
 
-`apps/web` runs Next.js 16.4. APIs, conventions, and file structure may differ from your training data. Before writing Next.js code, read the relevant guide in `apps/web/node_modules/next/dist/docs/`. The repo root has no `next` package, so resolve it from `apps/web`. Heed deprecation notices. Rendering and caching rationale for this app: `apps/web/docs/nextjs-16-patterns.md`.
+<important if="you are saving state on the device or touching localStorage">
+Use `deviceStore(key, defaults)` from `shared/device-store.ts` (key `seasonal:<name>` or `price:<name>`; never rename a key in use). Server HTML and first client render use defaults; `Providers` loads every store once after mount, and earlier writes apply on top. Store modules keep the store private and export hooks and functions (`toggleEaten`, `addToBasket`, ...).
+</important>
 
-`next dev` would normally write this as a managed block in `apps/web/AGENTS.md`. That is off (`agentRules: false` in `apps/web/next.config.ts`) so this file stays the single source of agent instructions.
+<important if="you are adding or changing an analytics event">
+Add it to the catalog in `shared/analytics/events.ts`, send only with `track()` from `shared/analytics/track.ts`. A new parameter must also be registered in GA (the catalog test lists it). Procedures: `apps/web/docs/analytics.md`.
+</important>
+
+<important if="you are adding or changing animation or transitions">
+CSS keyframes for small effects, `motion` for drag, spring and layout animation, React `<ViewTransition>` only for the three spec'd transitions (CSS in `apps/web/app/globals.css`). Every animation ends instantly under `prefers-reduced-motion`.
+</important>
+
+<important if="you are opening a bottom sheet or dialog">
+Open with `overlay-kit` (`<OverlayProvider>` in `apps/web/shared/providers.tsx`). Bottom sheets: `@workspace/ui/components/bottom-sheet` (`BottomSheet`, `openBottomSheet`). Examples: `features/seasonal/components/detail-sheet.tsx`, `features/seasonal/this-month/settings-panel.tsx`.
+</important>
+
+<important if="you are writing Next.js code (routing, caching, rendering, config)">
+`apps/web` runs Next.js 16.4, which may differ from your training data. Read the relevant guide in `apps/web/node_modules/next/dist/docs/` first (resolve `next` from `apps/web`; the root has none). Heed deprecation notices. This app's rendering and caching rationale: `apps/web/docs/nextjs-16-patterns.md`. `agentRules: false` in `apps/web/next.config.ts` keeps this file the single source of agent instructions.
+</important>
 
 <!-- BEGIN:turborepo-agent-rules -->
 
