@@ -18,7 +18,7 @@ import { VERDICT_TONE } from "../components/verdict-tone"
 const COPY = PRICE_COPY.detail
 
 // "내가 본 가격": 매장에서 본 가격을 적으면 화면에서만 판정한다. 저장하지 않는다(domain-model 2026-10-19 결정).
-// 범위 막대의 "내가 본" 핀과 하단 바가 같은 값을 본다. 품종을 바꾸면 그 품종 값만 보이게 품종 id와 함께 둔다.
+// 범위 막대의 "내가 본" 핀과 본문 섹션이 같은 값을 본다. 품종을 바꾸면 그 품종 값만 보이게 품종 id와 함께 둔다.
 const useMyPriceStore = create<{ id: string | null; price: number | null }>(() => ({ id: null, price: null }))
 
 /** 이 품종에 적은 "내가 본 가격". 없으면 null. */
@@ -27,10 +27,11 @@ export function useMyPrice(id: string): number | null {
 }
 
 /**
- * 하단 고정 "내가 본 가격 적기". 하단 내비 위에 뜬 크림 버튼이고, 바텀 시트에서 가격을 적으면 같은 자리에 비교 카드가 뜬다.
+ * 본문 "내가 본 가격" 섹션(.scratch/shell-unify/spec.md 6장). 하단 내비와 겹치지 않게 떠 있는 바 대신 본문에 둔다.
+ * 버튼을 누르면 바텀 시트에서 가격을 적고, 같은 자리에 비교 카드가 뜬다. 섹션 칩 "내 가격"이 id로 이 섹션에 데려온다.
  * 카드는 흰 바탕 · 판정 색 띠 · 꽉 찬 판정 칩으로 배경(크림)과 확실히 구분한다.
  */
-export function MyPriceBar({ detail }: { detail: VarietyDetail }) {
+export function MyPriceSection({ detail, id }: { detail: VarietyDetail; id: string }) {
   const mine = useMyPrice(detail.id)
   const ask = async () => {
     const price = await openMyPriceSheet(detail, mine)
@@ -38,7 +39,10 @@ export function MyPriceBar({ detail }: { detail: VarietyDetail }) {
   }
   const verdict = mine == null ? null : verdictOf(mine, detail.usual, detail.band)
   return (
-    <div className="sticky bottom-[calc(max(14px,env(safe-area-inset-bottom))+70px)] z-10 flex justify-center lg:bottom-6">
+    <section id={id} aria-labelledby={`${id}-title`} className="flex scroll-mt-28 flex-col gap-3">
+      <h2 id={`${id}-title`} className="text-[17px] font-semibold text-ink">
+        {COPY.myPriceTitle}
+      </h2>
       {verdict?.pct != null && mine != null && detail.usual != null ? (
         <MyPriceCard
           // 값을 바꿀 때마다 다시 떠오르게
@@ -55,14 +59,14 @@ export function MyPriceBar({ detail }: { detail: VarietyDetail }) {
           type="button"
           onClick={ask}
           // 크림 배경과 구분되게 옅은 골드(gold-soft)로 채우고 글자는 espresso(대비 약 7:1). 검정 · 초록은 쓰지 않는다(2026-10-27 사용자 결정).
-          className="flex h-11 w-fit items-center gap-2.5 rounded-full bg-gold-soft pr-5 pl-[18px] text-left text-espresso shadow-lg shadow-gold/25 transition-transform duration-150 ease-out active:scale-[0.98] motion-safe:animate-rise"
+          className="flex h-11 w-fit items-center gap-2.5 rounded-full bg-gold-soft pr-5 pl-[18px] text-left text-espresso transition-transform duration-150 ease-out active:scale-[0.98]"
         >
           <PenLine aria-hidden size={18} strokeWidth={1.9} className="shrink-0" />
           <span className="text-[15px] font-semibold">{COPY.myPrice}</span>
           <span className="ml-1 shrink-0 text-[12.5px] text-espresso/70">{COPY.myPriceUnit(detail.baseUnit)}</span>
         </button>
       )}
-    </div>
+    </section>
   )
 }
 
