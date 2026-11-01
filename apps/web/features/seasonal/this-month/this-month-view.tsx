@@ -47,7 +47,7 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
         </aside>
 
         <div className="min-w-0">
-          <section id={HERO_ID} aria-labelledby="hero-title" className="scroll-mt-16 pr-12 pl-[18px] pt-10 pb-7 lg:scroll-mt-16 lg:px-0 lg:pt-12">
+          <section id={HERO_ID} aria-labelledby="hero-title" className="scroll-mt-16 pr-12 pl-[18px] pt-10 pb-7 lg:scroll-mt-32 lg:px-0 lg:pt-12">
             {/* 첫 화면에서 한 번만 부드럽게 나타난다. 제목 다음에 설명이 이어진다. */}
             <TextReveal
               as="h1"
@@ -123,7 +123,7 @@ function MonthSection({
       id={monthSectionId(month)}
       data-month={month}
       aria-label={`${month}월`}
-      className="scroll-mt-16 border-t border-hairline pr-12 pl-[18px] pt-12 pb-7 lg:scroll-mt-16 lg:px-0 lg:pt-8"
+      className="scroll-mt-16 border-t border-hairline pr-12 pl-[18px] pt-12 pb-7 lg:scroll-mt-32 lg:px-0 lg:pt-8"
     >
       <div className="lg:flex lg:items-baseline lg:gap-4">
         <h2 className="font-number text-[88px] leading-[0.9] tabular-nums lg:font-heading lg:text-[28px] lg:leading-none lg:font-bold">

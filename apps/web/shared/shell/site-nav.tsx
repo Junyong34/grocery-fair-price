@@ -13,7 +13,9 @@ import { routes } from "@/shared/routes"
 
 import { activeMenuKey, MENUS } from "./menus"
 import { NavLink } from "./nav-link"
+import { headerScrollStep, INITIAL_HEADER_SCROLL } from "./header-scroll"
 import { screenOf } from "./screens"
+import { scrollToTopIfCurrent } from "./scroll-to-top"
 
 /** 메뉴 칸 옆에 붙는 배지(담은 개수 등). 메뉴 key → 요소. 레이아웃이 넣는다. */
 export type MenuBadges = Partial<Record<string, React.ReactNode>>
@@ -47,6 +49,7 @@ export function FloatingNav({ badges = {} }: { badges?: MenuBadges }) {
             key={key}
             href={href}
             aria-current={i === active ? "page" : undefined}
+            onClick={(event) => scrollToTopIfCurrent(event, i === active)}
             className={cn(
               "relative flex h-12 flex-col items-center justify-center gap-1 text-[11px] leading-none no-underline transition-colors duration-200",
               i === active ? "font-semibold text-espresso hover:text-espresso" : "text-stone hover:text-ink"
@@ -86,6 +89,46 @@ export function HeaderBar({ children }: { children: React.ReactNode }) {
 const BAR_HIDES =
   "motion-safe:transition-opacity motion-safe:duration-300 max-lg:group-has-[[data-header-bar]]/header:pointer-events-none max-lg:group-has-[[data-header-bar]]/header:opacity-0"
 
+/** 화면 맨 위에서 헤더 아래까지의 높이(px). 헤더가 숨으면 0이 된다. 고정 줄(탭 · 구간 줄)이 CSS 변수 --shell-top으로 읽는다. */
+const HEADER_HEIGHT = 56
+
+/**
+ * hide-on-scroll 화면에서 헤더를 보일지(.scratch/shell-unify/spec.md 4-2). 아래로 내리면 숨고 위로 올리면 나온다.
+ * 판정은 headerScrollStep(순수 함수)이 한다. 데스크톱(≥1024)과 pinned 화면은 늘 보인다.
+ * 보임 여부를 <html>의 --shell-top으로도 내보내 고정 줄이 헤더 아래 · 맨 위로 따라 움직이게 한다.
+ */
+function useHeaderVisible(hideOnScroll: boolean) {
+  const [visible, setVisible] = useState(true)
+  useEffect(() => {
+    if (!hideOnScroll) {
+      setVisible(true)
+      return
+    }
+    const desktop = window.matchMedia("(min-width: 1024px)")
+    let state = { ...INITIAL_HEADER_SCROLL, lastY: window.scrollY, anchorY: window.scrollY }
+    let frame = 0
+    const update = () => {
+      frame = 0
+      if (desktop.matches) return setVisible(true)
+      state = headerScrollStep(state, window.scrollY, document.documentElement.scrollHeight - window.innerHeight)
+      setVisible(state.visible)
+    }
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update)
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+      cancelAnimationFrame(frame)
+      setVisible(true)
+    }
+  }, [hideOnScroll])
+  useEffect(() => {
+    document.documentElement.style.setProperty("--shell-top", `${visible ? HEADER_HEIGHT : 0}px`)
+  }, [visible])
+  return [visible, () => setVisible(true)] as const
+}
+
 /** 이만큼(px) 내려가면 헤더가 위에서 떨어져 떠 있는 바가 된다. */
 const STUCK_AT = 8
 
@@ -112,7 +155,7 @@ function useScrolledDown() {
 }
 
 /**
- * 사이트 헤더: 로고 · (데스크톱) 주요 메뉴 · 화면별 버튼(actions). 늘 위에 붙어 있다.
+ * 사이트 헤더: 로고 · (데스크톱) 주요 메뉴 · 화면별 버튼(actions). 위에 붙어 있고, hide-on-scroll 화면(screens.ts)에서는 모바일에서 아래로 내리면 숨는다.
  * 맨 위에서는 화면 폭에 붙은 평평한 줄이고, 내려가면 가장자리에서 떨어진 둥근 바로 떠오른다.
  * 다시 맨 위에 닿으면 탄성 있게 제자리로 붙는다(자석처럼).
  * 모바일 헤더 타입: 화면이 HeaderBar로 넣는 바(예: 품종 상세의 "‹ 계란 · 담기")가 data-header-bar를 달면
@@ -127,11 +170,18 @@ export function SiteHeader({
 }) {
   const stuck = useScrolledDown()
   // 검색 타입 화면(P2)은 모바일에서 화면의 검색 입력이 헤더 자리를 맡는다(.scratch/shell-unify/spec.md 3장).
-  const { header } = screenOf(usePathname())
+  const { header, scroll } = screenOf(usePathname())
+  const [visible, reveal] = useHeaderVisible(scroll === "hide-on-scroll")
   return (
     <header
       data-stuck={stuck ? "" : undefined}
-      className={cn("group/header sticky top-0 z-(--z-dock) h-14", header === "search" && "max-lg:hidden")}
+      data-hidden={visible ? undefined : ""}
+      // 숨은 헤더 안으로 키보드 초점이 들어오면 다시 보인다.
+      onFocusCapture={reveal}
+      className={cn(
+        "group/header sticky top-0 z-(--z-dock) h-14 motion-safe:transition-transform motion-safe:duration-300 max-lg:data-hidden:-translate-y-[72px]",
+        header === "search" && "max-lg:hidden"
+      )}
     >
       <div
         className={cn(

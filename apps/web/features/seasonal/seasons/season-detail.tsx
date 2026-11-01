@@ -104,7 +104,7 @@ export function SeasonDetail({ season }: { season: Season }) {
                 key={month}
                 id={`season-month-${month}`}
                 aria-labelledby={`season-month-${month}-title`}
-                className="scroll-mt-20"
+                className="scroll-mt-20 lg:scroll-mt-32"
               >
                 <div className="flex items-baseline justify-between gap-3 border-b border-hairline pb-2">
                   <h2
