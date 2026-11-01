@@ -8,6 +8,9 @@ export const DISH_ROWS = [
   { id: "mandu", name: "만두" },
   { id: "sikhye", name: "식혜" },
   { id: "sujeonggwa", name: "수정과" },
+  { id: "japchae", name: "잡채" },
+  { id: "sogalbijjim", name: "소갈비찜" },
+  { id: "donggeurangttaeng", name: "동그랑땡" },
   { id: "ogokbap", name: "오곡밥" },
   { id: "mugeun-namul", name: "묵은 나물" },
   { id: "bureom", name: "부럼" },
@@ -17,5 +20,7 @@ export const DISH_ROWS = [
   { id: "songpyeon", name: "송편" },
   { id: "toran-tang", name: "토란탕" },
   { id: "dakjjim", name: "닭찜" },
+  { id: "la-galbi-gui", name: "LA갈비구이" },
+  { id: "dongtae-jeon", name: "동태전" },
   { id: "dongchimi", name: "동치미" },
 ] as const

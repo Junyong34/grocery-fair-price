@@ -9,7 +9,7 @@ type FestivalDateRule = { lunar: readonly [month: number, day: number] } | "sols
 /**
  * 명절 목록. month는 대표 양력 월로, 다가오는 명절을 고를 때 쓴다.
  * date는 양력 날짜를 구하는 규칙이다(calendar/lunar). 음력이면 [월, 일], 동지는 "solstice"다. 해마다 계산하므로 연도별 표를 손으로 고치지 않는다.
- * 삼복처럼 하루로 정할 수 없으면 비워 둔다. traditionalDishes는 전통 음식 id(dishes.ts)다. 전통 음식 출처: prototypes/seasonal-food/scripts/build_seasonal_lists.py의 HOLIDAYS.
+ * 삼복처럼 하루로 정할 수 없으면 비워 둔다. traditionalDishes는 전통 음식 id(dishes.ts)다. 전통 음식 출처: prototypes/seasonal-food/scripts/build_seasonal_lists.py의 DISHES와 docs/holiday-food-expansion-research-2026-11-01.md.
  * 요즘 흔히 차려 먹지 않는 음식(귀밝이술, 화양적, 수리취떡, 제호탕)은 넣지 않고, 그런 음식만 남는 단오는 명절에서 뺐다(2026-11-01).
  */
 export const FESTIVALS = [
@@ -19,7 +19,15 @@ export const FESTIVALS = [
     month: 2,
     period: "음력 1월 1일",
     date: { lunar: [1, 1] },
-    traditionalDishes: ["tteokguk", "mandu", "sikhye", "sujeonggwa"],
+    traditionalDishes: [
+      "tteokguk",
+      "mandu",
+      "sikhye",
+      "sujeonggwa",
+      "japchae",
+      "sogalbijjim",
+      "donggeurangttaeng",
+    ],
     seasonalFoodIds: ["spinach", "snow-crab", "hallabong", "bomdong"],
   },
   {
@@ -45,7 +53,16 @@ export const FESTIVALS = [
     month: 9,
     period: "음력 8월 15일",
     date: { lunar: [8, 15] },
-    traditionalDishes: ["songpyeon", "toran-tang", "dakjjim"],
+    traditionalDishes: [
+      "songpyeon",
+      "toran-tang",
+      "dakjjim",
+      "japchae",
+      "sogalbijjim",
+      "la-galbi-gui",
+      "donggeurangttaeng",
+      "dongtae-jeon",
+    ],
     seasonalFoodIds: ["gizzard-shad", "pear", "apple", "chestnut"],
   },
   {
