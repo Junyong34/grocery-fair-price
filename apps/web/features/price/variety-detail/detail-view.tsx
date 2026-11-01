@@ -14,7 +14,7 @@ import { WhySection } from "./why-section"
 const SECTIONS = [
   { id: P3_SECTIONS.price, label: "시세" },
   { id: P3_SECTIONS.places, label: "어디서" },
-  { id: P3_SECTIONS.why, label: "왜" },
+  { id: P3_SECTIONS.why, label: "추이" },
 ] as const
 
 /** 판정 전(평소가 없음)이면 "내가 본 가격" 섹션과 칩을 뺀다. */

@@ -15,7 +15,8 @@ function useCurrentSection(sections: readonly Section[]) {
     let frame = 0
     const update = () => {
       frame = 0
-      const line = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--shell-top")) + 56
+      // 섹션 칩 줄(40) 아래 조금 여유를 둔 선. 칩으로 이동한 섹션(scroll-mt-28)이 이 선을 넘어 활성이 된다.
+      const line = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--shell-top")) + 96
       const atEnd = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2
       const passed = sections.filter(({ id }) => (document.getElementById(id)?.getBoundingClientRect().top ?? Infinity) <= line)
       setCurrent((atEnd ? sections.at(-1) : passed.at(-1) ?? sections[0])?.id)
@@ -45,8 +46,15 @@ export function SectionChips({ sections }: { sections: readonly Section[] }) {
           current={current === id}
           onClick={(event) => {
             event.preventDefault()
+            const target = document.getElementById(id)
+            // 접힌 섹션("왜 이 판정일까?")이면 펼친 뒤 이동한다. 접힌 채로 가면 제목 한 줄만 보인다.
+            const trigger = target?.querySelector<HTMLButtonElement>('button[aria-expanded="false"]')
+            trigger?.click()
             const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-            document.getElementById(id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" })
+            const go = () => target?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" })
+            // 펼치는 애니메이션(약 300ms)이 끝난 뒤에 옮긴다. 펼치는 동안 옮기면 높이가 바뀌어 중간에 멈춘다.
+            if (trigger) window.setTimeout(go, reduce ? 0 : 320)
+            else go()
           }}
         >
           {label}
