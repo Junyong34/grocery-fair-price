@@ -109,38 +109,40 @@ export function SeasonDetail({ season }: { season: Season }) {
                   aria-labelledby={`season-month-${month}-title`}
                   className="scroll-mt-[calc(var(--shell-top)+var(--tabs-h)+72px)]"
                 >
-                  <div className="flex items-baseline justify-between gap-3 border-b border-hairline pb-2">
+                  <div className="flex items-baseline justify-between gap-3 border-b border-hairline pb-3">
                     <h2
                       id={`season-month-${month}-title`}
-                      className="flex items-baseline gap-3"
+                      className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1"
                     >
-                      <span className="font-number text-[28px] leading-none tabular-nums lg:text-[44px]">
+                      <span className="shrink-0 font-number text-[28px] leading-none tabular-nums lg:text-[36px]">
                         {month}월
                       </span>
-                      <span className="font-heading text-[15px] text-stone lg:text-lg">
+                      <span className="font-heading text-sm leading-relaxed text-stone lg:text-base">
                         {MONTH_NOTES[month]}
                       </span>
                     </h2>
-                    <span className="shrink-0 text-xs text-stone">
+                    <span className="shrink-0 text-[13px] text-stone tabular-nums">
                       {foods.length}가지
                     </span>
                   </div>
-                  <ul className="mt-4 grid grid-cols-4 gap-x-3 gap-y-4 md:grid-cols-6 lg:grid-cols-8">
+                  <ul className="mt-5 grid grid-cols-4 items-start gap-x-2.5 gap-y-5 sm:grid-cols-6 sm:gap-x-3 sm:gap-y-6">
                     {foods.map((food) => (
                       <li key={food.id} className="min-w-0">
                         <Link
                           href={routes.seasonal.food(food.id)}
-                          className="flex flex-col items-center gap-1 text-center text-xs text-ink no-underline hover:text-ink"
+                          className="group/food flex h-full flex-col items-center gap-2 rounded-lg text-center text-[13px] leading-5 text-stone no-underline hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring sm:text-sm"
                         >
-                          <span className="relative block w-full rounded-md bg-surface/60 p-1.5">
+                          <span className="relative block w-full rounded-lg bg-surface/40 p-2 group-hover/food:bg-surface/70 group-focus-visible/food:bg-surface/70">
                             <FoodImage
                               food={food}
-                              sizes="100px"
+                              sizes="(min-width: 1024px) 110px, (min-width: 640px) 120px, 22vw"
                               showName={false}
                             />
                             <EatenBadgeToday foodId={food.id} />
                           </span>
-                          <span className="w-full truncate">{food.name}</span>
+                          <span className="min-h-5 w-full font-medium break-keep">
+                            {food.name}
+                          </span>
                         </Link>
                       </li>
                     ))}
