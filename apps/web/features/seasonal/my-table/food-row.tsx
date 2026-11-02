@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { memo, useState } from "react"
 
 import {
   EAT_LABEL_OFF,
@@ -14,20 +14,17 @@ import { Checkbox } from "@workspace/ui/components/checkbox"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { FoodImage } from "@/features/seasonal/components/food-image"
+import { toggleEaten, useIsEaten } from "@/shared/eaten-store"
 import { routes } from "@/shared/routes"
 
 import { TypedLabel } from "./typed-label"
 
-/** 나의 식탁 목록 한 줄. 체크박스 | 이미지 | 이름·제철 달 | 라벨. 이름을 누르면 품종 상세로 간다. */
-export function FoodRow({
-  food,
-  eaten,
-  onToggle,
-}: {
-  food: Food
-  eaten: boolean
-  onToggle: () => void
-}) {
+/**
+ * 나의 식탁 목록 한 줄. 체크박스 | 이미지 | 이름·제철 달 | 라벨. 이름을 누르면 품종 상세로 간다.
+ * 먹음 여부는 행이 직접 구독한다. 하나를 체크해도 그 행만 다시 그리고 나머지 200여 행은 memo로 건너뛴다.
+ */
+export const FoodRow = memo(function FoodRow({ food, year }: { food: Food; year: number }) {
+  const eaten = useIsEaten(year, food.id)
   // 켤 때마다 key를 바꿔 이미지 바운스와 "+1"을 다시 띄운다.
   const [pops, setPops] = useState(0)
   // 방금 체크해서 뽑은 문구. 다시 열면 없고, 그때는 품종 id 해시로 고정한 문구를 쓴다.
@@ -48,7 +45,7 @@ export function FoodRow({
             setPops((n) => n + 1)
             setFresh(eatLabel(Math.floor(Math.random() * 1000)))
           }
-          onToggle()
+          toggleEaten(year, food.id)
         }}
         aria-label={`${food.name} 먹음`}
       />
@@ -113,4 +110,4 @@ export function FoodRow({
       </label>
     </li>
   )
-}
+})

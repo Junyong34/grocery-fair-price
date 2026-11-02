@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useDeferredValue, useEffect, useRef, useState } from "react"
 
 import { SEASON_COPY, UI_COPY } from "@workspace/seasonal/data/copy"
 import {
@@ -8,7 +8,7 @@ import {
   tally,
   type Scope,
 } from "@workspace/seasonal/data/eaten-stats"
-import { FOODS, type Food } from "@workspace/seasonal/data/foods"
+import { FOODS } from "@workspace/seasonal/data/foods"
 import { MONTHS } from "@workspace/seasonal/data/months"
 import { SEASONS } from "@workspace/seasonal/data/seasons"
 import { matchFoods } from "@workspace/seasonal/search/match-foods"
@@ -17,7 +17,7 @@ import { Segmented } from "@workspace/ui/components/segmented"
 import { cn } from "@workspace/ui/lib/utils"
 import { ScrollRow } from "@workspace/ui/components/scroll-row"
 
-import { toggleEaten, useEatenIds } from "@/shared/eaten-store"
+import { useEatenIds } from "@/shared/eaten-store"
 import { useToday } from "@/shared/today-context"
 
 import { FoodRow } from "./food-row"
@@ -61,12 +61,10 @@ export function MyTableView() {
   const inScope = scopeFoods(scope)
   const scopeTally = tally(inScope, eaten)
   const yearTally = tally(FOODS, eaten)
-  const list = matchFoods(inScope, query)
+  // 목록은 늦춘 검색어로 거른다. 입력창은 바로 바뀌고, 200여 행을 다시 거르는 일은 그 뒤에 한다.
+  const deferredQuery = useDeferredValue(query)
+  const list = matchFoods(inScope, deferredQuery)
   const listEaten = list.filter((food) => eaten.has(food.id)).length
-
-  const onToggle = (food: Food) => {
-    toggleEaten(year, food.id)
-  }
 
   // 차트에서 다른 방식의 범위를 고르는 일은 없지만, 방식과 범위가 어긋나지 않게 함께 맞춘다.
   const onScope = (next: Scope) => {
@@ -170,24 +168,19 @@ export function MyTableView() {
         {/* 검색어가 없으면 목록이 곧 요약의 범위라 개수가 겹치므로, 검색 중일 때만 결과 수를 보인다. */}
         {/* live 영역은 숨기지 않고 늘 두어야 바뀐 문구가 읽힌다. 비어 있으면 높이가 0이다. */}
         <p aria-live="polite" className="mt-1 text-xs text-stone tabular-nums">
-          {query.trim() && list.length > 0
-            ? UI_COPY.searchResult(query.trim(), list.length, listEaten)
+          {deferredQuery.trim() && list.length > 0
+            ? UI_COPY.searchResult(deferredQuery.trim(), list.length, listEaten)
             : ""}
         </p>
         {list.length ? (
           <ul className="mt-3 grid lg:grid-cols-2 lg:gap-x-6">
             {list.map((food) => (
-              <FoodRow
-                key={food.id}
-                food={food}
-                eaten={eaten.has(food.id)}
-                onToggle={() => onToggle(food)}
-              />
+              <FoodRow key={food.id} food={food} year={year} />
             ))}
           </ul>
         ) : (
           <p className="my-8 rounded-xl border border-dashed border-hairline bg-surface/30 px-5 py-8 text-center text-sm leading-relaxed text-stone">
-            {UI_COPY.emptySearch(query)}
+            {UI_COPY.emptySearch(deferredQuery)}
           </p>
         )}
       </section>
