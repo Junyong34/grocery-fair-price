@@ -159,7 +159,7 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
       </span>
       {holiday && (
         // 긴 공휴일 이름도 좁은 칸 안에서 읽도록 작은 글자로 감싸고 말줄임하지 않는다.
-        <HolidayName names={names} className="w-full px-0.5 text-[9px] leading-tight break-all text-holiday in-data-[holidays=off]:hidden! lg:text-[10px]" />
+        <HolidayName names={names} className="w-full px-0.5 text-[8px] leading-tight break-all text-holiday in-data-[holidays=off]:hidden! lg:text-[10px]" />
       )}
     </div>
   )
