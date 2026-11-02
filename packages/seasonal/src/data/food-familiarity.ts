@@ -135,6 +135,7 @@ export const RARE_FOODS: ReadonlySet<string> = new Set([
   "lumpfish",
   "herring",
   "redlip-mullet",
+  "halfbeak",
   "red-rockfish",
   "gray-rockfish",
   "ganjaemi",
