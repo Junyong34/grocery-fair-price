@@ -10,6 +10,8 @@ if (existsSync(rootEnv)) process.loadEnvFile(rootEnv)
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@workspace/ui", "@workspace/seasonal", "@workspace/price"],
+  // 웹 앱 설치 정보가 앱 밖의 Oura 팔레트를 읽으므로 배포 파일 추적 범위를 저장소까지 넓힌다.
+  outputFileTracingRoot: resolve(import.meta.dirname, "../.."),
   // 데이터는 기본이 동적이고, 캐시는 "use cache"로 고른다. 정적 셸을 먼저 보내고 나머지는 스트리밍한다.
   // 두 옵션은 다음 메이저에서 항상 켜진다 (node_modules/next/dist/docs/.../cacheComponents.md).
   cacheComponents: true,

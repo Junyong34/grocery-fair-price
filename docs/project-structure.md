@@ -84,6 +84,9 @@ import 경로:
 | `next.config.ts` | `cacheComponents: true`, `partialPrefetching: true`, `agentRules: false`(AGENTS.md를 루트 하나로) |
 | `proxy.ts` | `/seasonal/festivals` → 서울 날짜 기준 다가오는 명절로 리다이렉트. `matcher`는 정적 문자열이어야 해서 경로를 직접 쓴다 |
 | `app/layout.tsx` | `<html lang="ko" data-mode="light">`, Pretendard(본문), Gowun Batang(`--font-serif-ko`, 제목), 사이트 기본 메타데이터, `Providers` |
+| `app/manifest.ts` | `/manifest.webmanifest`. 홈 화면 웹 앱 설치 정보(`shared/pwa.ts`): 장볼날, 시세 메인(`/`), 주소창 없는 창, 기존 브랜드 아이콘과 Oura 캔버스 색. `public/downloads/manifest.json`과 별개 |
+| `shared/pwa.ts` · `pwa.test.ts` | 웹 앱 설치 정보와 팔레트 원본 읽기, 이름·시작 경로·아이콘 규격 검증. 루트 레이아웃의 테마색도 함께 사용 |
+| `shared/shell/install-prompt.tsx` | 공통 셸의 홈 화면 설치 안내. `useDevice`로 휴대폰에서만 표시. 지원 브라우저 설치창·iOS 수동 안내, 설치된 앱 숨김, 닫기 상태는 `price:install-prompt`에 저장 |
 | `app/globals.css` | `@workspace/ui/globals.css`와 `cojeev.css`를 불러오고, ViewTransition 키프레임과 reduced-motion 처리 |
 | `components.json` | shadcn 설정. 실제 설치는 `packages/ui`에서 한다(`pnpm ui:add`) |
 | `DESIGN.md` | Oura 디자인 언어 분석(색, 서체, 간격, 컴포넌트) |

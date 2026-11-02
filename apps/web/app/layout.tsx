@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Gowun_Batang } from "next/font/google"
 
 import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css"
@@ -6,6 +6,7 @@ import "./globals.css"
 import { AnalyticsTag } from "@/shared/analytics/analytics-tag"
 import { createMetadata, SITE_CONFIG, siteUrl } from "@/shared/meta"
 import { Providers } from "@/shared/providers"
+import { WEB_APP_BACKGROUND } from "@/shared/pwa"
 import { searchVerification } from "@/shared/seo/indexing"
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -16,8 +17,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
   title: { default: SITE_CONFIG.titleDefault, template: SITE_CONFIG.titleTemplate },
   applicationName: SITE_CONFIG.name,
+  appleWebApp: { capable: true, title: SITE_CONFIG.name, statusBarStyle: "default" },
   verification: searchVerification(),
 }
+
+export const viewport: Viewport = { themeColor: WEB_APP_BACKGROUND, colorScheme: "light" }
 
 // 제목(계절명, 달별 문구)용 명조. 한글 글리프가 많아 미리 불러오지 않고 unicode-range로 필요한 조각만 받는다.
 // 본문 Pretendard는 위 CSS(동적 서브셋)로, 큰 숫자는 cojeev display 서체로 쓴다. 연결은 packages/ui globals.css.

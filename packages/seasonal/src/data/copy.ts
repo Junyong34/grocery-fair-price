@@ -7,6 +7,18 @@ import type { Festival } from "./festivals"
 import type { Month } from "./months"
 import type { Season } from "./seasons"
 
+/** 시세·제철 공통 셸의 모바일 홈 화면 설치 안내. */
+export const INSTALL_COPY = {
+  label: "홈 화면 설치 안내",
+  title: "장볼날을 홈 화면에 추가하세요",
+  description: "장볼 때 시세와 제철달력을 바로 열어보세요.",
+  install: "홈 화면에 추가",
+  ios: "Safari의 공유 메뉴에서 ‘홈 화면에 추가’를 선택하세요.",
+  browser: "브라우저 메뉴에서 ‘앱 설치’ 또는 ‘홈 화면에 추가’를 선택하세요. 메뉴가 없다면 Chrome이나 Safari에서 열어주세요.",
+  close: "설치 안내 다시 보지 않기",
+  failed: "설치창을 열지 못했어요. 브라우저 메뉴에서 홈 화면에 추가해 주세요.",
+} as const
+
 /** 달마다 한 줄 문구(2a 월 섹션, 2b 제목). */
 export const MONTH_NOTES: Record<Month, string> = {
   1: "찬 바다에서 굴과 방어가 가장 기름진 달",

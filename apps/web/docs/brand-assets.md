@@ -63,6 +63,16 @@
 | `app/icon.svg`       | `favicon.svg`           | 초록 바탕 축약형 SVG 아이콘 |
 | `app/apple-icon.png` | `favicon-green-180.png` | 초록 바탕 180×180 Apple 홈 화면 아이콘 |
 
+## 홈 화면 웹 앱
+
+`app/manifest.ts`가 `/manifest.webmanifest`를 제공한다. 설치 이름은 `장볼날`, 시작 화면은 시세 메인(`/`), 실행 방식은 `standalone`(주소창 없는 별도 창)이다. 시세·제철 화면 모두 앱 범위에 포함한다.
+
+설치 아이콘은 기존 `public/images/brand/favicon-green-192.png`와 `favicon-green-512.png`를 사용한다. Apple 홈 화면은 위의 `app/apple-icon.png`를 사용한다. 배경·테마색은 `shared/pwa.ts`가 Oura 팔레트의 `--color-canvas`에서 읽어 웹 앱 정보와 루트 레이아웃에 적용하므로 색을 따로 관리하지 않는다.
+
+공통 셸의 `InstallPrompt`는 `useDevice`의 `isHydrated`·`isMobile` 확인 후 휴대폰에서만 표시한다. Android 등 지원 브라우저에서는 버튼으로 설치창을 열고, iOS에서는 Safari 공유 메뉴를 안내한다. 설치 이벤트가 없는 환경은 브라우저 메뉴를 안내한다. 앱 창으로 실행 중이거나 안내를 닫았다면 숨긴다. 닫기 선택은 `deviceStore`의 `price:install-prompt` 키에 저장하여 다시 표시하지 않는다.
+
+운영 설치는 HTTPS에서 확인한다. Android Chrome의 설치 메뉴와 iPhone Safari의 공유 → 홈 화면에 추가로 설치한 뒤 이름·아이콘·시세 시작 화면·주소창 없는 실행을 확인한다. 푸시 알림·오프라인 캐시는 별도 기능이다. `public/downloads/manifest.json`은 다운로드 목록이며 웹 앱 설정이 아니다.
+
 ## 교체
 
 브랜드 원본을 변경했다면 아래 명령으로 PNG·SVG·WebP·ICO를 내보낸다.
