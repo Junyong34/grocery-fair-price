@@ -215,6 +215,7 @@ import 경로:
 | `print-screen.ts` | `/print` 화면의 용지 둘레 여백(`PRINT_SCREEN_GUTTER`). `print.css`(CSS 변수 `--print-gutter`)와 어드민 미리보기 크기 계산이 함께 쓴다 |
 | `providers.tsx` | `TooltipProvider`, `OverlayProvider`(overlay-kit). 마운트 뒤 기기 저장 store를 모두 불러온다(`rehydrateDeviceStores`) |
 | `device-store.ts` | `deviceStore(키, 기본값, { version, migrate })`: 기기(localStorage) 저장 store를 만든다. 불러오기 전에 쓴 값은 불러온 값 위에 얹는다. 노드(서버 · 테스트)에서는 메모리 저장소 |
+| `use-device.ts`, `device/` | 기기 유형·OS·터치·방향 판별 훅. react-device-check의 MIT 코드를 로컬로 가져왔고 출처·사용법·라이선스는 `device/README.md`, `device/LICENSE`에 보존한다. 서버 기본값으로 분기하기 전에 `isHydrated`를 확인한다 |
 | `meta.ts` | `SITE_CONFIG`(사이트 이름 "장볼날"), `siteUrl()`, `absoluteUrl()`, `createMetadata()`, `ogImagePath()` |
 | `seo/` | 검색 색인: `pages.ts`(색인 레지스트리. 품종 상세처럼 목록을 데이터 입구에서 읽는 라우트는 `DATA_SEO_PAGES`에 두고 `app/sitemap.ts`가 펼친다)와 가드 테스트, `indexing.ts`(색인 스위치·소유 확인), `json-ld.tsx`(구조화 데이터), `titles.ts`(검색용 제목·설명), `route-pattern.ts` |
 | `today.ts` | `getSeoulToday()`: `server-only`. `connection()` 뒤에 서울 오늘을 계산하고 React `cache`로 요청당 한 번 |
