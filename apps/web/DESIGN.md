@@ -349,6 +349,42 @@ Color discipline is the signature move. The whole palette is earth-toned — mus
 - Three surface worlds cycling in a predictable rhythm: cream editorial → black news/footer band → silver product stage.
 - Photography-first hierarchy: full-bleed imagery leads, UI recedes to hairlines and quiet labels.
 
+## 제철달력 화면의 적용 기준
+
+아래는 계절 상세·월별 도감·나의 식탁에 적용한 기준이다. 뒤의 Oura 분석은 원형 참고이며, 실제 앱의 서체·선택 색상·화면별 수치는 이 절을 따른다. 기존의 크림색 바탕, 얇은 경계선, 터치 영역 원칙은 반복하지 않는다.
+
+### 색조와 선택 상태
+
+- 계절 상세의 품종 그림 바탕, 나의 식탁 요약 카드와 검색창은 `bg-surface/40`으로 밝기만 살짝 높인다. 품종 그림은 hover·키보드 focus에서 `bg-surface/70`으로 구분한다.
+- 계절 이동 카드는 `bg-canvas`를 사용한다. 계절색을 섞은 회색 그라데이션이나 요약 카드의 색 번짐을 추가하지 않는다. 계절색은 아이콘·진행률 등 의미가 있는 표시에 남긴다.
+- 계절 상세의 월 칩은 기본 `border-hairline`·`bg-canvas`·`text-stone`, 현재 월은 `border-gold-soft`·`bg-gold-soft/30`·`text-gold-deep`·semibold다. 스크롤에 따라 현재 월 하나만 강조한다.
+- 나의 식탁 필터는 선택 시 `border-gold`·`bg-gold-wash`·`text-gold-deep`, 계절 요약 칸은 `border-gold-soft`·`bg-gold-wash`로 맞춘다. 선택하지 않은 계절 칸도 글자 전체를 흐리게 하지 않는다.
+- 나의 식탁의 제철 달·미기록 상태·검색 placeholder는 `text-stone`이다. 미기록 그림은 불투명도 70%·채도 75%로 알아볼 수 있게 남기고, 기록한 그림은 원래 색을 쓴다.
+
+### 글자 크기와 정보 위계
+
+앱의 실제 서체는 본문 Pretendard, 제목 Gowun Batang(`font-heading`), 큰 숫자 cojeev display(`font-number`)다.
+
+| 요소 | 적용값 |
+|---|---|
+| 계절 상세 품종명 | 모바일 13px, 640px 이상 14px, medium, 줄 높이 20px, 중앙 정렬. 말줄임 없이 단어를 보존한다. |
+| 계절 상세 월 제목 | 28px, 1024px 이상 36px. 설명은 14px / 16px, 품종 수는 13px·고정폭 숫자다. |
+| 계절 상세 월 칩 | 13px. 현재 월만 semibold다. |
+| 하단 계절 이동 | 계절명 24px·제목 서체·bold, 방향 안내와 월 범위 12px다. |
+| 나의 식탁 목록 | 품종명 16px·제목 서체·bold, 제철 달과 기록 상태 12px. 이름은 왼쪽, 상태는 오른쪽 정렬이다. |
+| 나의 식탁 필터·검색 | 필터 13px, 검색 입력 16px다. |
+
+### 배치와 여백
+
+- 계절 상세·나의 식탁 본문 최대 폭은 1080px, 좌우 여백은 모바일 18px / 1024px 이상 24px다. 나의 식탁은 넓은 화면에서 요약 280px + 간격 32px + 목록으로 나눈다.
+- 계절 상세 품종 목록은 모바일 4열, 640px 이상 6열이다. 월 제목과 목록 사이는 20px, 카드 사이 가로 간격은 10px / 12px, 행 간격은 20px / 24px다.
+- 품종 그림은 정사각형·모서리 8px·안쪽 여백 8px를 쓰고, 그림과 이름 사이는 8px다. 월 제목·설명은 기준선을 맞추되 좁으면 설명이 다음 줄로 흐르게 한다.
+- 계절 상세 월 칩은 보이는 높이 32px, 칩 사이 4px다. 실제 터치 영역은 기존 Touch Targets 기준을 유지한다.
+- 하단 계절 이동은 두 개의 낮은 가로 카드다. 안쪽 여백 12px, 작은 식재료 그림 하나 40px, 계절명과 월 범위 간격 4px를 쓴다. 현재 구성의 높이는 약 104px이며 고정 높이를 강제하지 않는다. 이전 화살표는 왼쪽, 다음 화살표는 오른쪽에 둔다.
+- 나의 식탁 목록은 `체크 44px | 그림 40px | 유동 폭 이름·제철 달 | 상태`의 네 열로 정렬한다. 열 간격 8px, 행 위아래 여백 12px, 이름과 제철 달 사이 4px다.
+- 나의 식탁 요약 카드는 안쪽 여백 20px / 넓은 화면 24px, 그림자 대신 얇은 테두리를 사용한다. 검색·필터 줄 간격은 12px, 필터와 목록 사이는 12px다.
+- 월별 도감의 월 제목은 각 카드 안에서 탭 바로 아래에 고정한다. 제목 바탕은 불투명한 `bg-surface`로 그림과 겹치지 않게 하고, 한쪽만 펼쳐도 각 제목은 자기 카드 끝에서 사라진다.
+
 ## Colors
 
 > Source pages analysed: the homepage, the Oura Ring 5 store page, the Activity & Movement page, and the Clinical & Science Experts page. The palette below reconciles all four into one system.
