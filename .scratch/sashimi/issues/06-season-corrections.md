@@ -1,6 +1,6 @@
 # 06. 출처 조사 반영: 앱 제철 보정
 
-Status: needs-info
+Status: needs-triage
 Type: task (AFK)
 Blocked by: 01, `research-months.md` 완료
 
