@@ -1,0 +1,19 @@
+{
+  "radish": {
+    "months": [1, 2, 3, 10, 11, 12],
+    "peak": [10, 11],
+    "reason": "기존 가을무에 제주 월동무의 12월 상순~3월 하순 수확기를 합친다. 수확 기간을 최성기로 단정하지 않고 기존 대표 달은 유지한다.",
+    "sources": ["https://jasdc.or.kr/info/intro/crops.htm"],
+    "checkedAt": "2026-11-02"
+  },
+  "young-radish": {
+    "months": [5, 6, 7],
+    "peak": [6, 7],
+    "reason": "기존 5~6월에 농촌진흥청 2019년 7월 식재료와 강남구 2025년 제철 채소 달력의 7월 대표 채소 선정을 반영한다.",
+    "sources": [
+      "https://www.rda.go.kr/board/board.do?boardId=farmprmninfo&currPage=5&dataNo=100000756452&mode=updateCnt&prgId=day_farmprmninfoEntry&searchEDate=&searchSDate=",
+      "https://www.gangnam.go.kr/board/B_000031/1074136/view.do?mid=ID01_031"
+    ],
+    "checkedAt": "2026-11-02"
+  }
+}

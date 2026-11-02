@@ -4,6 +4,13 @@ import { findFood, foodsInMonth, foodsInSeason, foodsInSeasonWith, isDrawn, mont
 
 // 예상값은 prototypes/seasonal-food/docs/seasonal-lists/foods.json(검증 품종)에서 셌다.
 describe("foodsInMonth", () => {
+  it("무는 월동 수확기, 열무는 7월 식재료 조사로 확인한 달을 포함한다", () => {
+    for (const month of [12, 1, 2, 3]) expect(foodsInMonth(month).map((food) => food.id)).toContain("radish")
+    expect(foodsInMonth(7).map((food) => food.id)).toContain("young-radish")
+    expect(findFood("radish")?.peak).toEqual([10, 11])
+    expect(findFood("young-radish")?.peak).toEqual([6, 7])
+  })
+
   it("그 달이 제철인 품종만 고른다", () => {
     const october = foodsInMonth(10).map((food) => food.name)
 
@@ -49,8 +56,8 @@ describe("seasonsOf", () => {
 describe("monthHighlights", () => {
   it("월별 문구에 등장하는 제철 품종을 가장 먼저 배치한다", () => {
     const mentioned: Record<number, string[]> = {
-      2: ["봄동"], 3: ["냉이", "달래"], 4: ["두릅"], 5: ["완두콩"],
-      6: ["매실", "감자"], 7: ["수박"], 8: ["복숭아"],
+      1: ["무"], 2: ["봄동"], 3: ["냉이", "달래"], 4: ["두릅"], 5: ["완두콩"],
+      6: ["매실", "감자"], 7: ["열무", "수박"], 8: ["복숭아"],
       10: ["밤", "고구마"], 11: ["배추", "무"], 12: ["귤"],
     }
     for (const [month, names] of Object.entries(mentioned)) {

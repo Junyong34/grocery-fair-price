@@ -1,5 +1,6 @@
 // 생성 파일. 직접 고치지 않는다. packages/seasonal/scripts/build-foods.mjs로 다시 만든다.
 // 원천: prototypes/seasonal-food/docs/seasonal-lists/foods.json의 검증 품종 207개.
+// 제철 보정: food-season-corrections.json (조사 근거 포함).
 
 export const FOOD_ROWS = [
   { id: "eggplant", name: "가지", aliases: [], category: "채소", months: [6,7,8,9,10], peak: [7,8], core: true },
@@ -70,7 +71,7 @@ export const FOOD_ROWS = [
   { id: "pollock", name: "명태", aliases: [], category: "수산", months: [1,2,12], peak: [1,2,12], core: true },
   { id: "quince", name: "모과", aliases: [], category: "과일", months: [9,10], peak: [10], core: false },
   { id: "wood-ear", name: "목이버섯", aliases: [], category: "버섯", months: [3,4,5,6], peak: [3], core: false },
-  { id: "radish", name: "무", aliases: [], category: "채소", months: [10,11], peak: [10,11], core: true },
+  { id: "radish", name: "무", aliases: [], category: "채소", months: [1,2,3,10,11,12], peak: [10,11], core: true },
   { id: "fig", name: "무화과", aliases: [], category: "과일", months: [9,10], peak: [9], core: true },
   { id: "snailfish", name: "물메기", aliases: [], category: "수산", months: [1,2,12], peak: [2], core: false },
   { id: "loach", name: "미꾸라지", aliases: [], category: "수산", months: [8,9,10,11], peak: [8,9,10], core: false },
@@ -143,7 +144,7 @@ export const FOOD_ROWS = [
   { id: "thistle-greens", name: "엉겅퀴", aliases: [], category: "채소", months: [5,6,7], peak: [6], core: false },
   { id: "bitter-melon", name: "여주", aliases: ["고야"], category: "채소", months: [6,7,8], peak: [8], core: false },
   { id: "lotus-root", name: "연근", aliases: [], category: "채소", months: [1,2,3,9,10,11,12], peak: [2], core: false },
-  { id: "young-radish", name: "열무", aliases: [], category: "채소", months: [5,6], peak: [6], core: false },
+  { id: "young-radish", name: "열무", aliases: [], category: "채소", months: [5,6,7], peak: [6,7], core: false },
   { id: "mulberry", name: "오디", aliases: [], category: "과일", months: [5], peak: [5], core: false },
   { id: "omija", name: "오미자", aliases: [], category: "과일", months: [9,10], peak: [9], core: false },
   { id: "cucumber", name: "오이", aliases: [], category: "채소", months: [5,6,7,8], peak: [5,6,7,8], core: true },

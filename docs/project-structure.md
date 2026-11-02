@@ -338,6 +338,7 @@ apps/web/public/dishes/PROVENANCE.md
 packages/seasonal/src/data/drawn-dishes.generated.ts
 ```
 
+- `packages/seasonal/src/data/food-season-corrections.json`은 재조사한 제철 기간과 출처를 보관한다. 품종 생성 시 원본 위에 적용한다. `prototypes/` 없이 이 보정만 반영할 때는 `pnpm --filter @workspace/seasonal build:foods --refresh-seasons`로 기존 생성 목록을 읽어 재생성한다. 새 품종 추가에는 원본이 필요하다.
 - 출력은 모두 커밋한다. 원천이 `prototypes/`(Git 밖)에 있어 새 클론에서는 다시 만들 수 없기 때문이다.
 - 일러스트가 없는 품종의 id는 `build-foods.mjs`의 `NEW_IDS`에서 정한다. 그림이 없으면 화면은 이름 카드를 보인다.
 - 그림체는 `watercolor`, 변형은 `color`(모든 화면)와 `motion`(1i 큰 그림, SVG 안 CSS 키프레임), 바닥 그림자는 끈다.
