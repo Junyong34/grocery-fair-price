@@ -15,7 +15,7 @@
 6. `app/seasonal/(this-month)/page.tsx:20` `Page` → `<Suspense fallback={<div className="min-h-svh" aria-busy />}>`(`:22`) → `ThisMonth`(`:28`): `await getSeoulToday()`(`:29`) → `ThisMonthView today={today}`.
 7. `features/seasonal/this-month/this-month-view.tsx:30` `ThisMonthView`(server):
    - 12개월 데이터(`:33`), 히어로는 `months[thisMonth - 1]`(`:34`).
-   - `MonthSection`(`:103`)마다 `festivalsInMonth` · `holidaysInMonth` · `monthCalendar({ today })`(`:117-120`)를 계산한다.
+   - `MonthSection`(`:103`)마다 `holidaysInMonth` · `monthCalendar({ today })`(`:117-120`)를 계산한다.
    - `Scatter`(`:170`) → `ScatterField`(`features/seasonal/components/scatter-field.tsx:13`)가 모바일 · 데스크톱 두 판을 그린다. 각 판에서 서버가 `scatterLayout(...)`(`:29`)을 계산한다(`packages/seasonal/src/layout/scatter.ts`, Lloyd `LLOYD_ITERATIONS = 10`).
    - client 말단: `DraggableScatter`(그림 위치 `deviceStore`), `SettingsScope` · `SettingsCalendar`, `MonthScrollSpy`, `DesktopMonthPanel`, `JumpButton` · `MonthRail`, `YearEndSummary`(먹음 기록 수).
    - server: `MoreFoods`, `DownloadsCard`(정적 manifest).

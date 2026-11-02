@@ -2,8 +2,7 @@ import Link from "next/link"
 
 import { holidaysInMonth } from "@workspace/seasonal/calendar/holidays"
 import { monthCalendar, type CalendarDate } from "@workspace/seasonal/calendar/month-calendar"
-import { MONTH_NOTES, UI_COPY } from "@workspace/seasonal/data/copy"
-import { festivalDate, festivalsInMonth } from "@workspace/seasonal/data/festivals"
+import { MONTH_NOTES } from "@workspace/seasonal/data/copy"
 import { foodsInMonth, monthHighlights } from "@workspace/seasonal/data/foods"
 import { MONTHS, type Month } from "@workspace/seasonal/data/months"
 import { SCATTER_MAX_FOODS } from "@workspace/seasonal/layout/scatter"
@@ -13,6 +12,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import { routes } from "@/shared/routes"
 
 import { DownloadsCard } from "../components/downloads-card"
+import { MonthDaysCard } from "../components/month-days-card"
 import { ScatterField } from "../components/scatter-field"
 import { HERO_ID, monthSectionId } from "./active-month"
 import { DesktopMonthPanel } from "./desktop-month-panel"
@@ -114,7 +114,6 @@ function MonthSection({
   note: string
   today: CalendarDate
 }) {
-  const festivals = festivalsInMonth(month, today.year)
   const holidays = holidaysInMonth(today.year, month)
   // 모바일 판은 달력(고정)이 들어갈 높이가 달의 주 수에 따라 다르다.
   const weeks = monthCalendar({ year: today.year, month, today, holidays }).length
@@ -151,16 +150,7 @@ function MonthSection({
           {foods.length}가지 제철<span> · 그림을 끌어 달력 위에도 놓아 꾸며 보세요</span>
         </p>
         <MoreFoods year={today.year} foods={foods.filter((food) => !pictured.includes(food))} />
-        <p className="mt-3 text-xs text-stone">
-          {festivals.length
-            ? `명절 ${festivals
-                .map((festival) => {
-                  const date = festivalDate(festival.slug, today.year)
-                  return date ? `${festival.name} ${date.month}.${date.day}` : festival.name
-                })
-                .join(" · ")}`
-            : UI_COPY.noFestivalThisMonth}
-        </p>
+        <MonthDaysCard month={month} today={today} className="mt-4 lg:max-w-[420px]" />
       </div>
     </section>
   )

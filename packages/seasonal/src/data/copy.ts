@@ -4,6 +4,7 @@
 import { josa } from "es-hangul"
 
 import type { Festival } from "./festivals"
+import type { MonthDayId, MonthDayKind } from "./month-days"
 import type { Month } from "./months"
 import type { Season } from "./seasons"
 
@@ -88,7 +89,13 @@ export const UI_COPY = {
   searchPlaceholder: "음식 이름 검색 (예: 사과, ㅅㄱ)",
   emptySearch: (query: string) =>
     `"${query}"에 맞는 제철음식이 없어요. 철자를 바꾸거나 필터를 '전체'로 바꿔 보세요.`,
-  noFestivalThisMonth: "이 달의 명절 없음",
+  /** 달력 아래 "이달의 절기·명절" 카드(month-days.ts) */
+  monthDaysTitle: "이달의 절기·명절",
+  noMonthDay: "이달은 이름난 절기나 명절이 없어요",
+  nextMonthDay: (name: string, month: number, day: number) =>
+    `다음은 ${month}월 ${day}일 ${name}`,
+  /** 명절 줄의 설명. 전통 음식 이름 몇 가지를 받는다 */
+  festivalDayNote: (dishes: readonly string[]) => `${dishes.join("·")} 먹는 날`,
   /** 2a 이달 맨 아래: 열두 달 스크롤이 끝났을 때 */
   yearEndTitle: "열두 달을 다 둘러봤어요",
   yearEndMyTableHint: "먹은 제철을 기록하면 나의 식탁에 모여요",
@@ -178,3 +185,31 @@ export const DOWNLOADS_COPY = {
   /** 2a · 2b 입구 카드(1-a) */
   entry: { title: "제철 달력 · 포스터 PDF 받기", hint: "집에서 인쇄해 냉장고에 붙여 보세요" },
 } as const
+
+/** "이달의 절기·명절" 줄의 종류 태그 */
+export const MONTH_DAY_KIND_LABELS: Record<MonthDayKind, string> = {
+  festival: "명절",
+  "solar-term": "절기",
+  custom: "세시",
+}
+
+/** "이달의 절기·명절" 줄의 한 줄 설명(명절은 UI_COPY.festivalDayNote로 전통 음식을 적는다). */
+export const MONTH_DAY_NOTES: Record<Exclude<MonthDayId, Festival>, string> = {
+  sohan: "한 해 가운데 가장 춥다는 때",
+  daehan: "큰 추위라는 이름의 겨울 마지막 절기",
+  ipchun: "봄이 시작되는 날",
+  gyeongchip: "개구리가 겨울잠에서 깨어나는 때",
+  chunbun: "낮과 밤의 길이가 같아지는 날",
+  hansik: "불을 피우지 않고 찬 음식을 먹던 날",
+  ipha: "여름이 시작되는 날",
+  dano: "창포물에 머리를 감던 수릿날",
+  haji: "낮이 가장 긴 날",
+  chobok: "삼복더위가 시작되는 날",
+  jungbok: "삼복더위의 한가운데",
+  malbok: "삼복더위의 마지막 고비",
+  ipchu: "가을이 시작되는 날",
+  chilseok: "견우와 직녀가 만나는 날",
+  cheoseo: "더위가 물러가고 선선해지는 때",
+  chubun: "이날부터 밤이 낮보다 길어지는 날",
+  ipdong: "겨울이 시작되는 날, 김장을 준비할 때",
+}

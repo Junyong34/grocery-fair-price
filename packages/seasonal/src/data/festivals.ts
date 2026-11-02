@@ -110,11 +110,6 @@ export function festivalDate(slug: Festival, year: number): CalendarDate | null 
   return rule === "solstice" ? winterSolstice(year) : lunarToSolar(year, rule.lunar[0], rule.lunar[1])
 }
 
-/** 그해 그 달에 드는 명절. 날짜가 없으면(삼복) 대표 달로 본다. */
-export function festivalsInMonth(month: number, year: number): readonly FestivalInfo[] {
-  return FESTIVALS.filter((festival) => (festivalDate(festival.slug, year)?.month ?? festival.month) === month)
-}
-
 /** 그 무렵 제철 품종으로 그 품종을 꼽은 명절(품종 상세의 관련 명절). */
 export function festivalsWithFood(foodId: string): readonly FestivalInfo[] {
   return FESTIVALS.filter((festival) => (festival.seasonalFoodIds as readonly string[]).includes(foodId))

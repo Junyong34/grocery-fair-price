@@ -1,8 +1,7 @@
 import Link from "next/link"
-import { ViewTransition } from "react"
+import { Suspense, ViewTransition } from "react"
 
-import { MONTH_NOTES, UI_COPY } from "@workspace/seasonal/data/copy"
-import { FESTIVALS } from "@workspace/seasonal/data/festivals"
+import { MONTH_NOTES } from "@workspace/seasonal/data/copy"
 import { foodsInMonth } from "@workspace/seasonal/data/foods"
 import type { Month } from "@workspace/seasonal/data/months"
 import { Button } from "@workspace/ui/components/button"
@@ -10,6 +9,7 @@ import { Button } from "@workspace/ui/components/button"
 import { routes } from "@/shared/routes"
 
 import { DownloadsCard } from "../components/downloads-card"
+import { MonthDaysCardToday } from "../components/month-days-card"
 import { ShareButton } from "../components/share-button"
 import { EatenInMonth } from "./eaten-summary"
 import { FoodCard } from "./food-card"
@@ -25,12 +25,12 @@ const next = (month: number) => (month === 12 ? 1 : month + 1)
 export function MonthView({ month }: { month: Month }) {
   const foods = foodsInMonth(month)
   const note = MONTH_NOTES[month]
-  // 명절 줄은 대표 달 기준이다. 연도에 따라 바뀌는 날짜(정월대보름 2·3월)는 2a 달력이 보여 준다.
-  const festivals = FESTIVALS.filter((festival) => festival.month === month)
-
-  const festivalLine = festivals.length
-    ? `명절 · ${festivals.map((festival) => festival.name).join(", ")}`
-    : UI_COPY.noFestivalThisMonth
+  // 절기·명절 카드는 해마다 날짜가 바뀌어 요청 시점의 연도로 그린다. 나머지 본문은 정적이다.
+  const monthDays = (
+    <Suspense fallback={null}>
+      <MonthDaysCardToday month={month} />
+    </Suspense>
+  )
 
   return (
     <ViewTransition
@@ -62,7 +62,7 @@ export function MonthView({ month }: { month: Month }) {
             가지
           </p>
           <hr className="my-2 hidden border-hairline lg:block" />
-          <p className="hidden text-sm text-stone lg:block">{festivalLine}</p>
+          <div className="hidden lg:block">{monthDays}</div>
           <div className="mt-2 hidden gap-2 lg:flex">
             <MonthStep month={previous(month)} direction="previous" />
             <MonthStep month={next(month)} direction="next" />
@@ -95,7 +95,7 @@ export function MonthView({ month }: { month: Month }) {
         </section>
 
         <footer className="mt-8 flex flex-col gap-4 lg:hidden">
-          <p className="text-sm text-stone">{festivalLine}</p>
+          {monthDays}
           <div className="flex items-center justify-between gap-2">
             <MonthStep month={previous(month)} direction="previous" />
             <Link

@@ -164,7 +164,7 @@ import 경로:
 | `my-table/` | 1h | `my-table-view`, `food-row`, `typed-label` |
 | `food-detail/` | 1i | `food-detail`, `eat-toggle`, `festival-link` |
 | `search/` | 전역 검색 | `food-search`(헤더 버튼), `food-search-dialog`(cojeev command, 초성 검색) |
-| `components/` | 공통 | `seasonal-shell`(공통 셸에 제철 메뉴 · 검색 · ⚙를 넣는다), `sub-tabs`, `food-image`(그림 없으면 이름 카드), `detail-sheet`(품종 · 에디션 상세 시트), `scatter-field`·`draggable-scatter`(흩어진 배치와 드래그), `month-calendar`, `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-name`(먹은 품종 이름 밑줄), `eaten-count`, `share-button`, `holiday-name`, `screen-stub` |
+| `components/` | 공통 | `seasonal-shell`(공통 셸에 제철 메뉴 · 검색 · ⚙를 넣는다), `sub-tabs`, `food-image`(그림 없으면 이름 카드), `detail-sheet`(품종 · 에디션 상세 시트), `scatter-field`·`draggable-scatter`(흩어진 배치와 드래그), `month-calendar`, `month-days-card`(달력 아래 "이달의 절기·명절". 2b는 `MonthDaysCardToday`를 `<Suspense>` 안에), `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-name`(먹은 품종 이름 밑줄), `eaten-count`, `share-button`, `holiday-name`, `screen-stub` |
 | `downloads/` | PDF 내려받기(.scratch/calendar-download) | `downloads-view`(목록: 종류별 가로 줄 `EditionShelf`), `edition-detail`(상세: 시트 · 페이지 공용), `edition-thumbnail`, `edition-download-link`(A4 내려받기 주소) |
 | `settings/` | 설정 화면 항목 | `display-settings`(화면 표시 섹션, 먹음 기록 지우기) |
 | `stores/` | 공통 | `settings-store`(표시 설정), `scatter-store`(옮긴 배치와 달력 자리) |
@@ -260,13 +260,15 @@ import 경로:
 | `data/dishes.ts` | 전통 음식 `TRADITIONAL_DISHES`(품종과 따로), `DishId`, `findDish`, `dishNames`, `isDishDrawn` |
 | `data/dish-rows.ts` | 전통 음식 행(`id`, `name`). import가 없어 `foods:sync`가 Node로 바로 읽는다 |
 | `data/drawn-dishes.generated.ts` | 생성 파일. 그림이 있는 전통 음식 id |
-| `data/festivals.ts` | `FESTIVALS`(전통 음식 id 포함), `festivalOf`(slug로 찾기), 연도별 날짜, `upcomingFestival`, `festivalsInMonth`, `festivalsWithFood` |
+| `data/festivals.ts` | `FESTIVALS`(전통 음식 id 포함), `festivalOf`(slug로 찾기), 연도별 날짜, `upcomingFestival`, `festivalsWithFood` |
+| `data/month-days.ts` | 달력 아래 "이달의 절기·명절": 명절 + 이름난 절기 + 세시(복날·한식·단오·칠석)를 달별·날짜 순으로(`monthDays`, 빈 달의 `nextMonthDay`). 설명 문구는 `copy.ts` `MONTH_DAY_NOTES` |
 | `data/copy.ts` | 화면 문구: 달별 문구, 계절 설명, 명절 배경, UI 문구, 먹음 라벨 |
 | `calendar/today.ts` | `TIME_ZONE`(Asia/Seoul), `seoulNow`, `seoulToday`, `currentMonth` |
 | `calendar/month-calendar.ts` | 달력 칸 계산(일·월요일 시작), `CalendarDate` |
 | `calendar/variants.ts` | 달력 모양 4가지(`CALENDAR_VARIANTS`)와 이름. 화면 ⚙와 인쇄물이 같이 쓴다 |
 | `calendar/holidays.ts` | 그 달 공휴일 |
 | `calendar/lunar.ts` | 음력 → 양력, 동지 |
+| `calendar/solar-terms.ts` | 24절기 시각·서울 날짜(태양 황경, VSOP87 축약) |
 | `calendar/date-utils.ts` | 요일 이름, 달의 날 수 |
 | `layout/scatter.ts` | 흩어진 배치. 시드 난수(LCG)로 같은 입력이면 같은 결과, 0..1 정규화 좌표, 화면 구간(`SCATTER_FRAMES`)별 고정 비율 |
 | `layout/arrangement.ts` | 시드 뒤의 판 위 자리: 저장된 배치 병합(`restingSpots`), 끄는 동안(`moveSpot`)·놓은 뒤(`settleSpots`) 겹침 풀기, 판 위 달력 가두기. 시드와 같은 그림+이름표 겹침 규칙 |
