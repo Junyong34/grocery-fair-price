@@ -75,7 +75,7 @@ export function MyTableView() {
   }
 
   return (
-    <div className="mx-auto max-w-[900px] px-[18px] pt-6 pb-8 lg:grid lg:grid-cols-[300px_1fr] lg:gap-10 lg:px-6 lg:pt-10">
+    <div className="mx-auto max-w-[1080px] px-[18px] pt-6 pb-8 lg:grid lg:grid-cols-[280px_1fr] lg:gap-8 lg:px-6 lg:pt-8">
       {/* 화면에는 요약 카드의 "나의 식탁 · 연도"가 제목 역할을 한다. 문서 제목은 보조기술용으로만 둔다(2b 목록·3a와 같은 방식). sr-only는 absolute라 그리드 칸을 차지하지 않는다. */}
       <h1 className="sr-only">나의 식탁</h1>
       <ScopeSummary
@@ -91,7 +91,7 @@ export function MyTableView() {
       />
 
       <section aria-label="제철 목록" className="mt-6 lg:mt-0">
-        <div className="sticky top-14 z-(--z-sticky) -mx-[18px] flex flex-col gap-2.5 bg-canvas/94 px-[18px] py-3 backdrop-blur lg:mx-0 lg:px-0">
+        <div className="sticky top-14 z-(--z-sticky) -mx-[18px] flex flex-col gap-3 bg-canvas/94 px-[18px] py-3 backdrop-blur lg:mx-0 lg:px-0 lg:pt-0">
           {summaryHidden && (
             <div className="flex items-center gap-3 motion-safe:animate-rise lg:hidden">
               <span className="shrink-0 text-xs text-stone">
@@ -102,9 +102,16 @@ export function MyTableView() {
                   value={scopeTally.eaten}
                   format={{ maximumFractionDigits: 0 }}
                 />
-                <span className="text-xs text-stone"> / {scopeTally.total}</span>
+                <span className="text-xs text-stone">
+                  {" "}
+                  / {scopeTally.total}
+                </span>
               </span>
-              <Meter tally={scopeTally} fill={scopeFill(scope)} className="flex-1" />
+              <Meter
+                tally={scopeTally}
+                fill={scopeFill(scope)}
+                className="flex-1"
+              />
             </div>
           )}
           <div className="flex flex-wrap items-center gap-2">
@@ -114,7 +121,7 @@ export function MyTableView() {
               onChange={(event) => setQuery(event.target.value)}
               placeholder={UI_COPY.searchPlaceholder}
               aria-label="음식 이름 검색"
-              className="h-9 min-w-0 basis-full rounded-md border border-hairline bg-surface px-3 text-base outline-none placeholder:text-caption focus-visible:border-gold min-[480px]:basis-0 min-[480px]:flex-1 lg:w-[280px] lg:basis-auto lg:flex-none"
+              className="h-11 min-w-0 basis-full rounded-lg border border-hairline bg-surface/40 px-3 text-base outline-none placeholder:text-stone focus-visible:border-gold focus-visible:ring-1 focus-visible:ring-gold min-[480px]:flex-1 min-[480px]:basis-0"
             />
             <Segmented
               aria-label="필터 방식"
@@ -162,13 +169,13 @@ export function MyTableView() {
 
         {/* 검색어가 없으면 목록이 곧 요약의 범위라 개수가 겹치므로, 검색 중일 때만 결과 수를 보인다. */}
         {/* live 영역은 숨기지 않고 늘 두어야 바뀐 문구가 읽힌다. 비어 있으면 높이가 0이다. */}
-        <p aria-live="polite" className="mt-1 text-xs text-caption tabular-nums">
+        <p aria-live="polite" className="mt-1 text-xs text-stone tabular-nums">
           {query.trim() && list.length > 0
             ? UI_COPY.searchResult(query.trim(), list.length, listEaten)
             : ""}
         </p>
         {list.length ? (
-          <ul className="mt-2 grid lg:grid-cols-2 lg:gap-x-6">
+          <ul className="mt-3 grid lg:grid-cols-2 lg:gap-x-6">
             {list.map((food) => (
               <FoodRow
                 key={food.id}
@@ -179,7 +186,7 @@ export function MyTableView() {
             ))}
           </ul>
         ) : (
-          <p className="mt-8 text-center text-sm text-stone">
+          <p className="my-8 rounded-xl border border-dashed border-hairline bg-surface/30 px-5 py-8 text-center text-sm leading-relaxed text-stone">
             {UI_COPY.emptySearch(query)}
           </p>
         )}
@@ -221,7 +228,7 @@ function Chip({
       aria-pressed={on}
       onClick={onClick}
       className={cn(
-        "shrink-0 rounded-[4px] border px-2.5 py-1.5 text-xs transition-colors duration-200 active:scale-[0.97] focus-visible:outline-2 focus-visible:outline-gold",
+        "min-h-11 shrink-0 rounded-full border px-3 text-[13px] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-gold motion-reduce:transition-none",
         on
           ? "border-gold bg-gold-wash text-gold-deep"
           : "border-hairline text-stone hover:border-silver hover:text-ink"

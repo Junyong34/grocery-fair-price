@@ -31,18 +31,8 @@ const SEASON_FILL: Record<Season, string> = {
   winter: "bg-season-winter",
 }
 
-/**
- * 계절을 고르면 요약 판 오른쪽 위에 그 계절색 빛이 번진다.
- * 판 전체를 물들이면 canvas와 구분이 사라져서(가을 gold가 특히) 판은 흰 바탕을 지킨다.
- */
-const SEASON_GLOW: Record<Season, string> = {
-  spring: "[--glow:var(--color-season-spring)]",
-  summer: "[--glow:var(--color-season-summer)]",
-  autumn: "[--glow:var(--color-season-autumn)]",
-  winter: "[--glow:var(--color-season-winter)]",
-}
-
-const MOTION = "transition-[width,height,opacity,background-color] duration-400 ease-out motion-reduce:transition-none"
+const MOTION =
+  "transition-[width,height,opacity,background-color] duration-400 ease-out motion-reduce:transition-none"
 
 /** 범위 이름. 전체면 null, 달이면 "10월", 계절이면 "가을". */
 export function scopeName(scope: Scope): string | null {
@@ -74,7 +64,9 @@ export function Meter({
     >
       <span
         className={cn("block h-full rounded-full", fill, MOTION)}
-        style={{ width: `${tally.total ? (tally.eaten / tally.total) * 100 : 0}%` }}
+        style={{
+          width: `${tally.total ? (tally.eaten / tally.total) * 100 : 0}%`,
+        }}
       />
     </span>
   )
@@ -109,22 +101,15 @@ export function ScopeSummary({
   return (
     <aside
       aria-label="올해 기록 요약"
-      className="relative isolate flex flex-col overflow-hidden rounded-2xl bg-surface p-5 shadow-[0_1px_2px_color-mix(in_oklab,var(--color-espresso)_8%,transparent)] lg:sticky lg:top-20 lg:self-start lg:p-6"
+      className="flex flex-col rounded-2xl border border-hairline bg-surface/40 p-5 lg:sticky lg:top-20 lg:self-start lg:p-6"
     >
-      <span
-        aria-hidden
-        className={cn(
-          "pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(80%_60%_at_100%_0%,color-mix(in_oklab,var(--glow)_16%,transparent),transparent_70%)] transition-opacity duration-500 motion-reduce:transition-none",
-          typeof scope === "string" ? cn(SEASON_GLOW[scope], "opacity-100") : "opacity-0"
-        )}
-      />
       <div className="flex min-h-6 items-center justify-between gap-2 text-sm text-stone">
         <span>나의 식탁 · {year}</span>
         {scope !== null && (
           <button
             type="button"
             onClick={() => onScope(null)}
-            className="rounded-sm text-xs text-caption tabular-nums underline-offset-4 transition-colors hover:text-ink hover:underline focus-visible:outline-2 focus-visible:outline-gold"
+            className="rounded-sm text-xs text-stone tabular-nums underline-offset-4 transition-colors hover:text-ink hover:underline focus-visible:outline-2 focus-visible:outline-gold"
           >
             올해 전체 {yearTally.eaten}/{yearTally.total} 보기
           </button>
@@ -135,9 +120,7 @@ export function ScopeSummary({
         key={name}
         className="mt-4 flex items-center gap-1.5 font-heading text-[17px] font-bold text-ink motion-safe:animate-fade-in"
       >
-        {typeof scope === "string" && (
-          <SeasonIcon season={scope} />
-        )}
+        {typeof scope === "string" && <SeasonIcon season={scope} />}
         {UI_COPY.scopeTitle(name)}
       </p>
       <p ref={ref} className="mt-1 flex items-baseline gap-1.5">
@@ -147,7 +130,7 @@ export function ScopeSummary({
           format={{ maximumFractionDigits: 0 }}
           className="font-number text-[60px] leading-none tabular-nums lg:text-[76px]"
         />
-        <span className="font-number text-xl text-caption tabular-nums">
+        <span className="font-number text-xl text-stone tabular-nums">
           / {scopeTally.total}
         </span>
       </p>
@@ -217,7 +200,11 @@ function MonthChart({
   const max = Math.max(...tallies.map((t) => t.total))
   return (
     <div>
-      <div role="group" aria-label="달마다 먹은 제철 수" className="grid grid-cols-12 gap-1">
+      <div
+        role="group"
+        aria-label="달마다 먹은 제철 수"
+        className="grid grid-cols-12 gap-1"
+      >
         {MONTHS.map((month, i) => {
           const t = tallies[i]!
           const on = selected === month
@@ -236,7 +223,9 @@ function MonthChart({
                   className={cn(
                     "relative w-full overflow-hidden rounded-t-[3px]",
                     MOTION,
-                    on ? "bg-gold-pale/45" : "bg-hairline group-hover:bg-silver/70",
+                    on
+                      ? "bg-gold-pale/45"
+                      : "bg-hairline group-hover:bg-silver/70",
                     dim && "opacity-40"
                   )}
                   style={{ height: `${Math.max(8, (t.total / max) * 100)}%` }}
@@ -247,13 +236,15 @@ function MonthChart({
                       MOTION,
                       on ? "bg-gold" : "bg-gold-soft"
                     )}
-                    style={{ height: `${t.total ? (t.eaten / t.total) * 100 : 0}%` }}
+                    style={{
+                      height: `${t.total ? (t.eaten / t.total) * 100 : 0}%`,
+                    }}
                   />
                 </span>
               </span>
               <span
                 className={cn(
-                  "text-[11px] leading-none text-caption tabular-nums transition-colors",
+                  "text-[11px] leading-none text-stone tabular-nums transition-colors",
                   (on || month === thisMonth) && "font-semibold text-ink"
                 )}
               >
@@ -270,7 +261,7 @@ function MonthChart({
           )
         })}
       </div>
-      <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-caption">
+      <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-stone">
         <Legend swatch="bg-gold-soft">먹음</Legend>
         <Legend swatch="bg-hairline">그 달 제철</Legend>
         <span className="inline-flex items-center gap-1">
@@ -311,7 +302,11 @@ function SeasonChart({
 }) {
   const tallies = seasonTallies(eaten)
   return (
-    <div role="group" aria-label="계절마다 먹은 제철 수" className="grid grid-cols-2 gap-2 min-[560px]:grid-cols-4 lg:grid-cols-2">
+    <div
+      role="group"
+      aria-label="계절마다 먹은 제철 수"
+      className="grid grid-cols-2 gap-2 min-[560px]:grid-cols-4 lg:grid-cols-2"
+    >
       {SEASONS.map((season) => {
         const t = tallies[season]
         const on = selected === season
@@ -323,11 +318,10 @@ function SeasonChart({
             aria-label={`${SEASON_COPY[season].name} 제철 ${t.total}가지 중 ${t.eaten}가지 먹음`}
             onClick={() => onSelect(on ? null : season)}
             className={cn(
-              "flex flex-col gap-2 rounded-xl border p-3 text-left transition-[background-color,border-color,opacity,transform] duration-200 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold motion-reduce:transition-none",
+              "flex flex-col gap-2 rounded-xl border p-3 text-left transition-[background-color,border-color,opacity,transform] duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold active:scale-[0.98] motion-reduce:transition-none",
               on
-                ? "border-current/0 bg-surface shadow-[0_1px_3px_color-mix(in_oklab,var(--color-espresso)_12%,transparent)]"
-                : "border-hairline bg-canvas/50 hover:bg-canvas",
-              selected !== null && !on && "opacity-55"
+                ? "border-gold-soft bg-gold-wash"
+                : "border-hairline bg-canvas hover:bg-surface/40"
             )}
           >
             <span className="flex items-center justify-between gap-1">
@@ -341,12 +335,12 @@ function SeasonChart({
                 {SEASON_COPY[season].name}
               </span>
               {season === thisSeason && (
-                <span className="text-[10px] text-caption">지금</span>
+                <span className="text-[10px] text-stone">지금</span>
               )}
             </span>
             <span className="font-number text-2xl leading-none tabular-nums">
               {t.eaten}
-              <span className="text-sm text-caption"> / {t.total}</span>
+              <span className="text-sm text-stone"> / {t.total}</span>
             </span>
             <Meter tally={t} fill={SEASON_FILL[season]} className="h-1" />
           </button>

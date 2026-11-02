@@ -35,10 +35,11 @@ export function FoodRow({
   const id = `eat-${food.id}`
   const label = eaten ? (fresh ?? eatLabel(hashString(food.id))) : EAT_LABEL_OFF
   return (
-    <li className="grid grid-cols-[24px_40px_1fr_auto] items-center gap-3 border-b border-hairline py-2.5">
+    <li className="grid grid-cols-[44px_40px_minmax(0,1fr)_auto] items-center gap-2 border-b border-hairline py-3">
       <Checkbox
         id={id}
         tone="yellow"
+        className="min-h-11 min-w-11 justify-center"
         checked={eaten}
         onCheckedChange={() => {
           if (eaten) {
@@ -55,8 +56,8 @@ export function FoodRow({
         <span
           key={pops}
           className={cn(
-            "grid size-full place-items-center transition-[opacity,filter] duration-300",
-            eaten ? "opacity-100" : "opacity-45 saturate-50",
+            "grid size-full place-items-center transition-[opacity,filter] duration-300 motion-reduce:transition-none",
+            eaten ? "opacity-100" : "opacity-70 saturate-75",
             pops > 0 && eaten && "motion-safe:animate-bounce-in"
           )}
         >
@@ -83,28 +84,32 @@ export function FoodRow({
       </span>
       <Link
         href={routes.seasonal.food(food.id)}
-        className="flex min-w-0 flex-col no-underline"
+        className="flex min-h-11 min-w-0 flex-col justify-center gap-1 rounded-sm no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
         <span
           className={cn(
-            "truncate font-heading text-[17px] font-bold",
+            "truncate font-heading text-base leading-tight font-bold",
             eaten ? "text-ink" : "text-stone"
           )}
         >
           {food.name}
         </span>
-        <span className="text-xs text-caption">
+        <span className="text-xs text-stone">
           {formatSeasonMonths(food.months)}
         </span>
       </Link>
       <label
         htmlFor={id}
         className={cn(
-          "text-xs",
-          eaten ? "font-semibold text-gold-deep" : "text-caption"
+          "flex min-h-11 cursor-pointer items-center justify-end text-right text-xs whitespace-nowrap",
+          eaten ? "font-semibold text-gold-deep" : "text-stone"
         )}
       >
-        <TypedLabel key={`${eaten}:${label}`} text={label} animate={eaten && fresh !== null} />
+        <TypedLabel
+          key={`${eaten}:${label}`}
+          text={label}
+          animate={eaten && fresh !== null}
+        />
       </label>
     </li>
   )
