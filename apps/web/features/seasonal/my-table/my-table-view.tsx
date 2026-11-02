@@ -2,13 +2,17 @@
 
 import { useDeferredValue, useEffect, useRef, useState } from "react"
 
-import { SEASON_COPY, UI_COPY } from "@workspace/seasonal/data/copy"
+import {
+  MY_TABLE_COPY,
+  SEASON_COPY,
+  UI_COPY,
+} from "@workspace/seasonal/data/copy"
 import {
   scopeFoods,
   tally,
   type Scope,
 } from "@workspace/seasonal/data/eaten-stats"
-import { FOODS } from "@workspace/seasonal/data/foods"
+import { FOODS, type FoodCategory } from "@workspace/seasonal/data/foods"
 import { MONTHS } from "@workspace/seasonal/data/months"
 import { SEASONS } from "@workspace/seasonal/data/seasons"
 import { matchFoods } from "@workspace/seasonal/search/match-foods"
@@ -21,6 +25,7 @@ import { useEatenIds } from "@/shared/eaten-store"
 import { useToday } from "@/shared/today-context"
 
 import { FoodRow } from "./food-row"
+import { CategoryFilter } from "./category-filter"
 import {
   Meter,
   ScopeSummary,
@@ -41,6 +46,7 @@ export function MyTableView() {
   const [query, setQuery] = useState("")
   const [mode, setMode] = useState<FilterMode>("month")
   const [scope, setScope] = useState<Scope>(null)
+  const [category, setCategory] = useState<FoodCategory | null>(null)
   // 큰 요약이 화면 밖으로 나가면 sticky 영역에 한 줄 요약을 띄운다(모바일).
   const summaryRef = useRef<HTMLParagraphElement>(null)
   const [summaryHidden, setSummaryHidden] = useState(false)
@@ -63,8 +69,10 @@ export function MyTableView() {
   const yearTally = tally(FOODS, eaten)
   // 목록은 늦춘 검색어로 거른다. 입력창은 바로 바뀌고, 200여 행을 다시 거르는 일은 그 뒤에 한다.
   const deferredQuery = useDeferredValue(query)
-  const list = matchFoods(inScope, deferredQuery)
+  const list = matchFoods(scopeFoods(scope, category), deferredQuery)
   const listEaten = list.filter((food) => eaten.has(food.id)).length
+  const hasQuery = deferredQuery.trim().length > 0
+  const hasFilters = scope !== null || category !== null
 
   // 차트에서 다른 방식의 범위를 고르는 일은 없지만, 방식과 범위가 어긋나지 않게 함께 맞춘다.
   const onScope = (next: Scope) => {
@@ -121,18 +129,21 @@ export function MyTableView() {
               aria-label="음식 이름 검색"
               className="h-11 min-w-0 basis-full rounded-lg border border-hairline bg-surface/40 px-3 text-base outline-none placeholder:text-stone focus-visible:border-gold focus-visible:ring-1 focus-visible:ring-gold min-[480px]:flex-1 min-[480px]:basis-0"
             />
-            <Segmented
-              aria-label="필터 방식"
-              options={[
-                { value: "month", label: "월별" },
-                { value: "season", label: "계절별" },
-              ]}
-              value={mode}
-              onValueChange={(next: FilterMode) => {
-                setMode(next)
-                setScope(null) // 모드를 바꾸면 '전체'로 되돌린다.
-              }}
-            />
+            <div className="flex w-full items-center justify-between gap-2 min-[480px]:w-auto">
+              <Segmented
+                aria-label="필터 방식"
+                options={[
+                  { value: "month", label: "월별" },
+                  { value: "season", label: "계절별" },
+                ]}
+                value={mode}
+                onValueChange={(next: FilterMode) => {
+                  setMode(next)
+                  setScope(null) // 모드를 바꾸면 '전체'로 되돌린다.
+                }}
+              />
+              <CategoryFilter value={category} onChange={setCategory} />
+            </div>
           </div>
           <ScrollRow
             role="group"
@@ -165,11 +176,17 @@ export function MyTableView() {
           </ScrollRow>
         </div>
 
-        {/* 검색어가 없으면 목록이 곧 요약의 범위라 개수가 겹치므로, 검색 중일 때만 결과 수를 보인다. */}
+        {/* 검색·카테고리가 적용되면 목록과 시기 요약의 범위가 다르므로 별도 집계한다. */}
         {/* live 영역은 숨기지 않고 늘 두어야 바뀐 문구가 읽힌다. 비어 있으면 높이가 0이다. */}
-        <p aria-live="polite" className="mt-1 text-xs text-stone tabular-nums">
-          {deferredQuery.trim() && list.length > 0
-            ? UI_COPY.searchResult(deferredQuery.trim(), list.length, listEaten)
+        <p aria-live="polite" className="mt-1 text-xs break-words text-stone tabular-nums">
+          {hasQuery || category !== null
+            ? MY_TABLE_COPY.listResult(
+                scopeName(scope),
+                category,
+                deferredQuery,
+                list.length,
+                listEaten
+              )
             : ""}
         </p>
         {list.length ? (
@@ -179,9 +196,47 @@ export function MyTableView() {
             ))}
           </ul>
         ) : (
-          <p className="my-8 rounded-xl border border-dashed border-hairline bg-surface/30 px-5 py-8 text-center text-sm leading-relaxed text-stone">
-            {UI_COPY.emptySearch(deferredQuery)}
-          </p>
+          <div className="my-8 rounded-xl border border-dashed border-hairline bg-surface/30 px-5 py-8 text-center text-sm leading-relaxed text-stone">
+            <p className="font-medium break-words text-ink">
+              {MY_TABLE_COPY.emptyTitle(deferredQuery, hasFilters)}
+            </p>
+            <p className="mt-2">
+              {hasQuery
+                ? hasFilters
+                  ? MY_TABLE_COPY.emptyFilterHint
+                  : MY_TABLE_COPY.emptySearchHint
+                : MY_TABLE_COPY.emptyScopeHint}
+            </p>
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              {category !== null && (
+                <button
+                  type="button"
+                  onClick={() => setCategory(null)}
+                  className="min-h-11 rounded-full border border-hairline px-4 hover:bg-gold/10 focus-visible:outline-2 focus-visible:outline-gold"
+                >
+                  {MY_TABLE_COPY.clearCategory}
+                </button>
+              )}
+              {hasQuery && (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="min-h-11 rounded-full border border-hairline px-4 hover:bg-gold/10 focus-visible:outline-2 focus-visible:outline-gold"
+                >
+                  {MY_TABLE_COPY.clearQuery}
+                </button>
+              )}
+              {scope !== null && (
+                <button
+                  type="button"
+                  onClick={() => setScope(null)}
+                  className="min-h-11 rounded-full border border-hairline px-4 hover:bg-gold/10 focus-visible:outline-2 focus-visible:outline-gold"
+                >
+                  {MY_TABLE_COPY.clearScope}
+                </button>
+              )}
+            </div>
+          </div>
         )}
       </section>
     </div>

@@ -1,4 +1,10 @@
-import { FOODS, foodsInMonth, foodsInSeason, type Food } from "./foods"
+import {
+  FOODS,
+  foodsInMonth,
+  foodsInSeason,
+  type Food,
+  type FoodCategory,
+} from "./foods"
 import { MONTHS, type Month } from "./months"
 import { SEASONS, type Season } from "./seasons"
 
@@ -8,10 +14,20 @@ export type Scope = Month | Season | null
 /** 범위 안의 품종 수(total)와 그 가운데 먹은 수(eaten). */
 export type Tally = { eaten: number; total: number }
 
-/** 범위에 드는 품종. 전체면 FOODS 그대로다. */
-export function scopeFoods(scope: Scope): readonly Food[] {
-  if (scope === null) return FOODS
-  return typeof scope === "number" ? foodsInMonth(scope) : foodsInSeason(scope)
+/** 시기 범위에 드는 품종. 카테고리를 넘기면 교집합, 생략하면 시기 기준 요약에도 쓴다. */
+export function scopeFoods(
+  scope: Scope,
+  category: FoodCategory | null = null
+): readonly Food[] {
+  const foods =
+    scope === null
+      ? FOODS
+      : typeof scope === "number"
+        ? foodsInMonth(scope)
+        : foodsInSeason(scope)
+  return category === null
+    ? foods
+    : foods.filter((food) => food.category === category)
 }
 
 export function tally(foods: readonly Food[], eaten: ReadonlySet<string>): Tally {

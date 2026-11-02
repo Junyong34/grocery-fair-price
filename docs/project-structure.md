@@ -163,7 +163,7 @@ import 경로:
 | `month-timeline/` | 2b | `month-timeline`, `month-view`, `months-index`, `food-grid`, `food-card`, `month-food-fold`, `eaten-summary`, `view-store`(열 수, 저장 안 함) |
 | `seasons/` | 3a | `seasons-hero`, `season-card`, `season-detail`, `season-background`, `season-style`, `now-tag` |
 | `festivals/` | 1g | `festival-view`, `festival-chips`, `festival-background`, `festival-style`, `festival-date`, `dish-image`(전통 음식 그림 또는 한지 인장) |
-| `my-table/` | 1h | `my-table-view`, `food-row`, `typed-label` |
+| `my-table/` | 1h | `my-table-view`(시기 × 카테고리 × 검색), `category-filter`(단일 선택 하단 시트), `scope-summary`(시기 기준 요약), `food-row`, `typed-label` |
 | `food-detail/` | 1i | `food-detail`, `eat-toggle`, `festival-link` |
 | `search/` | 전역 검색 | `food-search`(헤더 버튼), `food-search-dialog`(cojeev command, 초성 검색) |
 | `components/` | 공통 | `seasonal-shell`(공통 셸에 제철 메뉴 · 검색 · ⚙를 넣는다), `sub-tabs`, `food-image`(그림 없으면 이름 카드), `detail-sheet`(품종 · 에디션 상세 시트), `scatter-field`·`draggable-scatter`(흩어진 배치와 드래그), `month-calendar`, `month-days-card`(달력 아래 "이달의 절기·명절". 2b는 `MonthDaysCardToday`를 `<Suspense>` 안에), `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-name`(먹은 품종 이름 밑줄), `eaten-count`, `share-button`, `holiday-name`, `screen-stub` |
@@ -264,7 +264,7 @@ import 경로:
 | `data/drawn-dishes.generated.ts` | 생성 파일. 그림이 있는 전통 음식 id |
 | `data/festivals.ts` | `FESTIVALS`(전통 음식 id 포함), `festivalOf`(slug로 찾기), 연도별 날짜, `upcomingFestival`, `festivalsWithFood` |
 | `data/month-days.ts` | 달력 아래 "이달의 절기·명절": 명절 + 이름난 절기 + 세시(복날·한식·단오·칠석)를 달별·날짜 순으로(`monthDays`, 빈 달의 `nextMonthDay`). 설명 문구는 `copy.ts` `MONTH_DAY_NOTES` |
-| `data/copy.ts` | 화면 문구: 달별 문구, 계절 설명, 명절 배경, UI 문구, 먹음 라벨 |
+| `data/copy.ts` · `copy.test.ts` | 화면 문구: 달별 문구, 계절 설명, 명절 배경, UI 문구, 먹음 라벨. `MY_TABLE_COPY`는 목록 결과 수·조건별 빈 결과 안내 |
 | `calendar/today.ts` | `TIME_ZONE`(Asia/Seoul), `seoulNow`, `seoulToday`, `currentMonth` |
 | `calendar/month-calendar.ts` | 달력 칸 계산(일·월요일 시작), `CalendarDate` |
 | `calendar/variants.ts` | 달력 모양 4가지(`CALENDAR_VARIANTS`)와 이름. 화면 ⚙와 인쇄물이 같이 쓴다 |

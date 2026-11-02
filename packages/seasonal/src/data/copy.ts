@@ -4,6 +4,7 @@
 import { josa } from "es-hangul"
 
 import type { Festival } from "./festivals"
+import type { FoodCategory } from "./foods"
 import type { MonthDayId, MonthDayKind } from "./month-days"
 import type { Month } from "./months"
 import type { Season } from "./seasons"
@@ -87,8 +88,6 @@ export const UI_COPY = {
   eatDetailHintOn: "나의 식탁에 기록했어요",
   /** 품종 검색 입력란(헤더 검색, 나의 식탁) */
   searchPlaceholder: "음식 이름 검색 (예: 사과, ㅅㄱ)",
-  emptySearch: (query: string) =>
-    `"${query}"에 맞는 제철음식이 없어요. 철자를 바꾸거나 필터를 '전체'로 바꿔 보세요.`,
   /** 달력 아래 "이달의 절기·명절" 카드(month-days.ts) */
   monthDaysTitle: "이달의 절기·명절",
   noMonthDay: "이달은 이름난 절기나 명절이 없어요",
@@ -104,9 +103,6 @@ export const UI_COPY = {
   /** 나의 식탁 요약의 범위 제목(전체·달·계절 이름을 받는다) */
   scopeTitle: (name: string | null) =>
     name ? `${name} 제철 중 맛본 것` : "올해 맛본 제철",
-  /** 나의 식탁 목록 위, 검색 중일 때만 */
-  searchResult: (query: string, count: number, eaten: number) =>
-    `"${query}" 검색 결과 ${count}가지 · ${eaten}가지 먹음`,
   /** 나의 식탁 요약의 큰 숫자 아래 한 줄 */
   scopeProgress: (eaten: number, total: number) =>
     eaten === 0
@@ -114,6 +110,37 @@ export const UI_COPY = {
       : eaten === total
         ? "모두 맛봤어요"
         : `${total - eaten}가지 남았어요`,
+} as const
+
+/** 나의 식탁의 목록 필터. 요약 카드의 시기 기준 집계와 구분한다. */
+export const MY_TABLE_COPY = {
+  allCategories: "전체 카테고리",
+  categoryTitle: "카테고리 선택",
+  categoryDescription: "목록에서 볼 카테고리를 하나 선택하세요.",
+  clearCategory: "카테고리 전체 보기",
+  clearQuery: "검색어 지우기",
+  clearScope: "전체 시기 보기",
+  emptySearchHint: "음식 이름, 다른 이름이나 초성으로 다시 검색해 보세요.",
+  emptyFilterHint: "검색어를 지우거나 선택한 시기·카테고리를 바꿔 보세요.",
+  emptyScopeHint: "다른 시기나 카테고리를 선택해 보세요.",
+  emptyTitle: (query: string, filtered: boolean) => {
+    const term = query.trim()
+    if (!term) return "선택한 조건에 맞는 품종이 없어요"
+    return filtered
+      ? `선택한 조건에서 "${term}"을 찾지 못했어요`
+      : `"${term}" 검색 결과가 없어요`
+  },
+  listResult: (
+    scope: string | null,
+    category: FoodCategory | null,
+    query: string,
+    count: number,
+    eaten: number
+  ) => {
+    const conditions = [scope ?? "전체 시기", category ?? "전체 카테고리"]
+    if (query.trim()) conditions.push(`"${query.trim()}" 검색 결과`)
+    return `${conditions.join(" · ")} ${count}가지 · 먹음 ${eaten}가지`
+  },
 } as const
 
 /** 나의 식탁 행 라벨. 먹은 품종은 EAT_LABELS에서 고르고, 안 먹은 품종은 EAT_LABEL_OFF다. 어떤 음식에도 어울리게 중립적으로 쓴다. */

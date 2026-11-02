@@ -4,6 +4,7 @@ import { monthTallies, scopeFoods, seasonTallies, tally } from "./eaten-stats"
 import { FOODS, foodsInMonth, foodsInSeason } from "./foods"
 import { MONTHS } from "./months"
 import { SEASONS } from "./seasons"
+import { matchFoods } from "../search/match-foods"
 
 // 감 9~11월, 굴 10~2월, 전어 8~10월
 const eaten = new Set(["persimmon", "oyster", "gizzard-shad"])
@@ -16,6 +17,31 @@ describe("scopeFoods", () => {
   it("달이면 그 달 제철, 계절이면 그 계절 제철", () => {
     expect(scopeFoods(10)).toEqual(foodsInMonth(10))
     expect(scopeFoods("winter")).toEqual(foodsInSeason("winter"))
+  })
+
+  it("시기와 카테고리를 함께 좁히며, 요약용 시기 범위는 바꾸지 않는다", () => {
+    expect(scopeFoods(11, "버섯").map((food) => food.id)).toEqual([
+      "branching-mushroom",
+    ])
+    expect(scopeFoods(1, "버섯")).toEqual([])
+    expect(
+      scopeFoods("winter", "수산").some((food) => food.id === "oyster")
+    ).toBe(true)
+    expect(
+      scopeFoods("winter", "수산").some((food) => food.id === "mandarin")
+    ).toBe(false)
+    expect(scopeFoods(11).some((food) => food.id === "persimmon")).toBe(true)
+    expect(scopeFoods(null, "버섯")).toHaveLength(5)
+  })
+
+  it("카테고리 안에서도 별칭·초성 검색을 함께 적용한다", () => {
+    expect(
+      matchFoods(scopeFoods(11, "수산"), "넙치").map((food) => food.id)
+    ).toEqual(["olive-flounder"])
+    expect(
+      matchFoods(scopeFoods(11, "수산"), "ㄱㅇ").map((food) => food.id)
+    ).toContain("olive-flounder")
+    expect(matchFoods(scopeFoods(11, "수산"), "감")).toEqual([])
   })
 })
 
