@@ -162,7 +162,7 @@
 | `peach` | 복숭아 | `d7ba3c77537d863d` |
 | `peanut` | 땅콩 | `836c2289d4660710` |
 | `pear` | 배 | `14bf36bc3a8c478a` |
-| `pearl-spot-chromis` | 자리돔 | `4514e7717a1cb35f` |
+| `pearl-spot-chromis` | 자리돔 | `e97f633972281cc0` |
 | `pen-shell` | 키조개 | `1e43541f59a93ac2` |
 | `perilla-seed` | 들깨 | `a14905dbd31d0dc1` |
 | `persimmon` | 감 | `be664e364f9cb373` |

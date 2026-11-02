@@ -150,7 +150,7 @@ export const FOOD_BOTTOM: Readonly<Record<string, number>> = {
   "peach": 0.88,
   "peanut": 0.84,
   "pear": 0.86,
-  "pearl-spot-chromis": 0.75,
+  "pearl-spot-chromis": 0.7,
   "pen-shell": 0.84,
   "perilla-seed": 0.84,
   "persimmon": 0.86,
