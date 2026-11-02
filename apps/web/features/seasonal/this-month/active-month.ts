@@ -14,8 +14,37 @@ export const monthSectionId = (month: number) => `month-${month}`
 export function jumpToMonth(month: number | null) {
   const target = document.getElementById(month ? monthSectionId(month) : HERO_ID)
   if (!target) return
-  target.scrollIntoView({ block: "start", behavior: "instant" })
+  alignTo(target)
   if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     target.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 350, easing: "ease-out" })
   }
+}
+
+// 화면 밖 달은 예상 높이로 놓여 있다가(content-visibility) 화면 가까이 오면 실제 높이로 그려진다. 바로 위 달이 이동한 뒤
+// 수백 ms 지나 그려지며 자리를 민다(8월은 예상보다 약 200px 크다). 그래서 ALIGN_MS 동안 밀릴 때마다 다시 맞춘다.
+// 그사이 사용자가 직접 스크롤하면 바로 그만둔다.
+const ALIGN_MS = 600
+let stopAlign: (() => void) | null = null
+
+function alignTo(target: HTMLElement) {
+  stopAlign?.()
+  const align = () => target.scrollIntoView({ block: "start", behavior: "instant" })
+  align()
+  const expected = target.getBoundingClientRect().top
+  const until = performance.now() + ALIGN_MS
+  let frame = 0
+  const check = () => {
+    if (Math.abs(target.getBoundingClientRect().top - expected) >= 1) align()
+    if (performance.now() < until) frame = requestAnimationFrame(check)
+    else stop()
+  }
+  const inputs = ["wheel", "touchstart", "keydown", "pointerdown"] as const
+  const stop = () => {
+    cancelAnimationFrame(frame)
+    for (const type of inputs) window.removeEventListener(type, stop, true)
+    stopAlign = null
+  }
+  for (const type of inputs) window.addEventListener(type, stop, { capture: true, passive: true })
+  stopAlign = stop
+  frame = requestAnimationFrame(check)
 }

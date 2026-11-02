@@ -16,8 +16,9 @@ export function MoreFoods({ foods, year }: { foods: readonly Food[]; year: numbe
   return (
     <Collapsible className="mt-4 border-t border-hairline pt-1">
       <CollapsibleTrigger className="min-h-11 text-xs text-stone">그 밖의 제철 {foods.length}가지</CollapsibleTrigger>
-      <CollapsibleContent className="[&_[data-disclosure-inner]]:bg-transparent! [&_[data-disclosure-inner]]:p-0!">
-        <ul className="grid grid-cols-[repeat(auto-fill,minmax(72px,1fr))] gap-x-2 gap-y-3 py-3">
+      {/* 아래로 열한 달이 이어지는 긴 문서라 높이를 애니메이션하면 매 프레임 레이아웃이 다시 돈다. 바로 펼치고 목록만 떠오르게 한다. */}
+      <CollapsibleContent animateHeight={false} className="[&_[data-disclosure-inner]]:bg-transparent! [&_[data-disclosure-inner]]:p-0!">
+        <ul className="motion-safe:animate-rise grid grid-cols-[repeat(auto-fill,minmax(72px,1fr))] gap-x-2 gap-y-3 py-3">
           {foods.map((food) => (
             <li key={food.id} className="min-w-0">
               <Link href={routes.seasonal.food(food.id)} scroll={false} className="group flex h-full flex-col items-center gap-2 rounded-xl px-1 py-2 text-center text-ink transition-colors hover:bg-surface focus-visible:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold motion-reduce:transition-none">

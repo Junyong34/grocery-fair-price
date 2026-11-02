@@ -117,12 +117,14 @@ function MonthSection({
   const holidays = holidaysInMonth(today.year, month)
   // 모바일 판은 달력(고정)이 들어갈 높이가 달의 주 수에 따라 다르다.
   const weeks = monthCalendar({ year: today.year, month, today, holidays }).length
+  // 화면 밖 달은 스타일·레이아웃·페인트를 건너뛴다(content-visibility). 예상 높이는 375·1280 폭에서 잰 섹션 높이(923~1226px, 대개 1030px)에서 위아래 padding을 뺀 콘텐츠 높이이고,
+  // auto라서 한 번 그려진 뒤에는 실제 높이를 기억한다. 판의 그림은 판 안에서만 움직여 섹션 밖으로 넘치지 않는다.
   return (
     <section
       id={monthSectionId(month)}
       data-month={month}
       aria-label={`${month}월`}
-      className="scroll-mt-16 border-t border-hairline pr-12 pl-[18px] pt-12 pb-7 lg:scroll-mt-32 lg:px-0 lg:pt-8"
+      className="scroll-mt-16 border-t border-hairline [content-visibility:auto] [contain-intrinsic-block-size:auto_955px] pr-12 pl-[18px] pt-12 pb-7 lg:scroll-mt-32 lg:px-0 lg:pt-8"
     >
       <div className="lg:flex lg:items-baseline lg:gap-4">
         <h2 className="font-number text-[88px] leading-[0.9] tabular-nums lg:font-heading lg:text-[28px] lg:leading-none lg:font-bold">

@@ -7,12 +7,17 @@ import {
   useChoreography,
 } from "@workspace/ui/lib/cojeev-motion/choreography";
 
-/** One interruptible height owner for Radix disclosures; closed descendants are inert. */
+/**
+ * One interruptible height owner for Radix disclosures; closed descendants are inert.
+ * animateHeight가 false면 높이를 애니메이션하지 않고 바로 펼치고 접는다. 긴 문서에서 매 프레임 레이아웃을 다시 하지 않게 한다.
+ */
 export function useDisclosureHeight(
   ref: React.RefObject<HTMLDivElement | null>,
   animationName?: string,
+  animateHeight = true,
 ) {
-  const { quiet } = useChoreography();
+  const { quiet: choreographyQuiet } = useChoreography();
+  const quiet = choreographyQuiet || !animateHeight;
   const quietRef = React.useRef(quiet);
   const settle = React.useRef<(() => void) | null>(null);
   React.useLayoutEffect(() => {

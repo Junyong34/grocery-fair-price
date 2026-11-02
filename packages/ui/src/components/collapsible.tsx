@@ -61,16 +61,20 @@ export function CollapsibleTrigger({
 }
 export type CollapsibleContentProps = React.ComponentProps<
   typeof Primitive.Content
->;
+> & {
+  /** false면 높이 애니메이션 없이 바로 펼친다. 아래로 긴 문서가 이어지는 곳에서 매 프레임 레이아웃을 피한다. 기본 true. */
+  animateHeight?: boolean;
+};
 export function CollapsibleContent({
   className,
   ref,
   children,
+  animateHeight = true,
   ...props
 }: CollapsibleContentProps) {
   const contentRef = React.useRef<HTMLDivElement>(null);
   React.useImperativeHandle(ref, () => contentRef.current!);
-  useDisclosureHeight(contentRef, props.style?.animationName);
+  useDisclosureHeight(contentRef, props.style?.animationName, animateHeight);
   return (
     <Primitive.Content
       ref={contentRef}
