@@ -10,7 +10,7 @@
 | kit sha | `6806db565e0538c4` |
 | 변형 | `color`, `motion` |
 | 바닥 그림자 | 끔 |
-| 품종 수 | 207 |
+| 품종 수 | 239 |
 
 | id | 이름 | food.mjs sha |
 |---|---|---|
@@ -19,6 +19,7 @@
 | `aengdu` | 앵두 | `eb81676fc607c3cb` |
 | `aged-pumpkin` | 늙은 호박 | `18a077451d96a3e5` |
 | `alpine-leek` | 산마늘 | `4dc1449b56476d6c` |
+| `anchovy` | 멸치 | `4612a4ac5cb53d55` |
 | `apple` | 사과 | `fa42621dbc0f22a4` |
 | `apricot` | 살구 | `d329babcc80ec849` |
 | `aralia-shoot` | 두릅 | `2f717a15eca1a7c0` |
@@ -28,6 +29,7 @@
 | `aster-scaber` | 취나물(참취) | `b3a88d4def7e729f` |
 | `atka-mackerel` | 임연수어 | `4372ab514787cdc2` |
 | `bamboo-shoot` | 죽순 | `074b42b55eabc00b` |
+| `banded-grouper` | 능성어 | `8cc9b53e0d260926` |
 | `bangah-leaf` | 방아잎 | `e8eea7eef67dfc50` |
 | `bangpung-namul` | 방풍나물 | `06f450494121809f` |
 | `barley` | 보리 | `07c88971b71f9c83` |
@@ -39,9 +41,13 @@
 | `bitter-melon` | 여주(고야) | `5c591ab913357312` |
 | `black-raspberry` | 복분자 | `847a02d5ea6a2a63` |
 | `black-rice` | 흑미 | `9acce02c61c04761` |
+| `black-scraper` | 말쥐치 | `c3bcc87581006354` |
+| `black-seabream` | 감성돔 | `d2141b81918bdc60` |
+| `blackfish` | 벵에돔 | `885e70860a820950` |
 | `blue-crab` | 꽃게 | `e4e99c1410b230b9` |
 | `blueberry` | 블루베리 | `046629f4575119ae` |
 | `bomdong` | 봄동 | `c12da3fe3ea33d84` |
+| `borimyeol` | 보리멸 | `0df2b7753ebcc544` |
 | `bracken` | 고사리 | `e49c6fa81355d681` |
 | `branching-mushroom` | 가지버섯 | `40d95e50897f5fe4` |
 | `broccoli` | 브로콜리 | `7b4cfb74d4e82b48` |
@@ -62,6 +68,7 @@
 | `cherry-tomato` | 방울토마토 | `c1376ff6fd9bb099` |
 | `chestnut` | 밤 | `e50b5ced4fc5592b` |
 | `chestnut-bean` | 밤콩 | `21fd82850660164e` |
+| `chicken-grunt` | 벤자리 | `dac42de509c29795` |
 | `chicory` | 치커리 | `255b222b8cc2b85f` |
 | `chinese-yam` | 마 | `03c1f424814b0216` |
 | `chonggak-radish` | 총각무 | `77fb8e531dc3b4c1` |
@@ -79,6 +86,7 @@
 | `eolgari-cabbage` | 얼갈이배추 | `a8321de907025dc6` |
 | `fig` | 무화과 | `783c52b4e0a75e6e` |
 | `foxtail-millet` | 조 | `dee8aabea8d8fec8` |
+| `ganjaemi` | 간재미 | `3e4aa8b739e2c598` |
 | `garlic` | 마늘 | `11b7d9dd6f29c4fa` |
 | `garlic-chive` | 부추 | `52d0f4e6061a0cf3` |
 | `garlic-scape` | 마늘종 | `b28b803cb8bd32c4` |
@@ -87,8 +95,11 @@
 | `ginseng-root` | 인삼 | `3cbb4a7869a2bdda` |
 | `gizzard-shad` | 전어 | `c9f74f6d64aab753` |
 | `glutinous-rice` | 찹쌀 | `8796ad1a96a115f0` |
+| `goby` | 망둥어 | `652755d1c7fea0b7` |
+| `goedorachi` | 괴도라치 | `0b801aaadd6f0134` |
 | `gomchwi` | 곰취 | `b71f8e262796e96a` |
 | `gondeure` | 곤드레 | `8c630dde90537611` |
+| `gray-rockfish` | 볼락 | `a37d77f5d9855e0d` |
 | `green-bean` | 껍질콩(그린빈) | `655460086d8bc0d0` |
 | `green-grape` | 포도 | `fbec5a48afc81caf` |
 | `green-mandarin` | 청귤 | `c74ed3a4ba8370e5` |
@@ -98,6 +109,7 @@
 | `gwamegi` | 과메기 | `7913c3bd8a478c93` |
 | `hairtail` | 갈치 | `67b18f9021e26091` |
 | `hallabong` | 한라봉 | `d0389aef816d9aec` |
+| `herring` | 청어 | `078e8be4706d7a55` |
 | `horse-mackerel` | 전갱이 | `a2407993303c2518` |
 | `ixeris` | 씀바귀 | `303c8ed480ececed` |
 | `ixeris-root-greens` | 고들빼기 | `f488fb527bde8b02` |
@@ -115,13 +127,17 @@
 | `lions-mane` | 노루궁뎅이버섯 | `3b6e68a30992befe` |
 | `loach` | 미꾸라지 | `eb6c3d1336f23c3b` |
 | `long-arm-octopus` | 낙지 | `d51e17ab21efdc98` |
+| `longtail-blackfish` | 긴꼬리벵에돔 | `5fc4c0837a5e33c1` |
+| `longtooth-grouper` | 자바리 | `942a42061ec02c56` |
 | `lotus-root` | 연근 | `cca6324471e7d97d` |
 | `luffa` | 수세미 | `73a6c7387eae4fe7` |
+| `lumpfish` | 도치 | `33f3831409726ef2` |
 | `mackerel` | 고등어 | `923d2b276f46c17d` |
 | `maesaengi` | 매생이 | `dd7f66bad71aa2e2` |
 | `mallow` | 아욱 | `241b9cc86f32eefe` |
 | `mandarin` | 귤 | `41c13780c25f9d15` |
 | `manila-clam` | 바지락 | `a9b14b731dba06f2` |
+| `marbled-rockfish` | 쏨뱅이 | `27cbd1f7e3bda467` |
 | `matsutake` | 송이버섯 | `f6793ef05a57eaf5` |
 | `melon` | 멜론 | `4ac7051b4eceda2a` |
 | `mideodeok` | 미더덕 | `d39f6e58ce047216` |
@@ -145,9 +161,11 @@
 | `peach` | 복숭아 | `d7ba3c77537d863d` |
 | `peanut` | 땅콩 | `836c2289d4660710` |
 | `pear` | 배 | `14bf36bc3a8c478a` |
+| `pearl-spot-chromis` | 자리돔 | `4514e7717a1cb35f` |
 | `pen-shell` | 키조개 | `1e43541f59a93ac2` |
 | `perilla-seed` | 들깨 | `a14905dbd31d0dc1` |
 | `persimmon` | 감 | `be664e364f9cb373` |
+| `pike-conger` | 갯장어 | `0d73670754e5ae8e` |
 | `pine-chive` | 솔부추 | `63dec99aea5ef5bd` |
 | `pine-nut` | 잣 | `53317810e9981992` |
 | `plum` | 자두 | `d96aa250cf030e69` |
@@ -156,9 +174,11 @@
 | `pomfret` | 병어 | `88f2ffce59d070d1` |
 | `potato` | 감자 | `f4e8608b7919128a` |
 | `proso-millet` | 기장 | `c4838ea5a5d66701` |
+| `pufferfish` | 복어 | `b5917d9978d15089` |
 | `pumpkin-leaf` | 호박잎 | `c08839a21cbed32d` |
 | `pumpkin-seed` | 호박씨 | `a34765e60c4dacdf` |
 | `quince` | 모과 | `0c906f4958e453ad` |
+| `rabbitfish` | 독가시치 | `a72ee327d4abcf1a` |
 | `radish` | 무 | `c00a2f2a2447e37e` |
 | `rapeseed-greens` | 유채나물 | `b27e5ae86bf63018` |
 | `raspberry` | 산딸기 | `b8ded8b97da9a46e` |
@@ -166,10 +186,16 @@
 | `red-cabbage` | 적채 | `fe31c02b17dea9a7` |
 | `red-chili` | 홍고추 | `dcd2adc7ce8b7982` |
 | `red-hyang` | 레드향 | `7517c5ea45a56413` |
+| `red-rockfish` | 불볼락(열기) | `9cac2f068d441b61` |
 | `red-seabream` | 도미(참돔) | `64f78b9f5ff1ecd9` |
+| `red-spotted-grouper` | 붉바리 | `b834f78724100832` |
+| `redlip-mullet` | 가숭어 | `f0e89d2337c16714` |
 | `rice` | 쌀 | `c3a3f5f402a99ee6` |
+| `rock-bream` | 돌돔 | `d3ecd165a5479c61` |
+| `roughscale-flounder` | 줄가자미 | `a924af8927679a12` |
 | `rye` | 호밀 | `eea1f8bc67c64af2` |
 | `samchae` | 삼채 | `0855f807f27e6d62` |
+| `sardinella` | 밴댕이 | `061bfe9e1f906e0c` |
 | `saury` | 꽁치 | `abb7e2466042b59b` |
 | `scallion` | 쪽파 | `b5eabcfc962fe205` |
 | `scallop` | 가리비 | `89e88513eb54c80b` |
@@ -177,6 +203,7 @@
 | `sea-cucumber` | 해삼 | `ad751f36604475ed` |
 | `sea-squirt` | 멍게 | `8c582123ed5b1ca0` |
 | `sea-urchin` | 성게 | `ecefb0bc7b5c0e77` |
+| `searobin` | 성대 | `c987c715e000bce1` |
 | `sebal-namul` | 세발나물 | `2e9d0068db9bc9d6` |
 | `seomcho` | 섬초 | `6633b8d3e7432ea6` |
 | `seoritae` | 서리태 | `6d23327ecf3a0d22` |
@@ -186,6 +213,8 @@
 | `shishito-pepper` | 꽈리고추 | `a4907f8a3d3a573d` |
 | `shrimp` | 새우 | `4986fb56c9feb43e` |
 | `silverberry` | 보리수열매 | `84d32f6b330a6732` |
+| `sixbar-sandperch` | 쌍동가리 | `64c3954242534a79` |
+| `skate` | 홍어 | `5c14b98f27217994` |
 | `snailfish` | 물메기 | `f4c31d3014f75896` |
 | `snow-crab` | 대게 | `4d92b73ed85276df` |
 | `sorghum` | 수수 | `43db3e98e631209f` |
@@ -195,6 +224,7 @@
 | `spinach` | 시금치 | `f8b222f9053ec563` |
 | `spring-flounder` | 봄 도다리(문치가자미) | `d138e1fbd8d4c03d` |
 | `squid` | 오징어 | `8a079cbaf94563f7` |
+| `stone-flounder` | 돌가자미 | `ba713c41ff4d9293` |
 | `strawberry` | 딸기(시설) | `7ce2e60592da75ea` |
 | `stringy-stonecrop` | 돌나물 | `3e29a0dfe4ec2a19` |
 | `sweet-potato` | 고구마 | `e441dcd3f3626d46` |
@@ -218,6 +248,8 @@
 | `wood-ear` | 목이버섯 | `47d2de9fc504fe4b` |
 | `yacon` | 야콘 | `a717278abc425c15` |
 | `yellow-croaker` | 조기 | `b03e74f3e5e1bcef` |
+| `yellowfin-flounder` | 참가자미 | `59bc03bdb38e2043` |
+| `yellowstripe-jack` | 부시리 | `b2f19efaca4e686d` |
 | `yellowtail` | 방어 | `8ad190066d2b1275` |
 | `young-radish` | 열무 | `e23c9d15839e98bb` |
 | `yuzu` | 유자 | `0c6817983368dd2f` |
