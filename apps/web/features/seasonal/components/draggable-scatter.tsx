@@ -353,7 +353,7 @@ function useCalendarScale(field: React.RefObject<HTMLDivElement | null>, enabled
 }
 
 /**
- * 판 위 그림 하나(그림 + 이름). 먹은 품종은 이름 앞에 ✓가 붙는다. ⚙에서 먹음 표시를 끄면 보이지 않는다(in-data-[eaten-mark=off]).
+ * 판 위 그림 하나(그림 + 이름). 먹은 품종은 이름 아래에 금색 형광펜을 긋는다. ⚙에서 먹음 표시를 끄면 감춘다.
  */
 function FoodTile({
   food,
@@ -386,15 +386,9 @@ function FoodTile({
         className="block text-center leading-tight font-semibold whitespace-nowrap"
         style={{ fontSize, marginTop }}
       >
-        {eaten && (
-          <span
-            aria-hidden
-            className="mr-[0.2em] text-gold-deep in-data-[eaten-mark=off]:hidden motion-safe:animate-tick"
-          >
-            ✓
-          </span>
-        )}
-        {food.name}
+        <span className={cn("relative isolate inline-block", eaten && "eaten-highlight")}>
+          {food.name}
+        </span>
         {eaten && <span className="sr-only"> 먹음</span>}
       </span>
     </>

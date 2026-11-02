@@ -1,6 +1,31 @@
 @import "@workspace/ui/globals.css";
 @import "@workspace/ui/cojeev.css";
 
+/* 먹음 기록: 글자 아래쪽에 두툼한 금색 형광펜 자국을 남긴다. 크기는 이름표와 함께 비례한다. */
+.eaten-highlight::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: auto -0.14em 0.02em;
+  height: 0.55em;
+  background: var(--color-gold-pale);
+  clip-path: polygon(
+    2% 15%,
+    26% 4%,
+    65% 10%,
+    97% 0,
+    100% 70%,
+    96% 91%,
+    60% 96%,
+    20% 89%,
+    0 100%
+  );
+}
+
+[data-eaten-mark="off"] .eaten-highlight::before {
+  display: none;
+}
+
 /* 한글 줄바꿈. 기본값은 음절 사이에서도 끊어 "기름 / 진 달"처럼 낱말이 갈라지므로 어절 단위로 끊는다.
    한 어절이 칸보다 길 때만 어절 안에서 끊는다(overflow-wrap). 제목은 줄 길이를 고르게, 문단은 끝줄에 한 낱말만 남지 않게 한다. */
 /* 화면 맨 위에서 헤더 아래까지의 높이. 헤더가 숨으면 셸(site-nav)이 0px로 바꾸고, 고정 줄(탭 · 구간 줄)이 이 값을 top으로 쓴다. */
