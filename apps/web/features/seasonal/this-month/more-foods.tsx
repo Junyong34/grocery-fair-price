@@ -3,23 +3,27 @@ import Link from "next/link"
 import type { Food } from "@workspace/seasonal/data/foods"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@workspace/ui/components/collapsible"
 
+import { FoodImage } from "@/features/seasonal/components/food-image"
 import { routes } from "@/shared/routes"
 
 /**
- * 흩뿌리기 판에 그리지 않은 그 달 제철 품종(판에는 대표 SCATTER_MAX_FOODS개만 그린다). 접어 두고, 펼치면 이름을 누르면 품종 시트가 열린다.
+ * 흩뿌리기 판에 그리지 않은 그 달 제철 품종(판에는 대표 SCATTER_MAX_FOODS개만 그린다). 접어 두고, 펼치면 그림과 이름을 함께 보여 주고, 누르면 품종 시트가 열린다.
  * 차례는 monthHighlights와 같다(그 달이 대표 달인 품종 먼저).
  */
 export function MoreFoods({ foods }: { foods: readonly Food[] }) {
   if (foods.length === 0) return null
   return (
-    <Collapsible className="mt-2">
+    <Collapsible className="mt-4 border-t border-hairline pt-1">
       <CollapsibleTrigger className="min-h-11 text-xs text-stone">그 밖의 제철 {foods.length}가지</CollapsibleTrigger>
-      <CollapsibleContent className="[&_[data-disclosure-inner]]:bg-transparent [&_[data-disclosure-inner]]:p-0">
-        <ul className="flex flex-wrap gap-x-3 gap-y-1.5 pb-2 text-sm">
+      <CollapsibleContent className="[&_[data-disclosure-inner]]:bg-transparent! [&_[data-disclosure-inner]]:p-0!">
+        <ul className="grid grid-cols-[repeat(auto-fill,minmax(72px,1fr))] gap-x-2 gap-y-3 py-3">
           {foods.map((food) => (
-            <li key={food.id}>
-              <Link href={routes.seasonal.food(food.id)} scroll={false} className="text-ink underline decoration-hairline underline-offset-4 hover:text-ink">
-                {food.name}
+            <li key={food.id} className="min-w-0">
+              <Link href={routes.seasonal.food(food.id)} scroll={false} className="group flex h-full flex-col items-center gap-2 rounded-xl px-1 py-2 text-center text-ink transition-colors hover:bg-surface focus-visible:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold motion-reduce:transition-none">
+                <div aria-hidden="true" className="w-14 shrink-0">
+                  <FoodImage food={food} sizes="56px" />
+                </div>
+                <span className="text-[13px] leading-snug break-keep group-hover:underline group-hover:decoration-hairline group-hover:underline-offset-4">{food.name}</span>
               </Link>
             </li>
           ))}
