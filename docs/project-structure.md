@@ -87,7 +87,7 @@ import 경로:
 | `app/manifest.ts` | `/manifest.webmanifest`. 홈 화면 웹 앱 설치 정보(`shared/pwa.ts`): 장볼날, 시세 메인(`/`), 주소창 없는 창, 기존 브랜드 아이콘과 Oura 캔버스 색. `public/downloads/manifest.json`과 별개 |
 | `shared/pwa.ts` · `pwa.test.ts` | 웹 앱 설치 정보와 팔레트 원본 읽기, 이름·시작 경로·아이콘 규격 검증. 루트 레이아웃의 테마색도 함께 사용 |
 | `shared/shell/install-prompt.tsx` | `useDevice`로 휴대폰에서만 표시하는 플로팅 설치 카드. 설치 버튼은 유지하고 수동 안내는 클릭 후 펼친다. `price:install-prompt`에 설치 완료·7일 숨김 기록(version 1) |
-| `shared/shell/install-prompt-state.ts` · `.test.ts` | 설치 안내의 만료 판정과 기존 영구 닫기 기록 마이그레이션. 설치 완료는 계속 숨기고 닫기는 7일 뒤 만료 |
+| `shared/shell/install-prompt-state.ts` · `.test.ts` | 설치 안내의 만료 판정. 설치 완료는 계속 숨기고 닫기는 7일 뒤 만료 |
 | `app/globals.css` | `@workspace/ui/globals.css`와 `cojeev.css`를 불러오고, ViewTransition 키프레임과 reduced-motion 처리 |
 | `components.json` | shadcn 설정. 실제 설치는 `packages/ui`에서 한다(`pnpm ui:add`) |
 | `DESIGN.md` | Oura 디자인 언어 분석(색, 서체, 간격, 컴포넌트) |

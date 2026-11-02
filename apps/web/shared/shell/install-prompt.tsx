@@ -14,7 +14,6 @@ import { useDevice } from "@/shared/use-device"
 import {
   canShowInstallPrompt,
   INSTALL_SNOOZE_MS,
-  migrateInstallPreferences,
   type InstallPreferences,
 } from "./install-prompt-state"
 
@@ -23,14 +22,10 @@ type InstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>
 }
 
-const preferences = deviceStore<InstallPreferences>(
-  "price:install-prompt",
-  { installed: false, dismissedUntil: 0 },
-  {
-    version: 1,
-    migrate: (persisted) => migrateInstallPreferences(persisted, Date.now()),
-  }
-)
+const preferences = deviceStore<InstallPreferences>("price:install-prompt", {
+  installed: false,
+  dismissedUntil: 0,
+})
 
 /** 휴대폰 전용 플로팅 설치 안내. 설치창 준비 여부와 무관하게 버튼·카드 모양을 유지한다. */
 export function InstallPrompt() {
@@ -52,37 +47,34 @@ export function InstallPrompt() {
     setInstallEvent(null)
   }
 
-  useEffect(
-    function subscribeToInstallation() {
-      const displayMode = window.matchMedia("(display-mode: standalone)")
-      function updateDisplayMode() {
-        const runningAsApp =
-          displayMode.matches ||
-          ("standalone" in navigator && navigator.standalone === true)
-        setStandalone(runningAsApp)
-        if (runningAsApp) preferences.set({ installed: true })
-      }
-      function captureInstallPrompt(event: Event) {
-        if (!isHydrated || !isMobile) return
-        event.preventDefault()
-        setInstallEvent(event as InstallPromptEvent)
-      }
-      function recordInstallation() {
-        preferences.set({ installed: true })
-        setInstallEvent(null)
-      }
-      updateDisplayMode()
-      displayMode.addEventListener("change", updateDisplayMode)
-      window.addEventListener("beforeinstallprompt", captureInstallPrompt)
-      window.addEventListener("appinstalled", recordInstallation)
-      return function unsubscribeFromInstallation() {
-        displayMode.removeEventListener("change", updateDisplayMode)
-        window.removeEventListener("beforeinstallprompt", captureInstallPrompt)
-        window.removeEventListener("appinstalled", recordInstallation)
-      }
-    },
-    [isHydrated, isMobile]
-  )
+  useEffect(function subscribeToInstallation() {
+    const displayMode = window.matchMedia("(display-mode: standalone)")
+    function updateDisplayMode() {
+      const runningAsApp =
+        displayMode.matches ||
+        ("standalone" in navigator && navigator.standalone === true)
+      setStandalone(runningAsApp)
+      if (runningAsApp) preferences.set({ installed: true })
+    }
+    // 기기 판별(useDevice)이 끝나기 전에 와도 놓치지 않게 늘 받아 둔다. 카드를 그릴지는 렌더에서 정한다.
+    function captureInstallPrompt(event: Event) {
+      event.preventDefault()
+      setInstallEvent(event as InstallPromptEvent)
+    }
+    function recordInstallation() {
+      preferences.set({ installed: true })
+      setInstallEvent(null)
+    }
+    updateDisplayMode()
+    displayMode.addEventListener("change", updateDisplayMode)
+    window.addEventListener("beforeinstallprompt", captureInstallPrompt)
+    window.addEventListener("appinstalled", recordInstallation)
+    return function unsubscribeFromInstallation() {
+      displayMode.removeEventListener("change", updateDisplayMode)
+      window.removeEventListener("beforeinstallprompt", captureInstallPrompt)
+      window.removeEventListener("appinstalled", recordInstallation)
+    }
+  }, [])
 
   useEffect(
     function scheduleSnoozeExpiry() {

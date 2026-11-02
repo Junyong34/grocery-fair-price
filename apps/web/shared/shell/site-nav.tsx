@@ -117,8 +117,11 @@ function useHeaderVisible(hideOnScroll: boolean) {
       if (!frame) frame = requestAnimationFrame(update)
     }
     window.addEventListener("scroll", onScroll, { passive: true })
+    // 숨은 채로 데스크톱 폭이 되면(태블릿 회전 등) 스크롤을 기다리지 않고 바로 보인다.
+    desktop.addEventListener("change", onScroll)
     return () => {
       window.removeEventListener("scroll", onScroll)
+      desktop.removeEventListener("change", onScroll)
       cancelAnimationFrame(frame)
       setVisible(true)
     }

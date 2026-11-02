@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import {
-  canShowInstallPrompt,
-  INSTALL_SNOOZE_MS,
-  migrateInstallPreferences,
-} from "./install-prompt-state"
+import { canShowInstallPrompt, INSTALL_SNOOZE_MS } from "./install-prompt-state"
 
 const now = 1_800_000_000_000
 
@@ -31,34 +27,5 @@ describe("홈 화면 설치 안내 기록", () => {
     expect(
       canShowInstallPrompt({ installed: false, dismissedUntil: 0 }, now)
     ).toBe(true)
-  })
-
-  it("기존 영구 닫기 기록을 마이그레이션 시점부터 7일 숨김으로 옮긴다", () => {
-    expect(migrateInstallPreferences({ dismissed: true }, now)).toEqual({
-      installed: false,
-      dismissedUntil: now + INSTALL_SNOOZE_MS,
-    })
-    expect(migrateInstallPreferences({ dismissed: false }, now)).toEqual({
-      installed: false,
-      dismissedUntil: 0,
-    })
-  })
-
-  it("설치 기록과 유효한 만료 시각을 보존하고 잘못된 저장값은 기본값으로 복구한다", () => {
-    expect(
-      migrateInstallPreferences({ installed: true, dismissedUntil: now }, now)
-    ).toEqual({ installed: true, dismissedUntil: now })
-    for (const value of [
-      null,
-      [],
-      "broken",
-      { installed: "true", dismissedUntil: "tomorrow" },
-      { dismissedUntil: Infinity },
-    ]) {
-      expect(migrateInstallPreferences(value, now)).toEqual({
-        installed: false,
-        dismissedUntil: 0,
-      })
-    }
   })
 })
