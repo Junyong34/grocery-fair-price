@@ -15,6 +15,17 @@ export { enableMorph, disableMorph } from "@workspace/ui/lib/cojeev-motion/categ
 const instances=new Set<{measure:(t:number)=>void;invalidate:()=>void;frame:(t:number,dt:number)=>boolean;rewind:()=>void;reseed:()=>void;refresh:()=>void}>()
 let clock:number|null=null,previous:number|null=null,raf=0,seed:number|null=null
 const pointer={x:-1e4,y:-1e4}
+// 우리 앱 수정: 화면 밖 morph는 재지도 그리지도 않는다. 원래는 마운트 때 인스턴스마다 크기 읽기·쓰기를 번갈아 해서
+// 강제 레이아웃이 인스턴스 수만큼 일어나고(나의 식탁 체크박스 207개), 스크롤마다 모두를 다시 쟀다.
+// 화면 가까이(200px) 들어오면 그때 재고 그린다. 서버 HTML에는 morph가 없으므로 첫 화면의 모습은 그대로다.
+// 결정적 시계(clock) 모드에서는 모두 그린다.
+const visibilityHandlers=new Map<Element,(visible:boolean)=>void>()
+let visibilityObserver:IntersectionObserver|null=null
+function observeVisibility(el:Element,onChange:(visible:boolean)=>void){
+ visibilityObserver??=new IntersectionObserver(entries=>{for(const entry of entries)visibilityHandlers.get(entry.target)?.(entry.isIntersecting)},{rootMargin:'200px'})
+ visibilityHandlers.set(el,onChange);visibilityObserver.observe(el)
+ return ()=>{visibilityHandlers.delete(el);visibilityObserver?.unobserve(el)}
+}
 function stop(){if(raf)cancelAnimationFrame(raf);raf=0}
 function frame(t:number){const dt=previous===null?0:Math.min(.05,Math.max(0,(t-previous)/1000));previous=t;let active=false;instances.forEach(b=>b.measure(t));instances.forEach(b=>{active=b.frame(t,dt)||active});return active}
 function wake(){if(clock!==null||raf||!instances.size||document.hidden)return;raf=requestAnimationFrame(t=>{raf=0;if(frame(t))wake()})}
@@ -174,13 +185,16 @@ export function useMorph<T extends HTMLElement>(category:Category,externalRef?:R
    // demands another read; reading every frame changes the pressure axis.
    function premeasure(t:number){
     if(!el.isConnected){automaticRadius=undefined;rectValid=false;return}
+    if(!visible&&clock===null)return
     const R=b.R,margin=tier.R+40
     const near=rectValid&&pointer.x>-1e3&&pointer.x>R.left-margin&&pointer.x<R.right+margin&&pointer.y>R.top-margin&&pointer.y<R.bottom+margin
     if(!rectValid||t-rAt>250||near||b.press.to||b.lobe.x>.02||b.jiggle>0){b.R=el.getBoundingClientRect();rAt=t;rectValid=true}
     resize=Math.round(b.R.width)!==b.w||Math.round(b.R.height)!==b.h
    }
    const invalidate=()=>{rectValid=false;dirty=true}
-   const instance={measure:premeasure,invalidate,frame:(t:number,dt:number)=>{if(!el.isConnected)return false;if(resize){resize=false;b.lob=null;dirty=true;lastD='';measure()}if(!b.w||!b.h||!b.R.width||!b.R.height)return false;const out=stepBody(b,pointer,dt,(staticBody?0:t/1000),cfg,staticBody,!dirty&&!colors.length&&tierName!=='spinner');if(out.d!==lastD){path.setAttribute('d',out.d);lastD=out.d}if(cfg.echo){const m=cfg.echoScale,ox=cfg.echoOff*Math.cos(b.seed),oy=cfg.echoOff*Math.sin(b.seed);echo.setAttribute('d',serializePath(out.points.map(([x,y])=>[b.w/2+(x-b.w/2)*m+ox,b.h/2+(y-b.h/2)*m+oy]),!!b.base.poly));echo.style.display=''}else echo.style.display='none';if(cfg.dots){while(dots.childElementCount>cfg.dots)dots.lastElementChild?.remove();while(dots.childElementCount<cfg.dots)dots.append(svgNode('circle',{r:(2+((dots.childElementCount*7+b.seed)%3)).toFixed(1)}));for(let i=0;i<cfg.dots;i++){const j=Math.floor((i/cfg.dots)*b.base.length+b.seed*3)%b.base.length,q=b.base[j],dot=dots.children[i];dot.setAttribute('cx',(out.points[j][0]+q[2]*(8+i*3)).toFixed(2));dot.setAttribute('cy',(out.points[j][1]+q[3]*(8+i*3)).toFixed(2))}dots.style.display=''}else dots.style.display='none';overlays?.paint(out.points,b,cfg);if(colors.length&&!staticBody)path.setAttribute('fill',morphColor(colors,t/1000));if(tierName==='spinner')svg.style.transform=staticBody?'':`rotate(${((t/1000)*40)%360}deg)`;if(el.hasAttribute('data-stable-hit')){el.style.transform=old.transform;if(tierName!=='spinner')svg.style.transform=out.press>.004&&!staticBody?`scale(${1-out.press*.03},${1-out.press*.015})`:''}else if(out.press>.004&&!staticBody)el.style.transform=`scale(${1-out.press*.03},${1-out.press*.015})`;else el.style.transform=old.transform;const work=out.active||dirty||(!staticBody&&(colors.length>0||tierName==='spinner'||!!(tier.depth&&tier.lobes&&cfg.drift&&(b.near||b.inside))));dirty=false;return work},rewind:()=>{rewindBody(b);rectValid=false;rAt=0;dirty=true;lastD=''},reseed:()=>{b.seed=bodySeed(el)},refresh:()=>{repaint();dirty=true;wake()}}
+   let visible=false
+   const unobserveVisibility=observeVisibility(el,next=>{visible=next;if(next){invalidate();wake()}})
+   const instance={measure:premeasure,invalidate,frame:(t:number,dt:number)=>{if(!el.isConnected||(!visible&&clock===null))return false;if(resize){resize=false;b.lob=null;dirty=true;lastD='';measure()}if(!b.w||!b.h||!b.R.width||!b.R.height)return false;const out=stepBody(b,pointer,dt,(staticBody?0:t/1000),cfg,staticBody,!dirty&&!colors.length&&tierName!=='spinner');if(out.d!==lastD){path.setAttribute('d',out.d);lastD=out.d}if(cfg.echo){const m=cfg.echoScale,ox=cfg.echoOff*Math.cos(b.seed),oy=cfg.echoOff*Math.sin(b.seed);echo.setAttribute('d',serializePath(out.points.map(([x,y])=>[b.w/2+(x-b.w/2)*m+ox,b.h/2+(y-b.h/2)*m+oy]),!!b.base.poly));echo.style.display=''}else echo.style.display='none';if(cfg.dots){while(dots.childElementCount>cfg.dots)dots.lastElementChild?.remove();while(dots.childElementCount<cfg.dots)dots.append(svgNode('circle',{r:(2+((dots.childElementCount*7+b.seed)%3)).toFixed(1)}));for(let i=0;i<cfg.dots;i++){const j=Math.floor((i/cfg.dots)*b.base.length+b.seed*3)%b.base.length,q=b.base[j],dot=dots.children[i];dot.setAttribute('cx',(out.points[j][0]+q[2]*(8+i*3)).toFixed(2));dot.setAttribute('cy',(out.points[j][1]+q[3]*(8+i*3)).toFixed(2))}dots.style.display=''}else dots.style.display='none';overlays?.paint(out.points,b,cfg);if(colors.length&&!staticBody)path.setAttribute('fill',morphColor(colors,t/1000));if(tierName==='spinner')svg.style.transform=staticBody?'':`rotate(${((t/1000)*40)%360}deg)`;if(el.hasAttribute('data-stable-hit')){el.style.transform=old.transform;if(tierName!=='spinner')svg.style.transform=out.press>.004&&!staticBody?`scale(${1-out.press*.03},${1-out.press*.015})`:''}else if(out.press>.004&&!staticBody)el.style.transform=`scale(${1-out.press*.03},${1-out.press*.015})`;else el.style.transform=old.transform;const work=out.active||dirty||(!staticBody&&(colors.length>0||tierName==='spinner'||!!(tier.depth&&tier.lobes&&cfg.drift&&(b.near||b.inside))));dirty=false;return work},rewind:()=>{rewindBody(b);rectValid=false;rAt=0;dirty=true;lastD=''},reseed:()=>{b.seed=bodySeed(el)},refresh:()=>{repaint();dirty=true;wake()}}
    const bodyAC=new AbortController(),bo={signal:bodyAC.signal}
    const press=()=>{if(!cfg.press||el.matches(':disabled,[aria-disabled="true"]'))return;b.press.to=1;b.press.k=260;wake()}
    const release=()=>{if(b.press.to){b.press.to=0;b.ripple=1;wake()}}
@@ -201,7 +215,7 @@ export function useMorph<T extends HTMLElement>(category:Category,externalRef?:R
     dirty=true;const time=clock??performance.now();instance.measure(time);instance.frame(time,0);wake()
    }
    repaint();instances.add(instance);const time=clock??performance.now();instance.measure(time);instance.frame(time,0);wake()
-   destroyBody=()=>{instances.delete(instance);bodyAC.abort();ro.disconnect();overlays?.dispose();svg.remove();el.classList.remove('v-morph-host','v-morph-live');if(relative)el.classList.remove('v-morph-rel');el.removeAttribute('data-hover');if(!explicit&&el.dataset.morph===mode)delete el.dataset.morph;if(!explicit)delete el.dataset.autoMorph;for(const [key,value]of [['--mfill',old.fill],['--mstroke',old.stroke],['--mpad',old.pad]]){if(value)el.style.setProperty(key,value);else el.style.removeProperty(key)}el.style.transform=old.transform;if(!instances.size)stop()}
+   destroyBody=()=>{instances.delete(instance);unobserveVisibility();bodyAC.abort();ro.disconnect();overlays?.dispose();svg.remove();el.classList.remove('v-morph-host','v-morph-live');if(relative)el.classList.remove('v-morph-rel');el.removeAttribute('data-hover');if(!explicit&&el.dataset.morph===mode)delete el.dataset.morph;if(!explicit)delete el.dataset.autoMorph;for(const [key,value]of [['--mfill',old.fill],['--mstroke',old.stroke],['--mpad',old.pad]]){if(value)el.style.setProperty(key,value);else el.style.removeProperty(key)}el.style.transform=old.transform;if(!instances.size)stop()}
   }
   attach()
   signature=visualSignature()
