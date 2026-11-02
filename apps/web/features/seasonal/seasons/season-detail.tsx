@@ -23,6 +23,7 @@ import { FoodImage } from "../components/food-image"
 import { ShareButton } from "../components/share-button"
 import { SeasonTitle } from "./season-card"
 import { SEASON_COLOR_VAR } from "./season-style"
+import { SeasonMonthNav } from "./season-month-nav"
 
 const step = (season: Season, by: 1 | -1) =>
   SEASONS[(SEASONS.indexOf(season) + by + SEASONS.length) % SEASONS.length]!
@@ -59,20 +60,7 @@ export function SeasonDetail({ season }: { season: Season }) {
           <span className="shrink-0 font-heading text-lg font-bold">
             {copy.name}
           </span>
-          <nav
-            aria-label={`${copy.name} 월별 제철로 이동`}
-            className="ml-auto flex items-center"
-          >
-            {months.map((month) => (
-              <a
-                key={month}
-                href={`#season-month-${month}`}
-                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-sm text-stone no-underline hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-ring"
-              >
-                {month}월
-              </a>
-            ))}
-          </nav>
+          <SeasonMonthNav key={season} season={season} />
           <ShareButton className="shrink-0" />
         </div>
         <div className="pt-5 lg:grid lg:grid-cols-[300px_1fr] lg:gap-10 lg:pt-8">
