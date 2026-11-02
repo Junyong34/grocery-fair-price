@@ -48,8 +48,9 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
 
         <div className="min-w-0">
           <section id={HERO_ID} aria-labelledby="hero-title" className="scroll-mt-16 pr-12 pl-[18px] pt-10 pb-7 lg:scroll-mt-32 lg:px-0 lg:pt-12">
-            {/* 첫 화면에서 한 번만 부드럽게 나타난다. 제목 다음에 설명이 이어진다. */}
+            {/* 처음 들어오면 바로 보인다(모바일 LCP가 이 제목이다). 다른 화면에 갔다 돌아올 때만 부드럽게 나타나고, 제목 다음에 설명이 이어진다. */}
             <TextReveal
+              revealOnMount={false}
               as="h1"
               id="hero-title"
               text={`지금은 ${thisMonth}월`}
@@ -59,6 +60,7 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
               className="font-heading text-[46px] leading-tight lg:text-[64px]"
             />
             <TextReveal
+              revealOnMount={false}
               as="p"
               text={current.note}
               variant="fade"

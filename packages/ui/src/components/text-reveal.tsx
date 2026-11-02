@@ -18,6 +18,11 @@ export type TextRevealProps = Omit<React.HTMLAttributes<HTMLElement>, "children"
   stagger?: number;
   direction?: "up" | "down";
   duration?: number;
+  /**
+   * 우리 앱 수정: false면 처음 마운트될 때는 숨기지도 재생하지도 않고 바로 보인다(서버 HTML 그대로, LCP를 늦추지 않는다).
+   * 떠났다가 <Activity>로 다시 보일 때만 재생한다. 기본 true.
+   */
+  revealOnMount?: boolean;
 };
 
 function useTextLines(element: HTMLElement | null, text: string, active: boolean) {
@@ -64,26 +69,42 @@ function useTextLines(element: HTMLElement | null, text: string, active: boolean
 }
 
 /** A bounded entrance. Text stays readable after playback, interruption, and without motion or JavaScript. */
-export function TextReveal({ text, as: Tag = "span", replayKey = 0, variant = "rise", split = "word", stagger = 35, direction = "up", duration = 480, className, ...props }: TextRevealProps) {
+export function TextReveal({ text, as: Tag = "span", replayKey = 0, variant = "rise", split = "word", stagger = 35, direction = "up", duration = 480, revealOnMount = true, className, ...props }: TextRevealProps) {
   const host = React.useRef<HTMLElement>(null);
   const [mountedElement, setMountedElement] = React.useState<HTMLElement | null>(null);
   const setHost = React.useCallback((element: HTMLElement | null) => { host.current = element; setMountedElement(element); }, []);
   const { enabled, inView } = useMotionVisibility(host, mountedElement);
-  const played = React.useRef<string | null>(null);
+  const token = JSON.stringify([text, replayKey, variant, split, direction]);
+  // revealOnMount가 false면 첫 마운트는 이미 재생한 것으로 친다.
+  const played = React.useRef<string | null>(revealOnMount ? null : token);
   // 우리 앱 수정: 서버 HTML이 먼저 보였다가 하이드레이션 뒤 숨겨져 다시 나타나는 깜빡임을 막는다.
   // 처음에는 글자를 숨겨 두고, 애니메이션이 첫 프레임을 그린 뒤(또는 800ms 안전장치) 푼다.
-  const [hold, setHold] = React.useState(true);
+  const [hold, setHold] = React.useState(revealOnMount);
   React.useEffect(() => {
+    if (!hold) return;
     const timer = setTimeout(() => setHold(false), 800);
     return () => clearTimeout(timer);
-  }, []);
+  }, [hold]);
   // 우리 앱 수정: Cache Components는 떠난 페이지를 <Activity>로 숨겨 두므로 돌아와도 다시 마운트되지 않는다.
   // 숨겨질 때 "재생함" 기록을 지우고 글자를 다시 숨겨, 돌아오면 처음부터 다시 재생한다.
-  React.useLayoutEffect(() => () => {
-    played.current = null;
-    setHold(true);
-  }, []);
-  const token = JSON.stringify([text, replayKey, variant, split, direction]);
+  // revealOnMount가 false일 때: 개발 모드 StrictMode는 마운트 직후 같은 커밋 안에서 정리→재실행을 흉내 낸다.
+  // 숨겨졌다 돌아온 것과 구분하려고, 정리 직후(100ms 안) 다시 실행되면 첫 마운트 그대로 둔다.
+  const latestToken = React.useRef(token);
+  React.useLayoutEffect(() => { latestToken.current = token; }, [token]);
+  const hiddenAt = React.useRef<number | null>(null);
+  React.useLayoutEffect(() => {
+    const at = hiddenAt.current;
+    hiddenAt.current = null;
+    if (!revealOnMount && at !== null && performance.now() - at < 100) {
+      played.current = latestToken.current;
+      setHold(false);
+    }
+    return () => {
+      hiddenAt.current = performance.now();
+      played.current = null;
+      setHold(true);
+    };
+  }, [revealOnMount]);
   const lineResult = useTextLines(mountedElement, text, split === "line");
   const segmenter = React.useMemo(() => new Intl.Segmenter(undefined, { granularity: "grapheme" }), []);
   React.useEffect(() => {
