@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { RotateCcw } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 
@@ -35,6 +34,7 @@ import {
 } from "../stores/scatter-store"
 import { useIsEaten } from "@/shared/eaten-store"
 import { FoodImage } from "./food-image"
+import { IntentLink } from "./intent-link"
 import { useDragGesture } from "./use-drag-gesture"
 
 /** 이름표와 그림 아래 끝 사이 간격(그림 크기 대비). */
@@ -285,7 +285,7 @@ export function DraggableScatter({
         // 라벨 크기는 그림 크기와 상관없이 같다. 기준 px를 프레임 폭 비율(cqi)로 바꿔 함께 확대·축소한다.
         const labelPx = labelFontPx(frame)
         return (
-          <Link
+          <IntentLink
             key={item.id}
             href={routes.seasonal.food(item.id)}
             draggable={false}
@@ -318,7 +318,7 @@ export function DraggableScatter({
               fontSize={`${(labelPx / frame.width) * 100}cqi`}
               frameWidth={frame.width}
             />
-          </Link>
+          </IntentLink>
         )
       })}
       {(saved || (savedCalendar && !frame.reserveBottom)) && !live && (

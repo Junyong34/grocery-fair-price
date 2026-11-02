@@ -1,10 +1,9 @@
-import Link from "next/link"
-
 import type { Food } from "@workspace/seasonal/data/foods"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@workspace/ui/components/collapsible"
 
 import { EatenName } from "@/features/seasonal/components/eaten-name"
 import { FoodImage } from "@/features/seasonal/components/food-image"
+import { IntentLink } from "@/features/seasonal/components/intent-link"
 import { routes } from "@/shared/routes"
 
 /**
@@ -21,12 +20,12 @@ export function MoreFoods({ foods, year }: { foods: readonly Food[]; year: numbe
         <ul className="motion-safe:animate-rise grid grid-cols-[repeat(auto-fill,minmax(72px,1fr))] gap-x-2 gap-y-3 py-3">
           {foods.map((food) => (
             <li key={food.id} className="min-w-0">
-              <Link href={routes.seasonal.food(food.id)} scroll={false} className="group flex h-full flex-col items-center gap-2 rounded-xl px-1 py-2 text-center text-ink transition-colors hover:bg-surface focus-visible:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold motion-reduce:transition-none">
+              <IntentLink href={routes.seasonal.food(food.id)} scroll={false} className="group flex h-full flex-col items-center gap-2 rounded-xl px-1 py-2 text-center text-ink transition-colors hover:bg-surface focus-visible:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold motion-reduce:transition-none">
                 <div aria-hidden="true" className="w-14 shrink-0">
                   <FoodImage food={food} sizes="56px" />
                 </div>
                 <span className="text-[13px] leading-snug break-keep group-hover:underline group-hover:decoration-hairline group-hover:underline-offset-4"><EatenName year={year} foodId={food.id}>{food.name}</EatenName></span>
-              </Link>
+              </IntentLink>
             </li>
           ))}
         </ul>
