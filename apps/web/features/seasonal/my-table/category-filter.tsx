@@ -92,7 +92,7 @@ export function CategoryFilter({
           : "border-gold bg-gold/15 text-gold-deep"
       )}
     >
-      {value ?? MY_TABLE_COPY.allCategories}
+      {value ?? "카테고리"}
       <ChevronDown size={14} aria-hidden />
     </button>
   )
