@@ -3,7 +3,11 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 import { ViewTransition } from "react"
 
 import { MONTH_NOTES, SEASON_COPY } from "@workspace/seasonal/data/copy"
-import { foodsInMonth, foodsInSeason } from "@workspace/seasonal/data/foods"
+import {
+  foodsInMonth,
+  foodsInSeason,
+  seasonHighlights,
+} from "@workspace/seasonal/data/foods"
 import type { Month } from "@workspace/seasonal/data/months"
 import {
   SEASONS,
@@ -172,22 +176,41 @@ function SeasonStep({
     <Link
       href={routes.seasonal.season(season)}
       transitionTypes={[direction === "next" ? "season-next" : "season-prev"]}
-      className="group flex min-w-0 flex-col gap-3 rounded-xl border border-hairline bg-surface/85 p-4 text-ink no-underline hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-ring"
+      className="group flex min-w-0 flex-col gap-4 overflow-hidden rounded-2xl border p-4 text-ink no-underline hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+      style={{
+        background: `linear-gradient(145deg, color-mix(in srgb, ${SEASON_COLOR_VAR[season]} 12%, var(--color-surface)), var(--color-surface))`,
+        borderColor: `color-mix(in srgb, ${SEASON_COLOR_VAR[season]} 28%, var(--color-hairline))`,
+      }}
     >
-      <span className="flex items-center justify-between gap-2 text-xs text-stone">
-        {direction === "prev" ? "이전 계절" : "다음 계절"}
-        <Arrow aria-hidden size={16} />
+      <span className="flex items-center gap-2 text-xs text-stone">
+        {direction === "prev" && <Arrow aria-hidden size={18} />}
+        <span className={direction === "next" ? "ml-auto" : undefined}>
+          {direction === "prev" ? "이전 계절" : "다음 계절"}
+        </span>
+        {direction === "next" && <Arrow aria-hidden size={18} />}
       </span>
-      <span
-        className="border-l-[3px] pl-3"
-        style={{ borderColor: SEASON_COLOR_VAR[season] }}
-      >
-        <span className="block font-heading text-2xl font-bold">{name}</span>
-        <span className="mt-1 block text-xs text-stone">
+      <span className="text-center">
+        <span className="block font-heading text-[32px] leading-tight font-bold">
+          {name}
+        </span>
+        <span className="mt-1.5 block text-xs text-stone">
           {SEASON_MONTHS[season].join("·")}월
         </span>
       </span>
-      <span className="text-xs text-stone">
+      <span
+        aria-hidden
+        className="mx-auto grid w-full max-w-56 grid-cols-3 items-end gap-1"
+      >
+        {seasonHighlights(season, 3).map((food, index) => (
+          <span
+            key={food.id}
+            className={index === 1 ? "-translate-y-1" : undefined}
+          >
+            <FoodImage food={food} sizes="72px" showName={false} />
+          </span>
+        ))}
+      </span>
+      <span className="border-t border-ink/10 pt-3 text-center text-xs text-stone group-hover:text-ink">
         {foodsInSeason(season).length}가지 제철 보기
       </span>
     </Link>
