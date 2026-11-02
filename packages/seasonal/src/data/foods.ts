@@ -51,14 +51,31 @@ export function seasonsOf(food: Food): readonly Season[] {
 /** 그 달이 품종의 대표 달(peak)인지. months는 시장에 많이 나오는 범위이고, peak는 그 안에서 조사가 대표로 고른 달이다. */
 export const isPeak = (food: Food, month: number): boolean => (food.peak as readonly number[]).includes(month)
 
+// MONTH_NOTES에 등장하는 품종. 문구와 그림이 어긋나지 않게 대표 품종 안에 먼저 넣는다.
+// 제철 범위는 foodsInMonth를 그대로 따르며, 문구를 바꿀 때 이 목록도 함께 맞춘다.
+const MONTH_NOTE_FOODS: Partial<Record<number, readonly FoodId[]>> = {
+  2: ["bomdong"],
+  3: ["shepherds-purse", "wild-chive"],
+  4: ["aralia-shoot"],
+  5: ["green-pea"],
+  6: ["green-plum", "potato"],
+  7: ["watermelon"],
+  8: ["peach"],
+  10: ["chestnut", "sweet-potato"],
+  11: ["napa-cabbage", "radish"],
+  12: ["mandarin"],
+}
+
 /**
- * 그 달을 대표하는 품종(2a 흩뿌리기 판, 검색 설명). 그림이 있는 것, 그 달이 대표 달인 것, 처음부터 검증한 품종(core), 그 달에만 가까운(제철 달이 적은) 것, 이름 순.
+ * 그 달을 대표하는 품종(2a 흩뿌리기 판, 검색 설명). 월별 문구에 등장하는 품종, 그림이 있는 것, 그 달이 대표 달인 것, 처음부터 검증한 품종(core), 그 달에만 가까운(제철 달이 적은) 것, 이름 순.
  * 그 달 제철 품종이 많아(최대 86) 판에는 앞에서 몇 개만 그리고 나머지는 이름 목록으로 둔다.
  */
 export function monthHighlights(month: number, count: number): readonly Food[] {
+  const mentioned = new Set<FoodId>(MONTH_NOTE_FOODS[month] ?? [])
   return [...foodsInMonth(month)]
     .sort(
       (a, b) =>
+        Number(mentioned.has(b.id)) - Number(mentioned.has(a.id)) ||
         Number(isDrawn(b.id)) - Number(isDrawn(a.id)) ||
         Number(isPeak(b, month)) - Number(isPeak(a, month)) ||
         Number(b.core) - Number(a.core) ||

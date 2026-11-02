@@ -47,10 +47,21 @@ describe("seasonsOf", () => {
 })
 
 describe("monthHighlights", () => {
+  it("월별 문구에 등장하는 제철 품종을 가장 먼저 배치한다", () => {
+    const mentioned: Record<number, string[]> = {
+      2: ["봄동"], 3: ["냉이", "달래"], 4: ["두릅"], 5: ["완두콩"],
+      6: ["매실", "감자"], 7: ["수박"], 8: ["복숭아"],
+      10: ["밤", "고구마"], 11: ["배추", "무"], 12: ["귤"],
+    }
+    for (const [month, names] of Object.entries(mentioned)) {
+      expect(monthHighlights(Number(month), names.length).map((food) => food.name)).toEqual(expect.arrayContaining(names))
+    }
+  })
+
   it("그 달 품종 가운데 그림 있는 것, 그 달이 대표 달(peak)인 것, 처음부터 검증한 것(core), 제철이 짧은 것 순으로 고른다", () => {
     const all = monthHighlights(10, foodsInMonth(10).length)
     expect(all).toHaveLength(foodsInMonth(10).length)
-    const keys = all.map((food) => [Number(!isDrawn(food.id)), Number(!(food.peak as readonly number[]).includes(10)), Number(!food.core), food.months.length])
+    const keys = all.filter((food) => !["chestnut", "sweet-potato"].includes(food.id)).map((food) => [Number(!isDrawn(food.id)), Number(!(food.peak as readonly number[]).includes(10)), Number(!food.core), food.months.length])
     expect(keys).toEqual([...keys].sort((a, b) => a[0]! - b[0]! || a[1]! - b[1]! || a[2]! - b[2]! || a[3]! - b[3]!))
     // 10월 대표 20개 안에 사과·고등어·전어·감이 든다(정보누리에서 올린 품종보다 앞).
     expect(monthHighlights(10, 20).map((food) => food.name)).toEqual(expect.arrayContaining(["사과", "고등어", "전어", "감"]))
