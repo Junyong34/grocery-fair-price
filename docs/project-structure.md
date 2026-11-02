@@ -94,6 +94,7 @@ import 경로:
 | `DESIGN.md` | Oura 디자인 언어 분석(색, 서체, 간격, 컴포넌트) |
 | `docs/nextjs-16-patterns.md` | Next 16 렌더링·캐시 판단 근거(2026-10-14 조사, 2026-10-31 실제 코드에 맞춰 줄임) |
 | `docs/brand-assets.md` | 로고·파비콘 파일과 교체 방법 |
+| `docs/seafood-content/` | 새 수산·제철 회 화면의 콘텐츠 자료. `README.md`(문서 안내·화면 기획의 출발점), `monthly-content.md`(월별 설명), `species-review.md`(48종 이름 대응·근거·미확인 사항), `illustration-briefs.md`(최초 29종 외형 요청), `reference.json`(첨부 원문). Git 관리 대상이며 프로토타입 없이 읽을 수 있다 |
 | `docs/seo.md` | 검색 색인: 새 페이지 연결 체크리스트, 환경 변수, 운영 전환 절차 |
 | `vitest.config.ts` | `shared/` 순수 함수 테스트. tsconfig paths를 따르고 JSX만 여기서 변환한다 |
 
@@ -447,6 +448,7 @@ grocery-price/
 |---|---|
 | 에이전트 규칙 | `AGENTS.md` |
 | 제철 화면 명세 | `prototypes/seasonal-food/wireframes/WIREFRAME-SPEC.md` (Git 밖) |
+| 새 수산·제철 회 콘텐츠 자료 | `apps/web/docs/seafood-content/README.md` (Git 관리, 화면 주소·세부 기능 미정) |
 | 명세와 다르게 정한 것, MVP 결정 | `.scratch/seasonal-mvp/spec.md` |
 | SEO 결정(색인 정책, 구조화 데이터, 제목 패턴) | `.scratch/seo/spec.md` |
 | 색·서체 | `apps/web/DESIGN.md`, `packages/ui/src/styles/globals.css` |
