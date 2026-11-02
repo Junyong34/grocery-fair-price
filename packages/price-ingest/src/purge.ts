@@ -1,5 +1,5 @@
 // 주 1회 보존 정리 (pipeline 3-9 보관 1·2·6, ingest-foundation/10). KAMIS 워크플로가 월요일 다시 받기 뒤에 부른다.
-//   pnpm --filter @workspace/price-ingest purge [--dry-run]
+//   pnpm --filter @workspace/price-ingest run purge [--dry-run]
 // KAMIS 관측값은 최근 90일, 참가격은 최근 6 조사일만 남긴다. 그날의 요약이 없으면 지우지 않는다
 // (price.purge_expired_observations, 마이그레이션 20261026000100). 원본(Storage)은 지우지 않는다.
 // 시세 요약(daily_quote)은 182일이 지나면 시장 유형 범위를 지우고 national만 남긴다 (price.purge_expired_quotes, 3-9 보관 4).
