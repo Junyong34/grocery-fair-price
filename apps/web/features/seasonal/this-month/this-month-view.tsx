@@ -150,7 +150,7 @@ function MonthSection({
         <p className="mt-3 text-xs text-caption">
           {foods.length}가지 제철<span> · 그림을 끌어 달력 위에도 놓아 꾸며 보세요</span>
         </p>
-        <MoreFoods foods={foods.filter((food) => !pictured.includes(food))} />
+        <MoreFoods year={today.year} foods={foods.filter((food) => !pictured.includes(food))} />
         <p className="mt-3 text-xs text-stone">
           {festivals.length
             ? `명절 ${festivals
