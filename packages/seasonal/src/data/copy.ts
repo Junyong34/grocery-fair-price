@@ -92,8 +92,6 @@ export const UI_COPY = {
   /** 달력 아래 "이달의 절기·명절" 카드(month-days.ts) */
   monthDaysTitle: "이달의 절기·명절",
   noMonthDay: "이달은 이름난 절기나 명절이 없어요",
-  nextMonthDay: (name: string, month: number, day: number) =>
-    `다음은 ${month}월 ${day}일 ${name}`,
   /** 명절 줄의 설명. 전통 음식 이름 몇 가지를 받는다 */
   festivalDayNote: (dishes: readonly string[]) => `${dishes.join("·")} 먹는 날`,
   /** 2a 이달 맨 아래: 열두 달 스크롤이 끝났을 때 */

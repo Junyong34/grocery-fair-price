@@ -5,7 +5,7 @@ import type { CalendarDate } from "@workspace/seasonal/calendar/month-calendar"
 import { MONTH_DAY_KIND_LABELS, MONTH_DAY_NOTES, UI_COPY } from "@workspace/seasonal/data/copy"
 import { dishNames } from "@workspace/seasonal/data/dishes"
 import { festivalOf } from "@workspace/seasonal/data/festivals"
-import { monthDays, nextMonthDay, type MonthDay, type MonthDayKind } from "@workspace/seasonal/data/month-days"
+import { monthDays, type MonthDay, type MonthDayKind } from "@workspace/seasonal/data/month-days"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { routes } from "@/shared/routes"
@@ -26,7 +26,7 @@ function noteOf(day: MonthDay): string {
 
 /**
  * 달력 아래 "이달의 절기·명절"(2a 달 섹션, 2b). 명절·이름난 절기·세시를 날짜 순으로 적는다.
- * 명절과 복날은 명절 화면으로 이어진다. 그런 날이 없는 달은 다음에 오는 날을 알려 준다.
+ * 명절과 복날은 명절 화면으로 이어진다. 해당 달의 일정만 표시한다.
  */
 export function MonthDaysCard({
   month,
@@ -39,15 +39,14 @@ export function MonthDaysCard({
   className?: string
 }) {
   const days = monthDays(month, today.year)
-  const next = days.length ? undefined : nextMonthDay(month, today.year)
   return (
     <section
       aria-label={`${month}월의 절기·명절`}
-      className={cn("rounded-2xl border border-hairline bg-surface/70 px-4 pt-3 pb-1", className)}
+      className={cn("border-t border-hairline pt-4", className)}
     >
-      <h3 className="text-xs font-semibold text-caption">{UI_COPY.monthDaysTitle}</h3>
+      <h3 className="text-xs font-semibold text-stone">{UI_COPY.monthDaysTitle}</h3>
       {days.length ? (
-        <ul className="mt-1 divide-y divide-hairline">
+        <ul className="mt-2 divide-y divide-hairline">
           {days.map((day) => (
             <li key={day.id}>
               <DayRow day={day} isToday={isSameDay(day.date, today)} />
@@ -55,14 +54,7 @@ export function MonthDaysCard({
           ))}
         </ul>
       ) : (
-        <div className="py-3">
-          <p className="text-sm text-stone">{UI_COPY.noMonthDay}</p>
-          {next && (
-            <p className="mt-1 text-xs text-caption">
-              {UI_COPY.nextMonthDay(next.name, next.date.month, next.date.day)}
-            </p>
-          )}
-        </div>
+        <p className="mt-2 text-xs leading-relaxed break-keep text-caption">{UI_COPY.noMonthDay}</p>
       )}
     </section>
   )
@@ -103,7 +95,7 @@ function DayRow({ day, isToday }: { day: MonthDay; isToday: boolean }) {
       href={routes.seasonal.festival(day.festival)}
       className={cn(
         grid,
-        "-mx-2 rounded-lg px-2 no-underline transition-colors hover:bg-canvas focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-forest"
+        "-mx-2 rounded-lg px-2 no-underline transition-colors hover:bg-surface/60 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-forest motion-reduce:transition-none"
       )}
     >
       {body}
