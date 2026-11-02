@@ -92,8 +92,10 @@
   --v-skel-sheen: var(--color-surface);
   --v-disabled-face: var(--color-hairline);
   --v-disabled-fill: var(--color-hairline);
-  /* cojeev 본문 서체(DM Sans)에는 한글이 없다. Pretendard는 apps/web layout에서 불러온다. 숫자·영문 제목은 --font-display(Bricolage) 그대로. */
+  /* cojeev 본문 서체(DM Sans)에는 한글이 없다. Pretendard는 apps/web layout에서 불러온다. */
   --font-text: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  /* 숫자·영문 제목 Bricolage는 apps/web이 next/font/local로 불러와 --font-display-file에 담는다(shared/fonts/display-font.ts). */
+  --font-display: var(--font-display-file, "Bricolage Grotesque"), ui-sans-serif, system-ui, sans-serif;
 }
 
 @theme inline {

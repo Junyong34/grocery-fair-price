@@ -363,7 +363,7 @@ Color discipline is the signature move. The whole palette is earth-toned — mus
 
 ### 글자 크기와 정보 위계
 
-앱의 실제 서체는 본문 Pretendard, 제목 Gowun Batang(`font-heading`), 큰 숫자 cojeev display(`font-number`)다.
+앱의 실제 서체는 본문 Pretendard, 제목 Gowun Batang(`font-heading`), 큰 숫자 cojeev display 서체 Bricolage Grotesque(`font-number`, `shared/fonts/display-font.ts`)다.
 
 | 요소 | 적용값 |
 |---|---|

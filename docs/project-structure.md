@@ -85,6 +85,7 @@ import 경로:
 | `proxy.ts` | `/seasonal/festivals` → 서울 날짜 기준 다가오는 명절로 리다이렉트. `matcher`는 정적 문자열이어야 해서 경로를 직접 쓴다 |
 | `app/layout.tsx` | `<html lang="ko" data-mode="light">`, Pretendard(본문), Gowun Batang(`--font-serif-ko`, 제목), 사이트 기본 메타데이터, `Providers` |
 | `app/manifest.ts` | `/manifest.webmanifest`. 홈 화면 웹 앱 설치 정보(`shared/pwa.ts`): 장볼날, 시세 메인(`/`), 주소창 없는 창, 기존 브랜드 아이콘과 Oura 캔버스 색. `public/downloads/manifest.json`과 별개 |
+| `shared/fonts/display-font.ts` | 큰 숫자 서체 Bricolage Grotesque(`next/font/local`, 라이선스 동봉). 루트 레이아웃이 `--font-display-file`로 붙이고 `packages/ui` `cojeev.css`가 `--font-display`로 잇는다 |
 | `shared/pwa.ts` · `pwa.test.ts` | 웹 앱 설치 정보와 팔레트 원본 읽기, 이름·시작 경로·아이콘 규격 검증. 루트 레이아웃의 테마색도 함께 사용 |
 | `shared/shell/install-prompt.tsx` | `useDevice`로 휴대폰에서만 표시하는 플로팅 설치 카드. 설치 버튼은 유지하고 수동 안내는 클릭 후 펼친다. `price:install-prompt`에 설치 완료·7일 숨김 기록(version 1) |
 | `shared/shell/install-prompt-state.ts` · `.test.ts` | 설치 안내의 만료 판정. 설치 완료는 계속 숨기고 닫기는 7일 뒤 만료 |
@@ -306,7 +307,7 @@ import 경로:
 | `src/styles/globals.css` | Oura 팔레트(`--color-canvas`, `--color-gold`, `--color-season-*` …), 서체 변수(`--font-heading`, `--font-number`). 색의 유일한 원천 |
 | `src/styles/cojeev.css` | cojeev 스타일 import 목록과 cojeev 팔레트(`--v-*`)의 Oura 덮어쓰기 |
 | `src/styles/cojeev/*.css` | cojeev 컴포넌트별 CSS (설치 시 생성) |
-| `src/styles/cojeev-fonts.css`, `fonts/` | cojeev display 서체(Bricolage Grotesque, DM Sans)와 라이선스 |
+| `src/styles/cojeev-fonts.css`, `fonts/` | cojeev CSS 레이어 순서 선언과 서체 라이선스. 서체 파일은 넣지 않는다(DM Sans는 쓰지 않아 지웠고, Bricolage는 `apps/web/shared/fonts/`) |
 | `src/components/` | cojeev·shadcn에서 받은 컴포넌트와 직접 만든 범용 컴포넌트 |
 | `src/lib/cojeev/`, `src/lib/cojeev-motion/` | cojeev 컴포넌트가 쓰는 기하·모션 코드 (설치 시 생성) |
 | `src/lib/utils.ts` | `cn()` |
