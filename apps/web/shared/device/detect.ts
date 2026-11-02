@@ -1,4 +1,4 @@
-// react-device-check에서 가져와 React 19 환경에 맞춤. 출처와 이용 조건: ./README.md, ./LICENSE
+// react-device-check에서 가져와 React 19 환경에 맞춤. 출처와 이용 조건: ./README.md
 import type { DetectionInput, DetectOptions, DeviceType, OS } from "./types"
 
 const UA_DATA_PLATFORM_MAP: Record<string, OS> = {
