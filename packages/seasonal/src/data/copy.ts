@@ -4,7 +4,7 @@
 import { josa } from "es-hangul"
 
 import type { Festival } from "./festivals"
-import type { FoodCategory } from "./foods"
+import type { FoodCategory, FoodId } from "./foods"
 import type { MonthDayId, MonthDayKind } from "./month-days"
 import type { Month } from "./months"
 import type { Season } from "./seasons"
@@ -16,7 +16,8 @@ export const INSTALL_COPY = {
   description: "시세와 제철달력을 바로 열어보세요.",
   install: "홈 화면에 추가",
   ios: "Safari의 공유 메뉴에서 ‘홈 화면에 추가’를 선택하세요.",
-  browser: "브라우저 메뉴에서 ‘앱 설치’ 또는 ‘홈 화면에 추가’를 선택하세요. 메뉴가 없다면 Chrome이나 Safari에서 열어주세요.",
+  browser:
+    "브라우저 메뉴에서 ‘앱 설치’ 또는 ‘홈 화면에 추가’를 선택하세요. 메뉴가 없다면 Chrome이나 Safari에서 열어주세요.",
   close: "설치 안내 일주일 동안 닫기",
   confirmed: "홈 화면에 추가했어요",
   failed: "설치창을 열지 못했어요. 브라우저 메뉴에서 홈 화면에 추가해 주세요.",
@@ -181,25 +182,29 @@ export const DOWNLOADS_COPY = {
   shelfMeta: (count: number) => `${count}개`,
   printTips: {
     title: "인쇄 팁",
-    size: "A4 용지에 \"실제 크기\"로 인쇄하세요.",
+    size: 'A4 용지에 "실제 크기"로 인쇄하세요.',
     /** 월간 달력만 */
     oneMonth: "한 달만 뽑을 땐 인쇄 창에서 그 달 쪽 번호를 고르세요.",
   },
   backToList: "‹ 달력·포스터",
   others: "다른 인쇄물",
   seeAll: "전체 보기 ›",
-  thumbnailAlt: (name: string, index: number) => (index === 0 ? `${name} 미리보기` : `${name} 미리보기 ${index + 1}쪽`),
+  thumbnailAlt: (name: string, index: number) =>
+    index === 0 ? `${name} 미리보기` : `${name} 미리보기 ${index + 1}쪽`,
   /** 내려받기를 누른 뒤(5-a). 브라우저 다운로드가 끝났는지는 알 수 없어 "누른 뒤" 상태다. */
   done: {
     title: "내려받았어요",
-    where: "휴대폰은 \"파일\" 또는 \"다운로드\"에 있어요.",
+    where: '휴대폰은 "파일" 또는 "다운로드"에 있어요.',
     pcTitle: "휴대폰으로 받으셨나요?",
     pcBody: "인쇄는 PC에서 하는 게 편해요. 링크를 PC로 보내 보세요.",
     copyLink: "링크 복사",
     share: "공유하기",
     again: "다시 내려받기",
   },
-  a3: { ask: "A3로 크게 뽑고 싶다면 · A3도 원해요", thanks: "알려 주셔서 고마워요. 원하는 분이 많으면 A3도 열어 둘게요." },
+  a3: {
+    ask: "A3로 크게 뽑고 싶다면 · A3도 원해요",
+    thanks: "알려 주셔서 고마워요. 원하는 분이 많으면 A3도 열어 둘게요.",
+  },
   /** 내린 에디션 주소(6-1) */
   withdrawn: {
     title: "이 인쇄물은 내려갔어요",
@@ -208,7 +213,10 @@ export const DOWNLOADS_COPY = {
     seeAll: "다른 인쇄물 모두 보기",
   },
   /** 2a · 2b 입구 카드(1-a) */
-  entry: { title: "제철 달력 · 포스터 PDF 받기", hint: "집에서 인쇄해 냉장고에 붙여 보세요" },
+  entry: {
+    title: "제철 달력 · 포스터 PDF 받기",
+    hint: "집에서 인쇄해 냉장고에 붙여 보세요",
+  },
 } as const
 
 /** "이달의 절기·명절" 줄의 종류 태그 */
@@ -238,3 +246,89 @@ export const MONTH_DAY_NOTES: Record<Exclude<MonthDayId, Festival>, string> = {
   chubun: "이날부터 밤이 낮보다 길어지는 날",
   ipdong: "겨울이 시작되는 날, 김장을 준비할 때",
 }
+
+/**
+ * 제철 회 화면(.scratch/sashimi/spec.md). 첨부 「월별 제철 회 총정리」 원문을 다듬은 초안이고, 추가 품종은 새로 썼다.
+ * 설명은 품종마다 하나라 여러 달에 나와도 계절을 단정하지 않는다. 효능·산지는 단정하지 않는다.
+ */
+export const SASHIMI_COPY = {
+  tab: "제철 회",
+  pageTitle: (month: number) => `${month}월 제철 회`,
+  count: (n: number) => `${n}종`,
+  notice: "추천 시기는 참고용이에요. 지역과 자연산·양식 여부에 따라 달라요.",
+  monthTitles: {
+    1: "겨울 바다의 쫀득한 회",
+    2: "담백한 흰살과 고소한 겨울 생선",
+    3: "봄을 여는 볼락과 참돔",
+    4: "도다리와 가자미가 오르는 봄",
+    5: "고소함이 오르는 늦봄 회",
+    6: "초여름 바다의 담백한 회",
+    7: "더위에 즐기는 장어와 민어",
+    8: "한여름 단단한 부시리와 갯장어",
+    9: "가을 전어와 기름진 생선",
+    10: "가을 깊어 살 오른 횟감",
+    11: "늦가을 귀한 바리류 회",
+    12: "방어와 복어의 겨울 별미",
+  } satisfies Record<Month, string>,
+  descriptions: {
+    // 첨부 품종
+    pufferfish: "담백하고 쫄깃한 식감",
+    "roughscale-flounder": "단단하고 쫀득한 고급 횟감",
+    searobin: "은은한 단맛과 부드러운 살결",
+    "marbled-rockfish": "탄탄한 육질과 깊은 감칠맛",
+    lumpfish: "겨울에 즐기는 별미 생선",
+    herring: "기름진 살과 고소한 풍미",
+    skate: "특유의 향과 진한 감칠맛",
+    cod: "부드럽고 담백한 흰살 생선",
+    halfbeak: "깔끔한 단맛과 섬세한 식감",
+    "redlip-mullet": "지방이 올라 고소한 맛",
+    "olive-flounder": "탄력 있는 육질과 은은한 감칠맛",
+    "red-rockfish": "부드러운 살과 진한 감칠맛",
+    "korean-rockfish": "탱글하고 쫄깃한 식감",
+    "red-seabream": "은은한 단맛과 부드러운 육질",
+    "gray-rockfish": "담백하면서 고소한 풍미",
+    "spanish-mackerel": "부드러운 살과 풍부한 지방",
+    mullet: "담백하고 쫄깃한 맛",
+    "spring-flounder": "담백하고 부드러운 흰살 생선",
+    ganjaemi: "오독한 식감과 특유의 감칠맛",
+    "yellowfin-flounder": "쫀득한 육질과 은은한 단맛",
+    "atka-mackerel": "지방이 있어 고소하고 진한 맛",
+    "sixbar-sandperch": "담백하고 순한 흰살 생선",
+    anchovy: "갓 잡았을 때 고소하고 부드러운 회",
+    sardinella: "지방이 올라 고소하고 진한 맛",
+    "pearl-spot-chromis": "제주에서 즐겨 먹는 고소한 별미",
+    "sea-bass": "담백하고 깔끔한 흰살 생선",
+    "chicken-grunt": "기름이 올라 고소한 고급 횟감",
+    borimyeol: "섬세하고 담백한 흰살 생선",
+    "conger-eel": "부드럽고 고소한 별미",
+    "horse-mackerel": "지방이 올라 진하고 고소한 맛",
+    blackfish: "쫀득한 식감과 은은한 단맛",
+    hairtail: "부드러운 살과 고소한 풍미",
+    "pike-conger": "탄력 있는 육질과 담백한 맛",
+    "yellowstripe-jack": "단단한 식감과 균형 잡힌 감칠맛",
+    "gizzard-shad": "뼈째 썰어 고소하게 먹는 회",
+    mackerel: "기름지고 진한 감칠맛",
+    "rock-bream": "단단한 육질과 깊은 풍미",
+    "black-scraper": "담백하고 부드러운 식감",
+    goedorachi: "쫄깃한 식감의 독특한 별미",
+    "longtail-blackfish": "탄탄한 육질과 깊은 감칠맛",
+    rabbitfish: "독특한 향이 있는 별미",
+    "stone-flounder": "쫀득한 식감과 은은한 단맛",
+    "longtooth-grouper": "깊고 진한 감칠맛의 고급 횟감",
+    goby: "담백하고 부드러운 별미",
+    "red-spotted-grouper": "탄력 있는 살과 풍부한 감칠맛",
+    "banded-grouper": "단단한 육질과 깔끔한 맛",
+    "black-seabream": "담백하면서 고소한 풍미",
+    yellowtail: "지방이 풍부해 진하고 고소한 맛",
+    // 추가 품종
+    squid: "투명한 살의 달큰하고 쫄깃한 회",
+    "east-sea-hanchi": "부드럽고 단맛이 도는 한치회",
+    "jeju-hanchi": "얇게 썰어 먹는 연하고 단 회",
+    "long-arm-octopus": "산낙지로 즐기는 쫄깃한 식감",
+    "webfoot-octopus": "살짝 데친 숙회로 쫄깃하게",
+    croaker: "부드럽고 차진 여름 별미",
+    pomfret: "뼈째 썰어 고소한 회",
+  } satisfies Partial<Record<FoodId, string>> as Readonly<
+    Partial<Record<FoodId, string>>
+  >,
+} as const
