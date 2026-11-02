@@ -96,6 +96,7 @@ export const DRAWN_FOOD_IDS = [
   "green-plum",
   "gwamegi",
   "hairtail",
+  "halfbeak",
   "hallabong",
   "herring",
   "horse-mackerel",

@@ -10,7 +10,7 @@
 | kit sha | `6806db565e0538c4` |
 | 변형 | `color`, `motion` |
 | 바닥 그림자 | 끔 |
-| 품종 수 | 239 |
+| 품종 수 | 240 |
 
 | id | 이름 | food.mjs sha |
 |---|---|---|
@@ -108,6 +108,7 @@
 | `green-plum` | 매실 | `6e9c66360a7ccafa` |
 | `gwamegi` | 과메기 | `7913c3bd8a478c93` |
 | `hairtail` | 갈치 | `67b18f9021e26091` |
+| `halfbeak` | 학꽁치 | `d0052357dc884afb` |
 | `hallabong` | 한라봉 | `d0389aef816d9aec` |
 | `herring` | 청어 | `078e8be4706d7a55` |
 | `horse-mackerel` | 전갱이 | `a2407993303c2518` |

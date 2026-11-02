@@ -1,5 +1,5 @@
 // 생성 파일. 직접 고치지 않는다. packages/seasonal/scripts/build-foods.mjs로 다시 만든다.
-// 원천: prototypes/seasonal-food/docs/seasonal-lists/foods.json의 검증 품종 239개.
+// 원천: prototypes/seasonal-food/docs/seasonal-lists/foods.json의 검증 품종 240개.
 // 제철 보정: food-season-corrections.json (조사 근거 포함).
 
 export const FOOD_ROWS = [
@@ -231,6 +231,7 @@ export const FOOD_ROWS = [
   { id: "green-grape", name: "포도", aliases: [], category: "과일", months: [8,9,10], peak: [8,9], core: true },
   { id: "shiitake-mushroom", name: "표고버섯", aliases: [], category: "버섯", months: [9,10], peak: [9,10], core: true },
   { id: "bell-pepper", name: "피망", aliases: [], category: "채소", months: [4,5,6,7,8,9,10,11,12], peak: [5], core: false },
+  { id: "halfbeak", name: "학꽁치", aliases: [], category: "수산", months: [2], peak: [2], core: false },
   { id: "hallabong", name: "한라봉", aliases: [], category: "과일", months: [1,2,3,12], peak: [1,2,3], core: true },
   { id: "scallop", name: "해만가리비", aliases: ["가리비"], category: "수산", months: [11], peak: [11], core: true },
   { id: "sea-cucumber", name: "해삼", aliases: [], category: "수산", months: [1,2,10,11,12], peak: [11], core: false },

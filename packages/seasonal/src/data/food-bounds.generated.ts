@@ -96,6 +96,7 @@ export const FOOD_BOTTOM: Readonly<Record<string, number>> = {
   "green-plum": 0.86,
   "gwamegi": 0.84,
   "hairtail": 0.63,
+  "halfbeak": 0.56,
   "hallabong": 0.87,
   "herring": 0.63,
   "horse-mackerel": 0.64,
