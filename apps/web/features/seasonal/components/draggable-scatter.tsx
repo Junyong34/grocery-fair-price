@@ -1,7 +1,7 @@
 "use client"
 
 import { RotateCcw } from "lucide-react"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 
 import { FOOD_BOTTOM } from "@workspace/seasonal/data/food-bounds.generated"
 import type { Food } from "@workspace/seasonal/data/foods"
@@ -339,15 +339,25 @@ export function DraggableScatter({
   )
 }
 
-/** 판 폭 / MOBILE_CALENDAR_BASE_WIDTH. 재기 전(서버 HTML·첫 렌더)은 1이다. */
+/**
+ * 판 폭 / MOBILE_CALENDAR_BASE_WIDTH. 재기 전(서버 HTML)은 1이다.
+ * 이달 화면의 달 섹션은 content-visibility:auto라, 화면 밖 판은 화면 가까이 올 때까지 ResizeObserver가 알리지 않는다.
+ * 그러면 월 레일로 이동한 직후 달력이 1배로 작게 보였다가 커진다. 그래서 처음과 창 크기가 바뀔 때는 직접 잰다.
+ */
 function useCalendarScale(field: React.RefObject<HTMLDivElement | null>, enabled: boolean) {
   const [scale, setScale] = useState(1)
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = field.current
     if (!enabled || !el) return
-    const observer = new ResizeObserver(([entry]) => entry && setScale(entry.contentRect.width / MOBILE_CALENDAR_BASE_WIDTH))
+    const measure = () => setScale(el.getBoundingClientRect().width / MOBILE_CALENDAR_BASE_WIDTH)
+    measure()
+    const observer = new ResizeObserver(measure)
     observer.observe(el)
-    return () => observer.disconnect()
+    window.addEventListener("resize", measure)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener("resize", measure)
+    }
   }, [field, enabled])
   return scale
 }
