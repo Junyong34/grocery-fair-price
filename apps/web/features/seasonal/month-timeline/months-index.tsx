@@ -47,12 +47,13 @@ function MonthCard({ month }: { month: Month }) {
   return (
     <section
       aria-labelledby={`month-card-${month}`}
-      className="@container flex flex-col rounded-lg border border-hairline bg-surface/85 px-2.5 pt-3 pb-4 sm:px-4 sm:pt-3.5 sm:pb-5"
+      className="@container flex flex-col rounded-lg border border-hairline bg-surface/85 px-2.5 pb-4 sm:px-4 sm:pb-5"
     >
+      {/* 카드 자체를 고정 범위로 삼아 한쪽만 펼쳐도 짧은 카드의 제목은 카드 끝에서 함께 사라진다. */}
       <Link
         id={`month-card-${month}`}
         href={routes.seasonal.month(month)}
-        className="group/head flex items-center gap-1.5 px-0.5 text-ink no-underline hover:text-ink"
+        className="group/head sticky top-[calc(var(--shell-top)+var(--tabs-h))] z-[1] -mx-2.5 flex shrink-0 items-center gap-1.5 rounded-t-lg bg-surface px-3 py-3 text-ink no-underline hover:text-ink sm:-mx-4 sm:px-[18px] sm:py-3.5"
       >
         <span className="text-[22px] leading-none font-bold sm:text-2xl">
           {month}월
