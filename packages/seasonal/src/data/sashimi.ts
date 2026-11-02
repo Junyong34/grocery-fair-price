@@ -18,7 +18,10 @@ export const ADDED_SASHIMI = [
   "pomfret",
 ] as const satisfies readonly FoodId[]
 
-/** 달 → 회 품종 id. 적은 순서는 첨부 순서이고, 추가 품종이 뒤에 온다. 화면 순서는 sashimiInMonth가 정한다. */
+/**
+ * 달 → 회 품종 id. 적은 순서는 첨부 순서이고, 추가 품종이 뒤에 온다. 화면 순서는 sashimiInMonth가 정한다.
+ * 말쥐치·망둥어·밴댕이·능성어·불볼락은 첨부 달이 아니라 고친 앱 제철(food-season-corrections.json, 2026-11-03)을 따른다.
+ */
 export const SASHIMI_MONTHS: Readonly<Record<Month, readonly FoodId[]>> = {
   1: [
     "pufferfish",
@@ -28,8 +31,16 @@ export const SASHIMI_MONTHS: Readonly<Record<Month, readonly FoodId[]>> = {
     "lumpfish",
     "herring",
     "skate",
+    "banded-grouper",
   ],
-  2: ["cod", "halfbeak", "redlip-mullet", "olive-flounder", "east-sea-hanchi"],
+  2: [
+    "cod",
+    "halfbeak",
+    "redlip-mullet",
+    "olive-flounder",
+    "banded-grouper",
+    "east-sea-hanchi",
+  ],
   3: [
     "red-rockfish",
     "korean-rockfish",
@@ -44,6 +55,7 @@ export const SASHIMI_MONTHS: Readonly<Record<Month, readonly FoodId[]>> = {
     "ganjaemi",
     "yellowfin-flounder",
     "atka-mackerel",
+    "red-rockfish",
     "long-arm-octopus",
     "webfoot-octopus",
   ],
@@ -60,6 +72,7 @@ export const SASHIMI_MONTHS: Readonly<Record<Month, readonly FoodId[]>> = {
     "borimyeol",
     "pearl-spot-chromis",
     "sea-bass",
+    "sardinella",
     "pomfret",
   ],
   7: [
@@ -78,16 +91,31 @@ export const SASHIMI_MONTHS: Readonly<Record<Month, readonly FoodId[]>> = {
     "squid",
     "croaker",
   ],
-  9: ["gizzard-shad", "mackerel", "rock-bream", "black-scraper", "goedorachi"],
+  9: [
+    "gizzard-shad",
+    "mackerel",
+    "rock-bream",
+    "black-scraper",
+    "goedorachi",
+    "goby",
+  ],
   10: [
     "spanish-mackerel",
     "longtail-blackfish",
     "rabbitfish",
     "stone-flounder",
+    "black-scraper",
+    "goby",
     "long-arm-octopus",
   ],
-  11: ["longtooth-grouper", "goby", "red-spotted-grouper", "banded-grouper"],
-  12: ["pufferfish", "black-seabream", "yellowtail", "herring"],
+  11: ["longtooth-grouper", "red-spotted-grouper"],
+  12: [
+    "pufferfish",
+    "black-seabream",
+    "yellowtail",
+    "herring",
+    "banded-grouper",
+  ],
 }
 
 /** 그 달 회 품종. 친숙도 1→3 순서이고, 같은 등급은 적은 순서를 지킨다. 1~12 밖이면 빈 목록. */

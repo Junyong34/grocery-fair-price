@@ -15,5 +15,46 @@
       "https://www.gangnam.go.kr/board/B_000031/1074136/view.do?mid=ID01_031"
     ],
     "checkedAt": "2026-11-02"
+  },
+  "black-scraper": {
+    "months": [9, 10],
+    "peak": [9, 10],
+    "reason": "법정 금어기(5.1~7.31)와 수과원 소비 자제 달(4·8월)을 피한 9월 이후. 수과원 어종정보가 9·10월을 소비 권장 달로 둔다.",
+    "sources": [
+      "https://www.nifs.go.kr/portal/fr/chrpA/actionChrpFishView.do?fishId=fish_1575867824021",
+      ".scratch/sashimi/research-months.md"
+    ],
+    "checkedAt": "2026-11-03"
+  },
+  "goby": {
+    "months": [9, 10],
+    "peak": [9, 10],
+    "reason": "수품원 속담 '가을 망둑'과 9~10월 망둥어 낚시·회 기사에 근거가 몰려 있다. 11월은 뺀다.",
+    "sources": [
+      "https://www.wikitree.co.kr/articles/1086535",
+      ".scratch/sashimi/research-months.md"
+    ],
+    "checkedAt": "2026-11-03"
+  },
+  "sardinella": {
+    "months": [5, 6],
+    "peak": [5, 6],
+    "reason": "수품원 '반지' 글이 5~6월을 가장 맛있는 때로 적는다. 강화·인천의 밴댕이회는 반지일 수 있다.",
+    "sources": [".scratch/sashimi/research-months.md"],
+    "checkedAt": "2026-11-03"
+  },
+  "banded-grouper": {
+    "months": [1, 2, 12],
+    "peak": [1, 2, 12],
+    "reason": "사용자 편집 판단(2026-11-03): 회를 주로 먹는 겨울로 둔다. 확인한 수품원·수협 자료는 5~7월이라 근거와 다르다. 기관 자료로 겨울 근거가 나오면 갱신한다.",
+    "sources": [".scratch/sashimi/research-months.md"],
+    "checkedAt": "2026-11-03"
+  },
+  "red-rockfish": {
+    "months": [3, 4],
+    "peak": [3, 4],
+    "reason": "사용자 편집 판단(2026-11-03): 사람들이 주로 먹는 3~4월로 둔다. 수과원은 2~3월을 출산 성기로 적어 생물 기준과는 겹친다.",
+    "sources": [".scratch/sashimi/research-months.md"],
+    "checkedAt": "2026-11-03"
   }
 }

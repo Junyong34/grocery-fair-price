@@ -5,6 +5,15 @@ import { findFood } from "./foods"
 import { MONTHS } from "./months"
 import { ADDED_SASHIMI, SASHIMI_MONTHS, sashimiInMonth } from "./sashimi"
 
+// .scratch/sashimi/issues/06: food-season-corrections.json에 2026-11-03 더한 품종
+const SEASON_CORRECTED = [
+  "black-scraper",
+  "goby",
+  "sardinella",
+  "banded-grouper",
+  "red-rockfish",
+] as const
+
 describe("sashimi", () => {
   it("적은 id는 모두 있는 수산 품종이다", () => {
     for (const ids of Object.values(SASHIMI_MONTHS))
@@ -35,6 +44,15 @@ describe("sashimi", () => {
     }
   })
 
+  it("출처 조사로 제철을 고친 품종은 회 화면 달이 앱 제철과 같다", () => {
+    for (const id of SEASON_CORRECTED) {
+      const months = MONTHS.filter((month) =>
+        SASHIMI_MONTHS[month].includes(id)
+      )
+      expect(months, id).toEqual([...findFood(id)!.months])
+    }
+  })
+
   it("한 달 안에서는 친숙도 1→3 순서다", () => {
     for (const month of MONTHS) {
       const levels = sashimiInMonth(month).map((food) => familiarity(food.id))
@@ -48,6 +66,7 @@ describe("sashimi", () => {
       "cod",
       "halfbeak",
       "redlip-mullet",
+      "banded-grouper",
       "east-sea-hanchi",
     ])
   })
