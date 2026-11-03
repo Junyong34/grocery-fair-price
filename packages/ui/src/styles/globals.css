@@ -76,13 +76,16 @@
     /* 인쇄물 썸네일 받침. 크림(canvas)·흰(surface) 용지가 모두 떠 보이도록 캔버스보다 한 톤 진한 베이지 */
     --color-mat: color-mix(in oklab, var(--color-stone) 8%, var(--color-canvas));
 
+    /* 공통 표면용 연한 세이지. 가격 판정색과 같은 색이어도 의미는 각 이름으로 구분한다. */
+    --color-sage-wash: color-mix(in oklab, var(--color-sage) 22%, var(--color-canvas));
+
     /* 가격 판정색(싸요 · 보통 · 비싸요 · 판정 전). 이름만 새로 두고 값은 위 팔레트를 가리킨다.
        기본값은 점 · 선 · 막대, -wash는 카드 · 칩 배경, -ink는 그 위 글자(캔버스 · wash 위 4.5:1 이상). */
     --color-verdict-cheap: color-mix(in oklab, var(--color-sage) 50%, var(--color-forest));
     --color-verdict-normal: var(--color-gold);
     --color-verdict-pricey: var(--color-holiday);
     --color-verdict-none: var(--color-ash);
-    --color-verdict-cheap-wash: color-mix(in oklab, var(--color-sage) 22%, var(--color-canvas));
+    --color-verdict-cheap-wash: var(--color-sage-wash);
     --color-verdict-normal-wash: color-mix(in oklab, var(--color-gold-pale) 34%, var(--color-canvas));
     --color-verdict-pricey-wash: color-mix(in oklab, var(--color-holiday) 11%, var(--color-canvas));
     --color-verdict-none-wash: color-mix(in oklab, var(--color-silver) 40%, var(--color-canvas));
@@ -93,6 +96,25 @@
 
     /* 선택·켜짐 상태의 연한 gold 배경 (와이어프레임 accent-100) */
     --color-gold-wash: color-mix(in oklab, var(--color-gold-pale) 30%, var(--color-canvas));
+
+    /* 공통 색상 조합. 배경(pair-*)과 그 위 글자·아이콘(*-foreground)을 한 쌍으로 쓴다.
+       기본은 크림·매트, 강조는 포레스트·딥 골드. 사용 기준: apps/web/DESIGN.md. */
+    --color-pair-base: var(--color-canvas);
+    --color-pair-base-foreground: var(--color-ink);
+    --color-pair-muted: var(--color-mat);
+    --color-pair-muted-foreground: var(--color-ink);
+    --color-pair-forest: var(--color-sage-wash);
+    --color-pair-forest-foreground: var(--color-forest);
+    --color-pair-forest-strong: var(--color-forest);
+    --color-pair-forest-strong-foreground: var(--color-canvas);
+    --color-pair-gold: var(--color-gold-wash);
+    --color-pair-gold-foreground: var(--color-gold-deep);
+    --color-pair-gold-strong: var(--color-gold-deep);
+    --color-pair-gold-strong-foreground: var(--color-canvas);
+    --color-pair-ink: var(--color-ink);
+    --color-pair-ink-foreground: var(--color-canvas);
+    --color-pair-clay: var(--color-clay);
+    --color-pair-clay-foreground: var(--color-canvas);
 
     /* 공통 모션(와이어프레임 2.7). 쓰는 곳에서 motion-safe:animate-*로 붙인다. */
     --animate-pop: pop 1.2s ease-out both;

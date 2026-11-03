@@ -349,6 +349,78 @@ Color discipline is the signature move. The whole palette is earth-toned — mus
 - Three surface worlds cycling in a predictable rhythm: cream editorial → black news/footer band → silver product stage.
 - Photography-first hierarchy: full-bleed imagery leads, UI recedes to hairlines and quiet labels.
 
+## 장볼날 공통 색상 조합
+
+2026-11-04에 확인한 크림 배경 기준의 색상군이다. **크림·매트를 기본 표면으로, 포레스트·딥 골드를 강조색으로 쓴다.** 공통 색상 조합은 이 절을 따르고, 아래 Oura 분석은 원형 참고로 읽는다. 계절·명절·가격 판정처럼 의미가 정해진 색상은 해당 도메인의 토큰을 우선한다.
+
+### 색의 원천과 이름
+
+- 실제 값의 원천은 `packages/ui/src/styles/globals.css`다. 문서의 색상값을 화면에 직접 복사하지 않는다.
+- 원색 토큰(`canvas`, `mat`, `forest`, `gold-deep` 등) 위에 조합 토큰 `--color-pair-<이름>`과 `--color-pair-<이름>-foreground`를 둔다. 앞 토큰은 배경, `foreground`는 그 배경 위의 글자·아이콘이다.
+- Tailwind에서는 `bg-pair-<이름> text-pair-<이름>-foreground`를 함께 쓴다. 한 쌍의 배경만 바꾸고 이전 글자색을 남기지 않는다.
+- 연한 세이지 `sage-wash`는 `sage` 22%와 `canvas`의 Oklab 혼합색이다. `gold-wash`는 `gold-pale` 30%와 `canvas`, `mat`는 `stone` 8%와 `canvas`를 섞는다. 새 원색이나 고정된 혼합색 hex를 추가하지 않는다.
+
+### 조합 토큰과 용도
+
+아래 이름마다 배경 토큰과 `-foreground` 토큰이 실제 CSS에 정의되어 있다.
+
+| 조합 이름 | 배경 | 글자·아이콘 | 사용 기준 |
+|---|---|---|---|
+| `pair-base` | `canvas` · 크림 | `ink` | 페이지, 기본 검색창, 최근 본 품종처럼 가장 넓게 쓰는 기본 표면 |
+| `pair-muted` | `mat` · 매트 베이지 | `ink` | 담기 전 버튼, 보조 컨트롤, 받침처럼 기본 배경에서 한 단계 구분할 표면 |
+| `pair-forest` | `sage-wash` · 연한 세이지 | `forest` | 브랜드 안내나 강조 구역. 연한 바탕과 진한 초록을 함께 사용 |
+| `pair-forest-strong` | `forest` | `canvas` | 포레스트 강조가 필요한 작은 버튼·표식. 한 구역의 주된 행동 하나에 한정 |
+| `pair-gold` | `gold-wash` · 연한 골드 | `gold-deep` | 따뜻한 강조, 현재 위치, 주목할 안내. 보통 글씨에도 연한 골드 원색 대신 딥 골드를 사용 |
+| `pair-gold-strong` | `gold-deep` | `canvas` | 짧은 강조 표식. 넓은 배경이나 여러 행동 버튼에 반복하지 않음 |
+| `pair-ink` | `ink` | `canvas` | 담음·켜짐 같은 확정된 선택 상태, 또렷한 중립 강조 |
+| `pair-clay` | `clay` | `canvas` | 제한적인 보조 강조. 포레스트·골드와 같은 화면에서 동등하게 경쟁시키지 않음 |
+
+크림과 매트를 화면의 대부분에 사용하고, 연한 포레스트·골드는 필요한 구역에만 넣는다. 진한 채움은 작은 영역에 집중한다. 클레이는 기본 강조색으로 올리지 않는다.
+
+2026-11-04 브라우저의 불투명 단색 조합을 sRGB로 환산해 확인한 글자 대비는 약 6.17:1~15.32:1이다. 가장 낮은 조합은 `pair-gold`이며, 8쌍 모두 일반 글씨 기준 4.5:1 이상이다.
+
+### 현재 화면에 적용하는 기준
+
+- 시세 메인의 검색창과 최근 본 품종은 `pair-base`, 담기 전 버튼은 `pair-muted`, 담은 후 버튼은 `pair-ink` 조합이다. 메인·검색·품종 상세에서 같은 의미를 유지한다. 이 표는 기존 색상과 대응하는 기준이며, 모든 화면의 클래스 이름을 한 번에 바꿀 필요는 없다.
+- 담기 전후는 색상과 함께 `+`·체크 표시 및 `aria-pressed`로 구분한다. 일반 담기 버튼을 포레스트로 칠해 이미 담은 상태처럼 보이게 하지 않는다.
+- `hairline`은 연한 구분선, `silver`는 컨트롤 테두리에 사용한다. 경계·focus는 기존 컴포넌트 규칙을 유지하며 배경색의 미세한 차이만으로 조작 가능 여부를 전달하지 않는다.
+- 보조 글씨는 크림 위에서 `caption`, 매트 위에서는 `stone`을 우선한다. 연한 세이지·골드 위의 글씨는 각 조합의 `foreground`를 쓴다. `ash`, `mute`, `sage`, `gold-pale`을 작은 본문 글자색으로 쓰지 않는다.
+- `verdict-*`는 싸요·보통·비싸요·판정 전, `season-*`는 계절, `holiday`는 공휴일의 의미색이다. 일반 브랜드 강조에는 `pair-*`를 쓰고, 가격 판정이나 오류를 브랜드 색으로 대신 표시하지 않는다. 연한 세이지가 같더라도 일반 안내는 `pair-forest`, 가격 판정은 `verdict-cheap-wash`처럼 의미에 맞는 이름을 선택한다.
+- 흰색 `surface`는 정보 popover처럼 떠 있는 면에 남긴다. 기본 검색창·알약·담기 버튼을 구분하기 위한 기본값으로 흰색을 반복하지 않는다.
+- 아래 Oura 원형의 파란 CTA와 머스터드 버튼 관련 설명은 원형 분석이다. 장볼날의 공통 조합은 이 절을 우선하며, 연한 골드를 진한 글씨 없이 행동 배경으로 쓰지 않는다. 기존 하단 내비·계절 화면의 선택 표현은 각 화면 기준을 유지한다.
+- 라이트 모드 기준이다. 배경 불투명도, 이미지, 겹침을 바꾸면 실제 결과의 대비를 다시 확인한다. 기본 조합의 일반 글씨 대비는 4.5:1 이상을 유지한다.
+
+### 사용 예시
+
+아래 예시는 색상 클래스만 보여 준다. 크기·테두리·focus·접근성 상태는 기존 컴포넌트의 규칙을 함께 적용한다.
+
+```tsx
+<main className="bg-pair-base text-pair-base-foreground">…</main>
+
+<button
+  aria-pressed={added}
+  className={
+    added
+      ? "bg-pair-ink text-pair-ink-foreground"
+      : "bg-pair-muted text-pair-muted-foreground"
+  }
+>
+  {added ? "✓ 담음" : "+ 담기"}
+</button>
+
+<aside className="bg-pair-forest text-pair-forest-foreground">브랜드 안내</aside>
+<span className="bg-pair-gold text-pair-gold-foreground">현재 위치</span>
+```
+
+일반 CSS에서도 같은 쌍을 사용한다.
+
+```css
+.brand-note {
+  background: var(--color-pair-forest);
+  color: var(--color-pair-forest-foreground);
+}
+```
+
 ## 제철달력 화면의 적용 기준
 
 아래는 계절 상세·월별 도감·나의 식탁에 적용한 기준이다. 뒤의 Oura 분석은 원형 참고이며, 실제 앱의 서체·선택 색상·화면별 수치는 이 절을 따른다. 기존의 크림색 바탕, 얇은 경계선, 터치 영역 원칙은 반복하지 않는다.
