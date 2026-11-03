@@ -11,7 +11,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { routes } from "@/shared/routes"
 
-import { DownloadsCard } from "../components/downloads-card"
+import { DownloadsCard } from "@/shared/downloads/downloads-card"
 import { MonthDaysCard } from "../components/month-days-card"
 import { ScatterField } from "../components/scatter-field"
 import { HERO_ID, monthSectionId } from "./active-month"

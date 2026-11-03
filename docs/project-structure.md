@@ -170,7 +170,7 @@ import 경로:
 | `food-detail/` | 1i | `food-detail`, `eat-toggle`, `festival-link` |
 | `search/` | 전역 검색 | `food-search`(헤더 버튼), `food-search-dialog`(cojeev command, 초성 검색) |
 | `components/` | 공통 | `seasonal-shell`(공통 셸에 제철 메뉴 · 검색 · ⚙를 넣는다), `sub-tabs`, `food-image`(그림 없으면 이름 카드), `detail-sheet`(품종 · 에디션 상세 시트), `scatter-field`·`draggable-scatter`(흩어진 배치와 드래그), `month-calendar`, `month-days-card`(달력 아래 "이달의 절기·명절". 2b는 `MonthDaysCardToday`를 `<Suspense>` 안에), `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-name`(먹은 품종 이름 밑줄), `eaten-count`, `share-button`, `holiday-name`, `screen-stub` |
-| `downloads/` | PDF 내려받기(.scratch/calendar-download) | `downloads-view`(목록: 종류별 가로 줄 `EditionShelf`), `edition-detail`(상세: 시트 · 페이지 공용), `edition-thumbnail`, `edition-download-link`(A4 내려받기 주소) |
+| `downloads/` | PDF 내려받기(.scratch/calendar-download) | `downloads-view`(목록: 종류별 가로 줄 `EditionShelf`), `edition-detail`(상세: 시트 · 페이지 공용), `edition-download-link`(A4 내려받기 주소) |
 | `settings/` | 설정 화면 항목 | `display-settings`(화면 표시 섹션, 먹음 기록 지우기) |
 | `stores/` | 공통 | `settings-store`(표시 설정), `scatter-store`(옮긴 배치와 달력 자리) |
 
@@ -232,6 +232,7 @@ import 경로:
 | `shell/` | 가격과 제철이 같이 쓰는 셸: `site-shell`(헤더 + 본문 + 하단 내비), `site-nav`(`SiteHeader`, `FloatingNav`. 내비 칸 72px. 화면별 모바일 헤더 타입은 `HeaderBar`가 헤더의 바 자리에 포털로 그린다), `menus`(어디서나 같은 4칸: 시세 · 제철달력 · 담은 품종 · 나의 식탁, `activeMenuKey`), `match-path`(활성 판정 순수 함수), `nav-link`(활성 링크). `screens`(화면별 헤더 타입 root · sub · search와 스크롤 동작 표, `screenOf`), `sub-header`(하위 헤더 ‹ · 제목 · 액션, `HeaderBar` 포털로 그림), `search-link` · `settings-link`(루트 헤더 🔍 · ⚙). `header-scroll`(hide-on-scroll 헤더의 보임 판정 순수 함수: 10px 임계값, 맨 위 8px, 끝 튕김 무시), `scroll-to-top`(지금 탭을 다시 누르면 맨 위로). `section-row`(구간 줄: 본문의 원래 줄(id)이 화면 위로 지나가면 탭 줄 또는 헤더 아래에 나타나는 40px 고정 줄 `SectionRow`와 칩 `SectionChip`. 2b 달 칩 · 1g 명절 칩 · P3 섹션 칩 · P1 검색 줄이 쓴다. 탭 줄 높이는 CSS 변수 `--tabs-h`). 헤더가 숨으면 셸이 `<html>`의 CSS 변수 `--shell-top`을 56px → 0px로 바꾸고, 고정 줄(제철달력 탭 줄 등)은 이 값을 `top`으로 쓴다. 메뉴 배지(담은 개수)는 라우트 레이아웃이 `badges`로 넣는다. 셸 규칙은 `.scratch/shell-unify/spec.md` |
 | `analytics/` | GA4(절차: `apps/web/docs/analytics.md`): `events.ts`(이벤트 카탈로그. 이벤트를 더하고 지우는 곳은 여기 하나, `REGISTERED_PARAMS`는 GA에 등록한 매개변수)와 규칙 테스트, `config.ts`(`GA_MEASUREMENT_ID` · `GA_DEBUG`를 읽는 곳), `analytics-tag.tsx`(루트 layout이 그린다), `track.ts`(`track(이름, 매개변수)`, 화면은 이것만 부른다), `tracked-link.tsx`(서버 컴포넌트 링크에 이벤트) |
 | `downloads-manifest.ts` | 게시된 인쇄물 매니페스트(`DOWNLOADS`, `findEdition`, `findWithdrawn`). 내려받기 화면과 sitemap이 같이 읽는다 |
+| `downloads/` | 인쇄물 부품: `edition-thumbnail`(쪽 그림 · 받침), `downloads-card`(내려받기 목록으로 가는 입구 카드. 2a · 2b · P1 시세 메인이 같이 쓴다) |
 | `brand-logo.tsx` | 고운돋움 Regular를 패스로 만든 장볼날 가로 로고. 모바일에서 접힌 헤더는 심볼만 보여준다 |
 
 ## 5. 상태와 "오늘"

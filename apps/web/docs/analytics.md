@@ -36,7 +36,7 @@
 | `print_download` | 인쇄물 상세의 "PDF 내려받기" · "다시 내려받기" | `edition_id`, `edition_kind`, `paper`, `placement`(sheet · page) | `features/seasonal/downloads/edition-actions.tsx` |
 | `print_a3_request` | "A3도 원해요"를 이 기기에서 처음 누를 때 | `edition_id`, `edition_kind` | 같은 파일 `A3Request` |
 | `print_share` | 상세의 "공유", 받은 뒤 "링크 복사" · "공유하기". 공유 창을 닫기만 하면 세지 않는다 | `edition_id`, `method`(copy · share) | 같은 파일, `ShareButton`의 `onShared` |
-| `print_entry_click` | 2a · 2b의 "제철 달력 · 포스터 PDF 받기" 카드 | `placement`(this-month · month-timeline) | `features/seasonal/components/downloads-card.tsx` |
+| `print_entry_click` | 2a · 2b · P1 시세 메인의 "제철 달력 · 포스터 PDF 받기" 카드 | `placement`(this-month · month-timeline · price-home) | `shared/downloads/downloads-card.tsx` |
 
 페이지뷰는 보내지 않는다. GA 향상된 측정의 "브라우저 기록 이벤트 기반 페이지 변경"이 클라이언트 이동까지 센다. 직접 보내면 두 번 센다.
 

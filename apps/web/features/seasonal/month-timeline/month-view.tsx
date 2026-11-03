@@ -8,7 +8,7 @@ import { Button } from "@workspace/ui/components/button"
 
 import { routes } from "@/shared/routes"
 
-import { DownloadsCard } from "../components/downloads-card"
+import { DownloadsCard } from "@/shared/downloads/downloads-card"
 import { MonthDaysCardToday } from "../components/month-days-card"
 import { ShareButton } from "../components/share-button"
 import { EatenInMonth } from "./eaten-summary"

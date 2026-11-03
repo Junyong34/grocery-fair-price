@@ -3,6 +3,8 @@ import { monthDay } from "@workspace/price/format"
 import { latestSurveyedOn, pickByIds } from "@workspace/price/list"
 import type { VarietySummary } from "@workspace/price/types"
 
+import { DownloadsCard } from "@/shared/downloads/downloads-card"
+
 import { AddButton } from "../components/add-button"
 import { RecentPills } from "../components/recent-varieties"
 import { SearchEntry } from "../components/search-entry"
@@ -10,7 +12,7 @@ import { HOME_SEARCH_ID } from "./search-id"
 import { HomeSearchRow } from "./search-row"
 import { PriceHint, VarietyRow } from "../components/variety-row"
 
-/** P1 시세 메인: 큰 제목과 검색창, 최근 본 품종, 자주 사는 품종, 근거 한 줄. */
+/** P1 시세 메인: 큰 제목과 검색창, 최근 본 품종, 자주 사는 품종, 근거 한 줄, 맨 끝에 제철 달력 내려받기 카드. */
 export function HomeView({
   varieties,
   featuredIds,
@@ -50,6 +52,7 @@ export function HomeView({
         </ul>
       </section>
       {basisLine && <p className="text-xs text-caption">{basisLine}</p>}
+      <DownloadsCard placement="price-home" className="lg:max-w-[420px]" />
     </div>
   )
 }

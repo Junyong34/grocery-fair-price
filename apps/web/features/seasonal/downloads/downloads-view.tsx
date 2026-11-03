@@ -9,7 +9,7 @@ import { DOWNLOADS } from "@/shared/downloads-manifest"
 import { routes } from "@/shared/routes"
 import { SubHeader } from "@/shared/shell/sub-header"
 
-import { EditionThumbnail, ThumbnailMat } from "../components/edition-thumbnail"
+import { EditionThumbnail, ThumbnailMat } from "@/shared/downloads/edition-thumbnail"
 
 /** 내려받기 목록(2-C): 종류별 가로 줄. 칸을 누르면 상세가 시트로 뜬다(@sheet/(.)downloads/[edition]). */
 export function DownloadsView() {

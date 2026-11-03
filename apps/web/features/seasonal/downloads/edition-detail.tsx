@@ -3,7 +3,7 @@ import type { ManifestEntry } from "@workspace/seasonal/print/edition"
 import { editionMeta, editionName } from "@workspace/seasonal/print/listing"
 import { PRINT_KIND_LABELS } from "@workspace/seasonal/print/spec"
 
-import { EditionThumbnail, ThumbnailMat } from "../components/edition-thumbnail"
+import { EditionThumbnail, ThumbnailMat } from "@/shared/downloads/edition-thumbnail"
 import { EditionActions } from "./edition-actions"
 
 /**

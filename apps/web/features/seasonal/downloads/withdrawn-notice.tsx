@@ -7,7 +7,7 @@ import { editionMeta, editionName, replacementFor } from "@workspace/seasonal/pr
 import { DOWNLOADS } from "@/shared/downloads-manifest"
 import { routes } from "@/shared/routes"
 
-import { EditionThumbnail } from "../components/edition-thumbnail"
+import { EditionThumbnail } from "@/shared/downloads/edition-thumbnail"
 
 /** 내린 에디션 주소로 왔을 때(6-1). 같은 종류의 최신 에디션을 안내한다. 다른 해 달력으로 말없이 넘기지 않는다. */
 export function WithdrawnNotice({ edition }: { edition: WithdrawnEntry }) {

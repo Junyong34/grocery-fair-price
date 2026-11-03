@@ -4,14 +4,14 @@ import { DOWNLOADS_COPY } from "@workspace/seasonal/data/copy"
 import { editionName, featuredEdition } from "@workspace/seasonal/print/listing"
 import { cn } from "@workspace/ui/lib/utils"
 
+import type { AnalyticsEvents } from "@/shared/analytics/events"
 import { TrackedLink } from "@/shared/analytics/tracked-link"
+import { EditionThumbnail, ThumbnailMat } from "@/shared/downloads/edition-thumbnail"
 import { DOWNLOADS } from "@/shared/downloads-manifest"
 import { routes } from "@/shared/routes"
 
-import { EditionThumbnail, ThumbnailMat } from "./edition-thumbnail"
-
-/** 2a · 2b에서 내려받기 목록으로 가는 카드(1-a). 게시된 에디션이 없으면 그리지 않는다. */
-export function DownloadsCard({ placement, className }: { placement: "this-month" | "month-timeline"; className?: string }) {
+/** 2a · 2b · P1 시세 메인에서 내려받기 목록으로 가는 카드(1-a). 게시된 에디션이 없으면 그리지 않는다. */
+export function DownloadsCard({ placement, className }: { placement: AnalyticsEvents["print_entry_click"]["placement"]; className?: string }) {
   const featured = featuredEdition(DOWNLOADS.editions)
   if (!featured) return null
   return (
