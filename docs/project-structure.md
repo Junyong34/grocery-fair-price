@@ -207,7 +207,7 @@ import 경로:
 |---|---|
 | `data/` | 데이터 경계(명세 `.scratch/price-db-read/spec.md`). `price-source.ts`(`PriceSource`, `getPriceSource()`, `server-only`)만 화면이 부른다. 운영 DB `price.current_judgment`를 읽는다: `db.ts`(postgres 클라이언트 하나, `web_reader`, `WEB_DATABASE_URL`, `prepare: false`), `queries/`(판정 읽기 module: 메서드마다 파일 하나, `sql`을 받아 SQL · `@workspace/price/schema` 검사 · 어긋난 행 처리까지 하고 검사된 값을 돌려준다. `queries.db.test.ts`가 로컬 DB로 확인, `pnpm db:test`), `db-source.ts`(캐시 정책만: 목록 `hours` · 검색 `hours`(별칭 · 카테고리는 `days`) · 상세는 React `cache()`만), `featured.ts`(자주 사는 품종 상수). `data-boundary.test.ts`가 `data/` 밖의 `db` · `db-source` · `queries/` import를 막는다 |
 | `home/` | P1 시세 메인. 자주 사는 품종 제목 옆 기존 UI Popover로 시세·평소가·판정과 조사 범위를 안내하고, 목록 아래는 출처 이름만 우측 정렬한다 |
-| `search/` | P2 품종 검색. 검색어는 `history.replaceState`로 `?q=`에 맞춘다 |
+| `search/` | P2 품종 검색. 공용 `BackButton`이 검색창 앞에 있고, 직접 진입하면 시세 메인으로 간다. 검색어 지우기 ×는 입력창 안에 유지한다. 검색어는 `history.replaceState`로 `?q=`에 맞춘다 |
 | `basket/` | P4 담은 품종: 판정별 개수, 바뀐 판정 알림, 판정별 묶음, × 빼기, 편집(모두 빼기), 빈 목록. 기기 값을 불러온 뒤에 그린다 |
 | `variety-detail/` | P3 품종 상세: `detail-header`(본문 제목 줄, 최근 본 품종에 넣기. 모바일은 `DetailHeaderBar`가 처음부터 하위 헤더 "‹ 품종 · 담기"를 그리고, 데스크톱은 본문 줄에 뒤로 · 담기가 있다), `verdict-card`(판정 전 · 오래됨 · 표본 적음), `range-bar`, `places-section`(장소 비교, 판정 색 없음), `why-section`(`trend-chart` SVG + `dots-compare`), `my-price`(내가 본 가격, 저장 안 함) |
 | `components/` | 품종 행(`variety-row`: 모바일은 품종·판정과 시세를 묶고 넓은 화면은 네 열 subgrid, 시세·평소가·품종별 조사일 표시), 판정 칩 · 점(`verdict-chip`: 목록은 판정 단어만, 최근 3회 조사 편차 %는 상세에서 기준과 함께 표시. 색은 `verdict-tone`), `add-button`, `basket-toast`(담기 토스트 "배추를 담았어요 · 목록 보기", 화면 키보드 위로), `basket-badge`(내비 담은 개수), `search-entry`, `recent-varieties`, `price-shell` |

@@ -177,7 +177,6 @@ export const PRICE_COPY = {
   search: {
     placeholder: "품종 이름이나 초성",
     label: "품종 검색",
-    cancel: "취소",
     item: (item: string) => `품목 "${item}" · 어떤 ${item}인가요?`,
     alias: (alias: string) =>
       `"${alias}"${josaOf(alias, "은/는")} 이 품종으로 찾았어요`,
