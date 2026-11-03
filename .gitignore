@@ -2,6 +2,7 @@
 .idea
 .env
 .serena
+.playwright-mcp
 # Headroom
 .claude/.headroom_*
 
