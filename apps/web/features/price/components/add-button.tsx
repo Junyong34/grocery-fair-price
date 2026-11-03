@@ -27,7 +27,7 @@ export function AddButton({ variety }: { variety: VarietySummary }) {
         "grid size-11 place-items-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-reduce:transition-none",
         added
           ? "border-ink bg-ink text-canvas"
-          : "border-silver bg-surface text-ink hover:border-stone"
+          : "border-silver bg-mat text-ink hover:border-stone"
       )}
     >
       {added ? (
