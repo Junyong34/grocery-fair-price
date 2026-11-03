@@ -139,6 +139,14 @@ export function listBasisLine(
   return `조사일 ${dates} · ${sources.join(" · ")}`
 }
 
+/** 목록 하단은 출처 이름만 표시한다. 조사 범위와 날짜는 안내 popover·행에서 확인한다. */
+export function listSourceLine(
+  rows: readonly { basis: QuoteBasis }[]
+): string | null {
+  const sources = [...new Set(rows.map(({ basis }) => basis.source))]
+  return sources.length ? `출처: ${sources.join(" · ")}` : null
+}
+
 export const PRICE_COPY = {
   home: {
     title: ["지금 사도 될까?", "품종을 검색해 보세요"],
@@ -146,7 +154,7 @@ export const PRICE_COPY = {
     recent: "최근 본 품종",
     clearRecent: "지우기",
     featured: "자주 사는 품종",
-    openDetail: "품종을 누르면 가격 근거를 볼 수 있어요",
+    priceInfo: "시세·판정 안내",
   },
   /** 목록 위 설명 한 줄 */
   hint: [

@@ -4,6 +4,7 @@ import {
   basisLine,
   brandSpreadNote,
   listBasisLine,
+  listSourceLine,
   partOfMonth,
   PRICE_COPY,
   seasonNote,
@@ -140,6 +141,25 @@ describe("listBasisLine", () => {
 
   it("빈 목록이면 null", () => {
     expect(listBasisLine([])).toBeNull()
+  })
+})
+
+describe("목록의 짧은 출처", () => {
+  it("날짜와 조사 범위를 빼고 출처 이름만 중복 없이 표시한다", () => {
+    expect(
+      listSourceLine([
+        { basis: { source: "KAMIS", scope: "전국 조사 시장" } },
+        { basis: { source: "축평원", scope: "전국 평균" } },
+        { basis: { source: "KAMIS", scope: "대형마트" } },
+      ])
+    ).toBe("출처: KAMIS · 축평원")
+  })
+
+  it("출처가 하나면 구분자 없이 표시하고 빈 목록이면 숨긴다", () => {
+    expect(
+      listSourceLine([{ basis: { source: "KAMIS", scope: "전국 조사 시장" } }])
+    ).toBe("출처: KAMIS")
+    expect(listSourceLine([])).toBeNull()
   })
 })
 
