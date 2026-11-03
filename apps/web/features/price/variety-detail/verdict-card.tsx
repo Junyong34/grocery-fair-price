@@ -39,7 +39,7 @@ export function VerdictCard({
       )}
     >
       {detail.stale && (
-        <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-surface/80 px-2.5 py-1 text-xs font-semibold text-stone">
+        <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-canvas/80 px-2.5 py-1 text-xs font-semibold text-stone">
           <CalendarClock aria-hidden size={14} />
           {COPY.stale(
             detail.surveyedOn,
@@ -126,7 +126,7 @@ function PriceCell({
   muted?: boolean
 }) {
   return (
-    <div className="flex flex-col gap-1 rounded-2xl bg-surface/75 p-3">
+    <div className="flex flex-col gap-1 rounded-2xl bg-canvas/80 p-3">
       <dt className="text-xs font-semibold text-stone">{term}</dt>
       <dd className="flex flex-col gap-1">
         <span
