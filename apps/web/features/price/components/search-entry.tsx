@@ -16,7 +16,7 @@ export function SearchEntry({ className }: { className?: string }) {
     <Link
       href={routes.price.search}
       className={cn(
-        "flex h-14 items-center gap-3 rounded-full border border-silver bg-surface px-5 text-base text-caption no-underline shadow-sm shadow-ink/5 transition-colors hover:border-stone focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+        "flex h-14 items-center gap-3 rounded-full border border-silver bg-canvas px-5 text-base text-caption no-underline shadow-sm shadow-ink/5 transition-colors hover:border-stone focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
         className
       )}
     >
