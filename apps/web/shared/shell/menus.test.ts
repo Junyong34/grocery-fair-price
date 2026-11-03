@@ -18,6 +18,7 @@ describe("activeMenuKey", () => {
     ["/seasonal/months/11", "seasonal"],
     ["/seasonal/seasons/autumn", "seasonal"],
     ["/seasonal/festivals/chuseok", "seasonal"],
+    ["/seasonal/sashimi/2", "seasonal"],
     ["/seasonal/foods/napa-cabbage", "seasonal"],
     ["/seasonal/downloads", "seasonal"],
     ["/seasonal/downloads/2027-monthly", "seasonal"],

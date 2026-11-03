@@ -5,7 +5,7 @@ import { findFood, FOODS } from "@workspace/seasonal/data/foods"
 import { MONTHS } from "@workspace/seasonal/data/months"
 import { SEASONS } from "@workspace/seasonal/data/seasons"
 
-import { festivalSeo, foodSeo, homeSeo, seasonalHomeSeo, monthSeo, monthsIndexSeo, seasonSeo, seasonsIndexSeo } from "./titles"
+import { festivalSeo, foodSeo, homeSeo, seasonalHomeSeo, monthSeo, monthsIndexSeo, sashimiSeo, seasonSeo, seasonsIndexSeo } from "./titles"
 
 const all = [
   homeSeo(),
@@ -16,6 +16,7 @@ const all = [
   ...SEASONS.map(seasonSeo),
   ...FESTIVALS.map(({ slug }) => festivalSeo(slug)),
   ...FOODS.map(foodSeo),
+  ...MONTHS.map(sashimiSeo),
 ]
 
 describe("페이지 제목·설명", () => {
@@ -27,6 +28,7 @@ describe("페이지 제목·설명", () => {
     expect(seasonsIndexSeo().title).toBe("계절별 제철 음식")
     expect(seasonSeo("spring").title).toBe("봄 제철 음식")
     expect(festivalSeo("chuseok").title).toBe("추석 음식")
+    expect(sashimiSeo(12).title).toBe("12월 제철 회")
     expect(foodSeo(findFood("snow-crab")!).title).toBe("대게 제철 시기")
   })
 
@@ -53,6 +55,10 @@ describe("페이지 제목·설명", () => {
   it("달·계절 설명에 대표 품종 이름을 넣는다", () => {
     expect(monthSeo(3).description).toMatch(/냉이|달래/)
     expect(seasonSeo("autumn").description).toMatch(/사과|고등어/)
+  })
+
+  it("제철 회 설명에 그 달 횟감 이름을 넣는다", () => {
+    expect(sashimiSeo(12).description).toContain("방어")
   })
 
   it("명절 설명에 전통 음식을 넣는다", () => {

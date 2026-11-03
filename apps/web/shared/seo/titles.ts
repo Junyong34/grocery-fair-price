@@ -6,6 +6,7 @@ import { SEASON_COPY } from "@workspace/seasonal/data/copy"
 import { dishNames } from "@workspace/seasonal/data/dishes"
 import { type Festival, festivalOf, festivalsWithFood } from "@workspace/seasonal/data/festivals"
 import { type Food, foodsInSeasonWith, monthHighlights, seasonHighlights } from "@workspace/seasonal/data/foods"
+import { sashimiInMonth } from "@workspace/seasonal/data/sashimi"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 import type { Season } from "@workspace/seasonal/data/seasons"
 
@@ -74,6 +75,14 @@ export function festivalSeo(slug: Festival): PageSeo {
   return {
     title: `${name} 음식`,
     description: `${name}(${period})에 먹는 전통 음식 ${dishNames(traditionalDishes).join("·")}, 그리고 ${name} 무렵 제철 식재료를 소개해요.`,
+  }
+}
+
+/** 제철 회(.scratch/sashimi/spec.md) */
+export function sashimiSeo(month: number): PageSeo {
+  return {
+    title: `${month}월 제철 회`,
+    description: `${month}월에 회로 맛있는 생선과 해산물, ${names(sashimiInMonth(month).slice(0, 3))} 등. 맛과 식감을 한 줄씩 소개해요.`,
   }
 }
 

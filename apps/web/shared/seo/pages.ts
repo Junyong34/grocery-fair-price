@@ -35,6 +35,7 @@ export const SEO_PAGES: Readonly<Record<string, () => readonly SitemapEntry[]>> 
   "/seasonal/downloads/[edition]": () =>
     DOWNLOADS.editions.map((edition) => ({ path: routes.seasonal.download(edition.id), images: edition.thumbnails.map((thumbnail) => thumbnail.path) })),
   "/seasonal/seasons/[season]": () => SEASONS.map((season) => ({ path: routes.seasonal.season(season) })),
+  "/seasonal/sashimi/[month]": () => MONTHS.map((month) => ({ path: routes.seasonal.sashimiMonth(month) })),
   "/seasonal/festivals/[festival]": () => FESTIVALS.map(({ slug }) => ({ path: routes.seasonal.festival(slug) })),
   // 그림이 있는 품종은 일러스트를 이미지 sitemap으로 알린다(FoodImage가 그리는 그 파일).
   "/seasonal/foods/[food]": () =>

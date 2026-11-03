@@ -36,13 +36,14 @@ export const MENUS: readonly MenuItem[] = [
     Icon: ChartLine,
   },
   {
-    // 제철 화면 전체(이달 · 월별 · 계절 · 명절 · 품종 상세 · 내려받기). 나의 식탁만 따로 칸이 있다.
+    // 제철 화면 전체(이달 · 월별 · 계절 · 제철 회 · 명절 · 품종 상세 · 내려받기). 나의 식탁만 따로 칸이 있다.
     key: "seasonal",
     label: "제철달력",
     href: routes.seasonal.root,
     also: [
       routes.seasonal.months,
       routes.seasonal.seasons,
+      routes.seasonal.sashimi,
       routes.seasonal.festivals,
       routes.seasonal.food("").slice(0, -1),
       routes.seasonal.downloads,

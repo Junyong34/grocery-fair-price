@@ -33,6 +33,9 @@ export const routes = {
     /** 3a 계절 히어로 · 계절 상세 */
     seasons: "/seasonal/seasons",
     season: (season: Season) => `/seasonal/seasons/${season}`,
+    /** 제철 회. 접두 경로만 열면 proxy.ts가 서울 기준 이번 달로 보낸다(.scratch/sashimi/spec.md). */
+    sashimi: "/seasonal/sashimi",
+    sashimiMonth: (month: number) => `/seasonal/sashimi/${month}`,
     /** 1g 명절. 접두 경로만 열면 proxy.ts가 다가오는 명절로 보낸다. */
     festivals: "/seasonal/festivals",
     festival: (festival: Festival) => `/seasonal/festivals/${festival}`,
