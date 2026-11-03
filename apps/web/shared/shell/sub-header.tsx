@@ -6,22 +6,28 @@ import { useRouter } from "next/navigation"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { HeaderBar } from "./site-nav"
+import { useScrolledPast } from "./use-scrolled-past"
 
 /**
  * 모바일 하위 헤더(.scratch/shell-unify/spec.md 3장): ‹ · 제목 · 액션 0~2개. 사이트 헤더의 바 자리에 늘 그려 로고 · 버튼을 가린다.
  * ‹는 앞 화면이 있으면 뒤로, 주소로 바로 들어왔으면 fallbackHref(그 화면의 부모)로 간다. 데스크톱(≥1024)은 헤더가 바 자리를 그리지 않는다.
+ * revealAfter(본문 제목 줄 id)를 주면 제목은 숨겨 두었다가 그 줄이 반쯤 헤더 밑으로 들어가면 나타난다(짧은 화면은 끝까지 내려도 줄이 다 지나가지 않는다). 본문 첫 줄에 같은 제목이 크게 있는 화면(P3)용.
  */
 export function SubHeader({
   title,
   fallbackHref,
   actions,
+  revealAfter,
   className,
 }: {
   title: React.ReactNode
   fallbackHref: string
   actions?: React.ReactNode
+  revealAfter?: string
   className?: string
 }) {
+  const passed = useScrolledPast(revealAfter, { edge: "center" })
+  const hidden = revealAfter != null && !passed
   return (
     <HeaderBar>
       <div
@@ -32,7 +38,15 @@ export function SubHeader({
         )}
       >
         <BackButton fallbackHref={fallbackHref} />
-        <p className="min-w-0 flex-1 truncate font-heading text-[19px] leading-tight font-bold text-ink">
+        <p
+          aria-hidden={hidden || undefined}
+          className={cn(
+            "min-w-0 flex-1 truncate font-heading text-[19px] leading-tight font-bold text-ink",
+            revealAfter != null &&
+              "motion-safe:transition-[opacity,translate] motion-safe:duration-200",
+            hidden && "translate-y-1 opacity-0"
+          )}
+        >
           {title}
         </p>
         {actions && (

@@ -38,9 +38,21 @@ export function DetailHeader({ variety }: { variety: VarietySummary }) {
   )
 }
 
-/** 모바일 하위 헤더: "‹ 계란 · 담기"를 처음부터 헤더 자리에 둔다(.scratch/shell-unify/spec.md 3장). 데스크톱은 본문 제목 줄이 같은 일을 한다. */
+/**
+ * 모바일 하위 헤더: "‹ · 담기"를 처음부터 헤더 자리에 둔다(.scratch/shell-unify/spec.md 3장). 데스크톱은 본문 제목 줄이 같은 일을 한다.
+ * 품종 이름은 본문 제목 줄과 겹치므로 그 줄이 헤더 밑으로 지나간 뒤에만 헤더에 올린다.
+ */
 export function DetailHeaderBar({ variety }: { variety: VarietySummary }) {
-  return <SubHeader title={variety.name} fallbackHref={routes.home} actions={<KeepButton variety={variety} className="h-8 px-3 text-[13px]" />} />
+  return (
+    <SubHeader
+      title={variety.name}
+      fallbackHref={routes.home}
+      revealAfter={P3_SECTIONS.title}
+      actions={
+        <KeepButton variety={variety} className="h-8 px-3 text-[13px]" />
+      }
+    />
+  )
 }
 
 function KeepButton({
@@ -60,7 +72,7 @@ function KeepButton({
         "h-9 shrink-0 rounded-full border px-3.5 text-sm font-semibold transition-colors",
         added
           ? "border-ink bg-ink text-canvas"
-          : "border-silver bg-surface text-ink hover:border-stone",
+          : "border-silver bg-mat text-ink hover:border-stone",
         className
       )}
     >
