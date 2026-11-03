@@ -40,7 +40,7 @@ export function RecentPills({ varieties }: { varieties: readonly VarietySummary[
           <li key={variety.id}>
             <Link
               href={routes.price.variety(variety.id)}
-              className="inline-flex h-9 items-center gap-2 rounded-full border border-hairline bg-surface px-3.5 text-sm text-ink no-underline hover:border-stone"
+              className="inline-flex h-9 items-center gap-2 rounded-full border border-hairline bg-canvas px-3.5 text-sm text-ink no-underline hover:border-stone"
             >
               <VerdictDot verdict={variety.verdict} />
               {variety.name}
