@@ -35,6 +35,11 @@ export function verdictDiff(pct: number): string {
   return `평소보다 ${Math.abs(pct)}% ${pct > 0 ? "높아요" : "낮아요"}`
 }
 
+/** 수집된 판정의 편차는 최근 3 조사일의 중앙값이다. 직접 입력 가격의 당일 비교와 구분한다. */
+export function verdictTrendDiff(pct: number): string {
+  return `최근 3회 조사에서 ${verdictDiff(pct)}`
+}
+
 /** "10월 말"처럼 날짜를 달의 초 · 중순 · 말로. */
 export function partOfMonth(iso: string): string {
   const [, month, day] = iso.split("-").map(Number)
@@ -50,7 +55,8 @@ const SEASON_FLAT = 0.05
  */
 export function seasonNote(seasonIndex: number, iso: string): string {
   const pct = Math.round((seasonIndex - 1) * 100)
-  if (Math.abs(seasonIndex - 1) < SEASON_FLAT) return `${partOfMonth(iso)}엔 한 해 중 가격이 평소와 비슷한 때예요`
+  if (Math.abs(seasonIndex - 1) < SEASON_FLAT)
+    return `${partOfMonth(iso)}엔 한 해 중 가격이 평소와 비슷한 때예요`
   return `${partOfMonth(iso)}엔 한 해 평소보다 ${Math.abs(pct)}% ${pct > 0 ? "비싼" : "싼"} 때예요`
 }
 
@@ -58,12 +64,19 @@ export function seasonNote(seasonIndex: number, iso: string): string {
  * 계절 한 줄 뒤에 붙이는 판정 풀이. 평소가는 이미 계절을 감안한 값이라, 판정이 싸요 · 비싸요면 계절 말고 다른 이유가 있다.
  * 날씨 · 작황은 데이터로 확인하지 않으므로 "있을 수 있어요"로만 쓴다. 판정 전이면 null.
  */
-export function seasonVerdictNote(verdict: Verdict, seasonIndex: number): string | null {
+export function seasonVerdictNote(
+  verdict: Verdict,
+  seasonIndex: number
+): string | null {
   if (verdict.kind === "none" || verdict.pct === null) return null
-  if (verdict.kind === "pricey") return `계절을 감안해도 평소보다 ${Math.abs(verdict.pct)}% 높아요. 날씨 · 작황 · 수입량처럼 계절 말고 다른 이유가 있을 수 있어요`
-  if (verdict.kind === "cheap") return `계절을 감안해도 평소보다 ${Math.abs(verdict.pct)}% 낮아요. 물량이 많은 때일 수 있어요`
-  if (seasonIndex - 1 >= SEASON_FLAT) return "비싸 보여도 이맘때 오르는 만큼 오른 가격이에요"
-  if (1 - seasonIndex >= SEASON_FLAT) return "이맘때 내리는 만큼 내린 가격이에요"
+  if (verdict.kind === "pricey")
+    return `계절을 감안해도 평소보다 ${Math.abs(verdict.pct)}% 높아요. 날씨 · 작황 · 수입량처럼 계절 말고 다른 이유가 있을 수 있어요`
+  if (verdict.kind === "cheap")
+    return `계절을 감안해도 평소보다 ${Math.abs(verdict.pct)}% 낮아요. 물량이 많은 때일 수 있어요`
+  if (seasonIndex - 1 >= SEASON_FLAT)
+    return "비싸 보여도 이맘때 오르는 만큼 오른 가격이에요"
+  if (1 - seasonIndex >= SEASON_FLAT)
+    return "이맘때 내리는 만큼 내린 가격이에요"
   return null
 }
 
@@ -95,19 +108,35 @@ export const MARKET_TYPE_NAME: Record<MarketType, string> = {
 }
 
 /** 화면 맨 아래 근거 한 줄: "전국 조사 시장 45곳 · 10/23 조사 (KAMIS)" */
-export function basisLine(basis: QuoteBasis, surveyedOn: string, n: number): string {
+export function basisLine(
+  basis: QuoteBasis,
+  surveyedOn: string,
+  n: number
+): string {
   return `${basis.scope} ${n}곳 · ${monthDay(surveyedOn)} 조사 (${basis.source})`
 }
 
 /**
- * 목록 아래 근거 한 줄: "시세는 10/29 조사 · KAMIS 전국 조사 시장 · 축평원 전국 평균".
- * 조사일은 가장 최근 것, 출처는 행들에 처음 나온 순서대로 한 번씩 쓴다. 빈 목록이면 null.
+ * 목록 아래 근거 한 줄. 조사일이 다르면 범위로 쓰고, 출처는 처음 나온 순서대로 한 번씩 쓴다.
+ * 빈 목록이면 null. 행별 조사일도 시세 옆에 표시한다.
  */
-export function listBasisLine(rows: readonly { surveyedOn: string; basis: QuoteBasis }[]): string | null {
+export function listBasisLine(
+  rows: readonly { surveyedOn: string; basis: QuoteBasis }[]
+): string | null {
   const surveyedOn = latestSurveyedOn(rows)
   if (surveyedOn == null) return null
-  const sources = [...new Set(rows.map(({ basis }) => `${basis.source} ${basis.scope}`))]
-  return `시세는 ${monthDay(surveyedOn)} 조사 · ${sources.join(" · ")}`
+  const earliest = rows.reduce(
+    (day, row) => (row.surveyedOn < day ? row.surveyedOn : day),
+    surveyedOn
+  )
+  const dates =
+    earliest === surveyedOn
+      ? monthDay(surveyedOn)
+      : `${monthDay(earliest)}~${monthDay(surveyedOn)}`
+  const sources = [
+    ...new Set(rows.map(({ basis }) => `${basis.source} ${basis.scope}`)),
+  ]
+  return `조사일 ${dates} · ${sources.join(" · ")}`
 }
 
 export const PRICE_COPY = {
@@ -117,17 +146,20 @@ export const PRICE_COPY = {
     recent: "최근 본 품종",
     clearRecent: "지우기",
     featured: "자주 사는 품종",
+    openDetail: "품종을 누르면 가격 근거를 볼 수 있어요",
   },
   /** 목록 위 설명 한 줄 */
   hint: [
-    { term: "시세", text: "오늘 조사한 곳들의 중간값" },
-    { term: "평소", text: "이맘때 보통 가격" },
+    { term: "시세", text: "최근 조사 가격" },
+    { term: "평소가", text: "이맘때 보통 가격" },
   ],
+  judgmentHint: "판정은 최근 3회 조사 기준 · 판정 전은 평소가 없음",
   row: {
     usual: (usual: string) => `평소 ${usual}`,
     noUsual: "평소가 없음",
     add: (name: string) => `${name} 담기`,
     remove: (name: string) => `${name} 빼기`,
+    stale: "오래됨",
   },
   toast: {
     added: (name: string) => `${withJosa(name, "을/를")} 담았어요`,
@@ -139,9 +171,12 @@ export const PRICE_COPY = {
     label: "품종 검색",
     cancel: "취소",
     item: (item: string) => `품목 "${item}" · 어떤 ${item}인가요?`,
-    alias: (alias: string) => `"${alias}"${josaOf(alias, "은/는")} 이 품종으로 찾았어요`,
-    typo: (query: string) => `"${query}"에 맞는 품종이 없어요. 혹시 이 품종인가요?`,
-    noResult: (query: string) => `"${query}"${josaOf(query, "은/는")} 아직 판정하지 않아요`,
+    alias: (alias: string) =>
+      `"${alias}"${josaOf(alias, "은/는")} 이 품종으로 찾았어요`,
+    typo: (query: string) =>
+      `"${query}"에 맞는 품종이 없어요. 혹시 이 품종인가요?`,
+    noResult: (query: string) =>
+      `"${query}"${josaOf(query, "은/는")} 아직 판정하지 않아요`,
     tipsTitle: "이렇게 찾아보세요",
     tips: [
       { how: "품종 이름", example: "애호박, 삼겹살" },
@@ -156,16 +191,21 @@ export const PRICE_COPY = {
     add: "+ 담기",
     added: "✓ 담음",
     nowPrice: "지금 시세",
-    nowPriceNote: (surveyedOn: string, n: number) => `${monthDay(surveyedOn)} 조사한 ${n}곳 가격의 중간값`,
+    nowPriceNote: (surveyedOn: string, n: number) =>
+      `${monthDay(surveyedOn)} 조사한 ${n}곳 가격의 중간값`,
     usual: "평소가",
     usualNote: "이맘때 보통 이 정도예요",
-    noUsual: "평소가를 낼 만큼 시세가 아직 쌓이지 않았어요",
-    usualPending: "계산 중",
-    usualPendingNote: "시세가 쌓이면 보여 줘요",
-    stale: (surveyedOn: string, ago: string) => `마지막 조사 ${monthDay(surveyedOn)} · ${ago}`,
+    noUsual: "평소가가 없어 시세만 보여드려요",
+    verdictBasis:
+      "조사마다 평소가와 비교한 차이의 중간값이에요. 아래 두 금액의 차이와 다를 수 있어요.",
+    usualPending: "자료 없음",
+    usualPendingNote: "조사된 시세와 가격 흐름은 볼 수 있어요",
+    stale: (surveyedOn: string, ago: string) =>
+      `마지막 조사 ${monthDay(surveyedOn)} · ${ago}`,
     staleNote: "최근 조사가 없어 지금과 다를 수 있어요",
     fewSamples: (n: number) => `조사한 곳이 ${n}곳뿐이라 참고만 하세요`,
-    rangeTitle: (surveyedOn: string, n: number) => `${monthDay(surveyedOn)} 조사한 ${n}곳의 시세 범위`,
+    rangeTitle: (surveyedOn: string, n: number) =>
+      `${monthDay(surveyedOn)} 조사한 ${n}곳의 시세 범위`,
     rangeLow: "싼 곳",
     rangeHigh: "비싼 곳",
     rangeUsual: (usual: string) => `평소가 ${usual} · 평소 범위`,
@@ -181,7 +221,8 @@ export const PRICE_COPY = {
     places: (n: number) => `${n}곳`,
     showAllMarkets: (n: number) => `전통시장 ${n}곳 모두 보기`,
     showFewerMarkets: "접기",
-    placesNote: (national: string) => `막대의 점선은 전국 중간값(${national}원). 매장에서 본 가격을 여기 견주어 보세요.`,
+    placesNote: (national: string) =>
+      `막대의 점선은 전국 중간값(${national}원). 매장에서 본 가격을 여기 견주어 보세요.`,
     why: "왜 이 판정일까?",
     whyNoUsual: "가격 흐름 보기",
     trendTitle: "가격 추이",
@@ -199,40 +240,54 @@ export const PRICE_COPY = {
       pricey: "평소보다 비쌌던 날",
       cheap: "쌌던 날",
     },
-    forecastNote: "예상은 평년의 같은 시기 흐름을 지금 시세에 이어 붙인 것이에요. 날씨·작황에 따라 크게 달라질 수 있어요.",
+    forecastNote:
+      "예상은 평년의 같은 시기 흐름을 지금 시세에 이어 붙인 것이에요. 날씨·작황에 따라 크게 달라질 수 있어요.",
     noUsualTrendNote: "평소가가 생기면 평소 범위와 판정이 함께 보여요.",
     today: "오늘",
     shelfTitle: "판매처별 가격",
     shelfSub: (unit: string) => `${unit} 기준`,
-    shelfGroupQuote: (surveyedOn: string) => `시세 · ${monthDay(surveyedOn)} 조사`,
-    shelfGroupShelf: (surveyedOn: string) => `판매가 · 참가격 ${monthDay(surveyedOn)} 조사`,
+    shelfGroupQuote: (surveyedOn: string) =>
+      `시세 · ${monthDay(surveyedOn)} 조사`,
+    shelfGroupShelf: (surveyedOn: string) =>
+      `판매가 · 참가격 ${monthDay(surveyedOn)} 조사`,
     shelfLag: (shelfOn: string, quoteOn: string, days: number) =>
       `판매가는 참가격 ${monthDay(shelfOn)} 조사라 시세(${monthDay(quoteOn)})보다 ${days}일 앞선 값이에요.`,
     promo: "행사",
     marketDotsTitle: "조사 시장별 시세",
-    marketDotsSub: (surveyedOn: string, unit: string) => `${monthDay(surveyedOn)} 조사 · ${unit}`,
+    marketDotsSub: (surveyedOn: string, unit: string) =>
+      `${monthDay(surveyedOn)} 조사 · ${unit}`,
     marketDotsMedian: "가운데 값",
-    marketDotsNote: "대형마트 이름은 KAMIS가 B · C · E처럼 가려서 줘요. 같은 체인은 전국이 같은 값인 경우가 많아요.",
-    dotLegend: { quote: "시세", shelf: "판매가", market: "조사 시장 한 곳", band: "평소 범위 (보통)" },
+    marketDotsNote:
+      "대형마트 이름은 KAMIS가 B · C · E처럼 가려서 줘요. 같은 체인은 전국이 같은 값인 경우가 많아요.",
+    dotLegend: {
+      quote: "시세",
+      shelf: "판매가",
+      market: "조사 시장 한 곳",
+      band: "평소 범위 (보통)",
+    },
     myPrice: "내가 본 가격 적기",
     myPriceUnit: (unit: string) => `${unit} 기준`,
     myPriceTitle: "내가 본 가격",
     myPricePlaceholder: (example: string) => `예: ${example}`,
     myPriceWon: "원",
-    myPriceHint: "기준 단위로 입력해 주세요. 입력한 가격은 이 화면에서만 비교해요.",
+    myPriceHint:
+      "기준 단위로 입력해 주세요. 입력한 가격은 이 화면에서만 비교해요.",
     myPriceApply: "비교하기",
     myPriceClose: "닫기",
     myPriceClear: "내가 본 가격 지우기",
     myPriceEdit: "다시 적기",
     myPriceLabel: (unit: string) => `내가 본 가격 · ${unit}`,
-    myPriceAgainstUsual: (diff: string, usual: string) => `${diff} · 평소가 ${usual}원`,
+    myPriceAgainstUsual: (diff: string, usual: string) =>
+      `${diff} · 평소가 ${usual}원`,
   },
   basket: {
     title: "담은 품종",
     edit: "편집",
     done: "완료",
-    changed: (n: number, names: string) => `담은 뒤 판정이 바뀐 품종 ${n}개 · ${names}`,
-    changedRow: (date: string, before: string, now: string) => `${monthDay(date)}에 담을 때 ${before} → 지금 ${now}`,
+    changed: (n: number, names: string) =>
+      `담은 뒤 판정이 바뀐 품종 ${n}개 · ${names}`,
+    changedRow: (date: string, before: string, now: string) =>
+      `${monthDay(date)}에 담을 때 ${before} → 지금 ${now}`,
     columns: ["품종", "판정", "시세 · 평소"],
     addMore: "+ 품종 더 담기",
     emptyTitle: "아직 담은 품종이 없어요",

@@ -210,7 +210,7 @@ import 경로:
 | `search/` | P2 품종 검색. 검색어는 `history.replaceState`로 `?q=`에 맞춘다 |
 | `basket/` | P4 담은 품종: 판정별 개수, 바뀐 판정 알림, 판정별 묶음, × 빼기, 편집(모두 빼기), 빈 목록. 기기 값을 불러온 뒤에 그린다 |
 | `variety-detail/` | P3 품종 상세: `detail-header`(본문 제목 줄, 최근 본 품종에 넣기. 모바일은 `DetailHeaderBar`가 처음부터 하위 헤더 "‹ 품종 · 담기"를 그리고, 데스크톱은 본문 줄에 뒤로 · 담기가 있다), `verdict-card`(판정 전 · 오래됨 · 표본 적음), `range-bar`, `places-section`(장소 비교, 판정 색 없음), `why-section`(`trend-chart` SVG + `dots-compare`), `my-price`(내가 본 가격, 저장 안 함) |
-| `components/` | 품종 행(`variety-row`: 네 열 subgrid, 가격 두 줄, 설명 한 줄), 판정 칩 · 점(`verdict-chip`, 색은 `verdict-tone`), `add-button`, `basket-toast`(담기 토스트 "배추를 담았어요 · 목록 보기", 화면 키보드 위로), `basket-badge`(내비 담은 개수), `search-entry`, `recent-varieties`, `price-shell` |
+| `components/` | 품종 행(`variety-row`: 모바일은 품종·판정과 시세를 묶고 넓은 화면은 네 열 subgrid, 시세·평소가·품종별 조사일 표시), 판정 칩 · 점(`verdict-chip`: 목록은 판정 단어만, 최근 3회 조사 편차 %는 상세에서 기준과 함께 표시. 색은 `verdict-tone`), `add-button`, `basket-toast`(담기 토스트 "배추를 담았어요 · 목록 보기", 화면 키보드 위로), `basket-badge`(내비 담은 개수), `search-entry`, `recent-varieties`, `price-shell` |
 | `settings/` | 설정 화면 "내 기록"의 담은 품종 · 최근 본 품종 지우기(`price-record-settings`) |
 | `stores/` | `basket-store`(`price:basket`, 담을 때 판정 · 조사일), `recent-store`(`price:recent`) |
 

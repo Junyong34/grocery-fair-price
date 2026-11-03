@@ -1,6 +1,5 @@
 import { listBasisLine, PRICE_COPY } from "@workspace/price/copy"
-import { monthDay } from "@workspace/price/format"
-import { latestSurveyedOn, pickByIds } from "@workspace/price/list"
+import { pickByIds } from "@workspace/price/list"
 import type { VarietySummary } from "@workspace/price/types"
 
 import { DownloadsCard } from "@/shared/downloads/downloads-card"
@@ -21,8 +20,7 @@ export function HomeView({
   featuredIds: readonly string[]
 }) {
   const featured = pickByIds(varieties, featuredIds)
-  const surveyedOn = latestSurveyedOn(varieties)
-  const basisLine = listBasisLine(varieties)
+  const basisLine = listBasisLine(featured)
   return (
     <div className="mx-auto flex max-w-[640px] flex-col gap-9 px-[18px] pt-6 lg:pt-12">
       <div className="flex flex-col gap-5">
@@ -39,19 +37,25 @@ export function HomeView({
       <RecentPills varieties={varieties} />
       <section aria-labelledby="featured-title" className="flex flex-col gap-2">
         <div className="flex items-baseline gap-2">
-          <h2 id="featured-title" className="text-[15px] font-semibold text-ink">
+          <h2 id="featured-title" className="text-base font-semibold text-ink">
             {PRICE_COPY.home.featured}
           </h2>
-          {surveyedOn && <span className="text-xs text-caption">{monthDay(surveyedOn)} 조사</span>}
         </div>
-        <PriceHint />
+        <p className="text-[13px] text-caption">{PRICE_COPY.home.openDetail}</p>
+        <PriceHint className="mt-2" />
         <ul className="mt-1">
           {featured.map((variety) => (
-            <VarietyRow key={variety.id} variety={variety} action={<AddButton variety={variety} />} />
+            <VarietyRow
+              key={variety.id}
+              variety={variety}
+              action={<AddButton variety={variety} />}
+            />
           ))}
         </ul>
       </section>
-      {basisLine && <p className="text-xs text-caption">{basisLine}</p>}
+      {basisLine && (
+        <p className="text-[13px] leading-relaxed text-caption">{basisLine}</p>
+      )}
       <DownloadsCard placement="price-home" className="lg:max-w-[420px]" />
     </div>
   )

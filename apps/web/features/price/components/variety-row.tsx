@@ -3,7 +3,7 @@ import Link from "next/link"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { PRICE_COPY } from "@workspace/price/copy"
-import { won } from "@workspace/price/format"
+import { monthDay, won } from "@workspace/price/format"
 import type { VarietySummary } from "@workspace/price/types"
 
 import { routes } from "@/shared/routes"
@@ -11,23 +11,35 @@ import { routes } from "@/shared/routes"
 import { VerdictChip } from "./verdict-chip"
 
 /**
- * 목록 열 네 개: 품종 | 판정 칩 | 가격 두 줄 | 동작. P1 · P2 · P4의 모든 목록이 같은 폭을 쓴다.
- * 행은 subgrid라 열 제목(ROW_COLUMNS를 쓰는 줄)과도 맞는다.
+ * 모바일은 품종·판정과 시세를 묶고, 넓은 화면은 네 열로 정렬한다. P1 · P2 · P4 공통.
  */
-export const ROW_COLUMNS = "grid grid-cols-[minmax(0,1fr)_5.75rem_5.25rem_2.5rem] items-center gap-x-2"
+export const ROW_COLUMNS =
+  "grid grid-cols-[minmax(0,1fr)_2.75rem] items-center gap-x-3 sm:grid-cols-[minmax(0,1fr)_4.5rem_7rem_2.75rem]"
 
 /** 품종 이름 아래 작은 줄: "상품 · 1포기" */
-export function varietySub(variety: Pick<VarietySummary, "spec" | "baseUnit">): string {
-  return variety.spec ? `${variety.spec} · ${variety.baseUnit}` : variety.baseUnit
+export function varietySub(
+  variety: Pick<VarietySummary, "spec" | "baseUnit">
+): string {
+  return variety.spec
+    ? `${variety.spec} · ${variety.baseUnit}`
+    : variety.baseUnit
 }
 
 /** 가격 두 줄: 위는 시세, 아래는 평소가(없으면 "평소가 없음"). */
-export function PricePair({ variety }: { variety: Pick<VarietySummary, "price" | "usual"> }) {
+export function PricePair({
+  variety,
+}: {
+  variety: Pick<VarietySummary, "price" | "usual">
+}) {
   return (
     <span className="flex flex-col items-end leading-tight tabular-nums">
-      <span className="text-[15px] font-semibold text-ink">{won(variety.price)}원</span>
-      <span className="text-xs text-caption">
-        {variety.usual == null ? PRICE_COPY.row.noUsual : PRICE_COPY.row.usual(won(variety.usual))}
+      <span className="text-lg leading-tight font-semibold text-ink">
+        {won(variety.price)}원
+      </span>
+      <span className="mt-1 text-[13px] whitespace-nowrap text-caption">
+        {variety.usual == null
+          ? PRICE_COPY.row.noUsual
+          : PRICE_COPY.row.usual(won(variety.usual))}
       </span>
     </span>
   )
@@ -51,38 +63,72 @@ export function VarietyRow({
   className?: string
 }) {
   return (
-    <li className={cn(ROW_COLUMNS, "border-b border-hairline py-2.5 last:border-b-0", className)}>
+    <li
+      className={cn(
+        ROW_COLUMNS,
+        "border-b border-hairline last:border-b-0",
+        className
+      )}
+    >
       <Link
         href={routes.price.variety(variety.id)}
-        className="col-span-3 grid grid-cols-subgrid items-center rounded-lg no-underline outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring"
+        className="grid min-h-20 min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 rounded-lg py-2.5 no-underline outline-offset-2 hover:bg-mat focus-visible:outline-2 focus-visible:outline-ring active:bg-mat sm:col-span-3 sm:grid-cols-subgrid"
       >
-        <span className="flex min-w-0 flex-col leading-tight">
-          <span className="truncate text-[15px] font-semibold text-ink">{name ?? variety.name}</span>
-          <span className="truncate text-xs text-caption">{varietySub(variety)}</span>
+        <span className="flex min-w-0 flex-col gap-1">
+          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="text-base leading-snug font-semibold [overflow-wrap:anywhere] break-keep text-ink">
+              {name ?? variety.name}
+            </span>
+            <span className="sm:hidden">
+              <VerdictChip verdict={variety.verdict} />
+            </span>
+          </span>
+          <span className="text-[13px] leading-snug [overflow-wrap:anywhere] break-keep text-caption">
+            {varietySub(variety)}
+          </span>
         </span>
-        <span className="justify-self-start">
+        <span className="hidden justify-self-start sm:inline-flex">
           <VerdictChip verdict={variety.verdict} />
         </span>
-        <span className="justify-self-end">
+        <span className="flex flex-col items-end gap-0.5 justify-self-end">
           <PricePair variety={variety} />
+          <span className="text-xs text-caption">
+            <time dateTime={variety.surveyedOn}>
+              {monthDay(variety.surveyedOn)}
+            </time>{" "}
+            조사
+            {variety.stale && (
+              <span className="ml-1 font-semibold text-stone">
+                {PRICE_COPY.row.stale}
+              </span>
+            )}
+          </span>
         </span>
       </Link>
       <span className="justify-self-end">{action}</span>
-      {footer && <div className="col-span-4 pt-1.5">{footer}</div>}
+      {footer && <div className="col-span-full pb-3">{footer}</div>}
     </li>
   )
 }
 
-/** 목록 위 설명 한 줄: "시세 오늘 조사한 곳들의 중간값 · 평소 이맘때 보통 가격" */
+/** 최근 시세·평소가·판정이 서로 다른 기준이라는 안내. */
 export function PriceHint({ className }: { className?: string }) {
   return (
-    <p className={cn("flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-caption", className)}>
-      {PRICE_COPY.hint.map(({ term, text }) => (
-        <span key={term}>
-          <b className="mr-1 font-semibold text-stone">{term}</b>
-          {text}
-        </span>
-      ))}
-    </p>
+    <div
+      className={cn(
+        "flex flex-col gap-1 text-[13px] leading-relaxed text-caption",
+        className
+      )}
+    >
+      <p className="flex flex-wrap gap-x-3 gap-y-0.5">
+        {PRICE_COPY.hint.map(({ term, text }) => (
+          <span key={term}>
+            <b className="mr-1 font-semibold text-stone">{term}</b>
+            {text}
+          </span>
+        ))}
+      </p>
+      <p>{PRICE_COPY.judgmentHint}</p>
+    </div>
   )
 }

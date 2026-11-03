@@ -17,14 +17,24 @@ export function AddButton({ variety }: { variety: VarietySummary }) {
     <button
       type="button"
       aria-pressed={added}
-      aria-label={added ? PRICE_COPY.row.remove(variety.name) : PRICE_COPY.row.add(variety.name)}
+      aria-label={
+        added
+          ? PRICE_COPY.row.remove(variety.name)
+          : PRICE_COPY.row.add(variety.name)
+      }
       onClick={() => toggleBasket(variety)}
       className={cn(
-        "grid size-9 place-items-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-        added ? "border-ink bg-ink text-canvas" : "border-silver bg-surface text-ink hover:border-stone"
+        "grid size-11 place-items-center rounded-full border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-reduce:transition-none",
+        added
+          ? "border-ink bg-ink text-canvas"
+          : "border-silver bg-surface text-ink hover:border-stone"
       )}
     >
-      {added ? <Check aria-hidden size={16} strokeWidth={2.4} /> : <Plus aria-hidden size={17} strokeWidth={2} />}
+      {added ? (
+        <Check aria-hidden size={16} strokeWidth={2.4} />
+      ) : (
+        <Plus aria-hidden size={17} strokeWidth={2} />
+      )}
     </button>
   )
 }
