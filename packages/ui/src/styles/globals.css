@@ -73,8 +73,9 @@
     --color-holiday: #c43c2a;
     --color-holiday-wash: color-mix(in oklab, var(--color-holiday) 9%, var(--color-canvas));
 
-    /* 인쇄물 썸네일 받침. 크림(canvas)·흰(surface) 용지가 모두 떠 보이도록 캔버스보다 한 톤 진한 베이지 */
-    --color-mat: color-mix(in oklab, var(--color-stone) 8%, var(--color-canvas));
+    /* 캔버스보다 한 톤 진한 따뜻한 모래색. 읽기만 하는 정보 카드(시세 중간값), 담기 버튼, 행 hover, 인쇄물 썸네일 받침.
+       흰 카드 대신 쓴다. 금색 판정 wash(gold-pale 30~34%)와 섞이지 않게 ochre를 옅게 섞는다. */
+    --color-mat: color-mix(in oklab, var(--color-ochre) 12%, var(--color-canvas));
 
     /* 공통 표면용 연한 세이지. 가격 판정색과 같은 색이어도 의미는 각 이름으로 구분한다. */
     --color-sage-wash: color-mix(in oklab, var(--color-sage) 22%, var(--color-canvas));

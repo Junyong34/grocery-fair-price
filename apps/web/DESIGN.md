@@ -358,7 +358,7 @@ Color discipline is the signature move. The whole palette is earth-toned — mus
 - 실제 값의 원천은 `packages/ui/src/styles/globals.css`다. 문서의 색상값을 화면에 직접 복사하지 않는다.
 - 원색 토큰(`canvas`, `mat`, `forest`, `gold-deep` 등) 위에 조합 토큰 `--color-pair-<이름>`과 `--color-pair-<이름>-foreground`를 둔다. 앞 토큰은 배경, `foreground`는 그 배경 위의 글자·아이콘이다.
 - Tailwind에서는 `bg-pair-<이름> text-pair-<이름>-foreground`를 함께 쓴다. 한 쌍의 배경만 바꾸고 이전 글자색을 남기지 않는다.
-- 연한 세이지 `sage-wash`는 `sage` 22%와 `canvas`의 Oklab 혼합색이다. `gold-wash`는 `gold-pale` 30%와 `canvas`, `mat`는 `stone` 8%와 `canvas`를 섞는다. 새 원색이나 고정된 혼합색 hex를 추가하지 않는다.
+- 연한 세이지 `sage-wash`는 `sage` 22%와 `canvas`의 Oklab 혼합색이다. `gold-wash`는 `gold-pale` 30%와 `canvas`, `mat`는 `ochre` 12%와 `canvas`를 섞는다(따뜻한 모래색). 새 원색이나 고정된 혼합색 hex를 추가하지 않는다.
 
 ### 조합 토큰과 용도
 
@@ -367,7 +367,7 @@ Color discipline is the signature move. The whole palette is earth-toned — mus
 | 조합 이름 | 배경 | 글자·아이콘 | 사용 기준 |
 |---|---|---|---|
 | `pair-base` | `canvas` · 크림 | `ink` | 페이지, 기본 검색창, 최근 본 품종처럼 가장 넓게 쓰는 기본 표면 |
-| `pair-muted` | `mat` · 매트 베이지 | `ink` | 담기 전 버튼, 보조 컨트롤, 받침처럼 기본 배경에서 한 단계 구분할 표면 |
+| `pair-muted` | `mat` · 모래 베이지 | `ink` | 담기 전 버튼, 보조 컨트롤, 받침, 읽기만 하는 정보 카드처럼 기본 배경에서 한 단계 구분할 표면 |
 | `pair-forest` | `sage-wash` · 연한 세이지 | `forest` | 브랜드 안내나 강조 구역. 연한 바탕과 진한 초록을 함께 사용 |
 | `pair-forest-strong` | `forest` | `canvas` | 포레스트 강조가 필요한 작은 버튼·표식. 한 구역의 주된 행동 하나에 한정 |
 | `pair-gold` | `gold-wash` · 연한 골드 | `gold-deep` | 따뜻한 강조, 현재 위치, 주목할 안내. 보통 글씨에도 연한 골드 원색 대신 딥 골드를 사용 |

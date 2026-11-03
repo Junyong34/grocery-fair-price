@@ -55,7 +55,7 @@ export function PlacesSection({ detail }: { detail: VarietyDetail }) {
       </div>
       <dl className="grid grid-cols-2 gap-2">
         {detail.marketTypes.map((quote) => (
-          <div key={quote.type} className="flex flex-col gap-1 rounded-2xl bg-surface p-3">
+          <div key={quote.type} className="flex flex-col gap-1 rounded-2xl bg-mat p-3">
             <dt className="text-xs font-semibold text-stone">{COPY.typeMedian(MARKET_TYPE_NAME[quote.type])}</dt>
             <dd className="flex items-baseline gap-1.5">
               <span className="font-number text-[22px] leading-none text-ink tabular-nums">{won(quote.median)}원</span>
