@@ -217,8 +217,8 @@ function Results({
     case "none":
       return (
         <div className="flex flex-col gap-6">
-          {/* 큰 아이콘 · 가운데 정렬 대신 두 줄 안내로 줄여 아래 찾는 법 · 카테고리가 첫 화면에 들어오게 한다. */}
-          <div className="flex flex-col gap-1 pt-2">
+          {/* 큰 아이콘 없이 가운데 정렬 안내만 둬 높이를 줄이고, 아래 찾는 법 · 카테고리가 첫 화면에 들어오게 한다. */}
+          <div className="flex flex-col items-center gap-1 pt-2 text-center">
             <p className="text-base font-semibold text-ink">
               {PRICE_COPY.search.noResult(query.trim())}
             </p>

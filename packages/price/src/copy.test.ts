@@ -166,7 +166,7 @@ describe("목록의 짧은 출처", () => {
 describe("검색 문구", () => {
   it("결과가 없으면 판정이 아니라 찾는 품종 목록에 없다고 말한다", () => {
     expect(PRICE_COPY.search.noResult("트러플")).toBe(
-      '"트러플"에 맞는 품종이 없어요'
+      '"트러플" 검색 결과가 없어요'
     )
     expect(PRICE_COPY.search.noResultHint.join(" ")).not.toContain("판정")
   })
