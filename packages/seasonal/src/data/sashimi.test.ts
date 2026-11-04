@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import { familiarity } from "./food-familiarity"
 import { findFood } from "./foods"
 import { MONTHS } from "./months"
-import { ADDED_SASHIMI, SASHIMI_MONTHS, sashimiInMonth } from "./sashimi"
+import { ADDED_SASHIMI, isSashimiPick, SASHIMI_IDS, SASHIMI_MONTHS, sashimiInMonth } from "./sashimi"
 
 // .scratch/sashimi/issues/06: food-season-corrections.json에 2026-11-03 더한 품종
 const SEASON_CORRECTED = [
@@ -53,14 +53,38 @@ describe("sashimi", () => {
     }
   })
 
-  it("한 달 안에서는 친숙도 1→3 순서다", () => {
+  it("추천 품종 묶음과 나머지 묶음 안에서는 친숙도 1→3 순서다", () => {
     for (const month of MONTHS) {
-      const levels = sashimiInMonth(month).map((food) => familiarity(food.id))
-      expect(levels, `${month}월`).toEqual([...levels].sort((a, b) => a - b))
+      for (const pick of [true, false]) {
+        const levels = sashimiInMonth(month)
+          .filter((food) => isSashimiPick(food.id, month) === pick)
+          .map((food) => familiarity(food.id))
+        expect(levels, `${month}월`).toEqual([...levels].sort((a, b) => a - b))
+      }
     }
   })
 
-  it("같은 친숙도 안에서는 적은 순서(첨부 순서, 추가 품종은 뒤)를 지킨다", () => {
+  it("그 달 목록은 회 품종 가운데 그 달이 제철이거나 추천 달인 것 전부다", () => {
+    for (const month of MONTHS) {
+      const expected = SASHIMI_IDS.filter((id) => (findFood(id)!.months as readonly number[]).includes(month) || SASHIMI_MONTHS[month].includes(id))
+      expect(new Set(sashimiInMonth(month).map((food) => food.id)), `${month}월`).toEqual(new Set(expected))
+    }
+  })
+
+  it("11월에는 정점 달이 다른 방어·광어도 나온다(제철 범위가 겹치면 그 달 회)", () => {
+    const ids = sashimiInMonth(11).map((food) => food.id)
+    expect(ids).toContain("yellowtail")
+    expect(ids).toContain("olive-flounder")
+    expect(ids).toContain("longtooth-grouper")
+  })
+
+  it("추천 달 표시는 첨부·대표 달(SASHIMI_MONTHS)에만 붙는다", () => {
+    expect(isSashimiPick("longtooth-grouper", 11)).toBe(true)
+    expect(isSashimiPick("yellowtail", 11)).toBe(false)
+    expect(isSashimiPick("yellowtail", 12)).toBe(true)
+  })
+
+  it("그 달 추천 품종이 앞이고, 각 묶음 안은 친숙도 1→3, 같은 등급은 적은 순서다", () => {
     expect(sashimiInMonth(2).map((food) => food.id)).toEqual([
       "olive-flounder",
       "cod",
@@ -68,6 +92,10 @@ describe("sashimi", () => {
       "redlip-mullet",
       "banded-grouper",
       "east-sea-hanchi",
+      "red-seabream",
+      "spanish-mackerel",
+      "atka-mackerel",
+      "yellowtail",
     ])
   })
 

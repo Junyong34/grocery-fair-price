@@ -19,7 +19,8 @@ export const ADDED_SASHIMI = [
 ] as const satisfies readonly FoodId[]
 
 /**
- * 달 → 회 품종 id. 적은 순서는 첨부 순서이고, 추가 품종이 뒤에 온다. 화면 순서는 sashimiInMonth가 정한다.
+ * 달 → 회 품종 id(추천 달). 적은 순서는 첨부 순서이고, 추가 품종이 뒤에 온다.
+ * 화면의 그 달 목록은 sashimiInMonth가 제철 범위까지 넓혀 만든다.
  * 말쥐치·망둥어·밴댕이·능성어·불볼락은 첨부 달이 아니라 고친 앱 제철(food-season-corrections.json, 2026-11-03)을 따른다.
  */
 export const SASHIMI_MONTHS: Readonly<Record<Month, readonly FoodId[]>> = {
@@ -118,14 +119,29 @@ export const SASHIMI_MONTHS: Readonly<Record<Month, readonly FoodId[]>> = {
   ],
 }
 
-/** 그 달 회 품종. 친숙도 1→3 순서이고, 같은 등급은 적은 순서를 지킨다. 1~12 밖이면 빈 목록. */
+/** 회 화면에 나오는 품종 전부(첨부 48종 + 추가 7종). 처음 나온 달 순서. */
+export const SASHIMI_IDS: readonly FoodId[] = [...new Set(Object.values(SASHIMI_MONTHS).flat())]
+
+/** 그 달이 이 품종의 추천 달(첨부의 달, 추가 품종은 대표 달)인가. 화면에서 "추천" 표시에 쓴다. */
+export function isSashimiPick(id: FoodId, month: number): boolean {
+  return SASHIMI_MONTHS[month as Month]?.includes(id) ?? false
+}
+
+/**
+ * 그 달 회 품종: 회 품종 가운데 그 달이 제철(food.months)이거나 추천 달인 것 전부.
+ * 추천 달만 쓰면 품종마다 한 달에만 나와(11월에 방어·광어가 빠짐) 같은 사이트의 월별 제철과 어긋난다. SEO 감사 2026-11-04 F1.
+ * 순서: 그 달 추천 품종이 앞(12월 방어처럼 그 달이 절정인 것을 먼저), 각 묶음 안은 친숙도 1→3, 같은 등급은 SASHIMI_MONTHS에 적은 순서.
+ * 1~12 밖이면 빈 목록.
+ */
 export function sashimiInMonth(month: number): readonly Food[] {
-  const ids: readonly FoodId[] = SASHIMI_MONTHS[month as Month] ?? []
-  return ids
-    .map((id, index) => ({ food: findFood(id)!, index }))
+  const picks: readonly FoodId[] = SASHIMI_MONTHS[month as Month] ?? []
+  const order = (id: FoodId) => (picks.includes(id) ? picks.indexOf(id) : picks.length + SASHIMI_IDS.indexOf(id))
+  return SASHIMI_IDS.map((id) => findFood(id)!)
+    .filter((food) => picks.includes(food.id) || (food.months as readonly number[]).includes(month))
     .sort(
       (a, b) =>
-        familiarity(a.food.id) - familiarity(b.food.id) || a.index - b.index
+        Number(!picks.includes(a.id)) - Number(!picks.includes(b.id)) ||
+        familiarity(a.id) - familiarity(b.id) ||
+        order(a.id) - order(b.id)
     )
-    .map(({ food }) => food)
 }

@@ -267,6 +267,8 @@ export const SASHIMI_COPY = {
   tab: "제철 회",
   pageTitle: (month: number) => `${month}월 제철 회`,
   count: (n: number) => `${n}종`,
+  /** 그 달이 추천 달인 품종 카드의 표시. 나머지는 제철 범위에 그 달이 들어 있는 품종이다. */
+  pick: "이달 추천",
   notice: "추천 시기는 참고용이에요. 지역과 자연산·양식 여부에 따라 달라요.",
   monthTitles: {
     1: "겨울 바다의 쫀득한 회",
