@@ -82,7 +82,7 @@ export function PlacesSection({ detail }: { detail: VarietyDetail }) {
           )}
         </PlaceGroup>
       )}
-      <p className="text-xs text-caption">{COPY.placesNote(won(detail.price))}</p>
+      <p className="text-xs text-caption">{COPY.placesNote(won(detail.price), detail.basis)}</p>
     </section>
   )
 }

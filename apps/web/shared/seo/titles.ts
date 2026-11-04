@@ -2,6 +2,9 @@
 // 제목은 사람들이 실제로 치는 검색어 모양으로 쓴다("대게 제철 시기", "3월 제철 음식"). 꼬리 " | 장볼날"은 루트 레이아웃 template이 붙인다.
 // 설명은 페이지마다 달라야 하므로 그 페이지에만 있는 품종·음식 이름을 넣는다. 근거: .scratch/seo/spec.md "검색어에 맞춘 제목"
 
+import { VERDICT_WORD, verdictDiff } from "@workspace/price/copy"
+import { monthDay, won } from "@workspace/price/format"
+import type { VarietySummary } from "@workspace/price/types"
 import { SEASON_COPY } from "@workspace/seasonal/data/copy"
 import { dishNames } from "@workspace/seasonal/data/dishes"
 import { type Festival, festivalOf, festivalsWithFood } from "@workspace/seasonal/data/festivals"
@@ -46,11 +49,13 @@ export function varietiesIndexSeo(categories: readonly string[], count: number):
   }
 }
 
-/** P3 품종 상세 */
-export function varietySeo(variety: { name: string; baseUnit: string }): PageSeo {
+/** P3 품종 상세. 설명에 그날 시세와 판정을 넣어 검색 결과에서 바로 답이 보이게 한다(판정은 하루 1~2번 바뀐다). */
+export function varietySeo(variety: Pick<VarietySummary, "name" | "baseUnit" | "price" | "verdict" | "surveyedOn" | "basis">): PageSeo {
+  const { verdict } = variety
+  const judged = verdict.kind === "none" || verdict.pct == null ? "평소가는 아직 쌓이는 중" : `${verdictDiff(verdict.pct).replace(/요$/, "")} ${VERDICT_WORD[verdict.kind]}`
   return {
     title: `${variety.name} 시세 · 평소 가격`,
-    description: `${variety.name}(${variety.baseUnit}) 오늘 시세가 평소보다 싼지 비싼지, 대형마트·전통시장은 얼마에 파는지 견줘 보세요.`,
+    description: `${variety.name}(${variety.baseUnit}) 시세 ${won(variety.price)}원, ${judged}(${monthDay(variety.surveyedOn)} ${variety.basis.source} 조사). 대형마트·전통시장은 얼마에 파는지도 견줘 보세요.`,
   }
 }
 

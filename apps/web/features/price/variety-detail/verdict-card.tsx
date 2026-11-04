@@ -90,7 +90,7 @@ export function VerdictCard({
           term={COPY.nowPrice}
           value={`${won(detail.price)}원`}
           unit={detail.baseUnit}
-          note={COPY.nowPriceNote(detail.surveyedOn, detail.sampleSize)}
+          note={COPY.nowPriceNote(detail.surveyedOn, detail.sampleSize, detail.basis)}
         />
         {detail.usual == null ? (
           <PriceCell

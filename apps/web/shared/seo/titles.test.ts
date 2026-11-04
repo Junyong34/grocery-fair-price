@@ -18,6 +18,7 @@ import {
   seasonSeo,
   seasonsIndexSeo,
   varietiesIndexSeo,
+  varietySeo,
 } from "./titles"
 
 const all = [
@@ -54,6 +55,14 @@ describe("페이지 제목·설명", () => {
     expect(editionSeoTitle("열두 달 월별 제철 포스터")).toBe(
       "열두 달 월별 제철 포스터 PDF 무료 다운로드"
     )
+  })
+
+  it("품종 상세 설명에 그날 시세와 판정을 넣는다", () => {
+    const base = { name: "녹두", baseUnit: "100g", price: 2700, surveyedOn: "2026-11-03", basis: { source: "KAMIS", scope: "전국 조사 시장" } }
+    expect(varietySeo({ ...base, verdict: { kind: "pricey", pct: 9 } }).description).toBe(
+      "녹두(100g) 시세 2,700원, 평소보다 9% 높아 비싸요(11/3 KAMIS 조사). 대형마트·전통시장은 얼마에 파는지도 견줘 보세요."
+    )
+    expect(varietySeo({ ...base, verdict: { kind: "none", pct: null } }).description).toContain("평소가는 아직 쌓이는 중(11/3 KAMIS 조사)")
   })
 
   it("품종 허브 설명에 카테고리 이름과 품종 수를 넣는다", () => {

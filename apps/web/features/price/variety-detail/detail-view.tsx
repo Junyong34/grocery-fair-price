@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import { basisLine } from "@workspace/price/copy"
+import { basisLine, summaryLine } from "@workspace/price/copy"
 import type { VarietyDetail } from "@workspace/price/types"
 import { findFood } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
@@ -78,7 +78,9 @@ export function DetailView({
           <span aria-hidden className="text-stone">›</span>
         </Link>
       )}
-      <p className="pb-4 text-xs text-caption">
+      {/* 페이지 요약 한 문장(날짜·출처·숫자). 검색 결과와 AI 답변이 인용하기 좋은 꼴로 둔다. */}
+      <p className="max-w-prose text-sm leading-relaxed text-stone">{summaryLine(detail)}</p>
+      <p className="-mt-5 pb-4 text-xs text-caption">
         {basisLine(detail.basis, detail.surveyedOn, detail.sampleSize)}
       </p>
     </article>

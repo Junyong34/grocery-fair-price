@@ -3,7 +3,7 @@
 
 import { josa } from "es-hangul"
 
-import { monthDay, signedPct } from "./format"
+import { monthDay, signedPct, won } from "./format"
 import { latestSurveyedOn } from "./list"
 import type { MarketType, QuoteBasis, Verdict, VerdictKind } from "./types"
 
@@ -107,13 +107,22 @@ export const MARKET_TYPE_NAME: Record<MarketType, string> = {
   traditional: "전통시장",
 }
 
-/** 화면 맨 아래 근거 한 줄: "전국 조사 시장 45곳 · 10/23 조사 (KAMIS)" */
+/**
+ * 시세가 여러 곳의 중간값이 아니라 출처가 낸 평균 한 건인가(축평원 "전국 평균").
+ * 수집(price-ingest judgment/build.ts)이 정하는 scope 문구로 가른다. 이때 표본 수 1은 "1곳"이 아니다.
+ */
+export function isAverageBasis(basis: QuoteBasis): boolean {
+  return basis.scope.endsWith("평균")
+}
+
+/** 화면 맨 아래 근거 한 줄: "전국 조사 시장 45곳 · 10/23 조사 (KAMIS)", 평균이면 "전국 평균 · 11/3 조사 (축평원)" */
 export function basisLine(
   basis: QuoteBasis,
   surveyedOn: string,
   n: number
 ): string {
-  return `${basis.scope} ${n}곳 · ${monthDay(surveyedOn)} 조사 (${basis.source})`
+  const scope = isAverageBasis(basis) ? basis.scope : `${basis.scope} ${n}곳`
+  return `${scope} · ${monthDay(surveyedOn)} 조사 (${basis.source})`
 }
 
 /**
@@ -137,6 +146,36 @@ export function listBasisLine(
     ...new Set(rows.map(({ basis }) => `${basis.source} ${basis.scope}`)),
   ]
   return `조사일 ${dates} · ${sources.join(" · ")}`
+}
+
+/** "2026-11-03" → "2026년 11월 3일" */
+function longDate(iso: string): string {
+  const [year, month, day] = iso.split("-").map(Number)
+  return `${year}년 ${month}월 ${day}일`
+}
+
+/** 판정 낱말에 붙는 끝: "비싸요." / "보통이에요." */
+const VERDICT_END: Record<Exclude<VerdictKind, "none">, string> = { cheap: "싸요.", normal: "보통이에요.", pricey: "비싸요." }
+
+/**
+ * P3 품종 상세의 요약 한 문장. 검색 결과·AI 답변이 그대로 인용할 수 있게 날짜(연도 포함)·출처·표본·숫자를 한 문장에 담는다.
+ * 판정 차이는 최근 3회 조사 편차의 중간값이라 두 금액의 단순 차이와 다를 수 있어 "최근 3회 조사에서"를 붙인다.
+ */
+export function summaryLine(v: {
+  name: string
+  baseUnit: string
+  price: number
+  usual: number | null
+  verdict: Verdict
+  surveyedOn: string
+  sampleSize: number
+  basis: QuoteBasis
+}): string {
+  const scope = isAverageBasis(v.basis) ? v.basis.scope : `${v.basis.scope} ${v.sampleSize}곳 중간값`
+  const head = `${longDate(v.surveyedOn)} ${v.basis.source} ${scope} 기준, ${v.name}(${v.baseUnit}) 시세는 ${won(v.price)}원이에요.`
+  if (v.usual == null || v.verdict.kind === "none" || v.verdict.pct == null) return `${head} 평소가가 아직 쌓이지 않아 판정 전이에요.`
+  const diff = v.verdict.pct === 0 ? "평소와 같아" : `평소보다 ${Math.abs(v.verdict.pct)}% ${v.verdict.pct > 0 ? "높아" : "낮아"}`
+  return `${head} 평소가는 ${won(v.usual)}원이고, 최근 3회 조사에서 ${diff} ${VERDICT_END[v.verdict.kind]}`
 }
 
 /** 목록 하단은 출처 이름만 표시한다. 조사 범위와 날짜는 안내 popover·행에서 확인한다. */
@@ -209,8 +248,10 @@ export const PRICE_COPY = {
     add: "+ 담기",
     added: "✓ 담음",
     nowPrice: "지금 시세",
-    nowPriceNote: (surveyedOn: string, n: number) =>
-      `${monthDay(surveyedOn)} 조사한 ${n}곳 가격의 중간값`,
+    nowPriceNote: (surveyedOn: string, n: number, basis: QuoteBasis) =>
+      isAverageBasis(basis)
+        ? `${monthDay(surveyedOn)} 조사한 ${basis.scope} 가격`
+        : `${monthDay(surveyedOn)} 조사한 ${n}곳 가격의 중간값`,
     usual: "평소가",
     usualNote: "이맘때 보통 이 정도예요",
     noUsual: "평소가가 없어 시세만 보여드려요",
@@ -222,8 +263,10 @@ export const PRICE_COPY = {
       `마지막 조사 ${monthDay(surveyedOn)} · ${ago}`,
     staleNote: "최근 조사가 없어 지금과 다를 수 있어요",
     fewSamples: (n: number) => `조사한 곳이 ${n}곳뿐이라 참고만 하세요`,
-    rangeTitle: (surveyedOn: string, n: number) =>
-      `${monthDay(surveyedOn)} 조사한 ${n}곳의 시세 범위`,
+    rangeTitle: (surveyedOn: string, n: number, basis: QuoteBasis) =>
+      isAverageBasis(basis)
+        ? `${monthDay(surveyedOn)} 조사한 ${basis.scope} 가격`
+        : `${monthDay(surveyedOn)} 조사한 ${n}곳의 시세 범위`,
     rangeLow: "싼 곳",
     rangeHigh: "비싼 곳",
     rangeUsual: (usual: string) => `평소가 ${usual} · 평소 범위`,
@@ -239,8 +282,8 @@ export const PRICE_COPY = {
     places: (n: number) => `${n}곳`,
     showAllMarkets: (n: number) => `전통시장 ${n}곳 모두 보기`,
     showFewerMarkets: "접기",
-    placesNote: (national: string) =>
-      `막대의 점선은 전국 중간값(${national}원). 매장에서 본 가격을 여기 견주어 보세요.`,
+    placesNote: (national: string, basis: QuoteBasis) =>
+      `막대의 점선은 ${isAverageBasis(basis) ? basis.scope : "전국 중간값"}(${national}원). 매장에서 본 가격을 여기 견주어 보세요.`,
     why: "왜 이 판정일까?",
     whyNoUsual: "가격 흐름 보기",
     trendTitle: "가격 추이",

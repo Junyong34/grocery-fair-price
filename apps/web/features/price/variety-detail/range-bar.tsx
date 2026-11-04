@@ -31,9 +31,9 @@ export function RangeBar({ detail }: { detail: VarietyDetail }) {
   const mineVerdict = mine == null ? null : verdictOf(mine, usual, band)
 
   return (
-    <section aria-label={COPY.rangeTitle(detail.surveyedOn, range.n)} className="flex flex-col gap-2">
+    <section aria-label={COPY.rangeTitle(detail.surveyedOn, range.n, detail.basis)} className="flex flex-col gap-2">
       <div className="flex items-baseline justify-between text-[13px]">
-        <span className="font-semibold text-ink">{COPY.rangeTitle(detail.surveyedOn, range.n)}</span>
+        <span className="font-semibold text-ink">{COPY.rangeTitle(detail.surveyedOn, range.n, detail.basis)}</span>
         <span className="text-caption">{detail.baseUnit}</span>
       </div>
       <div className={cn("relative h-11", mine != null ? "mb-9" : "mb-1")}>

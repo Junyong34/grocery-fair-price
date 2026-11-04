@@ -7,6 +7,7 @@ import {
   listSourceLine,
   partOfMonth,
   PRICE_COPY,
+  summaryLine,
   seasonNote,
   seasonVerdictNote,
   verdictChip,
@@ -103,6 +104,57 @@ describe("basisLine", () => {
     expect(
       basisLine({ source: "KAMIS", scope: "전국 조사 시장" }, "2026-10-23", 45)
     ).toBe("전국 조사 시장 45곳 · 10/23 조사 (KAMIS)")
+  })
+
+  it("전국 평균(축평원)은 곳 수 대신 평균이라고만 쓴다(\"전국 평균 1곳\"이 아니다)", () => {
+    expect(basisLine({ source: "축평원", scope: "전국 평균" }, "2026-11-03", 1)).toBe("전국 평균 · 11/3 조사 (축평원)")
+  })
+})
+
+describe("summaryLine", () => {
+  const kamis = { source: "KAMIS", scope: "전국 조사 시장" }
+  const base = { name: "녹두", baseUnit: "100g", price: 2700, usual: 2480, surveyedOn: "2026-11-03", sampleSize: 40, basis: kamis }
+
+  it("날짜(연도 포함)·출처·표본·시세·평소가·판정을 한 문장으로 쓴다", () => {
+    expect(summaryLine({ ...base, verdict: { kind: "pricey", pct: 9 } })).toBe(
+      "2026년 11월 3일 KAMIS 전국 조사 시장 40곳 중간값 기준, 녹두(100g) 시세는 2,700원이에요. 평소가는 2,480원이고, 최근 3회 조사에서 평소보다 9% 높아 비싸요."
+    )
+  })
+
+  it("싸요 · 같은 값", () => {
+    expect(summaryLine({ ...base, verdict: { kind: "cheap", pct: -12 } })).toContain("평소보다 12% 낮아 싸요.")
+    expect(summaryLine({ ...base, verdict: { kind: "normal", pct: 0 } })).toContain("평소와 같아 보통이에요.")
+  })
+
+  it("판정 전이면 평소가가 없다고 쓴다", () => {
+    expect(summaryLine({ ...base, usual: null, verdict: { kind: "none", pct: null } })).toBe(
+      "2026년 11월 3일 KAMIS 전국 조사 시장 40곳 중간값 기준, 녹두(100g) 시세는 2,700원이에요. 평소가가 아직 쌓이지 않아 판정 전이에요."
+    )
+  })
+
+  it("전국 평균(축평원)은 곳 수와 중간값을 쓰지 않는다", () => {
+    expect(
+      summaryLine({ ...base, name: "계란", baseUnit: "30구", price: 6998, usual: null, sampleSize: 1, basis: { source: "축평원", scope: "전국 평균" }, verdict: { kind: "none", pct: null } })
+    ).toMatch(/^2026년 11월 3일 축평원 전국 평균 기준, 계란\(30구\) 시세는 6,998원이에요\./)
+  })
+})
+
+describe("nowPriceNote", () => {
+  it("조사 시장 가격은 곳 수와 중간값으로 쓴다", () => {
+    expect(PRICE_COPY.detail.nowPriceNote("2026-11-03", 40, { source: "KAMIS", scope: "전국 조사 시장" })).toBe("11/3 조사한 40곳 가격의 중간값")
+  })
+
+  it("범위 제목과 점선 설명도 전국 평균이면 곳 수·중간값을 쓰지 않는다", () => {
+    const ekape = { source: "축평원", scope: "전국 평균" }
+    const kamis = { source: "KAMIS", scope: "전국 조사 시장" }
+    expect(PRICE_COPY.detail.rangeTitle("2026-11-03", 1, ekape)).toBe("11/3 조사한 전국 평균 가격")
+    expect(PRICE_COPY.detail.rangeTitle("2026-11-03", 40, kamis)).toBe("11/3 조사한 40곳의 시세 범위")
+    expect(PRICE_COPY.detail.placesNote("6,998", ekape)).toBe("막대의 점선은 전국 평균(6,998원). 매장에서 본 가격을 여기 견주어 보세요.")
+    expect(PRICE_COPY.detail.placesNote("827", kamis)).toBe("막대의 점선은 전국 중간값(827원). 매장에서 본 가격을 여기 견주어 보세요.")
+  })
+
+  it("전국 평균 한 건은 중간값이라 하지 않는다", () => {
+    expect(PRICE_COPY.detail.nowPriceNote("2026-11-03", 1, { source: "축평원", scope: "전국 평균" })).toBe("11/3 조사한 전국 평균 가격")
   })
 })
 
