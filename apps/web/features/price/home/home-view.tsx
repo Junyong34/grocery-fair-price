@@ -35,10 +35,10 @@ export function HomeView({
   const basisLine = listBasisLine(featured)
   const sourceLine = listSourceLine(featured)
   return (
-    <div className="price-page flex flex-col gap-9 pt-6 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-10 lg:pt-12">
-      <div className="contents lg:col-start-1 lg:row-start-1 lg:flex lg:min-w-0 lg:flex-col lg:gap-9">
+    <div className="price-page flex flex-col gap-9 pt-6 lg:grid lg:grid-cols-[340px_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-8 lg:pt-10">
+      <div className="contents lg:col-start-1 lg:row-start-1 lg:flex lg:min-w-0 lg:flex-col lg:gap-9 lg:pt-5">
         <div className="flex flex-col gap-5">
-          <h1 className="font-heading text-[28px] leading-[1.35] tracking-[-0.02em] text-ink">
+          <h1 className="font-heading text-[28px] leading-[1.35] tracking-[-0.02em] text-ink lg:text-[32px]">
             {PRICE_COPY.home.title[0]}
             <br />
             {PRICE_COPY.home.title[1]}
@@ -52,7 +52,7 @@ export function HomeView({
       </div>
       <section
         aria-labelledby="featured-title"
-        className="flex min-w-0 flex-col gap-2 lg:col-start-2 lg:row-span-2 lg:row-start-1"
+        className="flex min-w-0 flex-col gap-2 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:rounded-2xl lg:border lg:border-hairline lg:bg-surface/50 lg:p-5"
       >
         <div className="flex items-center">
           <h2 id="featured-title" className="text-base font-semibold text-ink">
