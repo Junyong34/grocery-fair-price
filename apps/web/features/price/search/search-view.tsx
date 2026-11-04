@@ -2,7 +2,7 @@
 
 import { Search } from "lucide-react"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useMemo, useState } from "react"
 
 import {
@@ -28,19 +28,28 @@ import { AddButton } from "../components/add-button"
 import { useRecentVarieties } from "../components/recent-varieties"
 import { PriceHint, VarietyRow } from "../components/variety-row"
 
+type SearchViewProps = {
+  varieties: readonly VarietySummary[]
+  featuredIds: readonly string[]
+  index: SearchIndex
+}
+
+/**
+ * P2 품종 검색 화면. Cache Components는 떠난 화면을 <Activity>로 숨겨 두어 검색어가 남는다.
+ * 새로 들어올 때(🔍 · 검색창 · 링크, push/replace)는 bfcacheId가 바뀌어 다시 그려 주소 ?q=(없으면 빈 칸)로 시작하고 자동 포커스도 다시 잡는다.
+ * 뒤로 · 앞으로 가기로 돌아오면 bfcacheId가 같아 치던 검색어와 결과를 그대로 둔다(품종 상세 ‹ 뒤 다른 결과 보기).
+ * 화면이 숨을 때 지우는 방식(useLayoutEffect 정리)은 뒤로 가기에서도 지워져 쓰지 않는다.
+ */
+export function SearchView(props: SearchViewProps) {
+  const { bfcacheId } = useRouter()
+  return <SearchScreen key={bfcacheId} {...props} />
+}
+
 /**
  * P2 품종 검색. 치는 동안 결과가 바뀐다. 검색어는 주소 ?q=에 맞추되 기록을 쌓지 않아(replaceState) 뒤로 가기 한 번이면 진입했던 화면이다.
  * 검색은 서버가 내려 준 searchIndex로 브라우저에서 한다.
  */
-export function SearchView({
-  varieties,
-  featuredIds,
-  index,
-}: {
-  varieties: readonly VarietySummary[]
-  featuredIds: readonly string[]
-  index: SearchIndex
-}) {
+function SearchScreen({ varieties, featuredIds, index }: SearchViewProps) {
   const initial = useSearchParams().get("q") ?? ""
   const [query, setQuery] = useState(initial)
   const result = useMemo(() => searchVarieties(index, query), [index, query])
