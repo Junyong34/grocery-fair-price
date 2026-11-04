@@ -38,7 +38,6 @@ export function MyPriceSection({ detail, id }: { detail: VarietyDetail; id: stri
     if (price != null) useMyPriceStore.setState({ id: detail.id, price })
   }
   const verdict = mine == null ? null : verdictOf(mine, detail.usual, detail.band)
-  const shown = verdict?.pct != null && mine != null && detail.usual != null
   return (
     <section id={id} aria-labelledby={`${id}-title`} className="flex flex-col gap-3">
       {/* 지우기는 카드 밖 제목 줄 오른쪽에 둔다(최근 본 품종과 같은 자리). 카드 안 "다시 적기" 옆에 두면 너무 붙어 잘못 누르기 쉽다. */}
@@ -46,7 +45,7 @@ export function MyPriceSection({ detail, id }: { detail: VarietyDetail; id: stri
         <h2 id={`${id}-title`} className="text-[17px] font-semibold text-ink">
           {COPY.myPriceTitle}
         </h2>
-        {shown && (
+        {mine != null && (
           <button
             type="button"
             aria-label={COPY.myPriceClear}
@@ -57,7 +56,7 @@ export function MyPriceSection({ detail, id }: { detail: VarietyDetail; id: stri
           </button>
         )}
       </div>
-      {shown ? (
+      {verdict?.pct != null && mine != null && detail.usual != null ? (
         <MyPriceCard
           // 값을 바꿀 때마다 다시 떠오르게
           key={mine}
