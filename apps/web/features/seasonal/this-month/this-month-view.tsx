@@ -37,8 +37,9 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
     <SettingsScope>
       <MonthScrollSpy />
       <div className="mx-auto max-w-[600px] lg:grid lg:max-w-[1080px] lg:grid-cols-[280px_1fr] lg:px-6">
+        {/* 패널은 헤더(56px)와 탭 줄(~66px) 아래에 붙는다. 히어로의 lg:scroll-mt-32와 같은 128px이다. */}
         <aside className="hidden lg:block">
-          <div className="sticky top-16 max-h-[calc(100svh-64px)] overflow-y-auto">
+          <div className="sticky top-32 max-h-[calc(100svh-128px)] overflow-y-auto">
             <DesktopMonthPanel
               thisMonth={thisMonth}
               months={months.map(({ month, foods, note }) => ({ month, note, count: foods.length }))}

@@ -63,7 +63,7 @@ export function DesktopMonthPanel({
   }
 
   return (
-    <div className="flex flex-col gap-4 py-8 pr-6">
+    <div className="flex flex-col gap-4 pt-4 pb-2 pr-6">
       <p className="font-number text-[110px] leading-none tabular-nums">
         <MonthTitle month={shown.month} suffixClassName="ml-1 font-heading text-[48px]" englishClassName="text-[46px]" />
       </p>
