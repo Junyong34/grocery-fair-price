@@ -11,7 +11,6 @@ import {
   InputControl,
   InputWrapper,
 } from "@workspace/ui/components/input"
-import { cn } from "@workspace/ui/lib/utils"
 
 import { PRICE_COPY } from "@workspace/price/copy"
 import { pickByIds } from "@workspace/price/list"
@@ -152,7 +151,6 @@ function Results({
           )}
           <Group title={PRICE_COPY.home.featured}>
             <Pills
-              className="bg-pair-light text-pair-light-foreground"
               labels={featured.map((variety) => ({
                 key: variety.id,
                 label: variety.name,
@@ -208,11 +206,11 @@ function Results({
             </p>
           </div>
           <Group title={PRICE_COPY.search.tipsTitle}>
-            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 rounded-2xl bg-surface px-4 py-3 text-sm">
+            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 rounded-2xl bg-pair-light px-4 py-3 text-sm text-pair-light-foreground">
               {PRICE_COPY.search.tips.map(({ how, example }) => (
                 <div key={how} className="contents">
                   <dt className="text-caption">{how}</dt>
-                  <dd className="font-medium text-ink">{example}</dd>
+                  <dd className="font-medium">{example}</dd>
                 </div>
               ))}
             </dl>
@@ -261,17 +259,9 @@ type Pill = { key: string; label: string } & (
   { href: string } | { onClick: () => void }
 )
 
-function Pills({
-  labels,
-  className,
-}: {
-  labels: readonly Pill[]
-  className?: string
-}) {
-  const pillClassName = cn(
-    "inline-flex h-9 items-center rounded-full border border-hairline bg-surface px-3.5 text-sm text-ink no-underline hover:border-stone",
-    className
-  )
+function Pills({ labels }: { labels: readonly Pill[] }) {
+  const pillClassName =
+    "inline-flex h-9 items-center rounded-full border border-hairline bg-pair-light px-3.5 text-sm text-pair-light-foreground no-underline hover:border-stone"
   return (
     <ul className="flex flex-wrap gap-2">
       {labels.map((pill) => (
