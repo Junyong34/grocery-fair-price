@@ -16,7 +16,7 @@ export function EditionThumbnail({ thumbnail, name, index = 0, className, priori
       height={thumbnail.height}
       alt={DOWNLOADS_COPY.thumbnailAlt(name, index)}
       unoptimized
-      priority={priority}
+      loading={priority ? "eager" : "lazy"}
       className={cn(
         "h-auto w-full rounded-[3px] bg-surface shadow-[0_0_0_1px_rgb(0_0_0/0.07),0_1px_2px_rgb(0_0_0/0.08),0_8px_18px_-8px_rgb(0_0_0/0.28)]",
         className,

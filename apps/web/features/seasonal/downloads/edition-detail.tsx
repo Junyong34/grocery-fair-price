@@ -32,6 +32,7 @@ export function EditionDetail({ edition, title, placement }: { edition: Manifest
         </p>
       </div>
       {edition.description && <p className="text-[15px] leading-relaxed text-ink">{edition.description}</p>}
+      <p className="text-sm text-stone">{DOWNLOADS_COPY.free}</p>
       <div className="rounded-xl bg-surface px-4 py-3 text-[13px] leading-relaxed text-stone">
         <p className="font-semibold text-ink">{DOWNLOADS_COPY.printTips.title}</p>
         <p>{DOWNLOADS_COPY.printTips.size}</p>

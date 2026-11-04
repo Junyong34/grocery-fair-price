@@ -12,6 +12,7 @@ import { WithdrawnNotice } from "@/features/seasonal/downloads/withdrawn-notice"
 import { DOWNLOADS, findEdition, findWithdrawn } from "@/shared/downloads-manifest"
 import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
+import { breadcrumb, JsonLd } from "@/shared/seo/json-ld"
 import { SubHeader } from "@/shared/shell/sub-header"
 
 type Params = PageProps<"/seasonal/downloads/[edition]">["params"]
@@ -33,8 +34,8 @@ export async function generateMetadata(props: PageProps<"/seasonal/downloads/[ed
   if (!edition) return {}
   const name = editionName(edition)
   return createMetadata({
-    title: `${name} PDF`,
-    description: edition.description,
+    title: `${name} PDF 무료 다운로드`,
+    description: `${name} 무료 다운로드. ${edition.description} A4 PDF ${edition.pages}쪽을 회원가입 없이 내려받아 인쇄하세요.`,
     path: routes.seasonal.download(edition.id),
     ogImage: { title: name, subtitle: edition.description, badge: "PDF" },
   })
@@ -58,6 +59,7 @@ async function Edition({ params }: { params: Params }) {
   const others = DOWNLOADS.editions.filter((other) => other.id !== edition.id)
   return (
     <article className="mx-auto flex max-w-[560px] flex-col gap-4 pt-6 pb-12 lg:pt-10">
+      <JsonLd data={breadcrumb([{ name: "제철 음식 달력", path: routes.seasonal.root }, { name: DOWNLOADS_COPY.title, path: routes.seasonal.downloads }, { name: editionName(edition), path: routes.seasonal.download(edition.id) }])} />
       {/* 공유는 본문 버튼 줄에 있어 맨 위 줄에는 두지 않는다. */}
       <SubHeader title={editionName(edition)} fallbackHref={routes.seasonal.downloads} />
       <Link href={routes.seasonal.downloads} className="self-start px-[18px] text-sm text-stone max-lg:hidden">

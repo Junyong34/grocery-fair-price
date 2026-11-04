@@ -174,10 +174,20 @@ export function hashString(value: string): number {
 
 /** 달력·포스터 PDF 내려받기 화면(/seasonal/downloads). */
 export const DOWNLOADS_COPY = {
-  title: "달력·포스터 내려받기",
-  intro: "제철 달력과 포스터를 A4 PDF로 내려받아 집에서 인쇄해 보세요.",
+  title: "제철달력 무료 다운로드",
+  intro: "월별 제철 음식을 담은 달력을 무료로 받아 보세요. 원하는 인쇄물을 골라 A4 PDF로 내려받고, 집에서 인쇄해 냉장고에 붙여 두세요.",
+  free: "회원가입 없이 무료로 내려받을 수 있어요.",
+  guide: {
+    title: "제철달력 다운로드·인쇄 안내",
+    items: [
+      { question: "어떻게 무료로 다운로드하나요?", answer: '원하는 달력을 누르고 미리보기를 확인한 뒤 "PDF 무료 다운로드"를 누르세요. 회원가입이나 결제 없이 PDF를 받을 수 있어요.' },
+      { question: "어떤 달력을 고르면 되나요?", answer: "월간 달력은 한 달씩 넘겨 보고, 연간 달력은 열두 달을 한 장으로 볼 수 있어요. 각 인쇄물에 표시된 연도와 쪽 수를 확인해 골라 주세요." },
+      { question: "집에서 인쇄할 수 있나요?", answer: 'A4 용지에 "실제 크기"로 인쇄하세요. 월간 달력에서 한 달만 필요하다면 인쇄 창에서 해당 쪽 번호를 고르면 돼요. 휴대폰으로 받은 PDF도 PC로 옮겨 인쇄할 수 있어요.' },
+    ],
+    browse: "화면으로 월별 제철 음식 보기",
+  },
   empty: "아직 준비된 인쇄물이 없어요. 곧 올려 둘게요.",
-  download: "PDF 내려받기",
+  download: "PDF 무료 다운로드",
   share: "공유",
   shelfMeta: (count: number) => `${count}개`,
   printTips: {
@@ -214,7 +224,7 @@ export const DOWNLOADS_COPY = {
   },
   /** 2a · 2b 입구 카드(1-a) */
   entry: {
-    title: "제철 달력 · 포스터 PDF 받기",
+    title: "제철달력 무료 다운로드",
     hint: "집에서 인쇄해 냉장고에 붙여 보세요",
   },
 } as const

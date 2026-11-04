@@ -5,11 +5,12 @@ import { findFood, FOODS } from "@workspace/seasonal/data/foods"
 import { MONTHS } from "@workspace/seasonal/data/months"
 import { SEASONS } from "@workspace/seasonal/data/seasons"
 
-import { festivalSeo, foodSeo, homeSeo, seasonalHomeSeo, monthSeo, monthsIndexSeo, sashimiSeo, seasonSeo, seasonsIndexSeo } from "./titles"
+import { downloadsSeo, festivalSeo, foodSeo, homeSeo, seasonalHomeSeo, monthSeo, monthsIndexSeo, sashimiSeo, seasonSeo, seasonsIndexSeo } from "./titles"
 
 const all = [
   homeSeo(),
   seasonalHomeSeo(),
+  downloadsSeo(),
   monthsIndexSeo(),
   ...MONTHS.map(monthSeo),
   seasonsIndexSeo(),
@@ -23,6 +24,7 @@ describe("페이지 제목·설명", () => {
   it("검색어 모양의 제목을 만든다", () => {
     expect(homeSeo().title).toBe("오늘 식재료 시세 · 지금 사도 될까")
     expect(seasonalHomeSeo().title).toBe("제철 음식 달력")
+    expect(downloadsSeo().title).toBe("제철달력 무료 다운로드 · A4 PDF")
     expect(monthsIndexSeo().title).toBe("월별 제철 음식")
     expect(monthSeo(3).title).toBe("3월 제철 음식")
     expect(seasonsIndexSeo().title).toBe("계절별 제철 음식")
@@ -30,6 +32,11 @@ describe("페이지 제목·설명", () => {
     expect(festivalSeo("chuseok").title).toBe("추석 음식")
     expect(sashimiSeo(12).title).toBe("12월 제철 회")
     expect(foodSeo(findFood("snow-crab")!).title).toBe("대게 제철 시기")
+  })
+
+  it("다운로드 설명에 무료 제공과 파일 형식을 안내한다", () => {
+    expect(downloadsSeo().description).toContain("무료 다운로드")
+    expect(downloadsSeo().description).toContain("A4 PDF")
   })
 
   it("제목과 설명은 페이지마다 다르다", () => {
