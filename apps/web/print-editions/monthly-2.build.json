@@ -1,0 +1,20 @@
+{
+  "specHash": "6638818b",
+  "generatedAt": "2026-11-04T13:31:24.127Z",
+  "bytes": {
+    "/downloads/monthly-2/a4.pdf": 14012666,
+    "/downloads/monthly-2/a3.pdf": 24808278
+  },
+  "thumbnails": [
+    {
+      "path": "/downloads/monthly-2/thumb-1.webp",
+      "width": 480,
+      "height": 679
+    },
+    {
+      "path": "/downloads/monthly-2/thumb-2.webp",
+      "width": 480,
+      "height": 679
+    }
+  ]
+}

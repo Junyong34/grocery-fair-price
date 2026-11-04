@@ -1,0 +1,26 @@
+{
+  "id": "season-poster-2",
+  "title": "2027년 계절 포스터-2",
+  "description": "S-D 계절",
+  "status": "published",
+  "spec": {
+    "version": 1,
+    "orientation": "portrait",
+    "type": {
+      "heading": "gowun-batang",
+      "number": "pretendard",
+      "scale": 1.1
+    },
+    "surface": "season",
+    "margin": "safe",
+    "foods": {
+      "names": "korean",
+      "max": 30
+    },
+    "kind": "season-poster",
+    "title": "계절별 제철 음식",
+    "layout": "per-season",
+    "seasonLabel": "english-korean",
+    "categories": []
+  }
+}

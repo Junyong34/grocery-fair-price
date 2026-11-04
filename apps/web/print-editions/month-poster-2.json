@@ -1,0 +1,36 @@
+{
+  "id": "month-poster-2",
+  "title": "2027년 월별 제철 포스터-2",
+  "description": "P-C 수산,과일 카테고리",
+  "status": "published",
+  "spec": {
+    "version": 1,
+    "orientation": "portrait",
+    "type": {
+      "heading": "gowun-batang",
+      "number": "pretendard",
+      "scale": 1
+    },
+    "surface": "white",
+    "margin": "safe",
+    "foods": {
+      "names": "korean",
+      "max": 24
+    },
+    "kind": "month-poster",
+    "title": "달마다 제철",
+    "layout": "wheel",
+    "monthLabel": "korean",
+    "monthStyle": {
+      "palette": "season",
+      "size": "medium",
+      "frame": "none",
+      "font": "auto"
+    },
+    "grid": "3x4",
+    "categories": [
+      "과일",
+      "수산"
+    ]
+  }
+}

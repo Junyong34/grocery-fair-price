@@ -1,0 +1,30 @@
+{
+  "id": "season-poster-1",
+  "title": "계절 제철 포스터",
+  "description": "S-A 타입",
+  "status": "published",
+  "spec": {
+    "version": 1,
+    "orientation": "landscape",
+    "type": {
+      "heading": "gowun-batang",
+      "number": "pretendard",
+      "scale": 1
+    },
+    "surface": "white",
+    "margin": "safe",
+    "foods": {
+      "names": "korean",
+      "max": 30
+    },
+    "kind": "season-poster",
+    "title": "계절별 제철 음식",
+    "layout": "bands",
+    "seasonLabel": "english-korean",
+    "categories": [
+      "수산",
+      "채소",
+      "과일"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "specHash": "5b5e9fb2",
+  "generatedAt": "2026-11-04T13:50:17.195Z",
+  "bytes": {
+    "/downloads/month-poster-2/a4.pdf": 781107,
+    "/downloads/month-poster-2/a3.pdf": 1154949
+  },
+  "thumbnails": [
+    {
+      "path": "/downloads/month-poster-2/thumb-1.webp",
+      "width": 480,
+      "height": 679
+    }
+  ]
+}

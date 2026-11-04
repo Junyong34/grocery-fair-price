@@ -1,0 +1,40 @@
+{
+  "id": "monthly-3",
+  "title": "2027년도 달력-2",
+  "description": "M-E 타입",
+  "status": "published",
+  "spec": {
+    "version": 1,
+    "orientation": "portrait",
+    "type": {
+      "heading": "gowun-batang",
+      "number": "pretendard",
+      "scale": 1
+    },
+    "surface": "white",
+    "margin": "safe",
+    "foods": {
+      "names": "korean",
+      "max": 40
+    },
+    "kind": "monthly",
+    "year": 2027,
+    "cover": "months",
+    "monthLabel": "english-short-caps",
+    "monthStyle": {
+      "palette": "flow",
+      "size": "medium",
+      "frame": "rule",
+      "font": "auto"
+    },
+    "calendar": {
+      "weekStart": 0,
+      "weekday": "korean",
+      "holidays": "mark-and-name",
+      "size": "medium",
+      "variant": "plain"
+    },
+    "layout": "allover",
+    "memo": "none"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "specHash": "3bf22a3d",
+  "generatedAt": "2026-11-04T13:51:57.955Z",
+  "bytes": {
+    "/downloads/season-poster-2/a4.pdf": 5633007,
+    "/downloads/season-poster-2/a3.pdf": 10095173
+  },
+  "thumbnails": [
+    {
+      "path": "/downloads/season-poster-2/thumb-1.webp",
+      "width": 480,
+      "height": 679
+    }
+  ]
+}

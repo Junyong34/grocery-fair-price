@@ -1,0 +1,15 @@
+{
+  "specHash": "51827b40",
+  "generatedAt": "2026-11-04T13:40:27.788Z",
+  "bytes": {
+    "/downloads/year-sheet-2/a4.pdf": 883139,
+    "/downloads/year-sheet-2/a3.pdf": 1467390
+  },
+  "thumbnails": [
+    {
+      "path": "/downloads/year-sheet-2/thumb-1.webp",
+      "width": 480,
+      "height": 679
+    }
+  ]
+}

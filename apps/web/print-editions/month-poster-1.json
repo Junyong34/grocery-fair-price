@@ -1,0 +1,35 @@
+{
+  "id": "month-poster-1",
+  "title": "2027년 월별 제철 포스터",
+  "description": "P-A",
+  "status": "published",
+  "spec": {
+    "version": 1,
+    "orientation": "portrait",
+    "type": {
+      "heading": "gowun-batang",
+      "number": "pretendard",
+      "scale": 1
+    },
+    "surface": "white",
+    "margin": "safe",
+    "foods": {
+      "names": "korean",
+      "max": 24
+    },
+    "kind": "month-poster",
+    "title": "월별 수산",
+    "layout": "cells",
+    "monthLabel": "korean",
+    "monthStyle": {
+      "palette": "season",
+      "size": "medium",
+      "frame": "none",
+      "font": "auto"
+    },
+    "grid": "3x4",
+    "categories": [
+      "수산"
+    ]
+  }
+}

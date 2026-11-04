@@ -1,0 +1,38 @@
+{
+  "id": "year-sheet-2",
+  "title": "2027년 연간 달력",
+  "description": "Y-A 타입",
+  "status": "published",
+  "spec": {
+    "version": 1,
+    "orientation": "portrait",
+    "type": {
+      "heading": "gowun-batang",
+      "number": "pretendard",
+      "scale": 1
+    },
+    "surface": "white",
+    "margin": "safe",
+    "foods": {
+      "names": "korean",
+      "max": 4
+    },
+    "kind": "year-sheet",
+    "year": 2027,
+    "monthLabel": "big-number",
+    "monthStyle": {
+      "palette": "twelve",
+      "size": "large",
+      "frame": "none",
+      "font": "auto"
+    },
+    "calendar": {
+      "weekStart": 0,
+      "weekday": "korean",
+      "holidays": "mark",
+      "size": "medium"
+    },
+    "layout": "pairs",
+    "grid": "2x6"
+  }
+}

@@ -1,6 +1,50 @@
 {
   "editions": [
     {
+      "id": "month-poster-1",
+      "kind": "month-poster",
+      "title": "2027년 월별 제철 포스터",
+      "description": "P-A",
+      "orientation": "portrait",
+      "pages": 1,
+      "specHash": "12595448",
+      "generatedAt": "2026-11-04T13:43:35.548Z",
+      "files": {
+        "A4": {
+          "bytes": 1280193
+        }
+      },
+      "thumbnails": [
+        {
+          "path": "/downloads/month-poster-1/thumb-1.webp",
+          "width": 480,
+          "height": 679
+        }
+      ]
+    },
+    {
+      "id": "month-poster-2",
+      "kind": "month-poster",
+      "title": "2027년 월별 제철 포스터-2",
+      "description": "P-C 수산,과일 카테고리",
+      "orientation": "portrait",
+      "pages": 1,
+      "specHash": "5b5e9fb2",
+      "generatedAt": "2026-11-04T13:50:17.195Z",
+      "files": {
+        "A4": {
+          "bytes": 781107
+        }
+      },
+      "thumbnails": [
+        {
+          "path": "/downloads/month-poster-2/thumb-1.webp",
+          "width": 480,
+          "height": 679
+        }
+      ]
+    },
+    {
       "id": "monthly-1",
       "kind": "monthly",
       "title": "2026년도 달력",
@@ -29,6 +73,106 @@
       ]
     },
     {
+      "id": "monthly-2",
+      "kind": "monthly",
+      "title": "2027년 연간 달력",
+      "description": "M-A 타입",
+      "year": 2027,
+      "orientation": "portrait",
+      "pages": 13,
+      "specHash": "6638818b",
+      "generatedAt": "2026-11-04T13:31:24.127Z",
+      "files": {
+        "A4": {
+          "bytes": 14012666
+        }
+      },
+      "thumbnails": [
+        {
+          "path": "/downloads/monthly-2/thumb-1.webp",
+          "width": 480,
+          "height": 679
+        },
+        {
+          "path": "/downloads/monthly-2/thumb-2.webp",
+          "width": 480,
+          "height": 679
+        }
+      ]
+    },
+    {
+      "id": "monthly-3",
+      "kind": "monthly",
+      "title": "2027년도 달력-2",
+      "description": "M-E 타입",
+      "year": 2027,
+      "orientation": "portrait",
+      "pages": 13,
+      "specHash": "7458d907",
+      "generatedAt": "2026-11-04T13:35:09.628Z",
+      "files": {
+        "A4": {
+          "bytes": 24519134
+        }
+      },
+      "thumbnails": [
+        {
+          "path": "/downloads/monthly-3/thumb-1.webp",
+          "width": 480,
+          "height": 679
+        },
+        {
+          "path": "/downloads/monthly-3/thumb-2.webp",
+          "width": 480,
+          "height": 679
+        }
+      ]
+    },
+    {
+      "id": "season-poster-1",
+      "kind": "season-poster",
+      "title": "계절 제철 포스터",
+      "description": "S-A 타입",
+      "orientation": "landscape",
+      "pages": 1,
+      "specHash": "ae6ccb01",
+      "generatedAt": "2026-11-04T13:46:19.043Z",
+      "files": {
+        "A4": {
+          "bytes": 1058009
+        }
+      },
+      "thumbnails": [
+        {
+          "path": "/downloads/season-poster-1/thumb-1.webp",
+          "width": 480,
+          "height": 339
+        }
+      ]
+    },
+    {
+      "id": "season-poster-2",
+      "kind": "season-poster",
+      "title": "2027년 계절 포스터-2",
+      "description": "S-D 계절",
+      "orientation": "portrait",
+      "pages": 4,
+      "specHash": "3bf22a3d",
+      "generatedAt": "2026-11-04T13:51:57.955Z",
+      "files": {
+        "A4": {
+          "bytes": 5633007
+        }
+      },
+      "thumbnails": [
+        {
+          "path": "/downloads/season-poster-2/thumb-1.webp",
+          "width": 480,
+          "height": 679
+        }
+      ]
+    },
+    {
       "id": "year-sheet-1",
       "kind": "year-sheet",
       "title": "2026년 연간 달력",
@@ -46,6 +190,29 @@
       "thumbnails": [
         {
           "path": "/downloads/year-sheet-1/thumb-1.webp",
+          "width": 480,
+          "height": 679
+        }
+      ]
+    },
+    {
+      "id": "year-sheet-2",
+      "kind": "year-sheet",
+      "title": "2027년 연간 달력",
+      "description": "Y-A 타입",
+      "year": 2027,
+      "orientation": "portrait",
+      "pages": 1,
+      "specHash": "51827b40",
+      "generatedAt": "2026-11-04T13:40:27.788Z",
+      "files": {
+        "A4": {
+          "bytes": 883139
+        }
+      },
+      "thumbnails": [
+        {
+          "path": "/downloads/year-sheet-2/thumb-1.webp",
           "width": 480,
           "height": 679
         }
