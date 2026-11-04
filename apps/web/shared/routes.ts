@@ -14,7 +14,7 @@ export const routes = {
     /** P2 품종 검색. 검색어는 ?q= */
     search: "/search",
     searchFor: (query: string) => (query ? `/search?q=${encodeURIComponent(query)}` : "/search"),
-    /** P3 품종 상세의 접두 경로 */
+    /** 품종 허브(카테고리별 전체 품종). P3 품종 상세의 접두 경로이기도 하다. */
     varieties: "/prices",
     /** P3 품종 상세 */
     variety: (id: string) => `/prices/${id}`,

@@ -7,6 +7,7 @@ import { FOODS, findFood } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 
 import { ShareButton } from "@/features/seasonal/components/share-button"
+import { priceVarietyPath } from "@/features/price/data/price-source"
 import { FoodDetail } from "@/features/seasonal/food-detail/food-detail"
 import { createMetadata } from "@/shared/meta"
 import { SubHeader } from "@/shared/shell/sub-header"
@@ -60,7 +61,7 @@ async function Food({ params }: { params: Params }) {
         {/* 시트는 시트 제목 줄에 공유가 있다. 전체 페이지는 맨 위 줄 오른쪽에 둔다. */}
         <ShareButton className="-mr-2.5 shrink-0" />
       </div>
-      <FoodDetail food={food} title={<h1 className="font-heading text-[36px] leading-tight font-bold">{food.name}</h1>} />
+      <FoodDetail food={food} priceHref={await priceVarietyPath(food.id)} title={<h1 className="font-heading text-[36px] leading-tight font-bold">{food.name}</h1>} />
     </article>
   )
 }

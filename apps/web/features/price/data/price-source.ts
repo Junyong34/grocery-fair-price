@@ -2,6 +2,8 @@ import "server-only"
 
 import type { SearchIndex, VarietyDetail, VarietySummary } from "@workspace/price/types"
 
+import { routes } from "@/shared/routes"
+
 import { dbSource } from "./db-source"
 
 // 가격 화면이 데이터를 읽는 유일한 입구. 화면 · 컴포넌트는 서버 컴포넌트에서 getPriceSource()를 부르고
@@ -27,4 +29,18 @@ export interface PriceSource {
 /** 지금 쓰는 데이터 구현. */
 export function getPriceSource(): PriceSource {
   return dbSource
+}
+
+/**
+ * 시세 화면이 있는 품종이면 그 주소, 없으면 null. 제철 품종 상세가 같은 id의 시세로 이을 때 쓴다.
+ * 제철 화면은 가격 DB 없이도 떠야 하므로 DB 오류는 "링크 없음"으로 삼킨다.
+ */
+export async function priceVarietyPath(id: string): Promise<string | null> {
+  try {
+    const { varieties } = await getPriceSource().searchIndex()
+    return varieties.some((variety) => variety.id === id) ? routes.price.variety(id) : null
+  } catch (error) {
+    console.error("시세 품종 목록을 읽지 못해 시세 링크를 뺍니다", error)
+    return null
+  }
 }

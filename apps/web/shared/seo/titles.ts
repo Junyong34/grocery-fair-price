@@ -38,6 +38,14 @@ export function homeSeo(): PageSeo {
   }
 }
 
+/** 품종 허브(/prices). 카테고리 이름은 목록에서 받아 넣는다. */
+export function varietiesIndexSeo(categories: readonly string[], count: number): PageSeo {
+  return {
+    title: "식재료 시세 전체 품종 · 오늘 가격",
+    description: `${categories.join("·")} ${count}개 품종의 오늘 시세를 평소 가격과 견줘 카테고리별로 모았어요. KAMIS 전국 조사 시장 기준.`,
+  }
+}
+
 /** P3 품종 상세 */
 export function varietySeo(variety: { name: string; baseUnit: string }): PageSeo {
   return {

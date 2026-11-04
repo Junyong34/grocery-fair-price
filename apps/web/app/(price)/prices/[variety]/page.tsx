@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
+import { PRICE_COPY } from "@workspace/price/copy"
 import { isoDate } from "@workspace/price/format"
 
 import { getPriceSource } from "@/features/price/data/price-source"
@@ -45,7 +46,7 @@ async function Variety({ params }: { params: Params }) {
   if (!detail) notFound()
   return (
     <>
-      <JsonLd data={breadcrumb([{ name: varietySeo(detail).title, path: routes.price.variety(detail.id) }])} />
+      <JsonLd data={breadcrumb([{ name: PRICE_COPY.catalog.title, path: routes.price.varieties }, { name: varietySeo(detail).title, path: routes.price.variety(detail.id) }])} />
       <DetailView detail={detail} today={isoDate(today)} />
     </>
   )

@@ -1,4 +1,5 @@
 import { Info } from "lucide-react"
+import Link from "next/link"
 
 import {
   Popover,
@@ -15,6 +16,7 @@ import { pickByIds } from "@workspace/price/list"
 import type { VarietySummary } from "@workspace/price/types"
 
 import { DownloadsCard } from "@/shared/downloads/downloads-card"
+import { routes } from "@/shared/routes"
 
 import { AddButton } from "../components/add-button"
 import { RecentPills } from "../components/recent-varieties"
@@ -95,6 +97,9 @@ export function HomeView({
             />
           ))}
         </ul>
+        <Link href={routes.price.varieties} className="self-start py-2 text-sm text-ink underline underline-offset-4">
+          {PRICE_COPY.home.allVarieties}
+        </Link>
         {sourceLine && (
           <p className="mt-2 text-right text-xs leading-relaxed text-caption">
             {sourceLine}

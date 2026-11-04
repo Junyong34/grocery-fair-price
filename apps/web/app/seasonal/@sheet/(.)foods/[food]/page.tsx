@@ -3,6 +3,7 @@ import { Suspense } from "react"
 import { findFood } from "@workspace/seasonal/data/foods"
 
 import { DetailSheet } from "@/features/seasonal/components/detail-sheet"
+import { priceVarietyPath } from "@/features/price/data/price-source"
 import { FoodDetail } from "@/features/seasonal/food-detail/food-detail"
 
 // 메타데이터도 전체 페이지와 같다. 없으면 시트를 열었을 때 탭 제목·설명·canonical이 사이트 기본값으로 바뀐다.
@@ -25,7 +26,7 @@ async function Sheet({ params }: { params: Params }) {
   if (!food) return null
   return (
     <DetailSheet title={food.name}>
-      <FoodDetail food={food} />
+      <FoodDetail food={food} priceHref={await priceVarietyPath(food.id)} />
     </DetailSheet>
   )
 }

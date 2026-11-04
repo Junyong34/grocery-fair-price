@@ -24,9 +24,12 @@ const SAME_SEASON_LIMIT = 12
 export function FoodDetail({
   food,
   title,
+  priceHref,
 }: {
   food: Food
   title?: React.ReactNode
+  /** 같은 품종의 시세 화면 주소. 시세가 없는 품종이면 비워 "준비 중"을 보인다. */
+  priceHref?: string | null
 }) {
   const seasons = seasonsOf(food)
   const festivals = festivalsWithFood(food.id)
@@ -122,17 +125,26 @@ export function FoodDetail({
         </section>
       )}
 
-      <button
-        type="button"
-        disabled
-        className="rounded-md border border-hairline py-3 text-sm text-caption"
-        aria-describedby="price-coming-soon"
-      >
-        {UI_COPY.priceComingSoon}
-        <span id="price-coming-soon" className="sr-only">
-          가격 비교 기능이 생기면 열립니다
-        </span>
-      </button>
+      {priceHref ? (
+        <Link
+          href={priceHref}
+          className="rounded-md border border-ink py-3 text-center text-sm font-semibold text-ink no-underline hover:text-ink"
+        >
+          {UI_COPY.priceLink(food.name)}
+        </Link>
+      ) : (
+        <button
+          type="button"
+          disabled
+          className="rounded-md border border-hairline py-3 text-sm text-caption"
+          aria-describedby="price-coming-soon"
+        >
+          {UI_COPY.priceComingSoon}
+          <span id="price-coming-soon" className="sr-only">
+            가격 비교 기능이 생기면 열립니다
+          </span>
+        </button>
+      )}
     </div>
   )
 }

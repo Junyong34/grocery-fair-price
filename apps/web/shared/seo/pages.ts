@@ -25,6 +25,8 @@ export type SitemapEntry = {
 export const SEO_PAGES: Readonly<Record<string, () => readonly SitemapEntry[]>> = {
   // P1 시세 메인
   "/": () => [{ path: routes.home }],
+  // 품종 허브: 모든 품종 상세로 가는 색인 가능한 입구
+  "/prices": () => [{ path: routes.price.varieties }],
   "/seasonal": () => [{ path: routes.seasonal.root }],
   "/seasonal/months": () => [{ path: routes.seasonal.months }],
   "/seasonal/months/[month]": () => MONTHS.map((month) => ({ path: routes.seasonal.month(month) })),

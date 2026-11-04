@@ -107,6 +107,7 @@ import 경로:
 | `/` | P1 시세 메인 | `(price)/page.tsx` | `features/price/home/home-view` |
 | `/search?q=` | P2 품종 검색 (noindex) | `(price)/search/page.tsx` | `features/price/search/search-view` |
 | `/basket` | P4 담은 품종 (noindex) | `(price)/basket/page.tsx` | `features/price/basket/basket-view` |
+| `/prices` | 품종 허브(카테고리별 전체 품종, 색인 대상) | `(price)/prices/page.tsx` | `features/price/catalog/catalog-view`. 메인 "전체 품종 시세 보기"와 P3 빵부스러기가 여기로 온다 |
 | `/prices/[variety]` | P3 품종 상세 (가격 품종 slug) | `(price)/prices/[variety]/page.tsx` | `features/price/variety-detail/detail-view`. 품종 목록은 `getPriceSource()`에서 읽어 `generateStaticParams` · sitemap에 쓴다 |
 | `/seasonal` | 2a 이달 · 12개월 스크롤 | `seasonal/(this-month)/page.tsx` | `this-month/this-month-view` |
 | `/seasonal/months` | 2b 열두 달 카드 목록 | `seasonal/(this-month)/months/page.tsx` | `month-timeline/months-index` |
@@ -211,7 +212,8 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `home/` | P1 시세 메인. 자주 사는 품종 제목 옆 기존 UI Popover로 시세·평소가·판정과 조사 범위를 안내하고, 목록 아래는 출처 이름만 우측 정렬한다 |
 | `search/` | P2 품종 검색. 공용 `BackButton`이 검색창 앞에 있고, 직접 진입하면 시세 메인으로 간다. 검색어 지우기 ×는 입력창 안에 유지한다. 검색어는 `history.replaceState`로 `?q=`에 맞춘다 |
 | `basket/` | P4 담은 품종: 판정별 개수, 바뀐 판정 알림, 판정별 묶음, × 빼기, 편집(모두 빼기), 빈 목록. 기기 값을 불러온 뒤에 그린다 |
-| `variety-detail/` | P3 품종 상세: `detail-header`(본문 제목 줄, 최근 본 품종에 넣기. 모바일은 `DetailHeaderBar`가 처음부터 하위 헤더 "‹ 품종 · 담기"를 그리고, 데스크톱은 본문 줄에 뒤로 · 담기가 있다), `verdict-card`(판정 전 · 오래됨 · 표본 적음), `range-bar`, `places-section`(장소 비교, 판정 색 없음), `why-section`(`trend-chart` SVG + `dots-compare`), `my-price`(내가 본 가격, 저장 안 함) |
+| `catalog/` | 품종 허브(`/prices`): `groupByCategory`로 묶은 카테고리별 `VarietyRow` 목록 |
+| `variety-detail/` | P3 품종 상세(같은 id의 제철 품종이 있으면 "제철 시기 보기" 링크): `detail-header`(본문 제목 줄, 최근 본 품종에 넣기. 모바일은 `DetailHeaderBar`가 처음부터 하위 헤더 "‹ 품종 · 담기"를 그리고, 데스크톱은 본문 줄에 뒤로 · 담기가 있다), `verdict-card`(판정 전 · 오래됨 · 표본 적음), `range-bar`, `places-section`(장소 비교, 판정 색 없음), `why-section`(`trend-chart` SVG + `dots-compare`), `my-price`(내가 본 가격, 저장 안 함) |
 | `components/` | 품종 행(`variety-row`: 모바일은 품종·판정과 시세를 묶고 넓은 화면은 네 열 subgrid, 시세·평소가·품종별 조사일 표시), 판정 칩 · 점(`verdict-chip`: 목록은 판정 단어만, 최근 3회 조사 편차 %는 상세에서 기준과 함께 표시. 색은 `verdict-tone`), `add-button`, `basket-toast`(담기 토스트 "배추를 담았어요 · 목록 보기", 화면 키보드 위로), `basket-badge`(내비 담은 개수), `search-entry`, `recent-varieties`, `price-shell`, `header-search-link`(가격 루트 헤더 🔍. P1 `/`에서는 히어로 검색창 · 고정 검색 줄과 겹쳐 그리지 않는다) |
 | `settings/` | 설정 화면 "내 기록"의 담은 품종 · 최근 본 품종 지우기(`price-record-settings`) |
 | `stores/` | `basket-store`(`price:basket`, 담을 때 판정 · 조사일), `recent-store`(`price:recent`) |

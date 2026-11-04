@@ -13,3 +13,10 @@ export function pickByIds<T extends { id: string }>(rows: readonly T[], ids: rea
     return row ? [row] : []
   })
 }
+
+/** 카테고리별 묶음. 카테고리 순서와 묶음 안 순서는 들어온 목록 순서(목록은 이미 카테고리 정렬 · 품종 이름순)를 따른다. 품종 허브(/prices)에 쓴다. */
+export function groupByCategory<T extends { category: string }>(rows: readonly T[]): { category: string; rows: T[] }[] {
+  const groups = new Map<string, T[]>()
+  for (const row of rows) groups.set(row.category, [...(groups.get(row.category) ?? []), row])
+  return [...groups].map(([category, rows]) => ({ category, rows }))
+}

@@ -1,5 +1,11 @@
+import Link from "next/link"
+
 import { basisLine } from "@workspace/price/copy"
 import type { VarietyDetail } from "@workspace/price/types"
+import { findFood } from "@workspace/seasonal/data/foods"
+import { formatSeasonMonths } from "@workspace/seasonal/data/months"
+
+import { routes } from "@/shared/routes"
 
 import { DetailHeader, DetailHeaderBar } from "./detail-header"
 import { DotsCompare } from "./dots-compare"
@@ -29,6 +35,8 @@ export function DetailView({
   detail: VarietyDetail
   today: string
 }) {
+  // 제철달력에 같은 id 품종이 있으면 제철 시기로 잇는다(제철 품종 상세의 "오늘 시세 보기"와 짝).
+  const food = findFood(detail.id)
   return (
     <article className="price-page flex flex-col gap-7 pt-3 lg:pt-8">
       <DetailHeader variety={detail} />
@@ -58,6 +66,18 @@ export function DetailView({
           <WhySection detail={detail} dots={<DotsCompare detail={detail} />} />
         </div>
       </div>
+      {food && (
+        <Link
+          href={routes.seasonal.food(food.id)}
+          className="flex items-center justify-between gap-3 rounded-xl border border-hairline px-4 py-3 text-ink no-underline hover:text-ink"
+        >
+          <span className="flex flex-col gap-0.5">
+            <span className="text-sm font-semibold">{food.name} 제철 시기 보기</span>
+            <span className="text-xs text-stone">{formatSeasonMonths(food.months)}</span>
+          </span>
+          <span aria-hidden className="text-stone">›</span>
+        </Link>
+      )}
       <p className="pb-4 text-xs text-caption">
         {basisLine(detail.basis, detail.surveyedOn, detail.sampleSize)}
       </p>

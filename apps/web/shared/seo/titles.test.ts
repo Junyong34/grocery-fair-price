@@ -17,6 +17,7 @@ import {
   sashimiSeo,
   seasonSeo,
   seasonsIndexSeo,
+  varietiesIndexSeo,
 } from "./titles"
 
 const all = [
@@ -53,6 +54,12 @@ describe("페이지 제목·설명", () => {
     expect(editionSeoTitle("열두 달 월별 제철 포스터")).toBe(
       "열두 달 월별 제철 포스터 PDF 무료 다운로드"
     )
+  })
+
+  it("품종 허브 설명에 카테고리 이름과 품종 수를 넣는다", () => {
+    const seo = varietiesIndexSeo(["채소", "과일"], 127)
+    expect(seo.title).toBe("식재료 시세 전체 품종 · 오늘 가격")
+    expect(seo.description).toContain("채소·과일 127개 품종")
   })
 
   it("다운로드 설명에 무료 제공과 파일 형식을 안내한다", () => {
