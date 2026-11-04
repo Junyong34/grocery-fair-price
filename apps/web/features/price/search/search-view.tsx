@@ -61,13 +61,13 @@ function SearchScreen({ varieties, featuredIds, index }: SearchViewProps) {
   }
 
   return (
-    <div className="price-page flex flex-col gap-4 lg:gap-8 lg:pt-7">
+    <div className="price-page flex flex-col gap-4 lg:gap-8 lg:pt-8">
       {/* 모바일은 사이트 헤더 대신 이 검색 줄이 맨 위에 붙는다(검색 헤더, .scratch/shell-unify/spec.md 3장).
-          ‹는 하위 헤더(P3 등)와 같은 자리에 둔다: 모바일은 줄 높이 56 · 버튼 40 · 입력창 44(위아래 6px 여유), 데스크톱은 -ml-2로 꺾쇠를 본문 왼쪽 끝에 맞추고 pt-7로 세로 중심을 P3 제목 줄과 맞춘다. */}
+          ‹는 하위 헤더(P3 등)와 같은 자리에 둔다: 모바일은 줄 높이 56 · 버튼 40 · 입력창 44(위아래 6px 여유), 데스크톱은 -ml-2로 꺾쇠를 본문 왼쪽 끝에 맞추고 pt-8로 본문 시작 간격을 맞춘다. */}
       <form
         role="search"
         onSubmit={(event) => event.preventDefault()}
-        className="flex items-center gap-3 max-lg:sticky max-lg:top-0 max-lg:z-(--z-dock) max-lg:-mx-[18px] max-lg:h-14 max-lg:bg-canvas/94 max-lg:px-[18px] max-lg:backdrop-blur-md"
+        className="flex items-center gap-3 max-lg:sticky max-lg:top-0 max-lg:z-(--z-dock) max-lg:-mx-[18px] max-lg:h-14 max-lg:border-b max-lg:border-hairline max-lg:bg-canvas/94 max-lg:px-[18px] max-lg:backdrop-blur-md"
       >
         <BackButton
           fallbackHref={routes.home}

@@ -19,7 +19,7 @@ function Linked({ text }: { text: string }) {
 export function PrivacyView() {
   const [current] = PRIVACY_CHANGES
   return (
-    <article className="mx-auto flex max-w-[680px] flex-col gap-8 px-[18px] pt-6 pb-12 lg:px-6 lg:pt-10">
+    <article className="mx-auto flex max-w-[680px] flex-col gap-8 px-[18px] pt-6 pb-12 lg:px-6 lg:pt-8">
       <header className="flex flex-col gap-3">
         <h1 className="font-heading text-2xl font-bold text-ink lg:text-3xl">개인정보 처리방침</h1>
         <p className="text-[15px] leading-relaxed text-ink">{PRIVACY_INTRO}</p>

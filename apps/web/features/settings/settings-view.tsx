@@ -14,7 +14,7 @@ import { SETTINGS_COPY } from "./copy"
  */
 export function SettingsView({ display, records }: { display: React.ReactNode; records: React.ReactNode }) {
   return (
-    <div className="mx-auto flex max-w-[680px] flex-col gap-7 px-[18px] pt-4 pb-12 lg:px-6 lg:pt-10">
+    <div className="mx-auto flex max-w-[680px] flex-col gap-7 px-[18px] pt-4 pb-12 lg:px-6 lg:pt-8">
       <SubHeader title={SETTINGS_COPY.title} fallbackHref={routes.home} />
       <h1 className="font-heading text-2xl font-bold text-ink max-lg:sr-only">{SETTINGS_COPY.title}</h1>
       <SettingSection title={SETTINGS_COPY.sections.display}>{display}</SettingSection>

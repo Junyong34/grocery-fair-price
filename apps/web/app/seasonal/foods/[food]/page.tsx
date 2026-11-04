@@ -48,7 +48,7 @@ async function Food({ params }: { params: Params }) {
   const food = findFood((await params).food)
   if (!food) notFound()
   return (
-    <article className="mx-auto flex max-w-[560px] flex-col gap-4 px-[18px] pt-6 lg:pt-10">
+    <article className="mx-auto flex max-w-[560px] flex-col gap-4 px-[18px] pt-6 lg:pt-8">
       {/* 시트(@sheet)에는 넣지 않는다. 크롤러는 주소를 직접 열어 이 전체 페이지를 본다. */}
       <JsonLd data={breadcrumb([{ name: foodSeo(food).title, path: routes.seasonal.food(food.id) }])} />
       <SubHeader title={food.name} fallbackHref={routes.seasonal.root} actions={<ShareButton className="size-10" />} />

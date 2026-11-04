@@ -35,7 +35,7 @@ export function HomeView({
   const basisLine = listBasisLine(featured)
   const sourceLine = listSourceLine(featured)
   return (
-    <div className="price-page flex flex-col gap-9 pt-6 lg:grid lg:grid-cols-[340px_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-8 lg:pt-10">
+    <div className="price-page flex flex-col gap-9 pt-6 lg:grid lg:grid-cols-[340px_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-8 lg:pt-8">
       <div className="contents lg:col-start-1 lg:row-start-1 lg:flex lg:min-w-0 lg:flex-col lg:gap-9 lg:pt-5">
         <div className="flex flex-col gap-5">
           <h1 className="font-heading text-[28px] leading-[1.35] tracking-[-0.02em] text-ink lg:text-[32px]">

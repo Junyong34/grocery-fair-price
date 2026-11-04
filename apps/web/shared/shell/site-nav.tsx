@@ -188,7 +188,7 @@ export function SiteHeader({
     >
       <div
         className={cn(
-          "absolute inset-x-0 top-0 h-14 border border-transparent",
+          "absolute inset-x-0 top-0 h-14 border border-transparent border-b-hairline bg-canvas",
           "motion-safe:transition-[top,left,right,height,border-radius,background-color,border-color,box-shadow] motion-safe:duration-500 motion-safe:ease-[cubic-bezier(.34,1.45,.64,1)]",
           "group-data-stuck/header:top-2 group-data-stuck/header:right-[max(10px,calc(50%-548px))] group-data-stuck/header:left-[max(10px,calc(50%-548px))] group-data-stuck/header:h-12",
           "group-data-stuck/header:rounded-[20px] group-data-stuck/header:border-silver/50 group-data-stuck/header:bg-canvas/90 group-data-stuck/header:shadow-lg group-data-stuck/header:shadow-ink/8 group-data-stuck/header:backdrop-blur-md"

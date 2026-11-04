@@ -6,7 +6,7 @@ import { SOURCES_COPY } from "./copy"
 /** 데이터 출처(/settings/sources): 출처마다 무엇을 언제 조사하는지 한 줄씩. */
 export function SourcesView() {
   return (
-    <div className="mx-auto flex max-w-[680px] flex-col gap-6 px-[18px] pt-4 pb-12 lg:px-6 lg:pt-10">
+    <div className="mx-auto flex max-w-[680px] flex-col gap-6 px-[18px] pt-4 pb-12 lg:px-6 lg:pt-8">
       <header className="flex flex-col gap-2">
         <SubHeader title={SOURCES_COPY.title} fallbackHref={routes.settings.root} />
         <h1 className="font-heading text-2xl font-bold text-ink max-lg:sr-only">{SOURCES_COPY.title}</h1>

@@ -15,7 +15,7 @@ import { EditionThumbnail, ThumbnailMat } from "@/shared/downloads/edition-thumb
 export function DownloadsView() {
   const shelves = shelvesOf(DOWNLOADS.editions)
   return (
-    <div className="mx-auto flex max-w-[900px] flex-col gap-8 pt-6 pb-12 lg:pt-10">
+    <div className="mx-auto flex max-w-[900px] flex-col gap-8 pt-6 pb-12 lg:pt-8">
       <header className="flex flex-col gap-2 px-[18px] lg:px-6">
         <SubHeader title={DOWNLOADS_COPY.title} fallbackHref={routes.seasonal.root} revealAfter="downloads-title" />
         <h1 id="downloads-title" className="font-heading text-2xl font-bold text-ink lg:text-3xl">{DOWNLOADS_COPY.title}</h1>
