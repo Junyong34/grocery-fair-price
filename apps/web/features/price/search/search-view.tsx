@@ -27,6 +27,7 @@ import { BackButton } from "@/shared/shell/sub-header"
 import { AddButton } from "../components/add-button"
 import { useRecentVarieties } from "../components/recent-varieties"
 import { PriceHint, VarietyRow } from "../components/variety-row"
+import { RecentRow } from "./recent-row"
 
 type SearchViewProps = {
   varieties: readonly VarietySummary[]
@@ -162,11 +163,7 @@ function Results({
             <Group title={PRICE_COPY.home.recent}>
               <ul>
                 {recent.map((variety) => (
-                  <VarietyRow
-                    key={variety.id}
-                    variety={variety}
-                    action={<AddButton variety={variety} />}
-                  />
+                  <RecentRow key={variety.id} variety={variety} />
                 ))}
               </ul>
             </Group>
