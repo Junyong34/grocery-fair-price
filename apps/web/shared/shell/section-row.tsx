@@ -15,11 +15,14 @@ export function SectionRow({
   watch,
   belowTabs = false,
   label,
+  className,
   children,
 }: {
   watch: string
   belowTabs?: boolean
   label: string
+  /** 줄 높이 등을 바꿀 때(기본 h-10). */
+  className?: string
   children: React.ReactNode
 }) {
   const shown = useScrolledPast(watch, { belowTabs })
@@ -46,7 +49,8 @@ export function SectionRow({
         "motion-safe:transition-[top,opacity,translate] motion-safe:duration-300",
         shown
           ? "translate-y-0 opacity-100"
-          : "pointer-events-none -translate-y-2 opacity-0"
+          : "pointer-events-none -translate-y-2 opacity-0",
+        className
       )}
     >
       <div
