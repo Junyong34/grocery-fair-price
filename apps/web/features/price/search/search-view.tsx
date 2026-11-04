@@ -51,18 +51,19 @@ export function SearchView({
   }
 
   return (
-    <div className="mx-auto flex max-w-[640px] flex-col gap-4 px-[18px] pt-1 lg:pt-8">
-      {/* 모바일은 사이트 헤더 대신 이 검색 줄이 맨 위에 붙는다(검색 헤더, .scratch/shell-unify/spec.md 3장). */}
+    <div className="mx-auto flex max-w-[640px] flex-col gap-4 px-[18px] lg:pt-7">
+      {/* 모바일은 사이트 헤더 대신 이 검색 줄이 맨 위에 붙는다(검색 헤더, .scratch/shell-unify/spec.md 3장).
+          ‹는 하위 헤더(P3 등)와 같은 자리에 둔다: 모바일은 줄 높이 56 · 버튼 40 · 입력창 44(위아래 6px 여유), 데스크톱은 -ml-2로 꺾쇠를 본문 왼쪽 끝에 맞추고 pt-7로 세로 중심을 P3 제목 줄과 맞춘다. */}
       <form
         role="search"
         onSubmit={(event) => event.preventDefault()}
-        className="flex items-center gap-3 max-lg:sticky max-lg:top-0 max-lg:z-(--z-dock) max-lg:-mx-[18px] max-lg:bg-canvas/94 max-lg:px-[18px] max-lg:py-2 max-lg:backdrop-blur-md"
+        className="flex items-center gap-3 max-lg:sticky max-lg:top-0 max-lg:z-(--z-dock) max-lg:-mx-[18px] max-lg:bg-canvas/94 max-lg:h-14 max-lg:px-[18px] max-lg:backdrop-blur-md"
       >
         <BackButton
           fallbackHref={routes.home}
-          className="ml-0 size-11 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          className="-ml-[3px] lg:-ml-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         />
-        <InputWrapper as="label" variant="cream" className="min-w-0 flex-1">
+        <InputWrapper as="label" variant="cream" className="min-w-0 flex-1 max-lg:h-11">
           <InputAffix>
             <Search aria-hidden size={18} />
           </InputAffix>
