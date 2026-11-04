@@ -11,6 +11,7 @@ import {
   InputControl,
   InputWrapper,
 } from "@workspace/ui/components/input"
+import { cn } from "@workspace/ui/lib/utils"
 
 import { PRICE_COPY } from "@workspace/price/copy"
 import { pickByIds } from "@workspace/price/list"
@@ -150,6 +151,7 @@ function Results({
           )}
           <Group title={PRICE_COPY.home.featured}>
             <Pills
+              className="bg-pair-base text-pair-base-foreground"
               labels={featured.map((variety) => ({
                 key: variety.id,
                 label: variety.name,
@@ -258,19 +260,31 @@ type Pill = { key: string; label: string } & (
   { href: string } | { onClick: () => void }
 )
 
-function Pills({ labels }: { labels: readonly Pill[] }) {
-  const className =
-    "inline-flex h-9 items-center rounded-full border border-hairline bg-surface px-3.5 text-sm text-ink no-underline hover:border-stone"
+function Pills({
+  labels,
+  className,
+}: {
+  labels: readonly Pill[]
+  className?: string
+}) {
+  const pillClassName = cn(
+    "inline-flex h-9 items-center rounded-full border border-hairline bg-surface px-3.5 text-sm text-ink no-underline hover:border-stone",
+    className
+  )
   return (
     <ul className="flex flex-wrap gap-2">
       {labels.map((pill) => (
         <li key={pill.key}>
           {"href" in pill ? (
-            <Link href={pill.href} className={className}>
+            <Link href={pill.href} className={pillClassName}>
               {pill.label}
             </Link>
           ) : (
-            <button type="button" onClick={pill.onClick} className={className}>
+            <button
+              type="button"
+              onClick={pill.onClick}
+              className={pillClassName}
+            >
               {pill.label}
             </button>
           )}
