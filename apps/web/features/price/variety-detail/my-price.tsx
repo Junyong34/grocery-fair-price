@@ -38,12 +38,26 @@ export function MyPriceSection({ detail, id }: { detail: VarietyDetail; id: stri
     if (price != null) useMyPriceStore.setState({ id: detail.id, price })
   }
   const verdict = mine == null ? null : verdictOf(mine, detail.usual, detail.band)
+  const shown = verdict?.pct != null && mine != null && detail.usual != null
   return (
     <section id={id} aria-labelledby={`${id}-title`} className="flex flex-col gap-3">
-      <h2 id={`${id}-title`} className="text-[17px] font-semibold text-ink">
-        {COPY.myPriceTitle}
-      </h2>
-      {verdict?.pct != null && mine != null && detail.usual != null ? (
+      {/* 지우기는 카드 밖 제목 줄 오른쪽에 둔다(최근 본 품종과 같은 자리). 카드 안 "다시 적기" 옆에 두면 너무 붙어 잘못 누르기 쉽다. */}
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 id={`${id}-title`} className="text-[17px] font-semibold text-ink">
+          {COPY.myPriceTitle}
+        </h2>
+        {shown && (
+          <button
+            type="button"
+            aria-label={COPY.myPriceClear}
+            onClick={() => useMyPriceStore.setState({ id: null, price: null })}
+            className="relative text-xs text-caption underline-offset-2 after:absolute after:-inset-3 hover:text-ink hover:underline"
+          >
+            {COPY.myPriceClearShort}
+          </button>
+        )}
+      </div>
+      {shown ? (
         <MyPriceCard
           // 값을 바꿀 때마다 다시 떠오르게
           key={mine}
@@ -52,7 +66,6 @@ export function MyPriceSection({ detail, id }: { detail: VarietyDetail; id: stri
           usual={detail.usual}
           unit={detail.baseUnit}
           onEdit={ask}
-          onClear={() => useMyPriceStore.setState({ id: null, price: null })}
         />
       ) : (
         <button
@@ -70,21 +83,19 @@ export function MyPriceSection({ detail, id }: { detail: VarietyDetail; id: stri
   )
 }
 
-/** 적은 가격의 판정 카드: 큰 가격 · 꽉 찬 판정 칩 · 평소가 대비, 다시 적기와 지우기. */
+/** 적은 가격의 판정 카드: 큰 가격 · 꽉 찬 판정 칩 · 평소가 대비, 다시 적기. 지우기는 섹션 제목 줄에 있다. */
 function MyPriceCard({
   price,
   verdict,
   usual,
   unit,
   onEdit,
-  onClear,
 }: {
   price: number
   verdict: Verdict
   usual: number
   unit: string
   onEdit: () => void
-  onClear: () => void
 }) {
   const tone = VERDICT_TONE[verdict.kind]
   return (
@@ -94,7 +105,7 @@ function MyPriceCard({
       className="relative w-full overflow-hidden rounded-[22px] bg-surface shadow-xl shadow-ink/15 ring-1 ring-ink/8 motion-safe:animate-rise"
     >
       <span aria-hidden className={cn("absolute inset-y-0 left-0 w-1.5", tone.fill)} />
-      <div className="flex items-center gap-3 py-3 pr-3 pl-5">
+      <div className="flex items-center gap-3 py-3.5 pr-4 pl-5">
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <p className="text-xs font-medium text-caption">{COPY.myPriceLabel(unit)}</p>
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -114,14 +125,6 @@ function MyPriceCard({
           {COPY.myPriceEdit}
         </button>
       </div>
-      <button
-        type="button"
-        aria-label={COPY.myPriceClear}
-        onClick={onClear}
-        className="absolute top-1.5 right-1.5 grid size-7 place-items-center rounded-full text-mute hover:bg-canvas hover:text-ink"
-      >
-        <X aria-hidden size={14} />
-      </button>
     </section>
   )
 }

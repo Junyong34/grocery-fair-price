@@ -282,6 +282,7 @@ export const PRICE_COPY = {
     myPriceApply: "비교하기",
     myPriceClose: "닫기",
     myPriceClear: "내가 본 가격 지우기",
+    myPriceClearShort: "지우기",
     myPriceEdit: "다시 적기",
     myPriceLabel: (unit: string) => `내가 본 가격 · ${unit}`,
     myPriceAgainstUsual: (diff: string, usual: string) =>
