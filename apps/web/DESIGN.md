@@ -368,7 +368,7 @@ Color discipline is the signature move. The whole palette is earth-toned — mus
 | 조합 이름 | 배경 | 글자·아이콘 | 사용 기준 |
 |---|---|---|---|
 | `pair-base` | `canvas` · 크림 | `ink` | 페이지와 기본 내용 면처럼 가장 넓게 쓰는 바탕 |
-| `pair-light` | `surface` 70% + `canvas` 30% · 밝은 크림 | `ink` | 메인 검색창, 검색 입력창, 최근 본 품종·검색의 자주 사는 품종 알약. 크림보다 살짝 밝은 탐색 표면 |
+| `pair-light` | `surface` 70% + `canvas` 30% · 밝은 크림 | `ink` | 메인 검색창, 검색 입력창, 최근 본 품종·검색의 자주 사는 품종 알약, 달력·포스터 다운로드 진입 카드. 크림보다 살짝 밝은 탐색 표면 |
 | `pair-muted` | `mat` · 모래 베이지 | `ink` | 담기 전 버튼, 보조 컨트롤, 받침, 읽기만 하는 정보 카드처럼 기본 배경에서 한 단계 구분할 표면 |
 | `pair-forest` | `sage-wash` · 연한 세이지 | `forest` | 브랜드 안내나 강조 구역. 연한 바탕과 진한 초록을 함께 사용 |
 | `pair-forest-strong` | `forest` | `canvas` | 포레스트 강조가 필요한 작은 버튼·표식. 한 구역의 주된 행동 하나에 한정 |

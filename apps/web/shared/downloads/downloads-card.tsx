@@ -19,7 +19,7 @@ export function DownloadsCard({ placement, className }: { placement: AnalyticsEv
       href={routes.seasonal.downloads}
       eventName="print_entry_click"
       eventParams={{ placement }}
-      className={cn("flex items-center gap-3.5 rounded-2xl border border-hairline bg-canvas p-3 pr-4 text-ink no-underline hover:border-gold-pale", className)}
+      className={cn("flex items-center gap-3.5 rounded-2xl border border-hairline bg-pair-light p-3 pr-4 text-pair-light-foreground no-underline hover:border-gold-pale", className)}
     >
       {/* 받침 폭은 375에서 안내 문구가 한 줄에 드는 44px까지 */}
       {featured.thumbnails[0] && (
