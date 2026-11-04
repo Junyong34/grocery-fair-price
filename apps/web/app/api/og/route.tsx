@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs"
-import { join } from "node:path"
+import { fileURLToPath } from "node:url"
 import { ImageResponse } from "next/og"
 
 import { SEASON_COPY } from "@workspace/seasonal/data/copy"
@@ -39,21 +39,24 @@ const clip = (value: string | null, max: number) => {
   return text.length > max ? `${text.slice(0, max - 1)}…` : text
 }
 
-// 빌드가 이 파일들만 배포 묶음에 넣도록 경로를 고정 문자열로 쓴다(변수로 만들면 프로젝트 전체가 묶인다). 쓰는 굵기 두 가지만.
+// 폰트·로고는 new URL(…, import.meta.url)로 가리켜 번들러가 함수 묶음 안에 파일을 복사하게 한다.
+// process.cwd() 기준 경로는 pnpm 심볼릭 링크(node_modules/pretendard)와 public을 거쳐 운영 함수에서 파일을 찾지 못했다(모든 요청 500).
+const read = (url: URL) => readFileSync(fileURLToPath(url))
+// 쓰는 굵기 두 가지만.
 const fonts = [
   {
     name: "Pretendard",
-    data: readFileSync(join(process.cwd(), "node_modules/pretendard/dist/web/static/woff-subset/Pretendard-Regular.subset.woff")),
+    data: read(new URL("../../../node_modules/pretendard/dist/web/static/woff-subset/Pretendard-Regular.subset.woff", import.meta.url)),
     weight: 400 as const,
   },
   {
     name: "Pretendard",
-    data: readFileSync(join(process.cwd(), "node_modules/pretendard/dist/web/static/woff-subset/Pretendard-Bold.subset.woff")),
+    data: read(new URL("../../../node_modules/pretendard/dist/web/static/woff-subset/Pretendard-Bold.subset.woff", import.meta.url)),
     weight: 700 as const,
   },
 ]
 // 로고는 public의 원본 SVG를 그대로 쓴다. 로고를 바꾸면 OG도 따라 바뀐다.
-const LOGO = `data:image/svg+xml;base64,${readFileSync(join(process.cwd(), "public/images/brand/logo-lockup.svg")).toString("base64")}`
+const LOGO = `data:image/svg+xml;base64,${read(new URL("../../../public/images/brand/logo-lockup.svg", import.meta.url)).toString("base64")}`
 
 /** 계절색이 옅게 번지는 바탕(sunwash). 계절이 없으면 네 계절 색을 네 귀퉁이에 둔다. */
 function wash(season: Season | null): string {
