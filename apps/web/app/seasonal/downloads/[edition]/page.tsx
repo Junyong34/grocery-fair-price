@@ -61,12 +61,12 @@ async function Edition({ params }: { params: Params }) {
     <article className="mx-auto flex max-w-[560px] flex-col gap-4 pt-6 pb-12 lg:pt-8">
       <JsonLd data={breadcrumb([{ name: "제철 음식 달력", path: routes.seasonal.root }, { name: DOWNLOADS_COPY.title, path: routes.seasonal.downloads }, { name: editionName(edition), path: routes.seasonal.download(edition.id) }])} />
       {/* 공유는 본문 버튼 줄에 있어 맨 위 줄에는 두지 않는다. */}
-      <SubHeader title={editionName(edition)} fallbackHref={routes.seasonal.downloads} />
+      <SubHeader title={edition.title} fallbackHref={routes.seasonal.downloads} />
       <Link href={routes.seasonal.downloads} className="self-start px-[18px] text-sm text-stone max-lg:hidden">
         {DOWNLOADS_COPY.backToList}
       </Link>
       <div className="px-[18px]">
-        <EditionDetail edition={edition} placement="page" title={<h1 className="font-heading text-[28px] leading-tight font-bold text-ink">{editionName(edition)}</h1>} />
+        <EditionDetail edition={edition} placement="page" title={<h1 className="font-heading text-[28px] leading-tight font-bold text-ink">{edition.title}</h1>} />
       </div>
       {others.length > 0 && (
         <section aria-labelledby="others" className="mt-4 flex flex-col gap-3">

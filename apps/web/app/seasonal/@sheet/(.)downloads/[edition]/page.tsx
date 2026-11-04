@@ -1,7 +1,5 @@
 import { Suspense } from "react"
 
-import { editionName } from "@workspace/seasonal/print/listing"
-
 import { DetailSheet } from "@/features/seasonal/components/detail-sheet"
 import { EditionDetail } from "@/features/seasonal/downloads/edition-detail"
 import { findEdition } from "@/shared/downloads-manifest"
@@ -25,7 +23,7 @@ async function Sheet({ params }: { params: Params }) {
   if (!edition) return null
   // 공유는 아래 버튼 줄에 있어 제목 줄에는 두지 않는다.
   return (
-    <DetailSheet title={editionName(edition)} action={null}>
+    <DetailSheet title={edition.title} action={null}>
       <EditionDetail edition={edition} placement="sheet" />
     </DetailSheet>
   )

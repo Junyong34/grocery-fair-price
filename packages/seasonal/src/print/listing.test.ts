@@ -35,7 +35,7 @@ describe("shelvesOf", () => {
 })
 
 describe("editionName", () => {
-  it("제목 뒤에 종류를 붙인다(줄 밖에서 쓰는 이름: 시트 제목, 탭 제목)", () => {
+  it("제목 뒤에 종류를 붙인다(줄 밖에서 쓰는 이름: 탭 제목, PDF 파일 이름)", () => {
     expect(editionName({ kind: "monthly", title: "2027 크림" })).toBe("2027 크림 월간 달력")
   })
 })
