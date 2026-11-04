@@ -141,6 +141,19 @@ function Results({
     </ul>
   )
 
+  // 카테고리에서 둘러보기: 누르면 그 카테고리 이름으로 검색한다. 빈 검색(최근 본 품종 아래)과 결과 없음에서 쓴다.
+  const browse = (
+    <Group title={PRICE_COPY.search.browse}>
+      <Pills
+        labels={index.categories.map((category) => ({
+          key: category,
+          label: category,
+          onClick: () => onQuery(category),
+        }))}
+      />
+    </Group>
+  )
+
   switch (result.kind) {
     case "empty":
       return (
@@ -158,6 +171,7 @@ function Results({
               </ul>
             </Group>
           )}
+          {browse}
           <Group title={PRICE_COPY.home.featured}>
             <Pills
               labels={featured.map((variety) => ({
@@ -202,20 +216,18 @@ function Results({
       )
     case "none":
       return (
-        <div className="flex flex-col gap-7">
-          <div className="flex flex-col items-center gap-3 pt-8 text-center">
-            <span
-              aria-hidden
-              className="grid size-14 place-items-center rounded-full bg-verdict-none-wash text-stone"
-            >
-              <Search size={22} />
-            </span>
+        <div className="flex flex-col gap-6">
+          {/* 큰 아이콘 · 가운데 정렬 대신 두 줄 안내로 줄여 아래 찾는 법 · 카테고리가 첫 화면에 들어오게 한다. */}
+          <div className="flex flex-col gap-1 pt-2">
             <p className="text-base font-semibold text-ink">
               {PRICE_COPY.search.noResult(query.trim())}
             </p>
+            <p className="text-sm text-caption">
+              {PRICE_COPY.search.noResultHint}
+            </p>
           </div>
           <Group title={PRICE_COPY.search.tipsTitle}>
-            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 rounded-2xl bg-pair-light px-4 py-3 text-sm text-pair-light-foreground">
+            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-2xl bg-pair-light px-4 py-2.5 text-sm text-pair-light-foreground">
               {PRICE_COPY.search.tips.map(({ how, example }) => (
                 <div key={how} className="contents">
                   <dt className="text-caption">{how}</dt>
@@ -224,15 +236,7 @@ function Results({
               ))}
             </dl>
           </Group>
-          <Group title={PRICE_COPY.search.browse}>
-            <Pills
-              labels={index.categories.map((category) => ({
-                key: category,
-                label: category,
-                onClick: () => onQuery(category),
-              }))}
-            />
-          </Group>
+          {browse}
           <Group title={PRICE_COPY.home.featured}>
             <ul>
               {featured.slice(0, 3).map((variety) => (

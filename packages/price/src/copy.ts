@@ -182,8 +182,9 @@ export const PRICE_COPY = {
       `"${alias}"${josaOf(alias, "은/는")} 이 품종으로 찾았어요`,
     typo: (query: string) =>
       `"${query}"에 맞는 품종이 없어요. 혹시 이 품종인가요?`,
-    noResult: (query: string) =>
-      `"${query}"${josaOf(query, "은/는")} 아직 판정하지 않아요`,
+    // 검색은 시세를 모으는 품종 목록(searchIndex) 안에서만 찾는다. 없는 이유는 판정이 아니라 목록에 없어서다.
+    noResult: (query: string) => `"${query}"에 맞는 품종이 없어요`,
+    noResultHint: "지금은 시세를 모으는 품종만 찾을 수 있어요",
     tipsTitle: "이렇게 찾아보세요",
     tips: [
       { how: "품종 이름", example: "애호박, 삼겹살" },
