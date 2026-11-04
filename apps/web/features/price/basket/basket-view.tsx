@@ -44,7 +44,7 @@ export function BasketView({
   )
 
   return (
-    <div className="mx-auto flex max-w-[640px] flex-col gap-5 px-[18px] pt-4 lg:pt-10">
+    <div className="price-page flex flex-col gap-5 pt-4 lg:gap-8 lg:pt-10">
       <div className="flex items-center gap-2">
         <h1 className="font-heading text-[26px] leading-tight font-bold text-ink">
           {COPY.title}
@@ -71,98 +71,104 @@ export function BasketView({
       ) : view.count === 0 ? (
         <EmptyBasket />
       ) : (
-        <>
-          <ul
-            aria-label="판정별 개수"
-            className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-stone"
-          >
-            {view.tally.map(({ kind, count }) => (
-              <li key={kind} className="inline-flex items-center gap-1.5">
-                <VerdictDot verdict={{ kind, pct: null }} />
-                {VERDICT_WORD[kind]}
-                <b className="font-semibold text-ink tabular-nums">{count}</b>
-              </li>
-            ))}
-          </ul>
-          {view.changed.length > 0 && (
-            <p
-              role="status"
-              className="rounded-2xl bg-gold-wash px-4 py-3 text-sm text-ink"
+        <div className="contents lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start lg:gap-10">
+          <div className="contents lg:sticky lg:top-24 lg:flex lg:flex-col lg:gap-5">
+            <ul
+              aria-label="판정별 개수"
+              className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-stone lg:flex-col lg:gap-4"
             >
-              {COPY.changed(
-                view.changed.length,
-                view.changed.map((item) => item.variety.name).join(", ")
-              )}
-            </p>
-          )}
-          <div className="flex flex-col gap-1">
-            <PriceHint />
-            <div
-              className={cn(
-                ROW_COLUMNS,
-                "mt-2 hidden border-b border-hairline pb-1.5 text-[13px] font-semibold text-caption sm:grid"
-              )}
-            >
-              <span>{COPY.columns[0]}</span>
-              <span>{COPY.columns[1]}</span>
-              <span className="justify-self-end">{COPY.columns[2]}</span>
-              <span />
-            </div>
-            {view.groups.map((group) => (
-              <section key={group.kind} aria-label={group.title}>
-                <h2
-                  className={cn(
-                    "flex items-center gap-1.5 pt-4 pb-1 text-[13px] font-semibold",
-                    VERDICT_TONE[group.kind].ink
-                  )}
-                >
-                  <VerdictDot verdict={{ kind: group.kind, pct: null }} />
-                  {group.title}
-                  <small className="font-normal text-caption">
-                    {group.items.length}
-                  </small>
-                </h2>
-                <ul>
-                  {group.items.map((item) => (
-                    <VarietyRow
-                      key={item.variety.id}
-                      variety={item.variety}
-                      // × 빼기는 편집 중에만 보인다. 열 자리는 남겨 다른 목록과 열 폭이 같다.
-                      action={
-                        editing ? (
-                          <RemoveButton
-                            name={item.variety.name}
-                            onClick={() => removeFromBasket(item.variety.id)}
-                          />
-                        ) : undefined
-                      }
-                      footer={changedLine(item)}
-                    />
-                  ))}
-                </ul>
-              </section>
-            ))}
+              {view.tally.map(({ kind, count }) => (
+                <li key={kind} className="inline-flex items-center gap-1.5">
+                  <VerdictDot verdict={{ kind, pct: null }} />
+                  {VERDICT_WORD[kind]}
+                  <b className="font-semibold text-ink tabular-nums lg:ml-auto">
+                    {count}
+                  </b>
+                </li>
+              ))}
+            </ul>
+            {view.changed.length > 0 && (
+              <p
+                role="status"
+                className="rounded-2xl bg-gold-wash px-4 py-3 text-sm text-ink"
+              >
+                {COPY.changed(
+                  view.changed.length,
+                  view.changed.map((item) => item.variety.name).join(", ")
+                )}
+              </p>
+            )}
           </div>
-          {editing && (
-            <button
-              type="button"
-              onClick={() => {
-                clearBasket()
-                setEditing(false)
-              }}
-              className="h-11 rounded-full border border-silver text-sm font-semibold text-verdict-pricey-ink hover:border-stone"
+          <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-5">
+            <div className="flex min-w-0 flex-col gap-1">
+              <PriceHint />
+              <div
+                className={cn(
+                  ROW_COLUMNS,
+                  "mt-2 hidden border-b border-hairline pb-1.5 text-[13px] font-semibold text-caption sm:grid"
+                )}
+              >
+                <span>{COPY.columns[0]}</span>
+                <span>{COPY.columns[1]}</span>
+                <span className="justify-self-end">{COPY.columns[2]}</span>
+                <span />
+              </div>
+              {view.groups.map((group) => (
+                <section key={group.kind} aria-label={group.title}>
+                  <h2
+                    className={cn(
+                      "flex items-center gap-1.5 pt-4 pb-1 text-[13px] font-semibold",
+                      VERDICT_TONE[group.kind].ink
+                    )}
+                  >
+                    <VerdictDot verdict={{ kind: group.kind, pct: null }} />
+                    {group.title}
+                    <small className="font-normal text-caption">
+                      {group.items.length}
+                    </small>
+                  </h2>
+                  <ul>
+                    {group.items.map((item) => (
+                      <VarietyRow
+                        key={item.variety.id}
+                        variety={item.variety}
+                        // × 빼기는 편집 중에만 보인다. 열 자리는 남겨 다른 목록과 열 폭이 같다.
+                        action={
+                          editing ? (
+                            <RemoveButton
+                              name={item.variety.name}
+                              onClick={() => removeFromBasket(item.variety.id)}
+                            />
+                          ) : undefined
+                        }
+                        footer={changedLine(item)}
+                      />
+                    ))}
+                  </ul>
+                </section>
+              ))}
+            </div>
+            {editing && (
+              <button
+                type="button"
+                onClick={() => {
+                  clearBasket()
+                  setEditing(false)
+                }}
+                className="h-11 rounded-full border border-silver text-sm font-semibold text-verdict-pricey-ink hover:border-stone"
+              >
+                {COPY.clearAll}
+              </button>
+            )}
+            <Link
+              href={routes.price.search}
+              className="grid h-12 place-items-center rounded-full border border-dashed border-stone text-[15px] font-semibold text-ink no-underline hover:bg-surface"
             >
-              {COPY.clearAll}
-            </button>
-          )}
-          <Link
-            href={routes.price.search}
-            className="grid h-12 place-items-center rounded-full border border-dashed border-stone text-[15px] font-semibold text-ink no-underline hover:bg-surface"
-          >
-            {COPY.addMore}
-          </Link>
-          {basisLine && <p className="text-xs text-caption">{basisLine}</p>}
-        </>
+              {COPY.addMore}
+            </Link>
+            {basisLine && <p className="text-xs text-caption">{basisLine}</p>}
+          </div>
+        </div>
       )}
     </div>
   )

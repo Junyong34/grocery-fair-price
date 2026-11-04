@@ -1,0 +1,13 @@
+/* P1~P4 공통 폭. 모바일·태블릿의 기존 640px 한 열은 유지한다. */
+.price-page {
+  margin-inline: auto;
+  max-width: 640px;
+  padding-inline: 18px;
+}
+
+@media (min-width: 1024px) {
+  .price-page {
+    max-width: 960px;
+    padding-inline: 24px;
+  }
+}

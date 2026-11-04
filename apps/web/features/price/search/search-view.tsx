@@ -61,20 +61,24 @@ function SearchScreen({ varieties, featuredIds, index }: SearchViewProps) {
   }
 
   return (
-    <div className="mx-auto flex max-w-[640px] flex-col gap-4 px-[18px] lg:pt-7">
+    <div className="price-page flex flex-col gap-4 lg:gap-8 lg:pt-7">
       {/* 모바일은 사이트 헤더 대신 이 검색 줄이 맨 위에 붙는다(검색 헤더, .scratch/shell-unify/spec.md 3장).
           ‹는 하위 헤더(P3 등)와 같은 자리에 둔다: 모바일은 줄 높이 56 · 버튼 40 · 입력창 44(위아래 6px 여유), 데스크톱은 -ml-2로 꺾쇠를 본문 왼쪽 끝에 맞추고 pt-7로 세로 중심을 P3 제목 줄과 맞춘다. */}
       <form
         role="search"
         onSubmit={(event) => event.preventDefault()}
-        className="flex items-center gap-3 max-lg:sticky max-lg:top-0 max-lg:z-(--z-dock) max-lg:-mx-[18px] max-lg:bg-canvas/94 max-lg:h-14 max-lg:px-[18px] max-lg:backdrop-blur-md"
+        className="flex items-center gap-3 max-lg:sticky max-lg:top-0 max-lg:z-(--z-dock) max-lg:-mx-[18px] max-lg:h-14 max-lg:bg-canvas/94 max-lg:px-[18px] max-lg:backdrop-blur-md"
       >
         <BackButton
           fallbackHref={routes.home}
-          className="-ml-[3px] lg:-ml-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          className="-ml-[3px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring lg:-ml-2"
         />
         {/* 입력창의 모든 상태에서 같은 밝은 크림을 쓰고, focus의 금색 테두리는 기존 UI 표현을 유지한다. */}
-        <InputWrapper as="label" variant="cream" className="min-w-0 flex-1 bg-pair-light text-pair-light-foreground [--input:var(--color-pair-light)] [--v-canvas:var(--color-pair-light)] max-lg:h-11">
+        <InputWrapper
+          as="label"
+          variant="cream"
+          className="min-w-0 flex-1 bg-pair-light text-pair-light-foreground [--input:var(--color-pair-light)] [--v-canvas:var(--color-pair-light)] max-lg:h-11"
+        >
           <InputAffix>
             <Search aria-hidden size={18} />
           </InputAffix>
@@ -94,15 +98,41 @@ function SearchScreen({ varieties, featuredIds, index }: SearchViewProps) {
           )}
         </InputWrapper>
       </form>
-      <div aria-live="polite">
-        <Results
-          result={result}
-          query={query}
-          varieties={varieties}
-          featuredIds={featuredIds}
-          index={index}
-          onQuery={change}
-        />
+      <div className="contents lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start lg:gap-10">
+        <aside
+          aria-label={PRICE_COPY.search.browse}
+          className="hidden lg:sticky lg:top-24 lg:flex lg:flex-col lg:gap-8"
+        >
+          <Group title={PRICE_COPY.search.browse}>
+            <Pills
+              labels={index.categories.map((category) => ({
+                key: category,
+                label: category,
+                onClick: () => change(category),
+              }))}
+            />
+          </Group>
+          <Group title={PRICE_COPY.search.tipsTitle}>
+            <dl className="flex flex-col gap-3 text-sm">
+              {PRICE_COPY.search.tips.map(({ how, example }) => (
+                <div key={how}>
+                  <dt className="text-caption">{how}</dt>
+                  <dd className="mt-1 font-medium text-ink">{example}</dd>
+                </div>
+              ))}
+            </dl>
+          </Group>
+        </aside>
+        <div aria-live="polite" className="min-w-0">
+          <Results
+            result={result}
+            query={query}
+            varieties={varieties}
+            featuredIds={featuredIds}
+            index={index}
+            onQuery={change}
+          />
+        </div>
       </div>
     </div>
   )
@@ -144,15 +174,17 @@ function Results({
 
   // 카테고리에서 둘러보기: 누르면 그 카테고리 이름으로 검색한다. 빈 검색(최근 본 품종 아래)과 결과 없음에서 쓴다.
   const browse = (
-    <Group title={PRICE_COPY.search.browse}>
-      <Pills
-        labels={index.categories.map((category) => ({
-          key: category,
-          label: category,
-          onClick: () => onQuery(category),
-        }))}
-      />
-    </Group>
+    <div className="lg:hidden">
+      <Group title={PRICE_COPY.search.browse}>
+        <Pills
+          labels={index.categories.map((category) => ({
+            key: category,
+            label: category,
+            onClick: () => onQuery(category),
+          }))}
+        />
+      </Group>
+    </div>
   )
 
   switch (result.kind) {
@@ -227,16 +259,18 @@ function Results({
               ))}
             </p>
           </div>
-          <Group title={PRICE_COPY.search.tipsTitle}>
-            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-2xl bg-pair-light px-4 py-2.5 text-sm text-pair-light-foreground">
-              {PRICE_COPY.search.tips.map(({ how, example }) => (
-                <div key={how} className="contents">
-                  <dt className="text-caption">{how}</dt>
-                  <dd className="font-medium">{example}</dd>
-                </div>
-              ))}
-            </dl>
-          </Group>
+          <div className="lg:hidden">
+            <Group title={PRICE_COPY.search.tipsTitle}>
+              <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-2xl bg-pair-light px-4 py-2.5 text-sm text-pair-light-foreground">
+                {PRICE_COPY.search.tips.map(({ how, example }) => (
+                  <div key={how} className="contents">
+                    <dt className="text-caption">{how}</dt>
+                    <dd className="font-medium">{example}</dd>
+                  </div>
+                ))}
+              </dl>
+            </Group>
+          </div>
           {browse}
           <Group title={PRICE_COPY.home.featured}>
             <ul>

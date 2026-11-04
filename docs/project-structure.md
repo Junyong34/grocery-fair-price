@@ -203,6 +203,8 @@ import 경로:
 
 가격 화면(시세 · 판정). 명세 `.scratch/price-screens/spec.md`, 도메인은 `@workspace/price`.
 
+P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 1024px 미만 최대 640px, 데스크톱 최대 960px이며 홈 · 검색 · 담은 품종은 보조 영역과 목록, 상세는 시세와 장소 비교를 두 열로 배치한다. 기준은 `apps/web/DESIGN.md`의 가격 화면 데스크톱 배치에 기록한다.
+
 | 폴더 | 내용 |
 |---|---|
 | `data/` | 데이터 경계(명세 `.scratch/price-db-read/spec.md`). `price-source.ts`(`PriceSource`, `getPriceSource()`, `server-only`)만 화면이 부른다. 운영 DB `price.current_judgment`를 읽는다: `db.ts`(postgres 클라이언트 하나, `web_reader`, `WEB_DATABASE_URL`, `prepare: false`), `queries/`(판정 읽기 module: 메서드마다 파일 하나, `sql`을 받아 SQL · `@workspace/price/schema` 검사 · 어긋난 행 처리까지 하고 검사된 값을 돌려준다. `queries.db.test.ts`가 로컬 DB로 확인, `pnpm db:test`), `db-source.ts`(캐시 정책만: 목록 `hours` · 검색 `hours`(별칭 · 카테고리는 `days`) · 상세는 React `cache()`만), `featured.ts`(자주 사는 품종 상수). `data-boundary.test.ts`가 `data/` 밖의 `db` · `db-source` · `queries/` import를 막는다 |

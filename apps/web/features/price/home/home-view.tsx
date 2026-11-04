@@ -35,20 +35,25 @@ export function HomeView({
   const basisLine = listBasisLine(featured)
   const sourceLine = listSourceLine(featured)
   return (
-    <div className="mx-auto flex max-w-[640px] flex-col gap-9 px-[18px] pt-6 lg:pt-12">
-      <div className="flex flex-col gap-5">
-        <h1 className="font-heading text-[28px] leading-[1.35] tracking-[-0.02em] text-ink lg:text-[36px]">
-          {PRICE_COPY.home.title[0]}
-          <br />
-          {PRICE_COPY.home.title[1]}
-        </h1>
-        <div id={HOME_SEARCH_ID}>
-          <SearchEntry />
+    <div className="price-page flex flex-col gap-9 pt-6 lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-10 lg:pt-12">
+      <div className="contents lg:col-start-1 lg:row-start-1 lg:flex lg:min-w-0 lg:flex-col lg:gap-9">
+        <div className="flex flex-col gap-5">
+          <h1 className="font-heading text-[28px] leading-[1.35] tracking-[-0.02em] text-ink">
+            {PRICE_COPY.home.title[0]}
+            <br />
+            {PRICE_COPY.home.title[1]}
+          </h1>
+          <div id={HOME_SEARCH_ID}>
+            <SearchEntry />
+          </div>
+          <HomeSearchRow />
         </div>
-        <HomeSearchRow />
+        <RecentPills varieties={varieties} />
       </div>
-      <RecentPills varieties={varieties} />
-      <section aria-labelledby="featured-title" className="flex flex-col gap-2">
+      <section
+        aria-labelledby="featured-title"
+        className="flex min-w-0 flex-col gap-2 lg:col-start-2 lg:row-span-2 lg:row-start-1"
+      >
         <div className="flex items-center">
           <h2 id="featured-title" className="text-base font-semibold text-ink">
             {PRICE_COPY.home.featured}
@@ -96,7 +101,10 @@ export function HomeView({
           </p>
         )}
       </section>
-      <DownloadsCard placement="price-home" className="lg:max-w-[420px]" />
+      <DownloadsCard
+        placement="price-home"
+        className="lg:col-start-1 lg:row-start-2"
+      />
     </div>
   )
 }

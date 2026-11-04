@@ -512,6 +512,14 @@ Color discipline is the signature move. The whole palette is earth-toned — mus
 - 나의 식탁 요약 카드는 안쪽 여백 20px / 넓은 화면 24px, 그림자 대신 얇은 테두리를 사용한다. 검색·필터 줄 간격은 12px, 필터와 목록 사이는 12px다.
 - 월별 도감의 월 제목은 각 카드 안에서 탭 바로 아래에 고정한다. 제목 바탕은 불투명한 `bg-surface`로 그림과 겹치지 않게 하고, 한쪽만 펼쳐도 각 제목은 자기 카드 끝에서 사라진다.
 
+## 가격 화면의 데스크톱 배치
+
+- P1 시세 메인 · P2 검색 · P3 가격 상세 · P4 담은 품종은 `features/price/components/price-layout.css`의 `.price-page`를 쓴다. 1024px 미만은 기존 최대 640px · 좌우 18px, 1024px 이상은 최대 960px · 좌우 24px다. 너비에는 좌우 패딩을 포함한다.
+- 제철 탐색 화면과 공통 헤더의 최대 1080px는 유지한다. 설정 · 출처 안내 등은 이 가격 화면 기준에 포함하지 않는다.
+- 데스크톱의 열 간격은 40px다. 홈은 검색 · 최근 본 품종 · 다운로드 영역 280px와 나머지 품종 목록, 검색과 담은 품종은 보조 영역 240px와 나머지 결과 목록으로 나눈다. 목록은 하나의 읽기 순서를 유지한다.
+- 가격 상세는 시세 · 범위 · 내가 본 가격과 장소 비교를 같은 폭의 두 열로 배치한다. 가격 추이는 아래에서 두 열 전체를 쓴다. 섹션 이동 칩은 모바일에 유지하고 데스크톱에서는 숨긴다.
+- 1024px 미만의 콘텐츠 순서 · 간격 · 단일 열 배치는 유지한다. 데스크톱 열을 만들기 위한 묶음은 작은 화면에서 `display: contents`로 기존 흐름에 참여한다. 좁은 화면용 본문과 별도로 상태를 가진 UI를 중복 렌더하지 않는다.
+
 ## Colors
 
 > Source pages analysed: the homepage, the Oura Ring 5 store page, the Activity & Movement page, and the Clinical & Science Experts page. The palette below reconciles all four into one system.
