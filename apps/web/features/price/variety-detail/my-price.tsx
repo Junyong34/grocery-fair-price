@@ -27,8 +27,8 @@ export function useMyPrice(id: string): number | null {
 }
 
 /**
- * 본문 "내가 본 가격" 섹션(.scratch/shell-unify/spec.md 6장). 하단 내비와 겹치지 않게 떠 있는 바 대신 본문에 둔다.
- * 버튼을 누르면 바텀 시트에서 가격을 적고, 같은 자리에 비교 카드가 뜬다. 섹션 칩 "내 가격"이 id로 이 섹션에 데려온다.
+ * 본문 "내가 본 가격" 섹션(.scratch/shell-unify/spec.md 6장). 하단 내비와 겹치지 않게 떠 있는 바 대신 본문의 범위 막대 바로 아래에 둔다.
+ * 버튼을 누르면 바텀 시트에서 가격을 적고, 같은 자리에 비교 카드가 뜬다. 시세 구간 안에 있어 섹션 칩 "시세"가 이 자리로 데려온다.
  * 카드는 흰 바탕 · 판정 색 띠 · 꽉 찬 판정 칩으로 배경(크림)과 확실히 구분한다.
  */
 export function MyPriceSection({ detail, id }: { detail: VarietyDetail; id: string }) {
@@ -39,7 +39,7 @@ export function MyPriceSection({ detail, id }: { detail: VarietyDetail; id: stri
   }
   const verdict = mine == null ? null : verdictOf(mine, detail.usual, detail.band)
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="flex scroll-mt-28 flex-col gap-3">
+    <section id={id} aria-labelledby={`${id}-title`} className="flex flex-col gap-3">
       <h2 id={`${id}-title`} className="text-[17px] font-semibold text-ink">
         {COPY.myPriceTitle}
       </h2>

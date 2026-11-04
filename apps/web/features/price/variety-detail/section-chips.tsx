@@ -34,7 +34,7 @@ function useCurrentSection(sections: readonly Section[]) {
   return current
 }
 
-/** P3 섹션 칩 줄(시세 · 어디서 · 왜 · 내 가격). 제목 줄이 헤더 밑으로 지나가면 하위 헤더 아래에 붙는다. */
+/** P3 섹션 칩 줄(시세 · 어디서 · 추이). 제목 줄이 헤더 밑으로 지나가면 하위 헤더 아래에 붙는다. */
 export function SectionChips({ sections }: { sections: readonly Section[] }) {
   const current = useCurrentSection(sections)
   return (

@@ -8,6 +8,7 @@ import { PRICE_COPY } from "@workspace/price/copy"
 import type { VarietySummary } from "@workspace/price/types"
 
 import { routes } from "@/shared/routes"
+import { SearchLink } from "@/shared/shell/search-link"
 import { BackButton, SubHeader } from "@/shared/shell/sub-header"
 
 import { toggleBasket } from "../components/basket-toast"
@@ -39,7 +40,8 @@ export function DetailHeader({ variety }: { variety: VarietySummary }) {
 }
 
 /**
- * 모바일 하위 헤더: "‹ · 담기"를 처음부터 헤더 자리에 둔다(.scratch/shell-unify/spec.md 3장). 데스크톱은 본문 제목 줄이 같은 일을 한다.
+ * 모바일 하위 헤더: "‹ · 🔍 · 담기"를 처음부터 헤더 자리에 둔다(.scratch/shell-unify/spec.md 3장). 데스크톱은 본문 제목 줄이 같은 일을 하고, 🔍는 사이트 헤더에 이미 있다.
+ * 🔍는 검색엔진 등으로 바로 들어와 ‹가 메인으로 가는 경우에도 다른 품종을 한 번에 찾게 한다.
  * 품종 이름은 본문 제목 줄과 겹치므로 그 줄이 헤더 밑으로 지나간 뒤에만 헤더에 올린다.
  */
 export function DetailHeaderBar({ variety }: { variety: VarietySummary }) {
@@ -49,7 +51,10 @@ export function DetailHeaderBar({ variety }: { variety: VarietySummary }) {
       fallbackHref={routes.home}
       revealAfter={P3_SECTIONS.title}
       actions={
-        <KeepButton variety={variety} className="h-8 px-3 text-[13px]" />
+        <>
+          <SearchLink href={routes.price.search} label="품종 검색" />
+          <KeepButton variety={variety} className="h-8 px-3 text-[13px]" />
+        </>
       }
     />
   )
