@@ -5,7 +5,19 @@ import { findFood, FOODS } from "@workspace/seasonal/data/foods"
 import { MONTHS } from "@workspace/seasonal/data/months"
 import { SEASONS } from "@workspace/seasonal/data/seasons"
 
-import { downloadsSeo, festivalSeo, foodSeo, homeSeo, seasonalHomeSeo, monthSeo, monthsIndexSeo, sashimiSeo, seasonSeo, seasonsIndexSeo } from "./titles"
+import {
+  downloadsSeo,
+  editionSeoTitle,
+  festivalSeo,
+  foodSeo,
+  homeSeo,
+  seasonalHomeSeo,
+  monthSeo,
+  monthsIndexSeo,
+  sashimiSeo,
+  seasonSeo,
+  seasonsIndexSeo,
+} from "./titles"
 
 const all = [
   homeSeo(),
@@ -24,7 +36,7 @@ describe("페이지 제목·설명", () => {
   it("검색어 모양의 제목을 만든다", () => {
     expect(homeSeo().title).toBe("오늘 식재료 시세 · 지금 사도 될까")
     expect(seasonalHomeSeo().title).toBe("제철 음식 달력")
-    expect(downloadsSeo().title).toBe("제철달력 무료 다운로드 · A4 PDF")
+    expect(downloadsSeo().title).toBe("제철 음식 달력 무료 다운로드 · A4 PDF")
     expect(monthsIndexSeo().title).toBe("월별 제철 음식")
     expect(monthSeo(3).title).toBe("3월 제철 음식")
     expect(seasonsIndexSeo().title).toBe("계절별 제철 음식")
@@ -32,6 +44,15 @@ describe("페이지 제목·설명", () => {
     expect(festivalSeo("chuseok").title).toBe("추석 음식")
     expect(sashimiSeo(12).title).toBe("12월 제철 회")
     expect(foodSeo(findFood("snow-crab")!).title).toBe("대게 제철 시기")
+  })
+
+  it('인쇄물 제목에 "제철"이 없으면 "제철 음식"을 앞에 붙인다(철강 "제철"과 헷갈리지 않게)', () => {
+    expect(editionSeoTitle("2026년도 월간 달력")).toBe(
+      "제철 음식 2026년도 월간 달력 PDF 무료 다운로드"
+    )
+    expect(editionSeoTitle("열두 달 월별 제철 포스터")).toBe(
+      "열두 달 월별 제철 포스터 PDF 무료 다운로드"
+    )
   })
 
   it("다운로드 설명에 무료 제공과 파일 형식을 안내한다", () => {
@@ -45,18 +66,25 @@ describe("페이지 제목·설명", () => {
   })
 
   it("설명은 검색 결과에서 잘리지 않을 길이다", () => {
-    for (const { description } of all) expect(description.length).toBeLessThanOrEqual(120)
+    for (const { description } of all)
+      expect(description.length).toBeLessThanOrEqual(120)
   })
 
   it("품종 설명에 제철 달과 다른 이름을 넣는다", () => {
-    expect(foodSeo(findFood("snow-crab")!).description).toContain("제철은 12~5월이에요")
-    expect(foodSeo(findFood("olive-flounder")!).description).toContain("광어(넙치)")
+    expect(foodSeo(findFood("snow-crab")!).description).toContain(
+      "제철은 12~5월이에요"
+    )
+    expect(foodSeo(findFood("olive-flounder")!).description).toContain(
+      "광어(넙치)"
+    )
   })
 
   it("품종 설명은 관련 명절이 있을 때만 명절 이름을 넣는다", () => {
     // 설날이 대게를 그 무렵 제철 품종으로 꼽는다(festivals.ts).
     expect(foodSeo(findFood("snow-crab")!).description).toContain("설날 무렵")
-    expect(foodSeo(findFood("olive-flounder")!).description).not.toContain("무렵")
+    expect(foodSeo(findFood("olive-flounder")!).description).not.toContain(
+      "무렵"
+    )
   })
 
   it("달·계절 설명에 대표 품종 이름을 넣는다", () => {

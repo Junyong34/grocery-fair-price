@@ -38,6 +38,16 @@ describe("editionName", () => {
   it("제목 뒤에 종류를 붙인다(줄 밖에서 쓰는 이름: 시트 제목, 탭 제목)", () => {
     expect(editionName({ kind: "monthly", title: "2027 크림" })).toBe("2027 크림 월간 달력")
   })
+
+  it("제목 끝 단어가 종류 이름에 이미 있으면 겹치는 단어를 뺀다(\"달력 월간 달력\" 중복 방지)", () => {
+    expect(editionName({ kind: "monthly", title: "2026년도 달력" })).toBe("2026년도 월간 달력")
+    expect(editionName({ kind: "year-sheet", title: "2026년 연간 달력" })).toBe("2026년 연간 달력 한 장")
+    expect(editionName({ kind: "month-poster", title: "열두 달" })).toBe("열두 달 월별 제철 포스터")
+  })
+
+  it("제목이 모두 종류 이름과 겹쳐도 종류 이름은 남는다", () => {
+    expect(editionName({ kind: "monthly", title: "월간 달력" })).toBe("월간 달력")
+  })
 })
 
 describe("megabytes", () => {

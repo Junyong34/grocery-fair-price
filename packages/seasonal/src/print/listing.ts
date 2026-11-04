@@ -15,9 +15,16 @@ export function shelvesOf(editions: readonly ManifestEntry[]): Shelf[] {
   })).filter((shelf) => shelf.editions.length > 0)
 }
 
-/** 줄 밖에서 쓰는 이름. 줄 안의 칸은 종류가 줄 제목에 있어 제목만 쓴다. */
+/**
+ * 줄 밖에서 쓰는 이름. 줄 안의 칸은 종류가 줄 제목에 있어 제목만 쓴다.
+ * 제목 끝 단어가 종류 이름에도 있으면 뺀다: "2026년도 달력" + "월간 달력" → "2026년도 월간 달력".
+ */
 export function editionName({ kind, title }: Pick<ManifestEntry, "kind" | "title">): string {
-  return `${title} ${PRINT_KIND_LABELS[kind]}`
+  const label = PRINT_KIND_LABELS[kind]
+  const labelWords = new Set(label.split(" "))
+  const words = title.split(" ")
+  while (words.length > 0 && labelWords.has(words.at(-1)!)) words.pop()
+  return [...words, label].join(" ")
 }
 
 export const megabytes = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(1)}MB`

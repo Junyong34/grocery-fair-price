@@ -174,7 +174,7 @@ export function hashString(value: string): number {
 
 /** 달력·포스터 PDF 내려받기 화면(/seasonal/downloads). */
 export const DOWNLOADS_COPY = {
-  title: "제철달력 무료 다운로드",
+  title: "제철 음식 달력 무료 다운로드",
   intro: "월별 제철 음식을 담은 달력을 무료로 받아 보세요. 원하는 인쇄물을 골라 A4 PDF로 내려받고, 집에서 인쇄해 냉장고에 붙여 두세요.",
   free: "회원가입 없이 무료로 내려받을 수 있어요.",
   guide: {
@@ -224,7 +224,7 @@ export const DOWNLOADS_COPY = {
   },
   /** 2a · 2b 입구 카드(1-a) */
   entry: {
-    title: "제철달력 무료 다운로드",
+    title: "제철 음식 달력 무료 다운로드",
     hint: "집에서 인쇄해 냉장고에 붙여 보세요",
   },
 } as const

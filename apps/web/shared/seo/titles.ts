@@ -15,9 +15,14 @@ export type PageSeo = { title: string; description: string }
 /** 무료 PDF를 찾는 검색의 입구. 연도는 개별 인쇄물에서 안내한다. */
 export function downloadsSeo(): PageSeo {
   return {
-    title: "제철달력 무료 다운로드 · A4 PDF",
+    title: "제철 음식 달력 무료 다운로드 · A4 PDF",
     description: "제철달력 무료 다운로드. 월별 제철 음식을 담은 월간·연간 달력을 회원가입 없이 A4 PDF로 받아 보세요. 미리보기로 고르고 집에서 인쇄할 수 있어요.",
   }
+}
+
+/** 인쇄물 상세 제목. "제철"만 쓰면 철강(製鐵)으로 읽히는 검색엔진이 있어, 이름에 없으면 "제철 음식"을 앞에 붙인다. */
+export function editionSeoTitle(name: string): string {
+  return `${name.includes("제철") ? "" : "제철 음식 "}${name} PDF 무료 다운로드`
 }
 
 /** 설명에 넣을 품종 이름 목록. "냉이·달래·주꾸미" */

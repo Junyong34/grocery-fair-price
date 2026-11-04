@@ -13,6 +13,7 @@ import { DOWNLOADS, findEdition, findWithdrawn } from "@/shared/downloads-manife
 import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
 import { breadcrumb, JsonLd } from "@/shared/seo/json-ld"
+import { editionSeoTitle } from "@/shared/seo/titles"
 import { SubHeader } from "@/shared/shell/sub-header"
 
 type Params = PageProps<"/seasonal/downloads/[edition]">["params"]
@@ -34,7 +35,7 @@ export async function generateMetadata(props: PageProps<"/seasonal/downloads/[ed
   if (!edition) return {}
   const name = editionName(edition)
   return createMetadata({
-    title: `${name} PDF 무료 다운로드`,
+    title: editionSeoTitle(name),
     description: `${name} 무료 다운로드. ${edition.description} A4 PDF ${edition.pages}쪽을 회원가입 없이 내려받아 인쇄하세요.`,
     path: routes.seasonal.download(edition.id),
     ogImage: { title: name, subtitle: edition.description, badge: "PDF" },
