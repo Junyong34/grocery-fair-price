@@ -379,6 +379,55 @@ Color discipline is the signature move. The whole palette is earth-toned — mus
 
 2026-11-04 브라우저의 불투명 단색 조합을 sRGB로 환산해 확인한 글자 대비는 약 6.17:1~15.32:1이다. 가장 낮은 조합은 `pair-gold`이며, 8쌍 모두 일반 글씨 기준 4.5:1 이상이다.
 
+### 깊이와 중첩 표면의 기준
+
+**기본 구조는 크림·매트로 만들고, 한 묶음 안의 브랜드 강조는 포레스트나 골드 중 한 계열로 이어 간다.** 깊이가 늘어났다는 이유로 크림 → 베이지 → 세이지 → 골드처럼 색 계열을 순서대로 바꾸지 않는다. 서로 다른 색은 깊이보다 서로 다른 구역·상태로 읽히기 쉽다.
+
+아래 L0~L3는 내용 구조를 설명하는 단계이며 CSS `z-index`가 아니다. 모든 단계를 별도 카드로 감싸지 않고, 실제 구분이 필요한 면에만 배경색을 준다. 넓은 면은 보통 2~3단계 안에서 정리하고, 가장 진한 색은 작은 행동·표식에 집중한다.
+
+| 단계·역할 | 중립 구조 | 포레스트 강조 | 골드 강조 |
+|---|---|---|---|
+| L0 페이지 바탕 | `pair-base` | `pair-base` | `pair-base` |
+| L1 내용 묶음·보조 표면 | `pair-muted` | `pair-muted` | `pair-muted` |
+| L2 묶음 안의 내용·강조 면 | `pair-base` | `pair-forest` | `pair-gold` |
+| L3 작은 확정 상태·강조 행동·표식 | `pair-ink` | `pair-forest-strong` | `pair-gold-strong` |
+
+각 칸은 `bg-<토큰> text-<토큰>-foreground`를 함께 적용한다. 이 표는 단계마다 고정 색을 강제하는 규칙이 아니다. 예를 들어 담기 전 보조 버튼은 L3 위치에 있더라도 `pair-muted`, 담은 후는 `pair-ink`를 유지한다. `pair-forest-strong`은 브랜드 행동, `pair-gold-strong`은 짧은 강조 표식에 쓰며 기존 상태 의미를 덮어쓰지 않는다.
+
+중첩할 때는 다음 기준을 지킨다.
+
+- **혼합의 기준색은 항상 `canvas`다.** `mat`, `sage-wash`, `gold-wash`는 크림을 기준으로 이미 혼합된 불투명 토큰이다. 부모가 매트나 세이지여도 색을 다시 섞지 않는다. `bg-pair-forest/50` 같은 반투명 배경이나 부모의 `opacity`로 깊이를 표현하면 아래 색에 따라 실제 조합이 달라지므로 기본 중첩 방식으로 쓰지 않는다.
+- **안쪽으로 갈 때는 같은 계열의 진한 색 또는 중립 내용 면을 고른다.** 연한 세이지 안의 행동은 포레스트, 연한 골드 안의 표식은 딥 골드가 기본이다. 추가 내용 구분이 필요하면 크림 내용 면으로 돌아갈 수 있다.
+- **글자색은 바로 아래 표면의 `foreground`를 따른다.** 세이지 묶음 안에 크림 내용 면을 넣었다면 그 면에서는 `pair-base-foreground`로 재설정한다. 바깥의 포레스트 글자색을 모든 자식에게 그대로 상속하지 않는다.
+- **다른 강조 계열을 섞는 예외에는 별도 의미가 있어야 한다.** 세이지 안의 골드가 '현재 선택'처럼 분명한 상태를 나타낼 때는 가능하다. 상태 이름·아이콘 등을 함께 제공한다. 단순히 더 안쪽이라는 이유만으로 골드를 넣지 않는다. 판정·계절·공휴일의 의미색은 각 도메인 기준을 유지한다.
+- **면의 경계는 색만으로 구분하지 않는다.** 여백·배치로 먼저 묶고 필요하면 `hairline` 구분선이나 `silver` 컨트롤 테두리를 더한다. 특히 현재 매트와 연한 골드의 면끼리 대비는 약 1.03:1(2026-11-04 확인)이라 안팎의 차이가 작다. 이 값은 면 사이의 구분 정도이며, 앞 절의 글자 대비와 별개다. 샌드 베이지 `hairline`도 깊이 단계의 필수 채움색으로 올리지 않는다.
+- **떠 있는 면은 별도로 다룬다.** Popover·메뉴는 중첩 표면의 다음 색이 아니라 앞 내용을 덮는 별도 레이어다. 기존 UI 라이브러리의 portal·쌓임 순서를 사용하고, `surface` 배경·`ink` 글자와 부드러운 그림자로 떠오름을 표현한다. 부모의 강조색을 계속 누적하지 않는다.
+
+단계별 토큰 흐름은 다음과 같다.
+
+```text
+중립:       pair-base → pair-muted → pair-base   → pair-ink
+포레스트:   pair-base → pair-muted → pair-forest → pair-forest-strong
+골드:       pair-base → pair-muted → pair-gold   → pair-gold-strong
+```
+
+예를 들어 포레스트 계열의 색상 클래스는 다음처럼 적용한다. 아래 구조는 색상 관계를 설명하는 예시이며, 각 요소의 여백·크기·접근성 상태는 기존 컴포넌트 기준을 따른다.
+
+```tsx
+<main className="bg-pair-base text-pair-base-foreground">{/* L0 페이지 */}
+  <section className="bg-pair-muted text-pair-muted-foreground">{/* L1 묶음 */}
+    <aside className="bg-pair-forest text-pair-forest-foreground">{/* L2 강조 면 */}
+      <p>브랜드 안내</p>
+      <button className="bg-pair-forest-strong text-pair-forest-strong-foreground">
+        자세히 보기 {/* L3 주된 행동 하나 */}
+      </button>
+    </aside>
+  </section>
+</main>
+```
+
+중립 구조는 위 예시의 L2를 `bg-pair-base text-pair-base-foreground`, L3를 `bg-pair-ink text-pair-ink-foreground`로 바꾼다. 골드 구조는 L2에 `bg-pair-gold text-pair-gold-foreground`, L3의 짧은 표식에 `bg-pair-gold-strong text-pair-gold-strong-foreground`를 쓴다.
+
 ### 현재 화면에 적용하는 기준
 
 - 시세 메인의 검색창과 최근 본 품종은 `pair-base`, 담기 전 버튼은 `pair-muted`, 담은 후 버튼은 `pair-ink` 조합이다. 메인·검색·품종 상세에서 같은 의미를 유지한다. 이 표는 기존 색상과 대응하는 기준이며, 모든 화면의 클래스 이름을 한 번에 바꿀 필요는 없다.
