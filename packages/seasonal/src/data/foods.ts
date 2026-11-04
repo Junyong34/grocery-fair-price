@@ -96,3 +96,19 @@ export function seasonHighlights(season: Season, count: number): readonly Food[]
     .sort((a, b) => Number(isDrawn(b.id)) - Number(isDrawn(a.id)) || monthsIn(b.peak) - monthsIn(a.peak) || monthsIn(b.months) - monthsIn(a.months))
     .slice(0, count)
 }
+
+/** 월별 화면(2b)에서 카테고리를 늘어놓는 순서. 장보기 동선(채소·과일 → 수산 → 나머지). */
+export const MONTH_CATEGORY_ORDER = ["채소", "과일", "수산", "버섯", "곡물·견과"] as const satisfies readonly FoodCategory[]
+
+/**
+ * 그 달 품종을 카테고리별로 묶는다(2b 월별 화면의 소제목, "11월 제철 생선" 같은 검색에 답하는 묶음).
+ * 묶음 안은 monthHighlights 순서(그 달 문구에 나온 품종 · 그림 있는 품종 · 절정 순)라 대표 품종이 앞에 온다.
+ */
+export function foodsInMonthByCategory(month: number): { category: FoodCategory; foods: readonly Food[] }[] {
+  const ordered = monthHighlights(month, foodsInMonth(month).length)
+  const order: readonly FoodCategory[] = MONTH_CATEGORY_ORDER
+  const rest = [...new Set(ordered.map((food) => food.category))].filter((category) => !order.includes(category))
+  return [...order, ...rest]
+    .map((category) => ({ category, foods: ordered.filter((food) => food.category === category) }))
+    .filter((group) => group.foods.length > 0)
+}

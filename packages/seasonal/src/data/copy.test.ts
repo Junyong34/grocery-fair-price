@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { MY_TABLE_COPY, SASHIMI_COPY } from "./copy"
+import { MONTH_CATEGORY_COPY, MY_TABLE_COPY, SASHIMI_COPY } from "./copy"
 import { MONTHS } from "./months"
 import { SASHIMI_MONTHS, sashimiInMonth } from "./sashimi"
 
@@ -58,5 +58,14 @@ describe("제철 회 문구", () => {
 
   it("품종 수 표시", () => {
     expect(SASHIMI_COPY.count(6)).toBe("6종")
+  })
+})
+
+describe("월별 카테고리 소제목", () => {
+  it("소제목과 첫 문장", () => {
+    expect(MONTH_CATEGORY_COPY.heading(11, "수산")).toBe("11월 제철 생선·해산물")
+    expect(MONTH_CATEGORY_COPY.lead(11, "수산", ["방어", "굴", "광어"], 12)).toBe("11월에 제철인 생선·해산물은 방어·굴·광어 등 12가지예요.")
+    expect(MONTH_CATEGORY_COPY.lead(11, "버섯", ["표고", "느타리"], 2)).toBe("11월에 제철인 버섯은 표고·느타리 2가지예요.")
+    expect(MONTH_CATEGORY_COPY.lead(11, "채소", ["배추", "무", "시금치"], 3)).toBe("11월에 제철인 채소는 배추·무·시금치 3가지예요.")
   })
 })

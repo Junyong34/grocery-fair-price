@@ -1,8 +1,8 @@
 import Link from "next/link"
 import { Suspense, ViewTransition } from "react"
 
-import { MONTH_NOTES } from "@workspace/seasonal/data/copy"
-import { foodsInMonth } from "@workspace/seasonal/data/foods"
+import { MONTH_CATEGORY_COPY, MONTH_NOTES } from "@workspace/seasonal/data/copy"
+import { foodsInMonth, foodsInMonthByCategory } from "@workspace/seasonal/data/foods"
 import type { Month } from "@workspace/seasonal/data/months"
 import { Button } from "@workspace/ui/components/button"
 
@@ -18,12 +18,16 @@ import { FoodGrid, ViewSwitch } from "./food-grid"
 const previous = (month: number) => (month === 1 ? 12 : month - 1)
 const next = (month: number) => (month === 12 ? 1 : month + 1)
 
+/** 카테고리 첫 문장에 이름을 드는 품종 수. 품종은 카테고리별 소제목(h2) 아래 묶는다("11월 제철 생선" 같은 검색에 답하는 묶음). */
+const LEAD_NAMES = 3
+
 /**
  * 2b 월별 제철(명세 3.2) 본문. 한눈에 비교하고 바로 이동하는 화면이라 달력은 없다.
  * 달을 바꾸면 이 본문만 크로스페이드로 바뀐다(타임라인은 레이아웃에 남는다).
  */
 export function MonthView({ month }: { month: Month }) {
   const foods = foodsInMonth(month)
+  const groups = foodsInMonthByCategory(month)
   const note = MONTH_NOTES[month]
   // 절기·명절 카드는 해마다 날짜가 바뀌어 요청 시점의 연도로 그린다. 나머지 본문은 정적이다.
   const monthDays = (
@@ -80,17 +84,29 @@ export function MonthView({ month }: { month: Month }) {
           className="mt-6 flex flex-col gap-4 lg:mt-0"
         >
           <div className="flex items-center justify-between gap-3">
-            <h2 className="hidden text-lg font-semibold lg:block">
+            <p className="hidden text-lg font-semibold lg:block">
               {month}월 제철 전체
-            </h2>
+            </p>
             <span className="shrink-0 text-sm text-stone lg:hidden">보기</span>
             <ViewSwitch />
           </div>
-          <FoodGrid>
-            {foods.map((food) => (
-              <FoodCard key={food.id} food={food} />
-            ))}
-          </FoodGrid>
+          {groups.map(({ category, foods: group }) => (
+            <section key={category} aria-labelledby={`month-${category}`} className="flex flex-col gap-3 pt-2">
+              <div className="flex flex-col gap-1">
+                <h2 id={`month-${category}`} className="font-heading text-lg text-ink">
+                  {MONTH_CATEGORY_COPY.heading(month, category)}
+                </h2>
+                <p className="text-sm leading-relaxed text-stone">
+                  {MONTH_CATEGORY_COPY.lead(month, category, group.slice(0, LEAD_NAMES).map((food) => food.name), group.length)}
+                </p>
+              </div>
+              <FoodGrid>
+                {group.map((food) => (
+                  <FoodCard key={food.id} food={food} />
+                ))}
+              </FoodGrid>
+            </section>
+          ))}
           <DownloadsCard placement="month-timeline" className="mt-4 lg:max-w-[420px]" />
         </section>
 

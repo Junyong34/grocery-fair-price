@@ -23,6 +23,22 @@ export const INSTALL_COPY = {
   failed: "설치창을 열지 못했어요. 브라우저 메뉴에서 홈 화면에 추가해 주세요.",
 } as const
 
+/** 카테고리를 화면에 쓰는 이름과 주제 조사("생선·해산물은"). 수산은 검색어 모양("11월 제철 생선")에 맞춰 풀어 쓴다. */
+const CATEGORY_WORDS: Record<FoodCategory, { label: string; topic: string }> = {
+  채소: { label: "채소", topic: "채소는" },
+  과일: { label: "과일", topic: "과일은" },
+  수산: { label: "생선·해산물", topic: "생선·해산물은" },
+  버섯: { label: "버섯", topic: "버섯은" },
+  "곡물·견과": { label: "곡물·견과", topic: "곡물·견과는" },
+}
+
+/** 2b 월별 화면의 카테고리 소제목(h2)과 그 아래 첫 문장. names는 앞 몇 품종, n은 묶음 품종 수. */
+export const MONTH_CATEGORY_COPY = {
+  heading: (month: number, category: FoodCategory) => `${month}월 제철 ${CATEGORY_WORDS[category].label}`,
+  lead: (month: number, category: FoodCategory, names: readonly string[], n: number) =>
+    `${month}월에 제철인 ${CATEGORY_WORDS[category].topic} ${names.join("·")}${n > names.length ? ` 등 ${n}가지예요.` : ` ${n}가지예요.`}`,
+} as const
+
 /** 달마다 한 줄 문구(2a 월 섹션, 2b 제목). */
 export const MONTH_NOTES: Record<Month, string> = {
   1: "무를 푹 끓여 차리는 새해 첫 밥상",

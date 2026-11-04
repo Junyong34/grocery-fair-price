@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { findFood, foodsInMonth, foodsInSeason, foodsInSeasonWith, isDrawn, monthHighlights, seasonHighlights, seasonsOf } from "./foods"
+import { findFood, foodsInMonth, foodsInMonthByCategory, foodsInSeason, foodsInSeasonWith, isDrawn, monthHighlights, seasonHighlights, seasonsOf } from "./foods"
 
 // 예상값은 prototypes/seasonal-food/docs/seasonal-lists/foods.json(검증 품종)에서 셌다.
 describe("foodsInMonth", () => {
@@ -90,5 +90,29 @@ describe("seasonHighlights", () => {
     // 그림 있는 품종이 그림 없는 품종보다 먼저다. 일러스트가 늘어도 깨지지 않게 품종 이름 대신 순서로 확인한다.
     const summer = seasonHighlights("summer", foodsInSeason("summer").length).map((food) => isDrawn(food.id))
     expect(summer).toEqual([...summer].sort((a, b) => Number(b) - Number(a)))
+  })
+})
+
+describe("foodsInMonthByCategory", () => {
+  it("그 달 품종을 빠짐없이 한 번씩, 정해진 카테고리 순서로 묶는다", () => {
+    for (const month of [1, 6, 11]) {
+      const groups = foodsInMonthByCategory(month)
+      expect(groups.flatMap((group) => group.foods).map((food) => food.id).sort()).toEqual(foodsInMonth(month).map((food) => food.id).sort())
+      const order = ["채소", "과일", "수산", "버섯", "곡물·견과"]
+      const categories = groups.map((group) => group.category)
+      expect(categories).toEqual(order.filter((category) => categories.includes(category as never)))
+      for (const group of groups) {
+        expect(group.foods.length).toBeGreaterThan(0)
+        for (const food of group.foods) expect(food.category).toBe(group.category)
+      }
+    }
+  })
+
+  it("묶음 안은 그 달 대표 품종(monthHighlights) 순서다", () => {
+    const highlights = monthHighlights(11, foodsInMonth(11).length).map((food) => food.id)
+    for (const group of foodsInMonthByCategory(11)) {
+      const ids = group.foods.map((food) => food.id)
+      expect(ids).toEqual(highlights.filter((id) => ids.includes(id)))
+    }
   })
 })
