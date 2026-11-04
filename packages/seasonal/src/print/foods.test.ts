@@ -46,12 +46,12 @@ describe("monthPictures", () => {
     expect(monthPictures({ ...monthly, layout: "none" }, 1)).toEqual([])
   })
 
-  it("월별 포스터 원판(P-C)은 조각마다 넷, P-D 줄은 여섯을 넘지 않는다", () => {
+  it.each(["wheel", "rows-check"] as const)("월별 포스터 %s도 달마다 설정한 24개까지 담는다", (layout) => {
     for (const month of MONTHS) {
-      expect(monthPictures({ ...withMax(poster, 40), layout: "wheel" }, month).length).toBeLessThanOrEqual(4)
-      expect(monthPictures({ ...withMax(poster, 40), layout: "rows-check" }, month).length).toBeLessThanOrEqual(6)
+      const available = foodsInMonth(month).filter((food) => isDrawn(food.id))
+      expect(monthPictures({ ...withMax(poster, 24), layout }, month)).toHaveLength(Math.min(24, available.length))
     }
-    expect(monthPictures({ ...withMax(poster, 2), layout: "wheel" }, 10)).toHaveLength(2)
+    expect(monthPictures({ ...withMax(poster, 2), layout }, 10)).toHaveLength(2)
   })
 
   it("월별 포스터는 고른 카테고리만 넣는다", () => {

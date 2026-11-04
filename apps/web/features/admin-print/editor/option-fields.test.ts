@@ -105,9 +105,9 @@ describe("월별 포스터 한 줄에 한 달", () => {
   const fields = KIND_SECTIONS["month-poster"].flatMap((section) => section.fields)
   const byPath = (path: string) => fields.find((field) => field.path.join(".") === path)!
 
-  it("이름은 체크 목록에 늘 적고 배열은 한 줄 고정이라, 품종 이름·달 배열을 숨긴다", () => {
+  it("그림의 품종 이름은 고를 수 있고 달 배열은 한 줄 고정이다", () => {
     const spec = { ...DEFAULT_SPECS["month-poster"], layout: "rows-check" as const }
-    expect(isFieldShown(byPath("foods.names"), spec)).toBe(false)
+    expect(isFieldShown(byPath("foods.names"), spec)).toBe(true)
     expect(isFieldShown(byPath("grid"), spec)).toBe(false)
     expect(isFieldShown(byPath("categories"), spec)).toBe(true)
   })
@@ -169,10 +169,10 @@ describe("구성마다 숨는 옵션", () => {
     expect(isFieldShown(field("month-poster", "monthLabel"), spec)).toBe(true)
   })
 
-  it("월별 포스터 원형 판은 달 배열·품종 이름(부채꼴이 좁다)을 숨기고 개수는 남긴다", () => {
-    const spec = { ...DEFAULT_SPECS["month-poster"], layout: "wheel" as const }
+  it.each(["wheel", "rows-check"] as const)("월별 포스터 %s는 이름과 개수를 고르고 달 배열만 숨긴다", (layout) => {
+    const spec = { ...DEFAULT_SPECS["month-poster"], layout }
     expect(isFieldShown(field("month-poster", "grid"), spec)).toBe(false)
-    expect(isFieldShown(field("month-poster", "foods.names"), spec)).toBe(false)
+    expect(isFieldShown(field("month-poster", "foods.names"), spec)).toBe(true)
     expect(isFieldShown(field("month-poster", "foods.max"), spec)).toBe(true)
   })
 
@@ -243,11 +243,11 @@ describe("품종 개수 상한", () => {
     return shown.type === "number" ? shown.max : undefined
   }
 
-  it("월별 포스터 원형 판·한 줄 체크는 판 크기 상한까지만 고른다(구성 정의 foodsCap)", () => {
+  it("월별 포스터는 칸마다 최대 24개를 고른다", () => {
     const poster = DEFAULT_SPECS["month-poster"]
-    expect(foodsMax({ ...poster, layout: "cells" })).toBe(12)
-    expect(foodsMax({ ...poster, layout: "wheel" })).toBe(4)
-    expect(foodsMax({ ...poster, layout: "rows-check" })).toBe(6)
+    expect(foodsMax({ ...poster, layout: "cells" })).toBe(24)
+    expect(foodsMax({ ...poster, layout: "wheel" })).toBe(24)
+    expect(foodsMax({ ...poster, layout: "rows-check" })).toBe(24)
   })
 })
 

@@ -64,8 +64,9 @@ function ShapeView({ shape }: { shape: Shape }) {
     }
     case "bar":
       return <rect {...shape.box} rx={Math.min(shape.box.height / 2, 0.6)} fill={BAR_FILL[shape.tone]} />
+    // Node와 브라우저 삼각함수의 마지막 소수 자릿수 차이가 하이드레이션 경고를 만들지 않게 한다.
     case "line":
-      return <line x1={shape.from[0]} y1={shape.from[1]} x2={shape.to[0]} y2={shape.to[1]} stroke={shape.tone ? LINE_STROKE[shape.tone] : "var(--color-silver)"} {...stroke} />
+      return <line x1={shape.from[0].toFixed(6)} y1={shape.from[1].toFixed(6)} x2={shape.to[0].toFixed(6)} y2={shape.to[1].toFixed(6)} stroke={shape.tone ? LINE_STROKE[shape.tone] : "var(--color-silver)"} {...stroke} />
     case "frame":
       return <rect {...shape.box} rx={1.5} fill={shape.fill ? "var(--color-surface)" : "none"} stroke="var(--color-silver)" {...stroke} />
     case "check":

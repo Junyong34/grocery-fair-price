@@ -91,8 +91,8 @@ function MonthChart({ spec }: { spec: MonthPosterSpec }) {
 }
 
 /**
- * P-C 원형 판: 달 표기 크기. 조각마다 그림은 monthPictures가 넷 이하로 고르고, 넷이면 A4 세로 그림 한 변 약 11mm다.
- * 조각이 좁아 이름은 넣지 않는다. 세로는 판 폭, 가로는 판 높이가 지름이다.
+ * P-C 원형 판: 세로는 판 폭, 가로는 판 높이가 지름이다.
+ * 그림과 선택한 이름은 각 부채꼴의 자리 안에 함께 넣는다.
  */
 const WHEEL = { label: 4.2 } as const
 
@@ -109,7 +109,7 @@ function MonthWheel({ spec }: { spec: MonthPosterSpec }) {
   }))
   return (
     <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <Wheel layout={layout} items={items} labelSize={WHEEL.label}>
+      <Wheel layout={layout} items={items} labelSize={WHEEL.label} showName={spec.foods.names === "korean"}>
         <span className="print-heading" style={{ fontSize: t(5), fontWeight: 700 }}>
           열두 달
         </span>
@@ -134,7 +134,11 @@ function MonthRows({ spec }: { spec: MonthPosterSpec }) {
   const pictures = MONTHS.map((month) => monthPictures(spec, month))
   const lists = MONTHS.map((month) => monthChecklist(spec, month))
   // 그림과 목록 글자를 열두 줄이 같은 크기로 쓴다. 가장 많은 달에 맞춘다.
-  const size = Math.min(...pictures.filter((list) => list.length).map((list) => flowSize(list.length, ROW.pictures, body, 0)))
+  const showName = spec.foods.names === "korean"
+  const pictureSize = Math.min(...pictures.filter((list) => list.length).map((list) => flowSize(list.length, ROW.pictures, body, 0)))
+  const longestName = Math.max(1, ...pictures.flat().map((food) => food.name.length))
+  const nameSize = showName ? Math.min(2.2, pictureSize / (longestName + 1.6)) : 0
+  const size = Math.min(...pictures.filter((list) => list.length).map((list) => flowSize(list.length, ROW.pictures, body, nameSize)))
   const lines = Math.ceil(Math.max(1, ...lists.map((list) => list.length)) / CHECK_COLUMNS)
   const fontSize = Math.min(2.8, body / (lines * CHECK_LINE * 1.1))
   return (
@@ -156,7 +160,7 @@ function MonthRows({ spec }: { spec: MonthPosterSpec }) {
           <h2 style={{ width: u(ROW.label), flex: "none", margin: 0, display: "flex", justifyContent: "flex-end" }}>
             <MonthLabel month={month} text={spec.monthLabel} style={spec.monthStyle} fontSize={Math.min(body * 0.6, 11)} textFontSize={4.2} maxHeight={body} maxWidth={ROW.label} length="short" align="end" />
           </h2>
-          <FoodArea foods={pictures[i]!} width={ROW.pictures} height={body} layout="flow" month={month} showName={false} maxSize={size} style={{ justifyContent: "flex-start" }} />
+          <FoodArea foods={pictures[i]!} width={ROW.pictures} height={body} layout="flow" month={month} showName={showName} nameSize={nameSize} maxSize={size} style={{ justifyContent: "flex-start" }} />
           <CheckList foods={lists[i]!} columns={CHECK_COLUMNS} fontSize={fontSize} lineHeight={CHECK_LINE} style={{ flex: 1, alignSelf: "stretch", columnFill: "auto", height: u(body) }} />
         </section>
       ))}

@@ -18,8 +18,13 @@ export type WheelItem = {
  * 원형 판. 자리 계산은 @workspace/seasonal/print/wheel의 wheelLayout이 하고, 여기서는 부채꼴(SVG)과 그림·표기를 그 자리에 놓는다.
  * items는 layout.sectors와 같은 차례(12시 방향부터 시계 방향)다. children은 가운데 빈 원 안에 놓는다.
  */
-export function Wheel({ layout, items, labelSize = 0, children }: { layout: WheelLayout; items: readonly WheelItem[]; labelSize?: number; children?: React.ReactNode }) {
+export function Wheel({ layout, items, labelSize = 0, showName = false, children }: { layout: WheelLayout; items: readonly WheelItem[]; labelSize?: number; showName?: boolean; children?: React.ReactNode }) {
   const { diameter: d, inner, pictureSize, sectors } = layout
+  // 배치가 보장하는 원 안에 그림+이름 사각형을 넣는다. 대각선이 pictureSize여서 이웃·부채꼴 경계를 넘지 않는다.
+  const boxSize = pictureSize / Math.SQRT2
+  const longestName = Math.max(1, ...items.flatMap((item) => item.foods.map((food) => food.name.length)))
+  const nameSize = showName ? Math.min(2.4, boxSize / (longestName + 1.6)) : 0
+  const size = boxSize - nameSize * 1.6
   const c = d / 2
   const at = (angle: number, r: number) => `${c + r * Math.sin(angle)} ${c - r * Math.cos(angle)}`
   return (
@@ -48,10 +53,10 @@ export function Wheel({ layout, items, labelSize = 0, children }: { layout: Whee
               <FoodFigure
                 key={`${i}-${food.id}`}
                 food={food}
-                size={pictureSize}
-                nameSize={0}
-                showName={false}
-                style={{ left: u(slot.x - pictureSize / 2), top: u(slot.y - pictureSize / 2) }}
+                size={size}
+                nameSize={nameSize}
+                showName={showName}
+                style={{ left: u(slot.x - size / 2), top: u(slot.y - boxSize / 2) }}
               />
             )
           )

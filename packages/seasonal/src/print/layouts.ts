@@ -66,15 +66,14 @@ export const LAYOUT_DEFS: { [K in PrintKind]: Record<(typeof LAYOUTS)[K][number]
     cells: { label: "열두 칸", wireframe: "P-A" },
     // 줄마다 이름을 적고 달마다 대표 여섯을 싣는다(foods.ts chartFoods).
     chart: { label: "품종×달 막대표", wireframe: "P-B", ignores: ["grid", "foods.names", "foods.max"] },
-    // 원판 조각 하나가 좁아 넷을 넘으면 그림이 작아진다. 이름 자리가 없다.
-    wheel: { label: "열두 달 원형 판", wireframe: "P-C", foodsCap: 4, ignores: ["grid", "foods.names"] },
-    // 한 줄로만 놓아 여섯을 넘으면 두 줄로 접혀 그림이 작아진다. 나머지는 체크 목록에 이름으로 있다. 달을 한 줄씩 쌓는다.
+    // 이름을 켜면 그림과 이름이 함께 부채꼴 안에 들어가도록 크기를 줄인다.
+    wheel: { label: "열두 달 원형 판", wireframe: "P-C", ignores: ["grid"] },
+    // 달을 한 줄씩 쌓는다. 품종이 많으면 그림을 여러 줄로 접고 이름 자리까지 포함해 크기를 줄인다.
     "rows-check": {
       label: "한 줄에 한 달 · 장보기 체크(세로 용지)",
       wireframe: "P-D",
       portraitOnly: true,
-      foodsCap: 6,
-      ignores: ["grid", "foods.names"],
+      ignores: ["grid"],
     },
   },
 }

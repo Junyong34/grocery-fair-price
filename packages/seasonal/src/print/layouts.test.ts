@@ -43,9 +43,9 @@ describe("layoutReads", () => {
 })
 
 describe("foodsPerCell", () => {
-  it("사양의 개수와 판 크기 상한 가운데 작은 쪽", () => {
+  it("월별 포스터는 설정한 개수를 그대로 쓴다", () => {
     const poster = DEFAULT_SPECS["month-poster"]
-    expect(foodsPerCell({ ...poster, layout: "wheel", foods: { ...poster.foods, max: 12 } })).toBe(4)
+    expect(foodsPerCell({ ...poster, layout: "wheel", foods: { ...poster.foods, max: 24 } })).toBe(24)
     expect(foodsPerCell({ ...poster, layout: "rows-check", foods: { ...poster.foods, max: 3 } })).toBe(3)
     expect(foodsPerCell({ ...poster, layout: "cells", foods: { ...poster.foods, max: 12 } })).toBe(12)
   })

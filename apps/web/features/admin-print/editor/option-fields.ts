@@ -123,7 +123,7 @@ const categories: OptionFieldSpec = { type: "categories", label: "카테고리(�
 /** 구성이 그 옵션을 읽을 때만 보인다(layouts.ts). */
 const reads = (option: LayoutOption) => (spec: PrintSpec) => layoutReads(spec, option)
 
-/** 품종 칸. max는 종류의 상한이고, 구성에 판 크기 상한(foodsCap)이 있으면 그보다 작게 고를 수 없다. */
+/** 품종 칸. max는 종류의 상한이고, 구성에 판 크기 상한(foodsCap)이 있으면 그 상한까지만 고를 수 있다. */
 const foods = (max: number): OptionSection => ({
   title: "품종",
   fields: [
@@ -224,7 +224,7 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
     { title: "구성", fields: [layout("month-poster")] },
     { title: "용지", fields: [orientation, margin, title, { ...grid, when: reads("grid") }] },
     { title: "달 표기", fields: [monthLabel, ...monthStyle] },
-    { ...foods(12), fields: [...foods(12).fields, categories] },
+    { ...foods(24), fields: [...foods(24).fields, categories] },
     look,
   ],
 }
