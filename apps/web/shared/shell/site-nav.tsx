@@ -28,7 +28,8 @@ const CELL = 72
  * 2차 탭과 같은 크림(gold-wash) 트레이에 아이콘·라벨을 세로로 놓고, 지금 메뉴 뒤에 둥근 강조 배경이 깔린다. 메뉴를 바꾸면 배경이 옆 칸으로 미끄러진다.
  */
 export function FloatingNav({ badges = {} }: { badges?: MenuBadges }) {
-  const activeKey = activeMenuKey(usePathname())
+  const pathname = usePathname()
+  const activeKey = activeMenuKey(pathname)
   const items = MENUS
   const active = items.findIndex(({ key }) => key === activeKey)
   return (
@@ -49,7 +50,8 @@ export function FloatingNav({ badges = {} }: { badges?: MenuBadges }) {
             key={key}
             href={href}
             aria-current={i === active ? "page" : undefined}
-            onClick={(event) => scrollToTopIfCurrent(event, i === active)}
+            // 그 탭의 메인에 있을 때만 맨 위로 올린다. 하위 화면(품종 상세 등)이면 메인으로 이동한다.
+            onClick={(event) => scrollToTopIfCurrent(event, pathname === href)}
             className={cn(
               "relative flex h-12 flex-col items-center justify-center gap-1 text-[11px] leading-none no-underline transition-colors duration-200",
               i === active ? "font-semibold text-espresso hover:text-espresso" : "text-stone hover:text-ink"
