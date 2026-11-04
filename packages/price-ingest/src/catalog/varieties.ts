@@ -142,6 +142,7 @@ export const VARIETIES: readonly VarietyDef[] = [
   { slug: "water-dropwort", name: "미나리", item: "leafy", unit: "100g", seasonal: ["water-dropwort"], specs: one({ kamis: ["252-00-04"] }) },
   { slug: "garlic-chive", name: "부추", item: "leafy", unit: "100g", seasonal: ["garlic-chive"], specs: one({ kamis: ["254-00-04"] }) },
   { slug: "young-radish", name: "열무", item: "leafy", unit: "100g", seasonal: ["young-radish"], specs: one({ kamis: ["233-00-04"] }) },
+  { slug: "mustard-greens", name: "갓", item: "leafy", unit: "100g", seasonal: ["mustard-greens"], specs: one({ kamis: ["216-00-04"] }) },
   { slug: "radish", name: "무", item: "root", unit: "1개", seasonal: ["radish"], specs: grades(["231-*"], [309]) },
   { slug: "carrot", name: "당근", item: "root", unit: "100g", seasonal: ["carrot"], specs: grades(["232-01"], [928]) },
   { slug: "potato", name: "감자", item: "root", unit: "100g", seasonal: ["potato"], specs: grades(["152-01"], [929]) },
@@ -309,6 +310,8 @@ export const VARIETIES: readonly VarietyDef[] = [
   { slug: "shucked-mussel", name: "깐홍합", item: "shellfish", unit: "100g", specs: one({ kamis: ["658-01-30"] }) },
   { slug: "manila-clam", name: "바지락", item: "shellfish", unit: "100g", seasonal: ["manila-clam"], specs: one({ kamis: ["661-00-30"] }) },
   { slug: "cockle", name: "새꼬막", item: "shellfish", unit: "100g", seasonal: ["cockle"], specs: one({ kamis: ["665-00-30"] }) },
+  { slug: "oyster", name: "굴", item: "shellfish", unit: "100g", seasonal: ["oyster"], specs: one({ kamis: ["644-00-30"] }) },
+  { slug: "scallop", name: "가리비", item: "shellfish", unit: "100g", seasonal: ["scallop"], specs: one({ kamis: ["659-01-30"] }) },
 
   // 건어물·양념
   { slug: "dried-anchovy", name: "마른멸치", item: "dried-seafood", unit: "100g", specs: [
