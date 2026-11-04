@@ -16,12 +16,12 @@ export function SearchEntry({ className }: { className?: string }) {
     <Link
       href={routes.price.search}
       className={cn(
-        "flex h-14 items-center gap-3 rounded-full border border-silver bg-canvas px-5 text-base text-caption no-underline shadow-sm shadow-ink/5 transition-colors hover:border-stone focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+        "flex h-14 items-center gap-3 rounded-full border border-silver bg-pair-light px-5 text-base text-pair-light-foreground no-underline shadow-sm shadow-ink/5 transition-colors hover:border-stone focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
         className
       )}
     >
       <Search aria-hidden size={20} className="text-stone" />
-      <span>{PRICE_COPY.home.searchPlaceholder}</span>
+      <span className="text-caption">{PRICE_COPY.home.searchPlaceholder}</span>
       <span className="sr-only">{PRICE_COPY.search.label}</span>
     </Link>
   )

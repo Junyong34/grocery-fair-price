@@ -359,6 +359,7 @@ Color discipline is the signature move. The whole palette is earth-toned — mus
 - 원색 토큰(`canvas`, `mat`, `forest`, `gold-deep` 등) 위에 조합 토큰 `--color-pair-<이름>`과 `--color-pair-<이름>-foreground`를 둔다. 앞 토큰은 배경, `foreground`는 그 배경 위의 글자·아이콘이다.
 - Tailwind에서는 `bg-pair-<이름> text-pair-<이름>-foreground`를 함께 쓴다. 한 쌍의 배경만 바꾸고 이전 글자색을 남기지 않는다.
 - 연한 세이지 `sage-wash`는 `sage` 22%와 `canvas`의 Oklab 혼합색이다. `gold-wash`는 `gold-pale` 30%와 `canvas`, `mat`는 `ochre` 12%와 `canvas`를 섞는다(따뜻한 모래색). 새 원색이나 고정된 혼합색 hex를 추가하지 않는다.
+- 밝은 크림 `pair-light`는 `surface` 70%와 `canvas` 30%를 Oklab으로 혼합한 불투명 색이다. `transparent`와 섞은 흰색이나 `bg-surface/70`으로 대체하지 않는다. 부모가 매트·세이지여도 같은 색을 유지한다.
 
 ### 조합 토큰과 용도
 
@@ -366,7 +367,8 @@ Color discipline is the signature move. The whole palette is earth-toned — mus
 
 | 조합 이름 | 배경 | 글자·아이콘 | 사용 기준 |
 |---|---|---|---|
-| `pair-base` | `canvas` · 크림 | `ink` | 페이지, 기본 검색창, 최근 본 품종처럼 가장 넓게 쓰는 기본 표면 |
+| `pair-base` | `canvas` · 크림 | `ink` | 페이지와 기본 내용 면처럼 가장 넓게 쓰는 바탕 |
+| `pair-light` | `surface` 70% + `canvas` 30% · 밝은 크림 | `ink` | 메인 검색창, 검색 입력창, 최근 본 품종·검색의 자주 사는 품종 알약. 크림보다 살짝 밝은 탐색 표면 |
 | `pair-muted` | `mat` · 모래 베이지 | `ink` | 담기 전 버튼, 보조 컨트롤, 받침, 읽기만 하는 정보 카드처럼 기본 배경에서 한 단계 구분할 표면 |
 | `pair-forest` | `sage-wash` · 연한 세이지 | `forest` | 브랜드 안내나 강조 구역. 연한 바탕과 진한 초록을 함께 사용 |
 | `pair-forest-strong` | `forest` | `canvas` | 포레스트 강조가 필요한 작은 버튼·표식. 한 구역의 주된 행동 하나에 한정 |
@@ -377,7 +379,9 @@ Color discipline is the signature move. The whole palette is earth-toned — mus
 
 크림과 매트를 화면의 대부분에 사용하고, 연한 포레스트·골드는 필요한 구역에만 넣는다. 진한 채움은 작은 영역에 집중한다. 클레이는 기본 강조색으로 올리지 않는다.
 
-2026-11-04 브라우저의 불투명 단색 조합을 sRGB로 환산해 확인한 글자 대비는 약 6.17:1~15.32:1이다. 가장 낮은 조합은 `pair-gold`이며, 8쌍 모두 일반 글씨 기준 4.5:1 이상이다.
+2026-11-04 브라우저의 불투명 단색 조합을 sRGB로 환산해 확인한 글자 대비는 약 6.17:1~16.65:1이다. 가장 낮은 조합은 `pair-gold`, 가장 높은 조합은 `pair-light`이며, 9쌍 모두 일반 글씨 기준 4.5:1 이상이다. 각 조합의 불투명도나 글자색을 바꾸면 다시 확인한다.
+
+`pair-light`는 기본 바탕에서 탐색 대상을 구분하는 밝기 차이다. 별도의 깊이 단계나 선택 상태를 뜻하지 않는다. 입력창은 기본·hover·focus에서 같은 밝은 크림을 유지하고, focus 테두리·링은 기존 UI 컴포넌트의 표현을 사용한다. 입력한 글자는 `pair-light-foreground`, 메인의 검색 예시·placeholder는 기존 보조 글자색을 유지한다.
 
 ### 깊이와 중첩 표면의 기준
 
@@ -396,7 +400,7 @@ Color discipline is the signature move. The whole palette is earth-toned — mus
 
 중첩할 때는 다음 기준을 지킨다.
 
-- **혼합의 기준색은 항상 `canvas`다.** `mat`, `sage-wash`, `gold-wash`는 크림을 기준으로 이미 혼합된 불투명 토큰이다. 부모가 매트나 세이지여도 색을 다시 섞지 않는다. `bg-pair-forest/50` 같은 반투명 배경이나 부모의 `opacity`로 깊이를 표현하면 아래 색에 따라 실제 조합이 달라지므로 기본 중첩 방식으로 쓰지 않는다.
+- **혼합의 기준색은 항상 `canvas`다.** `pair-light`, `mat`, `sage-wash`, `gold-wash`는 크림을 기준으로 이미 혼합된 불투명 토큰이다. 부모가 매트나 세이지여도 색을 다시 섞지 않는다. `bg-pair-forest/50` 같은 반투명 배경이나 부모의 `opacity`로 깊이를 표현하면 아래 색에 따라 실제 조합이 달라지므로 기본 중첩 방식으로 쓰지 않는다.
 - **안쪽으로 갈 때는 같은 계열의 진한 색 또는 중립 내용 면을 고른다.** 연한 세이지 안의 행동은 포레스트, 연한 골드 안의 표식은 딥 골드가 기본이다. 추가 내용 구분이 필요하면 크림 내용 면으로 돌아갈 수 있다.
 - **글자색은 바로 아래 표면의 `foreground`를 따른다.** 세이지 묶음 안에 크림 내용 면을 넣었다면 그 면에서는 `pair-base-foreground`로 재설정한다. 바깥의 포레스트 글자색을 모든 자식에게 그대로 상속하지 않는다.
 - **다른 강조 계열을 섞는 예외에는 별도 의미가 있어야 한다.** 세이지 안의 골드가 '현재 선택'처럼 분명한 상태를 나타낼 때는 가능하다. 상태 이름·아이콘 등을 함께 제공한다. 단순히 더 안쪽이라는 이유만으로 골드를 넣지 않는다. 판정·계절·공휴일의 의미색은 각 도메인 기준을 유지한다.
@@ -430,7 +434,7 @@ Color discipline is the signature move. The whole palette is earth-toned — mus
 
 ### 현재 화면에 적용하는 기준
 
-- 시세 메인의 검색창과 최근 본 품종은 `pair-base`, 담기 전 버튼은 `pair-muted`, 담은 후 버튼은 `pair-ink` 조합이다. 메인·검색·품종 상세에서 같은 의미를 유지한다. 이 표는 기존 색상과 대응하는 기준이며, 모든 화면의 클래스 이름을 한 번에 바꿀 필요는 없다.
+- 시세 메인 검색창·검색 입력창·최근 본 품종·검색의 자주 사는 품종 알약은 `pair-light`, 담기 전 버튼은 `pair-muted`, 담은 후 버튼은 `pair-ink` 조합이다. 메인·검색·품종 상세에서 같은 의미를 유지한다. 이 표는 기존 색상과 대응하는 기준이며, 모든 화면의 클래스 이름을 한 번에 바꿀 필요는 없다.
 - 담기 전후는 색상과 함께 `+`·체크 표시 및 `aria-pressed`로 구분한다. 일반 담기 버튼을 포레스트로 칠해 이미 담은 상태처럼 보이게 하지 않는다.
 - `hairline`은 연한 구분선, `silver`는 컨트롤 테두리에 사용한다. 경계·focus는 기존 컴포넌트 규칙을 유지하며 배경색의 미세한 차이만으로 조작 가능 여부를 전달하지 않는다.
 - 보조 글씨는 크림 위에서 `caption`, 매트 위에서는 `stone`을 우선한다. 연한 세이지·골드 위의 글씨는 각 조합의 `foreground`를 쓴다. `ash`, `mute`, `sage`, `gold-pale`을 작은 본문 글자색으로 쓰지 않는다.

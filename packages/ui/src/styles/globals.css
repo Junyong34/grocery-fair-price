@@ -102,6 +102,9 @@
        기본은 크림·매트, 강조는 포레스트·딥 골드. 사용 기준: apps/web/DESIGN.md. */
     --color-pair-base: var(--color-canvas);
     --color-pair-base-foreground: var(--color-ink);
+    /* 탐색 알약·검색 입력의 밝은 크림. 부모 배경에 영향을 받지 않는 불투명 혼합색. */
+    --color-pair-light: color-mix(in oklab, var(--color-surface) 70%, var(--color-canvas));
+    --color-pair-light-foreground: var(--color-ink);
     --color-pair-muted: var(--color-mat);
     --color-pair-muted-foreground: var(--color-ink);
     --color-pair-forest: var(--color-sage-wash);

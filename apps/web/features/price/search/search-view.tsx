@@ -64,7 +64,8 @@ export function SearchView({
           fallbackHref={routes.home}
           className="-ml-[3px] lg:-ml-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         />
-        <InputWrapper as="label" variant="cream" className="min-w-0 flex-1 max-lg:h-11">
+        {/* 입력창의 모든 상태에서 같은 밝은 크림을 쓰고, focus의 금색 테두리는 기존 UI 표현을 유지한다. */}
+        <InputWrapper as="label" variant="cream" className="min-w-0 flex-1 bg-pair-light text-pair-light-foreground [--input:var(--color-pair-light)] [--v-canvas:var(--color-pair-light)] max-lg:h-11">
           <InputAffix>
             <Search aria-hidden size={18} />
           </InputAffix>
@@ -151,7 +152,7 @@ function Results({
           )}
           <Group title={PRICE_COPY.home.featured}>
             <Pills
-              className="bg-pair-base text-pair-base-foreground"
+              className="bg-pair-light text-pair-light-foreground"
               labels={featured.map((variety) => ({
                 key: variety.id,
                 label: variety.name,
