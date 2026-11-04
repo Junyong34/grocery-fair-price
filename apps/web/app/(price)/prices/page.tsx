@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 
+import { PRICE_COPY } from "@workspace/price/copy"
 import { groupByCategory } from "@workspace/price/list"
 
 import { CatalogView } from "@/features/price/catalog/catalog-view"
@@ -18,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return createMetadata({
     ...(await seo()).seo,
     path: routes.price.varieties,
-    ogImage: { title: "전체 품종 시세", subtitle: "오늘 시세와 평소 가격", badge: "시세" },
+    ogImage: { title: PRICE_COPY.catalog.title, subtitle: PRICE_COPY.catalog.ogSubtitle, badge: "시세" },
   })
 }
 

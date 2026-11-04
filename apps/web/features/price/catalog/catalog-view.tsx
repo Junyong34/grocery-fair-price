@@ -21,7 +21,7 @@ export function CatalogView({ varieties }: { varieties: readonly VarietySummary[
         <h1 id="catalog-title" className="font-heading text-[28px] leading-tight text-ink lg:text-[32px]">{PRICE_COPY.catalog.title}</h1>
         <p className="max-w-prose text-sm leading-relaxed text-stone">{PRICE_COPY.catalog.intro(varieties.length)}</p>
         {groups.length > 1 && (
-          <nav aria-label="카테고리" className="flex flex-wrap gap-2 pt-1">
+          <nav aria-label={PRICE_COPY.catalog.categoryNav} className="flex flex-wrap gap-2 pt-1">
             {groups.map(({ category }, index) => (
               <a key={category} href={`#category-${index}`} className="rounded-full border border-hairline px-3 py-1.5 text-[13px] text-ink no-underline hover:bg-mat">
                 {category}

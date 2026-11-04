@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import { basisLine, summaryLine } from "@workspace/price/copy"
+import { basisLine, PRICE_COPY, summaryLine } from "@workspace/price/copy"
 import type { VarietyDetail } from "@workspace/price/types"
 import { findFood } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
@@ -72,7 +72,7 @@ export function DetailView({
           className="flex items-center justify-between gap-3 rounded-xl border border-hairline px-4 py-3 text-ink no-underline hover:text-ink"
         >
           <span className="flex flex-col gap-0.5">
-            <span className="text-sm font-semibold">{food.name} 제철 시기 보기</span>
+            <span className="text-sm font-semibold">{PRICE_COPY.seasonLink(food.name)}</span>
             <span className="text-xs text-stone">{formatSeasonMonths(food.months)}</span>
           </span>
           <span aria-hidden className="text-stone">›</span>

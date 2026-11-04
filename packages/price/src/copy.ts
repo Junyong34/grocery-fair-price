@@ -202,7 +202,11 @@ export const PRICE_COPY = {
     title: "전체 품종 시세",
     intro: (count: number) => `조사하는 ${count}개 품종의 최근 시세와 평소 가격을 카테고리별로 모았어요. 품종을 누르면 판정과 파는 곳별 가격을 볼 수 있어요.`,
     count: (count: number) => `${count}개`,
+    categoryNav: "카테고리",
+    ogSubtitle: "오늘 시세와 평소 가격",
   },
+  /** P3 품종 상세 아래, 같은 id의 제철 품종 상세로 가는 링크 */
+  seasonLink: (name: string) => `${name} 제철 시기 보기`,
   /** 목록 위 설명 한 줄 */
   hint: [
     { term: "시세", text: "최근 조사 가격" },
