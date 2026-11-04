@@ -223,7 +223,11 @@ function Results({
               {PRICE_COPY.search.noResult(query.trim())}
             </p>
             <p className="text-sm text-caption">
-              {PRICE_COPY.search.noResultHint}
+              {PRICE_COPY.search.noResultHint.map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
             </p>
           </div>
           <Group title={PRICE_COPY.search.tipsTitle}>

@@ -168,7 +168,7 @@ describe("검색 문구", () => {
     expect(PRICE_COPY.search.noResult("트러플")).toBe(
       '"트러플"에 맞는 품종이 없어요'
     )
-    expect(PRICE_COPY.search.noResultHint).not.toContain("판정")
+    expect(PRICE_COPY.search.noResultHint.join(" ")).not.toContain("판정")
   })
 
   it("따옴표 밖에 조사를 붙인다", () => {
