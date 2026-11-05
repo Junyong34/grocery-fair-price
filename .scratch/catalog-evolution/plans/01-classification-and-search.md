@@ -46,7 +46,14 @@ Status: needs-triage
 
 - `/prices/[variety]`: 기본 규격을 보여 준다. 기존 주소는 그대로 동작한다. 기본 규격 slug(예: `default`)는 URL에 드러나지 않는다.
 - `/prices/[variety]/[spec]`: 그 외 규격. 기본 규격 slug로 들어오면 품종 주소로 보낸다.
-- 쿼리(`?spec=`)를 쓰지 않는 이유: Cache Components에서 `searchParams`를 읽으면 그 페이지가 요청마다 렌더링된다. 경로 세그먼트는 `generateStaticParams`로 미리 만들 수 있다. 구현 전에 `apps/web/node_modules/next/dist/docs/`와 `apps/web/docs/nextjs-16-patterns.md`로 확인한다.
+- 경로 세그먼트를 고른 이유(2026-11-05, Next 16.4 문서 확인):
+  - 쿼리(`?spec=`)도 페이지 전체가 동적이 되지는 않는다. Cache Components에서는 `<Suspense>` 안에서 `searchParams`를 읽으면 뼈대는 미리 만들고 그 부분만 요청 때 만들어 흘려 보낸다(`next/dist/docs/01-app/02-guides/migrating-to-cache-components.md` "cookies, headers, and searchParams" 절). 다만 규격에 따라 달라지는 가격·판정 영역이 바로 그 동적 부분이라, 첫 화면에 잠깐 빈 칸이 생기고 요청마다 서버가 그린다.
+  - 경로는 기존 `/prices/[variety]`처럼 `generateStaticParams` + 첫 요청 생성 방식을 그대로 따른다. 페이지 전체 HTML이 바로 나온다.
+  - 탭을 `Link`로 만들면 Next가 화면에 보이는 규격 링크를 미리 받아 두어(prefetch) 탭 전환이 거의 즉시 바뀐다.
+  - 규격마다 주소가 따로 있어 검색 노출·canonical·공유 링크가 단순하다.
+  - 데이터 조회는 이미 `"use cache"` + `cacheLife("hours")`(`db-source.ts`)라 어느 방식이든 DB를 매번 부르지 않는다. 성능 차이는 렌더링 비용과 첫 화면 빈 칸 정도이고, 결정 이유는 검색 노출·공유 링크·기존 구조와의 일관성이 더 크다.
+- 기각한 방식: 쿼리(`?spec=`, 위 이유). 한 페이지에 모든 규격 데이터를 싣고 브라우저에서 전환하는 방식(탭 전환은 가장 빠르지만 페이지가 무겁고, 공유 링크로 연 규격이 기본 규격 다음에 바뀌어 그려지며, 검색 노출이 품종 하나뿐이다).
+- 라우트 파일: `app/(price)/prices/[variety]/[spec]/page.tsx`를 새로 두고 기존 품종 페이지와 같은 상세 컴포넌트를 렌더링한다. 선택적 catch-all(`[[...spec]]`)은 `/prices/spinach/a/b` 같은 잘못된 주소까지 받으므로 쓰지 않는다. 규격 목록은 `generateStaticParams`(1개 이상)로 내고, `params`는 `<Suspense>` 안에서 읽는다. 카탈로그에 없는 규격 slug는 `notFound()`, 카탈로그에는 있지만 판정 행이 없는 규격은 안내 화면이다.
 - 경로는 `routes.price`에 추가하고 `shared/seo/pages.ts`에 등록한다. 규격 페이지는 색인 대상이고, 사이트맵·OG·canonical을 정한다.
 
 ## 바꿀 곳
