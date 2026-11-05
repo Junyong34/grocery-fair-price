@@ -107,6 +107,8 @@
 
 구조는 레이아웃에서 오늘 Promise를 한 번 만들어(await하지 않고) Context로 나눠 주는 것이다. (`single-page-applications.md` "Using React's `use` within a Context Provider")
 
+**2a 예외: 날짜를 proxy에서 정한다(2026-11-05).** 2a는 12개월 전체가 "오늘"의 (연, 월)에 달려 있어 A로 그리면 본문 전체가 요청마다 그려졌다(운영 1.5초). 그래서 `proxy.ts`가 서울 기준 (연, 월)을 계산해 미리 그린 `/seasonal/at/[yearMonth]`로 rewrite하고, 일 단위 오늘 표시만 A로 채운다. 렌더 전에 계산하므로 C의 "달이 바뀔 때 묵은 판" 문제가 없다. rewrite된 페이지를 미리 그릴 때 `usePathname()`은 내부 경로를 돌려주므로, 경로로 현재 메뉴를 고르는 셸은 `usePublicPathname()`(`shared/shell/public-path.ts`)을 쓴다. 안 그러면 `aria-current`가 서버와 브라우저에서 달라 하이드레이션이 깨진다. 근거와 측정: `.scratch/seasonal-static/spec.md`.
+
 실제 코드: `shared/today.ts`의 `getSeoulToday()`(`connection()` 뒤 `seoulToday()`, React `cache()`로 한 요청에 한 번) → `app/seasonal/layout.tsx`의 `TodayProvider`(`shared/today-context.tsx`) → 클라이언트는 `<Suspense>` 안에서 `useToday()`(`use(promise)`)로 읽는다. 클라이언트에서 날짜를 다시 계산하지 않는다. 자정을 넘겨 탭을 열어 둔 경우는 무시한다.
 
 > 로컬 개발에서는 서버와 브라우저의 TZ가 같아 불일치를 놓치기 쉽다. 문서는 `TZ=UTC LANG=ja_JP.UTF-8 next dev`처럼 일부러 다르게 띄워 보라고 권한다. (`preventing-flash-before-hydration.md` "Good to know")

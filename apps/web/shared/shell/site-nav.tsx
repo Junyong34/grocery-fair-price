@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { createPortal } from "react-dom"
 
@@ -13,6 +12,7 @@ import { routes } from "@/shared/routes"
 
 import { activeMenuKey, MENUS } from "./menus"
 import { NavLink } from "./nav-link"
+import { usePublicPathname } from "./public-path"
 import { headerScrollStep, INITIAL_HEADER_SCROLL } from "./header-scroll"
 import { screenOf } from "./screens"
 import { scrollToTopIfCurrent } from "./scroll-to-top"
@@ -28,7 +28,7 @@ const CELL = 72
  * 2차 탭과 같은 크림(gold-wash) 트레이에 아이콘·라벨을 세로로 놓고, 지금 메뉴 뒤에 둥근 강조 배경이 깔린다. 메뉴를 바꾸면 배경이 옆 칸으로 미끄러진다.
  */
 export function FloatingNav({ badges = {} }: { badges?: MenuBadges }) {
-  const activeKey = activeMenuKey(usePathname())
+  const activeKey = activeMenuKey(usePublicPathname())
   const items = MENUS
   const active = items.findIndex(({ key }) => key === activeKey)
   return (
@@ -173,7 +173,7 @@ export function SiteHeader({
 }) {
   const stuck = useScrolledDown()
   // 검색 타입 화면(P2)은 모바일에서 화면의 검색 입력이 헤더 자리를 맡는다(.scratch/shell-unify/spec.md 3장).
-  const { header, scroll } = screenOf(usePathname())
+  const { header, scroll } = screenOf(usePublicPathname())
   const [visible, reveal] = useHeaderVisible(scroll === "hide-on-scroll")
   return (
     <header

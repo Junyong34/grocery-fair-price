@@ -1,8 +1,7 @@
 "use client"
 
-import { usePathname } from "next/navigation"
-
 import { routes } from "@/shared/routes"
+import { usePublicPathname } from "@/shared/shell/public-path"
 import { SearchLink } from "@/shared/shell/search-link"
 
 /**
@@ -10,7 +9,7 @@ import { SearchLink } from "@/shared/shell/search-link"
  * 그 검색창이 위로 지나가면 헤더 아래 고정 검색 줄(home/search-row)이 대신 붙어 어느 스크롤 위치에서도 검색이 겹친다.
  */
 export function HeaderSearchLink() {
-  const pathname = usePathname()
+  const pathname = usePublicPathname()
   if (pathname === routes.home) return null
   return <SearchLink href={routes.price.search} label="품종 검색" />
 }

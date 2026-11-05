@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Suspense } from "react"
 
 import { holidaysInMonth } from "@workspace/seasonal/calendar/holidays"
 import { monthCalendar, type CalendarDate } from "@workspace/seasonal/calendar/month-calendar"
@@ -12,7 +13,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import { routes } from "@/shared/routes"
 
 import { DownloadsCard } from "@/shared/downloads/downloads-card"
-import { MonthDaysCard } from "../components/month-days-card"
+import { MonthDaysCard, MonthDaysCardToday } from "../components/month-days-card"
 import { ScatterField } from "../components/scatter-field"
 import { HERO_ID, monthSectionId } from "./active-month"
 import { DesktopMonthPanel } from "./desktop-month-panel"
@@ -20,15 +21,19 @@ import { JumpButton, MonthRail } from "./month-jump"
 import { MonthScrollSpy } from "./month-scroll-spy"
 import { MonthTitle } from "./month-title"
 import { MoreFoods } from "./more-foods"
-import { SettingsCalendar, SettingsScope } from "./settings-scope"
+import { SettingsCalendar, SettingsCalendarToday, SettingsScope } from "./settings-scope"
 import { YearEnd } from "./year-end"
+
+/** 오늘 표시가 없는 날짜. 달력·일별 카드를 미리 그릴 때 쓴다(print/foods.ts와 같은 약속). */
+const NO_TODAY: CalendarDate = { year: 0, month: 0, day: 0 }
 
 /**
  * 2a 이달 · 12개월 스크롤(명세 3.1). 각 달은 "흩어진 제철 그림 → 달력" 순서다.
  * 모바일은 한 열 + 위 인디케이터 + 오른쪽 월 레일, 데스크톱은 왼쪽 고정 패널(달 이동 휠) + 오른쪽 스크롤.
+ * (연, 월)만으로 그려 빌드 때 미리 만든다(.scratch/seasonal-static/spec.md). 일 단위 "오늘" 표시는 이번 달 섹션의 달력과
+ * 일별 카드만 요청 때 채운다. 채우기 전에는 오늘 표시만 없는 같은 모양이라 레이아웃이 밀리지 않는다.
  */
-export function ThisMonthView({ today }: { today: CalendarDate }) {
-  const { year, month: thisMonth } = today
+export function ThisMonthView({ year, month: thisMonth }: { year: number; month: Month }) {
   // 판에는 그 달 대표 품종을 SCATTER_MAX_FOODS개까지 그린다(한 달 제철이 최대 92개라 다 그리면 너무 빽빽하다). 나머지는 판 아래 이름 목록이다.
   const months = MONTHS.map((month) => ({ month, foods: foodsInMonth(month), pictured: monthHighlights(month, SCATTER_MAX_FOODS), note: MONTH_NOTES[month] }))
   const current = months[thisMonth - 1]!
@@ -92,7 +97,7 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
           </section>
 
           {months.map(({ month, foods, pictured, note }) => (
-            <MonthSection key={month} month={month} foods={foods} pictured={pictured} note={note} today={today} />
+            <MonthSection key={month} year={year} month={month} isThisMonth={month === thisMonth} foods={foods} pictured={pictured} note={note} />
           ))}
 
           <YearEnd year={year} thisMonth={thisMonth} />
@@ -104,22 +109,36 @@ export function ThisMonthView({ today }: { today: CalendarDate }) {
 }
 
 function MonthSection({
+  year,
   month,
+  isThisMonth,
   foods,
   pictured,
   note,
-  today,
 }: {
+  year: number
   month: Month
+  /** 이번 달 섹션만 오늘 표시를 요청 때 채운다. 다른 달에는 오늘이 없다. */
+  isThisMonth: boolean
   foods: ReturnType<typeof foodsInMonth>
   /** 판에 그리는 대표 품종(foods의 일부) */
   pictured: ReturnType<typeof foodsInMonth>
   note: string
-  today: CalendarDate
 }) {
-  const holidays = holidaysInMonth(today.year, month)
+  const holidays = holidaysInMonth(year, month)
   // 모바일 판은 달력(고정)이 들어갈 높이가 달의 주 수에 따라 다르다.
-  const weeks = monthCalendar({ year: today.year, month, today, holidays }).length
+  const weeks = monthCalendar({ year, month, today: NO_TODAY, holidays }).length
+  // 이번 달만 오늘 동그라미를 요청 때 채운다. fallback은 오늘 표시만 없는 같은 달력이다.
+  const calendar = () => {
+    const plain = <SettingsCalendar year={year} month={month} today={NO_TODAY} holidays={holidays} />
+    if (!isThisMonth) return plain
+    return (
+      <Suspense fallback={plain}>
+        <SettingsCalendarToday year={year} month={month} holidays={holidays} />
+      </Suspense>
+    )
+  }
+  const daysCard = <MonthDaysCard month={month} year={year} today={NO_TODAY} className="mt-4 lg:max-w-[420px]" />
   // 화면 밖 달은 스타일·레이아웃·페인트를 건너뛴다(content-visibility). 예상 높이는 375·1280 폭에서 잰 섹션 높이(923~1226px, 대개 1030px)에서 위아래 padding을 뺀 콘텐츠 높이이고,
   // auto라서 한 번 그려진 뒤에는 실제 높이를 기억한다. 판의 그림은 판 안에서만 움직여 섹션 밖으로 넘치지 않는다.
   return (
@@ -144,18 +163,24 @@ function MonthSection({
         <Scatter
           month={month}
           foods={pictured}
-          year={today.year}
+          year={year}
           className="mt-5 lg:mt-0"
           desktopFrame="desktopMonth"
-          desktopCalendar={<SettingsCalendar year={today.year} month={month} today={today} holidays={holidays} />}
+          desktopCalendar={calendar()}
           mobileFrame={weeks >= 6 ? "mobileMonthTall" : "mobileMonth"}
-          mobileCalendar={<SettingsCalendar year={today.year} month={month} today={today} holidays={holidays} />}
+          mobileCalendar={calendar()}
         />
         <p className="mt-3 text-xs text-caption">
           {foods.length}가지 제철<span> · 그림을 끌어 달력 위에도 놓아 꾸며 보세요</span>
         </p>
-        <MoreFoods year={today.year} foods={foods.filter((food) => !pictured.includes(food))} />
-        <MonthDaysCard month={month} today={today} className="mt-4 lg:max-w-[420px]" />
+        <MoreFoods year={year} foods={foods.filter((food) => !pictured.includes(food))} />
+        {isThisMonth ? (
+          <Suspense fallback={daysCard}>
+            <MonthDaysCardToday month={month} className="mt-4 lg:max-w-[420px]" />
+          </Suspense>
+        ) : (
+          daysCard
+        )}
       </div>
     </section>
   )

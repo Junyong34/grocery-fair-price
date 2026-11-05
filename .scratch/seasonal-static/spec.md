@@ -137,3 +137,20 @@
 3. `/seasonal/at/[yearMonth]` 라우트 + `routes.seasonal.at` + SEO 등록(noindex, canonical)
 4. `proxy.ts` rewrite + `matcher`
 5. 5장 확인 → 운영 재측정 → 문서 갱신
+
+## 9. 구현 기록 (2026-11-05)
+
+8장 1~4를 한 번에 구현했다. spec과 달라진 점:
+
+- **noindex를 쓰지 않는다(3.3 수정).** `/seasonal`의 응답이 곧 `/seasonal/at/[yearMonth]` 페이지라서, 그 페이지를 noindex로 두면 `/seasonal`이 색인에서 빠진다. 메타데이터는 옛 `/seasonal`의 것을 그대로 옮겼다(색인, canonical `/seasonal`). 내부 경로로 직접 들어오는 경우는 canonical로 정리된다. `shared/seo/pages.ts`에서는 `"/seasonal"`(sitemap 1줄)을 유지하고, `"/seasonal/at/[yearMonth]"`는 sitemap 줄 없이 색인 대상으로 등록했다.
+- **옛 `/seasonal` 페이지를 남긴다.** 지우면 빌드가 실패한다("Parallel route slots cannot render the same URLs", "Unmatched app pages"). `@sheet/page.tsx`가 `/seasonal`을 그리기 때문이다. 남긴 페이지는 proxy가 돌지 않을 때의 대비책으로, 요청 시점에 그린다.
+- **하이드레이션 불일치를 고쳤다.** rewrite된 페이지를 미리 그릴 때 `usePathname()`은 `/seasonal/at/2026-11`을, 브라우저에서는 `/seasonal`을 돌려준다. 그래서 상단·하단 내비의 `aria-current`와 하단 내비의 활성 막대가 서버와 브라우저에서 달라 React #418이 났다(production에서만 보이고 dev에서는 안 보였다). 프로토타입에서는 놓쳤다. `shared/shell/public-path.ts`의 `usePublicPathname()`으로 셸(`nav-link`, `site-nav`, `header-search-link`)이 공개 주소를 쓰게 했다. 칩 줄(2b·명절·제철 회)은 rewrite 경로에 없어서 그대로 뒀다.
+- **오늘 표시(3.2):** 이번 달 섹션의 달력(모바일·데스크톱 두 벌)과 일별 카드만 `<Suspense>` 구멍이다. 프리렌더에 구멍 3개, postponed 약 5KB. 다른 달은 오늘 없는 날짜(`{0,0,0}`, print와 같은 약속)로 그린다.
+- **미리 그리는 해(3.4):** `STATIC_YEARS` = 2026 ~ 공휴일 데이터 마지막 해(지금 2027). 24쪽. proxy는 범위 밖의 해를 마지막 해로 붙인다(`staticYearMonth`). 공휴일 패키지를 올리면 해가 늘어난다. 2027년 안에 패키지를 올리지 않으면 2028년에는 2027년 판이 보인다.
+
+확인(로컬 `next build && next start`, 375·1280):
+- `/seasonal` → rewrite. 프리렌더 HTML 969K 안에 히어로 "지금은 11월"과 12개월 본문이 들어 있다. 이번 달 달력에 오늘(5일) 동그라미가 있다.
+- 1i 시트 열기·닫기, 탭 이동(계절 → 이달), 내비 활성 표시가 맞다. console 오류와 하이드레이션 경고는 없다. 남은 것은 기존 CSS preload 경고뿐이다.
+- `pnpm typecheck` · `pnpm lint`(0 errors) · `pnpm test` 통과.
+
+남은 확인: 운영 배포 후 재측정(5장 5·6), GA `page_path`(5장 4).

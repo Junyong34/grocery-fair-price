@@ -30,15 +30,18 @@ function noteOf(day: MonthDay): string {
  */
 export function MonthDaysCard({
   month,
+  year,
   today,
   className,
 }: {
   month: number
-  /** 서울 기준 오늘. 연도와 "오늘" 표시에 쓴다. */
+  /** 일정을 고르는 해 */
+  year: number
+  /** 서울 기준 오늘. "오늘" 표시에 쓴다. 미리 그릴 때는 오늘이 없는 날짜(0년 0월 0일)를 넘긴다. */
   today: CalendarDate
   className?: string
 }) {
-  const days = monthDays(month, today.year)
+  const days = monthDays(month, year)
   return (
     <section
       aria-label={`${month}월의 절기·명절`}
@@ -63,7 +66,7 @@ export function MonthDaysCard({
 /** 정적으로 미리 그리는 화면(2b)용. 오늘은 요청 시점에 읽으므로 <Suspense> 안에 둔다. */
 export async function MonthDaysCardToday({ month, className }: { month: number; className?: string }) {
   const today = await getSeoulToday()
-  return <MonthDaysCard month={month} today={today} className={className} />
+  return <MonthDaysCard month={month} year={today.year} today={today} className={className} />
 }
 
 function isSameDay(a: CalendarDate, b: CalendarDate): boolean {

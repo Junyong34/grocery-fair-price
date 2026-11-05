@@ -5,6 +5,11 @@ export type MonthHolidays = Readonly<Record<number, readonly string[]>>
 
 const HOLIDAYS: Record<string, readonly string[]> = Object.assign({}, ...Object.values(holidaysByYear))
 
+/** 공휴일 데이터가 있는 해(오름차순). 패키지의 내보내기 이름이 y2026 모양이다. */
+export const HOLIDAY_YEARS: readonly number[] = Object.keys(holidaysByYear)
+  .map((key) => Number(key.slice(1)))
+  .sort((a, b) => a - b)
+
 /** 관보의 법정 이름 → 화면에 적는 이름. 대체공휴일 괄호 안 이름도 함께 바뀐다. */
 const DISPLAY_NAMES: Readonly<Record<string, string>> = { 기독탄신일: "크리스마스" }
 

@@ -4,6 +4,7 @@
 import type { Festival } from "@workspace/seasonal/data/festivals"
 import type { Season } from "@workspace/seasonal/data/seasons"
 // 인쇄 URL 코덱만 가져온다. print/spec은 zod·품종 데이터를 싣고 있어 여기서 값을 import하면 모든 페이지 번들에 들어간다.
+import { formatYearMonth } from "@workspace/seasonal/calendar/year-month"
 import { encodeSpec } from "@workspace/seasonal/print/spec-codec"
 import type { Paper, PrintSpec, PublishedPaper } from "@workspace/seasonal/print/spec"
 
@@ -29,6 +30,8 @@ export const routes = {
     root: "/seasonal",
     /** 2a의 그 달 섹션. 해시라 정적 셸이 유지되고, 2a가 해시를 읽어 즉시 이동한다. */
     rootAt: (month: number) => `/seasonal#month-${month}`,
+    /** 2a를 (연, 월)마다 미리 그린 내부 경로. proxy.ts가 root를 여기로 rewrite한다. 화면 링크에는 root를 쓴다. */
+    at: (year: number, month: number) => `/seasonal/at/${formatYearMonth(year, month)}`,
     /** 2b 월별 보기: 열두 달 카드 목록과 그 달 상세 */
     months: "/seasonal/months",
     month: (month: number) => `/seasonal/months/${month}`,

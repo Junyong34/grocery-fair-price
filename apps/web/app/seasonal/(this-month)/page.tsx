@@ -1,5 +1,7 @@
 import { Suspense } from "react"
 
+import type { Month } from "@workspace/seasonal/data/months"
+
 import { ThisMonthView } from "@/features/seasonal/this-month/this-month-view"
 import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
@@ -16,7 +18,8 @@ export const metadata = createMetadata({
   },
 })
 
-// 2a는 "오늘"(서울)에 따라 히어로·달력이 달라지므로 요청 시점에 그린다. 셸(헤더·탭·내비)은 정적이다.
+// 2a의 실제 화면은 /seasonal/at/[yearMonth](미리 그린 정적 페이지)이고, proxy.ts가 /seasonal을 그리로 rewrite한다.
+// 이 페이지는 proxy가 돌지 않을 때의 대비책이다(@sheet/page.tsx와 짝이 맞아야 빌드된다). 요청 시점에 그린다.
 export default function Page() {
   return (
     <Suspense fallback={<div className="min-h-svh" aria-busy />}>
@@ -26,6 +29,6 @@ export default function Page() {
 }
 
 async function ThisMonth() {
-  const today = await getSeoulToday()
-  return <ThisMonthView today={today} />
+  const { year, month } = await getSeoulToday()
+  return <ThisMonthView year={year} month={month as Month} />
 }

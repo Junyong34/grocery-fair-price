@@ -28,6 +28,9 @@ export const SEO_PAGES: Readonly<Record<string, () => readonly SitemapEntry[]>> 
   // 품종 허브: 모든 품종 상세로 가는 색인 가능한 입구
   "/prices": () => [{ path: routes.price.varieties }],
   "/seasonal": () => [{ path: routes.seasonal.root }],
+  // 2a를 (연, 월)마다 미리 그린 내부 경로. proxy.ts가 /seasonal을 여기로 rewrite하므로 공개 주소는 위의 /seasonal 하나다.
+  // 메타데이터는 /seasonal의 것(색인, canonical /seasonal)이고 sitemap 줄은 없다.
+  "/seasonal/at/[yearMonth]": () => [],
   "/seasonal/months": () => [{ path: routes.seasonal.months }],
   "/seasonal/months/[month]": () => MONTHS.map((month) => ({ path: routes.seasonal.month(month) })),
   "/seasonal/seasons": () => [{ path: routes.seasonal.seasons }],

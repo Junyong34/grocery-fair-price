@@ -83,7 +83,7 @@ import 경로:
 |---|---|
 | `next.config.ts` | `cacheComponents: true`, `partialPrefetching: true`, `agentRules: false`(AGENTS.md를 루트 하나로) |
 | `vercel.json` | 서버 함수 지역 `hnd1`(도쿄). 가격 DB(Supabase `ap-northeast-1`) 옆에서 돌게 한다. 지정하지 않으면 기본 `iad1`(미국 동부)이라 동적 영역이 매 요청 미국을 왕복한다(.scratch/bundle-audit 이후 운영 측정, 2026-11-05). Vercel Root Directory가 `apps/web`라 여기 둔다 |
-| `proxy.ts` | `/seasonal/festivals` → 서울 날짜 기준 다가오는 명절로, `/seasonal/sashimi` → 이번 달 제철 회로 리다이렉트. `matcher`는 정적 문자열이어야 해서 경로를 직접 쓴다 |
+| `proxy.ts` | `/seasonal` → 서울 기준 이번 (연, 월)의 `/seasonal/at/[yearMonth]`로 rewrite(주소는 그대로). `/seasonal/festivals` → 서울 날짜 기준 다가오는 명절로, `/seasonal/sashimi` → 이번 달 제철 회로 리다이렉트. `matcher`는 정적 문자열이어야 해서 경로를 직접 쓴다 |
 | `app/layout.tsx` | `<html lang="ko" data-mode="light">`, Pretendard(본문), Gowun Batang(`--font-serif-ko`, 제목), 사이트 기본 메타데이터, `Providers` |
 | `app/manifest.ts` | `/manifest.webmanifest`. 홈 화면 웹 앱 설치 정보(`shared/pwa.ts`): 장볼날, 시세 메인(`/`), 주소창 없는 창, 기존 브랜드 아이콘과 Oura 캔버스 색. `public/downloads/manifest.json`과 별개 |
 | `shared/fonts/display-font.ts` | 큰 숫자 서체 Bricolage Grotesque(`next/font/local`, 라이선스 동봉). 루트 레이아웃이 `--font-display-file`로 붙이고 `packages/ui` `cojeev.css`가 `--font-display`로 잇는다 |
@@ -110,7 +110,8 @@ import 경로:
 | `/basket` | P4 담은 품종 (noindex) | `(price)/basket/page.tsx` | `features/price/basket/basket-view` |
 | `/prices` | 품종 허브(카테고리별 전체 품종, 색인 대상) | `(price)/prices/page.tsx` | `features/price/catalog/catalog-view`. 메인 "전체 품종 시세 보기"와 P3 빵부스러기가 여기로 온다 |
 | `/prices/[variety]` | P3 품종 상세 (가격 품종 slug) | `(price)/prices/[variety]/page.tsx` | `features/price/variety-detail/detail-view`. 품종 목록은 `getPriceSource()`에서 읽어 `generateStaticParams` · sitemap에 쓴다 |
-| `/seasonal` | 2a 이달 · 12개월 스크롤 | `seasonal/(this-month)/page.tsx` | `this-month/this-month-view` |
+| `/seasonal` | 2a 이달 · 12개월 스크롤 | `proxy.ts`가 아래 `at/[yearMonth]`로 rewrite. `seasonal/(this-month)/page.tsx`는 proxy가 돌지 않을 때의 대비책(요청 시점 렌더, `@sheet/page.tsx`와 짝) | `this-month/this-month-view` |
+| `/seasonal/at/[yearMonth]` | 2a를 (연, 월)마다 미리 그린 내부 경로(`2026-11`). 해는 `STATIC_YEARS`(2026~공휴일 데이터 마지막 해). 메타데이터는 `/seasonal`의 것 | `seasonal/(this-month)/at/[yearMonth]/page.tsx` | `this-month/this-month-view`. 이번 달 달력·일별 카드의 오늘 표시만 요청 때 채운다(`.scratch/seasonal-static/spec.md`) |
 | `/seasonal/months` | 2b 열두 달 카드 목록 | `seasonal/(this-month)/months/page.tsx` | `month-timeline/months-index` |
 | `/seasonal/months/[month]` | 2b 그 달 상세 (1~12) | `seasonal/(this-month)/months/(detail)/[month]/page.tsx` | `month-timeline/month-view`, 레이아웃에 `month-timeline` |
 | `/seasonal/seasons` | 3a 계절 히어로 | `seasonal/(season)/seasons/page.tsx` | `seasons/seasons-hero` |
