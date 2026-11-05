@@ -10,7 +10,7 @@ import { FoodImage } from "../components/food-image"
 
 /**
  * 제철 회 화면(.scratch/sashimi/spec.md 3장): 그 달 제목과 품종 수, 회 카드 목록, 안내 한 줄.
- * 목록은 그 달이 제철인 회 품종 전부이고, 그 달이 추천 달인 품종은 앞에 두고 "이달 추천"을 붙인다.
+ * 목록은 그 달이 제철인 회 품종 전부이고, 이달 추천(isSashimiPick: 흔히 먹는 회 중 그 달이 절정인 것)은 앞에 두고 "이달 추천"을 붙인다.
  * 달 칩은 레이아웃(sashimi-month-chips)에 있다. 카드를 누르면 1i가 시트로 열린다(@sheet 가로채기). 먹음 기록은 하지 않는다.
  */
 export function SashimiView({ month }: { month: Month }) {

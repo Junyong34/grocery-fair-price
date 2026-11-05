@@ -19,7 +19,7 @@ export const ADDED_SASHIMI = [
 ] as const satisfies readonly FoodId[]
 
 /**
- * 달 → 회 품종 id(추천 달). 적은 순서는 첨부 순서이고, 추가 품종이 뒤에 온다.
+ * 달 → 회 품종 id(첨부의 달). "이달 추천" 표시는 이 목록과 친숙도·대표 달로 정한다(isSashimiPick). 적은 순서는 첨부 순서이고, 추가 품종이 뒤에 온다.
  * 화면의 그 달 목록은 sashimiInMonth가 제철 범위까지 넓혀 만든다.
  * 말쥐치·망둥어·밴댕이·능성어·불볼락은 첨부 달이 아니라 고친 앱 제철(food-season-corrections.json, 2026-11-03)을 따른다.
  */
@@ -122,25 +122,37 @@ export const SASHIMI_MONTHS: Readonly<Record<Month, readonly FoodId[]>> = {
 /** 회 화면에 나오는 품종 전부(첨부 48종 + 추가 7종). 처음 나온 달 순서. */
 export const SASHIMI_IDS: readonly FoodId[] = [...new Set(Object.values(SASHIMI_MONTHS).flat())]
 
-/** 그 달이 이 품종의 추천 달(첨부의 달, 추가 품종은 대표 달)인가. 화면에서 "추천" 표시에 쓴다. */
+/**
+ * "이달 추천" 표시. 친숙도 1~2(흔히 사 먹는 회) 가운데 그 달이 첨부의 달이거나 앱 대표 달(peak)인 품종.
+ * 첨부 달만 쓰면 11월 추천이 자바리·붉바리처럼 비싸고 드문 회뿐이라, 장보기 서비스의 "추천"과 맞지 않았다(2026-11-06).
+ * 제철 범위(months) 전부로 넓히면 한 달 목록 대부분에 붙어 표시가 의미를 잃어 대표 달까지만 본다.
+ * 친숙도 3 품종은 추천하지 않고 목록에만 남긴다.
+ */
 export function isSashimiPick(id: FoodId, month: number): boolean {
-  return SASHIMI_MONTHS[month as Month]?.includes(id) ?? false
+  const food = findFood(id)
+  if (!food || familiarity(id) > 2) return false
+  return (
+    (SASHIMI_MONTHS[month as Month]?.includes(id) ?? false) ||
+    (food.peak as readonly number[]).includes(month)
+  )
 }
 
 /**
- * 그 달 회 품종: 회 품종 가운데 그 달이 제철(food.months)이거나 추천 달인 것 전부.
- * 추천 달만 쓰면 품종마다 한 달에만 나와(11월에 방어·광어가 빠짐) 같은 사이트의 월별 제철과 어긋난다. SEO 감사 2026-11-04 F1.
- * 순서: 그 달 추천 품종이 앞(12월 방어처럼 그 달이 절정인 것을 먼저), 각 묶음 안은 친숙도 1→3, 같은 등급은 SASHIMI_MONTHS에 적은 순서.
+ * 그 달 회 품종: 회 품종 가운데 그 달이 제철(food.months)이거나 첨부 달인 것 전부.
+ * 첨부 달만 쓰면 품종마다 한 달에만 나와(11월에 방어·광어가 빠짐) 같은 사이트의 월별 제철과 어긋난다. SEO 감사 2026-11-04 F1.
+ * 순서: 이달 추천 가운데 첨부 달 품종(12월 방어처럼 그 달이 절정인 것), 대표 달로 더한 추천, 나머지 순. 각 묶음 안은 친숙도 1→3, 같은 등급은 그 달 첨부 품종을 적은 순서로 먼저, 나머지는 SASHIMI_IDS 순서.
  * 1~12 밖이면 빈 목록.
  */
 export function sashimiInMonth(month: number): readonly Food[] {
-  const picks: readonly FoodId[] = SASHIMI_MONTHS[month as Month] ?? []
-  const order = (id: FoodId) => (picks.includes(id) ? picks.indexOf(id) : picks.length + SASHIMI_IDS.indexOf(id))
+  const listed: readonly FoodId[] = SASHIMI_MONTHS[month as Month] ?? []
+  const order = (id: FoodId) => (listed.includes(id) ? listed.indexOf(id) : listed.length + SASHIMI_IDS.indexOf(id))
+  // 0: 첨부 달 추천, 1: 대표 달로 더한 추천, 2: 나머지
+  const rank = (id: FoodId) => (!isSashimiPick(id, month) ? 2 : listed.includes(id) ? 0 : 1)
   return SASHIMI_IDS.map((id) => findFood(id)!)
-    .filter((food) => picks.includes(food.id) || (food.months as readonly number[]).includes(month))
+    .filter((food) => listed.includes(food.id) || (food.months as readonly number[]).includes(month))
     .sort(
       (a, b) =>
-        Number(!picks.includes(a.id)) - Number(!picks.includes(b.id)) ||
+        rank(a.id) - rank(b.id) ||
         familiarity(a.id) - familiarity(b.id) ||
         order(a.id) - order(b.id)
     )

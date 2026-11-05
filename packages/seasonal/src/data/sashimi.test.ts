@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import { familiarity } from "./food-familiarity"
-import { findFood } from "./foods"
+import { findFood, type FoodId } from "./foods"
 import { MONTHS } from "./months"
 import { ADDED_SASHIMI, isSashimiPick, SASHIMI_IDS, SASHIMI_MONTHS, sashimiInMonth } from "./sashimi"
 
@@ -53,11 +53,12 @@ describe("sashimi", () => {
     }
   })
 
-  it("추천 품종 묶음과 나머지 묶음 안에서는 친숙도 1→3 순서다", () => {
+  it("추천(첨부 달·대표 달)과 나머지 묶음 안에서는 친숙도 1→3 순서다", () => {
     for (const month of MONTHS) {
-      for (const pick of [true, false]) {
+      const rank = (id: FoodId) => (!isSashimiPick(id, month) ? 2 : SASHIMI_MONTHS[month].includes(id) ? 0 : 1)
+      for (const group of [0, 1, 2]) {
         const levels = sashimiInMonth(month)
-          .filter((food) => isSashimiPick(food.id, month) === pick)
+          .filter((food) => rank(food.id) === group)
           .map((food) => familiarity(food.id))
         expect(levels, `${month}월`).toEqual([...levels].sort((a, b) => a - b))
       }
@@ -78,24 +79,39 @@ describe("sashimi", () => {
     expect(ids).toContain("longtooth-grouper")
   })
 
-  it("추천 달 표시는 첨부·대표 달(SASHIMI_MONTHS)에만 붙는다", () => {
-    expect(isSashimiPick("longtooth-grouper", 11)).toBe(true)
-    expect(isSashimiPick("yellowtail", 11)).toBe(false)
-    expect(isSashimiPick("yellowtail", 12)).toBe(true)
+  it("이달 추천은 친숙도 1~2 품종 가운데 그 달이 첨부 달이거나 대표 달(peak)인 것이다", () => {
+    for (const month of MONTHS) {
+      for (const food of sashimiInMonth(month)) {
+        const expected =
+          familiarity(food.id) <= 2 &&
+          (SASHIMI_MONTHS[month].includes(food.id) || (food.peak as readonly number[]).includes(month))
+        expect(isSashimiPick(food.id, month), `${month}월 ${food.id}`).toBe(expected)
+      }
+    }
   })
 
-  it("그 달 추천 품종이 앞이고, 각 묶음 안은 친숙도 1→3, 같은 등급은 적은 순서다", () => {
+  it("11월 추천은 비싼 바리류가 아니라 흔히 먹는 회다", () => {
+    expect(isSashimiPick("longtooth-grouper", 11)).toBe(false)
+    expect(isSashimiPick("red-spotted-grouper", 11)).toBe(false)
+    expect(isSashimiPick("olive-flounder", 11)).toBe(true)
+    expect(isSashimiPick("yellowtail", 12)).toBe(true)
+    expect(sashimiInMonth(12).slice(0, 3).map((food) => food.id)).toEqual(["pufferfish", "black-seabream", "yellowtail"])
+    const ids = sashimiInMonth(11).map((food) => food.id)
+    expect(ids.indexOf("olive-flounder")).toBeLessThan(ids.indexOf("longtooth-grouper"))
+  })
+
+  it("그 달 추천 품종이 앞이고, 각 묶음 안은 친숙도 1→3, 추천은 첨부 달 품종이 대표 달 품종보다 먼저다", () => {
     expect(sashimiInMonth(2).map((food) => food.id)).toEqual([
       "olive-flounder",
       "cod",
-      "halfbeak",
-      "redlip-mullet",
-      "banded-grouper",
-      "east-sea-hanchi",
       "red-seabream",
       "spanish-mackerel",
       "atka-mackerel",
       "yellowtail",
+      "halfbeak",
+      "redlip-mullet",
+      "banded-grouper",
+      "east-sea-hanchi",
     ])
   })
 
