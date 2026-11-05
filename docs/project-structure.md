@@ -82,6 +82,7 @@ import 경로:
 | 파일 | 내용 |
 |---|---|
 | `next.config.ts` | `cacheComponents: true`, `partialPrefetching: true`, `agentRules: false`(AGENTS.md를 루트 하나로) |
+| `vercel.json` | 서버 함수 지역 `hnd1`(도쿄). 가격 DB(Supabase `ap-northeast-1`) 옆에서 돌게 한다. 지정하지 않으면 기본 `iad1`(미국 동부)이라 동적 영역이 매 요청 미국을 왕복한다(.scratch/bundle-audit 이후 운영 측정, 2026-11-05). Vercel Root Directory가 `apps/web`라 여기 둔다 |
 | `proxy.ts` | `/seasonal/festivals` → 서울 날짜 기준 다가오는 명절로, `/seasonal/sashimi` → 이번 달 제철 회로 리다이렉트. `matcher`는 정적 문자열이어야 해서 경로를 직접 쓴다 |
 | `app/layout.tsx` | `<html lang="ko" data-mode="light">`, Pretendard(본문), Gowun Batang(`--font-serif-ko`, 제목), 사이트 기본 메타데이터, `Providers` |
 | `app/manifest.ts` | `/manifest.webmanifest`. 홈 화면 웹 앱 설치 정보(`shared/pwa.ts`): 장볼날, 시세 메인(`/`), 주소창 없는 창, 기존 브랜드 아이콘과 Oura 캔버스 색. `public/downloads/manifest.json`과 별개 |
