@@ -9,6 +9,7 @@ import { ScrollRow } from "@workspace/ui/components/scroll-row"
 import { routes } from "@/shared/routes"
 
 import { PillLink } from "../components/pill"
+import { SASHIMI_MONTHS_ID } from "./sashimi-chip-row"
 
 /**
  * 제철 회 달 칩 12개(.scratch/sashimi/spec.md 3장). 레이아웃에 있어 달을 바꿔도 가로 스크롤 위치가 남는다.
@@ -29,7 +30,7 @@ export function SashimiMonthChips() {
   }, [pathname])
 
   return (
-    <nav aria-label="달 고르기" className="mx-auto max-w-[720px]">
+    <nav id={SASHIMI_MONTHS_ID} aria-label="달 고르기" className="mx-auto max-w-[720px]">
       <ScrollRow
         ref={scroller}
         className="gap-1.5 px-[18px] py-2 lg:grid lg:grid-cols-12 lg:px-6"

@@ -70,6 +70,7 @@
 | 2a 이달 | 루트 | hide-on-scroll | 탭 줄. 월 레일은 지금처럼 오른쪽 옆 |
 | 2b 열두 달 · 그 달 | 루트 | hide-on-scroll | 탭 줄 + (그 달) 달 칩 |
 | 3a 히어로 · 계절 상세 | 루트 | hide-on-scroll | 탭 줄 + (상세) 계절 칩 |
+| 제철 회 | 루트 | hide-on-scroll | 탭 줄 + 달 칩 |
 | 1g 명절 | 루트 | hide-on-scroll | 탭 줄 + 명절 칩 |
 | P2 품종 검색 | 검색 | pinned | 없음 |
 | P3 품종 상세 | 하위 | pinned | 섹션 칩(시세 · 어디서 · 추이) |
