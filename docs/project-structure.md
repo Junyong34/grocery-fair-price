@@ -451,6 +451,8 @@ grocery-price/
 
 형식은 `docs/agents/issue-tracker.md`, 라벨은 `docs/agents/triage-labels.md`를 따른다.
 
+시세 카탈로그 확장의 검토 초안은 `.scratch/catalog-evolution/spec.md`에 있다(운영자 1인 전제, 코드 카탈로그 유지). `plans/01`~`06`은 규격별 판정·검색, 코드 카탈로그 변경 흐름, 원천 검토, 제철 연결, 읽기 전용 검토 CLI, 판정 묶음 공개·백업 계획이며 `review.md`는 타당성과 기각한 안(DB 원본·운영 어드민)을 기록한다. 구현 전 확인 단계로, 기존 확정 명세를 대체하지 않는다.
+
 ## 12. 문서 지도
 
 | 알고 싶은 것 | 문서 |
