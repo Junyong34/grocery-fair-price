@@ -5,6 +5,7 @@ import { FOODS, type FoodCategory } from "../data/foods"
 import { MONTHS, type Month } from "../data/months"
 import { SEASONS } from "../data/seasons"
 import { layoutDef, LAYOUTS } from "./layouts"
+import { decodeSpecJson } from "./spec-codec"
 import { MONTH_LABEL_FONTS, MONTH_LABEL_FRAMES, MONTH_LABEL_PALETTES, MONTH_LABEL_SIZES, PRINT_MONTH_LABELS } from "./month-label"
 
 // PDF 인쇄 사양(.scratch/calendar-print/spec.md "데이터 모양"). 같은 사양이면 언제나 같은 PDF가 나온다.
@@ -268,20 +269,12 @@ export function pageCount(spec: PrintSpec): number {
   return 1
 }
 
-/** URL 쿼리에 넣는 모양(UTF-8 JSON의 base64url). */
-export function encodeSpec(spec: PrintSpec): string {
-  const bytes = new TextEncoder().encode(JSON.stringify(spec))
-  return btoa(String.fromCharCode(...bytes))
-    .replaceAll("+", "-")
-    .replaceAll("/", "_")
-    .replace(/=+$/, "")
-}
+/** URL 쿼리 모양은 spec-codec.ts에 있다. 여기서는 encodeSpec을 다시 내보내고, 디코딩한 값을 검증한다. */
+export { encodeSpec } from "./spec-codec"
 
 export function decodeSpec(encoded: string): PrintSpec | Error {
   try {
-    const binary = atob(encoded.replaceAll("-", "+").replaceAll("_", "/"))
-    const json = new TextDecoder().decode(Uint8Array.from(binary, (char) => char.charCodeAt(0)))
-    return parsePrintSpec(JSON.parse(json))
+    return parsePrintSpec(decodeSpecJson(encoded))
   } catch (error) {
     return error instanceof Error ? error : new Error(String(error))
   }

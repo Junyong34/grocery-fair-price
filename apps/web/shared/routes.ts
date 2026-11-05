@@ -3,7 +3,9 @@
 
 import type { Festival } from "@workspace/seasonal/data/festivals"
 import type { Season } from "@workspace/seasonal/data/seasons"
-import { encodeSpec, type Paper, type PrintSpec, type PublishedPaper } from "@workspace/seasonal/print/spec"
+// 인쇄 URL 코덱만 가져온다. print/spec은 zod·품종 데이터를 싣고 있어 여기서 값을 import하면 모든 페이지 번들에 들어간다.
+import { encodeSpec } from "@workspace/seasonal/print/spec-codec"
+import type { Paper, PrintSpec, PublishedPaper } from "@workspace/seasonal/print/spec"
 
 export const routes = {
   /** 서비스 메인(P1 시세 메인). 로고와 하단 내비 "시세"가 여기로 간다. */
