@@ -90,6 +90,30 @@
 
 확인 2, 3이 안 되면 구조를 다시 정한다. 대안은 `/seasonal/at/[yearMonth]`를 별도 라우트 대신 `(this-month)` 안의 `page.tsx`가 `params` 없이 `proxy`가 넣은 요청 헤더를 읽는 방식이지만, 그러면 다시 동적이 되므로 마지막 수단이다.
 
+### 5.1 프로토타입 결과 (2026-11-05)
+
+버릴 코드로 확인했다(되돌림). 만든 것:
+- `app/seasonal/(this-month)/at/[yearMonth]/page.tsx`: `generateStaticParams` 2026-01~12, 오늘은 그 달 1일로 고정
+- `proxy.ts`의 `/seasonal` → `/seasonal/at/<서울 연-월>` rewrite
+
+`next dev`와 `next build && next start`에서 375 크기로 확인했다.
+
+| # | 결과 | 근거 |
+|---|---|---|
+| 정적화 | **된다.** 2a 본문 전체가 프리렌더에 들어간다 | 같은 빌드 비교: 지금 `/seasonal`은 프리렌더 HTML 16K에 동적 구멍 1개(본문 전체), 히어로 없음. 프로토 `/seasonal/at/2026-11`은 969K에 구멍 0개, postponed 13B, "지금은 11월" 포함, `<img>` 782개 |
+| 2 | **통과.** 품종 클릭 → 1i 시트가 2a 위에 뜬다. 주소는 `/seasonal/foods/napa-cabbage` | dev·prod 둘 다. 뒤로 가기 하면 화면에서 시트가 닫힌다. 다만 dialog 노드가 DOM에 남는데, 이것이 지금 코드에서도 같은지는 비교하지 않았다 |
+| 3 | **통과.** 클라이언트 이동과 prefetch 응답 모두 rewrite된다 | RSC 응답 헤더 `x-nextjs-rewritten-path: /seasonal/at/2026-11`. `/seasonal/months`에 들어가면 `/seasonal?_rsc` prefetch(54KB)가 오고, "이달" 탭을 누르면 추가 요청 없이 바로 이동한다. 주소는 `/seasonal` |
+| 1 | **문제 있음.** 목록 밖 (연, 월)은 요청 때 그리는데, 두 번째 요청이 **500**이었다 | 서버 로그: `Route "/seasonal/at/[yearMonth]": … usePathname() in a Client Component outside of <Suspense>`(`shared/shell/site-nav.tsx`, digest `CLIENT_HOOK_DYNAMIC`). 런타임 프리렌더(ISR)에서 공유 셸의 `usePathname()`이 막힌다. 첫 요청은 200(571ms), 세 번째는 200이었다 |
+| 형식 오류 | `abc`는 200 + 본문 없는 not-found로 끝난다 | `notFound()`가 `<Suspense>` 안에서 불려 상태 코드가 이미 200으로 나간 뒤다. 2b 등 같은 패턴의 화면과 같다 |
+| 4·5·6 | 확인하지 않았다 | 운영 배포가 필요하다 |
+
+로컬 `next start`에서 `/seasonal/at/2026-11`을 압축 요청하면 완료까지 약 300ms였다(`/seasonal/months/3`은 20ms). 정적 파일을 매번 즉석에서 압축하는 Node 서버 비용으로 보이며, CDN에서는 다를 것이다. 운영 값은 미리보기 배포에서 잰다.
+
+**정한 것:**
+- 3.1 구조를 그대로 간다. 확인 2·3이 통과했다.
+- 3.4를 바꾼다. 목록 밖 (연, 월)을 런타임에 그리게 두지 않는다. 방법은 둘이다. (a) `generateStaticParams`가 공휴일 데이터가 있는 해(현재 `@hyunbinseo/holidays-kr` 5.2027.x, 2027년까지)를 모두 덮고, proxy는 범위 밖이면 마지막 해로 고정한다. (b) `site-nav`의 `usePathname()`을 `<Suspense>`로 감싸 런타임 프리렌더가 되게 한다. (a)가 범위가 작다. (b)는 다른 동적 params 화면(`/prices/[variety]` 목록 밖 품종)에도 같은 위험이 있는지 따로 확인할 가치가 있다(범위 밖, 7장에 추가).
+- 오늘 표시 구멍(3.2)을 넣으면 구멍이 생긴다. 운영의 2b(구멍 80개)처럼 그 구멍을 채우는 함수 호출이 요청마다 붙는다. 셸에 히어로와 본문이 다 있으므로 LCP에는 영향이 없다. 구멍은 **이번 달 섹션에만** 둬서 postponed 크기를 줄인다(3.2의 선택지를 이쪽으로 정한다).
+
 ## 6. 완료 기준
 
 - 운영에서 `/seasonal` HTML의 첫 바이트가 200ms 이하다. 셸에 히어로 제목 "지금은 N월"과 12개월 본문이 들어 있다(본문 완료가 셸 도착과 거의 같다). 오늘 표시 구멍은 별도로 채워져도 된다.
@@ -104,6 +128,7 @@
 - HTML 크기 자체 줄이기(`<img>` 782개, 링크 809개, RSC 606KB). 정적이 되면 문제가 줄지만 남는다. 예: 이번 달에서 먼 달은 그림을 줄이거나 화면에 들어올 때 그리기.
 - `/prices/[variety]` 속도(`hnd1` 반영 후 재측정).
 - 회사망 프록시 환경.
+- 공유 셸 `shared/shell/site-nav.tsx`의 `usePathname()`이 `<Suspense>` 밖이라 런타임 프리렌더(목록 밖 params)에서 500이 날 수 있다(5.1). 다른 동적 params 화면에서도 재현되는지 확인한다.
 
 ## 8. 작업 순서 (이슈로 나눌 때)
 
