@@ -262,7 +262,9 @@ export const PRICE_COPY = {
     /** stale의 "N주 전"을 채우기 전(정적 셸)에 보이는 글 */
     staleOn: (surveyedOn: string) => `마지막 조사 ${monthDay(surveyedOn)}`,
     staleNote: "최근 조사가 없어 지금과 다를 수 있어요",
-    fewSamples: (n: number) => `조사한 곳이 ${n}곳뿐이라 참고만 하세요`,
+    /** 표본 적음: 그날 조사한 곳이 같은 규격의 평소(최근 182일 중앙값)의 절반에 못 미침. 절대 수가 아니라 평소 대비라 "N곳뿐"이라 쓰지 않는다. */
+    fewSamples: (n: number) => `평소보다 적은 ${n}곳 조사`,
+    fewSamplesNote: "조사한 곳이 평소보다 적어 실제 시세와 다를 수 있어요. 판정은 참고로만 봐 주세요.",
     rangeTitle: (surveyedOn: string, n: number, basis: QuoteBasis) =>
       isAverageBasis(basis)
         ? `${monthDay(surveyedOn)} 조사한 ${basis.scope} 가격`
