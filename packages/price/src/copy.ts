@@ -265,6 +265,8 @@ export const PRICE_COPY = {
     usualPendingNote: "조사된 시세와 가격 흐름은 볼 수 있어요",
     stale: (surveyedOn: string, ago: string) =>
       `마지막 조사 ${monthDay(surveyedOn)} · ${ago}`,
+    /** stale의 "N주 전"을 채우기 전(정적 셸)에 보이는 글 */
+    staleOn: (surveyedOn: string) => `마지막 조사 ${monthDay(surveyedOn)}`,
     staleNote: "최근 조사가 없어 지금과 다를 수 있어요",
     fewSamples: (n: number) => `조사한 곳이 ${n}곳뿐이라 참고만 하세요`,
     rangeTitle: (surveyedOn: string, n: number, basis: QuoteBasis) =>

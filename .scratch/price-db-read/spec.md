@@ -29,11 +29,11 @@ Cache Components에서는 DB 읽기가 `"use cache"` 안이거나 `<Suspense>` �
 |---|---|---|
 | `listVarieties` | `"use cache"` + `cacheLife("hours")` | 시세 · 판정은 하루 1~2번 바뀐다 |
 | `searchIndex` | `"use cache"` + `cacheLife("hours")`, 안의 별칭 · 카테고리 읽기만 `cacheLife("days")` | 카탈로그는 드물게 바뀌지만 품종은 목록(hours)에서 뽑는다. 중첩 캐시는 바깥 `cacheLife`가 이기므로 바깥을 days로 두면 품종이 며칠 묵는다(03에서 고침) |
-| `getVariety` | 캐시 없음. React `cache()`로 한 요청 안에서만 한 번 읽는다 | 상세는 그때그때 조회. `generateMetadata`와 본문이 같은 요청에서 두 번 부른다 |
+| `getVariety` | `"use cache"` + `cacheLife("hours")` (2026-11-05 변경, 전에는 캐시 없음) | 요청마다 읽으면 P3 본문 전체가 동적이라 셸이 비었고, 운영에서 콜드 스타트 때 1~3초가 걸렸다. 목록과 같은 수명이라 두 화면이 같은 시점의 값을 보인다. 배치가 바꾼 값은 최대 hours만큼 늦게 보인다 |
 | `featuredIds` | 코드 상수 | |
-| "오늘"(서울 날짜) | 지금처럼 요청 때 계산 | `getSeoulToday()` |
+| "오늘"(서울 날짜) | 요청 때 계산 | `getSeoulToday()`. P3에서는 데이터가 오래됐을 때(`stale`)의 "N주 전" 배지만 `<Suspense>` 안에서 기다린다(`VerdictCard`의 `StaleAgo`). 그 밖의 P3는 정적이다 |
 
-- `/prices/[variety]`의 `generateStaticParams`는 `featuredIds`만 돌려준다 (최소 1개 규칙). 빌드가 상세 때문에 DB를 부르지 않는다. 나머지 품종은 요청 때 그린다.
+- `/prices/[variety]`의 `generateStaticParams`는 `listVarieties()`의 모든 품종을 돌려준다(2026-11-05 변경, 전에는 `featuredIds`만). 빌드가 품종마다 상세를 한 번씩 읽는다(약 130쪽, 1h 재검증). 목록에 없는 id는 요청 때 그리고 판정이 없으면 not-found다.
 - 목록 캐시 때문에 빌드는 DB를 읽는다. Vercel Production · Preview 환경변수에 `WEB_DATABASE_URL`이 있어야 한다 (사람 작업). 판정이 0행이어도 빈 목록으로 빌드된다.
 
 ## 3. 파일 배치 (데이터 흐름 패턴)

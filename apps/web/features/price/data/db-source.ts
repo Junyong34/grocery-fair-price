@@ -1,7 +1,6 @@
 import "server-only"
 
 import { cacheLife } from "next/cache"
-import { cache } from "react"
 
 import type { SearchIndex, VarietyDetail, VarietySummary } from "@workspace/price/types"
 
@@ -39,8 +38,13 @@ async function searchExtras() {
   return readSearchExtras(db())
 }
 
-// 상세는 캐시하지 않고 요청마다 읽는다. generateMetadata와 본문이 같은 요청에서 부르므로 cache()로 한 번만 읽는다.
-const getVariety = cache((id: string): Promise<VarietyDetail | null> => readVariety(db(), id))
+// 상세도 목록과 같은 수명으로 캐시한다(2026-11-05). 요청마다 읽으면 P3 본문 전체가 동적이라 셸이 비고, 콜드 스타트 때 1~3초가 걸렸다.
+// 캐시하면 P3가 빌드 때 미리 그려진다. 대신 배치가 바꾼 값은 최대 hours만큼 늦게 보인다(목록과 같다). generateMetadata와 본문이 같은 키로 부른다.
+async function getVariety(id: string): Promise<VarietyDetail | null> {
+  "use cache"
+  cacheLife("hours")
+  return readVariety(db(), id)
+}
 
 export const dbSource: PriceSource = {
   listVarieties,

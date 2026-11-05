@@ -3,7 +3,6 @@ import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
 import { PRICE_COPY } from "@workspace/price/copy"
-import { isoDate } from "@workspace/price/format"
 
 import { getPriceSource } from "@/features/price/data/price-source"
 import { DetailView } from "@/features/price/variety-detail/detail-view"
@@ -11,15 +10,14 @@ import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
 import { breadcrumb, JsonLd } from "@/shared/seo/json-ld"
 import { varietySeo } from "@/shared/seo/titles"
-import { getSeoulToday } from "@/shared/today"
 
 type Params = PageProps<"/prices/[variety]">["params"]
 
-// 빌드 때는 자주 사는 품종만 만든다(Cache Components는 최소 1개를 요구한다). 나머지 품종은 요청 때 그린다.
-// 판정이 없는 id는 notFound()로 막는다.
+// 판정이 있는 품종을 모두 빌드 때 그린다(상세 읽기가 캐시라 본문이 정적 셸에 들어간다). 목록에 없는 id는 요청 때 그리고,
+// 판정이 없으면 notFound()로 막는다.
 export async function generateStaticParams() {
-  const ids = await getPriceSource().featuredIds()
-  return ids.map((variety) => ({ variety }))
+  const varieties = await getPriceSource().listVarieties()
+  return varieties.map(({ id }) => ({ variety: id }))
 }
 
 export async function generateMetadata(props: PageProps<"/prices/[variety]">): Promise<Metadata> {
@@ -32,7 +30,7 @@ export async function generateMetadata(props: PageProps<"/prices/[variety]">): P
   })
 }
 
-// P3 품종 상세. "오늘"(서울)로 조사일이 얼마나 지났는지 쓰므로 요청 시점에 그린다.
+// P3 품종 상세. 본문은 정적이다. "오늘"(서울)은 데이터가 오래됐을 때의 "N주 전" 배지만 요청 때 채운다(VerdictCard).
 export default function Page(props: PageProps<"/prices/[variety]">) {
   return (
     <Suspense fallback={<div className="min-h-svh" aria-busy />}>
@@ -42,12 +40,12 @@ export default function Page(props: PageProps<"/prices/[variety]">) {
 }
 
 async function Variety({ params }: { params: Params }) {
-  const [detail, today] = await Promise.all([getPriceSource().getVariety((await params).variety), getSeoulToday()])
+  const detail = await getPriceSource().getVariety((await params).variety)
   if (!detail) notFound()
   return (
     <>
       <JsonLd data={breadcrumb([{ name: PRICE_COPY.catalog.title, path: routes.price.varieties }, { name: varietySeo(detail).title, path: routes.price.variety(detail.id) }])} />
-      <DetailView detail={detail} today={isoDate(today)} />
+      <DetailView detail={detail} />
     </>
   )
 }

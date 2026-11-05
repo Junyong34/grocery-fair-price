@@ -1,4 +1,5 @@
 import { CalendarClock } from "lucide-react"
+import { Suspense } from "react"
 
 import { cn } from "@workspace/ui/lib/utils"
 
@@ -7,8 +8,10 @@ import {
   VERDICT_WORD,
   verdictTrendDiff,
 } from "@workspace/price/copy"
-import { agoLabel, daysBetween, won } from "@workspace/price/format"
+import { agoLabel, daysBetween, isoDate, won } from "@workspace/price/format"
 import type { VarietyDetail } from "@workspace/price/types"
+
+import { getSeoulToday } from "@/shared/today"
 
 import { VERDICT_TONE } from "../components/verdict-tone"
 
@@ -19,13 +22,7 @@ const COPY = PRICE_COPY.detail
  * 판정 전이면 회색 "판정 전"과 평소가 "자료 없음". 데이터가 오래됐으면 조사일 배지와 흐린 판정,
  * 표본이 적으면 점선 상자와 "?".
  */
-export function VerdictCard({
-  detail,
-  today,
-}: {
-  detail: VarietyDetail
-  today: string
-}) {
+export function VerdictCard({ detail }: { detail: VarietyDetail }) {
   const { verdict } = detail
   const tone = VERDICT_TONE[verdict.kind]
   const none = verdict.kind === "none"
@@ -41,10 +38,10 @@ export function VerdictCard({
       {detail.stale && (
         <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-canvas/80 px-2.5 py-1 text-xs font-semibold text-stone">
           <CalendarClock aria-hidden size={14} />
-          {COPY.stale(
-            detail.surveyedOn,
-            agoLabel(daysBetween(detail.surveyedOn, today))
-          )}
+          {/* "N주 전"은 오늘(서울)에 달려 요청 때 채운다. 그 전에는 조사일만 보인다. 이 배지 말고는 P3에 동적인 곳이 없다. */}
+          <Suspense fallback={COPY.staleOn(detail.surveyedOn)}>
+            <StaleAgo surveyedOn={detail.surveyedOn} />
+          </Suspense>
         </span>
       )}
       <div
@@ -146,4 +143,9 @@ function PriceCell({
       </dd>
     </div>
   )
+}
+
+async function StaleAgo({ surveyedOn }: { surveyedOn: string }) {
+  const today = await getSeoulToday()
+  return COPY.stale(surveyedOn, agoLabel(daysBetween(surveyedOn, isoDate(today))))
 }

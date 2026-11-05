@@ -26,15 +26,9 @@ const SECTIONS = [
 /**
  * P3 품종 상세. 위는 판정(지금이 비싼 시기인가: 시세 대 평소가), 아래 "어디서 얼마에 팔까"는 장소 비교(이 가게가 비싸게 파나).
  * "내가 본 가격 적기"는 범위 막대 바로 아래(시세 구간 안)에 둔다. 매장에서 가격표를 보고 비교하는 게 이 화면의 핵심이라 첫 화면에 닿게 하고,
- * 적으면 바로 위 범위 막대에 "내가 본" 핀이 꽂혀 입력과 결과가 한 화면에 보인다. 판정 전(평소가 없음)이면 뺀다. today는 서울 기준 오늘(데이터가 오래됐는지 "2주 전"을 쓴다).
+ * 적으면 바로 위 범위 막대에 "내가 본" 핀이 꽂혀 입력과 결과가 한 화면에 보인다. 판정 전(평소가 없음)이면 뺀다.
  */
-export function DetailView({
-  detail,
-  today,
-}: {
-  detail: VarietyDetail
-  today: string
-}) {
+export function DetailView({ detail }: { detail: VarietyDetail }) {
   // 제철달력에 같은 id 품종이 있으면 제철 시기로 잇는다(제철 품종 상세의 "오늘 시세 보기"와 짝).
   const food = findFood(detail.id)
   return (
@@ -50,7 +44,7 @@ export function DetailView({
           id={P3_SECTIONS.price}
           className="flex min-w-0 scroll-mt-28 flex-col gap-7"
         >
-          <VerdictCard detail={detail} today={today} />
+          <VerdictCard detail={detail} />
           <RangeBar detail={detail} />
           {detail.usual != null && (
             <MyPriceSection detail={detail} id={P3_SECTIONS.myPrice} />
