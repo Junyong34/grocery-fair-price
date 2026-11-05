@@ -18,9 +18,13 @@ import { VERDICT_TONE } from "../components/verdict-tone"
 const COPY = PRICE_COPY.detail
 
 /**
- * P3 판정 카드(판정 색 배경): 큰 판정, 평소보다 몇 %, 지금 시세 · 평소가 두 칸.
- * 판정 전이면 회색 "판정 전"과 평소가 "자료 없음". 데이터가 오래됐으면 조사일 배지와 흐린 판정,
- * 표본이 적으면 "평소보다 적은 N곳 조사" 배지와 참고 안내. 기호("?")나 점선만으로는 뜻이 전해지지 않아 글로 쓴다.
+ * P3 판정 카드(판정 색 배경): 큰 판정, 평소보다 몇 %, 판정 주의, 지금 시세 · 평소가 두 칸.
+ * 판정 전이면 회색 "판정 전"과 평소가 "자료 없음".
+ * 판정 주의(데이터 오래됨 · 표본 적음)는 판정 바로 아래 Notice로 모은다. 기호("?")·점선만으로는 뜻이 전해지지 않아 제목 + 설명 글로 쓴다.
+ * 오래됐으면 판정도 흐리게 한다.
+ *
+ * 글씨는 세 층이다. 판정(44 · 17 · 13px, 판정 색) / 주의(13px semibold ink · 12px caption) / 금액 칸(12 · 22 · 12px).
+ * 주의와 금액 칸은 같은 크림 면(bg-canvas/80)을 써서 판정 색 위의 글씨 색을 판정 블록 하나로 줄인다.
  */
 export function VerdictCard({ detail }: { detail: VarietyDetail }) {
   const { verdict } = detail
@@ -35,21 +39,6 @@ export function VerdictCard({ detail }: { detail: VarietyDetail }) {
         tone.wash
       )}
     >
-      {few && !detail.stale && (
-        <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-canvas/80 px-2.5 py-1 text-xs font-semibold text-stone">
-          <Info aria-hidden size={14} />
-          {COPY.fewSamples(detail.sampleSize)}
-        </span>
-      )}
-      {detail.stale && (
-        <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-canvas/80 px-2.5 py-1 text-xs font-semibold text-stone">
-          <CalendarClock aria-hidden size={14} />
-          {/* "N주 전"은 오늘(서울)에 달려 요청 때 채운다. 그 전에는 조사일만 보인다. 이 배지 말고는 P3에 동적인 곳이 없다. */}
-          <Suspense fallback={COPY.staleOn(detail.surveyedOn)}>
-            <StaleAgo surveyedOn={detail.surveyedOn} />
-          </Suspense>
-        </span>
-      )}
       <div
         className={cn(
           "flex flex-col gap-1",
@@ -75,8 +64,23 @@ export function VerdictCard({ detail }: { detail: VarietyDetail }) {
           </p>
         )}
       </div>
-      {detail.stale && <p className="text-sm text-stone">{COPY.staleNote}</p>}
-      {few && <p className="text-sm text-stone">{COPY.fewSamplesNote}</p>}
+      {(detail.stale || few) && (
+        <div className="flex flex-col gap-2">
+          {detail.stale && (
+            <Notice
+              icon={<CalendarClock aria-hidden size={16} />}
+              title={
+                // "N주 전"은 오늘(서울)에 달려 요청 때 채운다. 그 전에는 조사일만 보인다. 이 줄 말고는 P3에 동적인 곳이 없다.
+                <Suspense fallback={COPY.staleOn(detail.surveyedOn)}>
+                  <StaleAgo surveyedOn={detail.surveyedOn} />
+                </Suspense>
+              }
+              body={COPY.staleNote}
+            />
+          )}
+          {few && <Notice icon={<Info aria-hidden size={16} />} title={COPY.fewSamples(detail.sampleSize)} body={COPY.fewSamplesNote(!none)} />}
+        </div>
+      )}
       <dl className="grid grid-cols-2 gap-2">
         <PriceCell
           term={COPY.nowPrice}
@@ -101,6 +105,19 @@ export function VerdictCard({ detail }: { detail: VarietyDetail }) {
         )}
       </dl>
     </section>
+  )
+}
+
+/** 판정 주의 한 줄: 아이콘 · 제목(무슨 일인지) · 설명(그래서 어떻게 보면 되는지). 금액 칸과 같은 크림 면이다. */
+function Notice({ icon, title, body }: { icon: React.ReactNode; title: React.ReactNode; body: string }) {
+  return (
+    <div role="note" className="flex gap-2 rounded-2xl bg-canvas/80 px-3 py-2.5">
+      <span className="mt-px shrink-0 text-stone">{icon}</span>
+      <p className="flex flex-col gap-0.5">
+        <span className="text-[13px] leading-snug font-semibold text-ink">{title}</span>
+        <span className="text-xs leading-relaxed text-caption">{body}</span>
+      </p>
+    </div>
   )
 }
 
