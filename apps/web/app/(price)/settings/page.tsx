@@ -1,5 +1,3 @@
-import { Suspense } from "react"
-
 import { PriceRecordSettings } from "@/features/price/settings/price-record-settings"
 import { EatenRecordSetting, SeasonalDisplaySettings } from "@/features/seasonal/settings/display-settings"
 import { SETTINGS_COPY } from "@/features/settings/copy"
@@ -21,11 +19,7 @@ export default function Page() {
   return (
     <TodayProvider today={getSeoulToday()}>
       <SettingsView
-        display={
-          <Suspense>
-            <SeasonalDisplaySettings />
-          </Suspense>
-        }
+        display={<SeasonalDisplaySettings />}
         records={
           <>
             <PriceRecordSettings />

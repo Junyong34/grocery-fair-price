@@ -44,7 +44,8 @@ export function ClearRow({
           {label}
           <SettingWhere>{where}</SettingWhere>
         </span>
-        {count !== null && <span className="text-xs text-stone">{count}개 저장됨</span>}
+        {/* 불러오기 전에도 줄 높이를 잡아 둬 개수가 나타날 때 행이 밀리지 않게 한다. */}
+        <span className="min-h-4 text-xs text-stone">{count !== null && `${count}개 저장됨`}</span>
       </span>
       <Button variant="outline" size="sm" disabled={count === 0} onClick={confirm}>
         지우기
