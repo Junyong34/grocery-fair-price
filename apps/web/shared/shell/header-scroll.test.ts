@@ -38,6 +38,22 @@ describe("headerScrollStep", () => {
     expect(run([0, 300, 2000, 2040, 2000])).toBe(false)
   })
 
+  it("문서가 짧아져 위치가 끌려 올라가면 숨은 채다", () => {
+    const hidden = [0, 3000, 6000].reduce((state, y) => headerScrollStep(state, y, 7000), INITIAL_HEADER_SCROLL)
+    expect(headerScrollStep(hidden, 5486, 5486).visible).toBe(false)
+  })
+
+  it("끌려 올라간 뒤에는 그 자리부터 다시 재서, 위로 올리면 나온다", () => {
+    const hidden = [0, 3000, 6000].reduce((state, y) => headerScrollStep(state, y, 7000), INITIAL_HEADER_SCROLL)
+    const clamped = headerScrollStep(hidden, 5486, 5486)
+    expect(headerScrollStep(clamped, 5470, 5486).visible).toBe(true)
+  })
+
+  it("문서가 짧아져도 맨 위까지 끌려 올라가면 보인다", () => {
+    const hidden = [0, 300, 600].reduce((state, y) => headerScrollStep(state, y, 2000), INITIAL_HEADER_SCROLL)
+    expect(headerScrollStep(hidden, 0, 0).visible).toBe(true)
+  })
+
   it("맨 위 위로 튕기는 음수 위치는 맨 위로 본다", () => {
     expect(run([0, 300, -20])).toBe(true)
   })

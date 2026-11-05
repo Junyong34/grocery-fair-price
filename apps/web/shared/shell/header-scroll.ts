@@ -19,10 +19,12 @@ export const INITIAL_HEADER_SCROLL: HeaderScrollState = { visible: true, lastY: 
 /**
  * 새 스크롤 위치 y로 다음 상태를 낸다. maxY는 문서 끝 위치(문서 높이 − 화면 높이)다.
  * iOS가 맨 위 · 맨 끝을 넘어 튕기는 동안의 위치는 무시한다(끝에서 헤더가 다시 나오는 깜빡임을 막는다).
+ * 지난 위치가 지금 문서 끝을 넘으면 문서가 짧아져(짧은 달로 넘긴 경우 등) 브라우저가 위치를 끌어올린 것이다. 위로 스크롤한 것이 아니므로 그 자리부터 다시 잰다.
  */
 export function headerScrollStep(state: HeaderScrollState, y: number, maxY: number): HeaderScrollState {
   if (y <= ALWAYS_VISIBLE_TOP) return { visible: true, lastY: Math.max(0, y), anchorY: Math.max(0, y) }
   if (y > maxY) return state
+  if (state.lastY > maxY) return { visible: state.visible, lastY: y, anchorY: y }
   const goingDown = y > state.lastY
   const wasGoingDown = state.lastY > state.anchorY
   // 방향이 바뀌면 바뀐 지점(lastY)부터 다시 잰다.
