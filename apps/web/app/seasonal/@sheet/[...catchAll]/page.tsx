@@ -3,3 +3,6 @@
 export default function CatchAll() {
   return null
 }
+
+// 달 페이지(instant = false)와 함께 렌더링되는 슬롯이다. 슬롯까지 빼야 달 페이지의 params 경고가 사라진다. null만 그려 기다릴 것이 없다.
+export const instant = false

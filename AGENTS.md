@@ -171,7 +171,7 @@ Add it to the catalog in `shared/analytics/events.ts`, send only with `track()` 
 </important>
 
 <important if="you are adding or changing animation or transitions">
-CSS keyframes for small effects, `motion` for drag, spring and layout animation, React `<ViewTransition>` only for the three spec'd transitions (CSS in `apps/web/app/globals.css`). Every animation ends instantly under `prefers-reduced-motion`.
+CSS keyframes for small effects, `motion` for drag, spring and layout animation, React `<ViewTransition>` only for the two spec'd transitions (CSS in `apps/web/app/globals.css`). Every animation ends instantly under `prefers-reduced-motion`.
 </important>
 
 <important if="you are opening a bottom sheet or dialog">

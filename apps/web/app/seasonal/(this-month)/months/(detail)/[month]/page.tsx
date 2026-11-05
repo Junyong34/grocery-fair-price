@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { Suspense } from "react"
 
 import { isMonth, MONTHS, type Month } from "@workspace/seasonal/data/months"
 import { seasonOfMonth } from "@workspace/seasonal/data/seasons"
@@ -11,7 +10,9 @@ import { routes } from "@/shared/routes"
 import { breadcrumb, JsonLd } from "@/shared/seo/json-ld"
 import { monthSeo, monthsIndexSeo } from "@/shared/seo/titles"
 
-type Params = PageProps<"/seasonal/months/[month]">["params"]
+// 달을 바꿀 때는 새 달이 준비될 때까지 지금 달을 그대로 둔다. 페이지에 Suspense 대체 화면을 두면 그 순간 문서가 짧아져
+// 스크롤이 위로 끌려갔다가 돌아온다(고정 줄 상태에서 페이지 상단이 비친다). 열두 달 모두 정적이라 기다림은 짧다.
+export const instant = false
 
 export function generateStaticParams() {
   return MONTHS.map((month) => ({ month: String(month) }))
@@ -35,17 +36,9 @@ export async function generateMetadata(
   })
 }
 
-// params는 URL 데이터라 <Suspense> 밖에서 읽으면 이동이 즉시 일어나지 않는다(instant navigation 검사).
-// 페이지 틀은 바로 보내고, params를 쓰는 부분만 Suspense 안에 둔다.
-export default function Page(props: PageProps<"/seasonal/months/[month]">) {
-  return (
-    <Suspense fallback={<div className="min-h-svh" aria-busy />}>
-      <Month params={props.params} />
-    </Suspense>
-  )
-}
-
-async function Month({ params }: { params: Params }) {
+export default async function Page({
+  params,
+}: PageProps<"/seasonal/months/[month]">) {
   const { month } = await params
   if (!isMonth(month)) notFound()
   const m = Number(month) as Month
