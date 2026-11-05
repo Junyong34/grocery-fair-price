@@ -33,7 +33,7 @@ export function SashimiMonthChips() {
     <nav id={SASHIMI_MONTHS_ID} aria-label="달 고르기" className="mx-auto max-w-[720px]">
       <ScrollRow
         ref={scroller}
-        className="gap-1.5 px-[18px] py-2 lg:grid lg:grid-cols-12 lg:px-6"
+        className="gap-1.5 px-[18px] pt-2 pb-3 lg:grid lg:grid-cols-12 lg:px-6"
         previousLabel="이전 달 보기"
         nextLabel="다음 달 보기"
       >

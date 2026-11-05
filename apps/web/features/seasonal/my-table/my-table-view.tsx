@@ -110,7 +110,7 @@ export function MyTableView() {
       />
 
       <section aria-label="제철 목록" className="mt-6 lg:mt-0">
-        <div className="sticky top-14 z-(--z-sticky) -mx-[18px] flex flex-col gap-3 bg-canvas/94 px-[18px] py-3 backdrop-blur lg:mx-0 lg:px-0 lg:pt-0">
+        <div className="sticky top-14 z-(--z-sticky) -mx-[18px] flex flex-col gap-3 bg-canvas px-[18px] py-3 lg:mx-0 lg:px-0 lg:pt-0">
           {summaryHidden && (
             <div className="flex items-center gap-3 motion-safe:animate-rise lg:hidden">
               <span className="shrink-0 text-xs text-stone">

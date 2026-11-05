@@ -16,6 +16,9 @@ const pillClass = (selected: boolean, className?: string) =>
     className
   )
 
+/** 알약을 담는 고정 구간 줄(SectionRow)의 높이. 위는 탭 줄 여백이 있어 아래에만 숨 쉴 틈을 더 둔다. */
+export const PILL_SECTION_ROW = "h-12 pb-1.5"
+
 /** 다른 주소로 가는 알약. 지금 주소면 aria-current="page"다. */
 export function PillLink({
   current,

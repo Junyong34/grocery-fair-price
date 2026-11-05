@@ -49,7 +49,7 @@ export function SectionRow({
           : "var(--shell-top)",
       }}
       className={cn(
-        "fixed inset-x-0 z-(--z-sticky) h-10 border-b border-hairline bg-canvas/94 backdrop-blur-md",
+        "fixed inset-x-0 z-(--z-sticky) h-10 border-b border-hairline bg-canvas",
         "motion-safe:transition-[top,opacity,translate] motion-safe:duration-300",
         shown
           ? "translate-y-0 opacity-100"
