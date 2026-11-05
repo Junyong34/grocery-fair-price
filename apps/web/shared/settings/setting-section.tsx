@@ -2,8 +2,8 @@
 export function SettingSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section aria-label={title} className="flex flex-col">
-      <h2 className="pb-1 text-[13px] font-semibold text-stone">{title}</h2>
-      <div className="flex flex-col divide-y divide-hairline">{children}</div>
+      <h2 className="pb-2 text-[13px] font-semibold text-stone">{title}</h2>
+      <div className="flex flex-col divide-y divide-hairline rounded-xl bg-pair-light px-4 py-1 text-pair-light-foreground">{children}</div>
     </section>
   )
 }

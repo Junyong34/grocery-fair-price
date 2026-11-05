@@ -27,7 +27,7 @@ export function SeasonalDisplaySettings() {
             달 이름
             <SettingWhere>제철달력</SettingWhere>
           </span>
-          <span className="text-xs text-stone">달 제목과 달 이동 목록의 표기</span>
+          <span className="text-xs text-stone">달 제목과 달 이동 목록</span>
         </span>
         <Segmented
           aria-label="달 이름"
@@ -78,11 +78,11 @@ function SettingRow({
         </span>
         <span className="text-xs text-stone">{hint}</span>
       </span>
-      {/* cojeev 스위치는 64×44로 커서 줄여 쓴다. */}
+      {/* cojeev 스위치는 64×44로 커서 줄여 쓴다. 줄어든 만큼 왼쪽 자리도 돌려줘 설명 글이 불필요하게 줄바꿈되지 않게 한다. */}
       <Switch
         checked={checked}
         onCheckedChange={onChange}
-        className="-my-2 origin-right scale-[.68]"
+        className="-my-2 -ml-5 origin-right scale-[.68]"
       />
     </label>
   )

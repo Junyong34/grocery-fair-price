@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { Suspense, useMemo } from "react"
 
 import { holidaysInMonth } from "@workspace/seasonal/calendar/holidays"
 import { CALENDAR_VARIANT_LABELS, CALENDAR_VARIANTS, type CalendarVariant } from "@workspace/seasonal/calendar/variants"
@@ -18,6 +18,7 @@ const PREVIEW_ZOOM = 0.22
 /**
  * 설정 화면의 달력 모양 고르기. 네 모양을 실제 달력(이번 달)을 줄인 미리보기로 보여 준다.
  * 화살표 키로 옆 모양을 고른다.
+ * 서울 오늘은 스트리밍으로 늦게 오므로 미리보기만 <Suspense>로 감싼다. 칸 높이가 고정이라 늦게 그려져도 레이아웃이 밀리지 않는다.
  */
 export function CalendarStylePicker({
   value,
@@ -26,10 +27,6 @@ export function CalendarStylePicker({
   value: CalendarVariant
   onChange: (value: CalendarVariant) => void
 }) {
-  // 미리보기는 서울 기준 이번 달이다. 서버가 계산한 오늘을 받으므로 <Suspense> 안에서 그린다.
-  const today = useToday()
-  // 설정 화면에만 있어 공휴일 데이터를 여기서 구해도 다른 화면 번들에 들지 않는다.
-  const holidays = useMemo(() => holidaysInMonth(today.year, today.month), [today.year, today.month])
   const index = CALENDAR_VARIANTS.indexOf(value)
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -72,7 +69,9 @@ export function CalendarStylePicker({
                 )}
               >
                 <span aria-hidden inert style={{ width: PREVIEW_WIDTH, zoom: PREVIEW_ZOOM }}>
-                  <MonthCalendar year={today.year} month={today.month} today={today} holidays={holidays} variant={variant} />
+                  <Suspense>
+                    <CalendarPreview variant={variant} />
+                  </Suspense>
                 </span>
               </span>
               {CALENDAR_VARIANT_LABELS[variant]}
@@ -82,4 +81,12 @@ export function CalendarStylePicker({
       </div>
     </div>
   )
+}
+
+/** 서울 기준 이번 달을 그린 미리보기 한 칸. 서버가 계산한 오늘을 받으므로 <Suspense> 안에서 그린다. */
+function CalendarPreview({ variant }: { variant: CalendarVariant }) {
+  const today = useToday()
+  // 설정 화면에만 있어 공휴일 데이터를 여기서 구해도 다른 화면 번들에 들지 않는다.
+  const holidays = useMemo(() => holidaysInMonth(today.year, today.month), [today.year, today.month])
+  return <MonthCalendar year={today.year} month={today.month} today={today} holidays={holidays} variant={variant} />
 }
