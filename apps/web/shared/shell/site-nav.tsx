@@ -11,7 +11,7 @@ import { BrandLogo } from "@/shared/brand-logo"
 import { SITE_CONFIG } from "@/shared/meta"
 import { routes } from "@/shared/routes"
 
-import { activeMenuKey, MENUS } from "./menus"
+import { activeMenuKey, MENUS, nextMenuOrigin } from "./menus"
 import { NavLink } from "./nav-link"
 import { headerScrollStep, INITIAL_HEADER_SCROLL } from "./header-scroll"
 import { screenOf } from "./screens"
@@ -23,13 +23,25 @@ export type MenuBadges = Partial<Record<string, React.ReactNode>>
 /** 하단 내비 칸 하나의 폭(px). 강조 배경이 칸 단위로 미끄러진다. 칸이 4개여도 375px에 들어간다(288px). */
 const CELL = 72
 
+/** 품종 상세의 출발지. 가격 · 제철 셸이 바뀌어도 남도록 모듈에 둔다. 서버에서는 effect가 돌지 않아 늘 null이고, 새로고침하면 비워진다. */
+let menuOrigin: string | null = null
+
+/** 지금 활성인 메뉴의 key. 하단 내비와 데스크톱 헤더가 같이 쓴다. 출발지는 커밋 뒤에만 바뀌어 품종 상세를 그리는 동안에는 고정이다. */
+function useActiveMenuKey(): string | null {
+  const pathname = usePathname()
+  useEffect(() => {
+    menuOrigin = nextMenuOrigin(menuOrigin, pathname)
+  }, [pathname])
+  return activeMenuKey(pathname, menuOrigin)
+}
+
 /**
  * 모바일 하단 가운데 떠 있는 내비(cojeev Action Dock 모양을 따랐다).
  * 2차 탭과 같은 크림(gold-wash) 트레이에 아이콘·라벨을 세로로 놓고, 지금 메뉴 뒤에 둥근 강조 배경이 깔린다. 메뉴를 바꾸면 배경이 옆 칸으로 미끄러진다.
  */
 export function FloatingNav({ badges = {} }: { badges?: MenuBadges }) {
   const pathname = usePathname()
-  const activeKey = activeMenuKey(pathname)
+  const activeKey = useActiveMenuKey()
   const items = MENUS
   const active = items.findIndex(({ key }) => key === activeKey)
   return (
@@ -177,6 +189,7 @@ export function SiteHeader({
   // 검색 타입 화면(P2)은 모바일에서 화면의 검색 입력이 헤더 자리를 맡는다(.scratch/shell-unify/spec.md 3장).
   const { header, scroll } = screenOf(usePathname())
   const [visible, reveal] = useHeaderVisible(scroll === "hide-on-scroll")
+  const activeKey = useActiveMenuKey()
   return (
     <header
       data-stuck={stuck ? "" : undefined}
@@ -210,12 +223,11 @@ export function SiteHeader({
             </span>
           </Link>
           <nav aria-label="주요 메뉴" className="hidden gap-6 lg:flex">
-            {MENUS.map(({ key, label, href, also, exact }) => (
+            {MENUS.map(({ key, label, href }) => (
               <NavLink
                 key={key}
                 href={href}
-                also={also}
-                exact={exact}
+                active={key === activeKey}
                 className="inline-flex items-center gap-1.5 text-[15px] text-stone hover:text-ink aria-[current=page]:font-semibold aria-[current=page]:text-ink"
               >
                 {label}

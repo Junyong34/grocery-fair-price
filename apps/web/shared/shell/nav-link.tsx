@@ -14,18 +14,18 @@ export function useIsActive(href: string, rule: ActiveRule = {}): boolean {
   return matchesPath(usePathname(), href, rule)
 }
 
-/** 현재 경로에 맞으면 aria-current="page"를 다는 링크. 모양은 className과 aria-current 선택자로 정한다. */
+/** 활성이면 aria-current="page"를 다는 링크. 모양은 className과 aria-current 선택자로 정한다. */
 export function NavLink({
   href,
+  active,
   className,
   children,
-  ...rule
-}: ActiveRule & {
+}: {
   href: string
+  active: boolean
   className?: string
   children: React.ReactNode
 }) {
-  const active = useIsActive(href, rule)
   return (
     <Link
       href={href}

@@ -18,10 +18,11 @@
 - 칸 순서와 위치는 바뀌지 않는다. 화면 상태에 따라 칸을 숨기거나 끄지 않는다(HIG Tab bars, M3 Navigation bar).
 - 활성 판정:
   - 시세: `/`, `/search`, `/prices/*`
-  - 제철달력: `/seasonal`, `/seasonal/months/*`, `/seasonal/seasons/*`, `/seasonal/festivals/*`, `/seasonal/foods/*`, `/seasonal/downloads/*`
+  - 제철달력: `/seasonal`, `/seasonal/months/*`, `/seasonal/seasons/*`, `/seasonal/festivals/*`, `/seasonal/downloads/*`
   - 담은 품종: `/basket`
   - 나의 식탁: `/seasonal/my-table`
   - `/settings/*`, `/privacy`: 어느 칸도 활성이 아니다.
+  - `/seasonal/foods/*`: 시트든 전체 페이지든 진입한 화면(직전의 품종 상세가 아닌 경로)의 칸을 따른다. 직접 진입 · 새로고침이거나 출발지가 어느 칸도 아니면 제철달력이다.
 - 담은 품종 배지(개수, 0이면 숨김)는 모든 화면에서 보인다.
 - "계절" 칸은 없어진다. 계절 · 명절은 제철달력 안 탭으로 옮긴다(2장).
 - 모양은 지금의 떠 있는 크림 트레이(칸 72px)를 그대로 쓴다. 4칸 = 288px로 375px에 들어간다.
