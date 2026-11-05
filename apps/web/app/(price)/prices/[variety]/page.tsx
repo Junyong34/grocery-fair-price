@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
-import { PRICE_COPY } from "@workspace/price/copy"
 import { relatedInCategory } from "@workspace/price/list"
 
 import { getPriceSource } from "@/features/price/data/price-source"
@@ -46,12 +45,12 @@ export default function Page(props: PageProps<"/prices/[variety]">) {
 async function Variety({ params }: { params: Params }) {
   const source = getPriceSource()
   const id = (await params).variety
-  // 목록은 품종 허브·sitemap과 같은 캐시 읽기라 상세마다 DB를 다시 읽지 않는다.
+  // 목록은 sitemap과 같은 캐시 읽기라 상세마다 DB를 다시 읽지 않는다.
   const [detail, varieties] = await Promise.all([source.getVariety(id), source.listVarieties()])
   if (!detail) notFound()
   return (
     <>
-      <JsonLd data={breadcrumb([{ name: PRICE_COPY.catalog.title, path: routes.price.varieties }, { name: varietySeo(detail).title, path: routes.price.variety(detail.id) }])} />
+      <JsonLd data={breadcrumb([{ name: varietySeo(detail).title, path: routes.price.variety(detail.id) }])} />
       <DetailView detail={detail} related={relatedInCategory(varieties, detail.id, RELATED_COUNT)} />
     </>
   )

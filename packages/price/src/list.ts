@@ -14,13 +14,6 @@ export function pickByIds<T extends { id: string }>(rows: readonly T[], ids: rea
   })
 }
 
-/** 카테고리별 묶음. 카테고리 순서와 묶음 안 순서는 들어온 목록 순서(목록은 이미 카테고리 정렬 · 품종 이름순)를 따른다. 품종 허브(/prices)에 쓴다. */
-export function groupByCategory<T extends { category: string }>(rows: readonly T[]): { category: string; rows: T[] }[] {
-  const groups = new Map<string, T[]>()
-  for (const row of rows) groups.set(row.category, [...(groups.get(row.category) ?? []), row])
-  return [...groups].map(([category, rows]) => ({ category, rows }))
-}
-
 /**
  * 같은 카테고리의 다른 품종 limit개(P3 아래 "다른 품종"). 그 품종 바로 다음부터 목록 끝에서 처음으로 돌아가며 고른다.
  * 맨 앞 몇 개만 고르면 모든 상세가 같은 품종으로만 이어지므로, 품종마다 이웃을 달리해 카테고리 안 모든 상세가 서로 이어지게 한다.

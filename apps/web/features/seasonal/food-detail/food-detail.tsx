@@ -28,7 +28,7 @@ export function FoodDetail({
 }: {
   food: Food
   title?: React.ReactNode
-  /** 같은 품종의 시세 화면 주소. 아직 시세 데이터가 없는 품종이면 비워 품종 허브(/prices) 링크를 보인다. */
+  /** 같은 품종의 시세 화면 주소. 아직 시세 데이터가 없는 품종이면 비워 시세 메인(/) 링크를 보인다. */
   priceHref?: string | null
 }) {
   const seasons = seasonsOf(food)
@@ -131,7 +131,7 @@ export function FoodDetail({
         </Link>
       ) : (
         <Link
-          href={routes.price.varieties}
+          href={routes.home}
           className="flex items-center justify-between gap-3 rounded-md border border-hairline px-4 py-3 text-ink no-underline hover:text-ink"
         >
           <span className="flex flex-col gap-0.5">

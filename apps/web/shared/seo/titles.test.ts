@@ -17,7 +17,6 @@ import {
   sashimiSeo,
   seasonSeo,
   seasonsIndexSeo,
-  varietiesIndexSeo,
   varietySeo,
 } from "./titles"
 
@@ -63,12 +62,6 @@ describe("페이지 제목·설명", () => {
       "녹두(100g) 시세 2,700원, 평소보다 9% 높아 비싸요(11/3 KAMIS 조사). 대형마트·전통시장은 얼마에 파는지도 견줘 보세요."
     )
     expect(varietySeo({ ...base, verdict: { kind: "none", pct: null } }).description).toContain("평소가는 아직 쌓이는 중(11/3 KAMIS 조사)")
-  })
-
-  it("품종 허브 설명에 카테고리 이름과 품종 수를 넣는다", () => {
-    const seo = varietiesIndexSeo(["채소", "과일"], 127)
-    expect(seo.title).toBe("식재료 시세 전체 품종 · 오늘 가격")
-    expect(seo.description).toContain("채소·과일 127개 품종")
   })
 
   it("다운로드 설명에 무료 제공과 파일 형식을 안내한다", () => {

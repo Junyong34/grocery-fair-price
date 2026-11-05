@@ -72,7 +72,7 @@ export function DetailView({ detail, related = [] }: { detail: VarietyDetail; re
           <span aria-hidden className="text-stone">›</span>
         </Link>
       )}
-      {/* 같은 카테고리의 다른 품종과 품종 허브. 품종 알약은 메인 "최근 본 품종"과 같은 pair-light(DESIGN.md). 검색으로 상세에 바로 들어온 사람이 비교를 이어 가고, 크롤러가 상세끼리 오간다. */}
+      {/* 같은 카테고리의 다른 품종. 품종 알약은 메인 "최근 본 품종"과 같은 pair-light(DESIGN.md). 검색으로 상세에 바로 들어온 사람이 비교를 이어 가고, 크롤러가 상세끼리 오간다. */}
       <section aria-labelledby="related-title" className="flex flex-col gap-1">
         <h2 id="related-title" className="text-base font-semibold text-ink">
           {PRICE_COPY.related.title(detail.category)}
@@ -91,9 +91,6 @@ export function DetailView({ detail, related = [] }: { detail: VarietyDetail; re
             ))}
           </ul>
         )}
-        <Link href={routes.price.varieties} className="self-start py-2 text-sm font-semibold text-ink">
-          {PRICE_COPY.related.all} ›
-        </Link>
       </section>
       {/* 페이지 요약 한 문장(날짜·출처·숫자). 검색 결과와 AI 답변이 인용하기 좋은 꼴로 둔다. */}
       <p className="max-w-prose text-sm leading-relaxed text-stone">{summaryLine(detail)}</p>

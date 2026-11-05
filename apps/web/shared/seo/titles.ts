@@ -41,14 +41,6 @@ export function homeSeo(): PageSeo {
   }
 }
 
-/** 품종 허브(/prices). 카테고리 이름은 목록에서 받아 넣는다. */
-export function varietiesIndexSeo(categories: readonly string[], count: number): PageSeo {
-  return {
-    title: "식재료 시세 전체 품종 · 오늘 가격",
-    description: `${categories.join("·")} ${count}개 품종의 오늘 시세를 평소 가격과 견줘 카테고리별로 모았어요. KAMIS·축평원 조사 기준.`,
-  }
-}
-
 /** P3 품종 상세. 설명에 그날 시세와 판정을 넣어 검색 결과에서 바로 답이 보이게 한다(판정은 하루 1~2번 바뀐다). */
 export function varietySeo(variety: Pick<VarietySummary, "name" | "baseUnit" | "price" | "verdict" | "surveyedOn" | "basis">): PageSeo {
   const { verdict } = variety

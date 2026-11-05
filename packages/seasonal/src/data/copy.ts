@@ -115,7 +115,7 @@ export const UI_COPY = {
   yearEndMyTableHint: "먹은 제철을 기록하면 나의 식탁에 모여요",
   yearEndMyTableAction: "나의 식탁 보기",
   yearEndMoreTitle: "다른 방법으로 둘러보기",
-  /** 1i 품종 상세: 아직 시세 데이터가 없는 품종일 때 시세 버튼 자리에 두는 안내와 품종 허브(/prices) 링크 */
+  /** 1i 품종 상세: 아직 시세 데이터가 없는 품종일 때 시세 버튼 자리에 두는 안내와 시세 메인(/) 링크 */
   priceUnavailable: (name: string) => `${name} 시세는 아직 준비 중이에요`,
   priceHubLink: "다른 품종 시세 보기",
   /** 1i 품종 상세에서 같은 품종의 시세 화면(/prices/<id>)으로 가는 버튼 */

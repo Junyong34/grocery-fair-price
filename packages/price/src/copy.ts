@@ -194,21 +194,10 @@ export const PRICE_COPY = {
     clearRecent: "지우기",
     featured: "자주 사는 품종",
     priceInfo: "시세·판정 안내",
-    /** 자주 사는 품종 아래, 품종 허브(/prices)로 가는 링크 */
-    allVarieties: "전체 품종 시세 보기",
   },
-  /** 품종 허브(/prices): 카테고리별 전체 품종 */
-  catalog: {
-    title: "전체 품종 시세",
-    intro: (count: number) => `조사하는 ${count}개 품종의 최근 시세와 평소 가격을 카테고리별로 모았어요. 품종을 누르면 판정과 파는 곳별 가격을 볼 수 있어요.`,
-    count: (count: number) => `${count}개`,
-    categoryNav: "카테고리",
-    ogSubtitle: "오늘 시세와 평소 가격",
-  },
-  /** P3 품종 상세 아래, 같은 카테고리의 다른 품종 목록과 품종 허브(/prices)로 가는 링크 */
+  /** P3 품종 상세 아래, 같은 카테고리의 다른 품종 목록 */
   related: {
     title: (category: string) => `${category} 다른 품종 시세`,
-    all: "전체 품종 시세 보기",
   },
   /** P3 품종 상세 아래, 같은 id의 제철 품종 상세로 가는 링크 */
   seasonLink: (name: string) => `${name} 제철 시기 보기`,
