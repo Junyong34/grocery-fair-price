@@ -16,7 +16,6 @@ import {
 } from "@workspace/seasonal/data/seasons"
 
 import { routes } from "@/shared/routes"
-import { BackButton } from "@/shared/shell/sub-header"
 
 import { EatenBadgeToday } from "../components/eaten-badge"
 import { FoodImage } from "../components/food-image"
@@ -54,9 +53,14 @@ export function SeasonDetail({ season }: { season: Season }) {
       }}
       default="none"
     >
-      <div className="mx-auto max-w-[1080px] px-[18px] pb-8 lg:px-6">
+      <div className="mx-auto max-w-[1080px] px-[18px] pt-1 pb-8 lg:px-6">
+        <Link
+          href={routes.seasonal.seasons}
+          className="inline-block py-1 text-sm text-stone no-underline hover:text-ink"
+        >
+          ← 사계절
+        </Link>
         <div className="sticky top-[calc(var(--shell-top)+var(--tabs-h))] z-[2] flex h-14 items-center gap-2 border-b border-hairline bg-canvas">
-          <BackButton fallbackHref={routes.seasonal.seasons} />
           <span className="shrink-0 font-heading text-lg font-bold">
             {copy.name}
           </span>
