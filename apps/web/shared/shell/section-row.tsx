@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useEffect, useRef } from "react"
 
+import { ScrollRow } from "@workspace/ui/components/scroll-row"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { useScrolledPast } from "./use-scrolled-past"
@@ -16,6 +17,7 @@ export function SectionRow({
   belowTabs = false,
   label,
   className,
+  activeKey,
   children,
 }: {
   watch: string
@@ -23,6 +25,8 @@ export function SectionRow({
   label: string
   /** 줄 높이 등을 바꿀 때(기본 h-10). */
   className?: string
+  /** 지금 칩을 바꾸는 값(주소 등). 줄이 보이는 동안 이 값이 바뀌면 지금 칩을 다시 가운데로 옮긴다. */
+  activeKey?: string
   children: React.ReactNode
 }) {
   const shown = useScrolledPast(watch, { belowTabs })
@@ -33,7 +37,7 @@ export function SectionRow({
     const chip = box?.querySelector<HTMLElement>("[aria-current]")
     if (!shown || !box || !chip) return
     box.scrollLeft = chip.offsetLeft - (box.clientWidth - chip.offsetWidth) / 2
-  }, [shown])
+  }, [shown, activeKey])
   return (
     <nav
       aria-label={label}
@@ -53,12 +57,14 @@ export function SectionRow({
         className
       )}
     >
-      <div
+      {/* 칩의 누르는 영역이 줄 높이를 넘어 세로로 밀리지 않게 overflow-y를 막는다. */}
+      <ScrollRow
         ref={scroller}
-        className="relative mx-auto flex h-full max-w-[1080px] items-center gap-1.5 overflow-x-auto px-[18px] [scrollbar-width:none] lg:px-6"
+        frameClassName="mx-auto h-full max-w-[1080px]"
+        className="relative h-full items-center gap-1.5 overflow-y-hidden px-[18px] lg:px-6"
       >
         {children}
-      </div>
+      </ScrollRow>
     </nav>
   )
 }

@@ -5,7 +5,9 @@ import { usePathname } from "next/navigation"
 import { FESTIVALS } from "@workspace/seasonal/data/festivals"
 
 import { routes } from "@/shared/routes"
-import { SectionChip, SectionRow } from "@/shared/shell/section-row"
+import { SectionRow } from "@/shared/shell/section-row"
+
+import { PillLink } from "../components/pill"
 
 /** 1g 명절 칩(id)이 화면 위로 지나가면 나타나는 얇은 명절 칩 줄. */
 export const FESTIVAL_CHIPS_ID = "festival-chips"
@@ -17,9 +19,9 @@ export function FestivalChipRow() {
       {FESTIVALS.map((festival) => {
         const href = routes.seasonal.festival(festival.slug)
         return (
-          <SectionChip key={festival.slug} href={href} current={pathname === href}>
+          <PillLink key={festival.slug} href={href} current={pathname === href}>
             {festival.name}
-          </SectionChip>
+          </PillLink>
         )
       })}
     </SectionRow>

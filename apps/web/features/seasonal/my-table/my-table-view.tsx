@@ -18,12 +18,14 @@ import { SEASONS } from "@workspace/seasonal/data/seasons"
 import { matchFoods } from "@workspace/seasonal/search/match-foods"
 import { AnimatedNumber } from "@workspace/ui/components/animated-number"
 import { Segmented } from "@workspace/ui/components/segmented"
-import { cn } from "@workspace/ui/lib/utils"
 import { ScrollRow } from "@workspace/ui/components/scroll-row"
 
 import { useEatenIds } from "@/shared/eaten-store"
 import { useToday } from "@/shared/today-context"
 
+import { PillButton } from "../components/pill"
+import { stepIn } from "../components/swipe-gesture"
+import { useSwipe } from "../components/use-swipe"
 import { FoodRow } from "./food-row"
 import { CategoryFilter } from "./category-filter"
 import {
@@ -33,6 +35,12 @@ import {
   scopeName,
   type FilterMode,
 } from "./scope-summary"
+
+/** 목록을 밀어 필터를 바꾸는 순서. 전체에서 시작하고 끝에서 멈춘다. */
+const SCOPE_ORDER: Record<FilterMode, readonly Scope[]> = {
+  month: [null, ...MONTHS],
+  season: [null, ...SEASONS],
+}
 
 /**
  * 1h 나의 식탁(명세 3.6). "검색 → 필터 → 체크" 흐름이다. 체크하면 +1과 진행률이 함께 움직인다.
@@ -79,6 +87,11 @@ export function MyTableView() {
     if (next !== null) setMode(typeof next === "number" ? "month" : "season")
     setScope(next)
   }
+
+  // 체크박스에서 시작한 터치는 use-swipe가 거른다. 행의 다른 곳에서 민 터치는 탭이 아니라 체크되지 않는다.
+  const listArea = useSwipe<HTMLDivElement>((direction) => {
+    setScope(stepIn(SCOPE_ORDER[mode], scope, direction))
+  })
 
   return (
     <div className="mx-auto max-w-[1080px] px-[18px] pt-6 pb-8 lg:grid lg:grid-cols-[280px_1fr] lg:gap-8 lg:px-6 lg:pt-8">
@@ -149,7 +162,7 @@ export function MyTableView() {
             role="group"
             aria-label="필터 값"
             frameClassName="-mx-[18px] lg:mx-0"
-            className="gap-1.5 px-[18px] lg:flex-wrap lg:px-0"
+            className="gap-1.5 px-[18px] py-1 lg:flex-wrap lg:px-0"
           >
             <Chip on={scope === null} onClick={() => setScope(null)}>
               전체
@@ -176,68 +189,70 @@ export function MyTableView() {
           </ScrollRow>
         </div>
 
-        {/* 검색·카테고리가 적용되면 목록과 시기 요약의 범위가 다르므로 별도 집계한다. */}
-        {/* live 영역은 숨기지 않고 늘 두어야 바뀐 문구가 읽힌다. 비어 있으면 높이가 0이다. */}
-        <p aria-live="polite" className="mt-1 text-xs break-words text-stone tabular-nums">
-          {hasQuery || category !== null
-            ? MY_TABLE_COPY.listResult(
-                scopeName(scope),
-                category,
-                deferredQuery,
-                list.length,
-                listEaten
-              )
-            : ""}
-        </p>
-        {list.length ? (
-          <ul className="mt-3 grid lg:grid-cols-2 lg:gap-x-6">
-            {list.map((food) => (
-              <FoodRow key={food.id} food={food} year={year} />
-            ))}
-          </ul>
-        ) : (
-          <div className="my-8 rounded-xl border border-dashed border-hairline bg-surface/30 px-5 py-8 text-center text-sm leading-relaxed text-stone">
-            <p className="font-medium break-words text-ink">
-              {MY_TABLE_COPY.emptyTitle(deferredQuery, hasFilters)}
-            </p>
-            <p className="mt-2">
-              {hasQuery
-                ? hasFilters
-                  ? MY_TABLE_COPY.emptyFilterHint
-                  : MY_TABLE_COPY.emptySearchHint
-                : MY_TABLE_COPY.emptyScopeHint}
-            </p>
-            <div className="mt-4 flex flex-wrap justify-center gap-2">
-              {category !== null && (
-                <button
-                  type="button"
-                  onClick={() => setCategory(null)}
-                  className="min-h-11 rounded-full border border-hairline px-4 hover:bg-gold/10 focus-visible:outline-2 focus-visible:outline-gold"
-                >
-                  {MY_TABLE_COPY.clearCategory}
-                </button>
-              )}
-              {hasQuery && (
-                <button
-                  type="button"
-                  onClick={() => setQuery("")}
-                  className="min-h-11 rounded-full border border-hairline px-4 hover:bg-gold/10 focus-visible:outline-2 focus-visible:outline-gold"
-                >
-                  {MY_TABLE_COPY.clearQuery}
-                </button>
-              )}
-              {scope !== null && (
-                <button
-                  type="button"
-                  onClick={() => setScope(null)}
-                  className="min-h-11 rounded-full border border-hairline px-4 hover:bg-gold/10 focus-visible:outline-2 focus-visible:outline-gold"
-                >
-                  {MY_TABLE_COPY.clearScope}
-                </button>
-              )}
+        <div ref={listArea}>
+          {/* 검색·카테고리가 적용되면 목록과 시기 요약의 범위가 다르므로 별도 집계한다. */}
+          {/* live 영역은 숨기지 않고 늘 두어야 바뀐 문구가 읽힌다. 비어 있으면 높이가 0이다. */}
+          <p aria-live="polite" className="mt-1 text-xs break-words text-stone tabular-nums">
+            {hasQuery || category !== null
+              ? MY_TABLE_COPY.listResult(
+                  scopeName(scope),
+                  category,
+                  deferredQuery,
+                  list.length,
+                  listEaten
+                )
+              : ""}
+          </p>
+          {list.length ? (
+            <ul className="mt-3 grid lg:grid-cols-2 lg:gap-x-6">
+              {list.map((food) => (
+                <FoodRow key={food.id} food={food} year={year} />
+              ))}
+            </ul>
+          ) : (
+            <div className="my-8 rounded-xl border border-dashed border-hairline bg-surface/30 px-5 py-8 text-center text-sm leading-relaxed text-stone">
+              <p className="font-medium break-words text-ink">
+                {MY_TABLE_COPY.emptyTitle(deferredQuery, hasFilters)}
+              </p>
+              <p className="mt-2">
+                {hasQuery
+                  ? hasFilters
+                    ? MY_TABLE_COPY.emptyFilterHint
+                    : MY_TABLE_COPY.emptySearchHint
+                  : MY_TABLE_COPY.emptyScopeHint}
+              </p>
+              <div className="mt-4 flex flex-wrap justify-center gap-2">
+                {category !== null && (
+                  <button
+                    type="button"
+                    onClick={() => setCategory(null)}
+                    className="min-h-11 rounded-full border border-hairline px-4 hover:bg-gold/10 focus-visible:outline-2 focus-visible:outline-gold"
+                  >
+                    {MY_TABLE_COPY.clearCategory}
+                  </button>
+                )}
+                {hasQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setQuery("")}
+                    className="min-h-11 rounded-full border border-hairline px-4 hover:bg-gold/10 focus-visible:outline-2 focus-visible:outline-gold"
+                  >
+                    {MY_TABLE_COPY.clearQuery}
+                  </button>
+                )}
+                {scope !== null && (
+                  <button
+                    type="button"
+                    onClick={() => setScope(null)}
+                    className="min-h-11 rounded-full border border-hairline px-4 hover:bg-gold/10 focus-visible:outline-2 focus-visible:outline-gold"
+                  >
+                    {MY_TABLE_COPY.clearScope}
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </section>
     </div>
   )
@@ -270,19 +285,8 @@ function Chip({
     })
   }, [on])
   return (
-    <button
-      ref={ref}
-      type="button"
-      aria-pressed={on}
-      onClick={onClick}
-      className={cn(
-        "min-h-11 shrink-0 rounded-full border px-3 text-[13px] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-gold motion-reduce:transition-none",
-        on
-          ? "border-gold bg-gold-wash text-gold-deep"
-          : "border-hairline text-stone hover:border-silver hover:text-ink"
-      )}
-    >
+    <PillButton ref={ref} selected={on} onClick={onClick}>
       {children}
-    </button>
+    </PillButton>
   )
 }
