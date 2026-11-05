@@ -18,10 +18,11 @@
 - 칸 순서와 위치는 바뀌지 않는다. 화면 상태에 따라 칸을 숨기거나 끄지 않는다(HIG Tab bars, M3 Navigation bar).
 - 활성 판정:
   - 시세: `/`, `/search`, `/prices/*`
-  - 제철달력: `/seasonal`, `/seasonal/months/*`, `/seasonal/seasons/*`, `/seasonal/festivals/*`, `/seasonal/foods/*`, `/seasonal/downloads/*`
+  - 제철달력: `/seasonal`, `/seasonal/months/*`, `/seasonal/seasons/*`, `/seasonal/festivals/*`, `/seasonal/downloads/*`
   - 담은 품종: `/basket`
   - 나의 식탁: `/seasonal/my-table`
   - `/settings/*`, `/privacy`: 어느 칸도 활성이 아니다.
+  - `/seasonal/foods/*`: 시트든 전체 페이지든 진입한 화면(직전의 품종 상세가 아닌 경로)의 칸을 따른다. 직접 진입 · 새로고침이거나 출발지가 어느 칸도 아니면 제철달력이다.
 - 담은 품종 배지(개수, 0이면 숨김)는 모든 화면에서 보인다.
 - "계절" 칸은 없어진다. 계절 · 명절은 제철달력 안 탭으로 옮긴다(2장).
 - 모양은 지금의 떠 있는 크림 트레이(칸 72px)를 그대로 쓴다. 4칸 = 288px로 375px에 들어간다.
@@ -94,7 +95,7 @@
   - 구간 줄 높이는 40px다. 칩이 눈에 보이는 높이는 30px로 둬도 되지만, 누르는 영역은 44px로 잡는다.
 - 스티키는 헤더를 포함해 최대 세 줄이다. 헤더가 숨은 동안은 두 줄(탭 44px + 구간 40px ≈ 86px), 헤더가 다시 나온 동안만 세 줄(≈134px)이다.
 - 헤더 · 탭 줄 · 구간 줄은 한 묶음으로 움직인다. 숨을 때는 묶음 전체가 위로 48px 옮겨 간다(transform, 레이아웃을 다시 계산하지 않음).
-- 지금 탭을 다시 누르면 맨 위로 스크롤한다.
+- 지금 탭을 다시 누르면 맨 위로 스크롤한다. 하단 내비는 그 탭의 메인에 있을 때만 맨 위로 올리고, 하위 화면(`/prices/[variety]` 등)이면 그 탭의 메인으로 이동한다.
 - `prefers-reduced-motion`이면 슬라이드 없이 바로 바뀐다.
 - 지금의 "맨 위에서 평평하다가 8px 내리면 떠 있는 둥근 바"(`useScrolledDown`, `STUCK_AT`) 모양은 다시 나타난 헤더와 pinned 헤더에 그대로 쓴다.
 - 데스크톱(≥1024)은 헤더를 숨기지 않는다(pinned). 탭 줄과 구간 줄 고정은 같다.
