@@ -15,6 +15,26 @@ export function shelvesOf(editions: readonly ManifestEntry[]): Shelf[] {
   })).filter((shelf) => shelf.editions.length > 0)
 }
 
+/** 에디션에 있는 연도(최신순). 포스터처럼 연도 없는 종류는 세지 않는다. */
+export function editionYears(editions: readonly ManifestEntry[]): number[] {
+  return yearChoices(editions.flatMap((edition) => edition.year ?? []))
+}
+
+/** 연도 필터의 선택지: 주어진 연도들과 현재 연도(있으면)의 합집합, 최신순. */
+export function yearChoices(years: readonly number[], currentYear?: number): number[] {
+  return [...new Set(currentYear === undefined ? years : [...years, currentYear])].sort((a, b) => b - a)
+}
+
+/** 연도가 없는 에디션(포스터). 어느 연도를 골라도 보인다. */
+export function yearlessEditions(editions: readonly ManifestEntry[]): ManifestEntry[] {
+  return editions.filter((edition) => edition.year === undefined)
+}
+
+/** 고른 연도에 보이는 에디션: 그 연도의 것과 연도 없는 것. 포스터를 거르면 어느 연도에서도 볼 수 없게 된다. */
+export function editionsOfYear(editions: readonly ManifestEntry[], year: number): ManifestEntry[] {
+  return editions.filter((edition) => edition.year === undefined || edition.year === year)
+}
+
 /**
  * 줄 밖에서 쓰는 이름. 줄 안의 칸은 종류가 줄 제목에 있어 제목만 쓴다.
  * 제목 끝 단어가 종류 이름에도 있으면 뺀다: "2026년도 달력" + "월간 달력" → "2026년도 월간 달력".

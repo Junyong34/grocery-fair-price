@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import { DOWNLOADS_COPY } from "../data/copy"
 import type { ManifestEntry } from "./edition"
-import { attachmentDisposition, downloadFileName, editionMeta, editionName, featuredEdition, megabytes, replacementFor, resolveDownload, shelvesOf } from "./listing"
+import { attachmentDisposition, downloadFileName, editionMeta, editionName, editionsOfYear, editionYears, featuredEdition, megabytes, replacementFor, resolveDownload, shelvesOf, yearChoices, yearlessEditions } from "./listing"
 
 const entry = (id: string, kind: ManifestEntry["kind"], extra: Partial<ManifestEntry> = {}): ManifestEntry => ({
   id,
@@ -34,8 +34,54 @@ describe("shelvesOf", () => {
   })
 })
 
+describe("editionYears", () => {
+  it("에디션에 있는 연도를 겹침 없이 최신순으로 준다. 연도 없는 포스터는 세지 않는다", () => {
+    const editions = [entry("a", "monthly", { year: 2026 }), entry("p", "month-poster"), entry("b", "year-sheet", { year: 2027 }), entry("c", "monthly", { year: 2027 })]
+    expect(editionYears(editions)).toEqual([2027, 2026])
+  })
+
+  it("에디션이 없으면 빈 목록", () => {
+    expect(editionYears([])).toEqual([])
+  })
+})
+
+describe("yearChoices", () => {
+  it("에디션 연도와 현재 연도의 합집합을 최신순으로 준다", () => {
+    expect(yearChoices([2027, 2026], 2026)).toEqual([2027, 2026])
+    expect(yearChoices([2027], 2026)).toEqual([2027, 2026])
+    expect(yearChoices([2025], 2026)).toEqual([2026, 2025])
+  })
+
+  it("에디션 연도가 없어도 현재 연도 하나는 있다", () => {
+    expect(yearChoices([], 2026)).toEqual([2026])
+  })
+})
+
+describe("editionsOfYear", () => {
+  const editions = [entry("m26", "monthly", { year: 2026 }), entry("m27", "monthly", { year: 2027 }), entry("poster", "month-poster")]
+
+  it("고른 연도의 에디션과 연도 없는 포스터를 함께 준다", () => {
+    expect(editionsOfYear(editions, 2026).map((edition) => edition.id)).toEqual(["m26", "poster"])
+    expect(editionsOfYear(editions, 2027).map((edition) => edition.id)).toEqual(["m27", "poster"])
+  })
+
+  it("어떤 에디션에도 없는 연도면 연도 없는 포스터만 남는다", () => {
+    expect(editionsOfYear(editions, 2030).map((edition) => edition.id)).toEqual(["poster"])
+  })
+
+  it("남는 것이 없으면 빈 목록", () => {
+    expect(editionsOfYear([entry("m26", "monthly", { year: 2026 })], 2027)).toEqual([])
+  })
+})
+
+describe("yearlessEditions", () => {
+  it("연도 없는 에디션만 준다", () => {
+    expect(yearlessEditions([entry("m", "monthly", { year: 2026 }), entry("p", "season-poster")]).map((edition) => edition.id)).toEqual(["p"])
+  })
+})
+
 describe("editionName", () => {
-  it("제목 뒤에 종류를 붙인다(줄 밖에서 쓰는 이름: 시트 제목, 탭 제목)", () => {
+  it("제목 뒤에 종류를 붙인다(줄 밖에서 쓰는 이름: 탭 제목, PDF 파일 이름)", () => {
     expect(editionName({ kind: "monthly", title: "2027 크림" })).toBe("2027 크림 월간 달력")
   })
 
