@@ -54,7 +54,7 @@ export function HomeView({
       </div>
       <section
         aria-labelledby="featured-title"
-        className="flex min-w-0 flex-col gap-2 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:rounded-2xl lg:border lg:border-hairline lg:bg-surface/50 lg:p-5"
+        className="flex min-w-0 flex-col gap-2 rounded-2xl border border-hairline bg-surface/50 p-3 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:p-5"
       >
         <div className="flex items-center">
           <h2 id="featured-title" className="text-base font-semibold text-ink">
