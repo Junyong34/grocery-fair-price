@@ -1,14 +1,14 @@
 "use client"
 
-import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useRef } from "react"
 
 import { MONTHS } from "@workspace/seasonal/data/months"
 import { ScrollRow } from "@workspace/ui/components/scroll-row"
-import { cn } from "@workspace/ui/lib/utils"
 
 import { routes } from "@/shared/routes"
+
+import { PillLink } from "../components/pill"
 
 /**
  * 제철 회 달 칩 12개(.scratch/sashimi/spec.md 3장). 레이아웃에 있어 달을 바꿔도 가로 스크롤 위치가 남는다.
@@ -40,20 +40,15 @@ export function SashimiMonthChips() {
           const href = routes.seasonal.sashimiMonth(month)
           const current = pathname === href
           return (
-            <Link
+            <PillLink
               key={month}
               href={href}
               scroll={false}
-              aria-current={current ? "page" : undefined}
-              className={cn(
-                "relative inline-flex h-9 shrink-0 items-center justify-center rounded-full border px-3.5 text-sm whitespace-nowrap tabular-nums no-underline transition-colors after:absolute after:inset-x-0 after:-inset-y-1 lg:px-0",
-                current
-                  ? "border-gold bg-gold-soft font-semibold text-espresso"
-                  : "border-hairline bg-surface/70 text-stone hover:border-silver hover:text-ink"
-              )}
+              current={current}
+              className="lg:px-0"
             >
               {month}월
-            </Link>
+            </PillLink>
           )
         })}
       </ScrollRow>
