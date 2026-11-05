@@ -13,6 +13,7 @@ import { ScrollRow } from "@workspace/ui/components/scroll-row"
 import { useEatenIds } from "@/shared/eaten-store"
 import { routes } from "@/shared/routes"
 import { useToday } from "@/shared/today-context"
+import { PillLink } from "../components/pill"
 import { MONTH_TIMELINE_ID } from "./month-chip-row"
 
 const SEASON_BG: Record<Season, string> = {
@@ -33,7 +34,7 @@ const SEASON_BAND: readonly { season: Season; label: string; span: number }[] =
   ]
 
 /**
- * 2b 12개월 타임라인 = 달 이동 내비. 모바일은 가로 스크롤 칩, 데스크톱은 12열.
+ * 2b 12개월 타임라인 = 달 이동 내비. 모바일은 가로 스크롤 알약, 데스크톱은 12열.
  * 레이아웃에 있어 달을 바꿔도 다시 마운트되지 않는다. 선택한 달은 주소에서 읽는다.
  */
 export function MonthTimeline() {
@@ -71,33 +72,14 @@ function MobileChips({ selected }: { selected: number }) {
       nextLabel="다음 달 보기"
     >
       {MONTHS.map((month) => (
-        <Link
+        <PillLink
           key={month}
           href={routes.seasonal.month(month)}
           scroll={false}
-          aria-current={month === selected ? "page" : undefined}
-          className={cn(
-            "flex w-[60px] shrink-0 flex-col items-start gap-1 rounded-md border border-hairline px-2 py-2 text-ink no-underline hover:text-ink",
-            "aria-[current=page]:border-gold aria-[current=page]:bg-gold-wash"
-          )}
+          current={month === selected}
         >
-          <span
-            aria-hidden
-            className={cn(
-              "h-1 w-7 rounded-full",
-              SEASON_BG[seasonOfMonth(month)]
-            )}
-          />
-          <span className="text-[15px] font-semibold tabular-nums">
-            {month}월
-          </span>
-          <span className="text-[11px] text-stone">
-            {foodsInMonth(month).length}가지
-          </span>
-          <Suspense fallback={<span className="h-3.5" />}>
-            <TodayMark month={month} className="text-[10px]" />
-          </Suspense>
-        </Link>
+          {month}월
+        </PillLink>
       ))}
     </ScrollRow>
   )

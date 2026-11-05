@@ -1,5 +1,6 @@
 import Link from "next/link"
 
+import { MonthSwipeArea } from "@/features/seasonal/components/month-swipe-area"
 import { MonthChipRow } from "@/features/seasonal/month-timeline/month-chip-row"
 import { MonthTimeline } from "@/features/seasonal/month-timeline/month-timeline"
 import { routes } from "@/shared/routes"
@@ -18,7 +19,7 @@ export default function MonthsLayout({
       </div>
       <MonthTimeline />
       <MonthChipRow />
-      {children}
+      <MonthSwipeArea route="month">{children}</MonthSwipeArea>
     </>
   )
 }
