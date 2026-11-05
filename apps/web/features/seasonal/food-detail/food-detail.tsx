@@ -96,11 +96,8 @@ export function FoodDetail({
           <h3 id="same-season" className="text-sm font-semibold text-stone">
             같은 때 제철
           </h3>
-          <ScrollRow
-            role="list"
-            frameClassName="-mx-1"
-            className="snap-x gap-3 px-1 pb-2"
-          >
+          {/* 시트 본문은 overflow-y-auto라 가로로도 스크롤된다. 음수 여백을 주면 그만큼 본문 전체가 옆으로 움직이니 쓰지 않는다. */}
+          <ScrollRow role="list" className="snap-x gap-3 pb-2">
             {sameSeason.map((other) => (
               <div
                 role="listitem"
