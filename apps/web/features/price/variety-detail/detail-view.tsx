@@ -1,7 +1,7 @@
 import Link from "next/link"
 
 import { basisLine, PRICE_COPY, summaryLine } from "@workspace/price/copy"
-import type { VarietyDetail } from "@workspace/price/types"
+import type { VarietyDetail, VarietySummary } from "@workspace/price/types"
 import { findFood } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 
@@ -28,7 +28,7 @@ const SECTIONS = [
  * "내가 본 가격 적기"는 범위 막대 바로 아래(시세 구간 안)에 둔다. 매장에서 가격표를 보고 비교하는 게 이 화면의 핵심이라 첫 화면에 닿게 하고,
  * 적으면 바로 위 범위 막대에 "내가 본" 핀이 꽂혀 입력과 결과가 한 화면에 보인다. 판정 전(평소가 없음)이면 뺀다.
  */
-export function DetailView({ detail }: { detail: VarietyDetail }) {
+export function DetailView({ detail, related = [] }: { detail: VarietyDetail; related?: readonly VarietySummary[] }) {
   // 제철달력에 같은 id 품종이 있으면 제철 시기로 잇는다(제철 품종 상세의 "오늘 시세 보기"와 짝).
   const food = findFood(detail.id)
   return (
@@ -72,6 +72,29 @@ export function DetailView({ detail }: { detail: VarietyDetail }) {
           <span aria-hidden className="text-stone">›</span>
         </Link>
       )}
+      {/* 같은 카테고리의 다른 품종과 품종 허브. 품종 알약은 메인 "최근 본 품종"과 같은 pair-light(DESIGN.md). 검색으로 상세에 바로 들어온 사람이 비교를 이어 가고, 크롤러가 상세끼리 오간다. */}
+      <section aria-labelledby="related-title" className="flex flex-col gap-1">
+        <h2 id="related-title" className="text-base font-semibold text-ink">
+          {PRICE_COPY.related.title(detail.category)}
+        </h2>
+        {related.length > 0 && (
+          <ul className="flex flex-wrap gap-2 pt-2">
+            {related.map((variety) => (
+              <li key={variety.id}>
+                <Link
+                  href={routes.price.variety(variety.id)}
+                  className="inline-flex h-9 items-center rounded-full border border-hairline bg-pair-light px-3.5 text-sm text-pair-light-foreground no-underline hover:border-stone"
+                >
+                  {variety.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+        <Link href={routes.price.varieties} className="self-start py-2 text-sm font-semibold text-ink">
+          {PRICE_COPY.related.all} ›
+        </Link>
+      </section>
       {/* 페이지 요약 한 문장(날짜·출처·숫자). 검색 결과와 AI 답변이 인용하기 좋은 꼴로 둔다. */}
       <p className="max-w-prose text-sm leading-relaxed text-stone">{summaryLine(detail)}</p>
       <p className="-mt-5 pb-4 text-xs text-caption">

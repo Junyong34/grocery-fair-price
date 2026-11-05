@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
 import { PRICE_COPY } from "@workspace/price/copy"
+import { relatedInCategory } from "@workspace/price/list"
 
 import { getPriceSource } from "@/features/price/data/price-source"
 import { DetailView } from "@/features/price/variety-detail/detail-view"
@@ -12,6 +13,9 @@ import { breadcrumb, JsonLd } from "@/shared/seo/json-ld"
 import { varietySeo } from "@/shared/seo/titles"
 
 type Params = PageProps<"/prices/[variety]">["params"]
+
+/** 상세 아래 "다른 품종"에 보이는 수 */
+const RELATED_COUNT = 6
 
 // 판정이 있는 품종을 모두 빌드 때 그린다(상세 읽기가 캐시라 본문이 정적 셸에 들어간다). 목록에 없는 id는 요청 때 그리고,
 // 판정이 없으면 notFound()로 막는다.
@@ -40,12 +44,15 @@ export default function Page(props: PageProps<"/prices/[variety]">) {
 }
 
 async function Variety({ params }: { params: Params }) {
-  const detail = await getPriceSource().getVariety((await params).variety)
+  const source = getPriceSource()
+  const id = (await params).variety
+  // 목록은 품종 허브·sitemap과 같은 캐시 읽기라 상세마다 DB를 다시 읽지 않는다.
+  const [detail, varieties] = await Promise.all([source.getVariety(id), source.listVarieties()])
   if (!detail) notFound()
   return (
     <>
       <JsonLd data={breadcrumb([{ name: PRICE_COPY.catalog.title, path: routes.price.varieties }, { name: varietySeo(detail).title, path: routes.price.variety(detail.id) }])} />
-      <DetailView detail={detail} />
+      <DetailView detail={detail} related={relatedInCategory(varieties, detail.id, RELATED_COUNT)} />
     </>
   )
 }

@@ -205,6 +205,11 @@ export const PRICE_COPY = {
     categoryNav: "카테고리",
     ogSubtitle: "오늘 시세와 평소 가격",
   },
+  /** P3 품종 상세 아래, 같은 카테고리의 다른 품종 목록과 품종 허브(/prices)로 가는 링크 */
+  related: {
+    title: (category: string) => `${category} 다른 품종 시세`,
+    all: "전체 품종 시세 보기",
+  },
   /** P3 품종 상세 아래, 같은 id의 제철 품종 상세로 가는 링크 */
   seasonLink: (name: string) => `${name} 제철 시기 보기`,
   /** 목록 위 설명 한 줄 */

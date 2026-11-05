@@ -62,6 +62,8 @@ function SearchScreen({ varieties, featuredIds, index }: SearchViewProps) {
 
   return (
     <div className="price-page flex flex-col gap-4 lg:gap-8 lg:pt-8">
+      {/* 화면 제목은 입력창이 대신한다. 보조 기술이 페이지 제목을 찾도록 보이지 않는 h1을 둔다. */}
+      <h1 className="sr-only">{PRICE_COPY.search.label}</h1>
       {/* 모바일은 사이트 헤더 대신 이 검색 줄이 맨 위에 붙는다(검색 헤더, .scratch/shell-unify/spec.md 3장).
           ‹와 뒤따르는 요소는 하위 헤더(P3 등)와 같은 자리에 둔다: 모바일은 줄 높이 56 · 버튼 40 · 입력창 44에 x 15 · y 8 · 간격 6(pt-px는 아래 구분선만큼 세로 중심을 맞춘다), 데스크톱은 -ml-2로 꺾쇠를 본문 왼쪽 끝에 맞추고 pt-8로 본문 시작 간격을 맞춘다. */}
       <form

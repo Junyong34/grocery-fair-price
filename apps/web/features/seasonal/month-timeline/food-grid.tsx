@@ -56,7 +56,7 @@ function Segment({
   return (
     <div className={className}>
       <Segmented
-        aria-label="보기"
+        aria-label="한 줄에 보일 품종 수"
         options={values.map((columns) => ({ value: columns, label: `${columns}열` }))}
         value={value}
         onValueChange={onChange}

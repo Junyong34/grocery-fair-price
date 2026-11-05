@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { groupByCategory, latestSurveyedOn, pickByIds } from "./list"
+import { groupByCategory, latestSurveyedOn, pickByIds, relatedInCategory } from "./list"
 
 const row = (id: string, surveyedOn: string) => ({ id, surveyedOn })
 
@@ -36,5 +36,25 @@ describe("groupByCategory", () => {
 
   it("빈 목록이면 빈 배열", () => {
     expect(groupByCategory([])).toEqual([])
+  })
+})
+
+describe("relatedInCategory", () => {
+  const rows = [
+    { id: "a", category: "채소" },
+    { id: "x", category: "과일" },
+    { id: "b", category: "채소" },
+    { id: "c", category: "채소" },
+    { id: "d", category: "채소" },
+  ]
+
+  it("같은 카테고리에서 그 품종 다음 것부터 돌아가며 고르고 자기 자신은 뺀다", () => {
+    expect(relatedInCategory(rows, "c", 2).map((r) => r.id)).toEqual(["d", "a"])
+    expect(relatedInCategory(rows, "a", 10).map((r) => r.id)).toEqual(["b", "c", "d"])
+  })
+
+  it("같은 카테고리에 다른 품종이 없거나 목록에 없는 id면 빈 배열", () => {
+    expect(relatedInCategory(rows, "x", 3)).toEqual([])
+    expect(relatedInCategory(rows, "nope", 3)).toEqual([])
   })
 })

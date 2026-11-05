@@ -83,11 +83,10 @@ export function MonthView({ month }: { month: Month }) {
         aria-label={`${month}월 제철 전체`}
         className="mt-6 flex flex-col gap-4 lg:mt-0"
       >
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-end gap-3 lg:justify-between">
           <p className="hidden text-lg font-semibold lg:block">
             {month}월 제철 전체
           </p>
-          <span className="shrink-0 text-sm text-stone lg:hidden">보기</span>
           <ViewSwitch />
         </div>
         {groups.map(({ category, foods: group }) => (

@@ -8,7 +8,7 @@ import type { VarietySummary } from "@workspace/price/types"
 import { SEASON_COPY } from "@workspace/seasonal/data/copy"
 import { dishNames } from "@workspace/seasonal/data/dishes"
 import { type Festival, festivalOf, festivalsWithFood } from "@workspace/seasonal/data/festivals"
-import { type Food, foodsInSeasonWith, monthHighlights, seasonHighlights } from "@workspace/seasonal/data/foods"
+import { type Food, foodsInMonth, foodsInSeasonWith, monthHighlights, seasonHighlights } from "@workspace/seasonal/data/foods"
 import { sashimiInMonth } from "@workspace/seasonal/data/sashimi"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 import type { Season } from "@workspace/seasonal/data/seasons"
@@ -76,7 +76,8 @@ export function monthsIndexSeo(): PageSeo {
 
 export function monthSeo(month: number): PageSeo {
   return {
-    title: `${month}월 제철 음식`,
+    // 품종 수는 2b 화면 머리의 "N가지"와 같은 값이다.
+    title: `${month}월 제철 음식 ${foodsInMonth(month).length}가지`,
     description: `${month}월 제철 음식은 ${names(monthHighlights(month, 3))} 등. ${month}월에 가장 맛있는 우리 땅 제철 식재료를 모아 보세요.`,
   }
 }
@@ -125,7 +126,8 @@ export function foodSeo(food: Food): PageSeo {
     together.length > 0 && `같은 때 제철인 ${names(together)}도 함께 확인해 보세요.`,
   ]
   return {
-    title: `${food.name} 제철 시기`,
+    // "언제부터 언제까지"를 찾는 검색이라 제철 달을 제목에 바로 보인다. 화면의 "제철 12~5월"과 같은 표기다.
+    title: `${food.name} 제철 시기 · ${months}`,
     description: parts.filter(Boolean).join(" "),
   }
 }

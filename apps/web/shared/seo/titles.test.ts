@@ -40,12 +40,12 @@ describe("페이지 제목·설명", () => {
     expect(seasonalHomeSeo().title).toBe("제철 음식 달력")
     expect(downloadsSeo().title).toBe("제철 음식 달력 무료 다운로드 · A4 PDF")
     expect(monthsIndexSeo().title).toBe("월별 제철 음식")
-    expect(monthSeo(3).title).toBe("3월 제철 음식")
+    expect(monthSeo(3).title).toMatch(/^3월 제철 음식 \d+가지$/)
     expect(seasonsIndexSeo().title).toBe("계절별 제철 음식")
     expect(seasonSeo("spring").title).toBe("봄 제철 음식")
     expect(festivalSeo("chuseok").title).toBe("추석 음식")
     expect(sashimiSeo(12).title).toBe("12월 제철 회")
-    expect(foodSeo(findFood("snow-crab")!).title).toBe("대게 제철 시기")
+    expect(foodSeo(findFood("snow-crab")!).title).toBe("대게 제철 시기 · 12~5월")
   })
 
   it('인쇄물 제목에 "제철"이 없으면 "제철 음식"을 앞에 붙인다(철강 "제철"과 헷갈리지 않게)', () => {
