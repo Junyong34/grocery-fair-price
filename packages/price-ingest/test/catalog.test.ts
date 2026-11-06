@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs"
 
 import { describe, expect, it } from "vitest"
 
+import { KAMIS_EXCLUDED } from "../src/catalog/match.ts"
 import { CATEGORIES, ITEMS, VARIETIES, type VarietyDef } from "../src/catalog/varieties.ts"
 
 const repo = new URL("../../../", import.meta.url)
@@ -86,7 +87,14 @@ describe("실측 코드표 (samples/inventory, 2026-10-19)", () => {
         const [item, vrty, grd] = k.split("-")
         return r.item_cd === item && (vrty === "*" || r.vrty_cd === vrty) && r.grd_cd === grd
       })
-    expect(kamisRetail.filter((r) => !covered(r)).map((r) => `${r.item_cd}-${r.vrty_cd}-${r.grd_cd} ${r.item_nm}`)).toEqual([])
+    const excluded = (r: Record<string, string>) => KAMIS_EXCLUDED.has(`${r.item_cd}-${r.vrty_cd}-${r.grd_cd}`)
+    expect(kamisRetail.filter((r) => !covered(r) && !excluded(r)).map((r) => `${r.item_cd}-${r.vrty_cd}-${r.grd_cd} ${r.item_nm}`)).toEqual([])
+  })
+
+  it("일부러 뺀 KAMIS 코드는 코드표에 있고 어느 규격에도 잇지 않는다", () => {
+    const keys = new Set(specs.flatMap(({ spec }) => spec.kamis ?? []))
+    const inTable = new Set(kamisRetail.map((r) => `${r.item_cd}-${r.vrty_cd}-${r.grd_cd}`))
+    expect([...KAMIS_EXCLUDED.keys()].filter((k) => keys.has(k) || !inTable.has(k))).toEqual([])
   })
 
   it("축평원 키는 코드표에 있고, 코드표의 키는 모두 잇는다", () => {

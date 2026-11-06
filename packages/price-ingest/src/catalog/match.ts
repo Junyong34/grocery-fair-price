@@ -55,6 +55,13 @@ export function chamgaTarget(goodId: number): CatalogTarget | undefined {
   return chamgaIndex.get(goodId)
 }
 
+// 실제 소매 데이터가 오지만 일부러 어느 규격에도 잇지 않는 KAMIS 코드(`품목-품종-등급`)와 이유.
+// 카탈로그에서 빼도 이미 열린 매핑은 매핑 적용이 고치지 않는다. 운영 DB에서는 그 매핑을 ignored로 바꿔 둔다.
+export const KAMIS_EXCLUDED: ReadonlyMap<string, string> = new Map([
+  ["111-01-04", "쌀 20kg: 쌀은 10kg 기준이다. 같은 날 kg당 10kg보다 중간 14% 싸서 섞으면 10kg 가격표와 어긋난다 (2026-11-06)"],
+  ["111-05-04", "쌀 20kg(햅쌀): 위와 같다 (2026-11-06)"],
+])
+
 // 신선식품이지만 아직 품종에 잇지 않는 참가격 상품. 매핑 적용이 ignored로 바꾸지 않고 pending으로 둔다
 export const CHAMGA_UNDECIDED: ReadonlyMap<number, string> = new Map([
   [1738, "볶음참깨: 원산지가 없어 참깨(국산)·(중국)을 고를 수 없다"],

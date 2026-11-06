@@ -18,7 +18,7 @@ export type SpecDef = {
 }
 
 // 기준 단위 (variety-list.md 규칙 5)
-export type BaseUnit = "100g" | "1kg" | "1개" | "30구" | "1L"
+export type BaseUnit = "100g" | "1kg" | "10kg" | "1개" | "30구" | "1L"
 
 export type VarietyDef = {
   slug: string
@@ -35,6 +35,7 @@ export type VarietyDef = {
 export const BASE_UNITS: Record<BaseUnit, { base_unit: "g" | "ea" | "ml"; base_unit_qty: number }> = {
   "100g": { base_unit: "g", base_unit_qty: 100 },
   "1kg": { base_unit: "g", base_unit_qty: 1000 },
+  "10kg": { base_unit: "g", base_unit_qty: 10000 },
   "1개": { base_unit: "ea", base_unit_qty: 1 },
   "30구": { base_unit: "ea", base_unit_qty: 30 },
   "1L": { base_unit: "ml", base_unit_qty: 1000 },
@@ -109,9 +110,11 @@ const hanwoo = (cut: string, chamga?: { plus: number; one: number }): SpecDef[] 
 
 export const VARIETIES: readonly VarietyDef[] = [
   // 쌀·잡곡·견과
-  { slug: "rice", name: "쌀", item: "rice", unit: "1kg", spread: "brand", seasonal: ["rice"], specs: [
-    { slug: "regular", name: "일반", kamis: ["111-01-04", "111-10-04"], chamga: [1568, 1569, 1570, 1571, 1572, 1739, 1782, 1783, 1784, 1785] },
-    { slug: "new-crop", name: "햅쌀", kamis: ["111-05-04", "111-11-04"] },
+  { slug: "rice", name: "쌀", item: "rice", unit: "10kg", spread: "brand", seasonal: ["rice"], specs: [
+    // 10kg 포대만 쓴다 (2026-11-06). 같은 날 20kg 포대는 kg당 6~19%(중간 14%) 싸서, 섞으면 10kg 가격표보다 늘 싸게 보이고
+    // 표본 구성이 바뀌는 날 시세가 튄다. 20kg(111-01·05)과 참가격 4kg(1782·1783)은 매핑을 ignored로 바꿨다 (카탈로그에서 빼도 열린 매핑은 남는다)
+    { slug: "regular", name: "일반", kamis: ["111-10-04"], chamga: [1568, 1569, 1570, 1571, 1572, 1739, 1784, 1785] },
+    { slug: "new-crop", name: "햅쌀", kamis: ["111-11-04"] },
   ] },
   { slug: "glutinous-rice", name: "찹쌀", item: "rice", unit: "1kg", spread: "brand", seasonal: ["glutinous-rice"], specs: one({ kamis: ["112-01-04"] }) },
   { slug: "brown-rice", name: "현미", item: "rice", unit: "1kg", spread: "brand", specs: one({ kamis: ["115-01-04"], chamga: [1576, 1578, 1819] }) },
