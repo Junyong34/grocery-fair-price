@@ -178,7 +178,8 @@ function EdgeButton({
       aria-hidden={!visible}
       onClick={onClick}
       className={cn(
-        "absolute top-1/2 z-10 grid size-7 -translate-y-1/2 place-items-center rounded-full border border-hairline bg-canvas/95 text-stone shadow-sm transition-opacity duration-200 hover:text-ink",
+        // 보이는 원은 28px로 두고, 손가락으로 누르는 영역만 가상 요소로 44px까지 넓힌다.
+        "absolute top-1/2 z-10 grid size-7 -translate-y-1/2 place-items-center rounded-full border border-hairline bg-canvas/95 text-stone shadow-sm transition-opacity duration-200 after:absolute after:-inset-2 hover:text-ink",
         side === "start" ? "left-1" : "right-1",
         visible ? "opacity-100" : "pointer-events-none opacity-0"
       )}

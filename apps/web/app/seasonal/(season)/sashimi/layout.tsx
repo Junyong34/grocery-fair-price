@@ -1,4 +1,3 @@
-import { MonthSwipeArea } from "@/features/seasonal/components/month-swipe-area"
 import { SashimiChipRow } from "@/features/seasonal/sashimi/sashimi-chip-row"
 import { SashimiMonthChips } from "@/features/seasonal/sashimi/sashimi-month-chips"
 
@@ -10,7 +9,7 @@ export default function SashimiLayout({
     <>
       <SashimiMonthChips />
       <SashimiChipRow />
-      <MonthSwipeArea route="sashimiMonth">{children}</MonthSwipeArea>
+      {children}
     </>
   )
 }

@@ -25,7 +25,9 @@ export function SashimiMonthChips() {
     if (!box || !chip) return
     box.scrollTo({
       left: chip.offsetLeft - (box.clientWidth - chip.offsetWidth) / 2,
-      behavior: "smooth",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "instant"
+        : "smooth",
     })
   }, [pathname])
 

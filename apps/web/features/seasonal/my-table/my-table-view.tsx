@@ -24,8 +24,6 @@ import { useEatenIds } from "@/shared/eaten-store"
 import { useToday } from "@/shared/today-context"
 
 import { PillButton } from "../components/pill"
-import { stepIn } from "../components/swipe-gesture"
-import { useSwipe } from "../components/use-swipe"
 import { FoodRow } from "./food-row"
 import { CategoryFilter } from "./category-filter"
 import {
@@ -35,12 +33,6 @@ import {
   scopeName,
   type FilterMode,
 } from "./scope-summary"
-
-/** 목록을 밀어 필터를 바꾸는 순서. 전체에서 시작하고 끝에서 멈춘다. */
-const SCOPE_ORDER: Record<FilterMode, readonly Scope[]> = {
-  month: [null, ...MONTHS],
-  season: [null, ...SEASONS],
-}
 
 /**
  * 1h 나의 식탁(명세 3.6). "검색 → 필터 → 체크" 흐름이다. 체크하면 +1과 진행률이 함께 움직인다.
@@ -87,11 +79,6 @@ export function MyTableView() {
     if (next !== null) setMode(typeof next === "number" ? "month" : "season")
     setScope(next)
   }
-
-  // 체크박스에서 시작한 터치는 use-swipe가 거른다. 행의 다른 곳에서 민 터치는 탭이 아니라 체크되지 않는다.
-  const listArea = useSwipe<HTMLDivElement>((direction) => {
-    setScope(stepIn(SCOPE_ORDER[mode], scope, direction))
-  })
 
   return (
     <div className="mx-auto max-w-[1080px] px-[18px] pt-6 pb-8 lg:grid lg:grid-cols-[280px_1fr] lg:gap-8 lg:px-6 lg:pt-8">
@@ -189,7 +176,7 @@ export function MyTableView() {
           </ScrollRow>
         </div>
 
-        <div ref={listArea}>
+        <div>
           {/* 검색·카테고리가 적용되면 목록과 시기 요약의 범위가 다르므로 별도 집계한다. */}
           {/* live 영역은 숨기지 않고 늘 두어야 바뀐 문구가 읽힌다. 비어 있으면 높이가 0이다. */}
           <p aria-live="polite" className="mt-1 text-xs break-words text-stone tabular-nums">
