@@ -3,12 +3,15 @@
 // 수집 도구(GA4)나 보존 기간을 바꾸면 이 파일과 shared/analytics, GA 관리 화면을 같이 고치고 CHANGES에 한 줄을 더한다.
 
 export const PRIVACY_OPERATOR = "장볼날"
-export const PRIVACY_CONTACT_EMAIL = "wnsdyd21@gmail.com"
+export const PRIVACY_CONTACT_EMAIL = "contact@jangbol.kr"
 /** GA4 관리 → 데이터 보존 기간과 같은 값 */
 export const ANALYTICS_RETENTION = "14개월"
 
 /** 시행일과 바뀐 내역. 새로 고치면 앞에 더한다. 첫 줄이 지금 판의 시행일이다. */
-export const PRIVACY_CHANGES: readonly { date: string; note: string }[] = [{ date: "2026-10-30", note: "처음 만듦" }]
+export const PRIVACY_CHANGES: readonly { date: string; note: string }[] = [
+  { date: "2026-11-06", note: "문의 이메일을 contact@jangbol.kr로 바꿈" },
+  { date: "2026-10-30", note: "처음 만듦" },
+]
 
 export type PrivacySection = { title: string; paragraphs?: readonly string[]; items?: readonly string[] }
 
