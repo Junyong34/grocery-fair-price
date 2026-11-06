@@ -115,16 +115,6 @@ export function isAverageBasis(basis: QuoteBasis): boolean {
   return basis.scope.endsWith("평균")
 }
 
-/** 화면 맨 아래 근거 한 줄: "전국 조사 시장 45곳 · 10/23 조사 (KAMIS)", 평균이면 "전국 평균 · 11/3 조사 (축평원)" */
-export function basisLine(
-  basis: QuoteBasis,
-  surveyedOn: string,
-  n: number
-): string {
-  const scope = isAverageBasis(basis) ? basis.scope : `${basis.scope} ${n}곳`
-  return `${scope} · ${monthDay(surveyedOn)} 조사 (${basis.source})`
-}
-
 /**
  * 목록 아래 근거 한 줄. 조사일이 다르면 범위로 쓰고, 출처는 처음 나온 순서대로 한 번씩 쓴다.
  * 빈 목록이면 null. 행별 조사일도 시세 옆에 표시한다.
@@ -159,6 +149,7 @@ const VERDICT_END: Record<Exclude<VerdictKind, "none">, string> = { cheap: "싸�
 
 /**
  * P3 품종 상세의 요약 한 문장. 검색 결과·AI 답변이 그대로 인용할 수 있게 날짜(연도 포함)·출처·표본·숫자를 한 문장에 담는다.
+ * 단위는 괄호 밖에 쓴다("고등어(국산) 1개"). 이름에 괄호가 있으면 "고등어(국산)(1개)"처럼 겹친다.
  * 판정 차이는 최근 3회 조사 편차의 중간값이라 두 금액의 단순 차이와 다를 수 있어 "최근 3회 조사에서"를 붙인다.
  */
 export function summaryLine(v: {
@@ -172,7 +163,7 @@ export function summaryLine(v: {
   basis: QuoteBasis
 }): string {
   const scope = isAverageBasis(v.basis) ? v.basis.scope : `${v.basis.scope} ${v.sampleSize}곳 중간값`
-  const head = `${longDate(v.surveyedOn)} ${v.basis.source} ${scope} 기준, ${v.name}(${v.baseUnit}) 시세는 ${won(v.price)}원이에요.`
+  const head = `${longDate(v.surveyedOn)} ${v.basis.source} ${scope} 기준, ${v.name} ${v.baseUnit} 시세는 ${won(v.price)}원이에요.`
   if (v.usual == null || v.verdict.kind === "none" || v.verdict.pct == null) return `${head} 평소가가 아직 쌓이지 않아 판정 전이에요.`
   const diff = v.verdict.pct === 0 ? "평소와 같아" : `평소보다 ${Math.abs(v.verdict.pct)}% ${v.verdict.pct > 0 ? "높아" : "낮아"}`
   return `${head} 평소가는 ${won(v.usual)}원이고, 최근 3회 조사에서 ${diff} ${VERDICT_END[v.verdict.kind]}`
@@ -242,6 +233,8 @@ export const PRICE_COPY = {
   },
   detail: {
     back: "뒤로",
+    /** 페이지 맨 아래 요약 문장 옆, 데이터 출처 안내(/settings/sources)로 가는 링크 */
+    sourcesLink: "데이터 출처",
     add: "+ 담기",
     added: "✓ 담음",
     nowPrice: "지금 시세",

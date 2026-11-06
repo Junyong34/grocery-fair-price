@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import { basisLine, PRICE_COPY, summaryLine } from "@workspace/price/copy"
+import { PRICE_COPY, summaryLine } from "@workspace/price/copy"
 import type { VarietyDetail, VarietySummary } from "@workspace/price/types"
 import { findFood } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
@@ -92,11 +92,19 @@ export function DetailView({ detail, related = [] }: { detail: VarietyDetail; re
           </ul>
         )}
       </section>
-      {/* 페이지 요약 한 문장(날짜·출처·숫자). 검색 결과와 AI 답변이 인용하기 좋은 꼴로 둔다. */}
-      <p className="max-w-prose text-sm leading-relaxed text-stone">{summaryLine(detail)}</p>
-      <p className="-mt-5 pb-4 text-xs text-caption">
-        {basisLine(detail.basis, detail.surveyedOn, detail.sampleSize)}
-      </p>
+      {/*
+        페이지 요약 한 문장(연도 포함 날짜·출처·표본·숫자). 검색 결과와 AI 답변이 인용하기 좋은 꼴로 둔다.
+        판정 카드와 내용이 겹치므로 본문 섹션처럼 보이지 않게 가는 선 아래 각주로 둔다(크림 위 보조 글씨는 caption, DESIGN.md).
+      */}
+      <footer className="flex flex-col gap-2 border-t border-hairline pt-4 pb-4">
+        <p className="max-w-prose text-[13px] leading-relaxed text-caption">{summaryLine(detail)}</p>
+        <Link
+          href={routes.settings.sources}
+          className="relative self-start text-xs text-caption underline underline-offset-2 after:absolute after:-inset-3 hover:text-ink"
+        >
+          {PRICE_COPY.detail.sourcesLink}
+        </Link>
+      </footer>
     </article>
   )
 }

@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest"
 
 import {
-  basisLine,
   brandSpreadNote,
   listBasisLine,
   listSourceLine,
@@ -99,25 +98,13 @@ describe("withJosa", () => {
   })
 })
 
-describe("basisLine", () => {
-  it("근거 한 줄", () => {
-    expect(
-      basisLine({ source: "KAMIS", scope: "전국 조사 시장" }, "2026-10-23", 45)
-    ).toBe("전국 조사 시장 45곳 · 10/23 조사 (KAMIS)")
-  })
-
-  it("전국 평균(축평원)은 곳 수 대신 평균이라고만 쓴다(\"전국 평균 1곳\"이 아니다)", () => {
-    expect(basisLine({ source: "축평원", scope: "전국 평균" }, "2026-11-03", 1)).toBe("전국 평균 · 11/3 조사 (축평원)")
-  })
-})
-
 describe("summaryLine", () => {
   const kamis = { source: "KAMIS", scope: "전국 조사 시장" }
   const base = { name: "녹두", baseUnit: "100g", price: 2700, usual: 2480, surveyedOn: "2026-11-03", sampleSize: 40, basis: kamis }
 
   it("날짜(연도 포함)·출처·표본·시세·평소가·판정을 한 문장으로 쓴다", () => {
     expect(summaryLine({ ...base, verdict: { kind: "pricey", pct: 9 } })).toBe(
-      "2026년 11월 3일 KAMIS 전국 조사 시장 40곳 중간값 기준, 녹두(100g) 시세는 2,700원이에요. 평소가는 2,480원이고, 최근 3회 조사에서 평소보다 9% 높아 비싸요."
+      "2026년 11월 3일 KAMIS 전국 조사 시장 40곳 중간값 기준, 녹두 100g 시세는 2,700원이에요. 평소가는 2,480원이고, 최근 3회 조사에서 평소보다 9% 높아 비싸요."
     )
   })
 
@@ -128,14 +115,14 @@ describe("summaryLine", () => {
 
   it("판정 전이면 평소가가 없다고 쓴다", () => {
     expect(summaryLine({ ...base, usual: null, verdict: { kind: "none", pct: null } })).toBe(
-      "2026년 11월 3일 KAMIS 전국 조사 시장 40곳 중간값 기준, 녹두(100g) 시세는 2,700원이에요. 평소가가 아직 쌓이지 않아 판정 전이에요."
+      "2026년 11월 3일 KAMIS 전국 조사 시장 40곳 중간값 기준, 녹두 100g 시세는 2,700원이에요. 평소가가 아직 쌓이지 않아 판정 전이에요."
     )
   })
 
   it("전국 평균(축평원)은 곳 수와 중간값을 쓰지 않는다", () => {
     expect(
       summaryLine({ ...base, name: "계란", baseUnit: "30구", price: 6998, usual: null, sampleSize: 1, basis: { source: "축평원", scope: "전국 평균" }, verdict: { kind: "none", pct: null } })
-    ).toMatch(/^2026년 11월 3일 축평원 전국 평균 기준, 계란\(30구\) 시세는 6,998원이에요\./)
+    ).toMatch(/^2026년 11월 3일 축평원 전국 평균 기준, 계란 30구 시세는 6,998원이에요\./)
   })
 })
 
@@ -228,5 +215,13 @@ describe("검색 문구", () => {
       '"대패삼겹"은 이 이름으로 찾았어요'
     )
     expect(PRICE_COPY.toast.added("배추")).toBe("배추를 담았어요")
+  })
+})
+
+describe("summaryLine 이름과 단위", () => {
+  it("이름에 괄호가 있어도 단위를 괄호 밖에 써서 괄호가 겹치지 않는다", () => {
+    expect(
+      summaryLine({ name: "고등어(국산)", baseUnit: "1개", price: 3990, usual: 4562, verdict: { kind: "cheap", pct: -13 }, surveyedOn: "2026-11-04", sampleSize: 37, basis: { source: "KAMIS", scope: "전국 조사 시장" } })
+    ).toContain("고등어(국산) 1개 시세는 3,990원이에요.")
   })
 })
