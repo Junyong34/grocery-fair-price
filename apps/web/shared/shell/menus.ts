@@ -50,7 +50,7 @@ export const MENUS: readonly MenuItem[] = [
     exact: true,
     Icon: CalendarDays,
   },
-  { key: "basket", label: "담은 품종", href: routes.price.basket, Icon: ShoppingBasket },
+  { key: "basket", label: "장바구니", href: routes.price.basket, Icon: ShoppingBasket },
   { key: "my-table", label: "나의 식탁", href: routes.seasonal.myTable, Icon: UtensilsCrossed },
 ]
 

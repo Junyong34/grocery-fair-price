@@ -188,16 +188,16 @@ export function listSourceLine(
 
 export const PRICE_COPY = {
   home: {
-    title: ["지금 사도 될까?", "품종을 검색해 보세요"],
+    title: ["지금 사도 될까?", "식재료를 검색해 보세요"],
     searchPlaceholder: "배추, 삼겹살, 고등어…",
-    recent: "최근 본 품종",
+    recent: "최근 본 시세",
     clearRecent: "지우기",
-    featured: "자주 사는 품종",
+    featured: "자주 사는 식재료",
     priceInfo: "시세·판정 안내",
   },
   /** P3 품종 상세 아래, 같은 카테고리의 다른 품종 목록 */
   related: {
-    title: (category: string) => `${category} 다른 품종 시세`,
+    title: (category: string) => `다른 ${category} 시세`,
   },
   /** P3 품종 상세 아래, 같은 id의 제철 품종 상세로 가는 링크 */
   seasonLink: (name: string) => `${name} 제철 시기 보기`,
@@ -220,26 +220,25 @@ export const PRICE_COPY = {
     openList: "목록 보기",
   },
   search: {
-    placeholder: "품종 이름이나 초성",
-    label: "품종 검색",
-    item: (item: string) => `품목 "${item}" · 어떤 ${item}인가요?`,
+    placeholder: "배추, 삼겹살, ㅂㅊ…",
+    label: "시세 검색",
+    item: (item: string) => `어떤 ${item}인가요?`,
     alias: (alias: string) =>
-      `"${alias}"${josaOf(alias, "은/는")} 이 품종으로 찾았어요`,
+      `"${alias}"${josaOf(alias, "은/는")} 이 이름으로 찾았어요`,
     typo: (query: string) =>
-      `"${query}"에 맞는 품종이 없어요. 혹시 이 품종인가요?`,
+      `"${query}"에 맞는 식재료가 없어요. 혹시 이걸 찾으셨나요?`,
     // 검색은 시세를 모으는 품종 목록(searchIndex) 안에서만 찾는다. 없는 이유는 판정이 아니라 목록에 없어서다.
     noResult: (query: string) => `"${query}" 검색 결과가 없어요`,
     // 오타 · 아무 글자일 때도 틀리지 않게 "~일 수 있어요". 특정 품종을 넣겠다는 약속은 하지 않는다(요청을 받는 경로가 없다).
     // 문장마다 한 줄로 그린다(375에서 문장 중간이 끊기지 않게).
-    noResultHint: ["아직 시세를 제공하지 않는 품종일 수 있어요.", "제공 품종은 계속 늘려 갈게요."],
+    noResultHint: ["아직 시세를 모으지 않는 식재료일 수 있어요.", "시세를 내는 식재료는 계속 늘려 갈게요."],
     tipsTitle: "이렇게 찾아보세요",
     tips: [
-      { how: "품종 이름", example: "애호박, 삼겹살" },
+      { how: "이름", example: "애호박, 호박, 삼겹살" },
       { how: "초성", example: "ㅇㅎㅂ" },
-      { how: "품목 이름", example: "호박, 소고기" },
     ],
     browse: "카테고리에서 둘러보기",
-    category: (category: string) => `${category} 품종`,
+    category: (category: string) => `${category} 시세`,
   },
   detail: {
     back: "뒤로",
@@ -346,18 +345,18 @@ export const PRICE_COPY = {
       `${diff} · 평소가 ${usual}원`,
   },
   basket: {
-    title: "담은 품종",
+    title: "장바구니",
     edit: "편집",
     done: "완료",
     changed: (n: number, names: string) =>
-      `담은 뒤 판정이 바뀐 품종 ${n}개 · ${names}`,
+      `담은 뒤 판정이 바뀐 식재료 ${n}개 · ${names}`,
     changedRow: (date: string, before: string, now: string) =>
       `${monthDay(date)}에 담을 때 ${before} → 지금 ${now}`,
-    columns: ["품종", "판정", "시세 · 평소"],
-    addMore: "+ 품종 더 담기",
-    emptyTitle: "아직 담은 품종이 없어요",
-    emptyBody: "살 품종을 담아 두면 판정을 한 번에 볼 수 있어요",
-    emptyAction: "품종 검색해서 담기",
+    columns: ["식재료", "판정", "시세 · 평소"],
+    addMore: "+ 더 담기",
+    emptyTitle: "장바구니가 비어 있어요",
+    emptyBody: "살 식재료를 담아 두면 판정을 한 번에 볼 수 있어요",
+    emptyAction: "검색해서 담기",
     clearAll: "모두 빼기",
   },
 } as const

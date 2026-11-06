@@ -52,7 +52,7 @@ export function DetailHeaderBar({ variety }: { variety: VarietySummary }) {
       revealAfter={P3_SECTIONS.title}
       actions={
         <>
-          <SearchLink href={routes.price.search} label="품종 검색" />
+          <SearchLink href={routes.price.search} label="시세 검색" />
           <KeepButton variety={variety} className="h-8 px-3 text-[13px]" />
         </>
       }

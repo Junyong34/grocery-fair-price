@@ -4,8 +4,8 @@ import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
 
 export const metadata = createMetadata({
-  title: "담은 품종",
-  description: "담아 둔 품종의 오늘 판정을 한 번에 봐요.",
+  title: "장바구니",
+  description: "담아 둔 식재료의 오늘 판정을 한 번에 봐요.",
   path: routes.price.basket,
   noIndex: true,
 })

@@ -4,7 +4,7 @@ import { activeMenuKey, MENUS, nextMenuOrigin } from "./menus"
 
 describe("MENUS", () => {
   it("어디서나 같은 4칸이다", () => {
-    expect(MENUS.map((item) => item.label)).toEqual(["시세", "제철달력", "담은 품종", "나의 식탁"])
+    expect(MENUS.map((item) => item.label)).toEqual(["시세", "제철달력", "장바구니", "나의 식탁"])
   })
 })
 

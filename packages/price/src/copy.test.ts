@@ -225,7 +225,7 @@ describe("검색 문구", () => {
 
   it("따옴표 밖에 조사를 붙인다", () => {
     expect(PRICE_COPY.search.alias("대패삼겹")).toBe(
-      '"대패삼겹"은 이 품종으로 찾았어요'
+      '"대패삼겹"은 이 이름으로 찾았어요'
     )
     expect(PRICE_COPY.toast.added("배추")).toBe("배추를 담았어요")
   })

@@ -11,5 +11,5 @@ import { SearchLink } from "@/shared/shell/search-link"
 export function HeaderSearchLink() {
   const pathname = usePublicPathname()
   if (pathname === routes.home) return null
-  return <SearchLink href={routes.price.search} label="품종 검색" />
+  return <SearchLink href={routes.price.search} label="시세 검색" />
 }

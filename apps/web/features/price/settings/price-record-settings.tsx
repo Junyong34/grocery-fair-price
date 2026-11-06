@@ -13,8 +13,8 @@ export function PriceRecordSettings() {
   const recentReady = useRecentHydrated()
   return (
     <>
-      <ClearRow label="담은 품종" where="담은 품종" count={basketReady ? basket : null} onClear={clearBasket} />
-      <ClearRow label="최근 본 품종" where="시세" count={recentReady ? recent : null} onClear={clearRecent} />
+      <ClearRow label="장바구니" where="장바구니" count={basketReady ? basket : null} onClear={clearBasket} />
+      <ClearRow label="최근 본 시세" where="시세" count={recentReady ? recent : null} onClear={clearRecent} />
     </>
   )
 }

@@ -117,7 +117,7 @@ export const UI_COPY = {
   yearEndMoreTitle: "다른 방법으로 둘러보기",
   /** 1i 품종 상세: 아직 시세 데이터가 없는 품종일 때 시세 버튼 자리에 두는 안내와 시세 메인(/) 링크 */
   priceUnavailable: (name: string) => `${name} 시세는 아직 준비 중이에요`,
-  priceHubLink: "다른 품종 시세 보기",
+  priceHubLink: "다른 식재료 시세 보기",
   /** 1i 품종 상세에서 같은 품종의 시세 화면(/prices/<id>)으로 가는 버튼 */
   priceLink: (name: string) => `${name} 오늘 시세 보기`,
   noRelatedFestival: "연결된 명절 없음",

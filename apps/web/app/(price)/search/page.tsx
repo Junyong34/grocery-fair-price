@@ -6,8 +6,8 @@ import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
 
 export const metadata = createMetadata({
-  title: "품종 검색",
-  description: "품종 이름이나 초성, 품목 이름으로 오늘 시세와 판정을 찾아보세요.",
+  title: "시세 검색",
+  description: "식재료 이름이나 초성으로 오늘 시세와 판정을 찾아보세요.",
   path: routes.price.search,
   noIndex: true,
 })
