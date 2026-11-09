@@ -238,6 +238,8 @@ create policy web_select on price.<표> for select to web_reader    using (true)
 
 표 정의: `category`, `item`, `variety`, `spec`, `alias`, `variety_seasonal_map` (열은 마이그레이션이 원본, 3장 첫머리).
 
+**카탈로그 원본은 이 표들이다 (2026-11-10, ADR 0005).** 아직 들어온 적 없는 원천 키의 규칙은 `catalog_key_rule`, 변경 제안은 `catalog_proposal`, 변경 기록은 `catalog_change`. 고치는 길은 소유자 접속(로컬 어드민, `catalog --import`)뿐이고 `ingest_writer`는 읽기만 한다. 승인할 때마다 `catalog --export`로 저장소의 `packages/price-ingest/src/catalog/snapshot.json`을 다시 써서 커밋한다. 이 사본이 운영자 결정의 백업이다 (Free 플랜은 자동 백업이 없다). 표를 SQL로 직접 고치지 않는다: 변경 기록이 남지 않는다.
+
 인덱스: `item(category_id)`, `variety(item_id)`, `alias(item_id)`, `alias(variety_id)`, `alias(lower(text))`, `variety_seasonal_map(seasonal_food_id)`. `spec(variety_id)`는 unique가 덮는다. 부분 unique는 표 제약으로 쓸 수 없어 `create unique index … where`로 만든다.
 
 **규격이 비지 않게 한다.** 매핑을 `mapped`로 확정할 때는 규격을 반드시 고른다. 원천이 규격을 가르지 않으면(축평원 `구분없음`, 참가격 상품 대부분) 그 품종의 기본 규격(`is_default`)을 넣는다. 그래서 집계 PK의 `spec_id`는 `null`이 아니다.
@@ -274,7 +276,7 @@ KAMIS 키에 `se_cd`를 넣는다. 구분이 다르면 단위도 다르다. 시�
 
 표 정의: `source_code_map` (열은 마이그레이션이 원본, 3장 첫머리).
 
-인덱스: `(variety_id, spec_id)` (복합 FK), `(status) where status = 'pending'` (운영자 처리 목록). 원천 키를 처음 본 순간 `pending`으로 자동 등록한다. 매핑이 없는 키도 버리지 않고 ②까지는 저장한다. 나중에 매핑하면 보존 기간 안의 관측값은 DB에서, 그 밖은 원본에서 다시 계산한다.
+인덱스: `(variety_id, spec_id)` (복합 FK), `(status) where status = 'pending'` (운영자 처리 목록). 원천 키를 처음 본 순간 `pending`으로 자동 등록하고, 원천 키 규칙(`catalog_key_rule`, 2026-11-10 ADR 0005)에 맞는 키는 바로 잇는다(`map`)·제외한다(`ignore`)·미룬다(`hold`). 매핑이 없는 키도 버리지 않고 ②까지는 저장한다. 나중에 매핑하면 보존 기간 안의 관측값은 DB에서, 그 밖은 원본에서 다시 계산한다.
 
 **환산 규칙.** 기준 단위 가격을 만드는 규칙이다. 행을 고치지 않고 새 버전을 추가한다. 관측값은 계산에 쓴 규칙의 `id`를 남긴다 (`observation.unit_rule_id`). 환산 기준(애호박 1개 ≈ 300g 같은 값)도 규칙의 값으로 두어, 값이 바뀌면 새 버전이 된다.
 
@@ -709,7 +711,7 @@ on conflict (source_item_id, obs_date, place_id) do update
 | `places` | 그날 KAMIS 시장 표본(`observation`, 대표 출처 · 매핑된 행, 이상치 제외). 대형마트는 체인 기호(`C-유통` → "대형마트 C")로 묶고, 지역은 KAMIS 시군구 코드 이름 |
 | `trend` | 최근 182일 `daily_quote` `national` + 같은 날 `usual_price`. 판정 전이면 평소가를 비운다 |
 | `shelf` | 최근 42일 안 가장 최근 참가격 조사일의 관측값을 판매처(`store_seller`)별로: 행사 아닌 값의 중간값, 행사 값뿐이면 행사가와 끝나는 날 |
-| `priceSpread` | 카탈로그 `spread: brand` (judgment.md 5-3) |
+| `priceSpread` | `variety.price_spread = 'brand'` (judgment.md 5-3) |
 | `basis` | KAMIS 시세면 "KAMIS · 전국 조사 시장", 축평원이면 "축평원 · 전국 평균" |
 | `forecast` | 아직 계산하지 않는다 (빈 배열이면 화면이 그리지 않는다) |
 

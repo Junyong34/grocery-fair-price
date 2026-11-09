@@ -1,10 +1,13 @@
-// 품종 카탈로그가 실측 코드표·제철 품종·variety-list.md와 맞는지 (ingest-foundation/08)
+// 카탈로그 사본(snapshot.json)이 실측 코드표·제철 품종·variety-list.md와 맞는지 (ingest-foundation/08, catalog-scale/04)
 import { readFileSync } from "node:fs"
 
 import { describe, expect, it } from "vitest"
 
-import { KAMIS_EXCLUDED } from "../src/catalog/match.ts"
-import { CATEGORIES, ITEMS, VARIETIES, type VarietyDef } from "../src/catalog/varieties.ts"
+import { readSnapshot } from "../src/catalog/snapshot.ts"
+import type { VarietyDef } from "../src/catalog/types.ts"
+
+const { categories: CATEGORIES, items: ITEMS, varieties: VARIETIES, exceptions } = readSnapshot()
+const KAMIS_EXCLUDED = new Map(exceptions.filter((e) => e.source === "kamis" && e.action === "ignore").map((e) => [e.key, e.reason]))
 
 const repo = new URL("../../../", import.meta.url)
 const read = (path: string) => readFileSync(new URL(path, repo), "utf8")

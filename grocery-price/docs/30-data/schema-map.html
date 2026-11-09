@@ -155,7 +155,7 @@ footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--li
     <span class="src c">참가격 생필품 가격</span>
   </div>
   <div class="facts">
-    <span><!-- erd:counts -->스키마 <code>price</code> · 테이블 <b>42</b>개 + 뷰 <b>1</b> · 묶음 <b>6</b>개<!-- /erd:counts --></span>
+    <span><!-- erd:counts -->스키마 <code>price</code> · 테이블 <b>45</b>개 + 뷰 <b>1</b> · 묶음 <b>6</b>개<!-- /erd:counts --></span>
     <span>1년차 DB 실측 기반 <b>465~525MB</b> / 무료 500MB</span>
     <span>1년차 원본 파일 추정 <b>250~330MB</b> / 무료 1GB</span>
     <span>근거 문서 <code>grocery-price/docs/30-data/pipeline.md</code> 3장</span>
@@ -343,6 +343,9 @@ erDiagram
   source_item ||--o{ source_code_map : ""
   unit_rule |o--o{ source_code_map : ""
   spec |o--o{ source_code_map : "(variety_id, spec_id)"
+  unit_rule |o--o{ catalog_key_rule : ""
+  spec |o--o{ catalog_key_rule : "(variety_id, spec_id)"
+  catalog_proposal |o--o{ catalog_change : "proposal_id"
   category {
     int id PK
     text slug UK
@@ -358,6 +361,7 @@ erDiagram
     text slug UK
     text base_unit "g ml ea"
     text status "active hidden"
+    text price_spread "brand"
   }
   spec {
     int id PK
@@ -396,6 +400,27 @@ erDiagram
     text source PK "kamis ekape chamga"
     text code_class PK
     text code PK
+  }
+  catalog_key_rule {
+    int id PK
+    text source "kamis ekape chamga, unique (source, key_pattern)"
+    text action "map ignore hold"
+    int variety_id FK
+    int spec_id FK
+    int unit_rule_id FK
+    text role "primary secondary"
+  }
+  catalog_proposal {
+    bigint id PK
+    text source "kamis ekape chamga, where (status = ANY (ARRAY['proposed'::text, 'approved'::text])) 하나"
+    text kind "map new_spec new_variety product_item ignore hold merge"
+    text confidence "high medium low"
+    text status "proposed approved rejected applied"
+  }
+  catalog_change {
+    bigint id PK
+    text action "insert update delete"
+    bigint proposal_id FK
   }
 </pre>
 <!-- /erd:group-1 -->
@@ -558,6 +583,7 @@ erDiagram
 <!-- erd:group-4 -->
 <pre class="mermaid">
 erDiagram
+  item |o--o{ product : ""
   product |o--o{ product : "merged_into"
   product ||--o{ product_source_key : ""
   source_item ||--o{ product_source_key : ""
@@ -569,6 +595,7 @@ erDiagram
     int id PK
     text status "surveyed not_surveyed merged"
     int merged_into FK
+    int item_id FK
   }
   product_source_key {
     int source_item_id PK, FK

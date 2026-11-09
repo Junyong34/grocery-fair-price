@@ -10,7 +10,7 @@ import { parseArgs } from "node:util"
 
 import type { JSONValue } from "postgres"
 
-import { BASE_UNITS, VARIETIES, type BaseUnit } from "../catalog/varieties.ts"
+import { baseUnitLabel } from "../catalog/types.ts"
 import { connectIngest, type Tx } from "../load/db.ts"
 import { actionsMaskCommands, describeError, redactorFromEnv, SECRET_ENV } from "../secrets.ts"
 import { buildJudgment, type JudgmentInput } from "./build.ts"
@@ -33,10 +33,7 @@ async function readStaleDays(tx: Tx): Promise<number> {
   return row.value
 }
 
-const unitLabel = (baseUnit: string, qty: number): string =>
-  (Object.entries(BASE_UNITS) as [BaseUnit, (typeof BASE_UNITS)[BaseUnit]][]).find(
-    ([, u]) => u.base_unit === baseUnit && u.base_unit_qty === qty,
-  )?.[0] ?? `${qty}${baseUnit}`
+const unitLabel = baseUnitLabel
 
 const group = <T extends { variety_id: number }>(rows: readonly T[]) => {
   const out = new Map<number, T[]>()
@@ -46,9 +43,9 @@ const group = <T extends { variety_id: number }>(rows: readonly T[]) => {
 
 export async function readJudgmentInputs(tx: Tx): Promise<{ key: Key; input: JudgmentInput }[]> {
   const varieties = await tx<
-    { variety_id: number; spec_id: number; slug: string; name: string; item: string; category: string; base_unit: string; base_unit_qty: string; spec_name: string; n_specs: number }[]
+    { variety_id: number; spec_id: number; slug: string; name: string; item: string; category: string; base_unit: string; base_unit_qty: string; spec_name: string; n_specs: number; price_spread: "brand" | null }[]
   >`
-    select v.id as variety_id, s.id as spec_id, v.slug, v.name, i.name as item, c.name as category,
+    select v.id as variety_id, s.id as spec_id, v.slug, v.name, i.name as item, c.name as category, v.price_spread,
            v.base_unit, v.base_unit_qty::text, s.name as spec_name,
            (select count(*)::int from price.spec s2 where s2.variety_id = v.id) as n_specs
       from price.variety v
@@ -128,7 +125,6 @@ export async function readJudgmentInputs(tx: Tx): Promise<{ key: Key; input: Jud
   const samplesOf = group(samples)
   const trendOf = group(trend)
   const shelfOf = group(shelf)
-  const spreadOf = new Map(VARIETIES.map((v) => [v.slug, v.spread]))
 
   const out: { key: Key; input: JudgmentInput }[] = []
   for (const v of varieties) {
@@ -138,7 +134,7 @@ export async function readJudgmentInputs(tx: Tx): Promise<{ key: Key; input: Jud
     const shelfRows = shelfOf.get(v.variety_id) ?? []
     const sellers = new Map<string, { price: number; promo: boolean; promoTo: string | null }[]>()
     for (const r of shelfRows) sellers.set(r.seller, [...(sellers.get(r.seller) ?? []), { price: r.price, promo: r.promo, promoTo: r.promo_to }])
-    const spread = spreadOf.get(v.slug)
+    const spread = v.price_spread ?? undefined
     out.push({
       key: { variety_id: v.variety_id, spec_id: v.spec_id, day: q.day },
       input: {

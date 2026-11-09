@@ -4,7 +4,8 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest"
 
 import { runBackfill, type BackfillDeps } from "../../src/backfill/run.ts"
-import { applyClasses } from "../../src/catalog/apply.ts"
+import { importSnapshot } from "../../src/catalog/db.ts"
+import { readSnapshot } from "../../src/catalog/snapshot.ts"
 import type { FetchLike } from "../../src/http.ts"
 import { EXIT } from "../../src/ingest/run.ts"
 import { recomputeDailyQuote } from "../../src/load/daily-quote.ts"
@@ -48,7 +49,7 @@ let regular: Quote[] = []
 describe("백필 원본 적재 (되돌림)", () => {
   beforeAll(async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       const file = kamisFile(babyCabbage(), null)
       await loadRawFile(tx, await pending(tx, file), file)
       await recomputeDailyQuote(tx, "quote", await observedDays(tx), "1999-10-12")
@@ -59,7 +60,7 @@ describe("백필 원본 적재 (되돌림)", () => {
 
   it("90일 밖의 날은 관측값에 넣지 않고 정기 경로와 같은 요약을 낸다. 90일 안의 날은 관측값으로 간다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       const file = backfillFile(kamisFile(babyCabbage(), null))
       const today = "2000-01-03" // 보존 기준 1999-10-05, 모든 범위 기준 1999-07-05
       const outcome = await loadRawFile(tx, await pending(tx, file), file, { today })
@@ -79,7 +80,7 @@ describe("백필 원본 적재 (되돌림)", () => {
 
   it("182일보다 오래된 날은 전국 범위만 낸다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       const file = backfillFile(kamisFile(babyCabbage(), null))
       await loadRawFile(tx, await pending(tx, file), file, { today: "2000-06-01" })
       expect(await observedDays(tx)).toEqual([])
@@ -89,7 +90,7 @@ describe("백필 원본 적재 (되돌림)", () => {
 
   it("같은 원본을 다시 적재해도 요약이 바뀌지 않는다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       const file = backfillFile(kamisFile(babyCabbage(), null))
       await loadRawFile(tx, await pending(tx, file), file, { today: "2000-06-01" })
       const again = await loadRawFile(tx, await pending(tx, file), file, { today: "2000-06-01" })
@@ -131,6 +132,7 @@ function deps(over: Partial<BackfillDeps> = {}): BackfillDeps {
     now: clock(),
     sleep: async () => {},
     log: () => {},
+    kamisPrimary: new Set(["279"]), // 카탈로그 규칙은 롤백 묶음에서만 넣으므로 백필 품목을 직접 준다
     ...over,
   }
 }

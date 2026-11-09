@@ -1,6 +1,6 @@
 # 04. 카탈로그 DB 원본 전환
 
-Status: needs-triage
+Status: claimed
 Type: task
 Blocked by: 01
 
@@ -31,3 +31,16 @@ Blocked by: 01
 ## 완료 기준
 
 - `varieties.ts`를 고치지 않고 DB만 바꿔도 다음 수집·판정에 반영된다. `pnpm db:test` 통과.
+
+## 진행 기록
+
+**2026-11-10 (코드, 운영 적용 전)**
+- **코드에만 있던 것은 "아직 들어온 적 없는 원천 키의 규칙"이었다.** 매핑 결과(`source_code_map`, `product_variety_map`)와 분류 표는 이미 DB에 있었다. 철마다 코드가 바뀌는 배추·무(`211-*-04`), 철이 와야 처음 오는 품목, 제외(쌀 20kg)·보류(볶음참깨)가 `match.ts`에만 있었다. 이것을 새 표 `price.catalog_key_rule`(map·ignore·hold, 사유)로 옮겼다.
+- 마이그레이션 `20261110000100_price_catalog_db_source.sql`: `catalog_key_rule`, `catalog_proposal`(06·07이 쓸 제안), `catalog_change`(변경 기록), `item.sort`, `variety.sort`, `variety.price_spread`(쌀 안내, 판정이 읽는다), `product.item_id`(상품은 언제나 품목에, GLOSSARY). 운영자 표라 `ingest_writer`는 읽기만.
+- `varieties.ts`·`match.ts`를 지우고 `src/catalog/snapshot.json`(품종 136, 규격 200, 규칙 288, 예외 7)으로 바꿨다. `types.ts`(모양), `snapshot.ts`(zod 검사), `rules.ts`(규칙 행 → 원천 키 찾기, 사본 차이), `db.ts`(내보내기·가져오기·규칙 읽기).
+- 명령: `catalog --export`(DB → 사본, ingest_writer 읽기 전용), `--import`(사본 → DB, 소유자, 바뀐 품종·예외를 `catalog_change`에), `--mappings`(규칙대로 매핑). `--classes`는 없앴다.
+- 적재(`applyMappings`)·백필(대표 품목)·판정(`price_spread`)이 DB를 읽는다. 규칙 없는 키는 pending, `ignore` 규칙인 pending 키는 ignored로 바뀐다(새 동작).
+- 테스트: 규칙 함수 5개(`catalog-rules.test.ts`), 사본 왕복·변경 기록·지움·권한 DB 테스트 4개(`catalog-snapshot.db.test.ts`). 기존 카탈로그·백필 테스트는 사본을 읽게 고쳤다. 커밋하는 백필 테스트는 대표 품목을 `deps.kamisPrimary`로 받는다.
+- 잃은 것: `varieties.ts`의 품종별 설명 주석(쌀 20kg를 뺀 이유 등). 제외 사유는 규칙의 `reason`으로 옮겼고, 나머지는 git 기록과 variety-list.md의 메모 열에 있다.
+
+**운영 적용 순서** (push 전에): ① 마이그레이션 → ② `catalog --import --dry-run`으로 바뀔 것 확인(숨겨질 품종이 없어야 한다) → ③ 실제 가져오기 → ④ `catalog --mappings --dry-run`이 아무것도 바꾸지 않는지 → ⑤ `catalog --export`로 운영 사본을 다시 써서 커밋 → push.

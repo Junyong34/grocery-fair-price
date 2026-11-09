@@ -14,7 +14,8 @@ const HTML = fileURLToPath(new URL("../../../grocery-price/docs/30-data/schema-m
 // 다른 묶음의 표는 FK로 가리킬 때 열 없이 이름만 그린다.
 const GROUPS: { id: number; tables: string[]; hideParents?: string[] }[] = [
   { id: 1, tables: ["category", "item", "variety", "spec", "alias", "variety_seasonal_map",
-                    "source_item", "source_code_map", "unit_rule", "source_code_table"] },
+                    "source_item", "source_code_map", "unit_rule", "source_code_table",
+                    "catalog_key_rule", "catalog_proposal", "catalog_change"] },
   { id: 2, tables: ["obs_place", "store", "market", "region", "region_code_map", "store_seller", "seller", "store_link"] },
   { id: 3, tables: ["observation", "observation_revision", "reference_observation"],
     hideParents: ["unit_rule"] },

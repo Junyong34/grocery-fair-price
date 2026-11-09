@@ -6,7 +6,8 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest"
 
 import { ADAPTER_VERSION } from "../../src/adapt/draft.ts"
 import { runBackfill, type BackfillDeps } from "../../src/backfill/run.ts"
-import { applyClasses } from "../../src/catalog/apply.ts"
+import { importSnapshot } from "../../src/catalog/db.ts"
+import { readSnapshot } from "../../src/catalog/snapshot.ts"
 import type { FetchLike } from "../../src/http.ts"
 import { EXIT } from "../../src/ingest/run.ts"
 import { recomputeDailyQuote } from "../../src/load/daily-quote.ts"
@@ -88,7 +89,7 @@ let regular: Quote[] = []
 describe("축평원 백필 원본 적재 (되돌림)", () => {
   beforeAll(async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       const file = ekapeFile("19991011", "daily")
       await loadRawFile(tx, await pending(tx, file, "ekape"), file)
       await recomputeDailyQuote(tx, "quote", ["1999-10-11"], "1999-10-12")
@@ -100,7 +101,7 @@ describe("축평원 백필 원본 적재 (되돌림)", () => {
 
   it("90일 밖의 날도 관측값에 넣고, 정기 경로와 같은 시세 요약을 낸다. source_day는 만들지 않는다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       const file = ekapeFile("19991011", "backfill")
       const outcome = await loadRawFile(tx, await pending(tx, file, "ekape"), file, { today: "2000-06-01" })
 
@@ -114,7 +115,7 @@ describe("축평원 백필 원본 적재 (되돌림)", () => {
 
   it("90일 안의 날은 정기 적재처럼 source_day를 만든다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       const file = ekapeFile("19991011", "backfill")
       await loadRawFile(tx, await pending(tx, file, "ekape"), file, { today: "1999-10-20" })
       expect(await sourceDay(tx)).toBe("ok")
@@ -123,7 +124,7 @@ describe("축평원 백필 원본 적재 (되돌림)", () => {
 
   it("같은 날의 다른 출처 요약은 지우지 않는다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       const kamis = kamisFile(kamisSample("1999", (row) => Object.assign(row, { item_cd: "279", vrty_cd: "00" })), null)
       const backfill = { ...kamis, header: { ...kamis.header, job: "backfill" as const } }
       await loadRawFile(tx, await pending(tx, backfill), backfill, { today: "2000-06-01" })
@@ -138,7 +139,7 @@ describe("축평원 백필 원본 적재 (되돌림)", () => {
 
   it("같은 원본을 다시 적재해도 관측값과 요약이 바뀌지 않는다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       const file = ekapeFile("19991011", "backfill")
       await loadRawFile(tx, await pending(tx, file, "ekape"), file, { today: "2000-06-01" })
       const again = await loadRawFile(tx, await pending(tx, file, "ekape"), file, { today: "2000-06-01" })

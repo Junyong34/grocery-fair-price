@@ -4,7 +4,6 @@
 //   한 품종이 두 품목 코드에서 오면 같은 묶음으로 받아야 하지만(pipeline 3-9 보관 1), 지금 카탈로그에는 그런 품종이 없다.
 // 축평원: 묶음 하나 = 축종 하나 × 달 하나. task_key는 'ekape:<축종>:<YYYY-MM>'다.
 //   하루 단위로만 조회되어(ekape.md 10장) 묶음 하나가 그 달의 날 수만큼 부른다. 축종 7개 모두 카탈로그에 대표 규격이 있다.
-import { kamisPrimaryItemCodes } from "../catalog/match.ts"
 import { addDays, EKAPE_JUDGE_KINDS } from "../ingest/collect.ts"
 import { KAMIS_ITEMS, type KamisItem } from "../ingest/kamis-items.ts"
 
@@ -13,8 +12,8 @@ export const BACKFILL_YEARS = 3
 
 export type BackfillTask = { taskKey: string; item: KamisItem; year: number }
 
-export function backfillItems(): KamisItem[] {
-  const primary = kamisPrimaryItemCodes()
+// primary: 카탈로그 규칙에서 KAMIS가 대표인 품목 코드 (CatalogIndex.kamisPrimaryItemCodes, 운영 DB의 catalog_key_rule)
+export function backfillItems(primary: ReadonlySet<string>): KamisItem[] {
   return KAMIS_ITEMS.filter((item) => primary.has(item.itemCd))
 }
 
@@ -32,9 +31,13 @@ export function taskKeyOf(item: KamisItem, year: number): string {
 
 // 최근 해부터 늘어놓는다. 예산이 모자라 중간에 멈춰도 최근 해(관측값 90일, 수준의 26주)부터 채워진다.
 // 첫 해는 today의 해 − years의 1월 1일이라 이력이 3년보다 조금 길다 (연중앙값이 그 날짜를 끝으로 하는 365일을 본다)
-export function backfillTasks(today: string, options: { years?: number; items?: readonly string[] } = {}): BackfillTask[] {
+export function backfillTasks(
+  today: string,
+  primary: ReadonlySet<string>,
+  options: { years?: number; items?: readonly string[] } = {},
+): BackfillTask[] {
   const years = options.years ?? BACKFILL_YEARS
-  let items = backfillItems()
+  let items = backfillItems(primary)
   if (options.items) {
     const unknown = options.items.filter((code) => !items.some((item) => item.itemCd === code))
     if (unknown.length > 0) throw new Error(`백필 대상이 아닌 품목 코드: ${unknown.join(", ")}`)

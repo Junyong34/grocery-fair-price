@@ -1,7 +1,9 @@
 // 일자 요약(daily_quote) 다시 계산 (ingest-foundation/10). 모두 되돌린다. KAMIS 행은 1999년 날짜로 넣는다.
 import { afterAll, describe, expect, it } from "vitest"
 
-import { applyClasses, applyMappings } from "../../src/catalog/apply.ts"
+import { applyMappings } from "../../src/catalog/apply.ts"
+import { importSnapshot } from "../../src/catalog/db.ts"
+import { readSnapshot } from "../../src/catalog/snapshot.ts"
 import { CALC_VERSION, recomputeDailyQuote } from "../../src/load/daily-quote.ts"
 import type { Tx } from "../../src/load/db.ts"
 import { loadRawFile } from "../../src/load/load-file.ts"
@@ -39,7 +41,7 @@ async function quotesOf(tx: Tx, slug: string): Promise<Quote[]> {
 describe("시세 일자 요약", () => {
   it("시장 표본의 중앙값을 전국·시장 유형별로 낸다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       const days = await loadBabyCabbage(tx)
       const result = await recomputeDailyQuote(tx, "quote", days, "1999-10-01")
       expect(result.written).toBeGreaterThan(0)
@@ -62,7 +64,7 @@ describe("시세 일자 요약", () => {
 
   it("매핑을 거두면 그날의 요약을 지우고, 보존 기간(90일) 밖의 날은 건드리지 않는다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       const days = await loadBabyCabbage(tx)
       await recomputeDailyQuote(tx, "quote", days, "1999-10-01")
       const before = (await quotesOf(tx, "baby-napa-cabbage")).length
@@ -91,7 +93,7 @@ describe("시세 일자 요약", () => {
 describe("판매가 일자 요약", () => {
   it("참가격 판매가를 전국·업태별로, 점포는 재등록 사슬로 센다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       await applyMappings(tx)
       await remapObservations(tx, "chamga")
       const days = await tx<{ day: string }[]>`

@@ -1,6 +1,6 @@
 # 품종 목록
 
-Status: 확정 (2026-10-26). `.scratch/p3-variety-catalog/issues/01-variety-list.md`의 산출물이다. 운영 DB에 넣는 원본은 `packages/price-ingest/src/catalog/varieties.ts`(slug·원천 키)이고, 테스트가 이 표와 같은지 본다. 품종을 고치면 둘을 같이 고친다.
+Status: 확정 (2026-10-26). `.scratch/p3-variety-catalog/issues/01-variety-list.md`의 산출물이다. 2026-11-10부터 카탈로그 원본은 운영 DB다 (ADR 0005). 저장소의 사본은 `packages/price-ingest/src/catalog/snapshot.json`(slug·원천 키, `catalog --export`로 만든다)이고, 테스트가 이 표와 사본이 같은지 본다. 품종을 고치면 DB를 고치고 사본을 다시 내보낸 뒤 이 표를 같이 고친다. 품종이 수백 개를 넘으면 이 표는 사본에서 만드는 보고서로 바꾼다 (catalog-scale).
 
 판정할 **품종**의 목록과 각 품종이 어느 출처의 어느 코드로 시세를 받는지 정한다. 용어는 [GLOSSARY.md](../../GLOSSARY.md). 입력은 [item-inventory.md](sources/item-inventory.md)(2026-10-19 실측)와 2026-10-19~23 KAMIS 가격 실측이다.
 

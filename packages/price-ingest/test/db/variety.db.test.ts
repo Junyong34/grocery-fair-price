@@ -2,7 +2,9 @@
 // 소유자 접속으로 분류 표를 넣고 같은 트랜잭션에서 적재한다. 1999년 날짜라 샘플 데이터와 겹치지 않는다.
 import { afterAll, describe, expect, it } from "vitest"
 
-import { applyClasses, applyMappings } from "../../src/catalog/apply.ts"
+import { applyMappings } from "../../src/catalog/apply.ts"
+import { importSnapshot } from "../../src/catalog/db.ts"
+import { readSnapshot } from "../../src/catalog/snapshot.ts"
 import type { Tx } from "../../src/load/db.ts"
 import { loadRawFile } from "../../src/load/load-file.ts"
 import { remapObservations } from "../../src/load/variety.ts"
@@ -44,7 +46,7 @@ async function observationsOf(tx: Tx, sourceKey: string): Promise<Mapped[]> {
 describe("적재 때 품종 매핑", () => {
   it("처음 본 KAMIS 키가 카탈로그에 있으면 바로 잇고 1포기를 1개로 센다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       await load(tx, asKamis({ item_cd: "279", vrty_cd: "00", item_nm: "알배기배추", vrty_nm: "알배기배추" }))
       const rows = await observationsOf(tx, "kamis:01-200-279-00-04")
       expect(rows.length).toBeGreaterThan(0)
@@ -57,7 +59,7 @@ describe("적재 때 품종 매핑", () => {
 
   it("10개 단위는 1개로 나누고, 1손은 1개로 바꾸지 않아 품종만 잇는다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       await load(tx, asKamis({ ctgry_cd: "400", item_cd: "411", vrty_cd: "08", unit: "개", unit_sz: "10" }))
       for (const row of await observationsOf(tx, "kamis:01-400-411-08-04")) {
         expect(row).toMatchObject({ variety: "apple", spec: "shinano-top" })
@@ -72,7 +74,7 @@ describe("적재 때 품종 매핑", () => {
 
   it("카탈로그에 없는 키는 pending으로 남고 품종을 비운다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       await load(tx, asKamis({ item_cd: "8299" }))
       const rows = await observationsOf(tx, "kamis:01-200-8299-02-04")
       expect(rows.every((row) => row.variety === null && row.per_base === null)).toBe(true)
@@ -92,7 +94,7 @@ describe("적재 때 품종 매핑", () => {
 describe("다시 매핑", () => {
   it("매핑을 넣으면 이미 쌓인 참가격 관측값에 품종과 상품 용량으로 낸 기준 단위 가격이 붙는다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       await applyMappings(tx)
       expect(await remapObservations(tx, "chamga")).toBeGreaterThan(0)
       const egg = await tx<{ variety: string; per_base: string; price_raw: number }[]>`
@@ -112,7 +114,7 @@ describe("다시 매핑", () => {
 
   it("매핑을 거두면 품종과 기준 단위 가격을 비운다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       await load(tx, asKamis({ item_cd: "279", vrty_cd: "00" }))
       await tx`
         update price.source_code_map m set status = 'ignored', variety_id = null, spec_id = null, unit_rule_id = null

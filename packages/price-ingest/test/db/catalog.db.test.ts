@@ -1,11 +1,14 @@
 // 카탈로그를 로컬 DB에 넣어 본다 (ingest-foundation/08). 모두 되돌려 샘플 데이터를 바꾸지 않는다.
 import { afterAll, beforeAll, describe, expect, it } from "vitest"
 
-import { applyClasses, applyMappings } from "../../src/catalog/apply.ts"
-import { VARIETIES } from "../../src/catalog/varieties.ts"
+import { applyMappings } from "../../src/catalog/apply.ts"
+import { importSnapshot } from "../../src/catalog/db.ts"
+import { readSnapshot } from "../../src/catalog/snapshot.ts"
 import type { Sql, Tx } from "../../src/load/db.ts"
 
 import { connectLocalAdmin, connectLocalIngest, inRollback } from "./local.ts"
+
+const VARIETIES = readSnapshot().varieties
 
 let admin: Sql
 let ingest: Sql
@@ -52,7 +55,7 @@ async function productMapOf(tx: Tx, goodId: number) {
 describe("분류 표", () => {
   it("품종·규격·제철 매핑·단위 규칙을 넣고, 다시 넣어도 같다. 카탈로그 밖 품종은 숨긴다", async () => {
     await inRollback(admin, async (tx) => {
-      const first = await applyClasses(tx)
+      const first = await importSnapshot(tx, readSnapshot(), "test")
       expect(first.varieties).toBe(VARIETIES.length)
       expect(first.hidden).toContain("sagwa") // 샘플 시드의 품종
       const [count] = await tx<{ n: number }[]>`select count(*)::int as n from price.variety where status = 'active'`
@@ -72,27 +75,32 @@ describe("분류 표", () => {
          where v.slug = 'apple'`
       expect(seasonal.map((r) => r.seasonal_food_id)).toEqual(["apple"])
 
-      const again = await applyClasses(tx)
+      const again = await importSnapshot(tx, readSnapshot(), "test")
       expect(again.hidden).toEqual([])
     })
   })
 
   it("ingest_writer는 분류 표를 쓰지 못한다", async () => {
-    await expect(inRollback(ingest, (tx) => applyClasses(tx).then(() => {}))).rejects.toThrow(/permission denied/)
+    await expect(inRollback(ingest, (tx) => importSnapshot(tx, readSnapshot(), "test").then(() => {}))).rejects.toThrow(/permission denied/)
   })
 })
 
 describe("매핑", () => {
-  it("분류 표가 없으면 멈춘다", async () => {
+  it("규칙이 없으면 pending으로 남기고, 규칙이 숨긴 품종을 가리키면 멈춘다", async () => {
     await inRollback(admin, async (tx) => {
+      await tx`delete from price.catalog_key_rule`
       await pendingKey(tx, "kamis", "kamis:01-400-411-08-05", { se_cd: "01", ctgry_cd: "400", item_cd: "411", vrty_cd: "08", grd_cd: "05" })
-      await expect(applyMappings(tx)).rejects.toThrow(/분류 표를 먼저/)
+      expect((await applyMappings(tx)).pending).toBeGreaterThan(0)
+      expect((await mapOf(tx, "kamis:01-400-411-08-05"))?.status).toBe("pending")
+      await importSnapshot(tx, readSnapshot(), "test")
+      await tx`update price.variety set status = 'hidden' where slug = 'apple'`
+      await expect(applyMappings(tx)).rejects.toThrow(/숨긴 품종/)
     })
   })
 
   it("pending 원천 키를 카탈로그대로 잇고, 이미 다르게 정한 것은 고치지 않고 알린다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       await pendingKey(tx, "kamis", "kamis:01-400-411-08-05", { se_cd: "01", ctgry_cd: "400", item_cd: "411", vrty_cd: "08", grd_cd: "05" })
       await pendingKey(tx, "kamis", "kamis:01-200-211-04-04", { se_cd: "01", ctgry_cd: "200", item_cd: "211", vrty_cd: "04", grd_cd: "04" })
       await pendingKey(tx, "kamis", "kamis:01-500-4301-21-2", { se_cd: "01", ctgry_cd: "500", item_cd: "4301", vrty_cd: "21", grd_cd: "2" })
@@ -125,7 +133,7 @@ describe("매핑", () => {
 
   it("카탈로그가 정한 매핑은 카탈로그가 바뀌면 고치고, 운영자가 정한 매핑은 그대로 둔다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       await pendingKey(tx, "kamis", "kamis:01-400-411-08-05", { se_cd: "01", ctgry_cd: "400", item_cd: "411", vrty_cd: "08", grd_cd: "05" })
       // 예전 카탈로그가 시나노골드를 다른 규격에 이었던 상태
       await tx`
@@ -147,7 +155,7 @@ describe("매핑", () => {
 
   it("참가격: 카탈로그의 신선 상품은 잇고, 원산지 미정 상품은 pending, 나머지 식품 상품은 ignored", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       const before = await productMapOf(tx, 302)
       expect(before?.status).toBe("pending") // 샘플 데이터의 배추(1.5~2kg)
       await applyMappings(tx)
@@ -164,7 +172,7 @@ describe("매핑", () => {
 
   it("분류 표를 넣은 뒤 ingest_writer 권한으로 매핑을 넣는다", async () => {
     await inRollback(admin, async (tx) => {
-      await applyClasses(tx)
+      await importSnapshot(tx, readSnapshot(), "test")
       // 같은 트랜잭션 안에서 권한·RLS를 ingest_writer로 (멤버십도 함께 되돌린다)
       await tx`grant ingest_writer to postgres`
       await tx`set local role ingest_writer`

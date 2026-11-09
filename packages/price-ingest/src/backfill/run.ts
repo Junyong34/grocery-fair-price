@@ -18,6 +18,8 @@ import { buildRawFile, callKeyOf, rawObjectKey, storagePathOf } from "../load/ra
 import { createObjectStore, type ObjectStore } from "../load/storage.ts"
 import { kstDateOf } from "../load/window.ts"
 import { createRedactor, errorSummary } from "../secrets.ts"
+import { readRules } from "../catalog/db.ts"
+import { CatalogIndex } from "../catalog/rules.ts"
 import { backfillTasks, ekapeBackfillTasks, taskRange } from "./plan.ts"
 
 export type BackfillSource = "kamis" | "ekape"
@@ -47,6 +49,7 @@ export type BackfillDeps = {
   log?: (line: string) => void
   gitSha?: string | null
   maxDbBytes?: number
+  kamisPrimary?: ReadonlySet<string> // KAMIS 대표 품목 코드. 없으면 운영 DB의 카탈로그 규칙에서 읽는다
 }
 
 export type BackfillResult = {
@@ -64,14 +67,14 @@ type TaskStatus = "pending" | "running" | "done" | "failed"
 // 출처와 관계없는 묶음 하나. label은 원본 파일 이름의 묶음 라벨이다
 type Task = { taskKey: string; label: string; collect: (ctx: CollectContext) => Promise<Collected> }
 
-function plannedTasks(source: BackfillSource, today: string, request: BackfillRequest): Task[] {
+function plannedTasks(source: BackfillSource, today: string, request: BackfillRequest, kamisPrimary: ReadonlySet<string>): Task[] {
   if (source === "ekape") {
     return ekapeBackfillTasks(today, { years: request.years, kinds: request.items }).map((task) => {
       const label = `backfill-${task.judgeKind}-${task.month}`
       return { taskKey: task.taskKey, label, collect: (ctx) => collectEkapeRange(ctx, task.judgeKind, { from: task.from, to: task.to, label }) }
     })
   }
-  return backfillTasks(today, { years: request.years, items: request.items }).map((task) => {
+  return backfillTasks(today, kamisPrimary, { years: request.years, items: request.items }).map((task) => {
     const label = `backfill-01-${task.item.itemCd}-${task.year}`
     const range = taskRange(task.year, today)!
     return { taskKey: task.taskKey, label, collect: (ctx) => collectKamisRange(ctx, task.item, { ...range, label }) }
@@ -105,7 +108,8 @@ export async function runBackfill(request: BackfillRequest, deps: BackfillDeps):
   const today = kstDateOf(startedAt)
   const budget = new CallBudget(request.budget ?? BACKFILL_BUDGET[source])
   const store = deps.store ?? createObjectStore({ url: deps.env.supabaseUrl, secretKey: deps.env.secretKey })
-  const tasks = plannedTasks(source, today, request)
+  let tasks: Task[] = []
+  let planError: unknown = null
   const result: BackfillResult = { exitCode: EXIT.ok, runId: null, errorCode: null, done: [], failed: [], remaining: 0, callsUsed: 0 }
 
   // 원본 업로드보다 DB가 먼저다: 진행 기록 없이 받으면 다음 실행이 같은 묶음을 또 받는다
@@ -119,6 +123,17 @@ export async function runBackfill(request: BackfillRequest, deps: BackfillDeps):
       say("다른 백필이 돌고 있어 끝낸다")
       await sql.end({ timeout: 5 })
       return { ...result, exitCode: EXIT.partial, errorCode: "already_running" }
+    }
+    // KAMIS 백필 품목은 운영 DB의 카탈로그 규칙에서 고른다 (catalog-scale/04)
+    const kamisPrimary =
+      source !== "kamis" ? new Set<string>() : (deps.kamisPrimary ?? new CatalogIndex(await readRules(sql)).kamisPrimaryItemCodes())
+    try {
+      tasks = plannedTasks(source, today, request, kamisPrimary)
+    } catch (error) {
+      // 인자 오류(백필 대상이 아닌 품목 등)는 DB 접속 실패가 아니다
+      await sql.end({ timeout: 5 })
+      planError = error
+      throw error
     }
     await sql`
       insert into price.backfill_task (source, task_key, status)
@@ -136,6 +151,7 @@ export async function runBackfill(request: BackfillRequest, deps: BackfillDeps):
     }
     result.runId = await registerRun(sql, { source, job: "backfill", callBudget: budget.limit, startedAt })
   } catch (error) {
+    if (error === planError) throw error
     say(`DB 접속·실행 기록 실패: ${errorSummary(error, redact)}`)
     return { ...result, exitCode: EXIT.dbUnreachable, errorCode: "db_unreachable" }
   }
