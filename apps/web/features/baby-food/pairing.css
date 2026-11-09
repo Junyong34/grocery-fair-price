@@ -423,3 +423,16 @@ button.pairing-item {
 .pairing-next {
   margin-top: 22px;
 }
+
+.pairing-entry-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--color-hairline);
+  text-underline-offset: 5px;
+}
+.pairing-entry-link:hover {
+  text-decoration-color: currentColor;
+}

@@ -1,6 +1,6 @@
 # 03 전체 궁합표와 제철 품종 상세에서 재료별 페이지로 연결
 
-Status: ready-for-agent
+Status: done (2026-11-09)
 Blocked by: 02
 
 ## 할 일
@@ -14,3 +14,11 @@ Blocked by: 02
 - 전체표 서버 HTML에 31개 재료 페이지 링크가 있다.
 - `/seasonal/foods/sweet-potato`에 궁합 링크가 있고, 해당하지 않는 품종에는 없다.
 - `next-dev-loop`로 375·1280 폭에서 확인한다. `pnpm typecheck`, `pnpm lint`, `pnpm test`가 통과한다.
+
+## 결과 (2026-11-09)
+
+- `PairingGrid`에 `linkTitles`를 더했어요. 전체표와 결과 화면에서만 켜고, 인쇄용과 결과 모달(`@pairing/(..)pairings`)에서는 꺼요. 전체표 서버 HTML에 재료 페이지 링크 31개가 있어요.
+- 제철 품종 상세에 링크가 붙는 품종은 19개예요. 위 목록 18개에 브로콜리가 더해졌어요. 브로콜리도 제철 품종이고 궁합표에 표가 있어요.
+- 결과 화면(`/baby-food/result?food=소고기`)에서 소고기 제목을 누르면 `/baby-food/pairings/beef` 전체 페이지가 열려요. 모달은 뜨지 않아요(02 완료 조건).
+- 375·1280 폭에서 확인했어요. 콘솔 오류는 없었어요.
+

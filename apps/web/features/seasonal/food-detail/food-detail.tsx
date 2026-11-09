@@ -1,8 +1,9 @@
 import Link from "next/link"
 
-import { UI_COPY } from "@workspace/seasonal/data/copy"
+import { INFANT_PAIRING_COPY, UI_COPY } from "@workspace/seasonal/data/copy"
 import { festivalsWithFood } from "@workspace/seasonal/data/festivals"
 import { foodsInSeasonWith, seasonsOf, type Food } from "@workspace/seasonal/data/foods"
+import { findPairing } from "@workspace/seasonal/data/infant-pairings"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 import { ScrollRow } from "@workspace/ui/components/scroll-row"
 
@@ -138,6 +139,17 @@ export function FoodDetail({
             <span className="text-sm font-semibold">{UI_COPY.priceHubLink}</span>
             <span className="text-xs text-caption">{UI_COPY.priceUnavailable(food.name)}</span>
           </span>
+          <span aria-hidden className="text-stone">›</span>
+        </Link>
+      )}
+
+      {/* 이유식 궁합표에 이 품종의 표가 있으면 재료별 궁합 페이지로 보낸다(baby-food-ingredient-pages/03). */}
+      {findPairing(food.id) && (
+        <Link
+          href={routes.babyFood.ingredient(food.id)}
+          className="flex items-center justify-between gap-3 rounded-md border border-hairline px-4 py-3 text-sm font-semibold text-ink no-underline hover:text-ink"
+        >
+          {INFANT_PAIRING_COPY.foodLink}
           <span aria-hidden className="text-stone">›</span>
         </Link>
       )}

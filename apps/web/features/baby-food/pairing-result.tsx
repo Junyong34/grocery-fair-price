@@ -49,7 +49,7 @@ export function PairingResult({
       >
         전체표 크게 보기 ↗
       </Link>
-      <PairingGrid rows={rows} selected={selected} />
+      <PairingGrid rows={rows} selected={selected} linkTitles />
       <section className="pairing-source">
         <h2 className="font-heading text-xl">표의 기준과 근거</h2>
         <p>{INFANT_PAIRING_COPY.source}</p>

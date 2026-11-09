@@ -48,7 +48,7 @@ export function CatalogFilter({ rows }: { rows: readonly PairingRow[] }) {
           해당 재료가 없어요. 이름이나 카테고리를 바꿔 보세요.
         </p>
       ) : (
-        <PairingGrid rows={visible} />
+        <PairingGrid rows={visible} linkTitles />
       )}
     </>
   )
