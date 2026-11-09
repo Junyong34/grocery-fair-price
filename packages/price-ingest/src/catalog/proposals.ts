@@ -51,11 +51,15 @@ export type ApplyResult = { applied: number[]; changes: number; mappings: Awaite
 export async function applyProposals(tx: Tx, ids: readonly number[]): Promise<ApplyResult> {
   const proposals = await readProposals(tx, ids, ["proposed", "approved"])
   let changes = 0
+  // 사본은 한 번만 읽고, 고친 사본을 이어서 쓴다 (넣은 사본이 곧 DB 카탈로그다). 제안마다 다시 읽으면 수백 건에 몇 분 걸린다
+  let current = await exportSnapshot(tx)
   for (const p of proposals) {
     const actor = `proposal:${p.id}`
-    const before = await exportSnapshot(tx)
-    const after = editSnapshot(before, p)
-    if (after !== before) changes += (await importSnapshot(tx, after, actor, p.id)).changes.length
+    const after = editSnapshot(current, p)
+    if (after !== current) {
+      changes += (await importSnapshot(tx, after, actor, p.id)).changes.length
+      current = after
+    }
     if (p.kind === "product_item") {
       const item = p.proposal.item as string | { slug: string }
       await setProductItem(tx, p.key, typeof item === "string" ? item : item.slug, actor, p.id)

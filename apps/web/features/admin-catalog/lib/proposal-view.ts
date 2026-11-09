@@ -17,11 +17,24 @@ export const CONFIDENCE_LABEL = { high: "높음", medium: "중간", low: "낮음
 export type CatalogNames = {
   varieties: Record<string, { name: string; specs: Record<string, string> }>
   items: Record<string, string>
+  categories: Record<string, string>
 }
 
 type Named = { slug: string; name: string }
+type NewItem = Named & { category: string }
+type ProposalLike = { kind: ProposalKind; proposal: Record<string, unknown> }
 
-export function describeProposal(p: { kind: ProposalKind; proposal: Record<string, unknown> }, names: CatalogNames): string {
+const newItemLabel = (item: NewItem, names: CatalogNames) => `새 품목 「${item.name}」(${names.categories[item.category] ?? item.category})`
+
+// 상품의 품목·새 식재료 제안이 가리키는 품목. 화면에서 품목별로 좁혀 볼 때 쓴다
+export function targetItemOf(p: ProposalLike, names: CatalogNames): { slug: string; label: string } | null {
+  if (p.kind !== "product_item" && p.kind !== "new_variety") return null
+  const item = p.proposal.item as string | NewItem
+  if (typeof item === "string") return { slug: item, label: names.items[item] ?? item }
+  return { slug: item.slug, label: `${item.name} (새 품목 · ${names.categories[item.category] ?? item.category})` }
+}
+
+export function describeProposal(p: ProposalLike, names: CatalogNames): string {
   const q = p.proposal
   const varietyName = (slug: unknown) => names.varieties[String(slug)]?.name ?? String(slug)
   const specName = (variety: unknown, spec: unknown) => names.varieties[String(variety)]?.specs[String(spec)] ?? String(spec)
@@ -32,12 +45,12 @@ export function describeProposal(p: { kind: ProposalKind; proposal: Record<strin
     case "new_spec":
       return `${varietyName(q.variety)}에 새 규격 「${(q.spec as Named).name}」`
     case "new_variety": {
-      const item = typeof q.item === "string" ? (names.items[q.item] ?? q.item) : `새 품목 「${(q.item as Named).name}」`
+      const item = typeof q.item === "string" ? (names.items[q.item] ?? q.item) : newItemLabel(q.item as NewItem, names)
       const v = q.variety as Named & { unit: string }
       return `${item}에 새 식재료 「${v.name}」 (${v.unit}, 규격 ${(q.spec as Named).name})`
     }
     case "product_item": {
-      const item = typeof q.item === "string" ? (names.items[q.item] ?? q.item) : `새 품목 「${(q.item as Named).name}」`
+      const item = typeof q.item === "string" ? (names.items[q.item] ?? q.item) : newItemLabel(q.item as NewItem, names)
       return q.variety === undefined ? `상품의 품목을 ${item}로` : `상품의 품목을 ${item}로, ${varietyName(q.variety)} · ${specName(q.variety, q.spec)}에 잇기`
     }
     case "ignore":

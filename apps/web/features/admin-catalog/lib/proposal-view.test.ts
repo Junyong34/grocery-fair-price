@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest"
 
-import { countByKind, describeProposal, type CatalogNames } from "./proposal-view"
+import { countByKind, describeProposal, targetItemOf, type CatalogNames } from "./proposal-view"
 
 const names: CatalogNames = {
   varieties: { "mackerel-kr": { name: "고등어(국산)", specs: { chilled: "냉장" } } },
   items: { "imported-fruit": "수입 과일", nuts: "견과" },
+  categories: { noodles: "면·라면", seafood: "수산물" },
 }
 
 describe("제안 한 줄 설명", () => {
@@ -20,7 +21,7 @@ describe("제안 한 줄 설명", () => {
       ),
     ).toBe("수입 과일에 새 식재료 「오렌지(미국)」 (1개, 규격 상품)")
     expect(describeProposal({ kind: "product_item", proposal: { item: "nuts" } }, names)).toBe("상품의 품목을 견과로")
-    expect(describeProposal({ kind: "product_item", proposal: { item: { slug: "ramen", name: "라면", category: "noodles" } } }, names)).toBe("상품의 품목을 새 품목 「라면」로")
+    expect(describeProposal({ kind: "product_item", proposal: { item: { slug: "ramen", name: "라면", category: "noodles" } } }, names)).toBe("상품의 품목을 새 품목 「라면」(면·라면)로")
     expect(describeProposal({ kind: "ignore", proposal: { reason: "2024-08부터 오지 않는다" } }, names)).toBe("2024-08부터 오지 않는다")
   })
 
@@ -30,7 +31,7 @@ describe("제안 한 줄 설명", () => {
         { kind: "new_variety", proposal: { item: { slug: "hairtail", name: "갈치", category: "seafood" }, variety: { slug: "h", name: "갈치(수입)", unit: "1개" }, spec: { slug: "l", name: "냉동 대" } } },
         names,
       ),
-    ).toBe("새 품목 「갈치」에 새 식재료 「갈치(수입)」 (1개, 규격 냉동 대)")
+    ).toBe("새 품목 「갈치」(수산물)에 새 식재료 「갈치(수입)」 (1개, 규격 냉동 대)")
     expect(describeProposal({ kind: "map", proposal: { variety: "x", spec: "y" } }, names)).toBe("x · y에 잇기")
   })
 })
@@ -38,5 +39,23 @@ describe("제안 한 줄 설명", () => {
 describe("종류별 개수", () => {
   it("종류마다 센다", () => {
     expect(countByKind([{ kind: "map" }, { kind: "hold" }, { kind: "map" }])).toEqual({ map: 2, hold: 1 })
+  })
+})
+
+describe("제안이 가리키는 품목", () => {
+  it("있는 품목은 그 이름, 새 품목은 새 품목 표시와 함께 낸다", () => {
+    expect(targetItemOf({ kind: "product_item", proposal: { item: "nuts" } }, names)).toEqual({ slug: "nuts", label: "견과" })
+    expect(targetItemOf({ kind: "product_item", proposal: { item: { slug: "ramen", name: "라면", category: "noodles" } } }, names)).toEqual({
+      slug: "ramen",
+      label: "라면 (새 품목 · 면·라면)",
+    })
+    expect(targetItemOf({ kind: "new_variety", proposal: { item: "imported-fruit", variety: { slug: "o", name: "오렌지", unit: "1개" }, spec: { slug: "t", name: "상품" } } }, names)).toEqual({
+      slug: "imported-fruit",
+      label: "수입 과일",
+    })
+  })
+
+  it("품목이 없는 제안은 null", () => {
+    expect(targetItemOf({ kind: "map", proposal: { variety: "mackerel-kr", spec: "chilled" } }, names)).toBeNull()
   })
 })

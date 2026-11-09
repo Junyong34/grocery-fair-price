@@ -55,6 +55,7 @@ export async function getProposalBoard(): Promise<ProposalBoardData> {
       select v.slug, v.name, (select jsonb_object_agg(s.slug, s.name) from price.spec s where s.variety_id = v.id) as specs
         from price.variety v`
     const items = await sql<{ slug: string; name: string }[]>`select slug, name from price.item`
+    const categories = await sql<{ slug: string; name: string }[]>`select slug, name from price.category`
     const open = rows.filter((r) => r.status === "proposed" || r.status === "approved")
     const decided = rows
       .filter((r) => r.status === "applied" || r.status === "rejected")
@@ -66,6 +67,7 @@ export async function getProposalBoard(): Promise<ProposalBoardData> {
       names: {
         varieties: Object.fromEntries(varieties.map((v) => [v.slug, { name: v.name, specs: v.specs ?? {} }])),
         items: Object.fromEntries(items.map((i) => [i.slug, i.name])),
+        categories: Object.fromEntries(categories.map((c) => [c.slug, c.name])),
       },
       db: ownerDbLabel(),
     }

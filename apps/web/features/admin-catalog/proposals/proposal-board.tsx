@@ -7,7 +7,7 @@ import { Input } from "@workspace/ui/components/input"
 import { NativeSelect, NativeSelectOption } from "@workspace/ui/components/native-select"
 import { Segmented } from "@workspace/ui/components/segmented"
 
-import { CONFIDENCE_LABEL, countByKind, describeProposal, KIND_LABEL, type ProposalKind } from "../lib/proposal-view"
+import { CONFIDENCE_LABEL, countByKind, describeProposal, KIND_LABEL, targetItemOf, type ProposalKind } from "../lib/proposal-view"
 import { applySelected, previewProposals, rejectSelected, revertApplied, type DecisionResult } from "../server/proposal-actions"
 import type { ProposalBoardData, ProposalRow } from "../server/proposals"
 
@@ -137,6 +137,7 @@ type TableProps = {
 function OpenTable({ rows, names, disabled, judgment, run }: TableProps) {
   const [kind, setKind] = useState<KindFilter>("all")
   const [confidence, setConfidence] = useState("all")
+  const [item, setItem] = useState("all")
   const [query, setQuery] = useState("")
   const [selected, setSelected] = useState<ReadonlySet<number>>(new Set())
   const q = query.trim()
@@ -146,10 +147,20 @@ function OpenTable({ rows, names, disabled, judgment, run }: TableProps) {
         (r) =>
           (kind === "all" || r.kind === kind) &&
           (confidence === "all" || (r.confidence ?? "none") === confidence) &&
+          (item === "all" || targetItemOf(r, names)?.slug === item) &&
           (q === "" || (r.label ?? "").includes(q) || r.key.includes(q) || describeProposal(r, names).includes(q)),
       ),
-    [rows, kind, confidence, q, names],
+    [rows, kind, confidence, item, q, names],
   )
+  // 제안이 가리키는 품목과 그 제안 수. 많은 것부터 (가공식품 품목 제안을 품목 하나씩 훑어볼 때)
+  const itemOptions = useMemo(() => {
+    const byItem = new Map<string, { label: string; count: number }>()
+    for (const r of rows) {
+      const t = targetItemOf(r, names)
+      if (t) byItem.set(t.slug, { label: t.label, count: (byItem.get(t.slug)?.count ?? 0) + 1 })
+    }
+    return [...byItem].sort((a, b) => b[1].count - a[1].count || a[1].label.localeCompare(b[1].label, "ko"))
+  }, [rows, names])
   const ids = [...selected].filter((id) => rows.some((r) => r.id === id)).sort((a, b) => a - b)
   const allVisible = visible.length > 0 && visible.every((r) => selected.has(r.id))
   const toggle = (id: number) => setSelected((s) => (s.has(id) ? new Set([...s].filter((x) => x !== id)) : new Set([...s, id])))
@@ -176,6 +187,16 @@ function OpenTable({ rows, names, disabled, judgment, run }: TableProps) {
           <NativeSelectOption value="medium">중간</NativeSelectOption>
           <NativeSelectOption value="low">낮음</NativeSelectOption>
         </NativeSelect>
+        {itemOptions.length > 0 && (
+          <NativeSelect aria-label="품목" value={item} onChange={(e) => setItem(e.target.value)} className="w-64">
+            <NativeSelectOption value="all">품목 전체 ({itemOptions.length})</NativeSelectOption>
+            {itemOptions.map(([slug, o]) => (
+              <NativeSelectOption key={slug} value={slug}>
+                {o.label} · {o.count}
+              </NativeSelectOption>
+            ))}
+          </NativeSelect>
+        )}
         <Input aria-label="제안 검색" placeholder="원문 이름·원천 키·제안" value={query} onChange={(e) => setQuery(e.target.value)} className="w-56" />
         <p className="ml-auto text-sm text-stone tabular-nums">{visible.length}건</p>
       </div>
