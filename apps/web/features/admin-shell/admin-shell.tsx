@@ -1,6 +1,6 @@
 "use client"
 
-import { BookOpen, LayoutTemplate, Printer } from "lucide-react"
+import { BookOpen, Carrot, LayoutTemplate, Printer } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -26,7 +26,7 @@ import { ADMIN_NAV, isActive, type AdminNavItem } from "./admin-nav"
 
 import "./admin-shell.css"
 
-const ICONS: Record<AdminNavItem["icon"], typeof Printer> = { editions: Printer, wireframes: LayoutTemplate, babyFood: BookOpen }
+const ICONS: Record<AdminNavItem["icon"], typeof Printer> = { editions: Printer, wireframes: LayoutTemplate, babyFood: BookOpen, varieties: Carrot }
 
 // 어드민 화면 공통 틀: 왼쪽 메뉴(모바일은 시트) + 본문. 인쇄(PDF 생성)할 때는 메뉴와 상단 줄을 숨긴다 (admin-shell.css).
 export function AdminShell({ children }: { children: React.ReactNode }) {
