@@ -15,10 +15,14 @@ import type { Season } from "@workspace/seasonal/data/seasons"
 
 export type PageSeo = { title: string; description: string }
 
-export function babyFoodPairingsSeo(): PageSeo {
+/**
+ * 이유식 궁합표. 구글은 "이유식 궁합(표)", 네이버는 "이유식 조합"·"이유식 상극 음식"으로 많이 찾는다.
+ * 설명 앞머리는 "[재료] 이유식 궁합" 검색이 가장 많은 소고기·닭고기로 연다. 재료 수는 features의 PAIRINGS 길이를 페이지가 넘긴다.
+ */
+export function babyFoodPairingsSeo(count: number): PageSeo {
   return {
-    title: "이유식 재료 궁합표 · 재료별 조합 찾기",
-    description: "당근·고구마·애호박 등 이유식 재료 31개의 궁합을 찾아보세요. 재료 이름으로 검색하거나 집에 있는 재료를 골라 원본의 잘 맞는 조합과 주의 목록을 확인할 수 있어요.",
+    title: "이유식 재료 궁합표 · 잘 맞는 조합과 상극 재료",
+    description: `소고기·닭고기·고구마·당근 등 이유식 재료 ${count}개의 궁합표. 재료마다 함께 넣기 좋은 조합과 주의할 상극 재료를 O·X로 정리했어요. 집에 있는 재료를 골라 바로 확인해 보세요.`,
   }
 }
 

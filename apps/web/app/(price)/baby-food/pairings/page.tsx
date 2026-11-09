@@ -1,10 +1,11 @@
+import { PAIRINGS } from "@/features/baby-food/data"
 import { PairingCatalog } from "@/features/baby-food/pairing-catalog"
 import { createMetadata } from "@/shared/meta"
 import { breadcrumb, JsonLd } from "@/shared/seo/json-ld"
 import { babyFoodPairingsSeo } from "@/shared/seo/titles"
 import { routes } from "@/shared/routes"
 
-const seo = babyFoodPairingsSeo()
+const seo = babyFoodPairingsSeo(PAIRINGS.length)
 export const metadata = createMetadata({
   ...seo,
   path: routes.babyFood.pairings,

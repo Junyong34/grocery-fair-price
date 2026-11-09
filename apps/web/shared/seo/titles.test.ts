@@ -25,7 +25,7 @@ const all = [
   homeSeo(),
   seasonalHomeSeo(),
   downloadsSeo(),
-  babyFoodPairingsSeo(),
+  babyFoodPairingsSeo(31),
   monthsIndexSeo(),
   ...MONTHS.map(monthSeo),
   seasonsIndexSeo(),
@@ -40,7 +40,7 @@ describe("페이지 제목·설명", () => {
     expect(homeSeo().title).toBe("오늘 식재료 시세 · 지금 사도 될까")
     expect(seasonalHomeSeo().title).toBe("제철 음식 달력")
     expect(downloadsSeo().title).toBe("제철 음식 달력 무료 다운로드 · A4 PDF")
-    expect(babyFoodPairingsSeo().title).toBe("이유식 재료 궁합표 · 재료별 조합 찾기")
+    expect(babyFoodPairingsSeo(31).title).toBe("이유식 재료 궁합표 · 잘 맞는 조합과 상극 재료")
     expect(monthsIndexSeo().title).toBe("월별 제철 음식")
     expect(monthSeo(3).title).toMatch(/^3월 제철 음식 \d+가지$/)
     expect(seasonsIndexSeo().title).toBe("계절별 제철 음식")
