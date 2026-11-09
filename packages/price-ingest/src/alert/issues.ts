@@ -13,6 +13,7 @@ export type Cause =
   | "unexpected" // 코드 오류, 시간 초과 등
   | "stale" // 출처의 마지막 수집이 기대보다 오래 멈췄다 (heartbeat)
   | "workflow_disabled" // 수집 워크플로가 꺼져 있었다 (heartbeat가 다시 켰다)
+  | "db_size" // DB 크기가 문턱(calc_param db.size_alert_mb) 이상이다 (heartbeat, catalog-scale/03)
 
 export type Alert = { source: AlertSource; cause: Cause; summary: string; runUrl: string | null; at: string }
 
@@ -34,6 +35,7 @@ const CAUSE_TEXT: Record<Cause, string> = {
   unexpected: "예상하지 못한 실패",
   stale: "수집이 멈춤",
   workflow_disabled: "수집 워크플로가 꺼져 있었음",
+  db_size: "DB 크기 문턱 넘음",
 }
 
 const CAUSE_HINT: Record<Cause, string> = {
@@ -43,6 +45,7 @@ const CAUSE_HINT: Record<Cause, string> = {
   partial: "실행 로그의 실패 호출·적재 줄을 본다. 다음 실행이 빈 날을 메운다.",
   unexpected: "실행 로그의 마지막 오류를 본다. 코드 오류면 고칠 때까지 계속 실패한다.",
   stale: "수집 워크플로가 도는지, 실패가 이어지는지 Actions에서 본다.",
+  db_size: "price.db_size 최근 행에서 큰 표를 본다. Free 500MB를 넘으면 DB가 읽기 전용이 되어 수집이 멈춘다. 플랜을 바꿨으면 calc_param db.size_alert_mb를 고친다.",
   workflow_disabled: "저장소 활동이 60일 없으면 GitHub이 예약 워크플로를 끈다. heartbeat가 다시 켰다. 꺼져 있던 동안 빠진 날을 확인한다.",
 }
 

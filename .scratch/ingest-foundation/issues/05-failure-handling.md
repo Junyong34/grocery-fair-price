@@ -17,7 +17,7 @@ Blocked by: 03
 - [x] 정기 실행 꺼짐 (2026-10-29, `ingest-schedule/14`. 50일 주기 사람 확인 일정은 운영자 달력) (공개 저장소는 60일 동안 저장소 활동이 없으면 schedule 워크플로가 꺼진다. 매일 수집이 돌아도 커밋이 없으면 꺼진다): 주 1회 heartbeat 워크플로가 (1) 수집 워크플로가 켜져 있는지 보고 꺼졌으면 `gh workflow enable`로 다시 켜고(`permissions: actions: write`), (2) 출처별 `source_day`의 마지막 `ok`가 기대보다 2일 넘게 멈췄으면 알림 이슈를 연다. heartbeat 자신도 꺼질 수 있으므로 50일 주기 사람 확인 일정을 함께 둔다 (pipeline.md 5-3-1)
 - [x] Supabase Free 일시정지 기준 확인 (`ingest-schedule/04`)
 - 백업(주 1회 `pg_dump`)은 **추후, 정식 서비스 전** (2026-10-20, pipeline.md 6-1). 이 이슈에서 만들지 않는다. 그 전까지 운영자 매핑은 원본으로 되살릴 수 없다는 위험을 받아들인다
-- [ ] DB 크기 감시: `pg_database_size`·표별 `pg_total_relation_size`를 수집 상태에 남기고 400MB를 넘으면 알림 (무료 500MB를 넘으면 읽기 전용)
+- [ ] DB 크기 감시 → [catalog-scale/03](../../catalog-scale/issues/03-db-size-watch.md)로 옮김 (2026-11-09): `pg_database_size`·표별 `pg_total_relation_size`를 수집 상태에 남기고 400MB를 넘으면 알림 (무료 500MB를 넘으면 읽기 전용)
   - 실측 방법은 02에서 정했다 (2026-10-21): 행당 크기는 `pnpm --filter @workspace/price-db measure`(같은 정의의 임시 표에 샘플 모양 행을 넣어 `pg_total_relation_size`), 운영 DB는 `price` 표마다 `pg_total_relation_size(oid)`와 행 수를 날마다 남긴다. 실측 1년차 465~525MB라 상단이 500MB를 넘는다. 넘을 기세면 pipeline.md 7장 "DB 용량"의 남은 순서(평년·평소가 날짜 줄이기, `daily_quote.sources` 정리, Pro)를 꺼낸다
 - [ ] 수집 상태 화면: 출처별 마지막 정상 날짜, `source_day` 상태, 최근 실패. 기존 `/admin` 활용 검토
 - [x] 정할 것: 판정 재계산 주기 → KAMIS 수집 직후 최근 7일 평소가를 다시 낸다 (2026-10-29, `ingest-kamis.yml`의 `usual` 단계)

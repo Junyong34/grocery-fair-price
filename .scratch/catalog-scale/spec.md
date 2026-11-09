@@ -46,7 +46,7 @@ Status: needs-triage
 
 | 티켓                                                           | 내용                                                                                | 누가     |
 | -------------------------------------------------------------- | ----------------------------------------------------------------------------------- | -------- |
-| [ingest-schedule/15](../ingest-schedule/issues/15-closeout.md) | 열흘 운영 결산, `claimed` 티켓 정리(ingest-foundation/03·04·07, ingest-schedule/12) | 에이전트 |
+| [ingest-schedule/15](../ingest-schedule/issues/15-closeout.md) | 열흘 운영 결산, `claimed` 티켓 정리(ingest-foundation/03·04·07, ingest-schedule/12) | 에이전트, **완료 2026-11-09** |
 | [02](issues/02-supabase-pro-backup.md)                         | Pro 전환, 일일 백업 확인, 복구 연습 한 번                                           | 사람     |
 | [03](issues/03-db-size-watch.md)                               | DB 크기 감시와 400MB 알림 (`ingest-foundation/05`에서 떼어 옴)                      | 에이전트 |
 

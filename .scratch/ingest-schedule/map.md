@@ -29,13 +29,15 @@ Label: wayfinder:map
 - [Actions Secrets와 개발계정 종료일](issues/01-actions-secrets.md): Secrets 네 개 등록, 종료일 2028-10-08 (30일 전 연장·전환). 남은 사람 확인은 ingest-foundation/01로
 - [러너 접속 실측](issues/03-runner-connectivity.md): probe 6/6 성공(각 1초 안팎), 예약보다 약 3시간 늦게 돔. 10-28에 러너 하나가 data.go.kr에 닿지 않은 반례가 있어 조기 종료와 09:30 다시 받기로 대응. 배치 위치는 그대로
 - [수집 워크플로 (KAMIS·축평원)](issues/11-workflows-kamis-ekape.md): 10-27·10-29 정기 실행이 사람 손 없이 성공. 09:30 다시 받기는 그날 성공한 실행이 있으면 건너뜀
+- [참가격 워크플로와 빈 조사일 채우기](issues/12-chamga-workflow-and-catch-up.md): 06-12 이후 조사일 9개를 채우고 빈 금요일 10개를 닫음. 10-23 조사일을 정기 실행이 사람 손 없이 받음
+- [일주일 결산](issues/15-closeout.md): 10-29~11-09 세 출처 모두 빠진 날 없이 적재, 실제 실행은 cron보다 3~5시간 늦음, 로그에 비밀값 없음, DB 369MB. 남은 일은 ingest-foundation/03·04로
 - [참가격 원본 적재 (상품·점포)](issues/06-load-chamga.md): 마스터는 실행마다 받아 가격보다 먼저 적재. 마스터에 없는 번호는 점포는 위치만, 상품은 임시 이름으로 넣고 다음 마스터가 채움. 상품 연결 기간은 2026-06-12부터
 
 ## Not yet specified
 
 - ~~**러너에서 data.go.kr이 안 되면 배치를 어디서 돌릴지.**~~ 03에서 러너가 붙는 것을 확인했다 (2026-10-29). 러너 하나만 닿지 않는 일이 다시 잦아지면 아래를 꺼낸다. martmemo-data는 GitHub 러너에서 data.go.kr 연결 시간 초과가 2주 연속 났다. 03의 실측이 실패하면 self-hosted 러너, 다른 배치 환경(ADR 0002의 Railway 후보), 재시도 간격 늘리기 중에서 정한다. ADR 0002를 고칠 수 있다.
 - **KAMIS 휴일을 어떻게 아는지.** 5-2는 공휴일 달력에 있는 날을 `empty_expected`로 본다. 달력 출처(우리 `packages/seasonal/calendar`의 공휴일, KAMIS 응답 자체)는 08을 하며 필요해지면 정한다.
-- **수집 시각 조정.** 처음 2주 `source_day.first_ok_at`으로 실제 도착 시각을 재서 cron을 앞당길지 정한다 (5-1). 수집이 2주 돈 뒤에야 물을 수 있다.
+- ~~**수집 시각 조정.**~~ 15에서 [ingest-foundation/03](../ingest-foundation/issues/03-ingest-package-and-actions.md)의 남은 일로 옮겼다 (2026-11-09). 처음 2주 `source_day.first_ok_at`으로 실제 도착 시각을 재서 cron을 앞당길지 정한다 (5-1). 수집이 2주 돈 뒤에야 물을 수 있다.
 
 ## Out of scope
 

@@ -1,9 +1,11 @@
 # 03. 수집 패키지와 GitHub Actions 워크플로
 
-Status: claimed
+Status: ready-for-agent
 Type: task
 Blocked by: 01, 02, p2-data-source-spec/12
 
+> 2026-11-09 상태: 정기 수집은 운영에서 열이틀 동안 사람 손 없이 돌았다([ingest-schedule/15](../../ingest-schedule/issues/15-closeout.md) 결산). 남은 일만 이 티켓에 둔다. ① 빈 날 메우기 → [ingest-schedule/08](../../ingest-schedule/issues/08-fill-gaps.md) ② 재등록 감시·보존 기간 밖 복원 → [ingest-schedule/09](../../ingest-schedule/issues/09-kamis-reregistration-watch.md) ③ `merge-product`(상품 병합. [catalog-scale/07](../../catalog-scale/issues/07-local-catalog-admin.md)의 "묶기"와 함께 만든다) ④ 원본 삭제와 보존 기간(3-7) ⑤ 수집 시각 조정: 실측으로는 cron보다 3~5시간 늦게 돈다. cron을 당겨도 늦음은 그대로일 수 있어, 당길지 다른 실행 환경을 쓸지 정한다 ⑥ 10-29 축평원 `daily` 실행 행 하나가 `running`으로 남아 있다. 끊긴 실행을 정리하는 규칙.
+>
 > 2026-10-29 상태: 정기 수집에 필요한 부분은 [ingest-schedule](../../ingest-schedule/map.md)에서 만들어 운영에서 돈다 (패키지·CLI·대조·적재 트랜잭션·워크플로·호출 예산·로그 가리기, ingest-schedule 02·05·06·07·10·11·12·13·14). 남은 것: 빈 날 메우기 `--fill-gaps`([ingest-schedule/08](../../ingest-schedule/issues/08-fill-gaps.md)), 보존 기간 밖 재등록 복원([ingest-schedule/09](../../ingest-schedule/issues/09-kamis-reregistration-watch.md)), `merge-product`, 원본 삭제. 이 티켓은 [ingest-schedule/15](../../ingest-schedule/issues/15-closeout.md)에서 닫는다. 아래 체크칸은 처음 계획이라 고치지 않았다.
 >
 > 2026-10-26: 남은 일 중 정기 수집을 켜는 데 필요한 것을 [ingest-schedule 지도](../../ingest-schedule/map.md)로 나눴다. 재계산, 관측값 정리·보존 기간 밖 재등록 복원, `merge-product`, 원본 삭제는 품종 목록 뒤로 미뤄 이 티켓에 남는다 (지도의 Out of scope).

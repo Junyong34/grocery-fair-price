@@ -2,9 +2,11 @@
 //   1. 수집 워크플로가 꺼져 있으면 다시 켜고 알린다
 //   2. 출처별 마지막 수집이 기대보다 오래 멈췄으면 알린다 (source_day)
 //   3. Supabase가 일시정지됐는지 Storage 조회·DB 접속으로 본다 (04 Answer). 닿으면 열린 supabase 알림을 닫는다
+//   4. DB 크기가 문턱(calc_param db.size_alert_mb) 이상이면 알린다 (catalog-scale/03). 넘은 동안은 supabase 알림을 닫지 않는다
 //   pnpm --filter @workspace/price-ingest heartbeat
 // 환경변수: GH_TOKEN(actions: write, issues: write), GH_REPO, INGEST_DATABASE_URL, SUPABASE_URL, SUPABASE_SECRET_KEY.
 // .env를 스스로 읽지 않는다. heartbeat 자신도 60일 규칙으로 꺼질 수 있다: 사람이 확인할 날은 14 Answer에 적는다.
+import { readSizeLimitMb, sizeAlertOf } from "../db-size.ts"
 import { addDays } from "../ingest/collect.ts"
 import { connectIngest, type Sql } from "../load/db.ts"
 import { createObjectStore } from "../load/storage.ts"
@@ -100,6 +102,7 @@ export async function runHeartbeat(gh: Gh, now = new Date()): Promise<string[]> 
   if (log.length === 0) log.push("수집 워크플로: 모두 켜져 있다")
 
   let supabaseOk = true
+  let sizeOver = false
   try {
     const store = createObjectStore({ url: required("SUPABASE_URL"), secretKey: required("SUPABASE_SECRET_KEY") })
     await store.list("chamga/")
@@ -117,6 +120,14 @@ export async function runHeartbeat(gh: Gh, now = new Date()): Promise<string[]> 
       log.push(`멈춤: ${s.source} ${s.summary}`)
       await alert({ source: s.source, cause: "stale", summary: s.summary })
     }
+    const [db] = await sql<{ bytes: string }[]>`select pg_database_size(current_database())::text as bytes`
+    const limit = await readSizeLimitMb(sql)
+    const over = sizeAlertOf(Number(db!.bytes), limit)
+    log.push(`DB 크기: ${Math.round(Number(db!.bytes) / 1024 / 1024)}MB (문턱 ${limit}MB)`)
+    if (over) {
+      sizeOver = true
+      await alert({ source: "supabase", cause: "db_size", summary: over })
+    }
   } catch (error) {
     supabaseOk = false
     log.push(`DB 접속 실패: ${reasonOf(error)}`)
@@ -125,7 +136,7 @@ export async function runHeartbeat(gh: Gh, now = new Date()): Promise<string[]> 
     await sql.end({ timeout: 5 })
   }
 
-  if (supabaseOk) {
+  if (supabaseOk && !sizeOver) {
     const closed = await resolveAlerts(gh, "supabase", "heartbeat에서 Storage·DB에 닿아 닫는다.")
     if (closed.length > 0) log.push(`supabase 알림 ${closed.map((n) => `#${n}`).join(", ")}를 닫았다`)
   }

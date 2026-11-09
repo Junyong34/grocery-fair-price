@@ -155,7 +155,7 @@ footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--li
     <span class="src c">참가격 생필품 가격</span>
   </div>
   <div class="facts">
-    <span><!-- erd:counts -->스키마 <code>price</code> · 테이블 <b>41</b>개 + 뷰 <b>1</b> · 묶음 <b>6</b>개<!-- /erd:counts --></span>
+    <span><!-- erd:counts -->스키마 <code>price</code> · 테이블 <b>42</b>개 + 뷰 <b>1</b> · 묶음 <b>6</b>개<!-- /erd:counts --></span>
     <span>1년차 DB 실측 기반 <b>465~525MB</b> / 무료 500MB</span>
     <span>1년차 원본 파일 추정 <b>250~330MB</b> / 무료 1GB</span>
     <span>근거 문서 <code>grocery-price/docs/30-data/pipeline.md</code> 3장</span>
@@ -744,6 +744,9 @@ erDiagram
     text source PK "kamis ekape chamga"
     text task_key PK
     text status "pending running done failed"
+  }
+  db_size {
+    timestamptz taken_at PK
   }
 </pre>
 <!-- /erd:group-6 -->

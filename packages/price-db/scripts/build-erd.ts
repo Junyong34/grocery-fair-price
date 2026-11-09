@@ -22,7 +22,7 @@ const GROUPS: { id: number; tables: string[]; hideParents?: string[] }[] = [
     hideParents: ["unit_rule", "raw_object"] },
   { id: 5, tables: ["daily_quote", "product_daily_summary", "reference_price", "season_index", "usual_price",
                     "judgment_batch", "judgment_current", "judgment_snapshot", "calc_param", "current_judgment"] },
-  { id: 6, tables: ["ingest_run", "raw_object", "source_master_change", "source_day", "source_day_part", "backfill_task"] },
+  { id: 6, tables: ["ingest_run", "raw_object", "source_master_change", "source_day", "source_day_part", "backfill_task", "db_size"] },
 ]
 
 // FK가 없는 논리 연결 (점선). DB 카탈로그에 없어 여기에 적는다.

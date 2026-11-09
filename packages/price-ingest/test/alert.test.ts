@@ -5,6 +5,7 @@ import { runAlert } from "../src/alert/cli.ts"
 import { decideAlert } from "../src/alert/decide.ts"
 import { enableWorkflows, staleSources, type SourceProgress } from "../src/alert/heartbeat.ts"
 import { bodyOf, raiseAlert, resolveAlerts, type Gh } from "../src/alert/issues.ts"
+import { sizeAlertOf, sizeLimitMbOf } from "../src/db-size.ts"
 import { EXIT } from "../src/ingest/run.ts"
 
 type Issue = { number: number; title: string; body: string; labels: string[]; open: boolean; comments: string[] }
@@ -162,5 +163,30 @@ describe("heartbeat", () => {
     expect(staleSources([{ ...fresh[2]!, lastOk: "2026-09-23" }], now)).toEqual([
       { source: "chamga", summary: "받은 조사일이 35일 넘게 없다 (마지막 2026-09-23)" },
     ])
+  })
+})
+
+describe("DB 크기 문턱 (catalog-scale/03)", () => {
+  const MB = 1024 * 1024
+
+  it("문턱 이상이면 알릴 문장을, 아래면 null을 돌려준다", () => {
+    expect(sizeAlertOf(399 * MB, 400)).toBeNull()
+    expect(sizeAlertOf(400 * MB, 400)).toBe("DB가 400MB로 문턱 400MB 이상이다. 표별 크기는 price.db_size 최근 행에 있다")
+    expect(sizeAlertOf(512.4 * MB, 400)).toMatch(/^DB가 512MB로/)
+  })
+
+  it("calc_param 값은 양수만 받고, 없거나 잘못되면 멈춘다", () => {
+    expect(sizeLimitMbOf(400)).toBe(400)
+    expect(sizeLimitMbOf("6400")).toBe(6400)
+    expect(() => sizeLimitMbOf(null)).toThrow(/db.size_alert_mb/)
+    expect(() => sizeLimitMbOf(0)).toThrow(/db.size_alert_mb/)
+    expect(() => sizeLimitMbOf("abc")).toThrow(/db.size_alert_mb/)
+  })
+
+  it("문턱을 넘으면 supabase · db_size 알림 이슈를 연다", async () => {
+    const { gh, issues } = fakeGh()
+    await raiseAlert(gh, { source: "supabase", cause: "db_size", summary: sizeAlertOf(420 * MB, 400)!, runUrl: null, at: "2026-11-09T00:00:00.000Z" })
+    expect(issues[0]!.title).toBe("[수집 알림] supabase: DB 크기 문턱 넘음")
+    expect(issues[0]!.labels).toEqual(["ingest-alert", "source:supabase", "cause:db_size"])
   })
 })

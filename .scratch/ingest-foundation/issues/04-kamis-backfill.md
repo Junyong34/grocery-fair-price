@@ -1,8 +1,10 @@
 # 04. KAMIS 3년 백필과 계절비율 계산 입력
 
-Status: claimed
+Status: ready-for-agent
 Type: task
 Blocked by: 03
+
+> 2026-11-09 상태: KAMIS 백필 묶음 364개 `done`(4,827회). 축평원 백필 326개 `done`(9,695회), **3개 `failed`**: `ekape:4301·4304·4401:2023-01`(`calls_failed`). 2023-01-01·02 응답이 HTTP 200인데 계약 검사(`ApiContractError`)에 걸린다(신정 휴일 응답 모양으로 추정). 실패 묶음은 매일 다시 시도되어 하루 약 93회를 쓰고, 백필 단계가 매일 `tasks_failed`(종료 코드 1)로 끝난다(워크플로는 성공). 남은 일: ① 그 응답을 보고 계약을 고치거나 휴일을 빈 날로 받아 묶음을 닫는다 ② 재등록 시나리오는 [ingest-schedule/09](../../ingest-schedule/issues/09-kamis-reregistration-watch.md)로 ③ 품목별 이력 시작일 확인.
 
 ## 목적
 

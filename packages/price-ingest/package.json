@@ -15,6 +15,7 @@
     "backfill": "node src/backfill/cli.ts",
     "catalog": "node src/catalog/cli.ts",
     "purge": "node src/purge.ts",
+    "size": "node src/db-size.ts",
     "summary": "node src/summary.ts",
     "alert": "node src/alert/cli.ts",
     "heartbeat": "node src/alert/heartbeat.ts",

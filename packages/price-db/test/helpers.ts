@@ -34,7 +34,7 @@ export const PRICE_TABLES = [
   "judgment_batch", "judgment_current", "judgment_snapshot", "calc_param",
   "ingest_run", "source_day", "source_day_part", "backfill_task",
   "product", "product_source_key", "product_attr_history", "product_variety_map", "al_variety_rule",
-  "raw_object",
+  "raw_object", "db_size",
 ] as const
 
 // web_reader가 읽는 표와 뷰 (pipeline.md 3-0 "web_reader가 읽는 표")
