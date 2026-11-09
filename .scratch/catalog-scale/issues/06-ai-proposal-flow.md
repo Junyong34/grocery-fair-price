@@ -1,8 +1,8 @@
 # 06. AI 제안 흐름 (로컬 에이전트)
 
-Status: needs-triage
+Status: in-progress (명령·절차 완료, 첫 실행은 pending 63개만. 가공식품은 05 뒤)
 Type: task
-Blocked by: 04, 05
+Blocked by: 04 (05는 가공식품 첫 실행만 막는다. 2026-11-09 사용자 결정으로 앞당김)
 
 ## 목적
 
@@ -24,9 +24,9 @@ pending 원천 키와 새 상품을 사람이 하나씩 보지 않게, 로컬 Cl
 
 ## 할 일
 
-- [ ] `pending --json`, `propose --file` 명령과 테스트
-- [ ] 제안 스킬 작성 (`mattpocock-skills:writing-for-agents` 기준)
-- [ ] 첫 실행: 지금 pending 전부와 참가격 가공식품 386개에 제안을 만들어 본다. 승인율·틀린 유형을 `## Answer`에
+- [x] `pending --json`, `propose --file` 명령과 테스트 (`src/catalog/pending.ts`·`proposal.ts`, 제안은 소유자 접속으로만 넣는다)
+- [x] 제안 절차 작성: `grocery-price/docs/30-data/catalog-propose.md` (`.claude/`가 gitignore라 로컬 스킬 `/catalog-propose`는 이 문서를 가리키기만 한다)
+- [ ] 첫 실행: pending 63개(KAMIS 55·축평원 3·참가격 보류 5)는 2026-11-09 운영에 제안 #64~126으로 넣었다(new_spec 29·ignore 20·hold 6·product_item 5·new_variety 3). 참가격 가공식품 386개는 05 뒤에. 승인율·틀린 유형은 승인(07) 뒤 `## Answer`에
 
 ## 완료 기준
 
