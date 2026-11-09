@@ -31,9 +31,11 @@ export function IngredientArt({ name }: { name: string }) {
 export function PairingGrid({
   rows,
   selected = [],
+  printable = false,
 }: {
   rows: readonly PairingRow[]
   selected?: readonly string[]
+  printable?: boolean
 }) {
   const chosen = new Set(selected)
   return (
@@ -81,21 +83,34 @@ export function PairingGrid({
                         <span className="text-sm text-caption">기재 없음</span>
                       )}
                       <ul className="pairing-items">
-                        {names.map((name) => (
-                          <li key={name}>
-                            <PairingEvidence
-                              base={row.name}
-                              name={name}
-                              sign={sign}
-                              selected={chosen.has(name)}
-                            >
+                        {names.map((name) => {
+                          const ingredient = (
+                            <>
                               <IngredientArt name={name} />
                               <span>{name}</span>
-                            </PairingEvidence>
-                          </li>
-                        ))}
+                            </>
+                          )
+                          return (
+                            <li key={name}>
+                              {printable ? (
+                                <span className="pairing-item">
+                                  {ingredient}
+                                </span>
+                              ) : (
+                                <PairingEvidence
+                                  base={row.name}
+                                  name={name}
+                                  sign={sign}
+                                  selected={chosen.has(name)}
+                                >
+                                  {ingredient}
+                                </PairingEvidence>
+                              )}
+                            </li>
+                          )
+                        })}
                       </ul>
-                      {row.name === "우유" && sign === "X" && (
+                      {!printable && row.name === "우유" && sign === "X" && (
                         <PairingEvidence base="우유" name="고구마" sign="X">
                           별도 조사 ↗
                         </PairingEvidence>

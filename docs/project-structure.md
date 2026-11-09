@@ -125,6 +125,7 @@ import 경로:
 | `/seasonal/downloads` | 달력·포스터 PDF 내려받기 | `seasonal/downloads/page.tsx` | `downloads/downloads-view`. `public/downloads/manifest.json`을 빌드 때 읽는다 |
 | `/seasonal/downloads/[edition]` | 에디션 상세(직접 열면 페이지, 목록에서 누르면 하단 시트 `@sheet/(.)downloads/[edition]`) | `seasonal/downloads/[edition]/page.tsx` | `downloads/edition-detail`, 매니페스트는 `shared/downloads-manifest` |
 | `/admin`, `/admin/edit?id=`, `/admin/wireframes` | 인쇄물 어드민 (개발 서버 전용, 운영 404). `wireframes`는 인쇄물 구조 안 모음 | `app/admin/` | `features/admin-print/` |
+| `/admin/baby-food/print` · `POST /admin/baby-food/pdf` | 이유식 궁합표 A4 세로 3장 미리보기와 로컬 PDF 다운로드 | `app/admin/baby-food/` | `features/baby-food/pairing-print`, `features/admin-print/server/generate` |
 | `/print?spec=&paper=&page=` | 인쇄 전용 페이지 (개발 서버 전용, 운영 404) | `app/print/page.tsx` | `features/print/print-document` |
 | (제철 화면 안에서 이동) | 1i 품종 상세 (하단 시트) | `seasonal/@sheet/(.)foods/[food]/page.tsx` | `components/detail-sheet` + `food-detail` |
 | `/api/og` | 공유 미리보기 이미지 1200×630 | `app/api/og/route.tsx` | 쿼리 `title`, `subtitle`, `badge`, `season` |

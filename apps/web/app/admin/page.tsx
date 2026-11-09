@@ -18,6 +18,9 @@ export default function Page() {
         <Link href={routes.admin.wireframes} className="self-start text-sm text-stone underline underline-offset-4 hover:text-ink">
           인쇄물 와이어프레임 보기
         </Link>
+        <Link href={routes.admin.babyFoodPrint} className="self-start rounded-full bg-forest px-4 py-2 text-sm font-medium text-canvas">
+          이유식 궁합표 · A4 3장 미리보기
+        </Link>
         <CleanStorageButton />
       </header>
       <Suspense fallback={<AdminBoardSkeleton />}>

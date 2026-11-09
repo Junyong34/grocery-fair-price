@@ -205,6 +205,7 @@
   overflow-wrap: anywhere;
 }
 .pairing-entry th {
+  text-align: center;
   color: var(--color-forest);
   background: var(--color-mat);
 }

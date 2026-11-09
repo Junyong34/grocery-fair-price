@@ -1,0 +1,125 @@
+.pairing-print-document .pairing-paper {
+  --sheet-w: 210mm;
+  --sheet-h: 297mm;
+  --u: 1mm;
+  background: var(--color-canvas);
+  padding: 9mm;
+  gap: 4mm;
+}
+
+.pairing-paper-head {
+  border-bottom: 0.3mm solid var(--color-forest);
+  padding-bottom: 3mm;
+  color: var(--color-forest);
+  font-size: 10pt;
+}
+
+.pairing-paper-head h2 {
+  font-size: 23pt;
+  font-weight: 700;
+}
+
+.pairing-paper-brand {
+  font-size: 9pt;
+}
+.pairing-paper .pairing-grid {
+  display: block;
+  columns: 3;
+  column-gap: 4mm;
+}
+.pairing-paper .pairing-entry {
+  break-inside: avoid;
+  padding: 2mm 0 3mm;
+}
+.pairing-paper .pairing-entry-title {
+  min-height: 6mm;
+  gap: 1mm;
+  margin-bottom: 1mm;
+  font-size: 12pt;
+}
+.pairing-paper .pairing-entry-title .pairing-art {
+  width: 7mm;
+  height: 7mm;
+}
+.pairing-paper .pairing-entry th,
+.pairing-paper .pairing-entry td {
+  padding: 0.7mm;
+  font-size: 9pt;
+}
+.pairing-paper .pairing-entry th {
+  text-align: center;
+}
+.pairing-paper .pairing-entry td > .text-sm {
+  font-size: 8pt;
+}
+.pairing-paper .pairing-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35mm 0.8mm;
+}
+.pairing-paper .pairing-item {
+  min-height: 4.4mm;
+  padding: 0;
+  gap: 0.7mm;
+  font-size: 9pt;
+}
+.pairing-paper .pairing-item .pairing-art {
+  width: 4.4mm;
+  height: 4.4mm;
+}
+.pairing-paper .pairing-placeholder {
+  border-width: 0.2mm;
+  border-radius: 0.8mm;
+}
+
+.pairing-paper:not(:last-child) .pairing-entry {
+  padding-bottom: 4mm;
+}
+.pairing-paper:not(:last-child) .pairing-item {
+  font-size: 10pt;
+  min-height: 5mm;
+}
+.pairing-paper:not(:last-child) .pairing-item .pairing-art {
+  width: 5mm;
+  height: 5mm;
+}
+
+.pairing-paper-foot {
+  margin-top: auto;
+  border-top: 0.25mm solid var(--color-hairline);
+  padding-top: 2mm;
+  color: var(--color-stone);
+  font-size: 8pt;
+  line-height: 1.4;
+}
+
+.pairing-paper-foot a {
+  margin-right: 1.5mm;
+  text-decoration: underline;
+}
+.pairing-paper-number {
+  margin-top: 1mm;
+  text-align: right;
+}
+
+@media screen {
+  .pairing-print-document {
+    overflow-x: auto;
+    padding: 14px 8px 0;
+    background: var(--color-hairline);
+  }
+  .pairing-print-document .pairing-paper {
+    margin-bottom: 14px;
+  }
+}
+
+@media print {
+  .pairing-print-toolbar {
+    display: none;
+  }
+  .admin-ui:has(.pairing-print-document) {
+    max-width: none;
+    padding: 0;
+    min-height: 0;
+  }
+}

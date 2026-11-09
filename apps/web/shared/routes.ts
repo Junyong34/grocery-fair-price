@@ -85,6 +85,9 @@ export const routes = {
     edition: (id: string) => `/admin/edit?id=${encodeURIComponent(id)}`,
     /** 인쇄물 구조 안(와이어프레임) 모음 */
     wireframes: "/admin/wireframes",
+    /** 고정 A4 세 장 미리보기와 다운로드. */
+    babyFoodPrint: "/admin/baby-food/print",
+    babyFoodPdf: "/admin/baby-food/pdf",
   },
 
   /** 인쇄 전용 페이지. 어드민 미리보기와 PDF 생성기가 연다. */

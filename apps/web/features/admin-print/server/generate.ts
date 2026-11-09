@@ -28,12 +28,7 @@ export async function generatePdfs(edition: Edition, origin: string): Promise<Bu
     const page = await browser.newPage({ deviceScaleFactor: 2 })
     for (const paper of PAPER_SIZES) {
       const url = `${origin}${routes.print(edition.spec, paper)}`
-      const response = await page.goto(url, { waitUntil: "networkidle" })
-      if (!response?.ok()) throw new Error(`${url} 응답 ${response?.status()}`)
-      await page.evaluate(async () => {
-        await document.fonts.ready
-        await Promise.all([...document.images].map((image) => image.decode()))
-      })
+      await loadPrintPage(page, url)
       const file = downloadPath(edition.id, paper)
       const target = path.join(PUBLIC_DIR, file)
       await mkdir(path.dirname(target), { recursive: true })
@@ -70,13 +65,49 @@ async function removeUnused(id: string, made: ReadonlySet<string>) {
   await Promise.all(files.filter((file) => generated(file) && !made.has(`${downloadDir(id)}/${file}`)).map((file) => rm(path.join(root, file), { force: true })))
 }
 
+async function loadPrintPage(page: Page, url: string) {
+  const response = await page.goto(url, { waitUntil: "networkidle" })
+  if (!response?.ok()) throw new Error(`${url} 응답 ${response?.status()}`)
+  await page.evaluate(async () => {
+    await document.fonts.ready
+    await Promise.all([...document.images].map((image) => {
+      image.loading = "eager"
+      return image.decode()
+    }))
+  })
+}
+
+/** 에디션이나 공개 목록에 넣지 않는 고정 A4 인쇄물. 파일은 브라우저로 바로 돌려준다. */
+export async function generateA4PortraitPdf(url: string, pages: number) {
+  const { chromium } = await import("playwright-core")
+  const browser = await chromium.launch({ channel: "chrome" })
+  try {
+    const page = await browser.newPage()
+    await page.emulateMedia({ media: "print" })
+    await loadPrintPage(page, url)
+    const overflow = await page.locator(".print-sheet").evaluateAll((sheets) =>
+      sheets.findIndex((sheet) => sheet.scrollHeight > sheet.clientHeight + 1 || sheet.scrollWidth > sheet.clientWidth + 1)
+    )
+    if (overflow >= 0) throw new Error(`${overflow + 1}쪽의 표가 용지 밖으로 나갔어요.`)
+    const pdf = await page.pdf({ preferCSSPageSize: true, printBackground: true })
+    checkPdfBoxes(pdf.toString("latin1"), "이유식 재료 궁합표 A4", sheetSize("A4", "portrait"), pages)
+    return Uint8Array.from(pdf)
+  } finally {
+    await browser.close()
+  }
+}
+
 function checkPdf(pdf: string, edition: Edition, paper: Paper): number {
-  const boxes = [...pdf.matchAll(/\/MediaBox\s*\[\s*[\d.]+\s+[\d.]+\s+([\d.]+)\s+([\d.]+)\s*\]/g)].map((match) => [Math.round(Number(match[1])), Math.round(Number(match[2]))])
-  const { width, height } = sheetSize(paper, edition.spec.orientation)
-  const expected = [pt(width), pt(height)]
-  const count = pageCount(edition.spec)
-  if (boxes.length !== count) throw new Error(`${edition.id} ${paper}: 쪽 수 ${boxes.length}, 기대 ${count}`)
-  const wrong = boxes.find(([w, h]) => Math.abs(w! - expected[0]!) > 1 || Math.abs(h! - expected[1]!) > 1)
-  if (wrong) throw new Error(`${edition.id} ${paper}: 쪽 크기 ${wrong.join("×")}pt, 기대 ${expected.join("×")}pt`)
+  checkPdfBoxes(pdf, `${edition.id} ${paper}`, sheetSize(paper, edition.spec.orientation), pageCount(edition.spec))
   return pdf.length
+}
+
+function checkPdfBoxes(pdf: string, label: string, size: { width: number; height: number }, count: number) {
+  const boxes = [...pdf.matchAll(/\/MediaBox\s*\[\s*[\d.]+\s+[\d.]+\s+([\d.]+)\s+([\d.]+)\s*\]/g)]
+    .map((match) => ({ width: Math.round(Number(match[1])), height: Math.round(Number(match[2])) }))
+  const width = pt(size.width)
+  const height = pt(size.height)
+  if (boxes.length !== count) throw new Error(`${label}: 쪽 수 ${boxes.length}, 기대 ${count}`)
+  const wrong = boxes.find((box) => Math.abs(box.width - width) > 1 || Math.abs(box.height - height) > 1)
+  if (wrong) throw new Error(`${label}: 쪽 크기 ${wrong.width}×${wrong.height}pt, 기대 ${width}×${height}pt`)
 }
