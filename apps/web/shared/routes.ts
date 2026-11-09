@@ -88,6 +88,8 @@ export const routes = {
     /** 고정 A4 세 장 미리보기와 다운로드. */
     babyFoodPrint: "/admin/baby-food/print",
     babyFoodPdf: "/admin/baby-food/pdf",
+    /** 카탈로그 어드민: 카테고리 (ADR 0005, 소유자 접속) */
+    catalogCategories: "/admin/catalog/categories",
     /** 카탈로그 어드민: 식재료 목록 (읽기 전용, ingest_writer) */
     catalogVarieties: "/admin/catalog/varieties",
     /** 카탈로그 어드민: 제안 검토 (catalog-scale/07, 소유자 접속) */
