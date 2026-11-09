@@ -250,6 +250,10 @@ export const PRICE_COPY = {
     perUnit: (unit: string, price: number) => `${unit}당 ${won(price)}원`,
     range: (min: number, max: number) => `최저 ${won(min)}원 ~ 최고 ${won(max)}원`,
     noVerdict: "가공식품은 판정 대신 판매처끼리 가격을 견줘요",
+    /** 판매가가 시세로 쓰이는 상품(품종이 있는 상품)의 판정 안내 */
+    verdictOnVariety: (name: string) => `판정은 아래 ‘${name}’ 시세에서 봐요`,
+    /** 품종은 있지만 아직 판정이 없는 상품 */
+    noVerdictYet: "아직 판정 전이라 판매처끼리 가격을 견줘요",
     stale: (surveyedOn: string) => `마지막 조사 ${monthDay(surveyedOn)}`,
     staleNote: "최근 조사에서 빠져 지금 가격과 다를 수 있어요",
     discontinued: "참가격이 더 조사하지 않는 상품이에요",
@@ -262,8 +266,32 @@ export const PRICE_COPY = {
     sellersNote: "점 = 이 판매처 중간값, 점선 = 전국 판매가",
     trendTitle: "최근 조사 가격",
     trendLegend: { median: "전국 판매가", min: "조사 최저가" },
-    variety: "이 상품이 들어간 식재료 시세 보기",
     basis: (stores: number, surveyedOn: string) => `참가격 전국 판매점 ${stores}곳 · ${monthDay(surveyedOn)} 조사`,
+    /** 최근 조사 가격: 첫 조사 대비 전국 판매가 변화 한 줄 */
+    trendChange: (change: number) =>
+      change === 0 ? "첫 조사와 같아요" : `첫 조사보다 ${won(Math.abs(change))}원 ${change < 0 ? "내렸어요" : "올랐어요"}`,
+    trendStats: { high: "기간 최고", average: "기간 평균", low: "기간 최저" },
+    /** 추이 그림의 대체 텍스트 */
+    trendSummary: (s: {
+      from: string
+      to: string
+      count: number
+      first: number
+      last: number
+      high: number
+      low: number
+      average: number
+      lastMin: number
+    }) =>
+      `${monthDay(s.from)}부터 ${monthDay(s.to)}까지 ${s.count}회 조사한 전국 판매가는 ${won(s.first)}원에서 ${won(s.last)}원이 됐어요. ` +
+      `기간 최고 ${won(s.high)}원, 최저 ${won(s.low)}원, 평균 ${won(s.average)}원이에요. 마지막 조사의 최저가는 ${won(s.lastMin)}원이에요.`,
+    /** 이 상품 판매가가 시세로 쓰이는 품종 */
+    varietyTitle: "이 판매가가 쓰이는 시세",
+    /** 같은 품목의 다른 상품 */
+    relatedTitle: (item: string) => `다른 ${item} 판매가`,
+    relatedNote: (unit: string | null) => (unit ? `${unit}당 가격이 싼 순` : "판매가 싼 순"),
+    relatedAll: (item: string) => `‘${item}’ 검색 결과에서 모두 보기`,
+    discontinuedShort: "조사 중단",
   },
   detail: {
     back: "뒤로",

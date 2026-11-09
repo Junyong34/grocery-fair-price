@@ -1,38 +1,54 @@
-import { ChevronDown } from "lucide-react"
+import { ArrowDownRight, ArrowUpRight, ChevronDown, Minus } from "lucide-react"
 
-import { priceAxis } from "@workspace/price/axis"
 import { PRICE_COPY } from "@workspace/price/copy"
-import { daysBetween, monthDay, won } from "@workspace/price/format"
+import { monthDay, won } from "@workspace/price/format"
 import type { ProductDetail } from "@workspace/price/types"
 
-const COPY = PRICE_COPY.product
-type Point = ProductDetail["trend"][number]
+import { TrendExplorer } from "./trend-explorer"
+import { trendStats } from "./trend-scale"
 
-/** 참가격이 조사한 날만 표시하고, 가로축은 실제 조사일 간격을 따른다. */
+const COPY = PRICE_COPY.product
+
+/**
+ * 최근 조사 가격. 참가격이 조사한 날만 표시하고, 가로축은 실제 조사일 간격을 따른다.
+ * 위는 고른 조사일(기본은 마지막)의 값, 가운데는 추이 그림과 기간 평균 기준선, 아래는 기간 최고 · 평균 · 최저와 조사일별 표.
+ */
 export function TrendSection({
   product,
 }: {
   product: Pick<ProductDetail, "trend">
 }) {
   const points = product.trend
-  const first = points[0]
-  const last = points.at(-1)
-  if (!first || !last) return null
-
-  const elapsedDays = daysBetween(first.date, last.date)
+  const stats = trendStats(points)
+  if (!stats) return null
+  const { first, last } = stats
+  const several = points.length > 1
+  const summary = COPY.trendSummary({
+    from: first.date,
+    to: last.date,
+    count: points.length,
+    first: first.median,
+    last: last.median,
+    high: stats.high.value,
+    low: stats.low.value,
+    average: stats.average,
+    lastMin: last.min,
+  })
+  const ChangeIcon =
+    stats.change < 0 ? ArrowDownRight : stats.change > 0 ? ArrowUpRight : Minus
 
   return (
     <section aria-labelledby="trend-title" className="flex flex-col gap-3">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h2
           id="trend-title"
-          className="text-xl leading-tight font-semibold text-ink sm:text-[22px]"
+          className="text-xl leading-snug font-semibold text-ink sm:text-[22px]"
         >
           {COPY.trendTitle}
         </h2>
-        <p className="text-sm text-caption tabular-nums">
+        <p className="text-[13px] leading-relaxed text-caption tabular-nums">
           <time dateTime={first.date}>{monthDay(first.date)}</time>
-          {elapsedDays > 0 && (
+          {several && (
             <>
               –<time dateTime={last.date}>{monthDay(last.date)}</time>
             </>
@@ -41,47 +57,49 @@ export function TrendSection({
           {points.length}회 조사
         </p>
       </div>
-      <div className="flex flex-col gap-5 rounded-3xl bg-pair-muted p-4 text-pair-muted-foreground sm:gap-6 sm:p-6">
-        <div>
-          <p className="mb-2 text-xs font-medium text-stone">최근 조사값</p>
-          <dl className="flex flex-wrap gap-x-8 gap-y-2">
-            <div className="flex flex-col gap-0.5">
-              <dt className="flex items-center gap-2 text-sm text-stone">
-                <span aria-hidden className="w-4 border-t-2 border-gold-deep" />
-                {COPY.trendLegend.median}
-              </dt>
-              <dd className="font-number text-2xl leading-tight tabular-nums">
-                {won(last.median)}원
-              </dd>
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <dt className="flex items-center gap-2 text-sm text-stone">
-                <span
-                  aria-hidden
-                  className="w-4 border-t-2 border-dashed border-olive"
-                />
-                {COPY.trendLegend.min}
-              </dt>
-              <dd className="font-number text-2xl leading-tight tabular-nums">
-                {won(last.min)}원
-              </dd>
-            </div>
-          </dl>
-        </div>
-        {elapsedDays > 0 && (
+      <div className="flex flex-col gap-5 rounded-3xl bg-pair-muted p-4 text-pair-muted-foreground sm:p-6">
+        <TrendExplorer
+          points={points}
+          average={stats.average}
+          summary={summary}
+        />
+        {several && (
           <>
-            <SurveyPlot
-              points={points}
-              first={first}
-              last={last}
-              elapsedDays={elapsedDays}
-            />
+            <div className="flex flex-col gap-3 border-t border-hairline pt-4">
+              <p className="flex items-center gap-1.5 text-sm font-semibold">
+                <ChangeIcon
+                  aria-hidden
+                  size={16}
+                  strokeWidth={2.2}
+                  className="shrink-0"
+                />
+                {COPY.trendChange(stats.change)}
+              </p>
+              <dl className="grid grid-cols-3 gap-x-3 text-[13px] leading-snug tabular-nums">
+                <Stat
+                  label={COPY.trendStats.high}
+                  value={stats.high.value}
+                  date={stats.high.date}
+                />
+                <Stat label={COPY.trendStats.average} value={stats.average}>
+                  <span
+                    aria-hidden
+                    className="w-3.5 border-t-2 border-dotted border-stone"
+                  />
+                </Stat>
+                <Stat
+                  label={COPY.trendStats.low}
+                  value={stats.low.value}
+                  date={stats.low.date}
+                />
+              </dl>
+            </div>
             <details className="group border-t border-hairline">
-              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-sm text-sm font-semibold hover:text-gold-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep [&::-webkit-details-marker]:hidden">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-sm text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
                 조사일별 가격 보기
                 <ChevronDown
                   aria-hidden
-                  className="size-4 shrink-0 group-open:rotate-180"
+                  className="size-4 shrink-0 text-stone group-open:rotate-180"
                 />
               </summary>
               <table className="mt-1 w-full border-collapse text-sm tabular-nums">
@@ -127,112 +145,33 @@ export function TrendSection({
   )
 }
 
-function SurveyPlot({
-  points,
-  first,
-  last,
-  elapsedDays,
+function Stat({
+  label,
+  value,
+  date,
+  children,
 }: {
-  points: readonly Point[]
-  first: Point
-  last: Point
-  elapsedDays: number
+  label: string
+  value: number
+  date?: string
+  children?: React.ReactNode
 }) {
-  const axis = priceAxis(
-    points.flatMap(({ median, min }) => [median, min]),
-    { pad: 0.08, ticks: 3 }
-  )
-  const base = axis.at(0)
-  const x = (date: string) =>
-    (100 * daysBetween(first.date, date)) / elapsedDays
-  const y = (value: number) => (100 * (1 - axis.at(value))) / (1 - base)
-  const ticks = axis.ticks.filter((tick) => tick >= 0 && Number.isInteger(tick))
-  const line = (key: "median" | "min") =>
-    points
-      .map(
-        (point, index) =>
-          `${index ? "L" : "M"}${x(point.date)},${y(point[key])}`
-      )
-      .join("")
-
   return (
-    <div
-      role="img"
-      aria-label="조사일별 전국 판매가와 최저가 추이"
-      dir="ltr"
-      className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3 gap-y-2 text-xs text-stone tabular-nums"
-    >
-      <span aria-hidden className="col-span-2">
-        단위: 원
-      </span>
-      <div aria-hidden className="relative self-stretch text-end">
-        <span className="invisible">{won(axis.max)}</span>
-        {ticks.map((tick) => (
-          <span
-            key={tick}
-            className="absolute end-0 -translate-y-1/2"
-            style={{ top: `${y(tick)}%` }}
-          >
-            {won(tick)}
-          </span>
-        ))}
-      </div>
-      <div aria-hidden className="relative">
-        <svg
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          className="block h-36 w-full overflow-visible sm:h-48"
-        >
-          {ticks.map((tick) => (
-            <line
-              key={tick}
-              x1="0"
-              x2="100"
-              y1={y(tick)}
-              y2={y(tick)}
-              className="stroke-hairline"
-              vectorEffect="non-scaling-stroke"
-            />
-          ))}
-          <path
-            d={line("median")}
-            fill="none"
-            className="stroke-gold-deep"
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-            vectorEffect="non-scaling-stroke"
-          />
-          <path
-            d={line("min")}
-            fill="none"
-            className="stroke-olive"
-            strokeWidth="2"
-            strokeDasharray="4 4"
-            strokeLinejoin="round"
-            vectorEffect="non-scaling-stroke"
-          />
-        </svg>
-        {points.map((point) => (
-          <span
-            key={point.date}
-            className="absolute inset-y-0"
-            style={{ left: `${x(point.date)}%` }}
-          >
-            <span
-              className="absolute size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-olive bg-pair-muted"
-              style={{ top: `${y(point.min)}%` }}
-            />
-            <span
-              className="absolute size-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold-deep"
-              style={{ top: `${y(point.median)}%` }}
-            />
-          </span>
-        ))}
-      </div>
-      <div aria-hidden className="col-start-2 flex justify-between gap-2">
-        <time dateTime={first.date}>{monthDay(first.date)}</time>
-        <time dateTime={last.date}>{monthDay(last.date)}</time>
-      </div>
+    <div className="flex min-w-0 flex-col gap-1">
+      <dt className="flex items-center gap-1.5 text-stone">
+        {children}
+        {label}
+      </dt>
+      <dd className="flex flex-col gap-0.5">
+        <span className="font-number text-lg leading-tight">
+          {won(value)}원
+        </span>
+        {date && (
+          <time dateTime={date} className="text-xs text-stone">
+            {monthDay(date)}
+          </time>
+        )}
+      </dd>
     </div>
   )
 }

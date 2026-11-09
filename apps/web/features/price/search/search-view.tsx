@@ -34,6 +34,7 @@ import { PriceHint, VarietyRow } from "../components/variety-row"
 import { Highlighted } from "./highlighted"
 import { ProductResults } from "./product-results"
 import { RecentRow } from "./recent-row"
+import { ResultSection } from "./result-section"
 
 type SearchViewProps = {
   varieties: readonly VarietySummary[]
@@ -44,6 +45,8 @@ type SearchViewProps = {
 }
 
 const INGREDIENT_TITLE = "식재료 시세"
+/** 식재료 묶음 설명. 상품 묶음("판정은 하지 않아요")과 짝을 이뤄 두 묶음이 무엇이 다른지 제목 바로 아래에서 알린다. */
+const VARIETIES_NOTE = "최근 시세를 평소가와 견줘 싼지 비싼지 알려 줘요"
 const COPY = PRICE_COPY.search
 
 /**
@@ -224,29 +227,22 @@ function Results({
       case "typo":
         varietyNote = PRICE_COPY.search.typo(query.trim())
         break
-      case "category":
-        varietyNote = PRICE_COPY.search.category(result.category)
-        break
+      // 카테고리("유제품 시세")는 묶음 제목 · 설명과 같은 말이라 따로 안내하지 않는다.
     }
 
+    // 위 묶음이 길어 상품 묶음이 첫 화면 아래로 밀릴 때만 건너뛰기 버튼을 둔다(식재료 1~2개면 상품이 바로 보인다).
+    const showJump = matchingProducts.length > 0 && matchingVarieties.length > 2
+
     return (
-      <div className="flex flex-col gap-6 lg:gap-8">
+      <div className="flex flex-col gap-8 lg:gap-10">
         {matchingVarieties.length > 0 && (
-          <section
-            aria-labelledby={varietyHeadingId}
-            className="flex flex-col gap-3"
-          >
-            <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-              <h2
-                id={varietyHeadingId}
-                className="flex flex-wrap items-baseline gap-x-2 font-heading text-xl leading-snug font-bold text-ink"
-              >
-                {INGREDIENT_TITLE}
-                <span className="font-sans text-sm font-semibold text-forest tabular-nums">
-                  {COPY.productsCount(matchingVarieties.length)}
-                </span>
-              </h2>
-              {matchingProducts.length > 0 && (
+          <ResultSection
+            headingId={varietyHeadingId}
+            title={INGREDIENT_TITLE}
+            count={matchingVarieties.length}
+            description={VARIETIES_NOTE}
+            action={
+              showJump && (
                 <button
                   type="button"
                   onClick={() => {
@@ -254,19 +250,20 @@ function Results({
                     heading?.focus({ preventScroll: true })
                     heading?.scrollIntoView({ block: "start" })
                   }}
-                  className="inline-flex min-h-10 items-center gap-2 rounded-full border border-hairline bg-pair-light px-3 text-sm font-semibold text-stone hover:border-stone focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-hairline bg-pair-light px-3.5 text-sm font-semibold text-stone hover:border-stone hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 >
                   {COPY.products} {COPY.productsCount(matchingProducts.length)}
                   <ArrowDown aria-hidden size={15} strokeWidth={2.25} />
                 </button>
-              )}
-            </header>
+              )
+            }
+          >
+            {/* 품목 · 별칭 · 오타 · 카테고리로 찾았을 때의 안내. 사용자에게 되묻는 말이라 설명보다 진하게 둔다. */}
             {varietyNote && (
-              <p className="text-sm leading-relaxed wrap-break-word text-stone">
+              <p className="px-1 text-sm leading-relaxed font-medium wrap-break-word text-stone">
                 {varietyNote}
               </p>
             )}
-            {result.kind === "hits" && <PriceHint />}
             <ul className="rounded-3xl bg-pair-light px-4 lg:px-5">
               {matchingVarieties.map((variety) => (
                 <VarietyRow
@@ -281,7 +278,9 @@ function Results({
                 />
               ))}
             </ul>
-          </section>
+            {/* 행을 먼저 훑고 나서 읽는 용어 풀이라 목록 아래에 둔다. */}
+            {result.kind === "hits" && <PriceHint className="px-1" />}
+          </ResultSection>
         )}
         {matchingProducts.length > 0 && (
           <ProductResults
@@ -351,7 +350,8 @@ function Results({
           </div>
           {browse}
           <Group title={PRICE_COPY.home.featured}>
-            <ul>
+            {/* 결과 목록과 같은 카드에 담아, 결과가 있을 때와 같은 행 모양으로 읽히게 한다. */}
+            <ul className="rounded-3xl bg-pair-light px-4 lg:px-5">
               {featured.slice(0, 3).map((variety) => (
                 <VarietyRow
                   key={variety.id}

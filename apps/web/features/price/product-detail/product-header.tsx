@@ -10,7 +10,7 @@ export function ProductHeader({ name, sub }: { name: string; sub: string }) {
     <header className="flex items-start gap-2">
       <BackButton fallbackHref={routes.home} className="-ms-2 max-lg:hidden" />
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-        <p className="text-sm font-semibold text-stone">상품 판매가</p>
+        <p className="text-sm font-semibold text-caption">상품 판매가</p>
         <h1
           id={TITLE_ID}
           className="font-heading text-3xl leading-[1.25] font-bold tracking-[-0.015em] text-balance [overflow-wrap:anywhere] break-keep text-ink lg:text-4xl"
