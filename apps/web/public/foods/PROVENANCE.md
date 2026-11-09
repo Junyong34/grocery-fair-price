@@ -10,7 +10,7 @@
 | kit sha | `6806db565e0538c4` |
 | 변형 | `color`, `motion` |
 | 바닥 그림자 | 끔 |
-| 품종 수 | 250 |
+| 품종 수 | 260 |
 
 | id | 이름 | food.mjs sha |
 |---|---|---|
@@ -18,6 +18,7 @@
 | `adlay` | 율무 | `e2c5cc08b4e5f651` |
 | `aengdu` | 앵두 | `eb81676fc607c3cb` |
 | `aged-pumpkin` | 늙은 호박 | `18a077451d96a3e5` |
+| `almond` | 아몬드 | `9f63b6e31c1da22d` |
 | `alpine-leek` | 산마늘 | `4dc1449b56476d6c` |
 | `anchovy` | 멸치 | `4612a4ac5cb53d55` |
 | `apple` | 사과 | `fa42621dbc0f22a4` |
@@ -28,12 +29,14 @@
 | `asparagus` | 아스파라거스 | `78907c2804ebdc18` |
 | `aster-scaber` | 취나물(참취) | `b3a88d4def7e729f` |
 | `atka-mackerel` | 임연수어 | `4372ab514787cdc2` |
+| `avocado` | 아보카도 | `555f0f6b7e53978d` |
 | `bamboo-shoot` | 죽순 | `074b42b55eabc00b` |
 | `banana` | 바나나 | `faf599af5e4abd16` |
 | `banded-grouper` | 능성어 | `8cc9b53e0d260926` |
 | `bangah-leaf` | 방아잎 | `e8eea7eef67dfc50` |
 | `bangpung-namul` | 방풍나물 | `06f450494121809f` |
 | `barley` | 보리 | `07c88971b71f9c83` |
+| `beef` | 소고기 | `06fa6730e4b42d6e` |
 | `beet` | 비트 | `e6c672a395bf53e3` |
 | `bell-pepper` | 피망 | `01d3f8f06d9f6bb3` |
 | `bellflower-root` | 도라지 | `2542bde0e7ff7d71` |
@@ -65,6 +68,7 @@
 | `celery` | 샐러리 | `b708e2c494a9ce8d` |
 | `chamnamul` | 참나물 | `2ab33d6e6568e51d` |
 | `chard` | 근대 | `4eebff1386e7e8c2` |
+| `cheese` | 치즈 | `52b2355dfed059bb` |
 | `cheonhyehyang` | 천혜향 | `f99ed1a0466ed847` |
 | `cherry` | 체리 | `0f02eea83335f8b8` |
 | `cherry-tomato` | 방울토마토 | `c1376ff6fd9bb099` |
@@ -104,6 +108,7 @@
 | `goedorachi` | 괴도라치 | `0b801aaadd6f0134` |
 | `gomchwi` | 곰취 | `b71f8e262796e96a` |
 | `gondeure` | 곤드레 | `8c630dde90537611` |
+| `grapefruit` | 자몽 | `b5eedf3a9607e959` |
 | `gray-rockfish` | 볼락 | `a37d77f5d9855e0d` |
 | `green-bean` | 껍질콩(그린빈) | `655460086d8bc0d0` |
 | `green-grape` | 포도 | `fbec5a48afc81caf` |
@@ -148,6 +153,7 @@
 | `matsutake` | 송이버섯 | `f6793ef05a57eaf5` |
 | `melon` | 멜론 | `4ac7051b4eceda2a` |
 | `mideodeok` | 미더덕 | `d39f6e58ce047216` |
+| `milk` | 우유 | `dca68342bc10d20d` |
 | `monkfish` | 아귀 | `f597c4d43ea7b60b` |
 | `mouse-eye-bean` | 쥐눈이콩 | `1592361edff62c20` |
 | `mugwort` | 쑥 | `21b9dad35ff9a09d` |
@@ -160,6 +166,7 @@
 | `oat` | 귀리 | `8453d3d1e5f700ee` |
 | `old-cucumber` | 노각 | `c61ba58cb518f0a6` |
 | `olive-flounder` | 광어(넙치) | `698faf02f4207fad` |
+| `olive-oil` | 올리브유 | `085f7f4a371fe5e7` |
 | `omija` | 오미자 | `4e01652edd55e92b` |
 | `onion` | 양파 | `8edd662b58b632d0` |
 | `oriental-melon` | 참외 | `073907b78971152f` |
@@ -202,6 +209,7 @@
 | `rock-bream` | 돌돔 | `d3ecd165a5479c61` |
 | `roughscale-flounder` | 줄가자미 | `a924af8927679a12` |
 | `rye` | 호밀 | `eea1f8bc67c64af2` |
+| `salmon` | 연어 | `b80e841aab4d7a2b` |
 | `salted-shrimp` | 새우젓 | `427f1c3b4ce6e8a7` |
 | `samchae` | 삼채 | `0855f807f27e6d62` |
 | `sardinella` | 밴댕이 | `061bfe9e1f906e0c` |
@@ -216,6 +224,7 @@
 | `sebal-namul` | 세발나물 | `2e9d0068db9bc9d6` |
 | `seomcho` | 섬초 | `6633b8d3e7432ea6` |
 | `seoritae` | 서리태 | `6d23327ecf3a0d22` |
+| `sesame-oil` | 참기름 | `d993bda547f75d0f` |
 | `sesame-seed` | 참깨 | `9b648c33da144f49` |
 | `shepherds-purse` | 냉이 | `d033fdad20eda453` |
 | `shiitake-mushroom` | 표고버섯 | `4605d53ca8155f7d` |
@@ -237,6 +246,7 @@
 | `stone-flounder` | 돌가자미 | `ba713c41ff4d9293` |
 | `strawberry` | 딸기(시설) | `7ce2e60592da75ea` |
 | `stringy-stonecrop` | 돌나물 | `3e29a0dfe4ec2a19` |
+| `sugar` | 설탕 | `6026bec9c48f5380` |
 | `sweet-potato` | 고구마 | `e441dcd3f3626d46` |
 | `sweet-potato-stem` | 고구마순 | `b29104acdd903888` |
 | `sweet-pumpkin` | 단호박 | `34d29af65a64863c` |
