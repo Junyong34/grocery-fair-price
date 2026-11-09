@@ -70,14 +70,16 @@ describe("카탈로그 모양", () => {
 // 갓·굴·가리비는 철이 와서 실측 뒤에 소매로 들어왔다 (굴·가리비 2026-10-21, 갓 2026-11-02부터, 2026-11-04 확인)
 const KAMIS_SEEN_LATER = new Set(["411-05-04", "411-05-05", "216-00-04", "644-00-30", "659-01-30"])
 
+// 2026-11-09부터 원천 키는 제안 흐름(catalog-scale/06·08)으로도 들어온다. 제안은 운영에 관측된 원천 키(source_item)에만 넣을 수 있어
+// 실측 뒤에 온 품종·등급·철 지난 키가 있다. 이런 키는 품목 코드만 실측 코드표에서 본다
+const kamisItems = new Set(kamisRetail.map((r) => r.item_cd))
+
 describe("실측 코드표 (samples/inventory, 2026-10-19)", () => {
   // 품종 `*`(배추·무)는 철마다 오는 코드가 달라 그 품목이 있는지만 본다
-  it("KAMIS 키는 소매로 오는 품목·품종·등급이다", () => {
+  it("KAMIS 키는 소매로 오는 품목이다 (품종·등급은 실측표나 운영 관측값에 있다)", () => {
     const matches = (key: string) => {
-      const [item, vrty, grd] = key.split("-")
-      if (KAMIS_SEEN_LATER.has(key)) return true
-      if (vrty === "*") return kamisRetail.some((r) => r.item_cd === item)
-      return kamisRetail.some((r) => r.item_cd === item && r.vrty_cd === vrty && r.grd_cd === grd)
+      const [item] = key.split("-")
+      return KAMIS_SEEN_LATER.has(key) || kamisItems.has(item!)
     }
     const missing = specs.flatMap(({ spec }) => spec.kamis ?? []).filter((k) => !matches(k))
     expect(missing).toEqual([])
@@ -94,10 +96,9 @@ describe("실측 코드표 (samples/inventory, 2026-10-19)", () => {
     expect(kamisRetail.filter((r) => !covered(r) && !excluded(r)).map((r) => `${r.item_cd}-${r.vrty_cd}-${r.grd_cd} ${r.item_nm}`)).toEqual([])
   })
 
-  it("일부러 뺀 KAMIS 코드는 코드표에 있고 어느 규격에도 잇지 않는다", () => {
+  it("일부러 뺀 KAMIS 코드는 소매로 오는 품목이고 어느 규격에도 잇지 않는다", () => {
     const keys = new Set(specs.flatMap(({ spec }) => spec.kamis ?? []))
-    const inTable = new Set(kamisRetail.map((r) => `${r.item_cd}-${r.vrty_cd}-${r.grd_cd}`))
-    expect([...KAMIS_EXCLUDED.keys()].filter((k) => keys.has(k) || !inTable.has(k))).toEqual([])
+    expect([...KAMIS_EXCLUDED.keys()].filter((k) => keys.has(k) || !kamisItems.has(k.split("-")[0]!))).toEqual([])
   })
 
   it("축평원 키는 코드표에 있고, 코드표의 키는 모두 잇는다", () => {

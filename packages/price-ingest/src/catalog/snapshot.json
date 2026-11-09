@@ -775,6 +775,27 @@
           "kamis": [
             "152-01-05"
           ]
+        },
+        {
+          "slug": "greenhouse-top",
+          "name": "수미(시설) 상품",
+          "kamis": [
+            "152-04-04"
+          ]
+        },
+        {
+          "slug": "greenhouse-mid",
+          "name": "수미(시설) 중품",
+          "kamis": [
+            "152-04-05"
+          ]
+        },
+        {
+          "slug": "daejima-mid",
+          "name": "대지마 중품",
+          "kamis": [
+            "152-02-05"
+          ]
         }
       ]
     },
@@ -843,6 +864,20 @@
           "chamga": [
             295
           ]
+        },
+        {
+          "slug": "new-crop",
+          "name": "햇양파",
+          "kamis": [
+            "245-02-04"
+          ]
+        },
+        {
+          "slug": "mid",
+          "name": "중품",
+          "kamis": [
+            "245-00-05"
+          ]
         }
       ]
     },
@@ -884,6 +919,13 @@
           ],
           "chamga": [
             1040
+          ]
+        },
+        {
+          "slug": "mid",
+          "name": "중품",
+          "kamis": [
+            "246-02-05"
           ]
         }
       ]
@@ -971,6 +1013,13 @@
           "kamis": [
             "242-02-04"
           ]
+        },
+        {
+          "slug": "mid",
+          "name": "중품",
+          "kamis": [
+            "242-02-05"
+          ]
         }
       ]
     },
@@ -985,6 +1034,13 @@
           "name": "기본",
           "kamis": [
             "242-04-04"
+          ]
+        },
+        {
+          "slug": "mid",
+          "name": "중품",
+          "kamis": [
+            "242-04-05"
           ]
         }
       ]
@@ -1067,6 +1123,13 @@
           "chamga": [
             934
           ]
+        },
+        {
+          "slug": "mid",
+          "name": "중품",
+          "kamis": [
+            "224-01-05"
+          ]
         }
       ]
     },
@@ -1099,6 +1162,13 @@
           "name": "기본",
           "kamis": [
             "251-00-04"
+          ]
+        },
+        {
+          "slug": "mid",
+          "name": "중품",
+          "kamis": [
+            "251-00-05"
           ]
         }
       ]
@@ -1211,6 +1281,13 @@
           "name": "기본",
           "kamis": [
             "280-00-04"
+          ]
+        },
+        {
+          "slug": "mid",
+          "name": "중품",
+          "kamis": [
+            "280-00-05"
           ]
         }
       ]
@@ -1366,6 +1443,20 @@
           "kamis": [
             "411-08-05"
           ]
+        },
+        {
+          "slug": "tsugaru-top",
+          "name": "쓰가루 상품",
+          "kamis": [
+            "411-06-04"
+          ]
+        },
+        {
+          "slug": "tsugaru-mid",
+          "name": "쓰가루 중품",
+          "kamis": [
+            "411-06-05"
+          ]
         }
       ]
     },
@@ -1390,6 +1481,20 @@
           "name": "중품",
           "kamis": [
             "412-01-05"
+          ]
+        },
+        {
+          "slug": "wonhwang-top",
+          "name": "원황 상품",
+          "kamis": [
+            "412-04-04"
+          ]
+        },
+        {
+          "slug": "wonhwang-mid",
+          "name": "원황 중품",
+          "kamis": [
+            "412-04-05"
           ]
         }
       ]
@@ -1434,6 +1539,13 @@
           "kamis": [
             "414-01-24"
           ]
+        },
+        {
+          "slug": "m",
+          "name": "M과",
+          "kamis": [
+            "414-01-25"
+          ]
         }
       ]
     },
@@ -1463,6 +1575,21 @@
           "name": "기본",
           "kamis": [
             "414-12-24"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "mba-grape",
+      "name": "MBA",
+      "item": "grape",
+      "unit": "100g",
+      "specs": [
+        {
+          "slug": "default",
+          "name": "기본",
+          "kamis": [
+            "414-06-24"
           ]
         }
       ]
@@ -1596,6 +1723,13 @@
           "kamis": [
             "257-00-04"
           ]
+        },
+        {
+          "slug": "mid",
+          "name": "중품",
+          "kamis": [
+            "257-00-05"
+          ]
         }
       ]
     },
@@ -1680,6 +1814,13 @@
           "kamis": [
             "421-06-05"
           ]
+        },
+        {
+          "slug": "top",
+          "name": "상품",
+          "kamis": [
+            "421-06-04"
+          ]
         }
       ]
     },
@@ -1720,6 +1861,13 @@
           "kamis": [
             "425-00-04"
           ]
+        },
+        {
+          "slug": "mid",
+          "name": "중품",
+          "kamis": [
+            "425-00-05"
+          ]
         }
       ]
     },
@@ -1734,6 +1882,13 @@
           "name": "기본",
           "kamis": [
             "428-00-04"
+          ]
+        },
+        {
+          "slug": "mid",
+          "name": "중품",
+          "kamis": [
+            "428-00-05"
           ]
         }
       ]
@@ -1767,6 +1922,21 @@
           "name": "기본",
           "kamis": [
             "430-00-04"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "orange-us",
+      "name": "오렌지(미국)",
+      "item": "imported-fruit",
+      "unit": "1개",
+      "specs": [
+        {
+          "slug": "top",
+          "name": "상품",
+          "kamis": [
+            "421-03-04"
           ]
         }
       ]
@@ -2362,6 +2532,27 @@
           "kamis": [
             "611-03-30"
           ]
+        },
+        {
+          "slug": "chilled-m",
+          "name": "냉장 중",
+          "kamis": [
+            "611-05-21"
+          ]
+        },
+        {
+          "slug": "frozen-l",
+          "name": "냉동 대",
+          "kamis": [
+            "611-06-20"
+          ]
+        },
+        {
+          "slug": "frozen-m",
+          "name": "냉동 중",
+          "kamis": [
+            "611-06-21"
+          ]
         }
       ]
     },
@@ -2455,6 +2646,13 @@
           "chamga": [
             939
           ]
+        },
+        {
+          "slug": "frozen-l",
+          "name": "냉동 대",
+          "kamis": [
+            "613-04-20"
+          ]
         }
       ]
     },
@@ -2482,6 +2680,20 @@
           "name": "냉동",
           "kamis": [
             "614-06-21"
+          ]
+        },
+        {
+          "slug": "chilled-s",
+          "name": "냉장 소",
+          "kamis": [
+            "614-05-22"
+          ]
+        },
+        {
+          "slug": "frozen-s",
+          "name": "냉동 소",
+          "kamis": [
+            "614-06-22"
           ]
         }
       ]
@@ -2577,6 +2789,13 @@
           "kamis": [
             "616-01-20"
           ]
+        },
+        {
+          "slug": "frozen-m",
+          "name": "냉동 중",
+          "kamis": [
+            "616-02-21"
+          ]
         }
       ]
     },
@@ -2618,6 +2837,21 @@
       ]
     },
     {
+      "slug": "hairtail-imported",
+      "name": "갈치(수입)",
+      "item": "fish",
+      "unit": "1개",
+      "specs": [
+        {
+          "slug": "frozen-l",
+          "name": "냉동 대",
+          "kamis": [
+            "613-05-20"
+          ]
+        }
+      ]
+    },
+    {
       "slug": "coastal-squid",
       "name": "오징어(연근해)",
       "item": "squid-octopus",
@@ -2651,6 +2885,13 @@
           ],
           "chamga": [
             941
+          ]
+        },
+        {
+          "slug": "frozen-m",
+          "name": "냉동 중",
+          "kamis": [
+            "619-04-21"
           ]
         }
       ]
@@ -2762,6 +3003,13 @@
           "name": "수꽃게 냉장",
           "kamis": [
             "656-05-30"
+          ]
+        },
+        {
+          "slug": "female-frozen",
+          "name": "암꽃게 냉동",
+          "kamis": [
+            "656-02-30"
           ]
         }
       ]
@@ -3126,6 +3374,162 @@
       "key": "1789",
       "action": "hold",
       "reason": "볶음참깨: 원산지가 없어 참깨(국산)·(중국)을 고를 수 없다"
+    },
+    {
+      "source": "kamis",
+      "key": "241-01-04",
+      "action": "hold",
+      "reason": "건고추 햇산화건이 기존 241-00과 무엇이 다른지(화건·양건, 햇산) 원문만으로 가를 수 없다"
+    },
+    {
+      "source": "kamis",
+      "key": "421-03-05",
+      "action": "hold",
+      "reason": "421-03-04 제안(새 품종 orange-us)이 승인된 뒤 그 품종의 중품 규격으로 잇는다"
+    },
+    {
+      "source": "ekape",
+      "key": "4401-31-00",
+      "action": "hold",
+      "reason": "수입 소고기 갈비(냉동) 구분 00: 원산지가 없어 미국산·호주산 갈비 중 고를 수 없다"
+    },
+    {
+      "source": "ekape",
+      "key": "4401-29-00",
+      "action": "hold",
+      "reason": "수입 소고기 양지(냉장) 구분 00: 원산지가 없어 미국산·호주산 양지 중 고를 수 없다"
+    },
+    {
+      "source": "ekape",
+      "key": "4401-37-00",
+      "action": "hold",
+      "reason": "수입 소고기 갈비살(냉장) 구분 00: 원산지가 없어 미국산 갈비살과 같은지 알 수 없다"
+    },
+    {
+      "source": "kamis",
+      "key": "9901-24-1",
+      "action": "hold",
+      "reason": "닭 절단육은 통닭(호수·kg)과 단위·부위가 달라 broiler 규격인지 새 품종인지 정할 근거가 없다"
+    },
+    {
+      "source": "kamis",
+      "key": "414-12-25",
+      "action": "ignore",
+      "reason": "2025-09부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "656-03-30",
+      "action": "ignore",
+      "reason": "2025-08부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "613-04-22",
+      "action": "ignore",
+      "reason": "2025-07부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "611-05-22",
+      "action": "ignore",
+      "reason": "2025-06부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "246-00-05",
+      "action": "ignore",
+      "reason": "2025-05부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "245-02-05",
+      "action": "ignore",
+      "reason": "2025-04부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "253-00-05",
+      "action": "ignore",
+      "reason": "2024-08부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "421-05-05",
+      "action": "ignore",
+      "reason": "2024-07부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "214-01-05",
+      "action": "ignore",
+      "reason": "2024-07부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "213-00-05",
+      "action": "ignore",
+      "reason": "2024-04부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "243-00-05",
+      "action": "ignore",
+      "reason": "2024-04부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "152-02-04",
+      "action": "ignore",
+      "reason": "2024-03부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "152-06-05",
+      "action": "ignore",
+      "reason": "2024-01부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "152-06-04",
+      "action": "ignore",
+      "reason": "2024-01부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "214-02-05",
+      "action": "ignore",
+      "reason": "2023-09부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "615-03-20",
+      "action": "ignore",
+      "reason": "2023-08부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "312-03-05",
+      "action": "ignore",
+      "reason": "2023-06부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "241-02-04",
+      "action": "ignore",
+      "reason": "2023-05부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "414-08-04",
+      "action": "ignore",
+      "reason": "2023-05부터 오지 않는다"
+    },
+    {
+      "source": "kamis",
+      "key": "414-09-04",
+      "action": "ignore",
+      "reason": "2023-03부터 오지 않는다"
     }
   ]
 }
