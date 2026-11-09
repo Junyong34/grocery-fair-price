@@ -261,7 +261,7 @@ export const PRICE_COPY = {
     promo: "행사",
     sellersNote: "점 = 이 판매처 중간값, 점선 = 전국 판매가",
     trendTitle: "최근 조사 가격",
-    trendLegend: { median: "전국 판매가", min: "가장 싼 곳" },
+    trendLegend: { median: "전국 판매가", min: "조사 최저가" },
     variety: "이 상품이 들어간 식재료 시세 보기",
     basis: (stores: number, surveyedOn: string) => `참가격 전국 판매점 ${stores}곳 · ${monthDay(surveyedOn)} 조사`,
   },

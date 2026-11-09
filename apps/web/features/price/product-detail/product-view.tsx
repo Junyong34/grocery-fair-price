@@ -1,4 +1,4 @@
-import { CalendarClock, Info } from "lucide-react"
+import { CalendarClock, ChevronRight, Info } from "lucide-react"
 import Link from "next/link"
 
 import { CHANNEL_NAME, PRICE_COPY } from "@workspace/price/copy"
@@ -13,55 +13,40 @@ import { TrendSection } from "./trend-section"
 
 const COPY = PRICE_COPY.product
 
-/**
- * 참가격 상품 상세(catalog-scale/10). 판정이 없다: 지금이 비싼 시기인지가 아니라 어디서 싸게 파는지를 견준다.
- * 위는 전국 판매가 · 기준 단위당 가격 · 업태별, 오른쪽(모바일은 아래)은 판매처별, 아래 전체 폭에 최근 조사 추이.
- */
+/** 전국 · 업태별 판매가와 판매처별 비교를 두 열로 두고, 최근 조사 가격은 아래 전체 폭에 둔다. */
 export function ProductView({ product }: { product: ProductDetail }) {
-  const sub = [product.category, product.item, product.size].filter(Boolean).join(" · ")
+  const sub = [product.category, product.item, product.size]
+    .filter(Boolean)
+    .join(" · ")
   return (
-    <article className="price-page flex flex-col gap-7 pt-3 lg:pt-8">
+    <article className="price-page flex flex-col gap-7 pt-3 pb-6 lg:gap-9 lg:pt-8">
       <ProductHeader name={product.name} sub={sub} />
       <ProductHeaderBar name={product.name} />
-      <div className="contents lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-x-10 lg:gap-y-8">
-        <div className="flex min-w-0 flex-col gap-7">
+      <div className="contents lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-x-8 lg:gap-y-9">
+        <div className="flex min-w-0 flex-col gap-7 lg:gap-8">
           <PriceCard product={product} />
           {product.channels.length > 0 && (
-            <section aria-labelledby="channels-title" className="flex flex-col gap-3">
-              <h2 id="channels-title" className="text-[17px] font-semibold text-ink">
-                {COPY.channelsTitle}
-              </h2>
-              <dl className="grid grid-cols-2 gap-2">
-                {product.channels.map((c) => (
-                  <div key={c.channel} className="flex flex-col gap-1 rounded-2xl bg-mat p-3">
-                    <dt className="text-xs font-semibold text-stone">{CHANNEL_NAME[c.channel]}</dt>
-                    <dd className="flex items-baseline gap-1.5">
-                      <span className="font-number text-[22px] leading-none text-ink tabular-nums">{won(c.median)}원</span>
-                      <span className="text-xs text-caption">{COPY.stores(c.stores)}</span>
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </section>
+            <ChannelsSection channels={product.channels} />
           )}
         </div>
-        <div className="min-w-0">
-          <SellersSection product={product} />
-        </div>
-        <div className="min-w-0 lg:col-span-2">
-          <TrendSection product={product} />
-        </div>
-      </div>
-      <footer className="flex flex-col gap-3 pb-6">
-        {product.varietyId && (
-          <Link
-            href={routes.price.variety(product.varietyId)}
-            className="inline-flex h-11 items-center justify-center rounded-full border border-silver text-sm font-semibold text-ink no-underline hover:border-stone"
-          >
-            {COPY.variety}
-          </Link>
+        <SellersSection product={product} />
+        {product.trend.length > 0 && (
+          <div className="contents lg:col-span-2 lg:block lg:min-w-0">
+            <TrendSection product={product} />
+          </div>
         )}
-        <p className="text-xs text-caption">{COPY.basis(product.range.stores, product.surveyedOn)}</p>
+      </div>
+      <RelatedLinks item={product.item} varietyId={product.varietyId} />
+      <footer className="flex flex-wrap items-center justify-between gap-x-5 gap-y-1 border-t border-hairline pt-3">
+        <p className="text-[13px] leading-relaxed text-caption">
+          {COPY.basis(product.range.stores, product.surveyedOn)}
+        </p>
+        <Link
+          href={routes.settings.sources}
+          className="inline-flex min-h-11 items-center text-sm text-stone underline underline-offset-3 hover:text-ink"
+        >
+          {PRICE_COPY.detail.sourcesLink}
+        </Link>
       </footer>
     </article>
   )
@@ -69,40 +54,157 @@ export function ProductView({ product }: { product: ProductDetail }) {
 
 function PriceCard({ product }: { product: ProductDetail }) {
   return (
-    <section aria-label={COPY.nationalPrice} className="flex flex-col gap-3 rounded-3xl bg-mat p-4">
-      <div className="flex flex-col gap-1">
-        <span className="text-xs font-semibold text-stone">{COPY.nationalPrice}</span>
-        <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-          <span className="font-number text-[34px] leading-none text-ink tabular-nums">{won(product.price)}원</span>
-          {product.perUnit && (
-            <span className="rounded-full bg-canvas/80 px-2 py-0.5 text-[13px] font-semibold text-ink tabular-nums">
-              {COPY.perUnit(product.perUnit.unit, product.perUnit.price)}
-            </span>
-          )}
-        </span>
-        <span className="text-xs text-caption">{COPY.nationalNote(product.surveyedOn, product.range.stores)}</span>
-        <span className="text-xs text-caption tabular-nums">{COPY.range(product.range.min, product.range.max)}</span>
+    <section
+      aria-labelledby="national-price-title"
+      className="flex flex-col gap-4 rounded-3xl bg-pair-muted p-4 text-pair-muted-foreground lg:p-5"
+    >
+      <div className="flex flex-col gap-1.5">
+        <h2 id="national-price-title" className="text-base font-semibold">
+          {COPY.nationalPrice}
+        </h2>
+        <p className="flex items-baseline gap-1 tabular-nums">
+          <span className="font-number text-[2.75rem] leading-[1.1] lg:text-5xl">
+            {won(product.price)}
+          </span>
+          <span className="text-lg font-semibold">원</span>
+        </p>
+        {product.perUnit && (
+          <p className="text-sm font-semibold tabular-nums">
+            {COPY.perUnit(product.perUnit.unit, product.perUnit.price)}
+          </p>
+        )}
+        <p className="text-[13px] leading-relaxed text-stone tabular-nums">
+          {COPY.nationalNote(product.surveyedOn, product.range.stores)}
+        </p>
       </div>
+
+      <div className="rounded-lg bg-pair-base px-3 py-2.5 text-pair-base-foreground">
+        <p className="text-[13px] font-semibold text-stone">조사 가격 범위</p>
+        <dl className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm leading-relaxed tabular-nums">
+          <div className="flex items-baseline gap-1.5">
+            <dt className="text-caption">최저</dt>
+            <dd className="font-semibold">{won(product.range.min)}원</dd>
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <dt className="text-caption">최고</dt>
+            <dd className="font-semibold">{won(product.range.max)}원</dd>
+          </div>
+        </dl>
+      </div>
+
       {product.status !== "active" && (
-        <Notice
-          icon={<CalendarClock aria-hidden size={16} />}
-          title={product.status === "discontinued" ? COPY.discontinued : COPY.stale(product.surveyedOn)}
-          body={COPY.staleNote}
-        />
+        <div
+          role="note"
+          className="flex gap-2 rounded-lg bg-pair-gold px-3 py-2.5 text-pair-gold-foreground"
+        >
+          <CalendarClock aria-hidden size={16} className="mt-0.5 shrink-0" />
+          <div className="text-[13px] leading-relaxed">
+            <p className="font-semibold">
+              {product.status === "discontinued"
+                ? COPY.discontinued
+                : COPY.stale(product.surveyedOn)}
+            </p>
+            <p>{COPY.staleNote}</p>
+          </div>
+        </div>
       )}
-      <Notice icon={<Info aria-hidden size={16} />} title={COPY.noVerdict} />
+      <p className="flex gap-2 text-[13px] leading-relaxed text-stone">
+        <Info aria-hidden size={16} className="mt-0.5 shrink-0" />
+        {COPY.noVerdict}
+      </p>
     </section>
   )
 }
 
-function Notice({ icon, title, body }: { icon: React.ReactNode; title: string; body?: string }) {
+function ChannelsSection({
+  channels,
+}: {
+  channels: ProductDetail["channels"]
+}) {
   return (
-    <div role="note" className="flex gap-2 rounded-2xl bg-canvas/80 px-3 py-2.5">
-      <span className="mt-px shrink-0 text-stone">{icon}</span>
-      <p className="flex flex-col gap-0.5">
-        <span className="text-[13px] leading-snug font-semibold text-ink">{title}</span>
-        {body && <span className="text-xs leading-relaxed text-caption">{body}</span>}
-      </p>
-    </div>
+    <section aria-labelledby="channels-title" className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+        <h2
+          id="channels-title"
+          className="text-xl leading-snug font-semibold text-ink sm:text-[22px]"
+        >
+          {COPY.channelsTitle}
+        </h2>
+        <p className="text-[13px] leading-relaxed text-caption">
+          조사 점포의 중간값
+        </p>
+      </div>
+      <dl className="divide-y divide-hairline border-y border-hairline">
+        {channels.map((channel) => (
+          <div
+            key={channel.channel}
+            className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-baseline gap-x-3 py-2.5"
+          >
+            <dt className="text-sm leading-relaxed font-semibold text-ink">
+              {CHANNEL_NAME[channel.channel]}{" "}
+              <span className="inline-block text-[13px] font-normal text-caption tabular-nums">
+                {COPY.stores(channel.stores)}
+              </span>
+            </dt>
+            <dd className="flex min-w-0 flex-col text-end tabular-nums">
+              <span className="text-base font-semibold text-ink">
+                {won(channel.median)}원
+              </span>
+              {channel.min !== channel.max && (
+                <span className="text-[13px] leading-relaxed [overflow-wrap:anywhere] text-caption">
+                  {COPY.range(channel.min, channel.max)}
+                </span>
+              )}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  )
+}
+
+function RelatedLinks({
+  item,
+  varietyId,
+}: Pick<ProductDetail, "item" | "varietyId">) {
+  if (!item && !varietyId) return null
+  return (
+    <nav
+      aria-labelledby="related-product-title"
+      className="flex flex-col gap-3"
+    >
+      <h2
+        id="related-product-title"
+        className="text-xl leading-snug font-semibold text-ink sm:text-[22px]"
+      >
+        관련 가격 더 보기
+      </h2>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {item && (
+          <RelatedLink
+            href={routes.price.searchFor(item)}
+            label={`‘${item}’ 검색 결과`}
+          />
+        )}
+        {varietyId && (
+          <RelatedLink
+            href={routes.price.variety(varietyId)}
+            label={COPY.variety}
+          />
+        )}
+      </div>
+    </nav>
+  )
+}
+
+function RelatedLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="flex min-h-11 items-center justify-between gap-2 rounded-xl border border-hairline bg-pair-light py-2.5 ps-3.5 pe-3 text-sm leading-relaxed font-semibold text-pair-light-foreground no-underline hover:border-stone"
+    >
+      <span className="[overflow-wrap:anywhere] break-keep">{label}</span>
+      <ChevronRight aria-hidden size={17} className="shrink-0 rtl:rotate-180" />
+    </Link>
   )
 }

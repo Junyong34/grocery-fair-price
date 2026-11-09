@@ -1,9 +1,9 @@
 "use client"
 
-import { Search } from "lucide-react"
+import { ArrowDown, Search } from "lucide-react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useMemo, useState } from "react"
+import { useId, useMemo, useState } from "react"
 
 import {
   InputAffix,
@@ -20,7 +20,11 @@ import {
   searchVarieties,
   type SearchResult,
 } from "@workspace/price/search"
-import type { ProductSummary, SearchIndex, VarietySummary } from "@workspace/price/types"
+import type {
+  ProductSummary,
+  SearchIndex,
+  VarietySummary,
+} from "@workspace/price/types"
 
 import { routes } from "@/shared/routes"
 import { BackButton } from "@/shared/shell/sub-header"
@@ -39,6 +43,9 @@ type SearchViewProps = {
   index: SearchIndex
 }
 
+const INGREDIENT_TITLE = "식재료 시세"
+const COPY = PRICE_COPY.search
+
 /**
  * P2 품종 검색 화면. Cache Components는 떠난 화면을 <Activity>로 숨겨 두어 검색어가 남는다.
  * 새로 들어올 때(🔍 · 검색창 · 링크, push/replace)는 bfcacheId가 바뀌어 다시 그려 주소 ?q=(없으면 빈 칸)로 시작하고 자동 포커스도 다시 잡는다.
@@ -54,11 +61,23 @@ export function SearchView(props: SearchViewProps) {
  * P2 품종 검색. 치는 동안 결과가 바뀐다. 검색어는 주소 ?q=에 맞추되 기록을 쌓지 않아(replaceState) 뒤로 가기 한 번이면 진입했던 화면이다.
  * 검색은 서버가 내려 준 searchIndex로 브라우저에서 한다.
  */
-function SearchScreen({ varieties, products, featuredIds, index }: SearchViewProps) {
+function SearchScreen({
+  varieties,
+  products,
+  featuredIds,
+  index,
+}: SearchViewProps) {
   const initial = useSearchParams().get("q") ?? ""
   const [query, setQuery] = useState(initial)
   const result = useMemo(() => searchVarieties(index, query), [index, query])
-  const productIds = useMemo(() => searchProducts(products, query), [products, query])
+  const matchingProducts = useMemo(
+    () => pickByIds(products, searchProducts(products, query)),
+    [products, query]
+  )
+  const matchingVarieties = useMemo(
+    () => ("ids" in result ? pickByIds(varieties, result.ids) : []),
+    [varieties, result]
+  )
 
   const change = (next: string) => {
     setQuery(next)
@@ -105,6 +124,12 @@ function SearchScreen({ varieties, products, featuredIds, index }: SearchViewPro
           )}
         </InputWrapper>
       </form>
+      <p role="status" className="sr-only">
+        {result.kind !== "empty" &&
+          (matchingVarieties.length > 0 || matchingProducts.length > 0
+            ? `${INGREDIENT_TITLE} ${COPY.productsCount(matchingVarieties.length)}, ${COPY.products} ${COPY.productsCount(matchingProducts.length)}`
+            : COPY.noResult(query.trim()))}
+      </p>
       <div className="contents lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start lg:gap-10">
         <aside
           aria-label={PRICE_COPY.search.browse}
@@ -130,13 +155,13 @@ function SearchScreen({ varieties, products, featuredIds, index }: SearchViewPro
             </dl>
           </Group>
         </aside>
-        <div aria-live="polite" className="min-w-0">
+        <div className="min-w-0">
           <Results
             result={result}
             query={query}
             varieties={varieties}
-            products={products}
-            productIds={productIds}
+            matchingVarieties={matchingVarieties}
+            matchingProducts={matchingProducts}
             featuredIds={featuredIds}
             index={index}
             onQuery={change}
@@ -151,8 +176,8 @@ function Results({
   result,
   query,
   varieties,
-  products,
-  productIds,
+  matchingVarieties,
+  matchingProducts,
   featuredIds,
   index,
   onQuery,
@@ -160,30 +185,16 @@ function Results({
   result: SearchResult
   query: string
   varieties: readonly VarietySummary[]
-  products: readonly ProductSummary[]
-  productIds: readonly string[]
+  matchingVarieties: readonly VarietySummary[]
+  matchingProducts: readonly ProductSummary[]
   featuredIds: readonly string[]
   index: SearchIndex
   onQuery: (query: string) => void
 }) {
   const recent = useRecentVarieties(varieties)
   const featured = pickByIds(varieties, featuredIds)
-  const rows = (ids: readonly string[], highlight = false) => (
-    <ul>
-      {pickByIds(varieties, ids).map((variety) => (
-        <VarietyRow
-          key={variety.id}
-          variety={variety}
-          name={
-            highlight ? (
-              <Highlighted name={variety.name} query={query} />
-            ) : undefined
-          }
-          action={<AddButton variety={variety} />}
-        />
-      ))}
-    </ul>
-  )
+  const varietyHeadingId = useId()
+  const productHeadingId = useId()
 
   // 카테고리에서 둘러보기: 누르면 그 카테고리 이름으로 검색한다. 빈 검색(최근 본 품종 아래)과 결과 없음에서 쓴다.
   const browse = (
@@ -200,19 +211,89 @@ function Results({
     </div>
   )
 
-  // 식재료 결과 아래 상품 묶음. 카테고리 결과에서는 품목마다 나눈다
-  const productGroup = (
-    <ProductResults products={products} ids={productIds} byItem={result.kind === "category"} />
-  )
-  const withProducts = (varietyPart: React.ReactNode) => (
-    <div className="flex flex-col gap-6">
-      {varietyPart}
-      {productGroup}
-    </div>
-  )
+  // 상품만 맞으면 "결과 없음" 대신 상품을 보여 준다.
+  if (matchingVarieties.length > 0 || matchingProducts.length > 0) {
+    let varietyNote: string | undefined
+    switch (result.kind) {
+      case "item":
+        varietyNote = PRICE_COPY.search.item(result.item)
+        break
+      case "alias":
+        varietyNote = PRICE_COPY.search.alias(query.trim())
+        break
+      case "typo":
+        varietyNote = PRICE_COPY.search.typo(query.trim())
+        break
+      case "category":
+        varietyNote = PRICE_COPY.search.category(result.category)
+        break
+    }
 
-  // 맞는 식재료는 없지만 상품은 있다: "결과 없음" 대신 상품을 보인다
-  if (result.kind === "none" && productIds.length > 0) return productGroup
+    return (
+      <div className="flex flex-col gap-6 lg:gap-8">
+        {matchingVarieties.length > 0 && (
+          <section
+            aria-labelledby={varietyHeadingId}
+            className="flex flex-col gap-3"
+          >
+            <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+              <h2
+                id={varietyHeadingId}
+                className="flex flex-wrap items-baseline gap-x-2 font-heading text-xl leading-snug font-bold text-ink"
+              >
+                {INGREDIENT_TITLE}
+                <span className="font-sans text-sm font-semibold text-forest tabular-nums">
+                  {COPY.productsCount(matchingVarieties.length)}
+                </span>
+              </h2>
+              {matchingProducts.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const heading = document.getElementById(productHeadingId)
+                    heading?.focus({ preventScroll: true })
+                    heading?.scrollIntoView({ block: "start" })
+                  }}
+                  className="inline-flex min-h-10 items-center gap-2 rounded-full border border-hairline bg-pair-light px-3 text-sm font-semibold text-stone hover:border-stone focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                >
+                  {COPY.products} {COPY.productsCount(matchingProducts.length)}
+                  <ArrowDown aria-hidden size={15} strokeWidth={2.25} />
+                </button>
+              )}
+            </header>
+            {varietyNote && (
+              <p className="text-sm leading-relaxed wrap-break-word text-stone">
+                {varietyNote}
+              </p>
+            )}
+            {result.kind === "hits" && <PriceHint />}
+            <ul className="rounded-3xl bg-pair-light px-4 lg:px-5">
+              {matchingVarieties.map((variety) => (
+                <VarietyRow
+                  key={variety.id}
+                  variety={variety}
+                  name={
+                    result.kind === "hits" ? (
+                      <Highlighted name={variety.name} query={query} />
+                    ) : undefined
+                  }
+                  action={<AddButton variety={variety} />}
+                />
+              ))}
+            </ul>
+          </section>
+        )}
+        {matchingProducts.length > 0 && (
+          <ProductResults
+            key={query.trim()}
+            products={matchingProducts}
+            headingId={productHeadingId}
+            byItem={result.kind === "category"}
+          />
+        )}
+      </div>
+    )
+  }
 
   switch (result.kind) {
     case "empty":
@@ -239,46 +320,12 @@ function Results({
           </Group>
         </div>
       )
-    case "hits":
-      return withProducts(
-        <div className="flex flex-col gap-2">
-          <PriceHint />
-          {rows(result.ids, true)}
-        </div>
-      )
-    case "item":
-      return withProducts(
-        <Group title={PRICE_COPY.search.item(result.item)}>
-          {rows(result.ids)}
-        </Group>
-      )
-    case "alias":
-      return withProducts(
-        <Group title={PRICE_COPY.search.alias(query.trim())}>
-          {rows(result.ids)}
-        </Group>
-      )
-    case "typo":
-      return withProducts(
-        <Group title={PRICE_COPY.search.typo(query.trim())}>
-          {rows(result.ids)}
-        </Group>
-      )
-    case "category":
-      // 가공식품 카테고리(라면·면 등)는 식재료가 없을 수 있다. 그때는 상품 묶음만 보인다
-      return withProducts(
-        result.ids.length > 0 && (
-          <Group title={PRICE_COPY.search.category(result.category)}>
-            {rows(result.ids)}
-          </Group>
-        )
-      )
-    case "none":
+    default:
       return (
         <div className="flex flex-col gap-6">
           {/* 큰 아이콘 없이 가운데 정렬 안내만 둬 높이를 줄이고, 아래 찾는 법 · 카테고리가 첫 화면에 들어오게 한다. */}
           <div className="flex flex-col items-center gap-1 pt-2 text-center">
-            <p className="text-base font-semibold text-ink">
+            <p className="text-base font-semibold [overflow-wrap:anywhere] text-ink">
               {PRICE_COPY.search.noResult(query.trim())}
             </p>
             <p className="text-sm text-caption">
