@@ -31,6 +31,7 @@
 - [0002](docs/adr/0002-supabase-and-github-actions.md): 정제 데이터는 Supabase Postgres, 원본 응답은 Supabase Storage, 수집은 GitHub Actions
 - [0003](docs/adr/0003-print-pdfs-on-r2-behind-route-handler.md): 인쇄물 PDF는 비공개 Cloudflare R2에 두고, 우리 주소의 짧은 서명 링크로만 내준다
 - [0004](docs/adr/0004-judgment-payload-is-screen-shape.md): 판정 payload는 화면 모양(`VarietyDetail`) 그대로 저장한다
+- [0005](docs/adr/0005-catalog-source-is-db.md): 카탈로그 원본은 코드가 아니라 DB 표이고, 로컬 어드민 승인으로만 바꾸며 승인마다 저장소에 내보낸다
 
 **조사 (P0)**
 - [data-sourcing-legal.md](docs/10-research/data-sourcing-legal.md): 크롤링 법적 리스크, 판례, 약관, 합법적 데이터 확보 전략

@@ -1,8 +1,10 @@
 # 02. Supabase Pro 전환과 일일 백업 확인
 
-Status: ready-for-human
+Status: ready-for-human (미룸: DB가 찰 때 사용자가 전환, 2026-11-09)
 Type: task
 Blocked by: 없음
+
+> 2026-11-09: 사용자가 Pro 전환을 "데이터가 꽉 차면" 하기로 했다. 그래서 04의 선행 조건에서 뺐고, 카탈로그 백업은 04의 "카탈로그 내보내기"가 맡는다(ADR 0005). 문턱 알림(03, 400MB)이 전환 시점을 알린다.
 
 ## 목적
 

@@ -22,6 +22,7 @@ Blocked by: 없음
 ## 진행 기록
 
 **2026-11-09 (코드, 운영 적용 전)**
+
 - 새 표 `price.db_size`(잰 시각, 전체 바이트, 표별 `{bytes, rows}` jsonb), `ingest_writer`는 읽기·쓰기만. 문턱은 `calc_param db.size_alert_mb = 400`(Free 500MB의 80%)으로 둬서, 플랜을 바꾸면 배포 없이 값만 고친다. 마이그레이션 `20261109000100_price_db_size.sql`, ERD 묶음 6, `helpers.ts` 목록.
 - `size` 명령(`src/db-size.ts`): 한 행을 남기고 크기 상위 5개 표를 찍는다. 문턱을 넘으면 Actions 경고(`::warning::`)만 찍는다. KAMIS 워크플로가 매일 수집·판정 뒤에 부른다(월요일은 보존 정리 뒤).
 - 알림: heartbeat(주 1회, 이슈 권한이 있다)가 `pg_database_size`를 직접 재서 문턱 이상이면 `supabase`·`db_size` 이슈를 연다. 넘은 동안에는 "Storage·DB에 닿음"으로 supabase 알림을 닫지 않는다. 날마다 알리지 않는 이유: 보존 정리 뒤 크기는 거의 멈춰 있고(15 결산), 400MB에서 500MB까지는 몇 주 넘게 걸린다.

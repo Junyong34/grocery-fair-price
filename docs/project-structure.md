@@ -445,7 +445,7 @@ grocery-price/
 │  ├─ 10-research/           api-spec.md (API 실측), gov-price-sites (정부 가격 화면 대조), public-data-survey, data-sourcing-legal, content-and-taxonomy, images
 │  ├─ 20-domain/             domain-model.md
 │  ├─ 30-data/               pipeline.md (저장 구조, 테이블, 수집 일정, 장애 처리), judgment.md (평소가·판정 계산), variety-list.md (품종 목록), sources/ (출처별 실측: kamis·ekape·chamgagyeok, item-inventory), schema-map.html (데이터 지도, ERD는 pnpm db:erd가 생성)
-│  └─ adr/                   0001 공공데이터와 제보, 크롤링 안 함 · 0002 Supabase + GitHub Actions · 0003 인쇄 PDF는 비공개 R2 · 0004 판정 payload는 화면 모양
+│  └─ adr/                   0001 공공데이터와 제보, 크롤링 안 함 · 0002 Supabase + GitHub Actions · 0003 인쇄 PDF는 비공개 R2 · 0004 판정 payload는 화면 모양 · 0005 카탈로그 원본은 DB
 └─ reference/public-data/
    ├─ kamis/, ekape/         원본 API 명세·코드표
    └─ samples/               실호출 응답 샘플, fetch-samples.sh, viewer/(template.html → build.py → api-explorer.html, smoke.sh)

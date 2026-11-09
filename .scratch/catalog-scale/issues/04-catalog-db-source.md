@@ -2,7 +2,7 @@
 
 Status: needs-triage
 Type: task
-Blocked by: 01, 02
+Blocked by: 01
 
 ## 목적
 
@@ -20,13 +20,13 @@ Blocked by: 01, 02
 - [ ] 제외·보류 사유를 코드 상수에서 `source_code_map.note`(또는 새 열)로 옮긴다
 - [ ] 적재가 처음 본 키를 이을 때 코드 색인 대신 DB의 `source_code_map`을 읽는다 (실행 시작에 한 번 읽어 메모리 색인)
 - [ ] `varieties.ts` → DB 한 번 옮기기. 그 뒤 `catalog --classes`가 DB를 덮어쓰지 않게 끄거나 지운다. `variety-list.md`와 코드가 같은지 보는 테스트는 DB 보고서로 바꾼다
-- [ ] 로컬 개발 DB를 운영 카탈로그로 채우는 길 (`seed.sql`이나 `catalog export|import`)
+- [ ] **카탈로그 내보내기 = 백업** (ADR 0005): `catalog export`가 카탈로그 표(카테고리·품목·품종·규격·별칭·상품 분류·원천 매핑·제외 사유·변경 기록)를 저장소의 JSON으로 쓴다. 승인 적용(08)이 끝날 때마다 돌려 커밋한다. `catalog import`가 그 파일로 로컬 DB를 채운다. 운영에서 되살리는 절차도 한 번 연습한다
 - [ ] pipeline.md 카탈로그 절, variety-list.md 머리말을 고친다
 
 ## 결정할 것 (needs-triage)
 
 - slug 규칙은 그대로 둔다: 한 번 정한 slug는 바꾸지 않는다(catalog-evolution/02)
-- 가공식품 상품을 `product` 표 그대로 쓸지, 화면 공개 여부·카테고리 열을 더할지
+- 상품은 언제나 품목에 속하고 품종은 선택이다 (GLOSSARY, 01). `product`에 품목 열과 화면 공개 여부를 더한다. 지금 `product_variety_map`(상품 → 품종)은 그대로 쓴다
 
 ## 완료 기준
 
