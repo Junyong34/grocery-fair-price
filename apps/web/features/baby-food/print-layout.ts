@@ -1,6 +1,6 @@
 import { BABY_FOOD_PAIRING_PAGE_COUNT } from "@workspace/seasonal/print/spec"
 
-import { PAIRINGS, type PairingRow } from "./data"
+import { PAIRINGS, type PairingRow } from "@workspace/seasonal/data/infant-pairings"
 
 const SHEET_COUNT = BABY_FOOD_PAIRING_PAGE_COUNT
 const COLUMNS_PER_SHEET = 3

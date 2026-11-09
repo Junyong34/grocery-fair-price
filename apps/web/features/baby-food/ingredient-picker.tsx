@@ -7,11 +7,11 @@ import { useState } from "react"
 import { Input } from "@workspace/ui/components/input"
 
 import { INFANT_PAIRING_COPY } from "@workspace/seasonal/data/copy"
+import { PAIRING_CATEGORIES, PAIRINGS } from "@workspace/seasonal/data/infant-pairings"
 
 import { routes } from "@/shared/routes"
 import { SubHeader } from "@/shared/shell/sub-header"
 
-import { PAIRING_CATEGORIES, PAIRINGS } from "./data"
 import { IngredientArt } from "./pairing-grid"
 
 export function IngredientPicker({

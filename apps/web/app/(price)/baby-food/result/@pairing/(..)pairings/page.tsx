@@ -1,6 +1,6 @@
 import { Suspense } from "react"
 
-import { PAIRING_SHEETS } from "@/features/baby-food/data"
+import { PAIRING_SHEETS } from "@workspace/seasonal/data/infant-pairings"
 import { PairingGrid } from "@/features/baby-food/pairing-grid"
 import { PairingModalRoute } from "@/features/baby-food/pairing-modal"
 import { readPairingSelection } from "@/features/baby-food/selection"

@@ -2,6 +2,7 @@
 
 import { overlay } from "overlay-kit"
 
+import { Badge } from "@workspace/ui/components/badge"
 import {
   Dialog,
   DialogClose,
@@ -10,8 +11,28 @@ import {
   DialogTitle,
 } from "@workspace/ui/components/dialog"
 import { INFANT_PAIRING_COPY } from "@workspace/seasonal/data/copy"
+import { explainInfantPairing } from "@workspace/seasonal/data/infant-pairings"
 
 import { PAIRING_REFERENCES } from "./data"
+
+function formatCaution(token: string): string {
+  if (token === "milkAge") return INFANT_PAIRING_COPY.cautions.milkAge
+  const [kind, names = ""] = token.split(":")
+  switch (kind) {
+    case "allergen":
+      return INFANT_PAIRING_COPY.cautions.allergen(names)
+    case "choking":
+      return INFANT_PAIRING_COPY.cautions.choking(names)
+    case "sodium":
+      return INFANT_PAIRING_COPY.cautions.sodium(names)
+    case "nitrate":
+      return INFANT_PAIRING_COPY.cautions.nitrate(names)
+    case "acidity":
+      return INFANT_PAIRING_COPY.cautions.acidity(names)
+    default:
+      return token
+  }
+}
 
 export function PairingEvidence({
   base,
@@ -26,10 +47,6 @@ export function PairingEvidence({
   selected?: boolean
   children: React.ReactNode
 }) {
-  const milkConflict =
-    (base === "우유" && ["고구마", "시금치"].includes(name)) ||
-    (name === "우유" && ["고구마", "시금치"].includes(base))
-
   return (
     <button
       type="button"
@@ -37,6 +54,20 @@ export function PairingEvidence({
       data-selected={selected || undefined}
       aria-label={`${base}와 ${name} 근거 보기`}
       onClick={() => {
+        const { kind, milkConflict, cautions } = explainInfantPairing(
+          base,
+          name,
+          sign
+        )
+        const label = INFANT_PAIRING_COPY.verdictLabels[kind]
+        const description =
+          kind === "good-general"
+            ? INFANT_PAIRING_COPY.verdictDescriptions["good-general"](
+                base,
+                name
+              )
+            : INFANT_PAIRING_COPY.verdictDescriptions[kind]
+
         overlay.open(({ isOpen, close, unmount }) => (
           <Dialog
             open={isOpen}
@@ -48,14 +79,34 @@ export function PairingEvidence({
             }}
           >
             <DialogContent className="pairing-evidence-dialog max-h-[85dvh] overflow-y-auto">
-              <DialogTitle className="font-heading">
-                {base} + {name}
-              </DialogTitle>
-              <DialogDescription>
-                {milkConflict
-                  ? INFANT_PAIRING_COPY.conflict
-                  : `원본의 ${base} 항목에서 ${name}은 ${sign}로 표시되어 있어요. ${INFANT_PAIRING_COPY.limit}`}
-              </DialogDescription>
+              <div className="flex flex-wrap items-center gap-2">
+                <DialogTitle className="font-heading">
+                  {base} + {name}
+                </DialogTitle>
+                <Badge
+                  size="sm"
+                  className={
+                    sign === "X" && !milkConflict
+                      ? "bg-pair-gold text-pair-gold-foreground"
+                      : "bg-pair-forest text-pair-forest-foreground"
+                  }
+                >
+                  {label}
+                </Badge>
+              </div>
+              <DialogDescription>{description}</DialogDescription>
+              {cautions.length > 0 && (
+                <div className="pairing-caution-box">
+                  <strong className="text-sm font-semibold">
+                    {INFANT_PAIRING_COPY.cautionTitle}
+                  </strong>
+                  <ul className="grid gap-1.5 text-sm">
+                    {cautions.map((token) => (
+                      <li key={token}>{formatCaution(token)}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               {milkConflict && (
                 <div className="grid gap-2 text-sm">
                   {[
@@ -72,6 +123,7 @@ export function PairingEvidence({
                   <p className="text-caption">검토일 2026.11.07</p>
                 </div>
               )}
+              <p className="text-xs text-caption">{INFANT_PAIRING_COPY.limit}</p>
               <DialogClose className="pairing-pill justify-self-end">
                 닫기
               </DialogClose>

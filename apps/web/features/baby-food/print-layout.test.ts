@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { PAIRINGS, type PairingRow } from "./data"
+import { PAIRINGS, type PairingRow } from "@workspace/seasonal/data/infant-pairings"
 import { paginatePairings } from "./print-layout"
 
 describe("A4 궁합표 배치", () => {
@@ -18,6 +18,7 @@ describe("A4 궁합표 배치", () => {
 
   it("긴 O·X 목록이 있는 재료부터 여러 장에 나눠 놓는다", () => {
     const rows: PairingRow[] = Array.from({ length: 12 }, (_, index) => ({
+      id: `item-${index}`,
       name: `재료 ${index}`,
       category: "채소",
       good: Array.from({ length: index < 3 ? 16 : 1 }, () => "표고버섯"),

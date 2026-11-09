@@ -17,7 +17,7 @@ export type PageSeo = { title: string; description: string }
 
 /**
  * 이유식 궁합표. 구글은 "이유식 궁합(표)", 네이버는 "이유식 조합"·"이유식 상극 음식"으로 많이 찾는다.
- * 설명 앞머리는 "[재료] 이유식 궁합" 검색이 가장 많은 소고기·닭고기로 연다. 재료 수는 features의 PAIRINGS 길이를 페이지가 넘긴다.
+ * 설명 앞머리는 "[재료] 이유식 궁합" 검색이 가장 많은 소고기·닭고기로 연다. 재료 수는 PAIRINGS 길이를 페이지가 넘긴다.
  */
 export function babyFoodPairingsSeo(count: number): PageSeo {
   return {

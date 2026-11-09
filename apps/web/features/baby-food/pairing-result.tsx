@@ -1,11 +1,11 @@
 import Link from "next/link"
 
 import { INFANT_PAIRING_COPY } from "@workspace/seasonal/data/copy"
+import { PAIRINGS } from "@workspace/seasonal/data/infant-pairings"
 import { Badge } from "@workspace/ui/components/badge"
 import { routes } from "@/shared/routes"
 import { SubHeader } from "@/shared/shell/sub-header"
 
-import { PAIRINGS } from "./data"
 import { PairingGrid } from "./pairing-grid"
 
 export function PairingResult({

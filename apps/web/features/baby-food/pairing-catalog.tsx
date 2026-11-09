@@ -1,11 +1,13 @@
 import Link from "next/link"
 
 import { INFANT_PAIRING_COPY } from "@workspace/seasonal/data/copy"
+import { PAIRINGS } from "@workspace/seasonal/data/infant-pairings"
+
 import { routes } from "@/shared/routes"
 import { SubHeader } from "@/shared/shell/sub-header"
 
 import { CatalogFilter } from "./catalog-filter"
-import { PAIRING_REFERENCES, PAIRINGS } from "./data"
+import { PAIRING_REFERENCES } from "./data"
 import { PairingEvidence } from "./pairing-evidence"
 
 export function PairingCatalog() {

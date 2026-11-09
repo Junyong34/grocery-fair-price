@@ -1,6 +1,13 @@
 import Image from "next/image"
 
-import { PAIRING_ART, type PairingRow } from "./data"
+import { INFANT_PAIRING_COPY } from "@workspace/seasonal/data/copy"
+import {
+  isMilkDuplicateConflict,
+  matchesSelectedIngredient,
+  type PairingRow,
+} from "@workspace/seasonal/data/infant-pairings"
+
+import { PAIRING_ART } from "./data"
 import { PairingEvidence } from "./pairing-evidence"
 
 export function IngredientArt({ name }: { name: string }) {
@@ -37,89 +44,91 @@ export function PairingGrid({
   selected?: readonly string[]
   printable?: boolean
 }) {
-  const chosen = new Set(selected)
   return (
     <div className="pairing-grid">
-      {rows.map((row) => {
-        // 우유의 두 X 표기는 원본 충돌이어서 별도 조사로 안내한다.
-        const bad =
-          row.name === "우유"
-            ? row.bad.filter((name) => name !== "고구마" && name !== "시금치")
-            : row.bad
-        return (
-          <article
-            key={row.name}
-            className="pairing-entry"
-            data-ingredient={row.name}
-          >
-            <h2 className="pairing-entry-title">
-              <IngredientArt name={row.name} />
-              {row.name}
-            </h2>
-            <table aria-label={`${row.name} 궁합표`}>
-              <thead>
-                <tr>
-                  <th scope="col">
-                    O <span className="sr-only">원본의 잘 맞는 목록</span>
-                  </th>
-                  <th scope="col">
-                    X <span className="sr-only">원본의 주의 목록</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {(
-                    [
-                      ["O", row.good],
-                      ["X", bad],
-                    ] as const
-                  ).map(([sign, names]) => (
-                    <td
-                      key={sign}
-                      className={sign === "X" ? "pairing-bad" : undefined}
-                    >
-                      <ul className="pairing-items">
-                        {names.map((name) => {
-                          const ingredient = (
-                            <>
-                              <IngredientArt name={name} />
-                              <span>{name}</span>
-                            </>
-                          )
-                          return (
-                            <li key={name}>
-                              {printable ? (
-                                <span className="pairing-item">
-                                  {ingredient}
-                                </span>
-                              ) : (
-                                <PairingEvidence
-                                  base={row.name}
-                                  name={name}
-                                  sign={sign}
-                                  selected={chosen.has(name)}
-                                >
-                                  {ingredient}
-                                </PairingEvidence>
+      {rows.map((row) => (
+        <article
+          key={row.name}
+          className="pairing-entry"
+          data-ingredient={row.name}
+        >
+          <h2 className="pairing-entry-title">
+            <IngredientArt name={row.name} />
+            {row.name}
+          </h2>
+          <table aria-label={`${row.name} 궁합표`}>
+            <thead>
+              <tr>
+                <th scope="col">
+                  O <span className="sr-only">원본의 잘 맞는 목록</span>
+                </th>
+                <th scope="col">
+                  X <span className="sr-only">원본의 주의 목록</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                {(
+                  [
+                    ["O", row.good],
+                    ["X", row.bad],
+                  ] as const
+                ).map(([sign, names]) => (
+                  <td
+                    key={sign}
+                    className={sign === "X" ? "pairing-bad" : undefined}
+                  >
+                    <ul className="pairing-items">
+                      {names.map((name) => {
+                        const isConflict =
+                          row.name === "우유" &&
+                          sign === "X" &&
+                          isMilkDuplicateConflict(row.name, name)
+                        const ingredient = (
+                          <>
+                            <IngredientArt name={name} />
+                            <span>
+                              {name}
+                              {isConflict && (
+                                <small className="pairing-conflict-note">
+                                  {" "}
+                                  ({INFANT_PAIRING_COPY.conflictBadge})
+                                </small>
                               )}
-                            </li>
-                          )
-                        })}
-                      </ul>
-                      {!printable && row.name === "우유" && sign === "X" && (
-                        <PairingEvidence base="우유" name="고구마" sign="X">
-                          별도 조사 ↗
-                        </PairingEvidence>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
-          </article>
-        )
-      })}
+                            </span>
+                          </>
+                        )
+                        return (
+                          <li key={name}>
+                            {printable ? (
+                              <span className="pairing-item">
+                                {ingredient}
+                              </span>
+                            ) : (
+                              <PairingEvidence
+                                base={row.name}
+                                name={name}
+                                sign={sign}
+                                selected={matchesSelectedIngredient(
+                                  name,
+                                  selected
+                                )}
+                              >
+                                {ingredient}
+                              </PairingEvidence>
+                            )}
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </article>
+      ))}
     </div>
   )
 }

@@ -4,7 +4,8 @@ import { useState } from "react"
 
 import { Input } from "@workspace/ui/components/input"
 
-import { PAIRING_CATEGORIES, type PairingRow } from "./data"
+import { PAIRING_CATEGORIES, type PairingRow } from "@workspace/seasonal/data/infant-pairings"
+
 import { PairingGrid } from "./pairing-grid"
 
 export function CatalogFilter({ rows }: { rows: readonly PairingRow[] }) {

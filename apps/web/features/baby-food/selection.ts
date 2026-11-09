@@ -1,4 +1,4 @@
-import { PAIRINGS } from "./data"
+import { PAIRINGS } from "@workspace/seasonal/data/infant-pairings"
 
 type Query = Record<string, string | string[] | undefined>
 

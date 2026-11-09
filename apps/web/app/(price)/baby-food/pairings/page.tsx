@@ -1,4 +1,4 @@
-import { PAIRINGS } from "@/features/baby-food/data"
+import { PAIRINGS } from "@workspace/seasonal/data/infant-pairings"
 import { PairingCatalog } from "@/features/baby-food/pairing-catalog"
 import { createMetadata } from "@/shared/meta"
 import { breadcrumb, JsonLd } from "@/shared/seo/json-ld"

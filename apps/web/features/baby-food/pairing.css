@@ -239,6 +239,20 @@ button.pairing-item {
   color: var(--color-pair-gold-foreground);
   background: var(--color-pair-gold);
 }
+.pairing-conflict-note {
+  font-size: 11px;
+  color: var(--color-stone);
+  font-weight: 400;
+}
+.pairing-caution-box {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-hairline);
+  border-radius: 10px;
+  background: var(--color-pair-muted);
+  color: var(--color-pair-muted-foreground);
+}
 .pairing-item:focus-visible,
 .pairing-pill:focus-visible,
 .pairing-option:focus-visible,
