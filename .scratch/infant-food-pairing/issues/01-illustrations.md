@@ -22,11 +22,11 @@ Status: needs-info
 | 구분                                                  | 이름 수 |
 | ----------------------------------------------------- | ------: |
 | 전체 고유 음식 이름                                   |      90 |
-| 이름·별칭 일치 + 실제 color.svg 있어 바로 재사용 가능 |      48 |
+| 이름·별칭 일치 + 실제 color.svg 있어 바로 재사용 가능 |      49 |
 | 별칭·범위·부위·형태 또는 정체 검토 필요               |      12 |
-| 바로 대응하는 배포 color.svg 없음                     |      30 |
-| 위 30개 중 기존 food.mjs 원본을 확인한 이름           |       9 |
-| 위 30개 중 새 그림 작업 대상으로 남긴 이름            |      21 |
+| 바로 대응하는 배포 color.svg 없음                     |      29 |
+| 위 29개 중 기존 food.mjs 원본을 확인한 이름           |       9 |
+| 위 29개 중 새 그림 작업 대상으로 남긴 이름            |      20 |
 
 위 세 분류는 중복 없이 전체 이름을 포함한다. 기준 목록은 브로콜리·콜리플라워를 나누면 32개지만, 이 티켓의 전체 90개에는 상대 음식도 포함된다.
 
@@ -79,6 +79,7 @@ Status: needs-info
 | 키위       | O 상대               | `kiwi`              | `apps/web/public/foods/kiwi/color.svg`              |
 | 토마토     | O 상대               | `tomato`            | `apps/web/public/foods/tomato/color.svg`            |
 | 파프리카   | O 상대               | `paprika`           | `apps/web/public/foods/paprika/color.svg`           |
+| 팥         | O 상대, X 상대       | `red-bean`          | `apps/web/public/foods/red-bean/color.svg`          |
 | 표고버섯   | O 상대               | `shiitake-mushroom` | `apps/web/public/foods/shiitake-mushroom/color.svg` |
 | 피망       | O 상대               | `bell-pepper`       | `apps/web/public/foods/bell-pepper/color.svg`       |
 | 호두       | O 상대               | `walnut`            | `apps/web/public/foods/walnut/color.svg`            |
@@ -111,7 +112,6 @@ Status: needs-info
 | 계란       | O 상대, 기준         | 새 그림 작업 대상으로 남김. 제작 전 seasonal-food-illustrator로 기존 원본·체크리스트를 다시 확인                    |
 | 김 | O 상대 | `prototypes/seasonal-food/foods/laver/food.mjs` 있음. 기존 원본 검수·재사용 및 배포 동기화 대상 확인 |
 | 깻잎       | O 상대               | `prototypes/seasonal-food/foods/perilla-leaf/food.mjs` 있음. 기존 원본 검수·재사용 및 배포 동기화 대상 확인         |
-| 꿀         | O 상대, X 상대       | 새 그림 작업 대상으로 남김. 제작 전 seasonal-food-illustrator로 기존 원본·체크리스트를 다시 확인                    |
 | 다시마     | O 상대               | `prototypes/seasonal-food/foods/kelp/food.mjs` 있음. 기존 원본 검수·재사용 및 배포 동기화 대상 확인                 |
 | 달걀노른자 | O 상대               | 새 그림 작업 대상으로 남김. 제작 전 seasonal-food-illustrator로 기존 원본·체크리스트를 다시 확인                    |
 | 닭고기     | 기준                 | 새 그림 작업 대상으로 남김. 제작 전 seasonal-food-illustrator로 기존 원본·체크리스트를 다시 확인                    |
@@ -155,6 +155,6 @@ Status: needs-info
 ## 검증 기록
 
 - 원문 표의 기준·O 상대·X 상대를 합쳐 고유 이름 90개를 추출했다.
-- 재사용 48개 + 검토 12개 + 배포 그림 없음 30개 = 90개로 대조했다.
+- 재사용 49개 + 검토 12개 + 배포 그림 없음 29개 = 90개로 대조했다.
 - 1절과 2절에 적힌 모든 `color.svg` 파일 존재를 확인했다. 3절의 명시된 `food.mjs` 원본도 확인했다.
 - SVG·생성 파일·앱 코드·원본 그림은 수정하지 않았다.

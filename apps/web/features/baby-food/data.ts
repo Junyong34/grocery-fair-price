@@ -71,7 +71,7 @@ export const PAIRINGS: readonly PairingRow[] = [
   },
   {
     name: "단호박",
-    good: ["계란", "양파", "꿀", "현미"],
+    good: ["계란", "양파", "팥", "현미"],
     bad: [],
     category: "채소",
   },
@@ -209,7 +209,7 @@ export const PAIRINGS: readonly PairingRow[] = [
   {
     name: "게살",
     good: ["부추", "브로콜리", "양파", "오이", "파프리카"],
-    bad: ["땅콩", "감", "꿀", "귤", "찹쌀"],
+    bad: ["땅콩", "감", "귤", "팥", "찹쌀"],
     category: "육류·수산",
   },
   {
@@ -240,7 +240,7 @@ export const PAIRINGS: readonly PairingRow[] = [
       "피망",
       "브로콜리",
     ],
-    bad: ["땅콩", "두유", "감"],
+    bad: ["두유", "감"],
     category: "기타",
   },
   {
@@ -278,7 +278,6 @@ export const PAIRING_ART: Readonly<Partial<Record<string, string>>> = {
   고구마: "/foods/sweet-potato/color.svg",
   귤: "/foods/mandarin/color.svg",
   근대: "/foods/chard/color.svg",
-  꿀: "/foods/honey/color.svg",
   김: "/foods/laver/color.svg",
   깻잎: "/foods/perilla-leaf/color.svg",
   녹두: "/foods/mung-bean/color.svg",
@@ -352,6 +351,7 @@ export const PAIRING_ART: Readonly<Partial<Record<string, string>>> = {
   파: "/foods/green-onion/color.svg",
   파인애플: "/foods/pineapple/color.svg",
   파프리카: "/foods/paprika/color.svg",
+  팥: "/foods/red-bean/color.svg",
   팽이버섯: "/foods/enoki-mushroom/color.svg",
   표고버섯: "/foods/shiitake-mushroom/color.svg",
   피망: "/foods/bell-pepper/color.svg",
