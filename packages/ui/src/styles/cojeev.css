@@ -356,10 +356,11 @@
     --chart-3: var(--v-olive);
     --chart-4: var(--v-blue);
     --chart-5: var(--v-ink);
-    --sidebar: var(--v-structure);
-    --sidebar-foreground: var(--on-structure);
-    --sidebar-muted: #B4BDCA;
-    --sidebar-primary: var(--v-pink);
+    /* 사이드바: cojeev 기본은 어두운 structure 판이다. Oura 밝은 판으로 덮는다 (어드민 왼쪽 메뉴) */
+    --sidebar: var(--color-canvas);
+    --sidebar-foreground: var(--color-ink);
+    --sidebar-muted: var(--color-stone);
+    --sidebar-primary: var(--color-stone);
     --muted-foreground-ink: #2E2A24;
     --muted-foreground-tinted: #4A443C;
 }

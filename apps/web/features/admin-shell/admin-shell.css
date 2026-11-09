@@ -1,0 +1,14 @@
+/* 어드민 셸. PDF 생성은 Chrome이 어드민 미리보기 화면을 인쇄 모드로 찍으므로(features/admin-print/server/generate.ts),
+   인쇄할 때는 메뉴·상단 줄을 숨기고 본문 여백을 없앤다. */
+@media print {
+  .admin-shell [data-slot="sidebar"],
+  .admin-shell [data-slot="sidebar-gap"],
+  .admin-shell [data-slot="sidebar-container"],
+  .admin-shell .admin-shell-bar {
+    display: none !important;
+  }
+  .admin-shell [data-slot="sidebar-inset"] > .admin-ui {
+    max-width: none;
+    padding: 0;
+  }
+}
