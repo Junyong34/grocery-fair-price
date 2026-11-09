@@ -1,6 +1,5 @@
 import { INFANT_PAIRING_COPY } from "@workspace/seasonal/data/copy"
 
-import { PAIRING_REFERENCES } from "./data"
 import { PairingGrid } from "./pairing-grid"
 import { PAIRING_PRINT_SHEETS } from "./print-layout"
 
@@ -34,20 +33,7 @@ export function PairingPrint({ title = "이유식 재료 궁합표" }: { title?:
             {columns.some((rows) =>
               rows.some(({ name }) => name === "우유")
             ) && (
-              <>
-                <p>{INFANT_PAIRING_COPY.conflict}</p>
-                <p>
-                  근거 ·{" "}
-                  {Object.values(PAIRING_REFERENCES).map(
-                    ({ title: label, href }) => (
-                      <a key={href} href={href}>
-                        {label}
-                      </a>
-                    )
-                  )}{" "}
-                  · 검토일 2026.11.07
-                </p>
-              </>
+              <p>{INFANT_PAIRING_COPY.conflict}</p>
             )}
             <p className="pairing-paper-number">
               {index + 1} / {PAIRING_PRINT_SHEETS.length}

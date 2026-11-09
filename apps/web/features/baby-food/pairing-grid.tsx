@@ -79,9 +79,6 @@ export function PairingGrid({
                       key={sign}
                       className={sign === "X" ? "pairing-bad" : undefined}
                     >
-                      {names.length === 0 && (
-                        <span className="text-sm text-caption">기재 없음</span>
-                      )}
                       <ul className="pairing-items">
                         {names.map((name) => {
                           const ingredient = (

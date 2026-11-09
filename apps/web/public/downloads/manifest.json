@@ -1,6 +1,28 @@
 {
   "editions": [
     {
+      "id": "baby-food-pairings-1",
+      "kind": "baby-food-pairings",
+      "title": "이유식 궁합표",
+      "description": "조합표",
+      "orientation": "portrait",
+      "pages": 3,
+      "specHash": "a7eb6a60",
+      "generatedAt": "2026-11-09T06:26:58.976Z",
+      "files": {
+        "A4": {
+          "bytes": 1640464
+        }
+      },
+      "thumbnails": [
+        {
+          "path": "/downloads/baby-food-pairings-1/thumb-1.webp",
+          "width": 480,
+          "height": 679
+        }
+      ]
+    },
+    {
       "id": "month-poster-1",
       "kind": "month-poster",
       "title": "2027년 월별 제철 포스터",

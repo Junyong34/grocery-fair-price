@@ -1,0 +1,13 @@
+{
+  "id": "baby-food-pairings-1",
+  "title": "이유식 궁합표",
+  "description": "조합표",
+  "status": "published",
+  "spec": {
+    "version": 1,
+    "kind": "baby-food-pairings",
+    "orientation": "portrait",
+    "layout": "three-sheets",
+    "title": "이유식 궁합표"
+  }
+}

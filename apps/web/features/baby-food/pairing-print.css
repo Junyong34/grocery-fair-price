@@ -37,20 +37,20 @@
   padding: 2mm 0 3mm;
 }
 .pairing-paper .pairing-entry-title {
-  min-block-size: 7mm;
-  gap: 1mm;
-  margin-block-end: 1mm;
-  font-size: 14pt;
+  min-block-size: 9mm;
+  gap: 1.2mm;
+  margin-block-end: 1.2mm;
+  font-size: 16pt;
   line-height: 1.15;
 }
 .pairing-paper .pairing-entry-title .pairing-art {
-  width: 7mm;
-  height: 7mm;
+  width: 9mm;
+  height: 9mm;
 }
 .pairing-paper .pairing-entry th,
 .pairing-paper .pairing-entry td {
-  padding: 0.7mm;
-  font-size: 9pt;
+  padding: 0.8mm;
+  font-size: 10pt;
   text-align: start;
 }
 .pairing-paper .pairing-entry th {
@@ -74,15 +74,15 @@
 .pairing-paper .pairing-item {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  min-block-size: 4.6mm;
+  min-block-size: 5.6mm;
   padding: 0;
-  gap: 0.7mm;
+  gap: 0.9mm;
   text-align: start;
-  font-size: 10pt;
+  font-size: 12pt;
 }
 .pairing-paper .pairing-item .pairing-art {
-  inline-size: 4.6mm;
-  block-size: 4.6mm;
+  inline-size: 5.6mm;
+  block-size: 5.6mm;
 }
 .pairing-paper .pairing-placeholder {
   border-width: 0.2mm;
@@ -98,10 +98,6 @@
   line-height: 1.4;
 }
 
-.pairing-paper-foot a {
-  margin-right: 1.5mm;
-  text-decoration: underline;
-}
 .pairing-paper-number {
   margin-top: 1mm;
   text-align: right;
