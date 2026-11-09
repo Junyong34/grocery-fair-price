@@ -105,6 +105,24 @@ describe("승인 적용", () => {
       expect(batch?.trigger).toBe("catalog")
     })
   })
+
+  it("product_item: 두 상품이 같은 새 품목을 가리키면 품목을 한 번 만들고 둘 다 그 품목에 속한다", async () => {
+    await inRollback(admin, async (tx) => {
+      await setup(tx)
+      const ramen = { slug: "ramen-test", name: "라면(시험)", category: "noodles" }
+      const a = await propose(tx, { source: "chamga", key: "1000", kind: "product_item", proposal: { item: ramen } })
+      const b = await propose(tx, { source: "chamga", key: "302", kind: "product_item", proposal: { item: ramen } })
+      await applyProposals(tx, [a, b])
+      const rows = await tx<{ item: string }[]>`
+        select i.slug as item from price.source_item si
+          join price.product_source_key k on k.source_item_id = si.id and k.valid_to is null
+          join price.product p on p.id = k.product_id join price.item i on i.id = p.item_id
+         where si.source_key in ('chamga:1000', 'chamga:302')`
+      expect(rows.map((r) => r.item)).toEqual(["ramen-test", "ramen-test"])
+      const [log] = await tx<{ n: number }[]>`select count(*)::int as n from price.catalog_change where target = 'item' and target_key = 'ramen-test'`
+      expect(log?.n).toBe(1)
+    })
+  })
 })
 
 describe("되돌리기", () => {

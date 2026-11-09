@@ -7,6 +7,7 @@ catalog-scale/06. 아직 규격에 잇지 않은 원천 키(pending)와 참가�
 ## 단계
 
 1. **내보내기.** `catalog pending --json --since 30 > <스크래치>/pending.json` (읽기만, `INGEST_DATABASE_URL`). 최근 30일 것을 먼저 하고, 다 끝나면 `--since` 없이 나머지를 한다. KAMIS 관측값은 90일 뒤 지워지니 최근 것이 급하다. `openProposal`이 있는 항목은 건너뛴다.
+   가공식품처럼 품종에 잇지 않기로 한(ignored) 참가격 상품의 품목을 정할 때는 `--source chamga --include-ignored`를 붙인다. `productItem`이 이미 있는 상품은 건너뛴다.
    완료: 다룰 항목 목록과 개수가 정해졌다.
 2. **읽기.** [GLOSSARY](../../GLOSSARY.md)의 카테고리·품목·품종·규격·상품, [variety-list.md](variety-list.md)의 "정한 규칙" 1~7, 저장소 사본 `packages/price-ingest/src/catalog/snapshot.json`(기존 품종의 slug·기준 단위·규격 이름과 원천 키). 항목마다 `category`가 출처 분류 대응표(`price.category_source_map`, 05)가 정한 카테고리다. 품목·품종은 그 카테고리 안에서 고른다(`category.note`의 예외를 먼저 본다. 예: KAMIS 특용작물은 품목마다 다르다).
    완료: 항목마다 `similar`에 나온 품종의 규격과 원천 키를 사본에서 찾아 봤다.
@@ -28,6 +29,8 @@ KAMIS 원천 키는 `품목-품종-등급`이고 `label`은 `품목/품종/등�
 - 단위가 기준 단위로 나눠지지 않으면(마리 ↔ 100g, 1손) 그 사실을 근거에 쓰고 확신을 낮춘다. 환산 기준이 정해질 때까지 기준 단위 가격은 비어 있다.
 - 1년 넘게 오지 않은 키(`lastSeen`이 13개월보다 오래됐고 `observations` 0)는 `ignore`, 이유 "YYYY-MM부터 오지 않는다". 햇양파·시설감자처럼 철마다 돌아오는 키는 13개월 안이면 잇는다.
 - 참가격 상품은 품목이 먼저다(GLOSSARY "상품": 언제나 품목에 속하고 품종은 선택). 신선식품으로 품종까지 확실하면 `product_item`에 `variety`·`spec`을 함께, 품목만 확실하면 `item`만.
+- 가공식품의 품목은 장보기에서 하나로 인식하는 단위다(라면, 컵라면, 우유). 대개 참가격 소분류 하나가 품목 하나다. 같은 것을 가리키는 기존 품목이 있으면 그 slug를 쓴다(우유, 견과, 양념의 고춧가루·액젓·소금). 새 품목은 `item`에 `{ slug, name, category }`로 쓰고 카테고리는 대응표의 `category`를 따른다. 같은 새 품목을 여러 상품이 가리켜도 되고, 처음 적용할 때 한 번 만든다.
+- 대응표의 카테고리가 상품과 맞지 않으면(예: 미역이 마른미역인데 김치·반찬·통조림) 제안 근거에 적고 사용자에게 알린다. 대응표는 사본을 고쳐 `catalog --import`로 고친다.
 - 이미 보류 규칙(`hold`)이 있는 항목은 그 이유를 풀 새 근거가 있을 때만 제안한다. 없으면 `hold`로 같은 이유를 다시 쓴다.
 - **근거가 부족하면 `hold`.** 추측해서 붙이지 않는다.
 
@@ -44,7 +47,7 @@ KAMIS 원천 키는 `품목-품종-등급`이고 `label`은 `품목/품종/등�
 | `map` | `{ "variety": "mackerel-kr", "spec": "frozen-l" }` |
 | `new_spec` | `{ "variety": "mackerel-kr", "spec": { "slug": "frozen-l", "name": "냉동 대" } }` |
 | `new_variety` | `{ "item": "orange", "variety": { "slug": "orange-au", "name": "오렌지(호주)", "unit": "1개" }, "spec": { "slug": "default", "name": "상품" } }`. 새 품목이면 `item`을 `{ "slug", "name", "category" }`로 |
-| `product_item` | `{ "item": "sesame" }` 또는 `{ "item": "sesame", "variety": "sesame-kr", "spec": "default" }` (참가격만) |
+| `product_item` | `{ "item": "nuts" }`, `{ "item": "nuts", "variety": "sesame-kr", "spec": "default" }`, 새 품목이면 `{ "item": { "slug": "ramen", "name": "라면", "category": "noodles" } }` (참가격만) |
 | `ignore` · `hold` | `{ "reason": "2024-08부터 오지 않는다" }` |
 
 ```json

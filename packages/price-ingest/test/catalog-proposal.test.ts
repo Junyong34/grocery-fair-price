@@ -66,9 +66,10 @@ describe("제안 파일", () => {
         proposal: { item: "melon", variety: { slug: "melon-2", name: "멜론2", unit: "1개" }, spec: { slug: "top", name: "상품" } }, rationale: "r", confidence: "low",
       },
       { source: "chamga", key: "1000", kind: "product_item", proposal: { item: "ramen" }, rationale: "r" },
+      { source: "chamga", key: "1001", kind: "product_item", proposal: { item: { slug: "ramen", name: "라면", category: "noodles" } }, rationale: "r" },
       { source: "kamis", key: "257-00-05", kind: "hold", proposal: { reason: "근거 부족" }, rationale: "r" },
     ])
-    expect(parsed.map((p) => p.kind)).toEqual(["map", "new_spec", "new_variety", "product_item", "hold"])
+    expect(parsed.map((p) => p.kind)).toEqual(["map", "new_spec", "new_variety", "product_item", "product_item", "hold"])
     expect(parsed[1]?.confidence).toBeNull()
   })
 

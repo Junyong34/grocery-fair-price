@@ -3957,7 +3957,9 @@
       "source": "chamga",
       "code": "030202009",
       "name": "미역",
-      "category": "side-dishes"
+      "category": "dried",
+      "item": "dried-seafood",
+      "note": "상품이 자른 마른미역이라 건어물이다"
     },
     {
       "source": "chamga",

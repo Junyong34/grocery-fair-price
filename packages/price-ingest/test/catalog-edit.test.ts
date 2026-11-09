@@ -59,6 +59,15 @@ describe("제안 → 사본", () => {
     expect(editSnapshot(base, { source: "chamga", key: "501", kind: "product_item", proposal: { item: "imported-fruit" } })).toEqual(base)
   })
 
+  it("product_item은 새 품목을 같은 카테고리의 품목 뒤에 만들고, 같은 새 품목을 다시 가리키면 그대로 둔다", () => {
+    const ramen = { slug: "ramen", name: "라면", category: "fruit" }
+    const out = editSnapshot(base, { source: "chamga", key: "900", kind: "product_item", proposal: { item: ramen } })
+    expect(out.items.map((i) => i.slug)).toEqual(["mackerel", "imported-fruit", "ramen"])
+    expect(editSnapshot(out, { source: "chamga", key: "901", kind: "product_item", proposal: { item: ramen } })).toBe(out)
+    expect(() => editSnapshot(out, { source: "chamga", key: "902", kind: "product_item", proposal: { item: { ...ramen, name: "봉지라면" } } })).toThrow(/ramen/)
+    expect(() => editSnapshot(base, { source: "chamga", key: "903", kind: "product_item", proposal: { item: { ...ramen, category: "nope" } } })).toThrow(/nope/)
+  })
+
   it("없는 품종·규격, 이미 있는 slug, 묶기는 멈춘다", () => {
     expect(() => editSnapshot(base, { source: "kamis", key: "1", kind: "map", proposal: { variety: "x", spec: "y" } })).toThrow(/품종 x/)
     expect(() => editSnapshot(base, { source: "kamis", key: "1", kind: "new_spec", proposal: { variety: "mackerel-kr", spec: { slug: "chilled", name: "냉장" } } })).toThrow(/이미/)

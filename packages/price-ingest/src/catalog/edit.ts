@@ -39,6 +39,23 @@ function insertAfterLast<T>(list: readonly T[], value: T, same: (x: T) => boolea
   return at < 0 ? [...list, value] : [...list.slice(0, at + 1), value, ...list.slice(at + 1)]
 }
 
+// 품목 slug면 있는지 보고, 새 품목이면 같은 카테고리의 품목 뒤에 만든다. 같은 이름·카테고리로 이미 있으면 그대로 둔다
+function ensureItem(snapshot: CatalogSnapshot, ref: unknown): [CatalogSnapshot, string] {
+  if (typeof ref === "string") {
+    if (!snapshot.items.some((i) => i.slug === ref)) throw new Error(`품목 ${ref}이 없다`)
+    return [snapshot, ref]
+  }
+  const item = ref as ItemDef
+  const existing = snapshot.items.find((i) => i.slug === item.slug)
+  if (existing) {
+    if (existing.name !== item.name || existing.category !== item.category) throw new Error(`품목 ${item.slug}이 이미 다른 이름·카테고리로 있다`)
+    return [snapshot, item.slug]
+  }
+  if (!snapshot.categories.some((c) => c.slug === item.category)) throw new Error(`카테고리 ${item.category}가 없다`)
+  const next = { slug: item.slug, name: item.name, category: item.category }
+  return [{ ...snapshot, items: insertAfterLast(snapshot.items, next, (i) => i.category === item.category) }, item.slug]
+}
+
 function variety(snapshot: CatalogSnapshot, slug: string): VarietyDef {
   const found = snapshot.varieties.find((v) => v.slug === slug)
   if (!found) throw new Error(`품종 ${slug}이 없다`)
@@ -53,9 +70,13 @@ export function editSnapshot(snapshot: CatalogSnapshot, entry: EditInput): Catal
   const { source, key } = entry
   const p = entry.proposal
   switch (entry.kind) {
-    case "map":
     case "product_item": {
-      if (entry.kind === "product_item" && p.variety === undefined) return snapshot // 품목만 정한 상품: 사본(품종·규격)은 그대로다
+      // 상품의 품목은 사본 밖(product.item_id)이다. 사본은 새 품목과, 품종을 고른 때의 규격 키만 바뀐다
+      const [withItem] = ensureItem(snapshot, p.item)
+      if (p.variety === undefined) return withItem
+      return editSnapshot(withItem, { source, key, kind: "map", proposal: { variety: p.variety, spec: p.spec } })
+    }
+    case "map": {
       const [vSlug, sSlug] = [String(p.variety), String(p.spec)]
       const v = variety(snapshot, vSlug)
       if (!v.specs.some((s) => s.slug === sSlug)) throw new Error(`규격 ${vSlug}/${sSlug}이 없다`)
@@ -74,21 +95,9 @@ export function editSnapshot(snapshot: CatalogSnapshot, entry: EditInput): Catal
       const v = p.variety as { slug: string; name: string; unit: VarietyDef["unit"] }
       const spec = p.spec as { slug: string; name: string }
       if (snapshot.varieties.some((x) => x.slug === v.slug)) throw new Error(`품종 ${v.slug}이 이미 있다`)
-      const detached = detach(snapshot, source, key)
-      let items = detached.items as readonly ItemDef[]
-      let itemSlug: string
-      if (typeof p.item === "string") {
-        if (!items.some((i) => i.slug === p.item)) throw new Error(`품목 ${p.item}이 없다`)
-        itemSlug = p.item
-      } else {
-        const item = p.item as ItemDef
-        if (items.some((i) => i.slug === item.slug)) throw new Error(`품목 ${item.slug}이 이미 있다`)
-        if (!detached.categories.some((c) => c.slug === item.category)) throw new Error(`카테고리 ${item.category}가 없다`)
-        items = insertAfterLast(items, { slug: item.slug, name: item.name, category: item.category }, (i) => i.category === item.category)
-        itemSlug = item.slug
-      }
+      const [detached, itemSlug] = ensureItem(detach(snapshot, source, key), p.item)
       const next: VarietyDef = { slug: v.slug, name: v.name, item: itemSlug, unit: v.unit, specs: [withKey({ slug: spec.slug, name: spec.name }, source, key)] }
-      return { ...detached, items, varieties: insertAfterLast(detached.varieties, next, (x) => x.item === itemSlug) }
+      return { ...detached, varieties: insertAfterLast(detached.varieties, next, (x) => x.item === itemSlug) }
     }
     case "ignore":
     case "hold": {

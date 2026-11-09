@@ -22,10 +22,14 @@ export type PendingEntry = {
   observations: number // 남은 관측값 수 (KAMIS는 90일 뒤 지워진다)
   hold: string | null // 보류 규칙이 있으면 그 이유
   openProposal: number | null // 열린 제안(proposed·approved) 번호. 있으면 새 제안을 넣지 않는다
+  mapStatus: "pending" | "ignored" // 지금 매핑 상태. ignored는 규칙 없이 잇지 않은 참가격 상품(대부분 가공식품, --include-ignored)
+  productItem: string | null // 참가격 상품이 이미 속한 품목 slug (product.item_id). 없으면 null
   similar: SimilarVarieties
 }
 
 type Row = {
+  map_status: "pending" | "ignored"
+  product_item: string | null
   source: Source
   key_parts: Record<string, string>
   label: string | null
@@ -36,9 +40,14 @@ type Row = {
   observations: number
 }
 
-export async function listPending(tx: Db, { source, sinceDays, today }: { source?: Source; sinceDays?: number; today: string }): Promise<PendingEntry[]> {
+// includeIgnored: 품종에 잇지 않기로 한(ignored) 참가격 상품도 낸다. 가공식품의 품목을 제안할 때 쓴다 (catalog-scale/06)
+export async function listPending(
+  tx: Db,
+  { source, sinceDays, today, includeIgnored = false }: { source?: Source; sinceDays?: number; today: string; includeIgnored?: boolean },
+): Promise<PendingEntry[]> {
+  const productStatuses = includeIgnored ? ["pending", "ignored"] : ["pending"]
   const keyRows = await tx<Row[]>`
-    select si.source, si.key_parts, si.label,
+    select si.source, si.key_parts, si.label, m.status as map_status, null::text as product_item,
            coalesce(si.key_parts->>'ctgry_cd', si.key_parts->>'judgeKind') as source_category,
            si.first_seen_on::text as first_seen, si.last_seen_on::text as last_seen,
            (select array_agg(distinct concat_ws(' ', o.qty_raw::text, o.unit_raw) order by concat_ws(' ', o.qty_raw::text, o.unit_raw))
@@ -48,12 +57,13 @@ export async function listPending(tx: Db, { source, sinceDays, today }: { source
       join price.source_code_map m on m.source_item_id = si.id and m.valid_to is null
      where m.status = 'pending'`
   const productRows = await tx<Row[]>`
-    select 'chamga' as source, si.key_parts, p.name as label, h.al_code as source_category,
+    select 'chamga' as source, si.key_parts, p.name as label, h.al_code as source_category, pm.status as map_status, pi.slug as product_item,
            array[concat_ws(' ', h.total_qty::text, h.total_unit)] as units,
            p.registered_on::text as first_seen, coalesce(p.last_price_on, p.registered_on)::text as last_seen,
            (select count(*)::int from price.observation o where o.source_item_id = si.id) as observations
       from price.product p
-      join price.product_variety_map pm on pm.product_id = p.id and pm.valid_to is null and pm.status = 'pending'
+      join price.product_variety_map pm on pm.product_id = p.id and pm.valid_to is null and pm.status = any(${productStatuses})
+      left join price.item pi on pi.id = p.item_id
       join price.product_source_key k on k.product_id = p.id and k.valid_to is null
       join price.source_item si on si.id = k.source_item_id
       left join lateral (
@@ -92,6 +102,8 @@ export async function listPending(tx: Db, { source, sinceDays, today }: { source
         observations: r.observations,
         hold: holdOf.get(id) ?? null,
         openProposal: openOf.get(id) ?? null,
+        mapStatus: r.map_status,
+        productItem: r.product_item,
         similar: similarVarieties({ source: r.source, key, label: r.label }, varieties, rules),
       }
     })
@@ -105,7 +117,11 @@ async function checkReferences(tx: Tx, entries: readonly ProposalEntry[]): Promi
   const keys = await tx<{ source: Source; key_parts: Record<string, string> }[]>`
     select source, key_parts from price.source_item where source = any(${[...new Set(entries.map((e) => e.source))]})`
   const known = new Set(keys.map((k) => `${k.source}:${keyPatternOf(k.source, k.key_parts)}`))
-  const items = new Set((await tx<{ slug: string }[]>`select slug from price.item`).map((r) => r.slug))
+  const itemRows = await tx<{ slug: string; name: string; category: string }[]>`
+    select i.slug, i.name, c.slug as category from price.item i join price.category c on c.id = i.category_id`
+  const items = new Map(itemRows.map((r) => [r.slug, `${r.name}|${r.category}`]))
+  const categories = new Set((await tx<{ slug: string }[]>`select slug from price.category`).map((r) => r.slug))
+  const newItems = new Map<string, string>() // 이 파일이 새로 만들 품목. 같은 slug는 같은 이름·카테고리여야 한다
   const specRows = await tx<{ variety: string; spec: string }[]>`
     select v.slug as variety, s.slug as spec from price.variety v left join price.spec s on s.variety_id = v.id`
   const varieties = new Set(specRows.map((r) => r.variety))
@@ -119,6 +135,15 @@ async function checkReferences(tx: Tx, entries: readonly ProposalEntry[]): Promi
       if (!ok) problems.push(`${id} (${e.kind}): ${what}`)
     }
     need(known.has(id), "원천 키가 DB에 없다")
+    // 품목: slug면 있어야 하고, 새 품목이면 카테고리가 있고 같은 slug의 품목이 있으면 이름·카테고리가 같아야 한다
+    const checkItem = (ref: unknown) => {
+      if (typeof ref === "string") return need(items.has(ref), `품목 ${ref}이 없다`)
+      const item = ref as { slug: string; name: string; category: string }
+      const def = `${item.name}|${item.category}`
+      need(categories.has(item.category), `카테고리 ${item.category}가 없다`)
+      need((items.get(item.slug) ?? newItems.get(item.slug) ?? def) === def, `품목 ${item.slug}이 이미 다른 이름·카테고리로 있다`)
+      newItems.set(item.slug, def)
+    }
     if (e.kind === "map" || e.kind === "merge") need(specs.has(`${String(p.variety)}/${String(p.spec)}`), `규격 ${String(p.variety)}/${String(p.spec)}이 없다`)
     if (e.kind === "new_spec") {
       const spec = p.spec as { slug: string }
@@ -126,15 +151,12 @@ async function checkReferences(tx: Tx, entries: readonly ProposalEntry[]): Promi
       need(!specs.has(`${String(p.variety)}/${spec.slug}`), `규격 ${String(p.variety)}/${spec.slug}이 이미 있다`)
     }
     if (e.kind === "new_variety") {
-      const item = p.item as string | { slug: string }
-      const variety = p.variety as { slug: string }
-      if (typeof item === "string") need(items.has(item), `품목 ${item}이 없다`)
-      else need(!items.has(item.slug), `품목 ${item.slug}이 이미 있다`)
-      need(!varieties.has(variety.slug), `품종 ${variety.slug}이 이미 있다`)
+      checkItem(p.item)
+      need(!varieties.has((p.variety as { slug: string }).slug), `품종 ${(p.variety as { slug: string }).slug}이 이미 있다`)
     }
     if (e.kind === "product_item") {
       need(e.source === "chamga", "상품의 품목은 참가격 상품에만 정한다")
-      need(items.has(String(p.item)), `품목 ${String(p.item)}이 없다`)
+      checkItem(p.item)
       if (p.variety !== undefined) need(varieties.has(String(p.variety)), `품종 ${String(p.variety)}이 없다`)
       if (p.spec !== undefined) need(specs.has(`${String(p.variety)}/${String(p.spec)}`), `규격 ${String(p.variety)}/${String(p.spec)}이 없다`)
     }

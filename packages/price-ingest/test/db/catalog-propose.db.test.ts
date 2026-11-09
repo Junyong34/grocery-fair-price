@@ -1,6 +1,7 @@
 // 제안 흐름을 로컬 DB에 넣어 본다 (catalog-scale/06). 모두 되돌려 샘플 데이터를 바꾸지 않는다.
 import { afterAll, beforeAll, describe, expect, it } from "vitest"
 
+import { applyMappings } from "../../src/catalog/apply.ts"
 import { importSnapshot } from "../../src/catalog/db.ts"
 import { insertProposals, listPending } from "../../src/catalog/pending.ts"
 import { parseProposalFile } from "../../src/catalog/proposal.ts"
@@ -58,6 +59,18 @@ describe("pending 내보내기", () => {
       await pendingMackerel(tx, "2026-09-01")
       expect((await listPending(tx, { today: "2026-11-09", sinceDays: 30 })).some((e) => e.key === "611-06-20")).toBe(false)
       expect((await listPending(tx, { today: "2026-11-09", source: "chamga" })).every((e) => e.source === "chamga")).toBe(true)
+    })
+  })
+
+  it("--include-ignored면 품종에 잇지 않은 참가격 상품(가공식품)도 낸다", async () => {
+    await inRollback(admin, async (tx) => {
+      await importSnapshot(tx, readSnapshot(), "test")
+      await applyMappings(tx) // 규칙 없는 참가격 상품(샘플의 가공식품)을 ignored로 둔다
+      const without = await listPending(tx, { today: "2026-11-09", source: "chamga" })
+      const withIgnored = await listPending(tx, { today: "2026-11-09", source: "chamga", includeIgnored: true })
+      expect(without.every((e) => e.mapStatus === "pending")).toBe(true)
+      expect(withIgnored.some((e) => e.mapStatus === "ignored")).toBe(true)
+      expect(withIgnored.length).toBeGreaterThan(without.length)
     })
   })
 

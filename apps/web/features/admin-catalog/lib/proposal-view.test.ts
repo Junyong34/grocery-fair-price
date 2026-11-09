@@ -20,6 +20,7 @@ describe("제안 한 줄 설명", () => {
       ),
     ).toBe("수입 과일에 새 식재료 「오렌지(미국)」 (1개, 규격 상품)")
     expect(describeProposal({ kind: "product_item", proposal: { item: "nuts" } }, names)).toBe("상품의 품목을 견과로")
+    expect(describeProposal({ kind: "product_item", proposal: { item: { slug: "ramen", name: "라면", category: "noodles" } } }, names)).toBe("상품의 품목을 새 품목 「라면」로")
     expect(describeProposal({ kind: "ignore", proposal: { reason: "2024-08부터 오지 않는다" } }, names)).toBe("2024-08부터 오지 않는다")
   })
 

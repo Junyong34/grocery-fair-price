@@ -2,7 +2,7 @@
 //   pnpm --filter @workspace/price-ingest catalog --export [--file 경로]            DB → 사본 (INGEST_DATABASE_URL). 기본 경로는 src/catalog/snapshot.json
 //   pnpm --filter @workspace/price-ingest catalog --import [--file 경로] [--dry-run] 사본 → 분류 표·규칙 표 (OWNER_DATABASE_URL, 소유자 postgres)
 //   pnpm --filter @workspace/price-ingest catalog --mappings [--dry-run]            규칙대로 매핑 (INGEST_DATABASE_URL, ingest_writer)
-//   pnpm --filter @workspace/price-ingest catalog pending [--json] [--source kamis] [--since 30]   제안할 거리 (INGEST_DATABASE_URL, 읽기만)
+//   pnpm --filter @workspace/price-ingest catalog pending [--json] [--source kamis] [--since 30] [--include-ignored]   제안할 거리 (INGEST_DATABASE_URL, 읽기만)
 //   pnpm --filter @workspace/price-ingest catalog propose --file 제안.json [--by 이름] [--dry-run]    제안을 catalog_proposal에 (OWNER_DATABASE_URL)
 //   pnpm --filter @workspace/price-ingest catalog apply --ids 64,65,70-80 [--skip-judgment] [--dry-run]  제안 적용 (OWNER_DATABASE_URL)
 //   pnpm --filter @workspace/price-ingest catalog reject --ids 64 [--dry-run]                              제안 반려 (OWNER_DATABASE_URL)
@@ -31,7 +31,7 @@ import { formatSnapshot, readSnapshot, SNAPSHOT_PATH } from "./snapshot.ts"
 
 const USAGE =
   "사용법: catalog --export|--import|--mappings [--file 경로] [--dry-run]\n" +
-  "       catalog pending [--json] [--source kamis|ekape|chamga] [--since 일수]\n" +
+  "       catalog pending [--json] [--source kamis|ekape|chamga] [--since 일수] [--include-ignored]\n" +
   "       catalog propose --file 제안.json [--by 제안한-주체] [--dry-run]\n" +
   "       catalog apply|reject|revert --ids 64,65,70-80 [--skip-judgment] [--dry-run]"
 const SOURCES: readonly Source[] = ["kamis", "ekape", "chamga"]
@@ -105,13 +105,13 @@ function describePending(e: PendingEntry): string {
   return [`${e.source}:${e.key}`, e.label ?? "-", e.units.join("·"), `${e.lastSeen} (${e.observations})`, ...notes.filter(Boolean)].join("  ")
 }
 
-async function pending(values: { json?: boolean; source?: string; since?: string }): Promise<void> {
+async function pending(values: { json?: boolean; source?: string; since?: string; "include-ignored"?: boolean }): Promise<void> {
   if (values.source !== undefined && !SOURCES.includes(values.source as Source)) throw new Error(USAGE)
   const sinceDays = values.since === undefined ? undefined : Number(values.since)
   if (sinceDays !== undefined && !(Number.isInteger(sinceDays) && sinceDays > 0)) throw new Error(USAGE)
   const sql = connectIngest(required("INGEST_DATABASE_URL"))
   try {
-    const entries = await sql.begin("read only", (tx) => listPending(tx, { source: values.source as Source | undefined, sinceDays, today: seoulToday() }))
+    const entries = await sql.begin("read only", (tx) => listPending(tx, { source: values.source as Source | undefined, sinceDays, today: seoulToday(), includeIgnored: values["include-ignored"] === true }))
     if (values.json) console.log(JSON.stringify(entries, null, 2))
     else {
       for (const e of entries) console.log(describePending(e))
@@ -133,6 +133,7 @@ async function main(): Promise<void> {
     allowPositionals: true,
     options: {
       json: { type: "boolean" },
+      "include-ignored": { type: "boolean" },
       source: { type: "string" },
       since: { type: "string" },
       by: { type: "string" },

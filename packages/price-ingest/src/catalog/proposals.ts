@@ -56,7 +56,10 @@ export async function applyProposals(tx: Tx, ids: readonly number[]): Promise<Ap
     const before = await exportSnapshot(tx)
     const after = editSnapshot(before, p)
     if (after !== before) changes += (await importSnapshot(tx, after, actor, p.id)).changes.length
-    if (p.kind === "product_item") await setProductItem(tx, p.key, String(p.proposal.item), actor, p.id)
+    if (p.kind === "product_item") {
+      const item = p.proposal.item as string | { slug: string }
+      await setProductItem(tx, p.key, typeof item === "string" ? item : item.slug, actor, p.id)
+    }
     await tx`update price.catalog_proposal set status = 'applied', decided_at = coalesce(decided_at, now()) where id = ${p.id}`
   }
   return { applied: proposals.map((p) => p.id), changes, mappings: await refreshMappings(tx) }

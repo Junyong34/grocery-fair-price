@@ -37,7 +37,7 @@ export function describeProposal(p: { kind: ProposalKind; proposal: Record<strin
       return `${item}에 새 식재료 「${v.name}」 (${v.unit}, 규격 ${(q.spec as Named).name})`
     }
     case "product_item": {
-      const item = names.items[String(q.item)] ?? String(q.item)
+      const item = typeof q.item === "string" ? (names.items[q.item] ?? q.item) : `새 품목 「${(q.item as Named).name}」`
       return q.variety === undefined ? `상품의 품목을 ${item}로` : `상품의 품목을 ${item}로, ${varietyName(q.variety)} · ${specName(q.variety, q.spec)}에 잇기`
     }
     case "ignore":

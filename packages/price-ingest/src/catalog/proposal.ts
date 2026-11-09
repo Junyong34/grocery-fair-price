@@ -53,17 +53,19 @@ export function similarVarieties(
 const slug = z.string().regex(/^[a-z0-9-]+$/)
 const named = z.strictObject({ slug, name: z.string().min(1) })
 const reason = z.strictObject({ reason: z.string().min(1) })
+// 품목: 있는 품목의 slug, 또는 새로 만들 품목 (같은 새 품목을 여러 제안이 가리켜도 된다. 처음 적용할 때 만든다)
+const itemRef = z.union([slug, z.strictObject({ slug, name: z.string().min(1), category: slug })])
 
 // kind마다 proposal 모양 (catalog_proposal.proposal). 승인 적용(08)이 이 모양을 읽는다
 const proposalOf = {
   map: z.strictObject({ variety: slug, spec: slug }),
   new_spec: z.strictObject({ variety: slug, spec: named }),
   new_variety: z.strictObject({
-    item: z.union([slug, z.strictObject({ slug, name: z.string().min(1), category: slug })]),
+    item: itemRef,
     variety: z.strictObject({ slug, name: z.string().min(1), unit: z.enum(["100g", "1kg", "10kg", "1개", "30구", "1L"]) }),
     spec: named,
   }),
-  product_item: z.strictObject({ item: slug, variety: slug.optional(), spec: slug.optional() }),
+  product_item: z.strictObject({ item: itemRef, variety: slug.optional(), spec: slug.optional() }),
   ignore: reason,
   hold: reason,
   merge: z.strictObject({ variety: slug, spec: slug }),
