@@ -69,7 +69,7 @@ describe.each(PRINT_KINDS)("%s 폼", (kind) => {
     const covered = new Set(fields.map((field) => field.path.join(".")))
     const missing = leafPaths(base)
       .map((path) => path.join("."))
-      .filter((path) => !FIXED.has(path) && !covered.has(path))
+      .filter((path) => !FIXED.has(path) && !covered.has(path) && !(kind === "baby-food-pairings" && path === "orientation"))
     expect(missing).toEqual([])
   })
 

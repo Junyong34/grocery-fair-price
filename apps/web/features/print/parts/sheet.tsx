@@ -1,4 +1,4 @@
-import { PAPERS, sheetSize, type Paper, type PrintSpec } from "@workspace/seasonal/print/spec"
+import { PAPERS, sheetSize, type Paper, type CalendarPrintSpec } from "@workspace/seasonal/print/spec"
 
 const FONTS = {
   "gowun-batang": "var(--font-heading)",
@@ -13,7 +13,7 @@ export function Sheet({
   className,
   children,
 }: {
-  spec: PrintSpec
+  spec: CalendarPrintSpec
   paper: Paper
   background: string
   className?: string

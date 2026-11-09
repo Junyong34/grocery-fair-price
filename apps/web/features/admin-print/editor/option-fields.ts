@@ -227,4 +227,7 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
     { ...foods(24), fields: [...foods(24).fields, categories] },
     look,
   ],
+  "baby-food-pairings": [
+    { title: "구성", fields: [layout("baby-food-pairings"), { ...title, label: "인쇄 제목" }] },
+  ],
 }

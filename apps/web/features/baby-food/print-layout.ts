@@ -1,6 +1,8 @@
+import { BABY_FOOD_PAIRING_PAGE_COUNT } from "@workspace/seasonal/print/spec"
+
 import { PAIRINGS, type PairingRow } from "./data"
 
-const SHEET_COUNT = 3
+const SHEET_COUNT = BABY_FOOD_PAIRING_PAGE_COUNT
 const COLUMNS_PER_SHEET = 3
 
 // A4 세로에서 좌우 9mm, 열 사이 4mm, O·X 칸 안쪽 여백을 뺀 폭이다.

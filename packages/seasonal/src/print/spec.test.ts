@@ -4,6 +4,7 @@ import {
   DEFAULT_SPECS,
   PAPERS,
   PRINT_KINDS,
+  papersForSpec,
   decodeSpec,
   encodeSpec,
   pageCount,
@@ -248,5 +249,16 @@ describe("쪽 수", () => {
     expect(pageCount(DEFAULT_SPECS["year-sheet"])).toBe(1)
     expect(pageCount(DEFAULT_SPECS["season-poster"])).toBe(1)
     expect(pageCount(DEFAULT_SPECS["month-poster"])).toBe(1)
+  })
+})
+
+
+describe("이유식 궁합표 사양", () => {
+  it("이름을 담은 세로 A4 3장 사양을 읽는다", () => {
+    const spec = { ...DEFAULT_SPECS["baby-food-pairings"], title: "우리 집 이유식 궁합표" }
+    expect(parsePrintSpec(spec)).toEqual(spec)
+    expect(pageCount(spec)).toBe(3)
+    expect(papersForSpec(spec)).toEqual(["A4"])
+    expect(parsePrintSpec({ ...spec, orientation: "landscape" })).toBeInstanceOf(Error)
   })
 })

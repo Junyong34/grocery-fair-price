@@ -502,7 +502,28 @@ const monthPoster: WireframeEntry[] = [
   },
 ]
 
-export const WIREFRAMES: readonly WireframeEntry[] = [...monthly, ...yearSheet, ...seasonPoster, ...monthPoster]
+const babyFood: WireframeEntry = {
+  code: "B-A",
+  kind: "baby-food-pairings",
+  page: "sheet",
+  title: "재료별 궁합표 3장",
+  summary: "한 장에 세 열. 재료 이름 아래 O와 X 목록을 나란히 둔다.",
+  source: "이유식 궁합표 A4 인쇄",
+  availability: { status: "available", options: 'layout: "three-sheets"' },
+  orientations: ["portrait"],
+  draw: (orientation) => {
+    const [header, body] = split(contentBox(orientation), "rows", [18, "*"], 4)
+    return [
+      ...posterTitle(header!),
+      ...monthGrid(body!, 3, 3, 4).flatMap((cell) => [
+        frame(cell),
+        ...split(inset(cell, 2), "cols", ["*", "*"], 2).flatMap((side) => nameList(side, { count: 4, columns: 1 })),
+      ]),
+    ]
+  },
+}
+
+export const WIREFRAMES: readonly WireframeEntry[] = [...monthly, ...yearSheet, ...seasonPoster, ...monthPoster, babyFood]
 
 export function wireframesOf(kind: PrintKind, page?: WireframeEntry["page"]): readonly WireframeEntry[] {
   return WIREFRAMES.filter((entry) => entry.kind === kind && (!page || entry.page === page))

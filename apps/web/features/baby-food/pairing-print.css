@@ -116,3 +116,16 @@
     min-height: 0;
   }
 }
+
+
+/* 에디션 미리보기 iframe의 여백은 기존 인쇄 루트가 맡는다. */
+.pairing-edition-print .pairing-print-document {
+  padding: 0;
+  background: transparent;
+}
+.pairing-edition-print .pairing-paper {
+  margin-bottom: var(--print-gutter);
+}
+@media print {
+  .pairing-edition-print .pairing-paper { margin-bottom: 0; }
+}

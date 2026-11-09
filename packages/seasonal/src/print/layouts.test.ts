@@ -15,7 +15,7 @@ describe("세로 전용 구성", () => {
   )
 
   it("정의에서 고른 구성만 세로 전용이다", () => {
-    expect(portraitOnly).toEqual(["monthly/side-check", "year-sheet/hero-top", "month-poster/rows-check"])
+    expect(portraitOnly).toEqual(["monthly/side-check", "year-sheet/hero-top", "month-poster/rows-check", "baby-food-pairings/three-sheets"])
   })
 
   it.each(PRINT_KINDS)("%s: 스키마가 가로 + 세로 전용 구성을 거절하고 나머지는 받는다", (kind) => {

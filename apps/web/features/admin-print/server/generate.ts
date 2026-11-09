@@ -6,7 +6,7 @@ import path from "node:path"
 import type { Page } from "playwright-core"
 
 import { downloadDir, downloadPath, thumbnailPages, thumbnailPath, type BuildRecord, type Edition, type Thumbnail } from "@workspace/seasonal/print/edition"
-import { PAPER_SIZES, pageCount, sheetSize, specHash, type Paper } from "@workspace/seasonal/print/spec"
+import { pageCount, papersForSpec, sheetSize, specHash, type Paper } from "@workspace/seasonal/print/spec"
 
 import { routes } from "@/shared/routes"
 
@@ -26,9 +26,10 @@ export async function generatePdfs(edition: Edition, origin: string): Promise<Bu
   let thumbnails: Thumbnail[] = []
   try {
     const page = await browser.newPage({ deviceScaleFactor: 2 })
-    for (const paper of PAPER_SIZES) {
+    for (const paper of papersForSpec(edition.spec)) {
       const url = `${origin}${routes.print(edition.spec, paper)}`
       await loadPrintPage(page, url)
+      if (edition.spec.kind === "baby-food-pairings") await assertPrintFits(page)
       const file = downloadPath(edition.id, paper)
       const target = path.join(PUBLIC_DIR, file)
       await mkdir(path.dirname(target), { recursive: true })
@@ -85,16 +86,20 @@ export async function generateA4PortraitPdf(url: string, pages: number) {
     const page = await browser.newPage()
     await page.emulateMedia({ media: "print" })
     await loadPrintPage(page, url)
-    const overflow = await page.locator(".print-sheet").evaluateAll((sheets) =>
-      sheets.findIndex((sheet) => sheet.scrollHeight > sheet.clientHeight + 1 || sheet.scrollWidth > sheet.clientWidth + 1)
-    )
-    if (overflow >= 0) throw new Error(`${overflow + 1}쪽의 표가 용지 밖으로 나갔어요.`)
+    await assertPrintFits(page)
     const pdf = await page.pdf({ preferCSSPageSize: true, printBackground: true })
     checkPdfBoxes(pdf.toString("latin1"), "이유식 재료 궁합표 A4", sheetSize("A4", "portrait"), pages)
     return Uint8Array.from(pdf)
   } finally {
     await browser.close()
   }
+}
+
+async function assertPrintFits(page: Page) {
+  const overflow = await page.locator(".print-sheet").evaluateAll((sheets) =>
+    sheets.findIndex((sheet) => sheet.scrollHeight > sheet.clientHeight + 1 || sheet.scrollWidth > sheet.clientWidth + 1)
+  )
+  if (overflow >= 0) throw new Error(`${overflow + 1}쪽의 표가 용지 밖으로 나갔어요.`)
 }
 
 function checkPdf(pdf: string, edition: Edition, paper: Paper): number {

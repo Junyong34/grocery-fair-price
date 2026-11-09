@@ -18,7 +18,7 @@ import { generatePdfs } from "./generate"
 import { assertAdmin } from "./guard"
 import { deleteObjects, staleKeys, storageReady, uploadEdition } from "./storage"
 
-const isPrintKind = (value: unknown): value is PrintKind => PRINT_KINDS.includes(value as PrintKind)
+const isPrintKind = (value: unknown): value is PrintKind => PRINT_KINDS.some((kind) => kind === value)
 const missing = (id: string): ActionResult<never> => ({ ok: false, error: `없는 에디션: ${id}` })
 const failure = (error: unknown): ActionResult<never> => ({ ok: false, error: error instanceof Error ? error.message : String(error) })
 
@@ -26,7 +26,9 @@ export async function createEdition(_state: FormState, formData: FormData): Prom
   assertAdmin()
   const kind = formData.get("kind")
   if (!isPrintKind(kind)) return { error: "종류를 고르세요." }
+  const title = String(formData.get("title") ?? "")
   let spec: PrintSpec = DEFAULT_SPECS[kind]
+  if (spec.kind === "baby-food-pairings") spec = { ...spec, title }
   if (kindHasYear(kind)) {
     // 폼은 범위 안 연도만 내놓지만, 자정을 넘겨 범위가 바뀌었거나 값을 손댄 요청도 여기서 막는다.
     const year = Number(formData.get("year"))
@@ -37,7 +39,7 @@ export async function createEdition(_state: FormState, formData: FormData): Prom
   const existing = (await listEditions()).map((edition) => edition.id)
   const edition = parseEdition({
     id: nextEditionId(kind, existing),
-    title: String(formData.get("title") ?? ""),
+    title,
     description: "",
     status: "draft",
     spec,

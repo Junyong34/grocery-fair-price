@@ -6,7 +6,7 @@ import { PAIRING_PRINT_SHEETS } from "./print-layout"
 
 import "./pairing-print.css"
 
-export function PairingPrint() {
+export function PairingPrint({ title = "이유식 재료 궁합표" }: { title?: string }) {
   return (
     <div className="pairing-print-document">
       {PAIRING_PRINT_SHEETS.map((columns, index) => (
@@ -18,7 +18,7 @@ export function PairingPrint() {
         >
           <header className="pairing-paper-head">
             <p className="pairing-paper-brand">장볼날 · 이유식 재료 노트</p>
-            <h2 className="font-heading">이유식 재료 궁합표</h2>
+            <h2 className="font-heading">{title}</h2>
             <p>
               {index + 1}장 · 기준 재료 {columns.flat().length}개
             </p>

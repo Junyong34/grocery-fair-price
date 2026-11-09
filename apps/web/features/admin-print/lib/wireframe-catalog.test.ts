@@ -11,10 +11,10 @@ describe("WIREFRAMES", () => {
     expect(new Set(codes).size).toBe(codes.length)
   })
 
-  it("종류마다 시트 안이 셋 이상이고, 지금 옵션으로 되는 안이 하나 이상이다", () => {
+  it("달력·포스터에는 시트 안이 셋 이상이고, 고정 궁합표에는 하나가 있다", () => {
     for (const kind of PRINT_KINDS) {
       const sheets = wireframesOf(kind, "sheet")
-      expect(sheets.length, kind).toBeGreaterThanOrEqual(3)
+      expect(sheets.length, kind).toBeGreaterThanOrEqual(kind === "baby-food-pairings" ? 1 : 3)
       expect(sheets.some((entry) => entry.availability.status === "available"), kind).toBe(true)
     }
   })
