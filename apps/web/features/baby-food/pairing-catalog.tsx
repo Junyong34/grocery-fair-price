@@ -22,8 +22,8 @@ export function PairingCatalog() {
         </Link>
       </div>
       <p className="pairing-lead">
-        기준 재료 {PAIRINGS.length}개의 O·X 목록을 살펴보세요. O는 원본의 잘
-        맞는 목록, X는 원본의 주의 목록이에요.
+        {INFANT_PAIRING_COPY.catalog(PAIRINGS.length)}
+        {" "}O는 원본의 잘 맞는 목록, X는 원본의 주의 목록이에요.
       </p>
       <CatalogFilter rows={PAIRINGS} />
       <section className="pairing-source">

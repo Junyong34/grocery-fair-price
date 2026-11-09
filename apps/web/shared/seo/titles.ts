@@ -17,8 +17,8 @@ export type PageSeo = { title: string; description: string }
 
 export function babyFoodPairingsSeo(): PageSeo {
   return {
-    title: "이유식 재료 궁합표 · 재료별 O·X 목록",
-    description: "당근, 고구마, 애호박 등 이유식 기준 재료 31개의 O·X 목록을 살펴보세요. 원본 표기와 별도로 조사한 우유 조합의 근거를 함께 확인할 수 있어요.",
+    title: "이유식 재료 궁합표 · 재료별 조합 찾기",
+    description: "당근·고구마·애호박 등 이유식 재료 31개의 궁합을 찾아보세요. 재료 이름으로 검색하거나 집에 있는 재료를 골라 원본의 잘 맞는 조합과 주의 목록을 확인할 수 있어요.",
   }
 }
 

@@ -14,7 +14,10 @@ export default function Page() {
   return (
     <>
       <JsonLd
-        data={breadcrumb([{ name: seo.title, path: routes.babyFood.pairings }])}
+        data={breadcrumb([
+          { name: "제철달력", path: routes.seasonal.root },
+          { name: "이유식 재료 궁합표", path: routes.babyFood.pairings },
+        ])}
       />
       <PairingCatalog />
     </>
