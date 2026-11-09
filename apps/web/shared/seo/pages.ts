@@ -33,6 +33,7 @@ export const SEO_PAGES: Readonly<Record<string, () => readonly SitemapEntry[]>> 
   "/seasonal/months/[month]": () => MONTHS.map((month) => ({ path: routes.seasonal.month(month) })),
   "/seasonal/seasons": () => [{ path: routes.seasonal.seasons }],
   "/seasonal/downloads": () => [{ path: routes.seasonal.downloads }],
+  "/baby-food/pairings": () => [{ path: routes.babyFood.pairings }],
   "/privacy": () => [{ path: routes.privacy }],
   // 게시된 에디션 상세. 썸네일을 이미지 sitemap으로 알린다. PDF 파일 주소는 색인하지 않는다(ADR 0003).
   "/seasonal/downloads/[edition]": () =>
@@ -64,6 +65,7 @@ export const DATA_SEO_PAGES: readonly string[] = [
 export const NOINDEX_ROUTES: readonly string[] = [
   // P2 품종 검색: 검색어마다 다른 결과라 색인할 본문이 없다.
   "/search",
+  "/baby-food/result",
   // P4 담은 품종: 기기에 저장된 목록으로 채워져 크롤러에게는 빈 화면이다.
   "/basket",
   // 설정 · 데이터 출처: 기기 값으로 채워지는 화면이고 검색으로 찾아올 내용이 아니다.
@@ -76,6 +78,9 @@ export const NOINDEX_ROUTES: readonly string[] = [
   "/admin",
 ]
 
+/** 자식 주소가 색인 대상인 경우, 이 주소 자체에만 noindex를 적용한다. */
+export const NOINDEX_PAGES: readonly string[] = [routes.babyFood.root]
+
 /** 다른 페이지로 보내기만 하는 라우트. sitemap에 넣지 않는다. */
 // 지금은 없다. "/"는 2026-10-27부터 P1 시세 메인이다.
 export const REDIRECT_ROUTES: readonly string[] = []
@@ -85,7 +90,7 @@ export type SeoPolicy = "index" | "noindex" | "redirect"
 /** 라우트 패턴의 색인 정책. 어디에도 없으면 undefined(가드 테스트가 실패한다). */
 export function seoPolicyOf(pattern: string): SeoPolicy | undefined {
   if (pattern in SEO_PAGES || DATA_SEO_PAGES.includes(pattern)) return "index"
-  if (NOINDEX_ROUTES.some((prefix) => pattern === prefix || pattern.startsWith(`${prefix}/`))) return "noindex"
+  if (NOINDEX_PAGES.includes(pattern) || NOINDEX_ROUTES.some((prefix) => pattern === prefix || pattern.startsWith(`${prefix}/`))) return "noindex"
   if (REDIRECT_ROUTES.includes(pattern)) return "redirect"
   return undefined
 }

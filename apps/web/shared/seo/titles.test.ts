@@ -6,6 +6,7 @@ import { MONTHS } from "@workspace/seasonal/data/months"
 import { SEASONS } from "@workspace/seasonal/data/seasons"
 
 import {
+  babyFoodPairingsSeo,
   downloadsSeo,
   editionSeoTitle,
   festivalSeo,
@@ -24,6 +25,7 @@ const all = [
   homeSeo(),
   seasonalHomeSeo(),
   downloadsSeo(),
+  babyFoodPairingsSeo(),
   monthsIndexSeo(),
   ...MONTHS.map(monthSeo),
   seasonsIndexSeo(),

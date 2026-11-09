@@ -56,6 +56,19 @@ export const routes = {
     downloadFile: (id: string, paper: PublishedPaper) => `/seasonal/downloads/${id}/${paper.toLowerCase()}`,
   },
 
+  babyFood: {
+    root: "/baby-food",
+    result: "/baby-food/result",
+    pairings: "/baby-food/pairings",
+    withSelection: (path: "/baby-food" | "/baby-food/result" | "/baby-food/pairings", names: readonly string[], age?: string) => {
+      const params = new URLSearchParams()
+      for (const name of names) params.append("food", name)
+      if (age) params.set("age", age)
+      const query = params.toString()
+      return query ? `${path}?${query}` : path
+    },
+  },
+
   /** 설정. ⚙를 어디서 눌러도 여기로 온다(.scratch/shell-unify/spec.md 5장). */
   settings: {
     root: "/settings",

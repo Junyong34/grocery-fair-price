@@ -103,6 +103,9 @@ export function HomeView({
           </p>
         )}
       </section>
+      <Link href={routes.babyFood.pairings} className="rounded-xl border border-hairline bg-mat px-5 py-4 text-sm font-medium text-forest lg:col-start-1">
+        이유식 재료 궁합표 보기 →
+      </Link>
       <DownloadsCard
         placement="price-home"
         className="lg:col-start-1 lg:row-start-2"

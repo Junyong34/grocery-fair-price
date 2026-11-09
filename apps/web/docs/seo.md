@@ -6,7 +6,7 @@
 
 | 파일 | 역할 |
 |---|---|
-| `shared/seo/pages.ts` | 색인 정책의 단일 출처. 모든 페이지를 `SEO_PAGES`(색인·sitemap), `NOINDEX_ROUTES`, `REDIRECT_ROUTES` 가운데 하나에 등록한다 |
+| `shared/seo/pages.ts` | 색인 정책의 단일 출처. 모든 페이지를 `SEO_PAGES`(색인·sitemap), `NOINDEX_ROUTES`·`NOINDEX_PAGES`(noindex), `REDIRECT_ROUTES` 가운데 하나에 등록한다 |
 | `shared/seo/pages.test.ts` | 가드 테스트. `app/**/page.tsx`가 위 셋 가운데 어디에도 없으면 `pnpm test`가 실패한다 |
 | `shared/seo/route-pattern.ts` | page 파일 경로 → 라우트 패턴. 라우트 그룹 `(x)`는 지우고, `@slot`·가로채기 라우트는 뺀다 |
 | `app/(price)/page.tsx` | 홈(`routes.home`, P1 시세 메인)의 `WebSite`·`Organization` JSON-LD. 홈이 바뀌면 새 홈 페이지로 옮긴다 |
@@ -24,6 +24,7 @@
    - 검색에 나와야 하면 `SEO_PAGES`에 라우트 패턴을 키로 넣는다. 값은 sitemap 줄을 돌려주는 함수다. 동적 세그먼트는 `generateStaticParams`와 같은 목록을 펼친다.
    - 기기 저장 데이터처럼 크롤러에게 빈 화면이면 `NOINDEX_ROUTES`에 넣고, 페이지에서 `createMetadata({ noIndex: true })`를 쓴다. robots.txt의 `Disallow`로 막지 않는다. 막으면 크롤러가 noindex를 읽지 못한다.
    - 다른 곳으로 보내기만 하면 `REDIRECT_ROUTES`에 넣는다.
+   - 하위 주소가 색인 대상이면 해당 페이지 주소만 `NOINDEX_PAGES`에 등록한다. 예를 들어 `/baby-food`는 재료 선택 페이지이고 `/baby-food/pairings`는 색인 대상이다.
 3. `shared/seo/titles.ts`에 그 페이지의 제목·설명 함수를 더하고(테스트 `titles.test.ts`의 목록에도 넣는다), 페이지에서 `createMetadata({ ...xxxSeo(), path, ogImage })`를 돌려준다.
    - `title`은 사람들이 실제로 검색하는 말로 쓴다("대게 제철 시기", "3월 제철 음식"). 화면의 `h1`과 달라도 된다.
    - `description`은 페이지마다 다르게 쓴다.

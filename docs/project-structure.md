@@ -128,6 +128,9 @@ import 경로:
 | `/print?spec=&paper=&page=` | 인쇄 전용 페이지 (개발 서버 전용, 운영 404) | `app/print/page.tsx` | `features/print/print-document` |
 | (제철 화면 안에서 이동) | 1i 품종 상세 (하단 시트) | `seasonal/@sheet/(.)foods/[food]/page.tsx` | `components/detail-sheet` + `food-detail` |
 | `/api/og` | 공유 미리보기 이미지 1200×630 | `app/api/og/route.tsx` | 쿼리 `title`, `subtitle`, `badge`, `season` |
+| `/baby-food` | 이유식 재료 선택 (noindex) | `(price)/baby-food/page.tsx` | `features/baby-food/ingredient-picker` |
+| `/baby-food/result` | 고른 재료 궁합 결과 (noindex) | `(price)/baby-food/result/page.tsx` | `features/baby-food/pairing-result` |
+| `/baby-food/pairings` | 전체 이유식 궁합표. 결과 화면에서 열면 3장 모달 | `(price)/baby-food/pairings/page.tsx`, `result/@pairing/(..)pairings/page.tsx` | `features/baby-food/pairing-catalog`, `pairing-modal` |
 | `/settings` | 설정: 화면 표시 · 내 기록 · 정보 (noindex) | `(price)/settings/page.tsx` | `features/settings/settings-view`. 제철 · 시세 항목은 라우트가 각 feature에서 넣는다(`seasonal/settings/display-settings`, `price/settings/price-record-settings`) |
 | `/settings/sources` | 데이터 출처 (noindex) | `(price)/settings/sources/page.tsx` | `features/settings/sources-view` |
 | `/privacy` | 개인정보 처리방침 (가격 셸) | `(price)/privacy/page.tsx` | `features/legal/privacy/` (본문 `privacy-content.ts`) |

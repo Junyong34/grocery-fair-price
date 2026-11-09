@@ -15,6 +15,13 @@ import type { Season } from "@workspace/seasonal/data/seasons"
 
 export type PageSeo = { title: string; description: string }
 
+export function babyFoodPairingsSeo(): PageSeo {
+  return {
+    title: "이유식 재료 궁합표 · 재료별 O·X 목록",
+    description: "당근, 고구마, 애호박 등 이유식 기준 재료 31개의 O·X 목록을 살펴보세요. 원본 표기와 별도로 조사한 우유 조합의 근거를 함께 확인할 수 있어요.",
+  }
+}
+
 /** 무료 PDF를 찾는 검색의 입구. 연도는 개별 인쇄물에서 안내한다. */
 export function downloadsSeo(): PageSeo {
   return {

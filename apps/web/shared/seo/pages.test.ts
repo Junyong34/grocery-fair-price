@@ -7,7 +7,7 @@ import { FOODS, isDrawn } from "@workspace/seasonal/data/foods"
 
 import { DOWNLOADS } from "@/shared/downloads-manifest"
 
-import { DATA_SEO_PAGES, NOINDEX_ROUTES, REDIRECT_ROUTES, SEO_PAGES, seoPolicyOf } from "./pages"
+import { DATA_SEO_PAGES, NOINDEX_PAGES, NOINDEX_ROUTES, REDIRECT_ROUTES, SEO_PAGES, seoPolicyOf } from "./pages"
 import { routePatternOf } from "./route-pattern"
 
 const APP_DIR = fileURLToPath(new URL("../../app", import.meta.url))
@@ -27,7 +27,7 @@ describe("SEO 레지스트리 가드", () => {
   })
 
   it("레지스트리에 적힌 라우트는 실제 페이지가 있다", () => {
-    const registered = [...Object.keys(SEO_PAGES), ...DATA_SEO_PAGES, ...REDIRECT_ROUTES]
+    const registered = [...Object.keys(SEO_PAGES), ...DATA_SEO_PAGES, ...REDIRECT_ROUTES, ...NOINDEX_PAGES]
     const orphans = registered.filter((pattern) => !pagePatterns.includes(pattern))
     expect(orphans, "지운 페이지는 pages.ts에서도 지운다").toEqual([])
     const unusedPrefixes = NOINDEX_ROUTES.filter((prefix) => !pagePatterns.some((pattern) => pattern === prefix || pattern.startsWith(`${prefix}/`)))
@@ -35,7 +35,7 @@ describe("SEO 레지스트리 가드", () => {
   })
 
   it("색인 대상은 noindex 접두 경로 아래에 있지 않다", () => {
-    const both = Object.keys(SEO_PAGES).filter((pattern) => NOINDEX_ROUTES.some((prefix) => pattern === prefix || pattern.startsWith(`${prefix}/`)))
+    const both = Object.keys(SEO_PAGES).filter((pattern) => NOINDEX_PAGES.includes(pattern) || NOINDEX_ROUTES.some((prefix) => pattern === prefix || pattern.startsWith(`${prefix}/`)))
     expect(both).toEqual([])
   })
 })
@@ -58,7 +58,7 @@ describe("SEO_PAGES", () => {
   })
 
   it("정적 생성되는 상세 페이지를 모두 담는다", () => {
-    // P1 1 + 2a 1 + 2b 목록 1 + 월 12 + 3a 목록 1 + 계절 4 + 제철 회 12 + PDF 내려받기 1 + 개인정보 처리방침 1 + 게시된 에디션 + 명절 + 품종
-    expect(paths).toHaveLength(1 + 1 + 1 + 12 + 1 + 4 + 12 + 1 + 1 + DOWNLOADS.editions.length + FESTIVALS.length + FOODS.length)
+    // P1 1 + 2a 1 + 2b 목록 1 + 월 12 + 3a 목록 1 + 계절 4 + 제철 회 12 + 이유식 궁합표 1 + PDF 내려받기 1 + 개인정보 처리방침 1 + 게시된 에디션 + 명절 + 품종
+    expect(paths).toHaveLength(1 + 1 + 1 + 12 + 1 + 4 + 12 + 1 + 1 + 1 + DOWNLOADS.editions.length + FESTIVALS.length + FOODS.length)
   })
 })
