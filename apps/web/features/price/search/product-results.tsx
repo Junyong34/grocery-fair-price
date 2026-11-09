@@ -7,9 +7,12 @@ import { flushSync } from "react-dom"
 
 import { PRICE_COPY } from "@workspace/price/copy"
 import { monthDay, won } from "@workspace/price/format"
+import { matchRange } from "@workspace/price/search"
 import type { ProductSummary } from "@workspace/price/types"
 
 import { routes } from "@/shared/routes"
+
+import { Highlighted } from "./highlighted"
 
 const COPY = PRICE_COPY.search
 
@@ -23,10 +26,12 @@ const SHOWN = 12
 export function ProductResults({
   products,
   headingId,
+  query,
   byItem = false,
 }: {
   products: readonly ProductSummary[]
   headingId: string
+  query?: string
   byItem?: boolean
 }) {
   const [open, setOpen] = useState(false)
@@ -60,6 +65,7 @@ export function ProductResults({
               <ProductRow
                 key={product.id}
                 product={product}
+                query={query}
                 linkRef={open && index === SHOWN ? firstRevealed : undefined}
               />
             ))}
@@ -94,11 +100,16 @@ function groupByItem(
 /** 상품 행: 이름 · 품목 · 용량 | 판매가 · 기준 단위당 가격. 누르면 상품 상세로 간다. */
 function ProductRow({
   product,
+  query,
   linkRef,
 }: {
   product: ProductSummary
+  query?: string
   linkRef?: Ref<HTMLAnchorElement>
 }) {
+  // 상품명에서 맞지 않은 경우에만 품목명에 검색 근거를 보여 준다.
+  const highlightItem =
+    query && product.item && !matchRange(product.name, query)
   return (
     <li className="border-b border-hairline last:border-b-0">
       <Link
@@ -108,10 +119,20 @@ function ProductRow({
       >
         <span className="flex min-w-0 flex-col gap-1">
           <span className="text-base leading-snug font-semibold [overflow-wrap:anywhere] break-keep text-ink">
-            {product.name}
+            {query ? (
+              <Highlighted name={product.name} query={query} />
+            ) : (
+              product.name
+            )}
           </span>
           <span className="text-[13px] leading-relaxed [overflow-wrap:anywhere] break-keep text-caption">
-            {[product.item, product.size].filter(Boolean).join(" · ")}
+            {highlightItem ? (
+              <Highlighted name={product.item} query={query} />
+            ) : (
+              product.item
+            )}
+            {product.item && product.size && " · "}
+            {product.size}
           </span>
         </span>
         <span className="flex max-w-28 flex-col gap-0.5 text-end tabular-nums sm:max-w-none">

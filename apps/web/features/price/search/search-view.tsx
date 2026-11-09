@@ -15,7 +15,6 @@ import {
 import { PRICE_COPY } from "@workspace/price/copy"
 import { pickByIds } from "@workspace/price/list"
 import {
-  matchRange,
   searchProducts,
   searchVarieties,
   type SearchResult,
@@ -32,6 +31,7 @@ import { BackButton } from "@/shared/shell/sub-header"
 import { AddButton } from "../components/add-button"
 import { useRecentVarieties } from "../components/recent-varieties"
 import { PriceHint, VarietyRow } from "../components/variety-row"
+import { Highlighted } from "./highlighted"
 import { ProductResults } from "./product-results"
 import { RecentRow } from "./recent-row"
 
@@ -287,6 +287,7 @@ function Results({
           <ProductResults
             key={query.trim()}
             products={matchingProducts}
+            query={result.kind === "category" ? undefined : query}
             headingId={productHeadingId}
             byItem={result.kind === "category"}
           />
@@ -407,21 +408,5 @@ function Pills({ labels }: { labels: readonly Pill[] }) {
         </li>
       ))}
     </ul>
-  )
-}
-
-/** 이름에서 검색어가 맞은 글자를 강조한다. */
-function Highlighted({ name, query }: { name: string; query: string }) {
-  const range = matchRange(name, query)
-  if (!range) return name
-  const chars = [...name]
-  return (
-    <>
-      {chars.slice(0, range[0]).join("")}
-      <mark className="rounded-sm bg-gold-wash text-ink">
-        {chars.slice(range[0], range[1]).join("")}
-      </mark>
-      {chars.slice(range[1]).join("")}
-    </>
   )
 }
