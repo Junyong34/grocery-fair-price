@@ -5,6 +5,7 @@
 // 소매 national 시세가 한 번도 없는 품종은 행을 만들지 않는다 (참가격만 있는 품종 등).
 // 검사: 행이 하나도 없거나 지금 묶음보다 MIN_KEEP_RATIO 넘게 줄면 묶음을 failed로 두고 포인터는 그대로 둔다.
 // 묶음은 최근 KEEP_BATCHES개와 지금 묶음만 남긴다.
+// 같은 묶음에 참가격 상품 payload(product_snapshot, catalog-scale/09)도 쓴다. 상품 행이 지금 묶음보다 MIN_KEEP_RATIO 넘게 줄어도 failed다.
 // 환경변수: INGEST_DATABASE_URL. .env를 스스로 읽지 않는다.
 import { parseArgs } from "node:util"
 
@@ -14,6 +15,7 @@ import { baseUnitLabel } from "../catalog/types.ts"
 import { connectIngest, type Tx } from "../load/db.ts"
 import { actionsMaskCommands, describeError, redactorFromEnv, SECRET_ENV } from "../secrets.ts"
 import { buildJudgment, type JudgmentInput } from "./build.ts"
+import { readProducts } from "./product-db.ts"
 
 const USAGE = "사용법: judgment [--trigger 이름] [--dry-run]"
 const DRY_RUN = Symbol("dry-run")
@@ -165,6 +167,8 @@ export type JudgmentResult = {
   status: "ready" | "failed"
   rows: number
   previousRows: number | null
+  products: number
+  previousProducts: number | null
   verdicts: Record<"cheap" | "normal" | "expensive" | "none", number>
   note: string | null
 }
@@ -196,15 +200,28 @@ export async function writeJudgment(tx: Tx, input: { trigger: string }): Promise
         )}) as r (variety_id int, spec_id int, as_of date, today_price numeric, usual numeric, verdict text, diff_pct numeric, payload jsonb)`
   }
 
-  const [current] = await tx<{ rows: number }[]>`
-    select count(*)::int as rows from price.current_judgment`
+  const products = await readProducts(tx)
+  if (products.length > 0) {
+    await tx`
+      insert into price.product_snapshot (batch_id, product_id, surveyed_on, status, payload)
+      select ${batchId}, r.product_id, r.surveyed_on, r.status, r.payload
+        from jsonb_to_recordset(${tx.json(
+          products.map((p) => ({ product_id: p.productId, surveyed_on: p.payload.surveyedOn, status: p.payload.status, payload: p.payload })) as unknown as JSONValue,
+        )}) as r (product_id int, surveyed_on date, status text, payload jsonb)`
+  }
+
+  const [current] = await tx<{ rows: number; products: number }[]>`
+    select (select count(*)::int from price.current_judgment) as rows, (select count(*)::int from price.current_product) as products`
   const previousRows = current && current.rows > 0 ? current.rows : null
+  const previousProducts = current && current.products > 0 ? current.products : null
   const note =
     built.length === 0
       ? "판정 행이 없다"
       : previousRows !== null && built.length < previousRows * MIN_KEEP_RATIO
         ? `판정 행이 ${previousRows} → ${built.length}로 줄었다`
-        : null
+        : previousProducts !== null && products.length < previousProducts * MIN_KEEP_RATIO
+          ? `상품 행이 ${previousProducts} → ${products.length}로 줄었다`
+          : null
   const verdicts = { cheap: 0, normal: 0, expensive: 0, none: 0 }
   for (const b of built) verdicts[b.row.verdict ?? "none"]++
 
@@ -220,7 +237,16 @@ export async function writeJudgment(tx: Tx, input: { trigger: string }): Promise
     delete from price.judgment_batch b
      where b.id not in (select id from price.judgment_batch order by id desc limit ${KEEP_BATCHES})
        and b.id not in (select batch_id from price.judgment_current)`
-  return { batchId, status: note ? "failed" : "ready", rows: built.length, previousRows, verdicts, note }
+  return {
+    batchId,
+    status: note ? "failed" : "ready",
+    rows: built.length,
+    previousRows,
+    products: products.length,
+    previousProducts,
+    verdicts,
+    note,
+  }
 }
 
 async function main(): Promise<void> {
@@ -239,7 +265,7 @@ async function main(): Promise<void> {
       const r = await writeJudgment(tx, { trigger })
       const v = r.verdicts
       console.log(
-        `판정 묶음 ${r.batchId}: ${r.status}, 행 ${r.rows} (지금 묶음 ${r.previousRows ?? "없음"}), 싸요 ${v.cheap} · 보통 ${v.normal} · 비싸요 ${v.expensive} · 판정 전 ${v.none}`,
+        `판정 묶음 ${r.batchId}: ${r.status}, 행 ${r.rows} (지금 묶음 ${r.previousRows ?? "없음"}), 싸요 ${v.cheap} · 보통 ${v.normal} · 비싸요 ${v.expensive} · 판정 전 ${v.none}, 상품 ${r.products} (지금 묶음 ${r.previousProducts ?? "없음"})`,
       )
       if (r.note) console.error(`포인터를 바꾸지 않았다: ${r.note}`)
       failed = r.status === "failed"

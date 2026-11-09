@@ -155,7 +155,7 @@ footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--li
     <span class="src c">참가격 생필품 가격</span>
   </div>
   <div class="facts">
-    <span><!-- erd:counts -->스키마 <code>price</code> · 테이블 <b>46</b>개 + 뷰 <b>1</b> · 묶음 <b>6</b>개<!-- /erd:counts --></span>
+    <span><!-- erd:counts -->스키마 <code>price</code> · 테이블 <b>47</b>개 + 뷰 <b>2</b> · 묶음 <b>6</b>개<!-- /erd:counts --></span>
     <span>1년차 DB 실측 기반 <b>465~525MB</b> / 무료 500MB</span>
     <span>1년차 원본 파일 추정 <b>250~330MB</b> / 무료 1GB</span>
     <span>근거 문서 <code>grocery-price/docs/30-data/pipeline.md</code> 3장</span>
@@ -659,8 +659,12 @@ erDiagram
   judgment_batch ||--o{ judgment_current : "batch_id"
   judgment_batch ||--o{ judgment_snapshot : "batch_id"
   spec ||--o{ judgment_snapshot : "(variety_id, spec_id)"
+  judgment_batch ||--o{ product_snapshot : "batch_id"
+  product ||--o{ product_snapshot : ""
   judgment_current ||..o{ current_judgment : "뷰가 읽음"
   judgment_snapshot ||..o{ current_judgment : "뷰가 읽음"
+  judgment_current ||..o{ current_product : "뷰가 읽음"
+  product_snapshot ||..o{ current_product : "뷰가 읽음"
   daily_quote {
     int variety_id PK, FK
     int spec_id PK, FK
@@ -706,6 +710,11 @@ erDiagram
     int spec_id PK, FK
     text verdict "cheap normal expensive"
   }
+  product_snapshot {
+    bigint batch_id PK, FK
+    int product_id PK, FK
+    text status "active stale discontinued"
+  }
   calc_param {
     text key PK
     text status "decided placeholder"
@@ -716,6 +725,10 @@ erDiagram
     int variety_id
     int spec_id
     text verdict
+  }
+  current_product {
+    text _ "뷰 (security_invoker)"
+    bigint batch_id
   }
 </pre>
 <!-- /erd:group-5 -->

@@ -1,6 +1,6 @@
 # 09. 가공식품 상품 payload와 공개
 
-Status: needs-triage
+Status: ready-for-agent
 Type: task
 Blocked by: 01, 05
 
@@ -19,6 +19,26 @@ Blocked by: 01, 05
 - [ ] 판정 묶음과 같은 포인터(`judgment_current`)로 공개한다 (catalog-evolution/06의 "화면용 카탈로그 정보를 판정 묶음에 싣는다"). 상품 행을 같은 묶음에 넣을지 별도 묶음으로 둘지 정한다
 - [ ] 단종·조사 중단 상품(`product.status = 'not_surveyed'`)과 마지막 조사일이 오래된 상품의 표시 규칙
 - [ ] ADR 0004대로 payload가 화면 모양인지 확인
+
+## 작업 계획 (2026-11-09)
+
+운영 DB 현황(읽기만): 참가격 상품 457개(모두 surveyed), 품종에 이은 64·품목만 정할 388·pending 5. `product_daily_summary`는 2026-06-12~10-23, 2주마다 조사일 하나(최근 448개 상품), 조사일마다 전국 1행·업태 약 3행·판매처 약 6행. 판매처 11곳.
+
+정한 것:
+- **대상은 상품 457개 전부**다. 품종에 이은 상품도 상품 페이지를 갖고, payload에 그 품종 id를 싣는다(10에서 "이 상품의 시세" 링크).
+- **카테고리·품목**: `product.item_id`가 있으면 그 품목·카테고리, 없으면 출처 분류 대응표(05, 참가격 AL 소분류)의 카테고리와 소분류 이름을 쓴다. 388개 품목 검토(06)를 기다리지 않는다.
+- **저장**: 판정과 같은 묶음(`judgment_batch`)에 새 표 `price.product_snapshot (batch_id, product_id, payload)`와 뷰 `price.current_product`를 둔다. 같은 `judgment_current` 포인터로 함께 바뀌므로 판정과 상품이 한 번에 공개된다. 판정 행 표에 섞지 않는 이유: `judgment_snapshot`은 품종·규격 FK와 판정 열을 가진다.
+- **판정은 내지 않는다**. 대신 최근 조사일의 전국 중간·최저·최고, 업태별 중간, 판매처별 가격(행사 표시), 최근 조사일 추이, 100g·100ml당 가격.
+
+단계:
+1. **payload 스키마** `productDetailSchema` (`packages/price/src/schema.ts`): id(참가격 goodId), name, item, category, size(`500g`), unitPrice 기준(100g·100ml·1개), surveyedOn, price(전국 중간), range(min·max·n), perUnit, channels[], sellers[](가격·행사), trend[](조사일·중간·최저), status(`active`·`stale`·`discontinued`), varietyId|null, basis. 스키마 테스트 먼저
+2. **빌드 함수** `packages/price-ingest/src/judgment/product.ts`: 요약 행 → payload (순수 함수, vitest 먼저). 100g당 환산, 오래된 조사일 규칙(마지막 조사일이 묶음의 최근 조사일보다 28일 넘게 이르면 stale, `not_surveyed`면 discontinued)
+3. **마이그레이션**: `product_snapshot` + 뷰 + `comment on` + RLS·권한(`web_reader` 읽기, `ingest_writer` 쓰기) + ERD 그룹·helpers 목록. `pnpm db:test`, `pnpm db:erd`
+4. **배치에 넣기**: `writeJudgment`가 같은 트랜잭션에서 상품 payload를 쓰고, 실패하면 묶음 전체를 실패로 둔다. DB 테스트(`test:db`)
+5. **운영 적용**(사용자 승인 뒤, push 전): 마이그레이션 → 판정 묶음 한 번 → 상품 행 수 확인
+6. 문서: `pipeline.md` 3-4, `docs/project-structure.md`, 이 티켓 Answer
+
+10으로 넘기는 것: 웹 읽기(`getPriceSource().getProduct`), 상품 URL, 검색 색인, 화면.
 
 ## 완료 기준
 

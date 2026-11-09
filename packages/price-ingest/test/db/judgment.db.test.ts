@@ -1,5 +1,5 @@
 // 판정 배치 쓰기 (ingest-foundation/11). 롤백 묶음 안에서 2096년 날짜의 시세와 평소가를 직접 넣고 판정 묶음과 포인터를 본다.
-import type { VarietyDetail } from "@workspace/price/types"
+import type { ProductDetail, VarietyDetail } from "@workspace/price/types"
 import { afterAll, beforeAll, describe, expect, it } from "vitest"
 
 import type { Sql, Tx } from "../../src/load/db.ts"
@@ -92,6 +92,68 @@ describe("판정 배치 쓰기", () => {
       const batches = await tx<{ id: number }[]>`select id::int from price.judgment_batch order by 1`
       expect(batches.length).toBe(KEEP_BATCHES)
       expect(batches.at(-1)!.id).toBe(last)
+    })
+  })
+
+  // 참가격 상품 하나(샘플 goodId 1000)에 2096년 조사일 둘의 요약을 넣는다
+  async function seedProduct(tx: Tx): Promise<number> {
+    const [p] = await tx<{ id: number }[]>`
+      select k.product_id as id from price.product_source_key k join price.source_item si on si.id = k.source_item_id
+       where si.source_key = 'chamga:1000' and k.valid_to is null`
+    const [seller] = await tx<{ id: number }[]>`select id from price.seller where name = '이마트'`
+    await tx`
+      insert into price.product_daily_summary (product_id, scope_key, obs_date, min, median, max, n_stores, promo_n, promo_unknown_n, computed_at)
+      values (${p!.id}, 'national', '2096-10-09', 1500, 1700, 1900, 100, 0, 0, now()),
+             (${p!.id}, 'national', '2096-10-23', 1600, 1800, 2000, 110, 0, 0, now()),
+             (${p!.id}, 'channel:large_mart', '2096-10-23', 1600, 1650, 1700, 20, 0, 0, now()),
+             (${p!.id}, ${`seller:${seller!.id}`}, '2096-10-23', 1600, 1640, 1700, 8, 2, 0, now())`
+    return p!.id
+  }
+
+  it("같은 묶음에 상품 payload를 쓰고 current_product로 읽힌다", async () => {
+    await inRollback(sql, async (tx) => {
+      await seed(tx)
+      const productId = await seedProduct(tx)
+      // 품목을 정한 상품은 그 품목·카테고리 이름을 싣는다 (로컬에는 출처 분류 대응표가 없어 정하지 않은 상품은 "기타")
+      const [item] = await tx<{ id: number; name: string; category: string }[]>`
+        select i.id, i.name, c.name as category from price.item i join price.category c on c.id = i.category_id order by i.id limit 1`
+      await tx`update price.product set item_id = ${item!.id} where id = ${productId}`
+      const r = await writeJudgment(tx, { trigger: "test" })
+      expect(r).toMatchObject({ status: "ready", note: null })
+      expect(r.products).toBeGreaterThan(0)
+
+      const [row] = await tx<{ batch_id: string; surveyed_on: string; status: string; payload: ProductDetail }[]>`
+        select batch_id::text, surveyed_on::text, status, payload from price.current_product where product_id = ${productId}`
+      expect(row).toMatchObject({ batch_id: String(r.batchId), surveyed_on: "2096-10-23", status: "active" })
+      expect(row!.payload).toMatchObject({
+        id: "1000",
+        price: 1800,
+        range: { min: 1600, max: 2000, stores: 110 },
+        channels: [{ channel: "large_mart", median: 1650, stores: 20 }],
+        sellers: [{ seller: "이마트", channel: "large_mart", price: 1640, promo: true }],
+        trend: [
+          { date: "2096-10-09", median: 1700, min: 1500 },
+          { date: "2096-10-23", median: 1800, min: 1600 },
+        ],
+        basis: { source: "참가격", scope: "전국 판매점" },
+      })
+      expect(row!.payload).toMatchObject({ item: item!.name, category: item!.category })
+      // 다른 상품은 2096년 조사에 없으니 stale이다
+      const [stale] = await tx<{ n: number }[]>`select count(*)::int as n from price.current_product where status = 'stale'`
+      expect(stale!.n).toBe(r.products - 1)
+    })
+  })
+
+  it("상품 행이 크게 줄면 묶음을 failed로 두고 포인터를 바꾸지 않는다", async () => {
+    await inRollback(sql, async (tx) => {
+      await seed(tx)
+      await seedProduct(tx)
+      const first = await writeJudgment(tx, { trigger: "test" })
+      await tx`delete from price.product_daily_summary where obs_date < '2096-01-01'`
+      const second = await writeJudgment(tx, { trigger: "test" })
+      expect(second).toMatchObject({ status: "failed", products: 1, note: `상품 행이 ${first.products} → 1로 줄었다` })
+      const [current] = await tx<{ batch_id: string }[]>`select batch_id::text from price.judgment_current`
+      expect(current!.batch_id).toBe(String(first.batchId))
     })
   })
 })

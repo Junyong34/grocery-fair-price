@@ -31,7 +31,7 @@ export const PRICE_TABLES = [
   "source_master_change",
   "observation", "observation_revision", "reference_observation",
   "daily_quote", "product_daily_summary", "reference_price", "season_index", "usual_price",
-  "judgment_batch", "judgment_current", "judgment_snapshot", "calc_param",
+  "judgment_batch", "judgment_current", "judgment_snapshot", "product_snapshot", "calc_param",
   "ingest_run", "source_day", "source_day_part", "backfill_task",
   "product", "product_source_key", "product_attr_history", "product_variety_map", "al_variety_rule",
   "raw_object", "db_size",
@@ -42,7 +42,7 @@ export const PRICE_TABLES = [
 export const WEB_READ = [
   "category", "item", "variety", "spec", "alias", "variety_seasonal_map",
   "daily_quote", "product_daily_summary", "reference_price", "usual_price",
-  "judgment_current", "judgment_snapshot", "current_judgment",
+  "judgment_current", "judgment_snapshot", "current_judgment", "product_snapshot", "current_product",
   "product", "product_attr_history", "seller", "region",
 ] as const
 

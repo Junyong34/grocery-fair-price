@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { searchIndexSchema, VARIETY_SUMMARY_KEYS, varietyDetailSchema, varietySummarySchema } from "./schema"
-import type { SearchIndex, VarietyDetail, VarietySummary } from "./types"
+import { productDetailSchema, searchIndexSchema, VARIETY_SUMMARY_KEYS, varietyDetailSchema, varietySummarySchema } from "./schema"
+import type { ProductDetail, SearchIndex, VarietyDetail, VarietySummary } from "./types"
 
 const SUMMARY: VarietySummary = {
   id: "napa-cabbage",
@@ -125,5 +125,33 @@ describe("VARIETY_SUMMARY_KEYS", () => {
   it("목록 행의 키와 같고, 상세 전용 키는 없다", () => {
     expect([...VARIETY_SUMMARY_KEYS].sort()).toEqual(Object.keys(SUMMARY).sort())
     for (const key of ["trend", "places", "shelf", "band"]) expect(VARIETY_SUMMARY_KEYS).not.toContain(key)
+  })
+})
+
+describe("상품 payload (catalog-scale/09)", () => {
+  const PRODUCT: ProductDetail = {
+    id: "1522",
+    name: "비비고 사골곰탕(500g)",
+    item: "국·탕",
+    category: "간편식·냉동",
+    size: "500g",
+    perUnit: { unit: "100g", price: 380 },
+    price: 1900,
+    range: { min: 1500, max: 2480, stores: 140 },
+    surveyedOn: "2026-10-23",
+    status: "active",
+    channels: [{ channel: "large_mart", median: 1850, min: 1500, max: 2180, stores: 12 }],
+    sellers: [{ seller: "이마트", channel: "large_mart", price: 1850, min: 1800, max: 1900, stores: 7, promo: false }],
+    trend: [{ date: "2026-10-09", median: 1980, min: 1600 }],
+    varietyId: null,
+    basis: { source: "참가격", scope: "전국 판매점" },
+  }
+
+  it("화면 모양 그대로 검사를 통과한다", () => {
+    expect(productDetailSchema.parse(PRODUCT)).toEqual(PRODUCT)
+  })
+
+  it("모르는 업태는 받지 않는다", () => {
+    expect(() => productDetailSchema.parse({ ...PRODUCT, channels: [{ ...PRODUCT.channels[0], channel: "market" }] })).toThrow()
   })
 })

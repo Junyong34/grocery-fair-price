@@ -22,7 +22,7 @@ const GROUPS: { id: number; tables: string[]; hideParents?: string[] }[] = [
   { id: 4, tables: ["product", "product_source_key", "product_attr_history", "product_variety_map", "al_variety_rule"],
     hideParents: ["unit_rule", "raw_object"] },
   { id: 5, tables: ["daily_quote", "product_daily_summary", "reference_price", "season_index", "usual_price",
-                    "judgment_batch", "judgment_current", "judgment_snapshot", "calc_param", "current_judgment"] },
+                    "judgment_batch", "judgment_current", "judgment_snapshot", "product_snapshot", "calc_param", "current_judgment", "current_product"] },
   { id: 6, tables: ["ingest_run", "raw_object", "source_master_change", "source_day", "source_day_part", "backfill_task", "db_size"] },
 ]
 

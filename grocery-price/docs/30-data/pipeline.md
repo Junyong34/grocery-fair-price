@@ -158,7 +158,7 @@ where n.nspname = 'price' and c.relkind in ('r','p','v','m')
 
 `web_reader`가 읽는 표 (화면이 쓰는 것만):
 - 분류: `category`, `item`, `variety`, `spec`, `alias`, `variety_seasonal_map` (검색, 이름)
-- 집계·판정: `daily_quote`, `product_daily_summary`, `reference_price`, `usual_price`, `judgment_current`, `judgment_snapshot`, 뷰 `current_judgment` (3-4)
+- 집계·판정: `daily_quote`, `product_daily_summary`, `reference_price`, `usual_price`, `judgment_current`, `judgment_snapshot`, `product_snapshot`, 뷰 `current_judgment`·`current_product` (3-4)
 - 상품: `product`, `product_attr_history` (이름·용량 표시)
 - 이름표: `seller` (`product_daily_summary`의 `seller:` 범위, 업태별 가격), `region` (시도 범위 이름)
 - 보류: 상품 화면의 "최근 조사일 점포별 가격" 블록을 ③에서 확정하면 `observation`(참가격 행만, RLS `using (product_id is not null)`), `obs_place`, `store`를 더한다. 그 전에는 열지 않는다.
@@ -225,6 +225,7 @@ create policy web_select on price.<표> for select to web_reader    using (true)
 | 3-4 | `product_daily_summary` | 상품별 일자 요약 | ○ |
 | 3-4 | `reference_price`, `usual_price` | 평년 등 비교값 / 평소가 | ○ |
 | 3-4 | `judgment_batch`, `judgment_current`, `judgment_snapshot`, 뷰 `current_judgment` | 판정 스냅샷 묶음 / 현재 묶음 포인터 / 품종·규격별 판정 / 현재 묶음의 판정 | ○ (`judgment_batch` 제외) |
+| 3-4 | `product_snapshot`, 뷰 `current_product` | 참가격 상품별 화면 payload (판정 묶음과 같은 묶음, 판정 없음, catalog-scale/09) / 현재 묶음의 상품 payload | ○ |
 | 3-4 | `calc_param` | 계산 상수 (정해진 값과 ②에서 정할 자리) | |
 | 3-5 | `ingest_run`, `source_day`, `source_day_part`, `backfill_task` | 수집 실행 / 출처 × 대상 날짜 상태 / 부분 누락 단위 / 백필 진행 | |
 | 3-6 | `product`, `product_source_key`, `product_attr_history`, `product_variety_map`, `al_variety_rule` | 상품 / 출처 키 → 상품 / 상품 속성 이력 / 상품 → 품종 / AL 소분류 → 품종 기본값 | ○ (`product`, `product_attr_history`) |

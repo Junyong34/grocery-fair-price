@@ -152,3 +152,71 @@ export const searchIndexSchema = z.object({
   /** 카테고리 이름, 보여 줄 순서대로 */
   categories: z.array(z.string()).readonly(),
 })
+
+/** 참가격 업태. 판매처(seller.channel)와 상품 요약 범위 `channel:<업태>`의 값이다. */
+export const channelSchema = z.enum(["large_mart", "ssm", "department", "convenience"])
+
+/** 업태 하나의 판매가 요약(상품 요약의 channel:* 범위). */
+export const productChannelSchema = z.object({
+  channel: channelSchema,
+  median: z.number(),
+  min: z.number(),
+  max: z.number(),
+  /** 조사 점포 수 */
+  stores: z.number(),
+})
+
+/** 판매처 하나의 판매가 요약(상품 요약의 seller:* 범위). 같은 판매처도 점포마다 값이 다를 수 있다. */
+export const productSellerSchema = z.object({
+  /** "이마트" */
+  seller: z.string(),
+  channel: channelSchema,
+  /** 대표 가격: 점포들의 중간값 */
+  price: z.number(),
+  min: z.number(),
+  max: z.number(),
+  stores: z.number(),
+  /** 행사 중인 점포가 있다. 참가격이 행사 여부를 주지 않으면 false */
+  promo: z.boolean(),
+})
+
+/** 상품 추이의 조사일 하나: 전국 중간값과 최저값. */
+export const productTrendPointSchema = z.object({
+  date: z.string(),
+  median: z.number(),
+  min: z.number(),
+})
+
+/**
+ * 상품 상세 하나(참가격 상품, catalog-scale/09). product_snapshot.payload 한 행 그대로다.
+ * 상품은 판정을 내지 않는다. 최근 조사일의 판매가와 업태·판매처별 비교, 추이만 보인다.
+ */
+export const productDetailSchema = z.object({
+  /** 참가격 상품 번호(goodId). URL에 쓴다 */
+  id: z.string(),
+  name: z.string(),
+  /** 품목 이름. 품목을 정하지 않았으면 참가격 소분류 이름 */
+  item: z.string(),
+  /** 카테고리 이름 */
+  category: z.string(),
+  /** 용량 표시("500g", "1.5L", "10개"). 모르면 null */
+  size: z.string().nullable(),
+  /** 기준 단위당 가격(전국 중간값 기준). g·ml·여러 개 묶음만 낸다 */
+  perUnit: z.object({ unit: z.string(), price: z.number() }).nullable(),
+  /** 최근 조사일의 전국 중간값(원, 상품 한 개) */
+  price: z.number(),
+  range: z.object({ min: z.number(), max: z.number(), stores: z.number() }),
+  /** 최근 조사일 */
+  surveyedOn: z.string(),
+  /** active: 최근 조사에 있다. stale: 최근 조사에서 빠졌다. discontinued: 참가격이 더 조사하지 않는다 */
+  status: z.enum(["active", "stale", "discontinued"]),
+  /** 업태별, 중간값 싼 순 */
+  channels: z.array(productChannelSchema).readonly(),
+  /** 판매처별, 가격 싼 순 */
+  sellers: z.array(productSellerSchema).readonly(),
+  /** 최근 조사일들, 날짜 오름차순 */
+  trend: z.array(productTrendPointSchema).readonly(),
+  /** 이 상품 가격이 시세로 쓰이는 품종 slug. 없으면 null */
+  varietyId: z.string().nullable(),
+  basis: quoteBasisSchema,
+})

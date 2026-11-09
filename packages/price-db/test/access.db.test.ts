@@ -16,7 +16,7 @@ const PERMISSION_DENIED = "42501"
 const READ_ONLY_TRANSACTION = "25006"
 
 describe("마이그레이션 결과", () => {
-  test("표 40개, 뷰 1개가 모두 RLS를 켜고 있다", async () => {
+  test("price의 표가 모두 RLS를 켜고 있고, 뷰는 current_judgment·current_product뿐이다", async () => {
     const rows = await admin<{ relname: string; relkind: string; relrowsecurity: boolean }[]>`
       select c.relname, c.relkind, c.relrowsecurity
       from pg_class c join pg_namespace n on n.oid = c.relnamespace
@@ -24,7 +24,7 @@ describe("마이그레이션 결과", () => {
     const tables = rows.filter((r) => r.relkind === "r")
     expect(tables.map((r) => r.relname).sort()).toEqual([...PRICE_TABLES].sort())
     expect(tables.filter((r) => !r.relrowsecurity)).toEqual([])
-    expect(rows.filter((r) => r.relkind === "v").map((r) => r.relname)).toEqual(["current_judgment"])
+    expect(rows.filter((r) => r.relkind === "v").map((r) => r.relname).sort()).toEqual(["current_judgment", "current_product"])
   })
 
   test("롤은 로그인만 되고 superuser·상속·롤 생성이 없으며, web_reader는 읽기 전용이다", async () => {
@@ -78,7 +78,7 @@ describe("(2) web_reader는 읽기 표가 아닌 표를 못 읽고 아무 표에
 
 describe("(3) anon·authenticated는 price의 어느 표도 못 읽는다", () => {
   for (const role of ["anon", "authenticated"] as const) {
-    test.each([...PRICE_TABLES, "current_judgment"])(`${role}: %s`, async (table) => {
+    test.each([...PRICE_TABLES, "current_judgment", "current_product"])(`${role}: %s`, async (table) => {
       const state = await sqlState(() =>
         inRollback(admin, async (tx) => {
           await tx.unsafe(`set local role ${role}`)
