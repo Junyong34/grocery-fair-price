@@ -1,6 +1,6 @@
 # 02 재료별 궁합 페이지 `/baby-food/pairings/[ingredient]`
 
-Status: ready-for-agent
+Status: done (2026-11-09)
 Blocked by: 01
 
 스펙: `../spec.md` "페이지 구성", "검색 메타", "라우팅·레이어"
@@ -23,3 +23,15 @@ Blocked by: 01
 - 결과 화면(`/baby-food/result?food=소고기`)에서 재료 페이지 링크가 모달이 아닌 전체 페이지로 열린다.
 - `next-dev-loop`로 375·1280 폭에서 확인하고, 콘솔 오류와 hydration 경고가 없다.
 - `pnpm typecheck`, `pnpm lint`, `pnpm test`가 통과한다.
+
+## 결과 (2026-11-09)
+
+- 25개 재료를 색인해요. noindex는 배추·우엉·블루베리·조개·연어·콩이에요. 판단은 `isPairingPageIndexable`이 하고, 사람이 쓴 본문(`INFANT_PAIRING_COPY.ingredients`, 04)이 있으면 색인해요.
+- `/baby-food/pairings/nope`은 200 + noindex로 나와요. 제철 상세와 같은 soft 404예요.
+- 공용 칩·자료 문단은 `pairing-items.tsx`·`pairing-source.tsx`·`ingredient-art.tsx`로 나눴어요.
+- `babyFoodIngredientSeo`는 `row`만 받아요. 역참조 인자는 쓸 곳이 없어서 뺐어요.
+- 375·1280 폭에서 확인했어요(beef·milk·broccoli·egg). 콘솔 오류와 hydration 경고는 없었어요.
+- 확인하지 못한 것:
+  - dev 서버의 `/sitemap.xml`은 HMR이 옛 `routes.ts`를 붙잡고 있어서 500이었어요. 펼친 목록은 `pages.test.ts`로만 확인했어요.
+  - 결과 화면에서 모달이 아닌 전체 페이지로 열리는지는, 링크가 생기는 03에서 확인해요.
+

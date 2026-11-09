@@ -2,6 +2,7 @@
 // 빠뜨리면 pages.test.ts(가드 테스트)가 실패한다. 절차와 근거: apps/web/docs/seo.md, .scratch/seo/spec.md
 
 import { FESTIVALS } from "@workspace/seasonal/data/festivals"
+import { INDEXABLE_PAIRINGS } from "@workspace/seasonal/data/infant-pairings"
 import { FOODS, isDrawn } from "@workspace/seasonal/data/foods"
 import { MONTHS } from "@workspace/seasonal/data/months"
 import { SEASONS } from "@workspace/seasonal/data/seasons"
@@ -34,6 +35,8 @@ export const SEO_PAGES: Readonly<Record<string, () => readonly SitemapEntry[]>> 
   "/seasonal/seasons": () => [{ path: routes.seasonal.seasons }],
   "/seasonal/downloads": () => [{ path: routes.seasonal.downloads }],
   "/baby-food/pairings": () => [{ path: routes.babyFood.pairings }],
+  // 재료별 궁합. 관계가 적은 재료는 페이지만 두고 noindex라 펼치지 않는다(isPairingPageIndexable).
+  "/baby-food/pairings/[ingredient]": () => INDEXABLE_PAIRINGS.map(({ id }) => ({ path: routes.babyFood.ingredient(id) })),
   "/privacy": () => [{ path: routes.privacy }],
   // 게시된 에디션 상세. 썸네일을 이미지 sitemap으로 알린다. PDF 파일 주소는 색인하지 않는다(ADR 0003).
   "/seasonal/downloads/[edition]": () =>

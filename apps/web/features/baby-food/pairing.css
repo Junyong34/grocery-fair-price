@@ -360,3 +360,66 @@ button.pairing-item {
     min-height: 44px;
   }
 }
+
+/* 재료별 궁합 페이지(baby-food-ingredient-pages/02) */
+.pairing-ingredient-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.pairing-ingredient-head .pairing-art {
+  width: 56px;
+  height: 56px;
+  flex: none;
+}
+.pairing-ingredient-section {
+  display: grid;
+  gap: 10px;
+  border-top: 1px solid var(--color-hairline);
+  padding-block: 16px 18px;
+}
+.pairing-ingredient-section h2 {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+}
+.pairing-ingredient-section[data-sign="O"] h2 {
+  color: var(--color-forest);
+}
+.pairing-ingredient-section[data-sign="X"] h2 {
+  color: var(--color-clay);
+}
+.pairing-note {
+  color: var(--color-stone);
+  font-size: 14px;
+}
+.pairing-base-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  font-size: 14px;
+  color: var(--color-stone);
+}
+.pairing-base-links a,
+.pairing-mentions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  color: var(--color-pair-base-foreground);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.pairing-mentions {
+  display: grid;
+  gap: 2px;
+}
+.pairing-mentions strong[data-sign="O"] {
+  color: var(--color-forest);
+}
+.pairing-mentions strong[data-sign="X"] {
+  color: var(--color-clay);
+}
+.pairing-next {
+  margin-top: 22px;
+}

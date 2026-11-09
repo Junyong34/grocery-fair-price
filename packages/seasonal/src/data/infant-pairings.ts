@@ -1,5 +1,8 @@
 // 이유식 재료 궁합표. docs/food-pairing-image-analysis.md 2절의 전사다. O·X는 원본의 분류이고, 의학적 사실로 쓰지 않는다.
 // 앱의 그림 경로(PAIRING_ART)와 참고 링크(PAIRING_REFERENCES)는 apps/web/features/baby-food/data.ts에 있다.
+
+import { INFANT_PAIRING_COPY } from "./copy"
+
 export type IngredientCategory = "채소" | "과일" | "육류·수산" | "기타"
 
 export type PairingRow = {
@@ -591,3 +594,36 @@ export function isPairingIndexable(
 ): boolean {
   return hasCopy || pairingRelationCount(row) >= PAIRING_INDEX_MIN_RELATIONS
 }
+
+/** 표 안의 재료 이름(item)으로 기준 재료를 찾는다. "브로콜리"·"콜리플라워"는 broccoli 표다. */
+export function findPairingByName(item: string): PairingRow | undefined {
+  return PAIRINGS.find((row) => termsOf(row.name).includes(item))
+}
+
+/** 본문에 함께 적는 별칭. 검색어("달걀 이유식", "대구살 이유식")를 받는다. */
+const PAIRING_ALIASES: Readonly<Partial<Record<string, string>>> = {
+  egg: "달걀",
+  "white-fish-fillet": "대구·가자미 등",
+}
+
+/** 화면과 제목에 쓰는 이름. "브로콜리/콜리플라워"는 "브로콜리·콜리플라워"로, alias면 "계란(달걀)"처럼 별칭을 붙인다. */
+export function pairingDisplayName(
+  row: PairingRow,
+  { alias = false }: { alias?: boolean } = {}
+): string {
+  const name = row.name.replaceAll("/", "·")
+  const extra = alias ? PAIRING_ALIASES[row.id] : undefined
+  return extra ? `${name}(${extra})` : name
+}
+
+/** 재료별 페이지의 색인 여부. 사람이 쓴 본문은 INFANT_PAIRING_COPY.ingredients(04)에 있다. */
+export function isPairingPageIndexable(row: PairingRow): boolean {
+  return isPairingIndexable(row, {
+    hasCopy: row.id in INFANT_PAIRING_COPY.ingredients,
+  })
+}
+
+/** 색인하고 sitemap에 넣는 재료별 페이지. */
+export const INDEXABLE_PAIRINGS: readonly PairingRow[] = PAIRINGS.filter(
+  isPairingPageIndexable
+)

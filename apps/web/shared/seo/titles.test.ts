@@ -2,10 +2,12 @@ import { describe, expect, it } from "vitest"
 
 import { FESTIVALS } from "@workspace/seasonal/data/festivals"
 import { findFood, FOODS } from "@workspace/seasonal/data/foods"
+import { findPairing, PAIRINGS } from "@workspace/seasonal/data/infant-pairings"
 import { MONTHS } from "@workspace/seasonal/data/months"
 import { SEASONS } from "@workspace/seasonal/data/seasons"
 
 import {
+  babyFoodIngredientSeo,
   babyFoodPairingsSeo,
   downloadsSeo,
   editionSeoTitle,
@@ -27,6 +29,7 @@ const all = [
   seasonalHomeSeo(),
   downloadsSeo(),
   babyFoodPairingsSeo(31),
+  ...PAIRINGS.map(babyFoodIngredientSeo),
   monthsIndexSeo(),
   ...MONTHS.map(monthSeo),
   seasonsIndexSeo(),
@@ -74,6 +77,16 @@ describe("페이지 제목·설명", () => {
     expect(seo.description).toBe(
       "비비고 사골곰탕(500g) 전국 판매가 1,980원(10/23 참가격 조사). 이마트·편의점 등 판매처 3곳 가격을 견줘 보세요."
     )
+  })
+
+  it("재료별 이유식 궁합은 O·X 수와 앞의 재료 이름을 넣는다", () => {
+    const beef = babyFoodIngredientSeo(findPairing("beef")!)
+    expect(beef.title).toBe("소고기 이유식 궁합 · 잘 맞는 재료와 상극 재료")
+    expect(beef.description).toBe("소고기 이유식에 잘 맞는 재료는 브로콜리·시금치·비타민 등 16가지, 주의할 재료는 부추·밤·고구마예요. 이유식 조합을 고를 때 참고하세요.")
+    const onion = babyFoodIngredientSeo(findPairing("onion")!)
+    expect(onion.title).toBe("양파 이유식 궁합 · 잘 맞는 재료 8가지")
+    expect(onion.description).not.toContain("주의할 재료")
+    expect(babyFoodIngredientSeo(findPairing("broccoli")!).title).toContain("브로콜리·콜리플라워 이유식 궁합")
   })
 
   it("다운로드 설명에 무료 제공과 파일 형식을 안내한다", () => {

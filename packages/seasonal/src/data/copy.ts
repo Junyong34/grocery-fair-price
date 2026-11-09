@@ -369,6 +369,14 @@ export const SASHIMI_COPY = {
 } as const
 
 /** 이유식 궁합표의 원본 분류와 근거 설명. */
+/** 재료별 궁합 페이지의 사람이 쓴 본문. 문장마다 출처를 확인하고 검토일을 적는다. */
+export type InfantPairingIngredientCopy = {
+  paragraphs: readonly string[]
+  sources: readonly { title: string; href: string }[]
+  /** 검토일(YYYY-MM-DD) */
+  reviewedOn: string
+}
+
 export const INFANT_PAIRING_COPY = {
   catalog: (count: number) =>
     `당근·고구마·애호박 등 이유식 재료 ${count}개의 궁합을 찾아보세요. 재료 이름으로 검색하거나, 집에 있는 재료를 골라 조합을 확인할 수 있어요.`,
@@ -377,6 +385,16 @@ export const INFANT_PAIRING_COPY = {
   limit: "모든 관계가 영유아 대상으로 검증된 것은 아닙니다. X만으로 섭취 금지를 뜻하지 않으며, 목록에 없는 조합은 판단하지 않습니다.",
   conflict: "원본에서 우유와 고구마·시금치는 O와 X 양쪽에 적혀 있습니다. 함께 조리하는 예가 있지만 특별한 영양 상승효과를 뜻하지는 않습니다. 우유의 사용 형태와 월령, 알레르기, 시금치 자체의 섭취 조건을 함께 확인하세요.",
   conflictBadge: "O·X 중복",
+  /** 재료별 페이지(/baby-food/pairings/[id])의 사람이 쓴 본문(baby-food-ingredient-pages/04). 키는 기준 재료 id. 있으면 관계 수와 상관없이 색인한다. */
+  ingredients: {} as Readonly<Partial<Record<string, InfantPairingIngredientCopy>>>,
+  /** 재료별 궁합 페이지 첫 문단. name은 별칭을 붙인 이름 */
+  ingredientLead: (name: string, good: number, bad: number) =>
+    `${name} 이유식에 함께 넣기 좋은 재료 ${good}가지${bad > 0 ? `와 주의할 재료 ${bad}가지` : ""}를 원본 궁합표에서 옮겼어요. O는 원본의 잘 맞는 목록, X는 원본의 주의 목록이에요.`,
+  mentionsNote: (name: string) => `다른 기준 재료의 표에 ${josa(name, "이/가")} 적힌 곳이에요. 방향이 반대인 관계라 위 목록과 다를 수 있어요.`,
+  /** 역참조 한 줄의 뒷부분. "고구마 표" 링크 뒤에 붙는다. */
+  mentionTail: (name: string) => `에서 ${josa(name, "은/는")}`,
+  /** 제철 품종 상세에서 재료별 궁합 페이지로 가는 링크 */
+  foodLink: "이유식 궁합 보기",
   cautionTitle: "이유식 급여 전 확인",
   verdictLabels: {
     conflict: "원본 O·X 중복 표기 · 이유식 조리 가능",

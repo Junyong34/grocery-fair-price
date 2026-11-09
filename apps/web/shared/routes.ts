@@ -64,6 +64,8 @@ export const routes = {
     root: "/baby-food",
     result: "/baby-food/result",
     pairings: "/baby-food/pairings",
+    /** 기준 재료별 궁합 페이지. id는 PAIRINGS의 영문 id(제철 품종 id와 같다) */
+    ingredient: (id: string) => `/baby-food/pairings/${id}`,
     withSelection: (path: "/baby-food" | "/baby-food/result" | "/baby-food/pairings", names: readonly string[]) => {
       const params = new URLSearchParams()
       for (const name of names) params.append("food", name)

@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest"
 
 import {
   findPairing,
+  findPairingByName,
+  INDEXABLE_PAIRINGS,
   isPairingIndexable,
+  isPairingPageIndexable,
+  pairingDisplayName,
   pairingMentions,
   pairingRelationCount,
   PAIRINGS,
@@ -104,5 +108,29 @@ describe("infant-pairings", () => {
         (pairing) => !isPairingIndexable(pairing, { hasCopy: false })
       )
     ).toHaveLength(6)
+  })
+
+  it("findPairingByName은 표 안의 재료 이름으로 기준 재료를 찾는다", () => {
+    expect(findPairingByName("소고기")?.id).toBe("beef")
+    expect(findPairingByName("브로콜리")?.id).toBe("broccoli")
+    expect(findPairingByName("콜리플라워")?.id).toBe("broccoli")
+    expect(findPairingByName("밤")).toBeUndefined()
+  })
+
+  it("pairingDisplayName은 /를 ·로 바꾸고 별칭을 괄호로 붙인다", () => {
+    expect(pairingDisplayName(row("브로콜리/콜리플라워"))).toBe(
+      "브로콜리·콜리플라워"
+    )
+    expect(pairingDisplayName(row("계란"), { alias: true })).toBe("계란(달걀)")
+    expect(pairingDisplayName(row("흰살생선"), { alias: true })).toBe(
+      "흰살생선(대구·가자미 등)"
+    )
+    expect(pairingDisplayName(row("계란"))).toBe("계란")
+  })
+
+  it("INDEXABLE_PAIRINGS는 사람이 쓴 본문이 없을 때 관계 수 5 이상인 재료다", () => {
+    expect(INDEXABLE_PAIRINGS).toHaveLength(25)
+    expect(INDEXABLE_PAIRINGS.every(isPairingPageIndexable)).toBe(true)
+    expect(isPairingPageIndexable(row("배추"))).toBe(false)
   })
 })

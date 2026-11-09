@@ -12,7 +12,7 @@ import { PAIRING_CATEGORIES, PAIRINGS } from "@workspace/seasonal/data/infant-pa
 import { routes } from "@/shared/routes"
 import { SubHeader } from "@/shared/shell/sub-header"
 
-import { IngredientArt } from "./pairing-grid"
+import { IngredientArt } from "./ingredient-art"
 
 export function IngredientPicker({
   selected,

@@ -1,39 +1,7 @@
-import Image from "next/image"
+import type { PairingRow } from "@workspace/seasonal/data/infant-pairings"
 
-import { INFANT_PAIRING_COPY } from "@workspace/seasonal/data/copy"
-import {
-  isMilkDuplicateConflict,
-  matchesSelectedIngredient,
-  type PairingRow,
-} from "@workspace/seasonal/data/infant-pairings"
-
-import { PAIRING_ART } from "./data"
-import { PairingEvidence } from "./pairing-evidence"
-
-export function IngredientArt({ name }: { name: string }) {
-  const paths =
-    name === "브로콜리/콜리플라워"
-      ? [PAIRING_ART["브로콜리"], PAIRING_ART["콜리플라워"]]
-      : [PAIRING_ART[name]]
-  return (
-    <span className="pairing-art" aria-hidden="true">
-      {paths.map((path, index) =>
-        path ? (
-          <Image
-            key={path}
-            src={path}
-            alt=""
-            width={64}
-            height={64}
-            unoptimized
-          />
-        ) : (
-          <span key={index} className="pairing-placeholder" />
-        )
-      )}
-    </span>
-  )
-}
+import { IngredientArt } from "./ingredient-art"
+import { PairingItems } from "./pairing-items"
 
 export function PairingGrid({
   rows,
@@ -79,49 +47,13 @@ export function PairingGrid({
                     key={sign}
                     className={sign === "X" ? "pairing-bad" : undefined}
                   >
-                    <ul className="pairing-items">
-                      {names.map((name) => {
-                        const isConflict =
-                          row.name === "우유" &&
-                          sign === "X" &&
-                          isMilkDuplicateConflict(row.name, name)
-                        const ingredient = (
-                          <>
-                            <IngredientArt name={name} />
-                            <span>
-                              {name}
-                              {isConflict && (
-                                <small className="pairing-conflict-note">
-                                  {" "}
-                                  ({INFANT_PAIRING_COPY.conflictBadge})
-                                </small>
-                              )}
-                            </span>
-                          </>
-                        )
-                        return (
-                          <li key={name}>
-                            {printable ? (
-                              <span className="pairing-item">
-                                {ingredient}
-                              </span>
-                            ) : (
-                              <PairingEvidence
-                                base={row.name}
-                                name={name}
-                                sign={sign}
-                                selected={matchesSelectedIngredient(
-                                  name,
-                                  selected
-                                )}
-                              >
-                                {ingredient}
-                              </PairingEvidence>
-                            )}
-                          </li>
-                        )
-                      })}
-                    </ul>
+                    <PairingItems
+                      base={row.name}
+                      sign={sign}
+                      names={names}
+                      selected={selected}
+                      printable={printable}
+                    />
                   </td>
                 ))}
               </tr>

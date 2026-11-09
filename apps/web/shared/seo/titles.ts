@@ -9,6 +9,7 @@ import { SEASON_COPY } from "@workspace/seasonal/data/copy"
 import { dishNames } from "@workspace/seasonal/data/dishes"
 import { type Festival, festivalOf, festivalsWithFood } from "@workspace/seasonal/data/festivals"
 import { type Food, foodsInMonth, foodsInSeasonWith, monthHighlights, seasonHighlights } from "@workspace/seasonal/data/foods"
+import { type PairingRow, pairingDisplayName } from "@workspace/seasonal/data/infant-pairings"
 import { sashimiInMonth } from "@workspace/seasonal/data/sashimi"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 import type { Season } from "@workspace/seasonal/data/seasons"
@@ -23,6 +24,24 @@ export function babyFoodPairingsSeo(count: number): PageSeo {
   return {
     title: "이유식 재료 궁합표 · 잘 맞는 조합과 상극 재료",
     description: `소고기·닭고기·고구마·당근 등 이유식 재료 ${count}개의 궁합표. 재료마다 함께 넣기 좋은 조합과 주의할 상극 재료를 O·X로 정리했어요. 집에 있는 재료를 골라 바로 확인해 보세요.`,
+  }
+}
+
+/** 앞에서 셋까지 ·로 잇고, 더 있으면 "등"을 붙인다. */
+function firstThree(names: readonly string[]): string {
+  return names.length > 3 ? `${names.slice(0, 3).join("·")} 등` : names.join("·")
+}
+
+/**
+ * 재료별 이유식 궁합(baby-food-ingredient-pages). 구글은 "[재료] 이유식 궁합", 네이버는 "[재료] 이유식 조합"으로 찾는다.
+ * 제목의 "상극"은 검색어다. 본문은 X를 원본의 주의 목록으로만 보인다.
+ */
+export function babyFoodIngredientSeo(row: PairingRow): PageSeo {
+  const name = pairingDisplayName(row)
+  const bad = row.bad.length > 0 ? `, 주의할 재료는 ${firstThree(row.bad)}예요` : "예요"
+  return {
+    title: row.bad.length > 0 ? `${name} 이유식 궁합 · 잘 맞는 재료와 상극 재료` : `${name} 이유식 궁합 · 잘 맞는 재료 ${row.good.length}가지`,
+    description: `${name} 이유식에 잘 맞는 재료는 ${firstThree(row.good)} ${row.good.length}가지${bad}. 이유식 조합을 고를 때 참고하세요.`,
   }
 }
 
