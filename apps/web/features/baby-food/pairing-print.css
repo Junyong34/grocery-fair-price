@@ -37,10 +37,11 @@
   padding: 2mm 0 3mm;
 }
 .pairing-paper .pairing-entry-title {
-  min-height: 6mm;
+  min-block-size: 7mm;
   gap: 1mm;
-  margin-bottom: 1mm;
-  font-size: 12pt;
+  margin-block-end: 1mm;
+  font-size: 14pt;
+  line-height: 1.15;
 }
 .pairing-paper .pairing-entry-title .pairing-art {
   width: 7mm;
@@ -50,27 +51,38 @@
 .pairing-paper .pairing-entry td {
   padding: 0.7mm;
   font-size: 9pt;
+  text-align: start;
 }
 .pairing-paper .pairing-entry th {
   text-align: center;
+  background: var(--color-sage-wash);
+}
+.pairing-paper .pairing-entry th:last-child {
+  background: color-mix(in srgb, var(--color-clay) 12%, var(--color-canvas));
+}
+.pairing-paper .pairing-entry :is(th, td):nth-child(2) {
+  border-inline-start: 0.25mm solid var(--color-silver);
 }
 .pairing-paper .pairing-entry td > .text-sm {
   font-size: 8pt;
 }
 .pairing-paper .pairing-items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35mm 0.8mm;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.35mm;
 }
 .pairing-paper .pairing-item {
-  min-height: 5.4mm;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  min-block-size: 4.6mm;
   padding: 0;
   gap: 0.7mm;
-  font-size: 11pt;
+  text-align: start;
+  font-size: 10pt;
 }
 .pairing-paper .pairing-item .pairing-art {
-  width: 5.4mm;
-  height: 5.4mm;
+  inline-size: 4.6mm;
+  block-size: 4.6mm;
 }
 .pairing-paper .pairing-placeholder {
   border-width: 0.2mm;
@@ -117,7 +129,6 @@
   }
 }
 
-
 /* 에디션 미리보기 iframe의 여백은 기존 인쇄 루트가 맡는다. */
 .pairing-edition-print .pairing-print-document {
   padding: 0;
@@ -127,5 +138,7 @@
   margin-bottom: var(--print-gutter);
 }
 @media print {
-  .pairing-edition-print .pairing-paper { margin-bottom: 0; }
+  .pairing-edition-print .pairing-paper {
+    margin-bottom: 0;
+  }
 }
