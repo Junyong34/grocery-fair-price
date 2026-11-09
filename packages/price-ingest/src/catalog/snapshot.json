@@ -193,6 +193,36 @@
       "category": "dairy"
     },
     {
+      "slug": "formula",
+      "name": "분유",
+      "category": "dairy"
+    },
+    {
+      "slug": "soy-milk",
+      "name": "두유",
+      "category": "dairy"
+    },
+    {
+      "slug": "yogurt",
+      "name": "발효유",
+      "category": "dairy"
+    },
+    {
+      "slug": "cheese",
+      "name": "치즈",
+      "category": "dairy"
+    },
+    {
+      "slug": "butter",
+      "name": "버터",
+      "category": "dairy"
+    },
+    {
+      "slug": "margarine",
+      "name": "마가린",
+      "category": "dairy"
+    },
+    {
       "slug": "mackerel",
       "name": "고등어",
       "category": "seafood"
@@ -226,6 +256,426 @@
       "slug": "seasoning",
       "name": "양념",
       "category": "sauces"
+    },
+    {
+      "slug": "gochujang",
+      "name": "고추장",
+      "category": "sauces"
+    },
+    {
+      "slug": "curry",
+      "name": "카레",
+      "category": "sauces"
+    },
+    {
+      "slug": "cooking-oil",
+      "name": "식용유",
+      "category": "sauces"
+    },
+    {
+      "slug": "flour",
+      "name": "밀가루",
+      "category": "sauces"
+    },
+    {
+      "slug": "pancake-mix",
+      "name": "부침가루",
+      "category": "sauces"
+    },
+    {
+      "slug": "mayonnaise",
+      "name": "마요네즈",
+      "category": "sauces"
+    },
+    {
+      "slug": "soy-sauce",
+      "name": "간장",
+      "category": "sauces"
+    },
+    {
+      "slug": "sugar",
+      "name": "설탕",
+      "category": "sauces"
+    },
+    {
+      "slug": "vinegar",
+      "name": "식초",
+      "category": "sauces"
+    },
+    {
+      "slug": "ketchup",
+      "name": "케첩",
+      "category": "sauces"
+    },
+    {
+      "slug": "dressing",
+      "name": "드레싱",
+      "category": "sauces"
+    },
+    {
+      "slug": "jam",
+      "name": "잼",
+      "category": "sauces"
+    },
+    {
+      "slug": "seasoning-mix",
+      "name": "혼합조미료",
+      "category": "sauces"
+    },
+    {
+      "slug": "corn-syrup",
+      "name": "물엿",
+      "category": "sauces"
+    },
+    {
+      "slug": "wasabi",
+      "name": "고추냉이",
+      "category": "sauces"
+    },
+    {
+      "slug": "sesame-oil",
+      "name": "참기름",
+      "category": "sauces"
+    },
+    {
+      "slug": "doenjang",
+      "name": "된장",
+      "category": "sauces"
+    },
+    {
+      "slug": "ssamjang",
+      "name": "쌈장",
+      "category": "sauces"
+    },
+    {
+      "slug": "honey",
+      "name": "꿀",
+      "category": "sauces"
+    },
+    {
+      "slug": "smoked-duck",
+      "name": "훈제오리",
+      "category": "deli"
+    },
+    {
+      "slug": "tofu",
+      "name": "두부",
+      "category": "deli"
+    },
+    {
+      "slug": "crab-stick",
+      "name": "맛살",
+      "category": "deli"
+    },
+    {
+      "slug": "fish-cake",
+      "name": "어묵",
+      "category": "deli"
+    },
+    {
+      "slug": "sausage",
+      "name": "소시지",
+      "category": "deli"
+    },
+    {
+      "slug": "ham",
+      "name": "햄",
+      "category": "deli"
+    },
+    {
+      "slug": "bacon",
+      "name": "베이컨",
+      "category": "deli"
+    },
+    {
+      "slug": "cup-ramen",
+      "name": "컵라면",
+      "category": "noodles"
+    },
+    {
+      "slug": "glass-noodles",
+      "name": "당면",
+      "category": "noodles"
+    },
+    {
+      "slug": "ramen",
+      "name": "라면",
+      "category": "noodles"
+    },
+    {
+      "slug": "pasta",
+      "name": "파스타면",
+      "category": "noodles"
+    },
+    {
+      "slug": "udon",
+      "name": "우동",
+      "category": "noodles"
+    },
+    {
+      "slug": "naengmyeon",
+      "name": "냉면",
+      "category": "noodles"
+    },
+    {
+      "slug": "noodles-dry",
+      "name": "국수",
+      "category": "noodles"
+    },
+    {
+      "slug": "soup-stew",
+      "name": "국·탕",
+      "category": "ready-meals"
+    },
+    {
+      "slug": "cup-rice",
+      "name": "컵밥",
+      "category": "ready-meals"
+    },
+    {
+      "slug": "instant-rice",
+      "name": "즉석밥",
+      "category": "ready-meals"
+    },
+    {
+      "slug": "instant-porridge",
+      "name": "즉석죽",
+      "category": "ready-meals"
+    },
+    {
+      "slug": "frozen-dumplings",
+      "name": "냉동만두",
+      "category": "ready-meals"
+    },
+    {
+      "slug": "frozen-cutlet",
+      "name": "냉동돈가스",
+      "category": "ready-meals"
+    },
+    {
+      "slug": "hot-dog",
+      "name": "핫도그",
+      "category": "ready-meals"
+    },
+    {
+      "slug": "tteokbokki",
+      "name": "떡볶이",
+      "category": "ready-meals"
+    },
+    {
+      "slug": "chicken-nuggets",
+      "name": "치킨너겟",
+      "category": "ready-meals"
+    },
+    {
+      "slug": "fried-rice",
+      "name": "볶음밥",
+      "category": "ready-meals"
+    },
+    {
+      "slug": "inari",
+      "name": "유부초밥",
+      "category": "ready-meals"
+    },
+    {
+      "slug": "rice-bowl-sauce",
+      "name": "즉석덮밥",
+      "category": "ready-meals"
+    },
+    {
+      "slug": "soup-mix",
+      "name": "스프",
+      "category": "ready-meals"
+    },
+    {
+      "slug": "energy-bar",
+      "name": "에너지바",
+      "category": "snacks"
+    },
+    {
+      "slug": "chocolate-bar",
+      "name": "초코바",
+      "category": "snacks"
+    },
+    {
+      "slug": "ice-cream",
+      "name": "아이스크림",
+      "category": "snacks"
+    },
+    {
+      "slug": "candy",
+      "name": "사탕",
+      "category": "snacks"
+    },
+    {
+      "slug": "snack",
+      "name": "스낵",
+      "category": "snacks"
+    },
+    {
+      "slug": "choco-pie",
+      "name": "초코파이",
+      "category": "snacks"
+    },
+    {
+      "slug": "chocolate",
+      "name": "초콜릿",
+      "category": "snacks"
+    },
+    {
+      "slug": "traditional-snack",
+      "name": "전통과자",
+      "category": "snacks"
+    },
+    {
+      "slug": "jelly",
+      "name": "젤리",
+      "category": "snacks"
+    },
+    {
+      "slug": "processed-fruit",
+      "name": "과일가공품",
+      "category": "snacks"
+    },
+    {
+      "slug": "baby-food",
+      "name": "이유식",
+      "category": "snacks"
+    },
+    {
+      "slug": "gum",
+      "name": "껌",
+      "category": "snacks"
+    },
+    {
+      "slug": "cracker",
+      "name": "크래커",
+      "category": "snacks"
+    },
+    {
+      "slug": "ice-pop",
+      "name": "빙과",
+      "category": "snacks"
+    },
+    {
+      "slug": "energy-drink",
+      "name": "에너지음료",
+      "category": "beverages"
+    },
+    {
+      "slug": "cola",
+      "name": "콜라",
+      "category": "beverages"
+    },
+    {
+      "slug": "makgeolli",
+      "name": "막걸리",
+      "category": "beverages"
+    },
+    {
+      "slug": "beer",
+      "name": "맥주",
+      "category": "beverages"
+    },
+    {
+      "slug": "vitamin-drink",
+      "name": "비타민음료",
+      "category": "beverages"
+    },
+    {
+      "slug": "juice",
+      "name": "주스",
+      "category": "beverages"
+    },
+    {
+      "slug": "canned-coffee",
+      "name": "캔커피",
+      "category": "beverages"
+    },
+    {
+      "slug": "coffee-mix",
+      "name": "커피믹스",
+      "category": "beverages"
+    },
+    {
+      "slug": "cider",
+      "name": "사이다",
+      "category": "beverages"
+    },
+    {
+      "slug": "water",
+      "name": "생수",
+      "category": "beverages"
+    },
+    {
+      "slug": "sports-drink",
+      "name": "이온음료",
+      "category": "beverages"
+    },
+    {
+      "slug": "protein-drink",
+      "name": "단백질음료",
+      "category": "beverages"
+    },
+    {
+      "slug": "hangover-drink",
+      "name": "숙취해소제",
+      "category": "beverages"
+    },
+    {
+      "slug": "sparkling-water",
+      "name": "탄산수",
+      "category": "beverages"
+    },
+    {
+      "slug": "capsule-coffee",
+      "name": "캡슐커피",
+      "category": "beverages"
+    },
+    {
+      "slug": "soju",
+      "name": "소주",
+      "category": "beverages"
+    },
+    {
+      "slug": "tea",
+      "name": "차",
+      "category": "beverages"
+    },
+    {
+      "slug": "seasoned-laver",
+      "name": "조미김",
+      "category": "side-dishes"
+    },
+    {
+      "slug": "canned-tuna",
+      "name": "참치캔",
+      "category": "side-dishes"
+    },
+    {
+      "slug": "kimchi",
+      "name": "포기김치",
+      "category": "side-dishes"
+    },
+    {
+      "slug": "jeotgal",
+      "name": "젓갈",
+      "category": "side-dishes"
+    },
+    {
+      "slug": "danmuji",
+      "name": "단무지",
+      "category": "side-dishes"
+    },
+    {
+      "slug": "bread",
+      "name": "빵",
+      "category": "bakery"
+    },
+    {
+      "slug": "cereal",
+      "name": "시리얼",
+      "category": "bakery"
     }
   ],
   "varieties": [
