@@ -20,7 +20,7 @@ export default function Page() {
           이유식 재료 궁합표 미리보기
         </h1>
         <p className="text-sm text-stone">
-          A4 세로 3장 · 채소, 채소·과일, 육류·수산·기타
+          A4 세로 3장 · 목록 길이에 맞춰 재료별 표를 고르게 배치했어요.
         </p>
         <form method="post" action={routes.admin.babyFoodPdf}>
           <button type="submit" className="pairing-pill pairing-primary">

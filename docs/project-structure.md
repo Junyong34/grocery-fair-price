@@ -125,7 +125,7 @@ import 경로:
 | `/seasonal/downloads` | 달력·포스터 PDF 내려받기 | `seasonal/downloads/page.tsx` | `downloads/downloads-view`. `public/downloads/manifest.json`을 빌드 때 읽는다 |
 | `/seasonal/downloads/[edition]` | 에디션 상세(직접 열면 페이지, 목록에서 누르면 하단 시트 `@sheet/(.)downloads/[edition]`) | `seasonal/downloads/[edition]/page.tsx` | `downloads/edition-detail`, 매니페스트는 `shared/downloads-manifest` |
 | `/admin`, `/admin/edit?id=`, `/admin/wireframes` | 인쇄물 어드민 (개발 서버 전용, 운영 404). `wireframes`는 인쇄물 구조 안 모음 | `app/admin/` | `features/admin-print/` |
-| `/admin/baby-food/print` · `POST /admin/baby-food/pdf` | 이유식 궁합표 A4 세로 3장 미리보기와 로컬 PDF 다운로드 | `app/admin/baby-food/` | `features/baby-food/pairing-print`, `features/admin-print/server/generate` |
+| `/admin/baby-food/print` · `POST /admin/baby-food/pdf` | 이유식 궁합표 A4 세로 3장 미리보기와 로컬 PDF 다운로드. 표 길이 기준으로 열을 나눔 | `app/admin/baby-food/` | `features/baby-food/pairing-print`, `features/admin-print/server/generate` |
 | `/print?spec=&paper=&page=` | 인쇄 전용 페이지 (개발 서버 전용, 운영 404) | `app/print/page.tsx` | `features/print/print-document` |
 | (제철 화면 안에서 이동) | 1i 품종 상세 (하단 시트) | `seasonal/@sheet/(.)foods/[food]/page.tsx` | `components/detail-sheet` + `food-detail` |
 | `/api/og` | 공유 미리보기 이미지 1200×630 | `app/api/og/route.tsx` | 쿼리 `title`, `subtitle`, `badge`, `season` |
@@ -201,7 +201,7 @@ import 경로:
 | `components/` | 목록과 편집기가 함께 쓰는 조각: `kind-mark`, `status`, `edition-id`, `delete-edition-button` |
 | `wireframes/` | `wireframe`(안 하나를 SVG로. 옵션 고르기의 미리보기로 쓸 수 있다), `wireframe-gallery`(`/admin/wireframes`) |
 | `board/` | `/admin` 목록. 서버 컴포넌트(`admin-board`, `edition-board`, `kind-group`, `edition-row`) |
-| `new-edition/` | 새 에디션 3단계 폼(`new-edition-form`, `kind-picker`, `form-step`) |
+| `new-edition/` | 새 에디션 폼(`new-edition-form`, `kind-picker`, `form-step`). 이유식 궁합표를 고르면 고정 A4 3장 미리보기로 연결한다 |
 | `editor/` | `/admin/edit`. `use-edition-editor`(편집본·저장·생성을 들고 있고, 판단은 `lib/flow`의 `editionDraft`)와 화면 조각(`editor-header`, `edition-steps`, `generated-files`, `options-panel`·`option-field`·`option-fields`(종류별 옵션 표. 구성 선택지와 구성별로 숨기는 옵션 · 품종 수 상한은 `print/layouts.ts`에서 읽는다. `option-fields.test`가 표의 값이 사양 스키마와 맞는지 본다), `listing-panel`, `preview-panel`·`print-preview`) |
 
 에디션 원본은 `apps/web/print-editions/<id>.json`, 생성 기록은 `<id>.build.json`, 결과 PDF와 매니페스트는 `apps/web/public/downloads/`에 있다. 에디션 JSON·생성 기록·매니페스트는 커밋하고, PDF는 용량이 커서 `.gitignore`로 뺀다. PDF를 둘 곳을 정하기 전까지는 에디션을 공개하지 않는다(매니페스트가 비어 있어야 운영 링크가 깨지지 않는다).

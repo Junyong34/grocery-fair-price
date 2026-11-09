@@ -22,10 +22,15 @@
 .pairing-paper-brand {
   font-size: 9pt;
 }
+.pairing-paper-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4mm;
+  align-items: start;
+}
 .pairing-paper .pairing-grid {
   display: block;
-  columns: 3;
-  column-gap: 4mm;
+  min-width: 0;
 }
 .pairing-paper .pairing-entry {
   break-inside: avoid;
@@ -58,30 +63,18 @@
   gap: 0.35mm 0.8mm;
 }
 .pairing-paper .pairing-item {
-  min-height: 4.4mm;
+  min-height: 5.4mm;
   padding: 0;
   gap: 0.7mm;
-  font-size: 9pt;
+  font-size: 11pt;
 }
 .pairing-paper .pairing-item .pairing-art {
-  width: 4.4mm;
-  height: 4.4mm;
+  width: 5.4mm;
+  height: 5.4mm;
 }
 .pairing-paper .pairing-placeholder {
   border-width: 0.2mm;
   border-radius: 0.8mm;
-}
-
-.pairing-paper:not(:last-child) .pairing-entry {
-  padding-bottom: 4mm;
-}
-.pairing-paper:not(:last-child) .pairing-item {
-  font-size: 10pt;
-  min-height: 5mm;
-}
-.pairing-paper:not(:last-child) .pairing-item .pairing-art {
-  width: 5mm;
-  height: 5mm;
 }
 
 .pairing-paper-foot {

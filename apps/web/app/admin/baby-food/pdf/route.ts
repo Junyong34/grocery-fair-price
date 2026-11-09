@@ -1,6 +1,6 @@
 import { generateA4PortraitPdf } from "@/features/admin-print/server/generate"
 import { adminEnabled } from "@/features/admin-print/server/guard"
-import { PAIRING_SHEETS } from "@/features/baby-food/data"
+import { PAIRING_PRINT_SHEETS } from "@/features/baby-food/print-layout"
 import { routes } from "@/shared/routes"
 
 export async function POST(request: Request) {
@@ -14,7 +14,10 @@ export async function POST(request: Request) {
 
   try {
     const preview = new URL(routes.admin.babyFoodPrint, url)
-    const pdf = await generateA4PortraitPdf(preview.href, PAIRING_SHEETS.length)
+    const pdf = await generateA4PortraitPdf(
+      preview.href,
+      PAIRING_PRINT_SHEETS.length
+    )
     return new Response(pdf, {
       headers: {
         "Content-Type": "application/pdf",
