@@ -220,3 +220,19 @@ export const productDetailSchema = z.object({
   varietyId: z.string().nullable(),
   basis: quoteBasisSchema,
 })
+
+/** 상품 목록 행 하나(검색 결과의 상품 묶음). 상품 payload에서 이 키만 읽는다. */
+export const productSummarySchema = productDetailSchema.pick({
+  id: true,
+  name: true,
+  item: true,
+  category: true,
+  size: true,
+  perUnit: true,
+  price: true,
+  surveyedOn: true,
+  status: true,
+})
+
+/** 상품 목록이 payload에서 읽는 키. */
+export const PRODUCT_SUMMARY_KEYS: readonly string[] = productSummarySchema.keyof().options

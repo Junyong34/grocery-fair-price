@@ -4,7 +4,7 @@
 
 import { VERDICT_WORD, verdictDiff } from "@workspace/price/copy"
 import { monthDay, won } from "@workspace/price/format"
-import type { VarietySummary } from "@workspace/price/types"
+import type { ProductDetail, VarietySummary } from "@workspace/price/types"
 import { SEASON_COPY } from "@workspace/seasonal/data/copy"
 import { dishNames } from "@workspace/seasonal/data/dishes"
 import { type Festival, festivalOf, festivalsWithFood } from "@workspace/seasonal/data/festivals"
@@ -59,6 +59,14 @@ export function varietySeo(variety: Pick<VarietySummary, "name" | "baseUnit" | "
   return {
     title: `${variety.name} 시세 · 평소 가격`,
     description: `${variety.name}(${variety.baseUnit}) 시세 ${won(variety.price)}원, ${judged}(${monthDay(variety.surveyedOn)} ${variety.basis.source} 조사). 대형마트·전통시장은 얼마에 파는지도 견줘 보세요.`,
+  }
+}
+
+/** 상품 상세(catalog-scale/10). 판정이 없어 판매가와 판매처 비교로 쓴다. 사람들은 "상품명 가격", "상품명 최저가"로 찾는다. */
+export function productSeo(product: Pick<ProductDetail, "name" | "price" | "surveyedOn"> & { sellers: readonly unknown[] }): PageSeo {
+  return {
+    title: `${product.name} 가격 비교`,
+    description: `${product.name} 전국 판매가 ${won(product.price)}원(${monthDay(product.surveyedOn)} 참가격 조사). 이마트·편의점 등 판매처 ${product.sellers.length}곳 가격을 견줘 보세요.`,
   }
 }
 

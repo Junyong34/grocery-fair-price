@@ -23,6 +23,10 @@ export const routes = {
     variety: (id: string) => `/prices/${id}`,
     /** P4 담은 품종 */
     basket: "/basket",
+    /** 상품 상세의 접두 경로. 페이지가 없고 next.config.ts가 시세 메인으로 보낸다. 링크에 쓰지 않는다. */
+    products: "/products",
+    /** 참가격 상품 상세(catalog-scale/10). id는 참가격 상품 번호(goodId) */
+    product: (id: string) => `/products/${id}`,
   },
 
   seasonal: {

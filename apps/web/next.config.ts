@@ -21,7 +21,11 @@ const nextConfig: NextConfig = {
   // 전체 품종 목록(/prices)은 품종이 늘면 한 페이지가 끝없이 길어져 뺐다. 이미 알려진 주소는 시세 메인으로 보낸다.
   // shared/routes.ts의 routes.price.varieties와 맞춰 둔다(설정 파일이라 routes를 import하지 않는다).
   async redirects() {
-    return [{ source: "/prices", destination: "/", permanent: true }]
+    return [
+      { source: "/prices", destination: "/", permanent: true },
+      // 상품 목록 페이지도 없다. 상품은 검색 · 카테고리로 찾는다(catalog-scale/10).
+      { source: "/products", destination: "/", permanent: true },
+    ]
   },
   experimental: {
     // next dev · build가 설치된 버전의 보안 권고를 확인해 안전한 버전을 알린다(기본값과 같다). 자동으로 올리지는 않는다.

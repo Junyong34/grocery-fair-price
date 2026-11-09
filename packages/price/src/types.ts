@@ -11,6 +11,7 @@ import type {
   productChannelSchema,
   productDetailSchema,
   productSellerSchema,
+  productSummarySchema,
   productTrendPointSchema,
   quoteBasisSchema,
   searchAliasSchema,
@@ -45,3 +46,4 @@ export type ProductChannel = z.infer<typeof productChannelSchema>
 export type ProductSeller = z.infer<typeof productSellerSchema>
 export type ProductTrendPoint = z.infer<typeof productTrendPointSchema>
 export type ProductDetail = z.infer<typeof productDetailSchema>
+export type ProductSummary = z.infer<typeof productSummarySchema>

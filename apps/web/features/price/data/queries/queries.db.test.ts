@@ -2,9 +2,11 @@ import postgres from "postgres"
 import { afterAll, describe, expect, it, vi } from "vitest"
 
 import { connectAdmin, connectAs } from "@workspace/price-db/src/db"
-import { VARIETY_SUMMARY_KEYS } from "@workspace/price/schema"
+import { PRODUCT_SUMMARY_KEYS, VARIETY_SUMMARY_KEYS } from "@workspace/price/schema"
 
+import { readProduct } from "./get-product"
 import { readVariety } from "./get-variety"
+import { readProducts } from "./list-products"
 import { readVarieties } from "./list-varieties"
 import { readSearchExtras } from "./search-index"
 
@@ -87,3 +89,23 @@ describe("readSearchExtras", () => {
     expect(extras.categories).toEqual(order.map((c) => c.name))
   })
 })
+
+describe("readProducts · readProduct (catalog-scale/10)", () => {
+  it("현재 묶음의 상품 행을 목록 키만 담아 돌려주고, 조사를 멈춘 상품은 뺀다", async () => {
+    const rows = await readProducts(web)
+    expect(rows.length).toBeGreaterThan(0)
+    for (const row of rows) {
+      expect(Object.keys(row).sort()).toEqual([...PRODUCT_SUMMARY_KEYS].sort())
+      expect(row.status).not.toBe("discontinued")
+    }
+  })
+
+  it("상품 하나의 payload 전체를 돌려주고, 없는 상품이면 null", async () => {
+    const [first] = await readProducts(web)
+    const detail = await readProduct(web, first!.id)
+    expect(detail).toMatchObject({ id: first!.id, name: first!.name, basis: { source: "참가격" } })
+    expect(detail!.sellers.length).toBeGreaterThan(0)
+    expect(await readProduct(web, "no-such-product")).toBeNull()
+  })
+})
+

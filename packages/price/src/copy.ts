@@ -5,7 +5,7 @@ import { josa } from "es-hangul"
 
 import { monthDay, signedPct, won } from "./format"
 import { latestSurveyedOn } from "./list"
-import type { MarketType, QuoteBasis, Verdict, VerdictKind } from "./types"
+import type { Channel, MarketType, QuoteBasis, Verdict, VerdictKind } from "./types"
 
 /** 판정 한 마디. */
 export const VERDICT_WORD: Record<VerdictKind, string> = {
@@ -105,6 +105,14 @@ export function withJosa(name: string, particle: Particle): string {
 export const MARKET_TYPE_NAME: Record<MarketType, string> = {
   large_retail: "대형마트",
   traditional: "전통시장",
+}
+
+/** 참가격 업태 이름 (상품 화면) */
+export const CHANNEL_NAME: Record<Channel, string> = {
+  large_mart: "대형마트",
+  ssm: "기업형 슈퍼",
+  department: "백화점",
+  convenience: "편의점",
 }
 
 /**
@@ -230,6 +238,32 @@ export const PRICE_COPY = {
     ],
     browse: "카테고리에서 둘러보기",
     category: (category: string) => `${category} 시세`,
+    // 식재료(판정 있음) 아래 상품 묶음 제목. 상품은 판정 대신 판매가를 보인다 (catalog-scale/10)
+    products: "상품 판매가",
+    productsCount: (n: number) => `${n}개`,
+    productsMore: (n: number) => `상품 ${n}개 더 보기`,
+  },
+  // 참가격 상품 상세 (catalog-scale/10). 판정이 없다: 지금이 비싼 시기인지가 아니라 어디서 싸게 파는지를 견준다
+  product: {
+    nationalPrice: "전국 판매가",
+    nationalNote: (surveyedOn: string, stores: number) => `${monthDay(surveyedOn)} 조사한 ${stores}곳 가격의 중간값`,
+    perUnit: (unit: string, price: number) => `${unit}당 ${won(price)}원`,
+    range: (min: number, max: number) => `최저 ${won(min)}원 ~ 최고 ${won(max)}원`,
+    noVerdict: "가공식품은 판정 대신 판매처끼리 가격을 견줘요",
+    stale: (surveyedOn: string) => `마지막 조사 ${monthDay(surveyedOn)}`,
+    staleNote: "최근 조사에서 빠져 지금 가격과 다를 수 있어요",
+    discontinued: "참가격이 더 조사하지 않는 상품이에요",
+    channelsTitle: "업태별 판매가",
+    sellersTitle: "어디서 얼마에 팔까",
+    sellersSub: (surveyedOn: string) => `${monthDay(surveyedOn)} 조사 · 싼 순`,
+    stores: (n: number) => `${n}곳`,
+    storesRange: (min: number, max: number) => `점포마다 ${won(min)}~${won(max)}원`,
+    promo: "행사",
+    sellersNote: "점 = 이 판매처 중간값, 점선 = 전국 판매가",
+    trendTitle: "최근 조사 가격",
+    trendLegend: { median: "전국 판매가", min: "가장 싼 곳" },
+    variety: "이 상품이 들어간 식재료 시세 보기",
+    basis: (stores: number, surveyedOn: string) => `참가격 전국 판매점 ${stores}곳 · ${monthDay(surveyedOn)} 조사`,
   },
   detail: {
     back: "뒤로",

@@ -16,10 +16,11 @@ import { PRICE_COPY } from "@workspace/price/copy"
 import { pickByIds } from "@workspace/price/list"
 import {
   matchRange,
+  searchProducts,
   searchVarieties,
   type SearchResult,
 } from "@workspace/price/search"
-import type { SearchIndex, VarietySummary } from "@workspace/price/types"
+import type { ProductSummary, SearchIndex, VarietySummary } from "@workspace/price/types"
 
 import { routes } from "@/shared/routes"
 import { BackButton } from "@/shared/shell/sub-header"
@@ -27,10 +28,13 @@ import { BackButton } from "@/shared/shell/sub-header"
 import { AddButton } from "../components/add-button"
 import { useRecentVarieties } from "../components/recent-varieties"
 import { PriceHint, VarietyRow } from "../components/variety-row"
+import { ProductResults } from "./product-results"
 import { RecentRow } from "./recent-row"
 
 type SearchViewProps = {
   varieties: readonly VarietySummary[]
+  /** 참가격 상품. 식재료 결과 아래 묶음으로 보인다(catalog-scale/10) */
+  products: readonly ProductSummary[]
   featuredIds: readonly string[]
   index: SearchIndex
 }
@@ -50,10 +54,11 @@ export function SearchView(props: SearchViewProps) {
  * P2 품종 검색. 치는 동안 결과가 바뀐다. 검색어는 주소 ?q=에 맞추되 기록을 쌓지 않아(replaceState) 뒤로 가기 한 번이면 진입했던 화면이다.
  * 검색은 서버가 내려 준 searchIndex로 브라우저에서 한다.
  */
-function SearchScreen({ varieties, featuredIds, index }: SearchViewProps) {
+function SearchScreen({ varieties, products, featuredIds, index }: SearchViewProps) {
   const initial = useSearchParams().get("q") ?? ""
   const [query, setQuery] = useState(initial)
   const result = useMemo(() => searchVarieties(index, query), [index, query])
+  const productIds = useMemo(() => searchProducts(products, query), [products, query])
 
   const change = (next: string) => {
     setQuery(next)
@@ -130,6 +135,8 @@ function SearchScreen({ varieties, featuredIds, index }: SearchViewProps) {
             result={result}
             query={query}
             varieties={varieties}
+            products={products}
+            productIds={productIds}
             featuredIds={featuredIds}
             index={index}
             onQuery={change}
@@ -144,6 +151,8 @@ function Results({
   result,
   query,
   varieties,
+  products,
+  productIds,
   featuredIds,
   index,
   onQuery,
@@ -151,6 +160,8 @@ function Results({
   result: SearchResult
   query: string
   varieties: readonly VarietySummary[]
+  products: readonly ProductSummary[]
+  productIds: readonly string[]
   featuredIds: readonly string[]
   index: SearchIndex
   onQuery: (query: string) => void
@@ -189,6 +200,20 @@ function Results({
     </div>
   )
 
+  // 식재료 결과 아래 상품 묶음. 카테고리 결과에서는 품목마다 나눈다
+  const productGroup = (
+    <ProductResults products={products} ids={productIds} byItem={result.kind === "category"} />
+  )
+  const withProducts = (varietyPart: React.ReactNode) => (
+    <div className="flex flex-col gap-6">
+      {varietyPart}
+      {productGroup}
+    </div>
+  )
+
+  // 맞는 식재료는 없지만 상품은 있다: "결과 없음" 대신 상품을 보인다
+  if (result.kind === "none" && productIds.length > 0) return productGroup
+
   switch (result.kind) {
     case "empty":
       return (
@@ -215,35 +240,38 @@ function Results({
         </div>
       )
     case "hits":
-      return (
+      return withProducts(
         <div className="flex flex-col gap-2">
           <PriceHint />
           {rows(result.ids, true)}
         </div>
       )
     case "item":
-      return (
+      return withProducts(
         <Group title={PRICE_COPY.search.item(result.item)}>
           {rows(result.ids)}
         </Group>
       )
     case "alias":
-      return (
+      return withProducts(
         <Group title={PRICE_COPY.search.alias(query.trim())}>
           {rows(result.ids)}
         </Group>
       )
     case "typo":
-      return (
+      return withProducts(
         <Group title={PRICE_COPY.search.typo(query.trim())}>
           {rows(result.ids)}
         </Group>
       )
     case "category":
-      return (
-        <Group title={PRICE_COPY.search.category(result.category)}>
-          {rows(result.ids)}
-        </Group>
+      // 가공식품 카테고리(라면·면 등)는 식재료가 없을 수 있다. 그때는 상품 묶음만 보인다
+      return withProducts(
+        result.ids.length > 0 && (
+          <Group title={PRICE_COPY.search.category(result.category)}>
+            {rows(result.ids)}
+          </Group>
+        )
       )
     case "none":
       return (

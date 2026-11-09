@@ -1,6 +1,6 @@
 import "server-only"
 
-import type { SearchIndex, VarietyDetail, VarietySummary } from "@workspace/price/types"
+import type { ProductDetail, ProductSummary, SearchIndex, VarietyDetail, VarietySummary } from "@workspace/price/types"
 
 import { routes } from "@/shared/routes"
 
@@ -24,6 +24,10 @@ export interface PriceSource {
   searchIndex(): Promise<SearchIndex>
   /** 자주 사는 품종(운영자가 정한 목록) */
   featuredIds(): Promise<readonly string[]>
+  /** 참가격 상품 목록(검색의 상품 묶음). 판정이 없다 (catalog-scale/10) */
+  listProducts(): Promise<readonly ProductSummary[]>
+  /** 상품 상세. id는 참가격 상품 번호(goodId). 없는 상품이면 null */
+  getProduct(id: string): Promise<ProductDetail | null>
 }
 
 /** 지금 쓰는 데이터 구현. */

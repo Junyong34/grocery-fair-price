@@ -106,10 +106,11 @@ import 경로:
 | URL | 화면 | 라우트 파일 | 화면 컴포넌트 |
 |---|---|---|---|
 | `/` | P1 시세 메인 | `(price)/page.tsx` | `features/price/home/home-view` |
-| `/search?q=` | P2 품종 검색 (noindex) | `(price)/search/page.tsx` | `features/price/search/search-view` |
+| `/search?q=` | P2 품종 검색 (noindex) | `(price)/search/page.tsx` | `features/price/search/search-view`. 식재료 결과 아래 상품 묶음(`product-results`, 카테고리 검색이면 품목별) |
 | `/basket` | P4 담은 품종 (noindex) | `(price)/basket/page.tsx` | `features/price/basket/basket-view` |
 | `/prices` | 페이지 없음. `next.config.ts` `redirects`가 `/`로 보낸다(전체 품종 목록은 페이징 없이 품종 수만큼 길어져 2026-11-06에 뺐다) | — | — |
 | `/prices/[variety]` | P3 품종 상세 (가격 품종 slug) | `(price)/prices/[variety]/page.tsx` | `features/price/variety-detail/detail-view`. 품종 목록은 `getPriceSource()`에서 읽어 `generateStaticParams` · sitemap에 쓴다 |
+| `/products/[product]` | 참가격 상품 상세 (참가격 상품 번호 goodId, 판정 없음, catalog-scale/10) | `(price)/products/[product]/page.tsx` | `features/price/product-detail/product-view`. 상품 목록(`listProducts`)으로 `generateStaticParams` · sitemap. `/products`는 `next.config.ts`가 `/`로 보낸다 |
 | `/seasonal` | 2a 이달 · 12개월 스크롤 | `proxy.ts`가 아래 `at/[yearMonth]`로 rewrite. `seasonal/(this-month)/page.tsx`는 proxy가 돌지 않을 때의 대비책(요청 시점 렌더, `@sheet/page.tsx`와 짝) | `this-month/this-month-view` |
 | `/seasonal/at/[yearMonth]` | 2a를 (연, 월)마다 미리 그린 내부 경로(`2026-11`). 해는 `STATIC_YEARS`(2026~공휴일 데이터 마지막 해). 메타데이터는 `/seasonal`의 것 | `seasonal/(this-month)/at/[yearMonth]/page.tsx` | `this-month/this-month-view`. 이번 달 달력·일별 카드의 오늘 표시만 요청 때 채운다(`.scratch/seasonal-static/spec.md`) |
 | `/seasonal/months` | 2b 열두 달 카드 목록 | `seasonal/(this-month)/months/page.tsx` | `month-timeline/months-index` |
@@ -220,6 +221,7 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `search/` | P2 품종 검색. 공용 `BackButton`이 검색창 앞에 있고, 직접 진입하면 시세 메인으로 간다. 검색어 지우기 ×는 입력창 안에 유지한다. 검색어는 `history.replaceState`로 `?q=`에 맞춘다 |
 | `basket/` | P4 담은 품종: 판정별 개수, 바뀐 판정 알림, 판정별 묶음, × 빼기, 편집(모두 빼기), 빈 목록. 기기 값을 불러온 뒤에 그린다 |
 | `variety-detail/` | P3 품종 상세(같은 id의 제철 품종이 있으면 "제철 시기 보기" 링크): `detail-header`(본문 제목 줄, 최근 본 품종에 넣기. 모바일은 `DetailHeaderBar`가 처음부터 하위 헤더 "‹ 품종 · 담기"를 그리고, 데스크톱은 본문 줄에 뒤로 · 담기가 있다), `verdict-card`(판정 전 · 오래됨 · 표본 적음), `range-bar`, `places-section`(장소 비교, 판정 색 없음), `why-section`(`trend-chart` SVG + `dots-compare`), `my-price`(내가 본 가격, 저장 안 함) |
+| `product-detail/` | 참가격 상품 상세(catalog-scale/10, 판정 없음): `product-view`(전국 판매가 · 기준 단위당 가격 · 업태별, 오래됨 · 조사 중단 안내), `sellers-section`(판매처별, 위치 막대), `trend-section`(최근 조사일 SVG), `product-header`(모바일 하위 헤더 ‹ · 🔍, 담기 없음) |
 | `components/` | 품종 행(`variety-row`: 모바일은 품종·판정과 시세를 묶고 넓은 화면은 네 열 subgrid, 시세·평소가·품종별 조사일 표시), 판정 칩 · 점(`verdict-chip`: 목록은 판정 단어만, 최근 3회 조사 편차 %는 상세에서 기준과 함께 표시. 색은 `verdict-tone`), `add-button`, `basket-toast`(담기 토스트 "배추를 담았어요 · 목록 보기", 화면 키보드 위로), `basket-badge`(내비 담은 개수), `search-entry`, `recent-varieties`, `price-shell`, `header-search-link`(가격 루트 헤더 🔍. P1 `/`에서는 히어로 검색창 · 고정 검색 줄과 겹쳐 그리지 않는다) |
 | `settings/` | 설정 화면 "내 기록"의 담은 품종 · 최근 본 품종 지우기(`price-record-settings`) |
 | `stores/` | `basket-store`(`price:basket`, 담을 때 판정 · 조사일), `recent-store`(`price:recent`) |

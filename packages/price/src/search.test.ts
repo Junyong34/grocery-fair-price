@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { matchRange, searchVarieties } from "./search"
+import { matchRange, searchProducts, searchVarieties } from "./search"
 import type { SearchIndex } from "./types"
 
 // 와이어프레임의 품종 일부. id는 이름으로 둔다.
@@ -120,3 +120,47 @@ describe("matchRange", () => {
     expect(matchRange("한우 등심", "우등")).toEqual([1, 4])
   })
 })
+
+describe("상품 검색 (catalog-scale/10)", () => {
+  const p = (id: string, name: string, item: string, category: string) => ({ id, name, item, category })
+  const PRODUCTS = [
+    p("1", "농심 신라면(120g*5입)", "라면", "라면·면"),
+    p("2", "농심 신라면 컵(65g)", "컵라면", "라면·면"),
+    p("3", "오뚜기 진라면 매운맛(120g*5입)", "라면", "라면·면"),
+    p("4", "비비고 사골곰탕(500g)", "국·탕", "간편식·냉동"),
+    p("5", "풀무원 국산콩 두부(300g)", "두부", "햄·어묵·두부"),
+  ]
+  const ids = (query: string) => searchProducts(PRODUCTS, query)
+
+  it("빈 검색어면 없다", () => {
+    expect(ids("  ")).toEqual([])
+  })
+
+  it("이름 · 품목 일부로 찾고, 이름 앞쪽에서 맞은 상품 · 짧은 이름을 앞에 둔다", () => {
+    expect(ids("신라면")).toEqual(["2", "1"])
+    // 품목이 "라면"과 똑같은 상품이 먼저, 그 안에서는 짧은 이름이 먼저다. 컵라면은 이름에서 맞아 그 뒤
+    expect(ids("라면")).toEqual(["1", "3", "2"])
+    // 품목으로도 찾는다. 이름에서 맞은 상품 뒤에 둔다
+    expect(ids("국·탕")).toEqual(["4"])
+    expect(ids("곰탕")).toEqual(["4"])
+  })
+
+  it("띄어쓰기를 무시하고 초성으로도 찾는다", () => {
+    expect(ids("사골 곰탕")).toEqual(["4"])
+    expect(ids("ㅅㄹㅁ")).toEqual(["2", "1"])
+  })
+
+  it("카테고리 이름이면 그 카테고리 상품을 모두 낸다", () => {
+    expect(ids("라면·면")).toEqual(["1", "2", "3"])
+  })
+
+  it("품목 이름과 똑같은 검색어면 그 품목 상품을 먼저 낸다 (브랜드 이름에 든 말보다)", () => {
+    const milk = [p("10", "서울우유 버터(450g)", "버터", "유제품"), p("11", "매일우유 오리지널(900ml)", "우유", "유제품"), p("12", "덴마크 우유(1L)", "우유", "유제품")]
+    expect(searchProducts(milk, "우유")).toEqual(["12", "11", "10"])
+  })
+
+  it("맞는 상품이 없으면 빈 목록", () => {
+    expect(ids("트러플")).toEqual([])
+  })
+})
+

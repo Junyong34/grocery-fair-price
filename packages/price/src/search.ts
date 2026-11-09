@@ -1,6 +1,6 @@
 import { canBeChoseong, getChoseong } from "es-hangul"
 
-import type { SearchIndex, SearchVariety } from "./types"
+import type { ProductSummary, SearchIndex, SearchVariety } from "./types"
 
 /**
  * 검색 결과.
@@ -77,6 +77,33 @@ function findHits(index: SearchIndex, q: string): string[] {
     .filter(({ at }) => at >= 0)
     .sort((a, b) => a.at - b.at || a.v.name.length - b.v.name.length || a.order - b.order)
     .map(({ v }) => v.id)
+}
+
+/**
+ * 검색어로 참가격 상품을 찾는다(catalog-scale/10). 식재료 결과 아래 상품 묶음에 쓴다.
+ * 검색어가 카테고리 이름이면 그 카테고리 상품을 모두(주어진 순서대로), 아니면 이름 · 품목 일부가 맞은 상품을 낸다.
+ * 순서: 품목 이름과 똑같은 상품, 그다음 이름에서 맞은 자리가 앞일수록 · 이름이 짧을수록 앞, 품목에서만 맞은 상품은 뒤. 초성 검색어도 받는다.
+ */
+export function searchProducts(products: readonly Pick<ProductSummary, "id" | "name" | "item" | "category">[], query: string): string[] {
+  const q = compact(query)
+  if (!q) return []
+  const inCategory = products.filter((p) => compact(p.category) === q)
+  if (inCategory.length) return inCategory.map((p) => p.id)
+  const toKey = isChoseongQuery(q) ? (text: string) => compact(getChoseong(text)) : compact
+  // 품목 이름과 똑같으면 맨 앞("우유" → 품목 우유가 서울우유 버터보다 먼저). 맞지 않으면 null
+  const rank = (p: (typeof products)[number]): number | null => {
+    if (compact(p.item) === q) return -1
+    const at = toKey(p.name).indexOf(q)
+    if (at >= 0) return at
+    return toKey(p.item).includes(q) ? Number.MAX_SAFE_INTEGER : null
+  }
+  return products
+    .flatMap((p, order) => {
+      const at = rank(p)
+      return at === null ? [] : [{ p, order, at }]
+    })
+    .sort((a, b) => a.at - b.at || a.p.name.length - b.p.name.length || a.order - b.order)
+    .map(({ p }) => p.id)
 }
 
 /**

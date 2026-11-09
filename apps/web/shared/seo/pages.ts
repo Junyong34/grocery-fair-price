@@ -56,6 +56,8 @@ export const SEO_PAGES: Readonly<Record<string, () => readonly SitemapEntry[]>> 
 export const DATA_SEO_PAGES: readonly string[] = [
   // P3 품종 상세
   "/prices/[variety]",
+  // 참가격 상품 상세 (catalog-scale/10)
+  "/products/[product]",
 ]
 
 /**

@@ -18,6 +18,7 @@ import {
   sashimiSeo,
   seasonSeo,
   seasonsIndexSeo,
+  productSeo,
   varietySeo,
 } from "./titles"
 
@@ -65,6 +66,14 @@ describe("페이지 제목·설명", () => {
       "녹두(100g) 시세 2,700원, 평소보다 9% 높아 비싸요(11/3 KAMIS 조사). 대형마트·전통시장은 얼마에 파는지도 견줘 보세요."
     )
     expect(varietySeo({ ...base, verdict: { kind: "none", pct: null } }).description).toContain("평소가는 아직 쌓이는 중(11/3 KAMIS 조사)")
+  })
+
+  it("상품 상세는 판정 없이 판매가와 판매처 수를 넣는다", () => {
+    const seo = productSeo({ name: "비비고 사골곰탕(500g)", price: 1980, surveyedOn: "2026-10-23", sellers: [{}, {}, {}] })
+    expect(seo.title).toBe("비비고 사골곰탕(500g) 가격 비교")
+    expect(seo.description).toBe(
+      "비비고 사골곰탕(500g) 전국 판매가 1,980원(10/23 참가격 조사). 이마트·편의점 등 판매처 3곳 가격을 견줘 보세요."
+    )
   })
 
   it("다운로드 설명에 무료 제공과 파일 형식을 안내한다", () => {

@@ -2,12 +2,14 @@ import "server-only"
 
 import { cacheLife } from "next/cache"
 
-import type { SearchIndex, VarietyDetail, VarietySummary } from "@workspace/price/types"
+import type { ProductDetail, ProductSummary, SearchIndex, VarietyDetail, VarietySummary } from "@workspace/price/types"
 
 import { db } from "./db"
 import { FEATURED_IDS } from "./featured"
 import type { PriceSource } from "./price-source"
+import { readProduct } from "./queries/get-product"
 import { readVariety } from "./queries/get-variety"
+import { readProducts } from "./queries/list-products"
 import { readVarieties } from "./queries/list-varieties"
 import { readSearchExtras } from "./queries/search-index"
 
@@ -46,7 +48,22 @@ async function getVariety(id: string): Promise<VarietyDetail | null> {
   return readVariety(db(), id)
 }
 
+// 상품(price.current_product)도 판정과 같은 묶음이라 같은 수명으로 캐시한다. 참가격은 2주마다 조사하지만 묶음은 날마다 바뀐다.
+async function listProducts(): Promise<readonly ProductSummary[]> {
+  "use cache"
+  cacheLife("hours")
+  return readProducts(db())
+}
+
+async function getProduct(id: string): Promise<ProductDetail | null> {
+  "use cache"
+  cacheLife("hours")
+  return readProduct(db(), id)
+}
+
 export const dbSource: PriceSource = {
+  listProducts,
+  getProduct,
   listVarieties,
   getVariety,
   searchIndex,

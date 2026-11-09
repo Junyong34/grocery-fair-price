@@ -7,7 +7,7 @@ import { routes } from "@/shared/routes"
 
 export const metadata = createMetadata({
   title: "시세 검색",
-  description: "식재료 이름이나 초성으로 오늘 시세와 판정을 찾아보세요.",
+  description: "식재료 · 상품 이름이나 초성으로 오늘 시세와 판정, 판매처별 가격을 찾아보세요.",
   path: routes.price.search,
   noIndex: true,
 })
@@ -15,10 +15,15 @@ export const metadata = createMetadata({
 // P2 품종 검색. 검색어(?q=)는 브라우저에서 읽어 정적 셸을 유지한다(useSearchParams는 Suspense 안).
 export default async function Page() {
   const source = getPriceSource()
-  const [varieties, featuredIds, index] = await Promise.all([source.listVarieties(), source.featuredIds(), source.searchIndex()])
+  const [varieties, products, featuredIds, index] = await Promise.all([
+    source.listVarieties(),
+    source.listProducts(),
+    source.featuredIds(),
+    source.searchIndex(),
+  ])
   return (
     <Suspense>
-      <SearchView varieties={varieties} featuredIds={featuredIds} index={index} />
+      <SearchView varieties={varieties} products={products} featuredIds={featuredIds} index={index} />
     </Suspense>
   )
 }
