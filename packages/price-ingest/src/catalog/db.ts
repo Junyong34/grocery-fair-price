@@ -74,7 +74,8 @@ export async function exportSnapshot(tx: Db): Promise<CatalogSnapshot> {
 
 export type ImportResult = { varieties: number; specs: number; rules: number; hidden: string[]; changes: CatalogChange[] }
 
-export async function importSnapshot(tx: Tx, snapshot: CatalogSnapshot, actor: string): Promise<ImportResult> {
+// proposalId: 이 가져오기를 낳은 제안 (승인 적용·되돌리기, catalog-scale/08). 변경 기록에 함께 남긴다
+export async function importSnapshot(tx: Tx, snapshot: CatalogSnapshot, actor: string, proposalId: number | null = null): Promise<ImportResult> {
   const before = await exportSnapshot(tx)
   const rules = rulesOfSnapshot(snapshot)
 
@@ -181,8 +182,8 @@ export async function importSnapshot(tx: Tx, snapshot: CatalogSnapshot, actor: s
   const changes = diffSnapshots(before, await exportSnapshot(tx))
   if (changes.length > 0) {
     await tx`
-      insert into price.catalog_change (actor, target, target_key, action, before, after)
-      select ${actor}, c.target, c."targetKey", c.action, c.before, c.after
+      insert into price.catalog_change (actor, target, target_key, action, before, after, proposal_id)
+      select ${actor}, c.target, c."targetKey", c.action, c.before, c.after, ${proposalId}
         from jsonb_to_recordset(${tx.json(changes as never)}) as c (target text, "targetKey" text, action text, before jsonb, after jsonb)`
   }
   return { varieties: snapshot.varieties.length, specs: specs.length, rules: rules.length, hidden: hidden.map((r) => r.slug), changes }

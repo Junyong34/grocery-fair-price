@@ -79,3 +79,12 @@ describe("제안 파일", () => {
     expect(() => parseProposalFile([map, map])).toThrow(/kamis:611-06-20/)
   })
 })
+
+describe("--ids", () => {
+  it("쉼표와 범위를 읽고 겹치면 하나로", async () => {
+    const { parseIds } = await import("../src/catalog/cli.ts")
+    expect(parseIds("64,65,70-72,65")).toEqual([64, 65, 70, 71, 72])
+    expect(() => parseIds("72-70")).toThrow(/거꾸로/)
+    expect(() => parseIds("a")).toThrow(/a/)
+  })
+})

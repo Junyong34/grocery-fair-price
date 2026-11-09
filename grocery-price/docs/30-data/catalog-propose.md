@@ -1,6 +1,6 @@
 # 카탈로그 제안 쓰기 (로컬 에이전트용)
 
-catalog-scale/06. 아직 규격에 잇지 않은 원천 키(pending)와 참가격 상품마다 분류 제안을 쓰고 `price.catalog_proposal`에 `proposed`로 넣는 절차다. 로컬 Claude Code 세션이 `/catalog-propose`로 이 문서를 따른다(스킬 파일은 `.claude/skills/catalog-propose/SKILL.md`, gitignore라 로컬에만 있다). 사람은 어드민(07)에서 승인하고, 승인 전에는 매핑·화면에 아무 영향이 없다.
+catalog-scale/06. 아직 규격에 잇지 않은 원천 키(pending)와 참가격 상품마다 분류 제안을 쓰고 `price.catalog_proposal`에 `proposed`로 넣는 절차다. 로컬 Claude Code 세션이 `/catalog-propose`로 이 문서를 따른다(스킬 파일은 `.claude/skills/catalog-propose/SKILL.md`, gitignore라 로컬에만 있다). 사람은 어드민(07)이나 `catalog apply|reject --ids`(08)로 승인·반려하고, 승인 전에는 매핑·화면에 아무 영향이 없다. 적용한 제안은 `catalog revert --ids`로 되돌린다.
 
 명령은 저장소 루트에서 `pnpm --filter @workspace/price-ingest catalog …`이다. 운영을 볼 때는 `node --env-file=../../.env src/catalog/cli.ts …`를 `packages/price-ingest`에서 부른다(`.env` 값은 출력하지 않는다).
 
