@@ -272,6 +272,8 @@ export const PAIRING_ART: Readonly<Partial<Record<string, string>>> = {
   감: "/foods/persimmon/color.svg",
   감자: "/foods/potato/color.svg",
   게: "/foods/blue-crab/color.svg",
+  게살: "/foods/crab-meat/color.svg",
+  검은깨: "/foods/black-sesame/color.svg",
   계란: "/foods/egg/color.svg",
   고구마: "/foods/sweet-potato/color.svg",
   귤: "/foods/mandarin/color.svg",
@@ -309,6 +311,7 @@ export const PAIRING_ART: Readonly<Partial<Record<string, string>>> = {
   브로콜리: "/foods/broccoli/color.svg",
   블루베리: "/foods/blueberry/color.svg",
   비트: "/foods/beet/color.svg",
+  비타민: "/foods/tatsoi/color.svg",
   사과: "/foods/apple/color.svg",
   새송이버섯: "/foods/king-oyster-mushroom/color.svg",
   새우: "/foods/shrimp/color.svg",
@@ -352,8 +355,10 @@ export const PAIRING_ART: Readonly<Partial<Record<string, string>>> = {
   팽이버섯: "/foods/enoki-mushroom/color.svg",
   표고버섯: "/foods/shiitake-mushroom/color.svg",
   피망: "/foods/bell-pepper/color.svg",
+  현미: "/foods/brown-rice/color.svg",
   호두: "/foods/walnut/color.svg",
   호박: "/foods/aged-pumpkin/color.svg",
+  흰살생선: "/foods/white-fish-fillet/color.svg",
 }
 
 export const PAIRING_SHEETS = [

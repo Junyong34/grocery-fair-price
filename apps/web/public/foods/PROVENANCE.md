@@ -10,7 +10,7 @@
 | kit sha | `6806db565e0538c4` |
 | 변형 | `color`, `motion` |
 | 바닥 그림자 | 끔 |
-| 품종 수 | 270 |
+| 품종 수 | 275 |
 
 | id | 이름 | food.mjs sha |
 |---|---|---|
@@ -47,6 +47,7 @@
 | `black-rice` | 흑미 | `9acce02c61c04761` |
 | `black-scraper` | 말쥐치 | `c3bcc87581006354` |
 | `black-seabream` | 감성돔 | `d2141b81918bdc60` |
+| `black-sesame` | 검은깨 | `9461f71d530c84f0` |
 | `blackfish` | 벵에돔 | `885e70860a820950` |
 | `blue-crab` | 꽃게 | `e4e99c1410b230b9` |
 | `blueberry` | 블루베리 | `046629f4575119ae` |
@@ -56,6 +57,7 @@
 | `bracken` | 고사리 | `e49c6fa81355d681` |
 | `branching-mushroom` | 가지버섯 | `40d95e50897f5fe4` |
 | `broccoli` | 브로콜리 | `7b4cfb74d4e82b48` |
+| `brown-rice` | 현미 | `71d3795f2c1b3130` |
 | `brussels-sprout` | 방울양배추 | `12985b43ab6adcf4` |
 | `buckwheat` | 메밀 | `b80dedf24d4eba09` |
 | `burdock` | 우엉 | `cfedeeb0a68dbe54` |
@@ -86,6 +88,7 @@
 | `cod` | 대구 | `8f32ccf40bb63b17` |
 | `conger-eel` | 바다장어 | `e9c8046d0ae9fb2b` |
 | `corn` | 옥수수 | `78fd3bd3b5af43de` |
+| `crab-meat` | 게살 | `d619756bac54e5b9` |
 | `croaker` | 민어 | `0db5307f9adabc46` |
 | `crown-daisy` | 쑥갓 | `82313a537f318af9` |
 | `cucumber` | 오이 | `3a4a9b75f1e2581d` |
@@ -261,6 +264,7 @@
 | `sweet-pumpkin` | 단호박 | `34d29af65a64863c` |
 | `taro` | 토란 | `571530289712581e` |
 | `taro-stem` | 토란대 | `7bc3e1f459ff1f87` |
+| `tatsoi` | 비타민 | `9d9939028455240c` |
 | `thistle-greens` | 엉겅퀴 | `1d4c5e641e0654fb` |
 | `tofu` | 두부 | `cdbf69ade960ccee` |
 | `tomato` | 토마토 | `118cb32c4ef1bf1e` |
@@ -273,6 +277,7 @@
 | `watermelon` | 수박 | `bf3396b4b1fc6dbd` |
 | `webfoot-octopus` | 주꾸미 | `92c6cd717ae73ed4` |
 | `wheat` | 밀 | `c82b214c0bc3f18c` |
+| `white-fish-fillet` | 흰살생선 | `82480a7b34c2619d` |
 | `wild-chive` | 달래 | `c46c47dd0189cf8a` |
 | `wild-grape` | 머루 | `197318d3fb850da7` |
 | `winter-melon` | 동아 | `a9a31a3446113aa0` |
