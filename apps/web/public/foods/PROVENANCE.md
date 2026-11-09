@@ -10,7 +10,7 @@
 | kit sha | `6806db565e0538c4` |
 | 변형 | `color`, `motion` |
 | 바닥 그림자 | 끔 |
-| 품종 수 | 260 |
+| 품종 수 | 270 |
 
 | id | 이름 | food.mjs sha |
 |---|---|---|
@@ -50,6 +50,7 @@
 | `blackfish` | 벵에돔 | `885e70860a820950` |
 | `blue-crab` | 꽃게 | `e4e99c1410b230b9` |
 | `blueberry` | 블루베리 | `046629f4575119ae` |
+| `bok-choy` | 청경채 | `0b9912dd5ef62b8b` |
 | `bomdong` | 봄동 | `c12da3fe3ea33d84` |
 | `borimyeol` | 보리멸 | `0df2b7753ebcc544` |
 | `bracken` | 고사리 | `e49c6fa81355d681` |
@@ -61,6 +62,7 @@
 | `butter` | 버터 | `6e0b66f5bece9175` |
 | `butterbur` | 머위 | `643b3fe1b366fe21` |
 | `butterbur-stalk` | 머위대 | `f0982acf2cfa9b5f` |
+| `button-mushroom` | 양송이버섯 | `56f88a3590d8fe56` |
 | `cabbage` | 양배추 | `35f016d67fe937c2` |
 | `carrot` | 당근 | `75175f5117116b70` |
 | `catfish` | 메기 | `9016845ed1eeedae` |
@@ -92,6 +94,7 @@
 | `egg` | 계란 | `9c44e2f2b7eb3936` |
 | `egg-yolk` | 달걀노른자 | `8536c70b0eae8801` |
 | `eggplant` | 가지 | `a4de725450f76709` |
+| `enoki-mushroom` | 팽이버섯 | `d9d618dd3f9fc56c` |
 | `eolgari-cabbage` | 얼갈이배추 | `a8321de907025dc6` |
 | `fig` | 무화과 | `783c52b4e0a75e6e` |
 | `foxtail-millet` | 조 | `dee8aabea8d8fec8` |
@@ -129,12 +132,15 @@
 | `jeju-hanchi` | 제주한치(창꼴뚜기) | `c08cb0cf77b53795` |
 | `jerusalem-artichoke` | 돼지감자 | `c54edee4a2de8259` |
 | `jujube` | 대추 | `53c0fd3dbd355516` |
+| `kelp` | 다시마 | `f56e7882bbbec254` |
 | `kidney-bean` | 강낭콩 | `48b83ecfc6a5bbdb` |
+| `king-oyster-mushroom` | 새송이버섯 | `113276f8549571fb` |
 | `kiwi` | 키위 | `2a13e980ab3542c7` |
 | `kohlrabi` | 콜라비 | `828e49b4b6076339` |
 | `korean-rockfish` | 우럭(조피볼락) | `78314edd3c2bc2cf` |
 | `korean-zucchini` | 애호박 | `601d149ba21867fa` |
 | `kudzu-root` | 칡 | `9e2384bb21bedd82` |
+| `laver` | 김 | `97d0b01626e358e2` |
 | `lettuce` | 상추 | `58a733c4ecd5ba34` |
 | `lions-mane` | 노루궁뎅이버섯 | `3b6e68a30992befe` |
 | `loach` | 미꾸라지 | `eb6c3d1336f23c3b` |
@@ -177,11 +183,13 @@
 | `pear` | 배 | `14bf36bc3a8c478a` |
 | `pearl-spot-chromis` | 자리돔 | `e97f633972281cc0` |
 | `pen-shell` | 키조개 | `1e43541f59a93ac2` |
+| `perilla-leaf` | 깻잎 | `b9ff439704368eca` |
 | `perilla-seed` | 들깨 | `a14905dbd31d0dc1` |
 | `persimmon` | 감 | `be664e364f9cb373` |
 | `pike-conger` | 갯장어 | `0d73670754e5ae8e` |
 | `pine-chive` | 솔부추 | `63dec99aea5ef5bd` |
 | `pine-nut` | 잣 | `53317810e9981992` |
+| `pineapple` | 파인애플 | `bbb2b843e8450c97` |
 | `plum` | 자두 | `d96aa250cf030e69` |
 | `pollock` | 명태 | `a391d9d92597325c` |
 | `pomegranate` | 석류 | `69811876c8d857fa` |
@@ -239,6 +247,7 @@
 | `soy-milk` | 두유 | `69083e05557b8362` |
 | `soybean` | 대두 | `8bf1a15c4c54a4d7` |
 | `soybean-leaf` | 콩잎 | `0934cc601baf070a` |
+| `soybean-sprout` | 콩나물 | `1297a5410b7efe69` |
 | `spanish-mackerel` | 삼치 | `230cac8f3b0492c1` |
 | `spinach` | 시금치 | `f8b222f9053ec563` |
 | `spring-flounder` | 봄 도다리(문치가자미) | `d138e1fbd8d4c03d` |
@@ -258,6 +267,7 @@
 | `tongue-sole` | 서대 | `735a8f8b3211e69c` |
 | `turnip` | 순무 | `3318a0533a121a5b` |
 | `uloe-melon` | 울외 | `0a5eb8dfdffa99df` |
+| `wakame` | 미역 | `e7034259855fe370` |
 | `walnut` | 호두 | `ca30fefb69949361` |
 | `water-dropwort` | 미나리 | `74abf50400fb0553` |
 | `watermelon` | 수박 | `bf3396b4b1fc6dbd` |
