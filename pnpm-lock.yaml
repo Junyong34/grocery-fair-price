@@ -47,6 +47,9 @@ importers:
       '@workspace/price':
         specifier: workspace:*
         version: link:../../packages/price
+      '@workspace/price-ingest':
+        specifier: workspace:*
+        version: link:../../packages/price-ingest
       '@workspace/seasonal':
         specifier: workspace:*
         version: link:../../packages/seasonal

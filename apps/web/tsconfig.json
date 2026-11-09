@@ -13,8 +13,12 @@
       ],
       "@workspace/price/*": [
         "../../packages/price/src/*"
+      ],
+      "@workspace/price-ingest/*": [
+        "../../packages/price-ingest/src/*"
       ]
     },
+    "allowImportingTsExtensions": true,
     "plugins": [
       {
         "name": "next"

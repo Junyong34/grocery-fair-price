@@ -90,6 +90,8 @@ export const routes = {
     babyFoodPdf: "/admin/baby-food/pdf",
     /** 카탈로그 어드민: 식재료 목록 (읽기 전용, ingest_writer) */
     catalogVarieties: "/admin/catalog/varieties",
+    /** 카탈로그 어드민: 제안 검토 (catalog-scale/07, 소유자 접속) */
+    catalogProposals: "/admin/catalog/proposals",
   },
 
   /** 인쇄 전용 페이지. 어드민 미리보기와 PDF 생성기가 연다. */

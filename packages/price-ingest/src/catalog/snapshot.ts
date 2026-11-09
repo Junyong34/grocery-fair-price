@@ -1,13 +1,15 @@
 // 저장소의 카탈로그 사본 snapshot.json을 읽는다 (ADR 0005). 원본은 운영 DB이고, catalog export가 이 파일을 쓴다.
 // 로컬 DB를 채우고(catalog import) 테스트가 실측 코드표·variety-list.md와 맞는지 볼 때 쓴다.
 import { readFileSync } from "node:fs"
+import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
 
 import { z } from "zod"
 
 import type { CatalogSnapshot } from "./types.ts"
 
-export const SNAPSHOT_PATH = fileURLToPath(new URL("./snapshot.json", import.meta.url))
+// new URL(…, import.meta.url)은 Next(Turbopack) 번들에서 다른 URL 클래스가 되어 fileURLToPath가 받지 않는다 (어드민 07이 이 모듈을 가져온다)
+export const SNAPSHOT_PATH = join(dirname(fileURLToPath(import.meta.url)), "snapshot.json")
 
 const slug = z.string().regex(/^[a-z0-9-]+$/)
 const spec = z.strictObject({
