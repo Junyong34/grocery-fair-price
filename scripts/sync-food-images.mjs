@@ -37,6 +37,7 @@ if (!existsSync(join(prototype, "kit/index.mjs"))) {
 const { renderSvg } = await import(pathToFileURL(join(prototype, "kit/index.mjs")))
 const { FOOD_ROWS } = await import(pathToFileURL(join(root, "packages/seasonal/src/data/foods.generated.ts")))
 const { DISH_ROWS } = await import(pathToFileURL(join(root, "packages/seasonal/src/data/dish-rows.ts")))
+const { PAIRING_ART } = await import(pathToFileURL(join(root, "apps/web/features/baby-food/data.ts")))
 
 const sha = (text) => createHash("sha256").update(text).digest("hex").slice(0, 16)
 const styleFile = join(prototype, "styles", STYLE_ID, "style.json")
@@ -75,7 +76,16 @@ async function copyDrawings(source, shownIds, outDir, variants) {
   return { copied, skipped }
 }
 
-const { copied, skipped } = await copyDrawings("foods", new Set(FOOD_ROWS.map((food) => food.id)), outDir, VARIANTS)
+const pairingFoodIds = Object.values(PAIRING_ART).flatMap((path) => {
+  const match = path?.match(/^\/foods\/([^/]+)\//)
+  return match ? [match[1]] : []
+})
+const { copied, skipped } = await copyDrawings(
+  "foods",
+  new Set([...FOOD_ROWS.map((food) => food.id), ...pairingFoodIds]),
+  outDir,
+  VARIANTS,
+)
 const dishes = await copyDrawings("dishes", new Set(DISH_ROWS.map((dish) => dish.id)), dishOutDir, DISH_VARIANTS)
 
 writeFileSync(

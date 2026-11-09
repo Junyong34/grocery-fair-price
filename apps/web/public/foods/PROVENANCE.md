@@ -10,7 +10,7 @@
 | kit sha | `6806db565e0538c4` |
 | 변형 | `color`, `motion` |
 | 바닥 그림자 | 끔 |
-| 품종 수 | 240 |
+| 품종 수 | 250 |
 
 | id | 이름 | food.mjs sha |
 |---|---|---|
@@ -29,6 +29,7 @@
 | `aster-scaber` | 취나물(참취) | `b3a88d4def7e729f` |
 | `atka-mackerel` | 임연수어 | `4372ab514787cdc2` |
 | `bamboo-shoot` | 죽순 | `074b42b55eabc00b` |
+| `banana` | 바나나 | `faf599af5e4abd16` |
 | `banded-grouper` | 능성어 | `8cc9b53e0d260926` |
 | `bangah-leaf` | 방아잎 | `e8eea7eef67dfc50` |
 | `bangpung-namul` | 방풍나물 | `06f450494121809f` |
@@ -54,6 +55,7 @@
 | `brussels-sprout` | 방울양배추 | `12985b43ab6adcf4` |
 | `buckwheat` | 메밀 | `b80dedf24d4eba09` |
 | `burdock` | 우엉 | `cfedeeb0a68dbe54` |
+| `butter` | 버터 | `6e0b66f5bece9175` |
 | `butterbur` | 머위 | `643b3fe1b366fe21` |
 | `butterbur-stalk` | 머위대 | `f0982acf2cfa9b5f` |
 | `cabbage` | 양배추 | `35f016d67fe937c2` |
@@ -68,6 +70,7 @@
 | `cherry-tomato` | 방울토마토 | `c1376ff6fd9bb099` |
 | `chestnut` | 밤 | `e50b5ced4fc5592b` |
 | `chestnut-bean` | 밤콩 | `21fd82850660164e` |
+| `chicken` | 닭고기 | `9afdf75f97eca275` |
 | `chicken-grunt` | 벤자리 | `dac42de509c29795` |
 | `chicory` | 치커리 | `255b222b8cc2b85f` |
 | `chinese-yam` | 마 | `03c1f424814b0216` |
@@ -82,6 +85,8 @@
 | `cucumber` | 오이 | `3a4a9b75f1e2581d` |
 | `deodeok` | 더덕 | `d70ec8080bdc66f6` |
 | `east-sea-hanchi` | 동해한치(화살꼴뚜기) | `9d61568f45c36210` |
+| `egg` | 계란 | `9c44e2f2b7eb3936` |
+| `egg-yolk` | 달걀노른자 | `8536c70b0eae8801` |
 | `eggplant` | 가지 | `a4de725450f76709` |
 | `eolgari-cabbage` | 얼갈이배추 | `a8321de907025dc6` |
 | `fig` | 무화과 | `783c52b4e0a75e6e` |
@@ -111,6 +116,7 @@
 | `halfbeak` | 학꽁치 | `d0052357dc884afb` |
 | `hallabong` | 한라봉 | `d0389aef816d9aec` |
 | `herring` | 청어 | `078e8be4706d7a55` |
+| `honey` | 꿀 | `8362da7b1cb894a3` |
 | `horse-mackerel` | 전갱이 | `a2407993303c2518` |
 | `ixeris` | 씀바귀 | `303c8ed480ececed` |
 | `ixeris-root-greens` | 고들빼기 | `f488fb527bde8b02` |
@@ -173,6 +179,7 @@
 | `pollock` | 명태 | `a391d9d92597325c` |
 | `pomegranate` | 석류 | `69811876c8d857fa` |
 | `pomfret` | 병어 | `88f2ffce59d070d1` |
+| `pork` | 돼지고기 | `f172854704e80d91` |
 | `potato` | 감자 | `f4e8608b7919128a` |
 | `proso-millet` | 기장 | `c4838ea5a5d66701` |
 | `pufferfish` | 복어 | `b5917d9978d15089` |
@@ -195,6 +202,7 @@
 | `rock-bream` | 돌돔 | `d3ecd165a5479c61` |
 | `roughscale-flounder` | 줄가자미 | `a924af8927679a12` |
 | `rye` | 호밀 | `eea1f8bc67c64af2` |
+| `salted-shrimp` | 새우젓 | `427f1c3b4ce6e8a7` |
 | `samchae` | 삼채 | `0855f807f27e6d62` |
 | `sardinella` | 밴댕이 | `061bfe9e1f906e0c` |
 | `saury` | 꽁치 | `abb7e2466042b59b` |
@@ -219,6 +227,7 @@
 | `snailfish` | 물메기 | `f4c31d3014f75896` |
 | `snow-crab` | 대게 | `4d92b73ed85276df` |
 | `sorghum` | 수수 | `43db3e98e631209f` |
+| `soy-milk` | 두유 | `69083e05557b8362` |
 | `soybean` | 대두 | `8bf1a15c4c54a4d7` |
 | `soybean-leaf` | 콩잎 | `0934cc601baf070a` |
 | `spanish-mackerel` | 삼치 | `230cac8f3b0492c1` |
@@ -234,6 +243,7 @@
 | `taro` | 토란 | `571530289712581e` |
 | `taro-stem` | 토란대 | `7bc3e1f459ff1f87` |
 | `thistle-greens` | 엉겅퀴 | `1d4c5e641e0654fb` |
+| `tofu` | 두부 | `cdbf69ade960ccee` |
 | `tomato` | 토마토 | `118cb32c4ef1bf1e` |
 | `tongue-sole` | 서대 | `735a8f8b3211e69c` |
 | `turnip` | 순무 | `3318a0533a121a5b` |
