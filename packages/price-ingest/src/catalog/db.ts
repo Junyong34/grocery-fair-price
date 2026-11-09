@@ -6,7 +6,7 @@
 import type { Sql, Tx } from "../load/db.ts"
 
 import { diffSnapshots, rulesOfSnapshot, type CatalogChange, type Rule } from "./rules.ts"
-import { BASE_UNITS, baseUnitLabel, UNIT_RULES, type BaseUnit, type CatalogSnapshot, type SpecDef, type VarietyDef } from "./types.ts"
+import { BASE_UNITS, baseUnitLabel, UNIT_RULES, type BaseUnit, type CatalogSnapshot, type SourceCategoryDef, type SpecDef, type VarietyDef } from "./types.ts"
 
 type Db = Sql | Tx
 
@@ -38,6 +38,12 @@ export async function exportSnapshot(tx: Db): Promise<CatalogSnapshot> {
     select variety_id, seasonal_food_id as food from price.variety_seasonal_map order by variety_id, seasonal_food_id`
   const exceptions = await tx<{ source: "kamis" | "ekape" | "chamga"; key: string; action: "ignore" | "hold"; reason: string }[]>`
     select source, key_pattern as key, action, reason from price.catalog_key_rule where action <> 'map' order by id`
+  const sourceCategories = await tx<{ source: SourceCategoryDef["source"]; code: string; name: string; category: string; item: string | null; note: string | null }[]>`
+    select m.source, m.source_class as code, m.class_name as name, c.slug as category, i.slug as item, m.note
+      from price.category_source_map m
+      join price.category c on c.id = m.category_id
+      left join price.item i on i.id = m.item_id
+     order by m.source, m.source_class`
 
   const keysOf = (specId: number, source: "kamis" | "ekape" | "chamga") => keys.filter((k) => k.spec_id === specId && k.source === source).map((k) => k.key)
   const specOf = (s: { id: number; slug: string; name: string }): SpecDef => {
@@ -69,6 +75,12 @@ export async function exportSnapshot(tx: Db): Promise<CatalogSnapshot> {
       return out
     }),
     exceptions: exceptions.map((e) => ({ source: e.source, key: e.key, action: e.action, reason: e.reason })),
+    sourceCategories: sourceCategories.map((m) => {
+      const out: { -readonly [K in keyof SourceCategoryDef]: SourceCategoryDef[K] } = { source: m.source, code: m.code, name: m.name, category: m.category }
+      if (m.item) out.item = m.item
+      if (m.note) out.note = m.note
+      return out
+    }),
   }
 }
 
@@ -109,6 +121,24 @@ export async function importSnapshot(tx: Tx, snapshot: CatalogSnapshot, actor: s
           base_unit_qty = excluded.base_unit_qty, status = excluded.status, price_spread = excluded.price_spread, sort = excluded.sort
      where (v.item_id, v.name, v.base_unit, v.base_unit_qty, v.status, v.price_spread, v.sort)
            is distinct from (excluded.item_id, excluded.name, excluded.base_unit, excluded.base_unit_qty, excluded.status, excluded.price_spread, excluded.sort)`
+
+  // 출처 분류 → 카테고리: 사본에 없는 대응은 지우고, 나머지는 사본대로 맞춘다 (catalog-scale/05)
+  const sourceCategories = snapshot.sourceCategories.map((m) => ({ ...m, item: m.item ?? null, note: m.note ?? null }))
+  await tx`
+    delete from price.category_source_map m
+     where (m.source, m.source_class) not in (
+       select r.source, r.code from jsonb_to_recordset(${tx.json(sourceCategories)}) as r (source text, code text))`
+  await tx`
+    insert into price.category_source_map as m (source, source_class, class_name, category_id, item_id, note)
+    select r.source, r.code, r.name, c.id, i.id, r.note
+      from jsonb_to_recordset(${tx.json(sourceCategories)}) as r (source text, code text, name text, category text, item text, note text)
+      join price.category c on c.slug = r.category
+      left join price.item i on i.slug = r.item
+    on conflict (source, source_class) do update
+      set class_name = excluded.class_name, category_id = excluded.category_id, item_id = excluded.item_id, note = excluded.note
+     where (m.class_name, m.category_id, m.item_id, m.note) is distinct from (excluded.class_name, excluded.category_id, excluded.item_id, excluded.note)`
+  const [mapped] = await tx<{ n: number }[]>`select count(*)::int as n from price.category_source_map`
+  if (mapped!.n !== sourceCategories.length) throw new Error(`출처 분류 대응 ${sourceCategories.length}개 중 ${mapped!.n}개만 넣었다. 없는 카테고리·품목 slug를 가리킨다`)
 
   // 사본에 없는 품종은 지우지 않고 숨긴다 (관측값·집계가 가리킬 수 있다)
   const hidden = await tx<{ slug: string }[]>`

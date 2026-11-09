@@ -42,6 +42,16 @@ export const snapshotSchema = z.strictObject({
       reason: z.string().min(1),
     }),
   ),
+  sourceCategories: z.array(
+    z.strictObject({
+      source: z.enum(["kamis", "ekape", "chamga"]),
+      code: z.string().regex(/^\d+$/),
+      name: z.string().min(1),
+      category: slug,
+      item: slug.optional(),
+      note: z.string().min(1).optional(),
+    }),
+  ),
 })
 
 export function parseSnapshot(text: string): CatalogSnapshot {

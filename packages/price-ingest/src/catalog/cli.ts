@@ -66,7 +66,7 @@ async function writeSnapshotFile(url: string, file: string): Promise<void> {
   try {
     const snapshot = await sql.begin("read only", (tx) => exportSnapshot(tx))
     writeFileSync(file, formatSnapshot(snapshot))
-    console.log(`내보냄: ${file} (카테고리 ${snapshot.categories.length}, 품목 ${snapshot.items.length}, 품종 ${snapshot.varieties.length}, 예외 ${snapshot.exceptions.length})`)
+    console.log(`내보냄: ${file} (카테고리 ${snapshot.categories.length}, 품목 ${snapshot.items.length}, 품종 ${snapshot.varieties.length}, 예외 ${snapshot.exceptions.length}, 출처 분류 ${snapshot.sourceCategories.length})`)
   } finally {
     await sql.end()
   }

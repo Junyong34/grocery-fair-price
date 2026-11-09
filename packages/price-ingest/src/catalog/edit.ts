@@ -105,11 +105,14 @@ const GROUPS = {
   item: "items",
   variety: "varieties",
   exception: "exceptions",
+  sourceCategory: "sourceCategories",
 } as const satisfies Record<CatalogChange["target"], keyof CatalogSnapshot>
 
 const idOf = (target: CatalogChange["target"], value: unknown): string => {
-  const v = value as { slug?: string; source?: string; key?: string }
-  return target === "exception" ? `${v.source}:${v.key}` : String(v.slug)
+  const v = value as { slug?: string; source?: string; key?: string; code?: string }
+  if (target === "exception") return `${v.source}:${v.key}`
+  if (target === "sourceCategory") return `${v.source}:${v.code}`
+  return String(v.slug)
 }
 
 // 변경 기록(diffSnapshots 모양)을 거꾸로 돌린다: 새로 생긴 것은 빼고, 고친 것은 전 값으로, 지운 것은 다시 넣는다

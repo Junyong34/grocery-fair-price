@@ -36,11 +36,17 @@ export type VarietyDef = {
 // 규격에 잇지 않는 원천 키. ignore: 일부러 잇지 않는다. hold: 근거가 없어 미룬다(pending으로 둔다)
 export type CatalogException = { source: "kamis" | "ekape" | "chamga"; key: string; action: "ignore" | "hold"; reason: string }
 
+// 출처 분류 → 카테고리 (price.category_source_map, catalog-scale/05). 새 원천 키·상품의 카테고리를 먼저 정한다.
+//   code: 참가격 AL 소분류, KAMIS 부류(ctgry_cd), 축평원 축종(judgeKind). name: 출처 분류 이름 그대로
+//   item: 이 출처 분류가 곧 한 품목이면 그 품목. note: 예외나 이유
+export type SourceCategoryDef = { source: "kamis" | "ekape" | "chamga"; code: string; name: string; category: string; item?: string; note?: string }
+
 export type CatalogSnapshot = {
   categories: readonly CategoryDef[]
   items: readonly ItemDef[]
   varieties: readonly VarietyDef[]
   exceptions: readonly CatalogException[]
+  sourceCategories: readonly SourceCategoryDef[]
 }
 
 export const BASE_UNITS: Record<BaseUnit, { base_unit: "g" | "ea" | "ml"; base_unit_qty: number }> = {

@@ -16,6 +16,7 @@ export type PendingEntry = {
   label: string | null // 원문 이름 (KAMIS `품목/품종/등급`, 참가격 상품명)
   units: string[] // 관측된 단위 (KAMIS·축평원 `1 마리`), 참가격은 상품 용량 (`200 g`)
   sourceCategory: string | null // 출처 분류: KAMIS 부류 코드, 축평원 축종, 참가격 AL 소분류
+  category: { slug: string; name: string; className: string; note: string | null } | null // 출처 분류 대응표(05)가 정한 카테고리. 대응이 없으면 null
   firstSeen: string
   lastSeen: string
   observations: number // 남은 관측값 수 (KAMIS는 90일 뒤 지워진다)
@@ -67,6 +68,10 @@ export async function listPending(tx: Db, { source, sinceDays, today }: { source
      where v.status = 'active'
      order by v.sort nulls last, v.id`
   const rules = await readRules(tx)
+  const categoryRows = await tx<{ source: Source; code: string; slug: string; name: string; class_name: string; note: string | null }[]>`
+    select m.source, m.source_class as code, c.slug, c.name, m.class_name, m.note
+      from price.category_source_map m join price.category c on c.id = m.category_id`
+  const categoryOf = new Map(categoryRows.map((r) => [`${r.source}:${r.code}`, { slug: r.slug, name: r.name, className: r.class_name, note: r.note }]))
   const holdOf = new Map(rules.filter((r) => r.action === "hold").map((r) => [`${r.source}:${r.key}`, r.reason]))
   const openOf = new Map(open.map((p) => [`${p.source}:${p.key}`, p.id]))
 
@@ -81,6 +86,7 @@ export async function listPending(tx: Db, { source, sinceDays, today }: { source
         label: r.label,
         units: r.units ?? [],
         sourceCategory: r.source_category,
+        category: r.source_category === null ? null : (categoryOf.get(`${r.source}:${r.source_category}`) ?? null),
         firstSeen: r.first_seen,
         lastSeen: r.last_seen,
         observations: r.observations,

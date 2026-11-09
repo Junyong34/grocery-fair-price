@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest"
 import { readSnapshot } from "../src/catalog/snapshot.ts"
 import type { VarietyDef } from "../src/catalog/types.ts"
 
-const { categories: CATEGORIES, items: ITEMS, varieties: VARIETIES, exceptions } = readSnapshot()
+const { categories: CATEGORIES, items: ITEMS, varieties: VARIETIES, exceptions, sourceCategories: SOURCE_CATEGORIES } = readSnapshot()
 const KAMIS_EXCLUDED = new Map(exceptions.filter((e) => e.source === "kamis" && e.action === "ignore").map((e) => [e.key, e.reason]))
 
 const repo = new URL("../../../", import.meta.url)
@@ -109,6 +109,39 @@ describe("실측 코드표 (samples/inventory, 2026-10-19)", () => {
 
   it("참가격 상품은 신선식품이다", () => {
     expect(specs.flatMap(({ spec }) => spec.chamga ?? []).filter((id) => !chamgaFresh.has(id))).toEqual([])
+  })
+})
+
+// 출처 분류 → 카테고리 (catalog-scale/05)
+describe("출처 분류 대응표", () => {
+  const categoryOf = new Map(SOURCE_CATEGORIES.map((m) => [`${m.source}:${m.code}`, m.category]))
+
+  it("출처 분류마다 하나이고, 가리키는 카테고리·품목이 있다", () => {
+    expect(categoryOf.size).toBe(SOURCE_CATEGORIES.length)
+    const categories = new Set(CATEGORIES.map((c) => c.slug))
+    const items = new Set(ITEMS.map((i) => i.slug))
+    expect(SOURCE_CATEGORIES.filter((m) => !categories.has(m.category) || (m.item !== undefined && !items.has(m.item)))).toEqual([])
+  })
+
+  it("참가격 식품 457개가 모두 카테고리 하나에 들어간다", () => {
+    const food = csv(`${inventory}cham-products.csv`).filter((r) => r.대분류 !== "생활용품")
+    expect(food).toHaveLength(457)
+    expect(food.filter((r) => !categoryOf.has(`chamga:${r.소분류_code}`)).map((r) => `${r.goodId} ${r.goodName} ${r.소분류}`)).toEqual([])
+  })
+
+  it("KAMIS 부류와 축평원 축종이 모두 카테고리에 들어간다", () => {
+    const kamis = [...new Set(kamisRetail.map((r) => r.ctgry_cd))].filter((c) => !categoryOf.has(`kamis:${c}`))
+    const ekape = [...new Set(csv(`${inventory}ekape-items.csv`).map((r) => r.judgeKind))].filter((c) => !categoryOf.has(`ekape:${c}`))
+    expect({ kamis, ekape }).toEqual({ kamis: [], ekape: [] })
+  })
+
+  it("품종이 잇는 참가격 상품은 그 품종의 카테고리와 대응표의 카테고리가 같다", () => {
+    const products = new Map(csv(`${inventory}cham-products.csv`).map((r) => [Number(r.goodId), r.소분류_code]))
+    const itemCategory = new Map(ITEMS.map((i) => [i.slug, i.category]))
+    const diff = VARIETIES.flatMap((v) =>
+      v.specs.flatMap((s) => (s.chamga ?? []).map((id) => ({ id, variety: v.slug, catalog: itemCategory.get(v.item), map: categoryOf.get(`chamga:${products.get(id)}`) }))),
+    ).filter((d) => d.catalog !== d.map)
+    expect(diff).toEqual([])
   })
 })
 

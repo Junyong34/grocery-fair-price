@@ -13,6 +13,7 @@ const base: CatalogSnapshot = {
     { slug: "orange", name: "오렌지", item: "imported-fruit", unit: "1개", specs: [{ slug: "default", name: "기본", kamis: ["421-06-05"], chamga: [500] }] },
   ],
   exceptions: [{ source: "kamis", key: "611-06-20", action: "hold", reason: "근거 없음" }],
+  sourceCategories: [],
 }
 
 describe("제안 → 사본", () => {

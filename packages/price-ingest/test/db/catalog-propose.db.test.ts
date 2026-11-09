@@ -44,6 +44,7 @@ describe("pending 내보내기", () => {
       const entries = await listPending(tx, { today: "2026-11-09" })
       const mackerel = entries.find((e) => e.key === "611-06-20")
       expect(mackerel).toMatchObject({ source: "kamis", label: "고등어/국산(냉동)/大", sourceCategory: "600", observations: 0, openProposal: null })
+      expect(mackerel?.category).toMatchObject({ slug: "seafood", className: "수산물" })
       expect(mackerel?.similar.sameCode.some((r) => r.variety === "mackerel-kr")).toBe(true)
       expect(mackerel?.similar.byName.map((v) => v.slug)).toContain("mackerel-kr")
       // 최근 관측이 먼저

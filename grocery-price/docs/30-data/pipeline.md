@@ -238,7 +238,7 @@ create policy web_select on price.<표> for select to web_reader    using (true)
 
 표 정의: `category`, `item`, `variety`, `spec`, `alias`, `variety_seasonal_map` (열은 마이그레이션이 원본, 3장 첫머리).
 
-**카탈로그 원본은 이 표들이다 (2026-11-10, ADR 0005).** 아직 들어온 적 없는 원천 키의 규칙은 `catalog_key_rule`, 변경 제안은 `catalog_proposal`, 변경 기록은 `catalog_change`. 고치는 길은 소유자 접속(로컬 어드민, `catalog --import`)뿐이고 `ingest_writer`는 읽기만 한다. 승인할 때마다 `catalog --export`로 저장소의 `packages/price-ingest/src/catalog/snapshot.json`을 다시 써서 커밋한다. 이 사본이 운영자 결정의 백업이다 (Free 플랜은 자동 백업이 없다). 표를 SQL로 직접 고치지 않는다: 변경 기록이 남지 않는다.
+**카탈로그 원본은 이 표들이다 (2026-11-10, ADR 0005).** 아직 들어온 적 없는 원천 키의 규칙은 `catalog_key_rule`, 변경 제안은 `catalog_proposal`, 변경 기록은 `catalog_change`, 출처 분류(참가격 AL 소분류·KAMIS 부류·축평원 축종)를 카테고리에 잇는 대응표는 `category_source_map`(catalog-scale/05). 고치는 길은 소유자 접속(로컬 어드민, `catalog --import`)뿐이고 `ingest_writer`는 읽기만 한다. 승인할 때마다 `catalog --export`로 저장소의 `packages/price-ingest/src/catalog/snapshot.json`을 다시 써서 커밋한다. 이 사본이 운영자 결정의 백업이다 (Free 플랜은 자동 백업이 없다). 표를 SQL로 직접 고치지 않는다: 변경 기록이 남지 않는다.
 
 인덱스: `item(category_id)`, `variety(item_id)`, `alias(item_id)`, `alias(variety_id)`, `alias(lower(text))`, `variety_seasonal_map(seasonal_food_id)`. `spec(variety_id)`는 unique가 덮는다. 부분 unique는 표 제약으로 쓸 수 없어 `create unique index … where`로 만든다.
 

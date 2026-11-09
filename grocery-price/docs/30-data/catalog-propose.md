@@ -8,7 +8,7 @@ catalog-scale/06. 아직 규격에 잇지 않은 원천 키(pending)와 참가�
 
 1. **내보내기.** `catalog pending --json --since 30 > <스크래치>/pending.json` (읽기만, `INGEST_DATABASE_URL`). 최근 30일 것을 먼저 하고, 다 끝나면 `--since` 없이 나머지를 한다. KAMIS 관측값은 90일 뒤 지워지니 최근 것이 급하다. `openProposal`이 있는 항목은 건너뛴다.
    완료: 다룰 항목 목록과 개수가 정해졌다.
-2. **읽기.** [GLOSSARY](../../GLOSSARY.md)의 카테고리·품목·품종·규격·상품, [variety-list.md](variety-list.md)의 "정한 규칙" 1~7, 저장소 사본 `packages/price-ingest/src/catalog/snapshot.json`(기존 품종의 slug·기준 단위·규격 이름과 원천 키). 출처 분류 대응표(`category_source_map`, 05)가 생기면 그것도.
+2. **읽기.** [GLOSSARY](../../GLOSSARY.md)의 카테고리·품목·품종·규격·상품, [variety-list.md](variety-list.md)의 "정한 규칙" 1~7, 저장소 사본 `packages/price-ingest/src/catalog/snapshot.json`(기존 품종의 slug·기준 단위·규격 이름과 원천 키). 항목마다 `category`가 출처 분류 대응표(`price.category_source_map`, 05)가 정한 카테고리다. 품목·품종은 그 카테고리 안에서 고른다(`category.note`의 예외를 먼저 본다. 예: KAMIS 특용작물은 품목마다 다르다).
    완료: 항목마다 `similar`에 나온 품종의 규격과 원천 키를 사본에서 찾아 봤다.
 3. **판단.** 항목마다 아래 "판단 규칙"으로 kind 하나를 고르고, 근거 한 줄과 확신을 쓴다.
    완료: 1단계 목록의 모든 항목에 제안이 하나씩 있다(모르면 `hold`).

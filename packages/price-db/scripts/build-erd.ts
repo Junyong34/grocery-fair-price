@@ -15,7 +15,7 @@ const HTML = fileURLToPath(new URL("../../../grocery-price/docs/30-data/schema-m
 const GROUPS: { id: number; tables: string[]; hideParents?: string[] }[] = [
   { id: 1, tables: ["category", "item", "variety", "spec", "alias", "variety_seasonal_map",
                     "source_item", "source_code_map", "unit_rule", "source_code_table",
-                    "catalog_key_rule", "catalog_proposal", "catalog_change"] },
+                    "catalog_key_rule", "catalog_proposal", "catalog_change", "category_source_map"] },
   { id: 2, tables: ["obs_place", "store", "market", "region", "region_code_map", "store_seller", "seller", "store_link"] },
   { id: 3, tables: ["observation", "observation_revision", "reference_observation"],
     hideParents: ["unit_rule"] },

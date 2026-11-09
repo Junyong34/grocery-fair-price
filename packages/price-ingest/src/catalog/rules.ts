@@ -72,7 +72,7 @@ export class CatalogIndex {
 }
 
 export type CatalogChange = {
-  target: "category" | "item" | "variety" | "exception"
+  target: "category" | "item" | "variety" | "exception" | "sourceCategory"
   targetKey: string
   action: "insert" | "update" | "delete"
   before: unknown
@@ -93,6 +93,7 @@ export function diffSnapshots(before: CatalogSnapshot, after: CatalogSnapshot): 
     ["item", (s) => s.items.map((i) => [i.slug, i])],
     ["variety", (s) => s.varieties.map((v) => [v.slug, v])],
     ["exception", (s) => s.exceptions.map((e) => [`${e.source}:${e.key}`, e])],
+    ["sourceCategory", (s) => s.sourceCategories.map((e) => [`${e.source}:${e.code}`, e])],
   ]
   const changes: CatalogChange[] = []
   for (const [target, entries] of groups) {

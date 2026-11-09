@@ -35,7 +35,7 @@ export const PRICE_TABLES = [
   "ingest_run", "source_day", "source_day_part", "backfill_task",
   "product", "product_source_key", "product_attr_history", "product_variety_map", "al_variety_rule",
   "raw_object", "db_size",
-  "catalog_key_rule", "catalog_proposal", "catalog_change",
+  "catalog_key_rule", "catalog_proposal", "catalog_change", "category_source_map",
 ] as const
 
 // web_reader가 읽는 표와 뷰 (pipeline.md 3-0 "web_reader가 읽는 표")
@@ -49,5 +49,5 @@ export const WEB_READ = [
 export const OPERATOR_TABLES = [
   "category", "item", "variety", "spec", "alias", "variety_seasonal_map",
   "unit_rule", "al_variety_rule", "seller", "calc_param",
-  "catalog_key_rule", "catalog_proposal", "catalog_change",
+  "catalog_key_rule", "catalog_proposal", "catalog_change", "category_source_map",
 ] as const

@@ -15,6 +15,7 @@ const snapshot: CatalogSnapshot = {
     },
   ],
   exceptions: [{ source: "kamis", key: "211-01-05", action: "ignore", reason: "중품은 받지 않는다" }],
+  sourceCategories: [],
 }
 
 describe("snapshot → 규칙 행", () => {
