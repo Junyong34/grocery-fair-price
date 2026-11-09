@@ -97,6 +97,8 @@ export const routes = {
     catalogCategories: "/admin/catalog/categories",
     /** 카탈로그 어드민: 식재료 목록 (읽기 전용, ingest_writer) */
     catalogVarieties: "/admin/catalog/varieties",
+    /** 카탈로그 어드민: 상품 목록 (catalog-scale/10, 읽기 전용, ingest_writer) */
+    catalogProducts: "/admin/catalog/products",
     /** 카탈로그 어드민: 제안 검토 (catalog-scale/07, 소유자 접속) */
     catalogProposals: "/admin/catalog/proposals",
   },

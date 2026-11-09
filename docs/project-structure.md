@@ -127,6 +127,7 @@ import 경로:
 | `/seasonal/downloads/[edition]` | 에디션 상세(직접 열면 페이지, 목록에서 누르면 하단 시트 `@sheet/(.)downloads/[edition]`) | `seasonal/downloads/[edition]/page.tsx` | `downloads/edition-detail`, 매니페스트는 `shared/downloads-manifest` |
 | `/admin`, `/admin/edit?id=`, `/admin/wireframes` | 인쇄물 어드민 (개발 서버 전용, 운영 404). `wireframes`는 인쇄물 구조 안 모음 | `app/admin/` | `features/admin-print/` |
 | `/admin/baby-food/print` · `POST /admin/baby-food/pdf` | 이유식 궁합표 A4 세로 3장 미리보기와 로컬 PDF 다운로드. 표 길이 기준으로 열을 나눔 | `app/admin/baby-food/` | `features/baby-food/pairing-print`, `features/admin-print/server/generate` |
+| `/admin/catalog/products` | 참가격 상품 목록 (catalog-scale/10, 개발 서버 전용, 읽기 전용 `ingest_writer`). 상품마다 카테고리 · 품목(품목 미정이면 참가격 소분류) · 품종 연결 · 상품 화면 상태(노출 · 오래됨 · 페이지 없음 · 조사 중단) · 판매가. 고치지 않고, 품목이 틀리면 상품의 품목 제안으로 고친다 | `app/admin/catalog/products/` | `features/admin-catalog/products`, `features/admin-catalog/server/products`(접속은 `server/reader-db`), `lib/product-view` |
 | `/admin/catalog/proposals` | 카탈로그 제안 검토 (catalog-scale/07, 개발 서버 전용, 운영 DB에 소유자 접속). 제안을 골라 미리보기(되돌림)·적용·반려하고, 적용한 제안을 되돌린다. 쓰기는 `@workspace/price-ingest/catalog/proposals`(08)만 거치고, 적용 뒤 `snapshot.json`을 다시 쓴다 | `app/admin/catalog/proposals/` | `features/admin-catalog/proposals`, `features/admin-catalog/server/proposal-actions` |
 | `/print?spec=&paper=&page=` | 인쇄 전용 페이지 (개발 서버 전용, 운영 404) | `app/print/page.tsx` | `features/print/print-document` |
 | (제철 화면 안에서 이동) | 1i 품종 상세 (하단 시트) | `seasonal/@sheet/(.)foods/[food]/page.tsx` | `components/detail-sheet` + `food-detail` |
