@@ -60,10 +60,9 @@ export const routes = {
     root: "/baby-food",
     result: "/baby-food/result",
     pairings: "/baby-food/pairings",
-    withSelection: (path: "/baby-food" | "/baby-food/result" | "/baby-food/pairings", names: readonly string[], age?: string) => {
+    withSelection: (path: "/baby-food" | "/baby-food/result" | "/baby-food/pairings", names: readonly string[]) => {
       const params = new URLSearchParams()
       for (const name of names) params.append("food", name)
-      if (age) params.set("age", age)
       const query = params.toString()
       return query ? `${path}?${query}` : path
     },

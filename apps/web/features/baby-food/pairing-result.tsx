@@ -3,31 +3,25 @@ import Link from "next/link"
 import { INFANT_PAIRING_COPY } from "@workspace/seasonal/data/copy"
 import { Badge } from "@workspace/ui/components/badge"
 import { routes } from "@/shared/routes"
+import { SubHeader } from "@/shared/shell/sub-header"
 
 import { PAIRINGS } from "./data"
 import { PairingGrid } from "./pairing-grid"
 
 export function PairingResult({
   selected,
-  age,
 }: {
   selected: readonly string[]
-  age: string
 }) {
+  const pickerHref = routes.babyFood.withSelection(routes.babyFood.root, selected)
   const rows = PAIRINGS.filter(({ name }) => selected.includes(name))
 
   return (
     <div className="pairing-page">
+      <SubHeader title="고른 재료의 궁합표" fallbackHref={pickerHref} revealAfter="pairing-result-title" />
       <div className="pairing-intro">
-        <h1>고른 재료의 궁합표</h1>
-        <Link
-          className="pairing-pill"
-          href={routes.babyFood.withSelection(
-            routes.babyFood.root,
-            selected,
-            age
-          )}
-        >
+        <h1 id="pairing-result-title">고른 재료의 궁합표</h1>
+        <Link className="pairing-pill" href={pickerHref}>
           재료 바꾸기
         </Link>
       </div>
@@ -42,7 +36,6 @@ export function PairingResult({
                 {name}
               </Badge>
             ))}
-            {age && <span className="text-sm text-caption">월령 {age}</span>}
           </div>
         </>
       ) : (

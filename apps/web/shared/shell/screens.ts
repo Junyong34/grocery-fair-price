@@ -25,6 +25,7 @@ const SCREENS: readonly Row[] = [
   { path: routes.seasonal.food("").slice(0, -1), header: "sub", scroll: "pinned" },
   { path: routes.seasonal.downloads, header: "sub", scroll: "pinned" },
   { path: routes.seasonal.root, header: "root", scroll: "hide-on-scroll" },
+  { path: routes.babyFood.root, header: "sub", scroll: "pinned" },
   { path: routes.settings.root, header: "sub", scroll: "pinned" },
 ]
 

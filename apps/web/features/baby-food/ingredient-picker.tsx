@@ -5,25 +5,22 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 import { Input } from "@workspace/ui/components/input"
-import { NativeSelect, NativeSelectOption } from "@workspace/ui/components/native-select"
 
 import { INFANT_PAIRING_COPY } from "@workspace/seasonal/data/copy"
 
 import { routes } from "@/shared/routes"
+import { SubHeader } from "@/shared/shell/sub-header"
 
-import { PAIRING_AGES, PAIRING_CATEGORIES, PAIRINGS } from "./data"
+import { PAIRING_CATEGORIES, PAIRINGS } from "./data"
 import { IngredientArt } from "./pairing-grid"
 
 export function IngredientPicker({
   selected,
-  age,
 }: {
   selected: readonly string[]
-  age: string
 }) {
   const router = useRouter()
   const [names, setNames] = useState(selected)
-  const [month, setMonth] = useState(age)
   const [query, setQuery] = useState("")
   const [category, setCategory] =
     useState<(typeof PAIRING_CATEGORIES)[number]>("전체")
@@ -45,6 +42,7 @@ export function IngredientPicker({
 
   return (
     <div className="pairing-page">
+      <SubHeader title="이유식 재료 선택" fallbackHref={routes.babyFood.pairings} />
       <div className="pairing-intro">
         <h1>오늘은 어떤 큐브를 함께 줄까요?</h1>
         <Link className="pairing-pill" href={routes.babyFood.pairings}>
@@ -58,11 +56,7 @@ export function IngredientPicker({
           event.preventDefault()
           if (names.length)
             router.push(
-              routes.babyFood.withSelection(
-                routes.babyFood.result,
-                names,
-                month
-              )
+              routes.babyFood.withSelection(routes.babyFood.result, names)
             )
         }}
       >
@@ -83,25 +77,6 @@ export function IngredientPicker({
               </button>
             ))}
           </div>
-          <label className="pairing-age">
-            <span>아기 월령 <span className="text-caption">(선택)</span></span>
-            <NativeSelect
-              className="w-full text-base bg-pair-muted text-pair-muted-foreground"
-              value={month}
-              onChange={(event) => setMonth(event.target.value)}
-              aria-describedby="pairing-age-note"
-            >
-              <NativeSelectOption value="">선택하지 않음</NativeSelectOption>
-              {PAIRING_AGES.map((option) => (
-                <NativeSelectOption key={option} value={option}>
-                  {option}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
-          </label>
-          <p id="pairing-age-note" className="text-sm text-caption">
-            {INFANT_PAIRING_COPY.age}
-          </p>
           <button
             className="pairing-pill pairing-primary"
             type="submit"

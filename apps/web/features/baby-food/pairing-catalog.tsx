@@ -2,6 +2,7 @@ import Link from "next/link"
 
 import { INFANT_PAIRING_COPY } from "@workspace/seasonal/data/copy"
 import { routes } from "@/shared/routes"
+import { SubHeader } from "@/shared/shell/sub-header"
 
 import { CatalogFilter } from "./catalog-filter"
 import { PAIRING_REFERENCES, PAIRINGS } from "./data"
@@ -10,8 +11,9 @@ import { PairingEvidence } from "./pairing-evidence"
 export function PairingCatalog() {
   return (
     <div className="pairing-page">
+      <SubHeader title="이유식 재료 궁합표" fallbackHref={routes.seasonal.root} revealAfter="pairing-catalog-title" />
       <div className="pairing-intro">
-        <h1>이유식 재료 궁합표</h1>
+        <h1 id="pairing-catalog-title">이유식 재료 궁합표</h1>
         <Link
           className="pairing-pill pairing-primary"
           href={routes.babyFood.root}

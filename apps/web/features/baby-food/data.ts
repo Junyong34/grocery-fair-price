@@ -374,7 +374,6 @@ export const PAIRING_CATEGORIES = [
   "육류·수산",
   "기타",
 ] as const
-export const PAIRING_AGES = ["6~8개월", "9~11개월", "12개월 이상"] as const
 
 export const PAIRING_REFERENCES = {
   sweetPotato: {
