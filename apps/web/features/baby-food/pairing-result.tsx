@@ -1,6 +1,7 @@
 import Link from "next/link"
 
 import { INFANT_PAIRING_COPY } from "@workspace/seasonal/data/copy"
+import { Badge } from "@workspace/ui/components/badge"
 import { routes } from "@/shared/routes"
 
 import { PAIRINGS } from "./data"
@@ -37,9 +38,9 @@ export function PairingResult({
           </p>
           <div className="pairing-controls mb-5">
             {selected.map((name) => (
-              <span className="pairing-pill" key={name}>
+              <Badge size="lg" className="bg-pair-muted text-pair-muted-foreground" key={name}>
                 {name}
-              </span>
+              </Badge>
             ))}
             {age && <span className="text-sm text-caption">월령 {age}</span>}
           </div>

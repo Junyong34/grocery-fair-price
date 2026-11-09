@@ -1,3 +1,5 @@
+import { SeasonalTabs } from "@/features/seasonal/components/sub-tabs"
+
 import "@/features/baby-food/pairing.css"
 
 export default function BabyFoodLayout({
@@ -5,5 +7,10 @@ export default function BabyFoodLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <>
+      <SeasonalTabs />
+      {children}
+    </>
+  )
 }

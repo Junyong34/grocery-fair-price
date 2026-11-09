@@ -36,7 +36,7 @@ export const MENUS: readonly MenuItem[] = [
     Icon: ChartLine,
   },
   {
-    // 제철 화면 전체(이달 · 월별 · 계절 · 제철 회 · 명절 · 내려받기). 나의 식탁만 따로 칸이 있다. 품종 상세는 activeMenuKey가 출발지로 정한다.
+    // 제철 화면 전체(이달 · 월별 · 계절 · 제철 회 · 명절 · 이유식 · 내려받기). 나의 식탁만 따로 칸이 있다. 품종 상세는 activeMenuKey가 출발지로 정한다.
     key: "seasonal",
     label: "제철달력",
     href: routes.seasonal.root,
@@ -46,6 +46,7 @@ export const MENUS: readonly MenuItem[] = [
       routes.seasonal.sashimi,
       routes.seasonal.festivals,
       routes.seasonal.downloads,
+      routes.babyFood.root,
     ],
     exact: true,
     Icon: CalendarDays,

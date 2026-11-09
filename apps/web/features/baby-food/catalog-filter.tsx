@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 
+import { Input } from "@workspace/ui/components/input"
+
 import { PAIRING_CATEGORIES, type PairingRow } from "./data"
 import { PairingGrid } from "./pairing-grid"
 
@@ -18,8 +20,9 @@ export function CatalogFilter({ rows }: { rows: readonly PairingRow[] }) {
   )
   return (
     <>
-      <input
-        className="pairing-search"
+      <Input
+        variant="cream"
+        className="text-base bg-pair-light text-pair-light-foreground [--input:var(--color-pair-light)] [--v-canvas:var(--color-pair-light)]"
         type="search"
         aria-label="전체 표 기준 재료 찾기"
         placeholder="표에서 기준 재료 찾기 · 예: 당근"

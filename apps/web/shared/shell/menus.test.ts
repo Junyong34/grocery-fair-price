@@ -22,6 +22,9 @@ describe("activeMenuKey", () => {
     ["/seasonal/foods/napa-cabbage", "seasonal"],
     ["/seasonal/downloads", "seasonal"],
     ["/seasonal/downloads/2027-monthly", "seasonal"],
+    ["/baby-food", "seasonal"],
+    ["/baby-food/pairings", "seasonal"],
+    ["/baby-food/result", "seasonal"],
     ["/basket", "basket"],
     ["/seasonal/my-table", "my-table"],
   ])("%s → %s", (pathname, key) => {

@@ -1,5 +1,4 @@
 import { Info } from "lucide-react"
-import Link from "next/link"
 
 import {
   Popover,
@@ -16,7 +15,6 @@ import { pickByIds } from "@workspace/price/list"
 import type { VarietySummary } from "@workspace/price/types"
 
 import { DownloadsCard } from "@/shared/downloads/downloads-card"
-import { routes } from "@/shared/routes"
 
 import { AddButton } from "../components/add-button"
 import { RecentPills } from "../components/recent-varieties"
@@ -103,9 +101,6 @@ export function HomeView({
           </p>
         )}
       </section>
-      <Link href={routes.babyFood.pairings} className="rounded-xl border border-hairline bg-mat px-5 py-4 text-sm font-medium text-forest lg:col-start-1">
-        이유식 재료 궁합표 보기 →
-      </Link>
       <DownloadsCard
         placement="price-home"
         className="lg:col-start-1 lg:row-start-2"

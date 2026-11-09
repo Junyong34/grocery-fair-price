@@ -2,7 +2,7 @@
   max-width: 1152px;
   margin-inline: auto;
   padding: clamp(24px, 4vw, 48px) clamp(16px, 4vw, 36px);
-  color: var(--color-ink);
+  color: var(--color-pair-base-foreground);
 }
 
 .pairing-intro,
@@ -42,17 +42,23 @@
   border: 1px solid var(--color-hairline);
   border-radius: 999px;
   padding: 7px 13px;
-  color: var(--color-ink);
+  background: var(--color-pair-light);
+  color: var(--color-pair-light-foreground);
   font-size: 14px;
   text-decoration: none;
   touch-action: manipulation;
 }
 
-.pairing-pill[aria-pressed="true"],
+.pairing-pill[aria-pressed="true"] {
+  background: var(--color-pair-ink);
+  border-color: var(--color-pair-ink);
+  color: var(--color-pair-ink-foreground);
+}
+
 .pairing-primary {
-  background: var(--color-forest);
-  border-color: var(--color-forest);
-  color: var(--color-canvas);
+  background: var(--color-pair-forest-strong);
+  border-color: var(--color-pair-forest-strong);
+  color: var(--color-pair-forest-strong-foreground);
 }
 
 .pairing-pill:disabled {
@@ -62,42 +68,20 @@
 
 .pairing-picker {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(210px, 260px);
+  grid-template-columns: minmax(210px, 260px) minmax(0, 1fr);
   gap: 26px;
   align-items: start;
 }
 
-.pairing-picker > div {
-  grid-row: 1;
-  grid-column: 1;
-}
-
 .pairing-selection {
-  grid-column: 2;
   display: grid;
   gap: 12px;
-  border-top: 2px solid var(--color-forest);
-  padding-top: 14px;
-}
-
-.pairing-search,
-.pairing-age select {
-  width: 100%;
-  min-height: 44px;
-  border: 1px solid var(--color-hairline);
-  border-radius: 10px;
-  padding: 8px 12px;
-  color: var(--color-ink);
-  background: var(--color-surface);
-  font-size: 16px;
+  min-width: 0;
 }
 
 .pairing-age {
   display: grid;
   gap: 5px;
-}
-.pairing-age > span {
-  display: inline;
 }
 
 .pairing-options,
@@ -123,7 +107,8 @@
   padding: 8px;
   border: 1px solid var(--color-hairline);
   border-radius: 12px;
-  background: color-mix(in srgb, var(--color-surface) 55%, var(--color-canvas));
+  background: var(--color-pair-light);
+  color: var(--color-pair-light-foreground);
   overflow-wrap: anywhere;
   font-size: 14px;
   touch-action: manipulation;
@@ -131,7 +116,8 @@
 
 .pairing-option[aria-pressed="true"] {
   border-color: var(--color-forest);
-  background: var(--color-sage-wash);
+  background: var(--color-pair-forest);
+  color: var(--color-pair-forest-foreground);
   box-shadow: inset 0 0 0 1px var(--color-forest);
 }
 
@@ -199,7 +185,7 @@
 }
 .pairing-entry th,
 .pairing-entry td {
-  text-align: left;
+  text-align: start;
   vertical-align: top;
   padding: 4px 5px;
   overflow-wrap: anywhere;
@@ -211,6 +197,16 @@
 }
 .pairing-entry th:last-child {
   color: var(--color-clay);
+}
+
+:is(.pairing-page, .pairing-dialog) .pairing-entry th {
+  color: var(--color-pair-forest-foreground);
+  background: var(--color-pair-forest);
+}
+
+:is(.pairing-page, .pairing-dialog) .pairing-entry th:last-child {
+  color: var(--color-pair-gold-foreground);
+  background: var(--color-pair-gold);
 }
 
 .pairing-items {
@@ -225,7 +221,7 @@
   max-width: 100%;
   min-height: 32px;
   padding: 2px 3px;
-  text-align: left;
+  text-align: start;
   font-size: 13px;
   line-height: 1.35;
   border-radius: 4px;
@@ -233,14 +229,20 @@
   touch-action: manipulation;
 }
 
+button.pairing-item {
+  text-decoration: underline;
+  text-decoration-color: var(--color-silver);
+  text-underline-offset: 3px;
+}
+
 .pairing-item[data-selected="true"] {
-  color: var(--color-forest);
-  background: var(--color-sage-wash);
+  color: var(--color-pair-forest-foreground);
+  background: var(--color-pair-forest);
   font-weight: 600;
 }
 .pairing-bad .pairing-item[data-selected="true"] {
-  color: var(--color-clay);
-  background: color-mix(in srgb, var(--color-clay) 14%, var(--color-canvas));
+  color: var(--color-pair-gold-foreground);
+  background: var(--color-pair-gold);
 }
 .pairing-item:focus-visible,
 .pairing-pill:focus-visible,
@@ -252,7 +254,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .pairing-item:hover {
-    text-decoration: underline;
+    text-decoration-color: currentColor;
   }
   .pairing-option:hover,
   .pairing-cover:hover {
@@ -306,11 +308,12 @@
 .pairing-cover {
   display: grid;
   gap: 8px;
-  text-align: left;
+  text-align: start;
   align-self: stretch;
   border: 1px solid var(--color-hairline);
   border-radius: 10px;
-  background: var(--color-surface);
+  background: var(--color-pair-muted);
+  color: var(--color-pair-muted-foreground);
   padding: 14px;
 }
 
@@ -318,11 +321,6 @@
   .pairing-picker {
     grid-template-columns: minmax(0, 1fr);
     gap: 20px;
-  }
-  .pairing-picker > div,
-  .pairing-selection {
-    grid-column: auto;
-    grid-row: auto;
   }
   .pairing-options {
     grid-template-columns: repeat(3, minmax(0, 1fr));

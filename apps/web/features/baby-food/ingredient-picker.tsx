@@ -4,6 +4,9 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
+import { Input } from "@workspace/ui/components/input"
+import { NativeSelect, NativeSelectOption } from "@workspace/ui/components/native-select"
+
 import { INFANT_PAIRING_COPY } from "@workspace/seasonal/data/copy"
 
 import { routes } from "@/shared/routes"
@@ -81,17 +84,20 @@ export function IngredientPicker({
             ))}
           </div>
           <label className="pairing-age">
-            아기 월령 <span className="text-caption">선택</span>
-            <select
+            <span>아기 월령 <span className="text-caption">(선택)</span></span>
+            <NativeSelect
+              className="w-full text-base bg-pair-muted text-pair-muted-foreground"
               value={month}
               onChange={(event) => setMonth(event.target.value)}
               aria-describedby="pairing-age-note"
             >
-              <option value="">선택하지 않음</option>
+              <NativeSelectOption value="">선택하지 않음</NativeSelectOption>
               {PAIRING_AGES.map((option) => (
-                <option key={option}>{option}</option>
+                <NativeSelectOption key={option} value={option}>
+                  {option}
+                </NativeSelectOption>
               ))}
-            </select>
+            </NativeSelect>
           </label>
           <p id="pairing-age-note" className="text-sm text-caption">
             {INFANT_PAIRING_COPY.age}
@@ -105,8 +111,9 @@ export function IngredientPicker({
           </button>
         </aside>
         <div className="min-w-0">
-          <input
-            className="pairing-search"
+          <Input
+            variant="cream"
+            className="text-base bg-pair-light text-pair-light-foreground [--input:var(--color-pair-light)] [--v-canvas:var(--color-pair-light)]"
             type="search"
             placeholder="재료 이름으로 찾아보세요"
             aria-label="재료 검색"
