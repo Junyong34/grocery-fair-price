@@ -28,4 +28,6 @@ Blocked by: 없음
 - 테스트: 문턱·값 검사·알림 이슈 3개(`alert.test.ts`), 기록 DB 테스트 1개(`db-size.db.test.ts`). `pnpm typecheck`·`lint`·`test`·`db:test`·`price-ingest test:db` 통과.
 - 실측 기준값(15 결산, 11-09): 369MB. `observation` 252MB, `daily_quote` 59MB, `season_index` 14MB, `product_daily_summary` 9.6MB.
 
-**남은 것**: 운영 DB에 마이그레이션을 적용한 뒤 push한다. 순서가 바뀌면 KAMIS 워크플로의 "DB 크기" 단계가 표가 없어 실패한다(알림 9). 적용 뒤 첫 정기 실행에서 행이 생기는지 보고 닫는다.
+**2026-11-09 운영 적용**: `supabase db push`(소유자 접속, 주소 가림)로 마이그레이션 적용 → 로컬에서 `size`를 운영에 한 번 돌려 첫 행(369MB)을 남김 → push(`b37a20a`).
+
+**남은 것**: (적용 완료) ~~운영 DB에 마이그레이션을 적용한 뒤 push한다.~~ 순서가 바뀌면 KAMIS 워크플로의 "DB 크기" 단계가 표가 없어 실패한다(알림 9). 11-10 KAMIS 정기 실행에서 행이 생기는지 보고 닫는다.
