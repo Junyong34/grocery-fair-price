@@ -1,12 +1,27 @@
+/*
+ * 월령별 과일 도감. 색은 Oura 팔레트 토큰만 쓴다(packages/ui/src/styles/globals.css).
+ * 뜻별 색: 금지 = holiday(빨강), 주의 = gold, 권장 = forest, 참고 = 중립(mat), 이달 제철 = 테두리만 sage.
+ */
+/* 바텀시트는 포털로 .fruits-page 밖에 그려지므로 뜻별 색은 :root에 둔다. */
+:root {
+  --fruits-danger-bg: var(--color-holiday-wash);
+  --fruits-danger-ink: var(--color-verdict-pricey-ink);
+  --fruits-danger-line: color-mix(in oklab, var(--color-holiday) 28%, var(--color-canvas));
+  --fruits-caution-bg: var(--color-pair-gold);
+  --fruits-caution-ink: var(--color-pair-gold-foreground);
+  --fruits-caution-line: color-mix(in oklab, var(--color-gold) 32%, var(--color-canvas));
+}
+
 .fruits-page {
+  --fruits-gutter: clamp(16px, 3.5vw, 32px);
   max-width: 1152px;
   margin-inline: auto;
-  padding: clamp(20px, 3.5vw, 40px) clamp(16px, 3.5vw, 32px);
-  color: var(--color-foreground, #1c1917);
+  padding: clamp(20px, 3.5vw, 40px) var(--fruits-gutter);
+  color: var(--color-pair-base-foreground);
 }
 
 .fruits-header {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .fruits-header h1 {
@@ -15,26 +30,29 @@
   line-height: 1.25;
   font-weight: 700;
   letter-spacing: -0.02em;
+  word-break: keep-all;
+  text-wrap: balance;
 }
 
 .fruits-lead {
   margin-top: 10px;
+  max-width: 62ch;
   font-size: 15px;
   line-height: 1.6;
-  color: var(--color-stone, #78716c);
+  color: var(--color-stone);
   word-break: keep-all;
+  text-wrap: pretty;
 }
 
-/* 월령 단계 탭바 */
+/* 월령 고르기: 이유식 궁합표의 거르기 알약(.pairing-pill)과 같은 색 규칙 */
 .fruits-stage-tabs-wrap {
   position: sticky;
-  top: 56px;
+  top: var(--shell-top, 56px);
   z-index: 10;
-  background: var(--color-background, #fff);
-  padding-block: 10px;
-  margin-inline: -16px;
-  padding-inline: 16px;
-  border-bottom: 1px solid var(--color-hairline, #f0eeee);
+  margin-inline: calc(-1 * var(--fruits-gutter));
+  padding: 10px var(--fruits-gutter);
+  background: var(--color-canvas);
+  border-bottom: 1px solid var(--color-hairline);
 }
 
 .fruits-stage-tabs {
@@ -42,9 +60,10 @@
   align-items: center;
   gap: 8px;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 2px;
+  /* 오른쪽 끝 알약이 잘려 보이게 해 옆으로 더 있다는 걸 알린다 */
+  scroll-padding-inline: var(--fruits-gutter);
 }
 
 .fruits-stage-tabs::-webkit-scrollbar {
@@ -58,92 +77,118 @@
   justify-content: center;
   flex-shrink: 0;
   min-height: 48px;
-  padding: 6px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--color-hairline, #e7e5e4);
-  background: var(--color-background, #fff);
-  color: var(--color-stone, #78716c);
+  padding: 5px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--color-hairline);
+  background: var(--color-pair-light);
+  color: var(--color-pair-light-foreground);
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
-  line-height: 1.2;
-  transition: all 0.15s ease;
+  line-height: 1.25;
   white-space: nowrap;
+  touch-action: manipulation;
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
 }
 
 .fruits-stage-pill small {
   font-size: 11px;
   font-weight: 400;
-  opacity: 0.8;
-  margin-top: 2px;
+  color: var(--color-caption);
 }
 
-.fruits-stage-pill:hover {
-  background: var(--color-muted, #f5f5f4);
-  color: var(--color-foreground, #1c1917);
+.fruits-stage-pill[aria-current="page"] {
+  background: var(--color-pair-ink);
+  border-color: var(--color-pair-ink);
+  color: var(--color-pair-ink-foreground);
 }
 
-.fruits-stage-pill[data-active="true"] {
-  background: var(--color-foreground, #1c1917);
-  color: var(--color-background, #fff);
-  border-color: var(--color-foreground, #1c1917);
+.fruits-stage-pill[aria-current="page"] small {
+  color: color-mix(in oklab, var(--color-pair-ink-foreground) 75%, transparent);
 }
 
-/* 동적 경고 배너 */
+@media (hover: hover) and (pointer: fine) {
+  .fruits-stage-pill:not([aria-current="page"]):hover {
+    border-color: var(--color-silver);
+    background: var(--color-pair-muted);
+  }
+}
+
+.fruits-stage-pill:focus-visible,
+.fruit-card:focus-visible,
+.fruits-warning-chip:focus-visible,
+.fruit-sheet-link:focus-visible {
+  outline: 2px solid var(--color-forest);
+  outline-offset: 2px;
+}
+
+/* 경고 배너 */
 .fruits-warning-banner {
   margin-block: 20px;
-  padding: 16px 20px;
+  padding: 16px 18px;
   border-radius: 14px;
-  border: 1px solid #fed7aa;
-  background: #fffbeb;
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: 8px;
+  --tone-bg: var(--fruits-danger-bg);
+  --tone-ink: var(--fruits-danger-ink);
+  --tone-line: var(--fruits-danger-line);
+  border: 1px solid var(--tone-line);
+  background: var(--tone-bg);
 }
 
-.fruits-warning-banner.banner-danger {
-  border-color: #fecaca;
-  background: #fef2f2;
+.fruits-warning-banner[data-tone="caution"] {
+  --tone-bg: var(--fruits-caution-bg);
+  --tone-ink: var(--fruits-caution-ink);
+  --tone-line: var(--fruits-caution-line);
 }
 
 .fruits-warning-title {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
-  color: #991b1b;
+  line-height: 1.35;
+  color: var(--tone-ink);
 }
 
-.fruits-warning-title.title-caution {
-  color: #9a3412;
+.fruits-warning-title svg {
+  flex: none;
 }
 
 .fruits-warning-desc {
-  font-size: 13.5px;
-  line-height: 1.5;
-  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--color-stone);
   word-break: keep-all;
+  text-wrap: pretty;
 }
 
 .fruits-warning-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 4px;
 }
 
 .fruits-warning-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-size: 12px;
+  min-height: 32px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
   font-weight: 600;
-  background: #fff;
-  border: 1px solid #fca5a5;
-  color: #b91c1c;
+  background: var(--color-canvas);
+  border: 1px solid var(--tone-line);
+  color: var(--tone-ink);
+  text-decoration: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fruits-warning-chip:hover {
+    border-color: var(--tone-ink);
+  }
 }
 
 /* 과일 그리드 */
@@ -155,18 +200,36 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 16px;
+  gap: 12px;
 }
 
 .fruits-grid-heading h2 {
   font-family: var(--font-heading);
   font-size: 20px;
   font-weight: 700;
+  line-height: 1.3;
 }
 
-.fruits-grid-heading span {
+.fruits-grid-heading > span {
+  flex: none;
   font-size: 13px;
-  color: var(--color-stone, #78716c);
+  color: var(--color-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+.fruits-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-block: 10px 16px;
+  font-size: 12px;
+  color: var(--color-caption);
+}
+
+.fruits-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .fruits-grid {
@@ -189,278 +252,257 @@
   }
 }
 
-/* 과일 카드 */
+/* 과일 카드: 바깥 반경 20 = 그림 칸 8 + 안쪽 여백 12 */
 .fruit-card {
   display: flex;
   flex-direction: column;
-  padding: 16px 14px;
-  background: var(--color-background, #fff);
-  border: 1px solid var(--color-hairline, #e7e5e4);
-  border-radius: 18px;
+  gap: 10px;
+  padding: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: 20px;
+  color: var(--color-ink);
   cursor: pointer;
-  text-align: left;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-  position: relative;
+  text-align: start;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition-property: border-color, box-shadow;
+  transition-duration: 150ms;
 }
 
-.fruit-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-  border-color: #d6d3d1;
+@media (hover: hover) and (pointer: fine) {
+  .fruit-card:hover {
+    border-color: var(--color-silver);
+    box-shadow:
+      0 1px 2px color-mix(in oklab, var(--color-ink) 6%, transparent),
+      0 6px 18px color-mix(in oklab, var(--color-ink) 6%, transparent);
+  }
 }
 
-.fruit-card-top {
+.fruit-card-badges {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 6px;
-  min-height: 24px;
-  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 22px;
 }
 
 .fruit-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 7px;
-  border-radius: 6px;
-  font-size: 11px;
+  min-height: 22px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 12px;
   font-weight: 600;
-  letter-spacing: -0.01em;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
-.badge-safe {
-  background: #ecfdf5;
-  color: #047857;
-  border: 1px solid #a7f3d0;
+.fruit-badge[data-tone="safe"] {
+  background: var(--color-pair-forest);
+  color: var(--color-pair-forest-foreground);
 }
 
-.badge-conventional {
-  background: #f5f5f4;
-  color: #57534e;
-  border: 1px solid #e7e5e4;
+.fruit-badge[data-tone="neutral"] {
+  background: var(--color-pair-muted);
+  color: var(--color-stone);
 }
 
-.badge-caution {
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
+.fruit-badge[data-tone="caution"] {
+  background: var(--fruits-caution-bg);
+  color: var(--fruits-caution-ink);
 }
 
-.badge-seasonal {
-  background: #f0fdf4;
-  color: #15803d;
-  border: 1px solid #bbf7d0;
+.fruit-badge[data-tone="season"] {
+  background: transparent;
+  border-color: var(--color-sage);
+  color: var(--color-forest);
 }
 
 .fruit-card-art {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px 8px;
-  min-height: 130px;
-  background: #fbfbfa;
-  border-radius: 14px;
-  margin-bottom: 12px;
+  aspect-ratio: 4 / 3;
+  background: var(--color-pair-light);
+  border-radius: 8px;
 }
 
 .fruit-card-art .pairing-art {
-  width: 88px;
-  height: 88px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 56%;
+  height: 72%;
 }
 
 .fruit-card-art .pairing-art img {
-  width: 88px !important;
-  height: 88px !important;
-  max-width: 88px !important;
-  max-height: 88px !important;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08));
 }
 
-@media (min-width: 640px) {
-  .fruit-card-art {
-    min-height: 150px;
-    padding: 20px 12px;
-  }
-  .fruit-card-art .pairing-art {
-    width: 104px;
-    height: 104px;
-  }
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
   .fruit-card-art .pairing-art img {
-    width: 104px !important;
-    height: 104px !important;
-    max-width: 104px !important;
-    max-height: 104px !important;
+    transition: scale 200ms ease-out;
   }
-}
-
-.fruit-card:hover .fruit-card-art .pairing-art img {
-  transform: scale(1.08);
-}
-
-.fruit-card-placeholder {
-  width: 80px;
-  height: 80px;
-  border: 1.5px dashed var(--color-hairline, #d6d3d1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-stone, #a8a29e);
-  font-size: 13px;
-  background: #fff;
+  .fruit-card:hover .fruit-card-art .pairing-art img {
+    scale: 1.04;
+  }
 }
 
 .fruit-card-info {
-  margin-top: auto;
+  display: grid;
+  gap: 2px;
+  padding-inline: 2px;
 }
 
 .fruit-card-name {
   font-family: var(--font-heading);
   font-size: 18px;
   font-weight: 700;
-  color: var(--color-foreground, #1c1917);
+  line-height: 1.3;
+  color: var(--color-ink);
+}
+
+.fruit-card-stage {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-stone);
 }
 
 .fruit-card-prep {
-  margin-top: 6px;
-  font-size: 12.5px;
-  line-height: 1.45;
-  color: var(--color-stone, #78716c);
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-caption);
+  word-break: keep-all;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.fruit-card-tag {
-  display: inline-block;
-  margin-top: 8px;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #0369a1;
-}
-
-/* 바텀시트 상세 가이드 */
-.fruit-sheet-content {
-  padding: 16px 20px 32px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
+/* 바텀시트 상세 */
 .fruit-sheet-hero {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
 .fruit-sheet-hero .pairing-art {
-  width: 72px;
-  height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fbfbfa;
-  border: 1px solid var(--color-hairline, #e7e5e4);
-  border-radius: 14px;
+  width: 64px;
+  height: 64px;
   padding: 6px;
+  background: var(--color-pair-light);
+  border-radius: 14px;
   flex: none;
 }
 
 .fruit-sheet-hero .pairing-art img {
-  width: 60px !important;
-  height: 60px !important;
-  max-width: 60px !important;
-  max-height: 60px !important;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.08));
 }
 
 .fruit-sheet-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
 }
 
 .fruit-sheet-title {
   font-family: var(--font-heading);
   font-size: 24px;
   font-weight: 700;
+  line-height: 1.2;
 }
 
 .fruit-sheet-badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  align-items: center;
+  gap: 4px 6px;
+}
+
+.fruit-sheet-stage {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-stone);
+}
+
+.fruit-sheet-content {
+  display: grid;
+  gap: 10px;
+  padding-block: 12px 4px;
 }
 
 .fruit-sheet-block {
-  padding: 14px;
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
   border-radius: 12px;
-  background: var(--color-muted, #f5f5f4);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  background: var(--color-pair-muted);
+  color: var(--color-pair-muted-foreground);
 }
 
-.fruit-sheet-block h4 {
-  font-size: 13.5px;
+.fruit-sheet-block h3 {
+  font-size: 14px;
   font-weight: 700;
-  color: var(--color-foreground, #1c1917);
+  line-height: 1.4;
 }
 
 .fruit-sheet-block p {
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: #44403c;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-stone);
   word-break: keep-all;
+  text-wrap: pretty;
 }
 
-.fruit-sheet-block.block-alert {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
+.fruit-sheet-block[data-tone="danger"] {
+  background: var(--fruits-danger-bg);
+  border: 1px solid var(--fruits-danger-line);
 }
 
-.fruit-sheet-block.block-alert h4 {
-  color: #b91c1c;
+.fruit-sheet-block[data-tone="danger"] h3 {
+  color: var(--fruits-danger-ink);
 }
 
 .fruit-sheet-links {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
   margin-top: 6px;
+  border-top: 1px solid var(--color-hairline);
 }
 
-.fruit-sheet-link-btn {
+.fruit-sheet-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  border-radius: 10px;
-  background: #fff;
-  border: 1px solid var(--color-hairline, #e7e5e4);
-  font-size: 14px;
+  min-height: 48px;
+  border-bottom: 1px solid var(--color-hairline);
+  font-size: 15px;
   font-weight: 600;
-  color: var(--color-foreground, #1c1917);
+  color: var(--color-ink);
   text-decoration: none;
-  transition: background 0.15s ease;
 }
 
-.fruit-sheet-link-btn:hover {
-  background: #f5f5f4;
+.fruit-sheet-link::after {
+  content: "›";
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--color-caption);
 }
 
-/* 하단 주의/금지 식재료 도감 */
+@media (hover: hover) and (pointer: fine) {
+  .fruit-sheet-link:hover {
+    color: var(--color-forest);
+  }
+}
+
+/* 하단 금지·주의 식재료 */
 .safety-section {
   margin-top: 48px;
   padding-top: 32px;
-  border-top: 1px solid var(--color-hairline, #e7e5e4);
+  border-top: 1px solid var(--color-hairline);
 }
 
 .safety-section-header {
@@ -471,38 +513,51 @@
   font-family: var(--font-heading);
   font-size: 22px;
   font-weight: 700;
+  line-height: 1.3;
 }
 
 .safety-section-header p {
   margin-top: 6px;
   font-size: 14px;
-  color: var(--color-stone, #78716c);
+  color: var(--color-caption);
 }
 
 .safety-cards-group {
-  margin-bottom: 24px;
+  --tone-bg: var(--fruits-danger-bg);
+  --tone-ink: var(--fruits-danger-ink);
+  --tone-line: var(--fruits-danger-line);
+  margin-bottom: 32px;
+}
+
+.safety-cards-group[data-tone="caution"] {
+  --tone-bg: var(--fruits-caution-bg);
+  --tone-ink: var(--fruits-caution-ink);
+  --tone-line: var(--fruits-caution-line);
 }
 
 .safety-group-title {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 700;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
   margin-bottom: 12px;
+  padding-inline-start: 12px;
+  border-inline-start: 4px solid var(--tone-ink);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--tone-ink);
 }
 
-.safety-group-title.group-danger {
-  color: #b91c1c;
-}
-
-.safety-group-title.group-warning {
-  color: #c2410c;
+.safety-group-title small {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-caption);
 }
 
 .safety-cards-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
 }
 
@@ -513,76 +568,74 @@
 }
 
 .safety-card {
+  display: grid;
+  align-content: start;
+  gap: 12px;
   padding: 16px;
   border-radius: 14px;
-  background: var(--color-background, #fff);
-  border: 1px solid var(--color-hairline, #e7e5e4);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--tone-line);
+  /* 배너 칩으로 넘어왔을 때 고정 줄(헤더 + 월령 줄) 아래에 보이게 */
+  scroll-margin-top: calc(var(--shell-top, 56px) + 88px);
 }
 
-.safety-card.card-forbidden {
-  border-color: #fecaca;
-  background: #fffafa;
-}
-
-.safety-card.card-caution {
-  border-color: #fed7aa;
-  background: #fffcf8;
+.safety-card:target {
+  border-color: var(--tone-ink);
+  box-shadow: 0 0 0 2px var(--tone-line);
 }
 
 .safety-card-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 12px;
 }
 
-.safety-card > .pairing-art {
-  width: 72px;
-  height: 72px;
+.safety-card-head .pairing-art {
+  width: 48px;
+  height: 48px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--tone-bg);
 }
 
-.safety-card > .pairing-art img {
+.safety-card-head .pairing-art img {
   width: 100%;
   height: 100%;
+  object-fit: contain;
 }
 
 .safety-card-name {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
+  line-height: 1.3;
 }
 
-.safety-card-badge {
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
+.safety-card-body {
+  display: grid;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 1.6;
+  word-break: keep-all;
 }
 
-.badge-forbidden-pill {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.badge-caution-pill {
-  background: #ffedd5;
-  color: #9a3412;
-}
-
-.safety-card-reason {
+.safety-card-body dt {
   font-size: 13px;
-  line-height: 1.5;
-  color: #374151;
-  word-break: keep-all;
+  font-weight: 700;
+  color: var(--tone-ink);
 }
 
-.safety-card-guide {
-  font-size: 12px;
-  line-height: 1.5;
-  color: #6b7280;
-  background: rgba(0, 0, 0, 0.02);
-  padding: 8px 10px;
+.safety-card-body dd {
+  color: var(--color-stone);
+  text-wrap: pretty;
+}
+
+.safety-card-body dd + dt {
+  margin-top: 8px;
+}
+
+.safety-card-body .safety-card-guide {
+  padding: 10px 12px;
   border-radius: 8px;
-  word-break: keep-all;
+  background: var(--color-pair-muted);
+  color: var(--color-ink);
 }

@@ -19,8 +19,7 @@ export default function Page() {
       <JsonLd
         data={breadcrumb([
           { name: "제철달력", path: routes.seasonal.root },
-          { name: "이유식 재료 궁합표", path: routes.babyFood.pairings },
-          { name: "월령별 과일 시기 도감", path: routes.babyFood.fruits },
+          { name: "월령별 과일 도감", path: routes.babyFood.fruits },
         ])}
       />
       <Suspense fallback={<div className="min-h-svh" aria-busy />}>

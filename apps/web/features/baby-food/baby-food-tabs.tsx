@@ -8,7 +8,7 @@ import { routes } from "@/shared/routes"
 
 const TABS = [
   {
-    label: "이유식 궁합",
+    label: "재료 궁합표",
     href: routes.babyFood.pairings,
     matches: (path: string) =>
       path === routes.babyFood.root ||
@@ -16,7 +16,7 @@ const TABS = [
       path.startsWith("/baby-food/result"),
   },
   {
-    label: "월령별 과일시기 도감",
+    label: "월령별 과일 도감",
     href: routes.babyFood.fruits,
     matches: (path: string) => path.startsWith(routes.babyFood.fruits),
   },
@@ -27,7 +27,7 @@ export function BabyFoodTabs() {
 
   return (
     <nav className="border-b border-hairline bg-canvas" aria-label="이유식 메뉴">
-      <div className="mx-auto flex max-w-[1080px] items-center gap-2 px-[18px] py-2.5 max-[360px]:px-3 lg:px-6">
+      <div className="mx-auto flex max-w-[1080px] items-stretch gap-5 px-[18px] max-[360px]:px-3 lg:px-6">
         {TABS.map((tab) => {
           const active = tab.matches(pathname)
           return (
@@ -36,10 +36,11 @@ export function BabyFoodTabs() {
               href={tab.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "inline-flex items-center rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
+                // 위 제철달력 탭(알약)과 아래 거르기 알약과 겹치지 않게, 이 줄은 밑줄 탭으로 둔다.
+                "-mb-px inline-flex min-h-11 items-center border-b-2 text-[15px] no-underline transition-colors",
                 active
-                  ? "bg-ink font-semibold text-canvas"
-                  : "text-stone hover:bg-hairline/60 hover:text-ink"
+                  ? "border-ink font-semibold text-ink"
+                  : "border-transparent font-medium text-caption hover:text-ink"
               )}
             >
               {tab.label}

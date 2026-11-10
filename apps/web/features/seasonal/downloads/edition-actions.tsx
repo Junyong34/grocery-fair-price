@@ -12,7 +12,7 @@ import { cn } from "@workspace/ui/lib/utils"
 import { track } from "@/shared/analytics/track"
 import { routes } from "@/shared/routes"
 
-import { copyPageLink, ShareButton, sharePage } from "../components/share-button"
+import { copyPageLink, ShareButton, sharePage } from "@/shared/share-button"
 import { requestA3, useA3Requested } from "../stores/a3-request-store"
 
 const noop = () => () => {}

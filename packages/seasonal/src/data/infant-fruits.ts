@@ -233,9 +233,9 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
     firstStage: "9-11-months",
     safetyStatus: "caution",
     prepMethod:
-      "껍질을 완전히 벗기고 씨를 뺀 뒤, **반드시 세로(길이 방향)로 4등분 이상 잘게 잘라** 급여합니다.",
+      "껍질을 완전히 벗기고 씨를 뺀 뒤, 반드시 세로(길이 방향)로 4등분 이상 잘게 잘라 급여합니다.",
     cuttingGuide:
-      "⚠️ 절대 통째로 주지 마세요! 동그란 알포도는 아기 기도를 완벽히 틀어막는 최고 위험 과일입니다. 가로로 자르면 안 되고 세로로 길쭉하게 4등분해야 합니다.",
+      "절대 통째로 주지 마세요! 동그란 알포도는 아기 기도를 완벽히 틀어막는 최고 위험 과일입니다. 가로로 자르면 안 되고 세로로 길쭉하게 4등분해야 합니다.",
     chokingRisk: true,
     allergyNote: "껍질과 씨를 삼키지 않도록 세심한 주의가 필요합니다.",
     seasonalFoodId: "green-grape",
@@ -378,8 +378,8 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
     firstStage: "12-months",
     safetyStatus: "caution",
     prepMethod:
-      "칼로 빙 둘러 씨를 완전히 빼내고, **반드시 4등분 이상 잘게 잘라서** 급여합니다.",
-    cuttingGuide: "⚠️ 체리 씨에는 청산배당체 독성이 있고, 통째 삼키면 기도 폐쇄 위험이 있습니다.",
+      "칼로 빙 둘러 씨를 완전히 빼내고, 반드시 4등분 이상 잘게 잘라서 급여합니다.",
+    cuttingGuide: "체리 씨에는 청산배당체 독성이 있고, 통째 삼키면 기도 폐쇄 위험이 있습니다.",
     chokingRisk: true,
     allergyNote: "씨 제거 여부를 두 번 확인하세요.",
     seasonalFoodId: "cherry",
@@ -419,7 +419,7 @@ export const PROHIBITED_FOODS: readonly ProhibitedFood[] = [
     targetStage: "before-12m",
     severity: "forbidden",
     reason:
-      "영아 보툴리누스증(*Clostridium botulinum*). 돌 미만 아기는 위산과 장내 균총이 미숙해 꿀의 보툴리누스 포자가 장내에서 발아하여 신경독소를 분비, 전신 근육 마비와 호흡 곤란(사망 위험)을 일으킵니다.",
+      "영아 보툴리누스증. 돌 미만 아기는 위산과 장내 균총이 미숙해 꿀의 보툴리누스 포자가 장내에서 발아하여 신경독소를 분비, 전신 근육 마비와 호흡 곤란(사망 위험)을 일으킵니다.",
     guide:
       "돌 전에는 꿀 및 꿀이 함유된 과자, 빵, 시럽을 일체 먹이지 마세요. 가열 조리해도 포자가 죽지 않습니다. 돌 이후에는 의학적 금기는 해제되나, 첨가당 제한을 위해 두 돌 이후 권장합니다.",
     iconId: "honey",
@@ -467,7 +467,7 @@ export const PROHIBITED_FOODS: readonly ProhibitedFood[] = [
     reason:
       "기관지 흡인(기도 질식사고) 위험. 딱딱하고 둥근 견과류 조각은 기도로 넘어가 폐렴을 유발하거나 기도를 막을 위험이 극도로 높습니다.",
     guide:
-      "알레르기 예방을 위한 곱게 간 분말이나 부드러운 페이스트 형태는 6개월 이후부터 권장되지만, **통째로 된 견과류는 만 4~5세 이전에는 절대 주지 마세요**.",
+      "알레르기 예방을 위한 곱게 간 분말이나 부드러운 페이스트 형태는 6개월 이후부터 권장되지만, 통째로 된 견과류는 만 4~5세 이전에는 절대 주지 마세요.",
     iconId: "peanut",
   },
   {
@@ -478,7 +478,7 @@ export const PROHIBITED_FOODS: readonly ProhibitedFood[] = [
     reason:
       "어릴 때 형성된 단맛 선호는 평생 비만과 만성 질환의 원인이 됩니다. 단맛이 강한 음식을 먹으면 채소나 담백한 밥을 거부합니다.",
     guide:
-      "세계보건기구(WHO)와 미국소아과학회(AAP)는 만 24개월 미만 영유아에게 **첨가당 0g(무가당)**을 강력 권고합니다. 단맛은 잘 익은 바나나나 과일로 대체하세요.",
+      "세계보건기구(WHO)와 미국소아과학회(AAP)는 만 24개월 미만 영유아에게 첨가당 0g(무가당)을 강력 권고합니다. 단맛은 잘 익은 바나나나 과일로 대체하세요.",
     iconId: "sugar",
   },
   {

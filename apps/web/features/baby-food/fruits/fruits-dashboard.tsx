@@ -10,8 +10,10 @@ import {
 } from "@workspace/seasonal/data/infant-fruits"
 
 import { routes } from "@/shared/routes"
+import { ShareButton } from "@/shared/share-button"
 import { SubHeader } from "@/shared/shell/sub-header"
 
+import { SAFETY_BADGES } from "./fruit-badges"
 import { FruitCard } from "./fruit-card"
 import { FruitDetailSheet } from "./fruit-detail-sheet"
 import { SafetyGuideSection } from "./safety-guide-section"
@@ -29,7 +31,6 @@ export function FruitsDashboard({
 }) {
   const [selectedFruit, setSelectedFruit] = useState<BabyFruit | null>(null)
 
-  const isAll = !stageId
   const fruits = getFruitsByStage(stageId ?? "all")
   const currentStageInfo = stageId
     ? BABY_FRUIT_STAGES.find((s) => s.id === stageId)
@@ -38,39 +39,48 @@ export function FruitsDashboard({
   return (
     <div className="fruits-page">
       <SubHeader
-        title="이유식 과일 시기 도감"
+        title="월령별 과일 도감"
         fallbackHref={routes.babyFood.pairings}
+        revealAfter="fruits-title"
+        actions={<ShareButton />}
       />
 
       <header className="fruits-header">
-        <h1>
+        <h1 id="fruits-title">
           {currentStageInfo
-            ? `${currentStageInfo.name} (${currentStageInfo.subTitle}) 아기 과일 시기`
-            : "월령별 아기 과일 시기 & 주의 식재료 도감"}
+            ? `${currentStageInfo.name} 아기 과일`
+            : "월령별 아기 과일 도감"}
         </h1>
         <p className="fruits-lead">
           {currentStageInfo
-            ? currentStageInfo.summary
-            : "생후 4~6개월 초기 이유식부터 24개월 완료기까지, 소아청소년과 지침에 맞춘 월령별 추천 과일과 질식 예방 손질법, 돌 전 금기 식품을 한눈에 확인하세요."}
+            ? `${currentStageInfo.subTitle} · ${currentStageInfo.summary}`
+            : "언제부터 어떤 과일을 줄 수 있는지 월령별로 모았어요. 과일을 누르면 손질법과 질식 예방법을 볼 수 있어요."}
         </p>
       </header>
 
-      {/* 월령 탭바 */}
       <StageTabs activeStage={stageId ?? "all"} />
 
-      {/* 동적 위험 경고 배너 */}
       <StageWarningBanner stageId={stageId ?? "all"} />
 
-      {/* 과일 그리드 */}
-      <section className="fruits-grid-section" aria-label="월령별 과일 목록">
+      <section className="fruits-grid-section" aria-labelledby="fruits-grid-title">
         <div className="fruits-grid-heading">
-          <h2>
+          <h2 id="fruits-grid-title">
             {currentStageInfo
-              ? `${currentStageInfo.name}에 추천하는 과일`
-              : "전체 월령 과일"}
+              ? `${currentStageInfo.name}에 줄 수 있는 과일`
+              : "모든 과일"}
           </h2>
-          <span>총 {fruits.length}가지</span>
+          <span>{fruits.length}가지</span>
         </div>
+        <ul className="fruits-legend" aria-label="표시 뜻">
+          {Object.values(SAFETY_BADGES).map((badge) => (
+            <li key={badge.tone}>
+              <span className="fruit-badge" data-tone={badge.tone}>
+                {badge.label}
+              </span>
+              {badge.legend}
+            </li>
+          ))}
+        </ul>
 
         <div className="fruits-grid">
           {fruits.map((fruit) => (
@@ -84,14 +94,12 @@ export function FruitsDashboard({
         </div>
       </section>
 
-      {/* 바텀시트 상세 가이드 */}
       <FruitDetailSheet
         fruit={selectedFruit}
         currentMonth={currentMonth}
         onClose={() => setSelectedFruit(null)}
       />
 
-      {/* 하단 영유아 시기별 금지 & 주의 식재료 도감 */}
       <SafetyGuideSection />
     </div>
   )

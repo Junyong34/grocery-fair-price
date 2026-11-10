@@ -14,15 +14,18 @@ export function PairingItems({
   names,
   selected = [],
   printable = false,
+  variant = "inline",
 }: {
   base: string
   sign: "O" | "X"
   names: readonly string[]
   selected?: readonly string[]
   printable?: boolean
+  /** tiles = 재료별 페이지의 그림 타일. inline = 궁합표 칸 안의 글자 목록 */
+  variant?: "inline" | "tiles"
 }) {
   return (
-    <ul className="pairing-items">
+    <ul className={variant === "tiles" ? "pairing-tiles" : "pairing-items"}>
       {names.map((name) => {
         const isConflict =
           base === "우유" && sign === "X" && isMilkDuplicateConflict(base, name)

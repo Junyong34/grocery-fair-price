@@ -25,12 +25,12 @@ export function CatalogFilter({ rows }: { rows: readonly PairingRow[] }) {
         variant="cream"
         className="text-base bg-pair-light text-pair-light-foreground [--input:var(--color-pair-light)] [--v-canvas:var(--color-pair-light)]"
         type="search"
-        aria-label="전체 표 기준 재료 찾기"
-        placeholder="표에서 기준 재료 찾기 · 예: 당근"
+        aria-label="재료 이름으로 찾기"
+        placeholder="예: 당근"
         value={query}
         onChange={(event) => setQuery(event.target.value)}
       />
-      <div className="pairing-controls my-4" aria-label="전체 표 카테고리">
+      <div className="pairing-controls my-4" role="group" aria-label="재료 종류">
         {PAIRING_CATEGORIES.map((item) => (
           <button
             type="button"
@@ -45,7 +45,8 @@ export function CatalogFilter({ rows }: { rows: readonly PairingRow[] }) {
       </div>
       {visible.length === 0 ? (
         <p role="status" className="text-caption">
-          해당 재료가 없어요. 이름이나 카테고리를 바꿔 보세요.
+          {search ? `‘${search}’에 맞는 재료가 없어요. ` : "이 종류에는 재료가 없어요. "}
+          이름을 줄이거나 ‘전체’를 눌러 보세요.
         </p>
       ) : (
         <PairingGrid rows={visible} linkTitles />

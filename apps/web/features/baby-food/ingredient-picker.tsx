@@ -45,7 +45,7 @@ export function IngredientPicker({
       <SubHeader title="이유식 재료 선택" fallbackHref={routes.babyFood.pairings} />
       <div className="pairing-intro">
         <h1>오늘은 어떤 큐브를 함께 줄까요?</h1>
-        <Link className="pairing-pill" href={routes.babyFood.pairings}>
+        <Link className="pairing-pill pairing-secondary" href={routes.babyFood.pairings}>
           전체 궁합표 보기
         </Link>
       </div>
@@ -64,12 +64,15 @@ export function IngredientPicker({
           <h2 className="font-heading text-xl">
             함께 쓸 재료 <span aria-live="polite">{names.length}개</span>
           </h2>
+          {names.length === 0 && (
+            <p className="text-sm text-caption">재료를 누르면 여기에 담겨요.</p>
+          )}
           <div className="pairing-controls">
             {names.map((name) => (
               <button
                 key={name}
                 type="button"
-                className="pairing-pill"
+                className="pairing-pill pairing-chosen"
                 aria-label={`${name} 선택 해제`}
                 onClick={() => toggle(name)}
               >
@@ -82,7 +85,7 @@ export function IngredientPicker({
             type="submit"
             disabled={!names.length}
           >
-            선택한 궁합표 보기 →
+            고른 재료 궁합 보기
           </button>
         </aside>
         <div className="min-w-0">
@@ -90,12 +93,12 @@ export function IngredientPicker({
             variant="cream"
             className="text-base bg-pair-light text-pair-light-foreground [--input:var(--color-pair-light)] [--v-canvas:var(--color-pair-light)]"
             type="search"
-            placeholder="재료 이름으로 찾아보세요"
-            aria-label="재료 검색"
+            placeholder="예: 당근"
+            aria-label="재료 이름으로 찾기"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
-          <div className="pairing-controls my-4" aria-label="재료 카테고리">
+          <div className="pairing-controls my-4" role="group" aria-label="재료 종류">
             {PAIRING_CATEGORIES.map((item) => (
               <button
                 key={item}
@@ -124,7 +127,8 @@ export function IngredientPicker({
           </div>
           {visible.length === 0 && (
             <p role="status" className="text-caption">
-              해당 재료가 없어요. 이름이나 카테고리를 바꿔 보세요.
+              {search ? `‘${search}’에 맞는 재료가 없어요. ` : "이 종류에는 재료가 없어요. "}
+              이름을 줄이거나 ‘전체’를 눌러 보세요.
             </p>
           )}
         </div>

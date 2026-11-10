@@ -1,24 +1,19 @@
 import { INFANT_PAIRING_COPY } from "@workspace/seasonal/data/copy"
 
 import { PAIRING_REFERENCES } from "./data"
-import { PairingEvidence } from "./pairing-evidence"
 
-/** 자료와 해석. 전체표와 재료별 페이지가 같은 문구를 쓴다. */
-export function PairingSource() {
+/**
+ * 출처. 전체표와 재료별 페이지 맨 아래에 접어 둔다.
+ * conflict가 false면(우유와 상관없는 재료 페이지) 우유 O·X 중복 해석을 뺀다.
+ */
+export function PairingSource({ conflict = true }: { conflict?: boolean }) {
   return (
-    <section className="pairing-source">
-      <h2 className="font-heading text-xl">자료와 해석</h2>
+    <details className="pairing-source pairing-source-details">
+      <summary>출처</summary>
       <p>{INFANT_PAIRING_COPY.source}</p>
       <p>{INFANT_PAIRING_COPY.limit}</p>
-      <p>{INFANT_PAIRING_COPY.conflict}</p>
-      <div className="pairing-controls">
-        <PairingEvidence base="우유" name="고구마" sign="O">
-          우유 + 고구마 근거 ↗
-        </PairingEvidence>
-        <PairingEvidence base="우유" name="시금치" sign="O">
-          우유 + 시금치 근거 ↗
-        </PairingEvidence>
-      </div>
+      {conflict && <p>{INFANT_PAIRING_COPY.conflict}</p>}
+      <h3 className="mt-2 font-semibold text-ink">참고 자료</h3>
       <ul className="grid gap-1 text-sm">
         {Object.values(PAIRING_REFERENCES).map(({ title, href }) => (
           <li key={href}>
@@ -28,7 +23,6 @@ export function PairingSource() {
           </li>
         ))}
       </ul>
-      <p className="text-sm text-caption">우유 조합 검토일 2026.11.07</p>
-    </section>
+    </details>
   )
 }

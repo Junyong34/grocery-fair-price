@@ -3,6 +3,7 @@
 import Link from "next/link"
 
 import { BottomSheet } from "@workspace/ui/components/bottom-sheet"
+import { PAIRINGS } from "@workspace/seasonal/data/infant-pairings"
 import {
   isBabyFruitSeasonal,
   type BabyFruit,
@@ -11,6 +12,10 @@ import {
 import { routes } from "@/shared/routes"
 import { FRUIT_GUIDE_ART } from "../data"
 import { IngredientArt } from "../ingredient-art"
+import { firstStageLabel, SAFETY_BADGES } from "./fruit-badges"
+
+/** 재료 궁합표에 기준 재료로 있는 id. 없는 과일은 궁합 링크를 두지 않는다(404 방지). */
+const PAIRING_IDS = new Set(PAIRINGS.map((row) => row.id))
 
 export function FruitDetailSheet({
   fruit,
@@ -26,12 +31,8 @@ export function FruitDetailSheet({
   const isSeasonal = currentMonth
     ? isBabyFruitSeasonal(fruit, currentMonth)
     : false
-
-  const badgeConfig = {
-    safe: { label: "안전 (권장)", className: "badge-safe" },
-    conventional: { label: "관행 (참고)", className: "badge-conventional" },
-    caution: { label: "주의 (손질필수)", className: "badge-caution" },
-  }[fruit.safetyStatus]
+  const badge = SAFETY_BADGES[fruit.safetyStatus]
+  const foodId = fruit.seasonalFoodId
 
   return (
     <BottomSheet
@@ -43,75 +44,67 @@ export function FruitDetailSheet({
           <div className="fruit-sheet-meta">
             <span className="fruit-sheet-title">{fruit.name}</span>
             <div className="fruit-sheet-badges">
-              <span className={`fruit-badge ${badgeConfig.className}`}>
-                {badgeConfig.label}
+              <span className="fruit-badge" data-tone={badge.tone}>
+                {badge.label}
               </span>
               {isSeasonal && (
-                <span className="fruit-badge badge-seasonal">🌿 이번 달 제철</span>
+                <span className="fruit-badge" data-tone="season">
+                  이달 제철
+                </span>
               )}
+              <span className="fruit-sheet-stage">{firstStageLabel(fruit)}</span>
             </div>
           </div>
         </div>
       }
     >
       <div className="fruit-sheet-content">
-        <div className="fruit-sheet-block">
-          <h4>🥣 권장 손질 및 조리법</h4>
-          <p>{fruit.prepMethod}</p>
-        </div>
-
-        {fruit.cuttingGuide && (
-          <div
-            className={`fruit-sheet-block ${
-              fruit.chokingRisk ? "block-alert" : ""
-            }`}
-          >
-            <h4>
-              {fruit.chokingRisk
-                ? "🚨 질식 예방 커팅 가이드 (필독)"
-                : "✂️ 핑거푸드 커팅 가이드"}
-            </h4>
+        {fruit.cuttingGuide && fruit.chokingRisk && (
+          <section className="fruit-sheet-block" data-tone="danger">
+            <h3>질식 예방 손질</h3>
             <p>{fruit.cuttingGuide}</p>
-          </div>
+          </section>
+        )}
+
+        <section className="fruit-sheet-block">
+          <h3>손질과 조리</h3>
+          <p>{fruit.prepMethod}</p>
+        </section>
+
+        {fruit.cuttingGuide && !fruit.chokingRisk && (
+          <section className="fruit-sheet-block">
+            <h3>먹일 때 참고</h3>
+            <p>{fruit.cuttingGuide}</p>
+          </section>
         )}
 
         {fruit.allergyNote && (
-          <div className="fruit-sheet-block">
-            <h4>💡 알레르기 및 주의사항</h4>
+          <section className="fruit-sheet-block">
+            <h3>알레르기와 주의</h3>
             <p>{fruit.allergyNote}</p>
-          </div>
+          </section>
         )}
 
-        <div className="fruit-sheet-links">
-          {fruit.seasonalFoodId && (
-            <>
+        {foodId && (
+          <nav className="fruit-sheet-links" aria-label={`${fruit.name} 더 보기`}>
+            <Link
+              href={routes.seasonal.food(foodId)}
+              className="fruit-sheet-link"
+              onClick={onClose}
+            >
+              {fruit.name} 제철 시기 보기
+            </Link>
+            {PAIRING_IDS.has(foodId) && (
               <Link
-                href={routes.seasonal.food(fruit.seasonalFoodId)}
-                className="fruit-sheet-link-btn"
+                href={routes.babyFood.ingredient(foodId)}
+                className="fruit-sheet-link"
                 onClick={onClose}
               >
-                <span>🌿 {fruit.name} 제철 달력 보기</span>
-                <span aria-hidden="true">→</span>
+                {fruit.name} 이유식 궁합 보기
               </Link>
-              <Link
-                href={routes.babyFood.ingredient(fruit.seasonalFoodId)}
-                className="fruit-sheet-link-btn"
-                onClick={onClose}
-              >
-                <span>🥣 {fruit.name} 이유식 재료 궁합 보기</span>
-                <span aria-hidden="true">→</span>
-              </Link>
-              <Link
-                href={routes.price.variety(fruit.seasonalFoodId)}
-                className="fruit-sheet-link-btn"
-                onClick={onClose}
-              >
-                <span>🛒 {fruit.name} 마트 장보기 시세 확인</span>
-                <span aria-hidden="true">→</span>
-              </Link>
-            </>
-          )}
-        </div>
+            )}
+          </nav>
+        )}
       </div>
     </BottomSheet>
   )

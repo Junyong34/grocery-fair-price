@@ -21,7 +21,7 @@ import {
 import { routes } from "@/shared/routes"
 
 import { FoodImage } from "../components/food-image"
-import { ShareButton } from "../components/share-button"
+import { ShareButton } from "@/shared/share-button"
 import { DishImage } from "./dish-image"
 import { FestivalBackground } from "./festival-background"
 import { CalendarLink, FestivalPeriod } from "./festival-date"

@@ -13,7 +13,7 @@ import { routes } from "@/shared/routes"
 
 import { DownloadsCard } from "@/shared/downloads/downloads-card"
 import { MonthDaysCardToday } from "../components/month-days-card"
-import { ShareButton } from "../components/share-button"
+import { ShareButton } from "@/shared/share-button"
 import { EatenInMonth } from "./eaten-summary"
 import { FoodCard } from "./food-card"
 import { FoodGrid, ViewSwitch } from "./food-grid"

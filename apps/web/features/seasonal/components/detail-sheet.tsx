@@ -7,7 +7,7 @@ import { useSyncExternalStore } from "react"
 import { BottomSheet } from "@workspace/ui/components/bottom-sheet"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@workspace/ui/components/sheet"
 
-import { ShareButton } from "./share-button"
+import { ShareButton } from "@/shared/share-button"
 
 const DESKTOP = "(min-width: 1024px)"
 

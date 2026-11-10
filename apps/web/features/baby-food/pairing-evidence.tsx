@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { overlay } from "overlay-kit"
 
 import { Badge } from "@workspace/ui/components/badge"
@@ -11,7 +12,13 @@ import {
   DialogTitle,
 } from "@workspace/ui/components/dialog"
 import { INFANT_PAIRING_COPY } from "@workspace/seasonal/data/copy"
-import { explainInfantPairing } from "@workspace/seasonal/data/infant-pairings"
+import {
+  explainInfantPairing,
+  findPairingByName,
+  pairingDisplayName,
+} from "@workspace/seasonal/data/infant-pairings"
+
+import { routes } from "@/shared/routes"
 
 import { PAIRING_REFERENCES } from "./data"
 
@@ -60,6 +67,9 @@ export function PairingEvidence({
           sign
         )
         const label = INFANT_PAIRING_COPY.verdictLabels[kind]
+        // 상대 재료에도 궁합표가 있으면 그 페이지로 잇는다(지금 보는 기준 재료는 빼고).
+        const partner = findPairingByName(name)
+        const partnerRow = partner && partner.name !== base ? partner : undefined
         const description =
           kind === "good-general"
             ? INFANT_PAIRING_COPY.verdictDescriptions["good-general"](
@@ -120,13 +130,26 @@ export function PairingEvidence({
                       {title}
                     </a>
                   ))}
-                  <p className="text-caption">검토일 2026.11.07</p>
                 </div>
               )}
               <p className="text-xs text-caption">{INFANT_PAIRING_COPY.limit}</p>
-              <DialogClose className="pairing-pill justify-self-end">
-                닫기
-              </DialogClose>
+              <div className="pairing-dialog-actions">
+                {partnerRow && (
+                  <Link
+                    href={routes.babyFood.ingredient(partnerRow.id)}
+                    className="pairing-pill pairing-primary"
+                    onClick={() => {
+                      close()
+                      unmount()
+                    }}
+                  >
+                    {pairingDisplayName(partnerRow)} 궁합 보기
+                  </Link>
+                )}
+                <DialogClose className="pairing-pill pairing-secondary">
+                  닫기
+                </DialogClose>
+              </div>
             </DialogContent>
           </Dialog>
         ))

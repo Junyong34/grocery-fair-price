@@ -5,7 +5,7 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { formatMonthLabel, MONTHS } from "@workspace/seasonal/data/months"
 
-import { ShareButton } from "../components/share-button"
+import { ShareButton } from "@/shared/share-button"
 import { useSettings } from "../stores/settings-store"
 
 import { jumpToMonth, useActiveMonth } from "./active-month"

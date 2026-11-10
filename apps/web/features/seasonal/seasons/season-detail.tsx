@@ -19,7 +19,7 @@ import { routes } from "@/shared/routes"
 
 import { EatenBadgeToday } from "../components/eaten-badge"
 import { FoodImage } from "../components/food-image"
-import { ShareButton } from "../components/share-button"
+import { ShareButton } from "@/shared/share-button"
 import { SeasonTitle } from "./season-card"
 import { SEASON_COLOR_VAR } from "./season-style"
 import { SeasonMonthNav } from "./season-month-nav"

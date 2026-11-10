@@ -7,6 +7,7 @@ import {
 
 import { FRUIT_GUIDE_ART } from "../data"
 import { IngredientArt } from "../ingredient-art"
+import { firstStageLabel, SAFETY_BADGES } from "./fruit-badges"
 
 export function FruitCard({
   fruit,
@@ -20,26 +21,23 @@ export function FruitCard({
   const isSeasonal = currentMonth
     ? isBabyFruitSeasonal(fruit, currentMonth)
     : false
-
-  const badgeConfig = {
-    safe: { label: "안전 (권장)", className: "badge-safe" },
-    conventional: { label: "관행 (참고)", className: "badge-conventional" },
-    caution: { label: "주의 (손질필수)", className: "badge-caution" },
-  }[fruit.safetyStatus]
+  const badge = SAFETY_BADGES[fruit.safetyStatus]
 
   return (
     <button
       type="button"
       className="fruit-card"
       onClick={() => onSelect(fruit)}
-      aria-label={`${fruit.name} 이유식 손질법 및 주의사항 보기`}
+      aria-haspopup="dialog"
     >
-      <div className="fruit-card-top">
-        <span className={`fruit-badge ${badgeConfig.className}`}>
-          {badgeConfig.label}
+      <div className="fruit-card-badges">
+        <span className="fruit-badge" data-tone={badge.tone}>
+          {badge.label}
         </span>
         {isSeasonal && (
-          <span className="fruit-badge badge-seasonal">🌿 이달 제철</span>
+          <span className="fruit-badge" data-tone="season">
+            이달 제철
+          </span>
         )}
       </div>
 
@@ -49,8 +47,8 @@ export function FruitCard({
 
       <div className="fruit-card-info">
         <h3 className="fruit-card-name">{fruit.name}</h3>
+        <p className="fruit-card-stage">{firstStageLabel(fruit)}</p>
         <p className="fruit-card-prep">{fruit.prepMethod}</p>
-        <span className="fruit-card-tag">{fruit.stages[0]?.replace("-months", "개월~") ?? "권장"}</span>
       </div>
     </button>
   )

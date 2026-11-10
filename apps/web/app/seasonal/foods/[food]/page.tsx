@@ -6,7 +6,7 @@ import { Suspense } from "react"
 import { FOODS, findFood } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 
-import { ShareButton } from "@/features/seasonal/components/share-button"
+import { ShareButton } from "@/shared/share-button"
 import { priceVarietyPath } from "@/features/price/data/price-source"
 import { FoodDetail } from "@/features/seasonal/food-detail/food-detail"
 import { createMetadata } from "@/shared/meta"
