@@ -21,12 +21,17 @@ import {
   sashimiSeo,
   seasonSeo,
   seasonsIndexSeo,
+  productCategorySeo,
   productSeo,
+  productsSeo,
   varietySeo,
 } from "./titles"
 
 const all = [
   homeSeo(),
+  productsSeo(),
+  productCategorySeo({ name: "김치·반찬·통조림", count: 120, items: ["즉석밥·죽", "냉동만두", "참치 통조림", "단무지·절임", "김치"] }),
+  productCategorySeo({ name: "라면·면", count: 31, items: ["라면", "국수"] }),
   seasonalHomeSeo(),
   downloadsSeo(),
   babyFoodPairingsSeo(31),

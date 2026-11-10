@@ -29,6 +29,7 @@ const product = (id: string, name = id): ProductSummary => ({
   surveyedOn: "2026-10-23",
   price: 4150,
   perUnit: { unit: "100g", price: 692 },
+  varietyId: null,
 })
 
 describe("최근 본 시세 · 상품", () => {

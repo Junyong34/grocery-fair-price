@@ -1,4 +1,5 @@
-import { Info } from "lucide-react"
+import { ChevronRight, Info } from "lucide-react"
+import Link from "next/link"
 
 import {
   Popover,
@@ -11,12 +12,15 @@ import {
   listSourceLine,
   PRICE_COPY,
 } from "@workspace/price/copy"
-import { pickByIds } from "@workspace/price/list"
+import { pickByIds, type ProductCategory } from "@workspace/price/list"
 import type { VarietySummary } from "@workspace/price/types"
 
 import { DownloadsCard } from "@/shared/downloads/downloads-card"
 
+import { routes } from "@/shared/routes"
+
 import { AddButton } from "../components/add-button"
+import { CategoryLinks } from "../components/category-links"
 import { RecentPills } from "../components/recent-varieties"
 import { SearchEntry } from "../components/search-entry"
 import { HOME_SEARCH_ID } from "./search-id"
@@ -27,9 +31,12 @@ import { PriceHint, VarietyRow } from "../components/variety-row"
 export function HomeView({
   varieties,
   featuredIds,
+  productCategories = [],
 }: {
   varieties: readonly VarietySummary[]
   featuredIds: readonly string[]
+  /** 상품이 있는 카테고리. 홈에서 링크만 따라 상품 상세에 닿는 길이다 */
+  productCategories?: readonly ProductCategory[]
 }) {
   const featured = pickByIds(varieties, featuredIds)
   const basisLine = listBasisLine(featured)
@@ -101,10 +108,29 @@ export function HomeView({
           </p>
         )}
       </section>
-      <DownloadsCard
-        placement="price-home"
-        className="lg:col-start-1 lg:row-start-2"
-      />
+      <div className="flex min-w-0 flex-col gap-9 lg:col-start-1 lg:row-start-2">
+        {productCategories.length > 0 && (
+          <nav aria-labelledby="home-products-title" className="flex flex-col gap-3">
+            <div className="flex flex-col gap-0.5">
+              <h2 id="home-products-title" className="text-base font-semibold text-ink">
+                {PRICE_COPY.catalog.homeTitle}
+              </h2>
+              <p className="text-[13px] leading-relaxed text-caption">
+                {PRICE_COPY.catalog.homeNote}
+              </p>
+            </div>
+            <CategoryLinks categories={productCategories} />
+            <Link
+              href={routes.price.products}
+              className="-ms-1 inline-flex min-h-11 items-center gap-0.5 self-start px-1 text-sm font-semibold text-stone no-underline hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              {PRICE_COPY.catalog.homeAll}
+              <ChevronRight aria-hidden size={16} strokeWidth={2.25} className="rtl:rotate-180" />
+            </Link>
+          </nav>
+        )}
+        <DownloadsCard placement="price-home" />
+      </div>
     </div>
   )
 }

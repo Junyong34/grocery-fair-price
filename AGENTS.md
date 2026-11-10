@@ -103,7 +103,7 @@ Each layer may import only from the layers below it:
 | Layer | Where | What goes there |
 |---|---|---|
 | App routes | `apps/web/app/` | Route files only (`page`, `layout`, `@slot`, route groups), plus `api/og`, `sitemap.ts`, `robots.ts`. Keep routes thin: validate params, set metadata, render a feature component. |
-| Features | `apps/web/features/<feature>/` | One folder per screen (`seasonal/this-month`, `month-timeline`, `seasons`, `festivals`, `my-table`, `food-detail`, `search`; `price/home`, `catalog`, `search`, `variety-detail`, `basket`). `components/` holds parts several screens share; `stores/` holds zustand stores. Features don't import each other; shared code moves down a layer. |
+| Features | `apps/web/features/<feature>/` | One folder per screen (`seasonal/this-month`, `month-timeline`, `seasons`, `festivals`, `my-table`, `food-detail`, `search`; `price/home`, `product-catalog`, `search`, `variety-detail`, `product-detail`, `basket`). `components/` holds parts several screens share; `stores/` holds zustand stores. Features don't import each other; shared code moves down a layer. |
 | App shared | `apps/web/shared/` | App-wide pieces: `routes.ts`, `providers.tsx`, `meta.ts`, `today.ts` + `today-context.tsx`, `eaten-store.ts`, `brand-logo.tsx`. |
 | Domain | `packages/seasonal` | Pure TS: `data/`, `calendar/`, `layout/` (seeded scatter), `search/` (초성 match). No React, Next.js or DOM. |
 | Domain | `packages/price` | Pure TS for price screens: `types`, `verdict` (`verdictOf`), `search`, `format`, `list`, `copy`. No React, Next.js or DOM. |

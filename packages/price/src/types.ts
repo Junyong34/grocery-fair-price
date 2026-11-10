@@ -3,6 +3,7 @@
 import type { z } from "zod"
 
 import type {
+  categorySchema,
   channelSchema,
   forecastPointSchema,
   marketTypeQuoteSchema,
@@ -41,6 +42,7 @@ export type VarietyDetail = z.infer<typeof varietyDetailSchema>
 export type SearchVariety = z.infer<typeof searchVarietySchema>
 export type SearchAlias = z.infer<typeof searchAliasSchema>
 export type SearchIndex = z.infer<typeof searchIndexSchema>
+export type Category = z.infer<typeof categorySchema>
 export type Channel = z.infer<typeof channelSchema>
 export type ProductChannel = z.infer<typeof productChannelSchema>
 export type ProductSeller = z.infer<typeof productSellerSchema>

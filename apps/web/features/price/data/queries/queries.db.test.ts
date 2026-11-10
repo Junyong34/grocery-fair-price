@@ -6,6 +6,7 @@ import { PRODUCT_SUMMARY_KEYS, VARIETY_SUMMARY_KEYS } from "@workspace/price/sch
 
 import { readProduct } from "./get-product"
 import { readVariety } from "./get-variety"
+import { readCategories } from "./list-categories"
 import { readProducts } from "./list-products"
 import { readVarieties } from "./list-varieties"
 import { readSearchExtras } from "./search-index"
@@ -87,6 +88,14 @@ describe("readSearchExtras", () => {
     for (const alias of extras.aliases) expect(("varietyId" in alias) !== ("item" in alias)).toBe(true)
     const order = await web<{ name: string }[]>`select name from price.category order by sort nulls last, name`
     expect(extras.categories).toEqual(order.map((c) => c.name))
+  })
+})
+
+describe("readCategories", () => {
+  it("slug와 이름을 보여 줄 순서대로 돌려준다", async () => {
+    const order = await web<{ slug: string; name: string }[]>`select slug, name from price.category order by sort nulls last, name`
+    expect(order.length).toBeGreaterThan(0)
+    expect(await readCategories(web)).toEqual(order.map(({ slug, name }) => ({ slug, name })))
   })
 })
 

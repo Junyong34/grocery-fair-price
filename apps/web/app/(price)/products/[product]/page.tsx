@@ -2,13 +2,15 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
+import { productCategories } from "@workspace/price/list"
+
 import { getPriceSource } from "@/features/price/data/price-source"
 import { ProductView } from "@/features/price/product-detail/product-view"
 import { relatedProducts } from "@/features/price/product-detail/related-products"
 import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
 import { breadcrumb, JsonLd } from "@/shared/seo/json-ld"
-import { productSeo } from "@/shared/seo/titles"
+import { productCategorySeo, productSeo, productsSeo } from "@/shared/seo/titles"
 
 type Params = PageProps<"/products/[product]">["params"]
 
@@ -44,14 +46,31 @@ async function Product({ params }: { params: Params }) {
   const source = getPriceSource()
   const id = (await params).product
   // 두 목록은 generateStaticParams · 검색과 같은 캐시 읽기라 상세마다 DB를 다시 읽지 않는다.
-  const [product, products, varieties] = await Promise.all([source.getProduct(id), source.listProducts(), source.listVarieties()])
+  const [product, products, varieties, categories] = await Promise.all([
+    source.getProduct(id),
+    source.listProducts(),
+    source.listVarieties(),
+    source.listCategories(),
+  ])
   if (!product) notFound()
+  const category = productCategories(categories, products).find((c) => c.name === product.category)
   // 판정 목록에 없는 품종은 시세 화면이 404라 잇지 않는다.
   const variety = varieties.find((v) => v.id === product.varietyId) ?? null
   return (
     <>
-      <JsonLd data={breadcrumb([{ name: productSeo(product).title, path: routes.price.product(product.id) }])} />
-      <ProductView product={product} variety={variety} related={relatedProducts(products, product, RELATED_COUNT)} />
+      <JsonLd
+        data={breadcrumb([
+          { name: productsSeo().title, path: routes.price.products },
+          ...(category ? [{ name: productCategorySeo(category).title, path: routes.price.productCategory(category.slug) }] : []),
+          { name: productSeo(product).title, path: routes.price.product(product.id) },
+        ])}
+      />
+      <ProductView
+        product={product}
+        variety={variety}
+        related={relatedProducts(products, product, RELATED_COUNT)}
+        categoryPath={category ? routes.price.productCategory(category.slug) : null}
+      />
     </>
   )
 }

@@ -8,7 +8,7 @@ import { routes } from "@/shared/routes"
 import { varietySub } from "../components/variety-row"
 import { VerdictChip } from "../components/verdict-chip"
 import type { RecentItem } from "../stores/recent-store"
-import { productSub } from "./product-sub"
+import { productSub } from "../components/product-sub"
 
 /**
  * P2 빈 검색어의 최근 본 품종 · 상품 한 줄(44px).

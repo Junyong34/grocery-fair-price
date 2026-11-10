@@ -2,13 +2,14 @@ import "server-only"
 
 import { cacheLife } from "next/cache"
 
-import type { ProductDetail, ProductSummary, SearchIndex, VarietyDetail, VarietySummary } from "@workspace/price/types"
+import type { Category, ProductDetail, ProductSummary, SearchIndex, VarietyDetail, VarietySummary } from "@workspace/price/types"
 
 import { db } from "./db"
 import { FEATURED_IDS } from "./featured"
 import type { PriceSource } from "./price-source"
 import { readProduct } from "./queries/get-product"
 import { readVariety } from "./queries/get-variety"
+import { readCategories } from "./queries/list-categories"
 import { readProducts } from "./queries/list-products"
 import { readVarieties } from "./queries/list-varieties"
 import { readSearchExtras } from "./queries/search-index"
@@ -40,6 +41,13 @@ async function searchExtras() {
   return readSearchExtras(db())
 }
 
+// 카테고리(slug · 이름)는 드물게 바뀐다.
+async function listCategories(): Promise<readonly Category[]> {
+  "use cache"
+  cacheLife("days")
+  return readCategories(db())
+}
+
 // 상세도 목록과 같은 수명으로 캐시한다(2026-11-05). 요청마다 읽으면 P3 본문 전체가 동적이라 셸이 비고, 콜드 스타트 때 1~3초가 걸렸다.
 // 캐시하면 P3가 빌드 때 미리 그려진다. 대신 배치가 바꾼 값은 최대 hours만큼 늦게 보인다(목록과 같다). generateMetadata와 본문이 같은 키로 부른다.
 async function getVariety(id: string): Promise<VarietyDetail | null> {
@@ -62,6 +70,7 @@ async function getProduct(id: string): Promise<ProductDetail | null> {
 }
 
 export const dbSource: PriceSource = {
+  listCategories,
   listProducts,
   getProduct,
   listVarieties,

@@ -23,8 +23,6 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       { source: "/prices", destination: "/", permanent: true },
-      // 상품 목록 페이지도 없다. 상품은 검색 · 카테고리로 찾는다(catalog-scale/10).
-      { source: "/products", destination: "/", permanent: true },
     ]
   },
   experimental: {

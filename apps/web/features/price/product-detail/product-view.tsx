@@ -25,7 +25,10 @@ export function ProductView({
   product,
   variety = null,
   related = { items: [], total: 0 },
+  categoryPath = null,
 }: {
+  /** 이 상품 카테고리의 페이지. 카테고리 목록에 없으면 null */
+  categoryPath?: string | null
   product: ProductDetail
   /** 이 상품 판매가가 시세로 쓰이는 품종. 판정 목록에 없으면 null(링크가 404로 가지 않게) */
   variety?: VarietySummary | null
@@ -58,6 +61,12 @@ export function ProductView({
         unit={product.perUnit?.unit ?? null}
         related={related}
       />
+      {categoryPath && (
+        <RelatedLink
+          href={categoryPath}
+          label={COPY.categoryLink(product.category)}
+        />
+      )}
       <footer className="flex flex-wrap items-center justify-between gap-x-5 gap-y-1 border-t border-hairline pt-3">
         <p className="text-[13px] leading-relaxed text-caption">
           {COPY.basis(product.range.stores, product.surveyedOn)}

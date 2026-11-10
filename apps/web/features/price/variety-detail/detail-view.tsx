@@ -1,13 +1,15 @@
 import Link from "next/link"
 
 import { PRICE_COPY } from "@workspace/price/copy"
-import type { VarietyDetail, VarietySummary } from "@workspace/price/types"
+import type { ProductSummary, VarietyDetail, VarietySummary } from "@workspace/price/types"
 import { comparesMyPrice } from "@workspace/price/verdict"
 import { explainVerdict } from "@workspace/price/verdict-copy"
 import { findFood } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 
 import { routes } from "@/shared/routes"
+
+import { ProductRow } from "../components/product-row"
 
 import { DetailHeader, DetailHeaderBar } from "./detail-header"
 import { DotsCompare } from "./dots-compare"
@@ -30,7 +32,19 @@ const SECTIONS = [
  * "내가 본 가격 적기"는 범위 막대 바로 아래(시세 구간 안)에 둔다. 매장에서 가격표를 보고 비교하는 게 이 화면의 핵심이라 첫 화면에 닿게 하고,
  * 적으면 바로 위 범위 막대에 "내가 본" 핀이 꽂혀 입력과 결과가 한 화면에 보인다. 판정 전(평소가 없음)이거나 품종 · 브랜드 편차가 큰 품종(쌀 등)이면 뺀다(comparesMyPrice).
  */
-export function DetailView({ detail, related = [] }: { detail: VarietyDetail; related?: readonly VarietySummary[] }) {
+export function DetailView({
+  detail,
+  related = [],
+  products = [],
+  categoryPath = null,
+}: {
+  detail: VarietyDetail
+  related?: readonly VarietySummary[]
+  /** 이 품종의 시세로 쓰이는 참가격 상품. 없으면 묶음을 뺀다 */
+  products?: readonly ProductSummary[]
+  /** 이 품종 카테고리의 상품 카테고리 페이지. 상품이 없는 카테고리면 null */
+  categoryPath?: string | null
+}) {
   // 제철달력에 같은 id 품종이 있으면 제철 시기로 잇는다(제철 품종 상세의 "오늘 시세 보기"와 짝).
   const food = findFood(detail.id)
   return (
@@ -74,12 +88,27 @@ export function DetailView({ detail, related = [] }: { detail: VarietyDetail; re
           <span aria-hidden className="text-stone">›</span>
         </Link>
       )}
+      {/* 이 품종의 시세로 쓰이는 상품. 시세 상세에서 상품 상세로 가는 길이다(상품 상세의 "이 판매가가 쓰이는 시세"와 짝). */}
+      {products.length > 0 && (
+        <section aria-labelledby="variety-products-title" className="flex flex-col gap-2">
+          <h2 id="variety-products-title" className="text-base font-semibold text-ink">
+            {PRICE_COPY.catalog.varietyProducts(detail.name)}
+          </h2>
+          <p className="text-[13px] leading-relaxed text-caption">{PRICE_COPY.catalog.productsNote}</p>
+          <ul className="rounded-3xl bg-pair-light px-4 lg:px-5">
+            {products.map((product) => (
+              <ProductRow key={product.id} product={product} hideItem />
+            ))}
+          </ul>
+        </section>
+      )}
       {/* 같은 카테고리의 다른 품종. 품종 알약은 메인 "최근 본 품종"과 같은 pair-light(DESIGN.md). 검색으로 상세에 바로 들어온 사람이 비교를 이어 가고, 크롤러가 상세끼리 오간다. */}
-      <section aria-labelledby="related-title" className="flex flex-col gap-1">
-        <h2 id="related-title" className="text-base font-semibold text-ink">
-          {PRICE_COPY.related.title(detail.category)}
-        </h2>
-        {related.length > 0 && (
+      {/* 같은 카테고리에 다른 품종이 없으면(유제품의 우유) 제목만 남지 않게 묶음을 뺀다. */}
+      {related.length > 0 && (
+        <section aria-labelledby="related-title" className="flex flex-col gap-1">
+          <h2 id="related-title" className="text-base font-semibold text-ink">
+            {PRICE_COPY.related.title(detail.category)}
+          </h2>
           <ul className="flex flex-wrap gap-2 pt-2">
             {related.map((variety) => (
               <li key={variety.id}>
@@ -92,8 +121,17 @@ export function DetailView({ detail, related = [] }: { detail: VarietyDetail; re
               </li>
             ))}
           </ul>
-        )}
-      </section>
+        </section>
+      )}
+      {categoryPath && (
+        <Link
+          href={categoryPath}
+          className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-hairline px-4 py-3 text-sm font-semibold text-ink no-underline hover:text-ink"
+        >
+          {PRICE_COPY.catalog.categoryLink(detail.category)}
+          <span aria-hidden className="text-stone">›</span>
+        </Link>
+      )}
       {/*
         페이지 요약 한 문장(연도 포함 날짜·출처·표본·숫자). 검색 결과와 AI 답변이 인용하기 좋은 꼴로 둔다.
         판정 카드와 내용이 겹치므로 본문 섹션처럼 보이지 않게 가는 선 아래 각주로 둔다(크림 위 보조 글씨는 caption, DESIGN.md).

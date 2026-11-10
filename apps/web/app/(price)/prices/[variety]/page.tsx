@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
-import { relatedInCategory } from "@workspace/price/list"
+import { productCategories, relatedInCategory } from "@workspace/price/list"
 
 import { getPriceSource } from "@/features/price/data/price-source"
 import { DetailView } from "@/features/price/variety-detail/detail-view"
@@ -46,12 +46,24 @@ async function Variety({ params }: { params: Params }) {
   const source = getPriceSource()
   const id = (await params).variety
   // 목록은 sitemap과 같은 캐시 읽기라 상세마다 DB를 다시 읽지 않는다.
-  const [detail, varieties] = await Promise.all([source.getVariety(id), source.listVarieties()])
+  const [detail, varieties, products, categories] = await Promise.all([
+    source.getVariety(id),
+    source.listVarieties(),
+    source.listProducts(),
+    source.listCategories(),
+  ])
   if (!detail) notFound()
+  // 상품이 있는 카테고리만 페이지가 있다(과일처럼 상품이 없는 카테고리는 잇지 않는다).
+  const category = productCategories(categories, products).find((c) => c.name === detail.category)
   return (
     <>
       <JsonLd data={breadcrumb([{ name: varietySeo(detail).title, path: routes.price.variety(detail.id) }])} />
-      <DetailView detail={detail} related={relatedInCategory(varieties, detail.id, RELATED_COUNT)} />
+      <DetailView
+        detail={detail}
+        related={relatedInCategory(varieties, detail.id, RELATED_COUNT)}
+        products={products.filter((product) => product.varietyId === detail.id)}
+        categoryPath={category ? routes.price.productCategory(category.slug) : null}
+      />
     </>
   )
 }

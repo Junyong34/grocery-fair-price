@@ -1,3 +1,5 @@
+import { productCategories } from "@workspace/price/list"
+
 import { getPriceSource } from "@/features/price/data/price-source"
 import { HomeView } from "@/features/price/home/home-view"
 import { createMetadata } from "@/shared/meta"
@@ -14,12 +16,17 @@ export const metadata = createMetadata({
 // P1 시세 메인. 목록은 데이터 입구(getPriceSource)에서 읽어 내려 준다.
 export default async function Page() {
   const source = getPriceSource()
-  const [varieties, featuredIds] = await Promise.all([source.listVarieties(), source.featuredIds()])
+  const [varieties, featuredIds, categories, products] = await Promise.all([
+    source.listVarieties(),
+    source.featuredIds(),
+    source.listCategories(),
+    source.listProducts(),
+  ])
   return (
     <>
       {/* 사이트 이름·로고. 구글은 홈에서만 읽으므로 routes.home인 이 페이지에만 둔다. */}
       <JsonLd data={[website(), organization()]} />
-      <HomeView varieties={varieties} featuredIds={featuredIds} />
+      <HomeView varieties={varieties} featuredIds={featuredIds} productCategories={productCategories(categories, products)} />
     </>
   )
 }

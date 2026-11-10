@@ -153,6 +153,9 @@ export const searchIndexSchema = z.object({
   categories: z.array(z.string()).readonly(),
 })
 
+/** 카테고리 하나. slug는 주소(상품 카테고리 페이지)에 쓴다. */
+export const categorySchema = z.object({ slug: z.string(), name: z.string() })
+
 /** 참가격 업태. 판매처(seller.channel)와 상품 요약 범위 `channel:<업태>`의 값이다. */
 export const channelSchema = z.enum(["large_mart", "ssm", "department", "convenience"])
 
@@ -232,6 +235,7 @@ export const productSummarySchema = productDetailSchema.pick({
   price: true,
   surveyedOn: true,
   status: true,
+  varietyId: true,
 })
 
 /** 상품 목록이 payload에서 읽는 키. */

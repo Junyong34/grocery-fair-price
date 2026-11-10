@@ -21,6 +21,7 @@ function product(
     price,
     surveyedOn: "2026-10-23",
     status,
+    varietyId: null,
   }
 }
 

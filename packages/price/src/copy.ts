@@ -114,6 +114,27 @@ export const PRICE_COPY = {
   related: {
     title: (category: string) => `다른 ${category} 시세`,
   },
+  /** 상품 목록(/products)과 상품 카테고리 페이지. 검색 없이 링크만 따라 모든 상품 상세에 닿는 길이다. */
+  catalog: {
+    title: "상품 가격 비교",
+    lead: "라면·우유·과자 같은 포장 상품의 전국 판매가를 카테고리별로 모았어요. 상품을 고르면 판매처별 가격을 견줄 수 있어요.",
+    categoryTitle: (category: string) => `${category} 가격 비교`,
+    count: (n: number) => `상품 ${n}개`,
+    /** 상품 묶음 설명. 식재료 시세와 달리 판정이 없다는 것을 알린다(GLOSSARY: 상품 · 판매가) */
+    productsNote: "참가격이 조사한 전국 판매가예요 · 판정은 하지 않아요",
+    varieties: (category: string) => `${category} 시세`,
+    varietiesNote: "이맘때 평소 가격과 견줘 싼지 비싼지 알려 드려요",
+    /** 카테고리 페이지 아래, 다른 카테고리로 가는 목록 */
+    others: "다른 상품 카테고리",
+    /** 시세 메인의 상품 카테고리 묶음 */
+    homeTitle: "상품 판매가",
+    homeNote: "포장 상품은 판매처별 가격을 견줘요",
+    homeAll: "상품 카테고리 모두 보기",
+    /** P3 품종 상세 아래, 이 품종의 시세로 쓰이는 상품 묶음 */
+    varietyProducts: (name: string) => `${name} 상품 판매가`,
+    /** P3 품종 상세 아래, 그 카테고리 페이지로 가는 링크 */
+    categoryLink: (category: string) => `${category} 상품 판매가 보기`,
+  },
   /** P3 품종 상세 아래, 같은 id의 제철 품종 상세로 가는 링크 */
   seasonLink: (name: string) => `${name} 제철 시기 보기`,
   /** 목록 위 설명 한 줄 */
@@ -213,6 +234,8 @@ export const PRICE_COPY = {
     relatedTitle: (item: string) => `다른 ${item} 판매가`,
     relatedNote: (unit: string | null) => (unit ? `${unit}당 가격이 싼 순` : "판매가 싼 순"),
     relatedAll: (item: string) => `‘${item}’ 검색 결과에서 모두 보기`,
+    /** 상품 상세 아래, 이 상품의 카테고리 페이지로 가는 링크 */
+    categoryLink: (category: string) => `${category} 상품 모두 보기`,
     discontinuedShort: "조사 중단",
   },
   detail: {
