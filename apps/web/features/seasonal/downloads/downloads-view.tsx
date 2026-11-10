@@ -20,9 +20,9 @@ export function DownloadsView() {
   const posters = yearless.filter(({ kind }) => kind === "season-poster" || kind === "month-poster")
   const babyFood = yearless.filter(({ kind }) => kind === "baby-food-pairings" || kind === "baby-food-fruits")
   return (
-    <div className="bg-surface">
-      <div className="mx-auto flex max-w-[900px] flex-col gap-12 px-6 pt-8 pb-14 lg:gap-14 lg:px-8 lg:pt-12">
-        <header className="flex flex-col items-start gap-3">
+    <div className="bg-canvas">
+      <div className="mx-auto flex max-w-[960px] flex-col gap-14 px-7 pt-10 pb-16 lg:gap-16 lg:px-10 lg:pt-14 lg:pb-20">
+        <header className="flex flex-col items-start gap-4">
           <SubHeader title={DOWNLOADS_COPY.format} fallbackHref={routes.seasonal.root} revealAfter="downloads-title" />
           <p className="rounded-full bg-gold-wash px-3 py-1 text-xs font-semibold text-gold-deep">{DOWNLOADS_COPY.format}</p>
           <h1 id="downloads-title" className="font-heading text-3xl leading-tight font-bold text-ink [overflow-wrap:anywhere] lg:text-4xl">
@@ -36,7 +36,7 @@ export function DownloadsView() {
           <DownloadSection id="calendars" copy={DOWNLOADS_COPY.sections.calendars}>
             <YearFilter panels={editionYears(calendars).map((year) => ({
               year,
-                  content: <EditionCards editions={editionsOfYear(calendars, year)} eagerThumbnails />,
+              content: <EditionCards editions={editionsOfYear(calendars, year)} eagerThumbnails />,
             }))} />
           </DownloadSection>
         )}
@@ -51,7 +51,7 @@ export function DownloadsView() {
           </DownloadSection>
         )}
 
-        <section aria-labelledby="download-guide" className="flex flex-col items-start gap-5 rounded-2xl bg-canvas p-6 lg:p-8">
+        <section aria-labelledby="download-guide" className="flex flex-col items-start gap-6 rounded-2xl bg-surface p-7 lg:p-9">
           <h2 id="download-guide" className="font-heading text-xl font-bold text-ink">{DOWNLOADS_COPY.guide.title}</h2>
           <dl className="grid gap-5 md:grid-cols-2 md:gap-8">
             {DOWNLOADS_COPY.guide.items.map(({ question, answer }) => (
@@ -70,7 +70,7 @@ export function DownloadsView() {
 
 function DownloadSection({ id, copy, children }: { id: string; copy: { title: string; description: string }; children: React.ReactNode }) {
   return (
-    <section aria-labelledby={id} className="flex flex-col gap-5">
+    <section aria-labelledby={id} className="flex flex-col gap-6">
       <div className="flex flex-col gap-1.5">
         <h2 id={id} className="font-heading text-2xl font-bold text-ink">{copy.title}</h2>
         <p className="text-sm leading-relaxed text-stone">{copy.description}</p>
@@ -82,19 +82,19 @@ function DownloadSection({ id, copy, children }: { id: string; copy: { title: st
 
 function EditionCards({ editions, eagerThumbnails }: { editions: readonly ManifestEntry[]; eagerThumbnails?: boolean }) {
   return (
-    <ul className="grid gap-4 md:grid-cols-2 md:gap-5">
+    <ul className="grid gap-5 md:grid-cols-2 md:gap-6">
       {shelvesOf(editions).flatMap(({ editions }) => editions).map((edition) => (
         <li key={edition.id} className="min-w-0">
           <Link
             href={routes.seasonal.download(edition.id)}
-            className="group grid h-full grid-cols-[auto_minmax(0,1fr)] items-center gap-3.5 rounded-2xl border border-hairline bg-canvas p-4 text-ink no-underline [overflow-wrap:anywhere] hover:border-gold-pale focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep sm:gap-5 sm:p-5"
+            className="group grid h-full grid-cols-[auto_minmax(0,1fr)] items-center gap-4 rounded-2xl border border-hairline bg-surface p-5 text-ink no-underline [overflow-wrap:anywhere] hover:border-gold-pale focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep sm:gap-6 sm:p-6"
           >
             <ThumbnailMat className="aspect-[4/5] w-16 rounded-lg p-2 sm:w-22">
               {edition.thumbnails[0] && (
                 <EditionThumbnail thumbnail={edition.thumbnails[0]} name={edition.title} decorative priority={eagerThumbnails} className="max-h-full w-auto max-w-full" />
               )}
             </ThumbnailMat>
-            <div className="flex min-w-0 flex-col gap-2">
+            <div className="flex min-w-0 flex-col gap-2.5">
               <div className="flex flex-col gap-1">
                 <h3 className="text-[15px] leading-snug font-semibold sm:text-base">{edition.title}</h3>
                 <p className="text-[13px] leading-snug text-stone">{edition.description}</p>
