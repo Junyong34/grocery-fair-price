@@ -1,7 +1,7 @@
 {
   "id": "year-sheet-1",
-  "title": "2026년 연간 달력",
-  "description": "연간 제철 달력!",
+  "title": "2026년 연간 달력 한 장",
+  "description": "열두 달 날짜와 달마다 대표 제철 음식을 한 장에 담았어요.",
   "status": "published",
   "spec": {
     "version": 1,

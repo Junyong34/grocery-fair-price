@@ -8,30 +8,27 @@ import { Segmented } from "@workspace/ui/components/segmented"
 
 import { useToday } from "@/shared/today-context"
 
-export type YearPanel = { year: number; content: React.ReactNode }
+type YearPanel = { year: number; content: React.ReactNode }
 
-/**
- * 내려받기 목록의 연도 필터. 처음에는 서울 기준 올해를 고른다.
- * 목록은 서버 컴포넌트로 연도마다 미리 만들어 받고 여기서는 하나만 고른다. 매니페스트에 없는 연도(올해 달력이 아직 없을 때)는 otherYears를 보인다.
- */
-export function YearFilter({ panels, otherYears }: { panels: readonly YearPanel[]; otherYears: React.ReactNode }) {
+/** 처음에는 서울 기준 올해를 고른다. 포스터와 이유식 자료는 이 필터 밖에서 그린다. */
+export function YearFilter({ panels }: { panels: readonly YearPanel[] }) {
   return (
-    <Suspense fallback={<div className="min-h-svh" aria-busy />}>
-      <Filtered panels={panels} otherYears={otherYears} />
+    <Suspense fallback={<div className="min-h-10" aria-busy />}>
+      <Filtered panels={panels} />
     </Suspense>
   )
 }
 
-function Filtered({ panels, otherYears }: { panels: readonly YearPanel[]; otherYears: React.ReactNode }) {
+function Filtered({ panels }: { panels: readonly YearPanel[] }) {
   const currentYear = useToday().year
   const [picked, setPicked] = useState<number | null>(null)
   const year = picked ?? currentYear
   const options = yearChoices(panels.map((panel) => panel.year), currentYear).map((value) => ({ value, label: DOWNLOADS_COPY.yearLabel(value) }))
-  const content = panels.find((panel) => panel.year === year)?.content ?? otherYears
+  const content = panels.find((panel) => panel.year === year)?.content
   return (
     <>
-      <Segmented aria-label={DOWNLOADS_COPY.yearFilter} options={options} value={year} onValueChange={setPicked} className="mx-[18px] self-start lg:mx-6" />
-      {content ?? <p className="px-[18px] text-sm text-caption lg:px-6">{DOWNLOADS_COPY.yearEmpty(year)}</p>}
+      <Segmented aria-label={DOWNLOADS_COPY.yearFilter} options={options} value={year} onValueChange={setPicked} className="max-w-full flex-wrap self-start" />
+      {content ?? <p className="text-sm text-caption">{DOWNLOADS_COPY.yearEmpty(year)}</p>}
     </>
   )
 }

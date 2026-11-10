@@ -1,7 +1,7 @@
 {
   "id": "monthly-3",
-  "title": "2027년도 달력-2",
-  "description": "M-E 타입",
+  "title": "2027년 흰색 월간 달력",
+  "description": "흰 바탕을 제철 음식 그림으로 채우고 월 이름은 영어로 적었어요.",
   "status": "published",
   "spec": {
     "version": 1,

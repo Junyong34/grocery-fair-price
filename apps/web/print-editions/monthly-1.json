@@ -1,7 +1,7 @@
 {
   "id": "monthly-1",
-  "title": "2026년도 달력",
-  "description": "2026년도 월간 달력",
+  "title": "2026년 제철 월간 달력",
+  "description": "표지와 1~12월 달력에 그달의 제철 음식 그림을 담았어요.",
   "status": "published",
   "spec": {
     "version": 1,

@@ -1,6 +1,5 @@
 "use client"
 
-import { Check } from "lucide-react"
 import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 
 import { DOWNLOADS_COPY } from "@workspace/seasonal/data/copy"
@@ -51,9 +50,8 @@ export function EditionActions({ edition, placement }: { edition: ManifestEntry;
       {done ? (
         <div ref={doneRef} role="status" className="flex scroll-mb-6 flex-col gap-3">
           <div>
-            <p className="flex items-center gap-1.5 font-heading text-xl font-bold text-ink">
+            <p className="font-heading text-xl font-bold text-ink">
               {DOWNLOADS_COPY.done.title}
-              <Check aria-hidden size={20} className="text-olive" />
             </p>
             <p className="text-[13px] text-stone">{DOWNLOADS_COPY.done.where}</p>
           </div>
@@ -74,10 +72,10 @@ export function EditionActions({ edition, placement }: { edition: ManifestEntry;
           {link("self-center text-sm text-stone underline underline-offset-4", DOWNLOADS_COPY.done.again)}
         </div>
       ) : (
-        <div className="grid grid-cols-[1fr_2fr] gap-2">
-          <ShareButton label={DOWNLOADS_COPY.share} className="h-11" onShared={shared} />
+        <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] gap-2">
+          <ShareButton label={DOWNLOADS_COPY.share} className="min-h-11" onShared={shared} />
           {link(
-            "inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-ink px-5 text-[15px] font-semibold text-canvas no-underline",
+            "flex min-h-11 flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 rounded-full bg-ink px-3 py-2 text-center text-sm font-semibold text-canvas no-underline",
             <>
               {DOWNLOADS_COPY.download}
               <span className="text-xs font-normal opacity-70">{megabytes(edition.files.A4.bytes)}</span>

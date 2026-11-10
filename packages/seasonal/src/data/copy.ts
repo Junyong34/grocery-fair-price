@@ -192,42 +192,47 @@ export function hashString(value: string): number {
   return Math.abs(h)
 }
 
-/** 달력·포스터 PDF 내려받기 화면(/seasonal/downloads). */
+/** 인쇄 자료 PDF 내려받기 화면(/seasonal/downloads). */
 export const DOWNLOADS_COPY = {
-  title: "제철 음식 달력 무료 다운로드",
-  intro: "월별 제철 음식을 담은 달력을 무료로 받아 보세요. 원하는 인쇄물을 골라 A4 PDF로 내려받고, 집에서 인쇄해 냉장고에 붙여 두세요.",
+  title: "제철·이유식 인쇄 자료",
+  intro: "제철 음식을 담은 달력과 포스터, 이유식 궁합표와 과일 도감을 모았어요. 용지 방향과 쪽 수를 확인하고 필요한 자료를 골라 보세요.",
   free: "회원가입 없이 무료로 내려받을 수 있어요.",
+  format: "A4 PDF 무료 다운로드",
+  sections: {
+    calendars: { title: "제철 달력", description: "연도를 고르고 월간 달력이나 한 장짜리 연간 달력을 비교해 보세요." },
+    posters: { title: "제철 음식 포스터", description: "달마다, 계절마다 제철인 음식을 그림으로 볼 수 있어요." },
+    babyFood: { title: "이유식 자료", description: "이유식 재료 조합과 월령별 과일 정보를 인쇄해 곁에 두고 보세요." },
+  },
   guide: {
-    title: "제철달력 다운로드·인쇄 안내",
+    title: "다운로드·인쇄 안내",
     items: [
-      { question: "어떻게 무료로 다운로드하나요?", answer: '원하는 달력을 누르고 미리보기를 확인한 뒤 "PDF 무료 다운로드"를 누르세요. 회원가입이나 결제 없이 PDF를 받을 수 있어요.' },
-      { question: "어떤 달력을 고르면 되나요?", answer: "월간 달력은 한 달씩 넘겨 보고, 연간 달력은 열두 달을 한 장으로 볼 수 있어요. 각 인쇄물에 표시된 연도와 쪽 수를 확인해 골라 주세요." },
+      { question: "파일은 어디서 받나요?", answer: '자료를 선택해 미리보기를 확인한 뒤 "PDF 무료 다운로드"를 누르세요. 자료마다 PDF 파일이 따로 있어요.' },
       { question: "집에서 인쇄할 수 있나요?", answer: 'A4 용지에 "실제 크기"로 인쇄하세요. 월간 달력에서 한 달만 필요하다면 인쇄 창에서 해당 쪽 번호를 고르면 돼요. 휴대폰으로 받은 PDF도 PC로 옮겨 인쇄할 수 있어요.' },
     ],
     browse: "화면으로 월별 제철 음식 보기",
   },
   empty: "아직 준비된 인쇄물이 없어요. 곧 올려 둘게요.",
-  yearFilter: "연도",
+  yearFilter: "달력 연도",
   yearLabel: (year: number) => `${year}년`,
-  yearEmpty: (year: number) => `${year}년 인쇄물은 아직 없어요. 다른 연도를 골라 보세요.`,
+  yearEmpty: (year: number) => `${year}년 달력은 아직 없어요. 다른 연도를 골라 보세요.`,
   download: "PDF 무료 다운로드",
+  previewDownload: "미리보기·다운로드",
   share: "공유",
-  shelfMeta: (count: number) => `${count}개`,
   printTips: {
     title: "인쇄 팁",
     size: 'A4 용지에 "실제 크기"로 인쇄하세요.',
     /** 월간 달력만 */
     oneMonth: "한 달만 뽑을 땐 인쇄 창에서 그 달 쪽 번호를 고르세요.",
   },
-  backToList: "‹ 달력·포스터",
+  backToList: "‹ 다운로드 목록",
   others: "다른 인쇄물",
   seeAll: "전체 보기 ›",
   thumbnailAlt: (name: string, index: number) =>
     index === 0 ? `${name} 미리보기` : `${name} 미리보기 ${index + 1}쪽`,
   /** 내려받기를 누른 뒤(5-a). 브라우저 다운로드가 끝났는지는 알 수 없어 "누른 뒤" 상태다. */
   done: {
-    title: "내려받았어요",
-    where: '휴대폰은 "파일" 또는 "다운로드"에 있어요.',
+    title: "다운로드를 요청했어요",
+    where: '파일을 받았다면 브라우저의 다운로드 목록에서 확인할 수 있어요.',
     pcTitle: "휴대폰으로 받으셨나요?",
     pcBody: "인쇄는 PC에서 하는 게 편해요. 링크를 PC로 보내 보세요.",
     copyLink: "링크 복사",
@@ -247,8 +252,8 @@ export const DOWNLOADS_COPY = {
   },
   /** 2a · 2b 입구 카드(1-a) */
   entry: {
-    title: "제철 음식 달력 무료 다운로드",
-    hint: "집에서 인쇄해 냉장고에 붙여 보세요",
+    title: "제철 달력·포스터·이유식 자료",
+    hint: "집에서 인쇄할 수 있는 무료 A4 PDF",
   },
 } as const
 

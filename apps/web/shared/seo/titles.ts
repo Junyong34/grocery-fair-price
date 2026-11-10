@@ -13,6 +13,7 @@ import { type PairingRow, pairingDisplayName } from "@workspace/seasonal/data/in
 import { sashimiInMonth } from "@workspace/seasonal/data/sashimi"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 import type { Season } from "@workspace/seasonal/data/seasons"
+import type { PrintKind } from "@workspace/seasonal/print/spec"
 
 export type PageSeo = { title: string; description: string }
 
@@ -73,14 +74,16 @@ export function babyFoodFruitsStageSeo(
 /** 무료 PDF를 찾는 검색의 입구. 연도는 개별 인쇄물에서 안내한다. */
 export function downloadsSeo(): PageSeo {
   return {
-    title: "제철 음식 달력 무료 다운로드 · A4 PDF",
-    description: "제철달력 무료 다운로드. 월별 제철 음식을 담은 월간·연간 달력을 회원가입 없이 A4 PDF로 받아 보세요. 미리보기로 고르고 집에서 인쇄할 수 있어요.",
+    title: "제철 달력·포스터·이유식 자료 무료 다운로드 · A4 PDF",
+    description: "월간·연간 제철 달력, 제철 음식 포스터, 이유식 궁합표와 월령별 과일 도감 무료 다운로드. 자료별 미리보기를 확인하고 회원가입 없이 A4 PDF를 받아 보세요.",
   }
 }
 
-/** 인쇄물 상세 제목. "제철"만 쓰면 철강(製鐵)으로 읽히는 검색엔진이 있어, 이름에 없으면 "제철 음식"을 앞에 붙인다. */
-export function editionSeoTitle(name: string): string {
-  return `${name.includes("제철") ? "" : "제철 음식 "}${name} PDF 무료 다운로드`
+/** 달력·포스터 이름에 제철이 빠졌으면 검색 제목에 덧붙인다. */
+export function editionSeoTitle(name: string, kind: PrintKind): string {
+  const isBabyFood = kind === "baby-food-pairings" || kind === "baby-food-fruits"
+  const prefix = isBabyFood || name.includes("제철") ? "" : "제철 음식 "
+  return `${prefix}${name} PDF 무료 다운로드`
 }
 
 /** 설명에 넣을 품종 이름 목록. "냉이·달래·주꾸미" */

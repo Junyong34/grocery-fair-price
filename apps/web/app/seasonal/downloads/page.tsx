@@ -9,7 +9,7 @@ import { downloadsSeo } from "@/shared/seo/titles"
 export const metadata = createMetadata({
   ...downloadsSeo(),
   path: routes.seasonal.downloads,
-  ogImage: { title: DOWNLOADS_COPY.title, subtitle: "A4 PDF 제철 달력과 포스터", badge: "PDF" },
+  ogImage: { title: DOWNLOADS_COPY.title, subtitle: DOWNLOADS_COPY.format, badge: "PDF" },
 })
 
 export default function Page() {

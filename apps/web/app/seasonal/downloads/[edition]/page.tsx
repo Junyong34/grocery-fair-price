@@ -35,10 +35,10 @@ export async function generateMetadata(props: PageProps<"/seasonal/downloads/[ed
   if (!edition) return {}
   const name = editionName(edition)
   return createMetadata({
-    title: editionSeoTitle(name),
+    title: editionSeoTitle(name, edition.kind),
     description: `${name} 무료 다운로드. ${edition.description} A4 PDF ${edition.pages}쪽을 회원가입 없이 내려받아 인쇄하세요.`,
     path: routes.seasonal.download(edition.id),
-    ogImage: { title: name, subtitle: edition.description, badge: "PDF" },
+    ogImage: { title: name, subtitle: DOWNLOADS_COPY.format, badge: "PDF" },
   })
 }
 
@@ -77,7 +77,7 @@ async function Edition({ params }: { params: Params }) {
               {DOWNLOADS_COPY.seeAll}
             </Link>
           </h2>
-          <EditionShelf editions={others} fullNames />
+          <EditionShelf editions={others} />
         </section>
       )}
     </article>

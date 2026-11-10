@@ -49,7 +49,7 @@ describe("페이지 제목·설명", () => {
   it("검색어 모양의 제목을 만든다", () => {
     expect(homeSeo().title).toBe("오늘 식재료 시세 · 지금 사도 될까")
     expect(seasonalHomeSeo().title).toBe("제철 음식 달력")
-    expect(downloadsSeo().title).toBe("제철 음식 달력 무료 다운로드 · A4 PDF")
+    expect(downloadsSeo().title).toBe("제철 달력·포스터·이유식 자료 무료 다운로드 · A4 PDF")
     expect(babyFoodPairingsSeo(31).title).toBe("이유식 재료 궁합표 · 잘 맞는 조합과 상극 재료")
     expect(monthsIndexSeo().title).toBe("월별 제철 음식")
     expect(monthSeo(3).title).toMatch(/^3월 제철 음식 \d+가지$/)
@@ -60,12 +60,15 @@ describe("페이지 제목·설명", () => {
     expect(foodSeo(findFood("snow-crab")!).title).toBe("대게 제철 시기 · 12~5월")
   })
 
-  it('인쇄물 제목에 "제철"이 없으면 "제철 음식"을 앞에 붙인다(철강 "제철"과 헷갈리지 않게)', () => {
-    expect(editionSeoTitle("2026년도 월간 달력")).toBe(
+  it('달력·포스터 이름에 "제철"이 없을 때만 검색 제목 앞에 "제철 음식"을 붙인다', () => {
+    expect(editionSeoTitle("2026년도 월간 달력", "monthly")).toBe(
       "제철 음식 2026년도 월간 달력 PDF 무료 다운로드"
     )
-    expect(editionSeoTitle("열두 달 월별 제철 포스터")).toBe(
+    expect(editionSeoTitle("열두 달 월별 제철 포스터", "month-poster")).toBe(
       "열두 달 월별 제철 포스터 PDF 무료 다운로드"
+    )
+    expect(editionSeoTitle("월령별 과일 시기 도감", "baby-food-fruits")).toBe(
+      "월령별 과일 시기 도감 PDF 무료 다운로드"
     )
   })
 

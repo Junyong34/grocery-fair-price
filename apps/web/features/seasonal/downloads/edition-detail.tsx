@@ -16,7 +16,7 @@ export function EditionDetail({ edition, title, placement }: { edition: Manifest
     <div className="flex flex-col gap-4">
       <ThumbnailMat className="gap-3 p-5">
         {edition.thumbnails.map((thumbnail, index) => (
-          <EditionThumbnail key={thumbnail.path} thumbnail={thumbnail} name={name} index={index} priority={index === 0} className="w-[140px] lg:w-[160px]" />
+          <EditionThumbnail key={thumbnail.path} thumbnail={thumbnail} name={name} index={index} priority={index === 0} className="w-[140px] min-w-0 lg:w-[160px]" />
         ))}
       </ThumbnailMat>
       <div className="flex flex-col gap-1">
@@ -25,7 +25,7 @@ export function EditionDetail({ edition, title, placement }: { edition: Manifest
         <p className="flex flex-wrap gap-x-2 text-[13px] text-stone tabular-nums">
           {editionMeta(edition).map((part, index) => (
             <span key={part}>
-              {index > 0 && <span aria-hidden className="mr-2 text-caption">·</span>}
+              {index > 0 && <span aria-hidden className="me-2 text-caption">·</span>}
               {part}
             </span>
           ))}

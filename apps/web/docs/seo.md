@@ -55,9 +55,9 @@
 4. 두 곳에 `https://<도메인>/sitemap.xml`을 제출한다. 네이버는 robots.txt도 "수집 요청" 화면에서 검사한다.
 5. Search Console URL 검사로 홈과 품종 페이지 하나씩 렌더 결과, canonical, noindex 여부를 확인한다. 구조화 데이터는 Rich Results Test로 확인한다.
 
-## 제철달력 무료 다운로드 검색
+## 인쇄 자료 무료 다운로드 검색
 
-- 대표 페이지는 `/seasonal/downloads`다. 제목은 `제철달력 무료 다운로드 · A4 PDF`, 본문 첫 제목은 `제철달력 무료 다운로드`로 맞춘다. 소개·무료 제공·인쇄 안내는 `packages/seasonal/src/data/copy.ts`에서 관리한다.
+- 대표 페이지는 `/seasonal/downloads`다. 제목과 본문에서 제철 달력, 포스터, 이유식 자료를 안내한다. 본문 제목·소개·인쇄 안내는 `packages/seasonal/src/data/copy.ts`에서 관리한다.
 - 개별 인쇄물은 이름·연도·종류를 유지한 제목에 `PDF 무료 다운로드`를 붙인다. 목록과 상세 모두 탐색경로 JSON-LD를 제공한다. 내려간 인쇄물은 기존대로 noindex다.
 - 목록과 게시된 상세는 이미 사이트맵에 포함된다. 배포 후 Search Console에서 목록 주소와 상세 하나의 실제 HTML·canonical·색인 허용 여부를 검사하고 색인 생성을 요청한다. 네이버 서치어드바이저에서도 목록 URL의 수집을 요청한다.
 - 운영의 `SITE_INDEXABLE=true` 및 공개 도메인 설정은 위 운영 전환 절차대로 확인한다. 로컬 검증만으로 운영 색인 상태나 검색 순위를 확인할 수는 없다.
