@@ -1,5 +1,6 @@
 import { FloatingNav, SiteHeader, type MenuBadges } from "./site-nav"
 import { InstallPrompt } from "./install-prompt"
+import { SiteFooter } from "./site-footer"
 
 /**
  * 가격과 제철이 같이 쓰는 셸: 위에 붙은 헤더, 모바일 하단 Floating Nav, 데스크톱 헤더 안 주요 메뉴.
@@ -25,9 +26,10 @@ export function SiteShell({
       </a>
       <SiteHeader badges={badges} actions={actions} />
       <InstallPrompt />
-      <main id="main" tabIndex={-1} className="flex-1 pb-28 outline-none lg:pb-12">
+      <main id="main" tabIndex={-1} className="flex-1 pb-8 outline-none lg:pb-12">
         {children}
       </main>
+      <SiteFooter />
       <FloatingNav badges={badges} />
     </div>
   )
