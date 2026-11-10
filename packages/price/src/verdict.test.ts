@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { DEFAULT_BAND, usualRange, verdictOf, verdictOfPct } from "./verdict"
+import { comparesMyPrice, DEFAULT_BAND, usualRange, verdictOf, verdictOfPct } from "./verdict"
 
 describe("verdictOf", () => {
   it("평소가 대비 차이를 반올림한 %로 낸다", () => {
@@ -78,5 +78,21 @@ describe("usualRange", () => {
   it("+10.4%는 보통이고 띠 안에 든다", () => {
     expect(verdictOf(4580, 4150, DEFAULT_BAND)).toEqual({ kind: "normal", pct: 10 })
     expect(usualRange(4150, DEFAULT_BAND)!.high).toBeGreaterThan(4580)
+  })
+})
+
+describe("comparesMyPrice", () => {
+  const base = { usual: 3270 as number | null, priceSpread: undefined as "brand" | undefined }
+
+  it("평소가가 있으면 내가 본 가격을 견줄 수 있다", () => {
+    expect(comparesMyPrice(base)).toBe(true)
+  })
+
+  it("평소가가 없으면 견줄 수 없다", () => {
+    expect(comparesMyPrice({ ...base, usual: null })).toBe(false)
+  })
+
+  it("품종 · 브랜드 편차가 큰 품종은 견주지 않는다: 브랜드 값을 일반 시세에 대면 늘 한쪽으로 나온다", () => {
+    expect(comparesMyPrice({ ...base, priceSpread: "brand" })).toBe(false)
   })
 })

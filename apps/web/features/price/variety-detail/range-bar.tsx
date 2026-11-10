@@ -6,7 +6,7 @@ import { isAverageBasis, PRICE_COPY } from "@workspace/price/copy"
 import { priceAxis } from "@workspace/price/axis"
 import { won } from "@workspace/price/format"
 import type { VarietyDetail } from "@workspace/price/types"
-import { usualRange, verdictOf } from "@workspace/price/verdict"
+import { comparesMyPrice, usualRange, verdictOf } from "@workspace/price/verdict"
 
 import { VERDICT_TONE } from "../components/verdict-tone"
 import { useMyPrice } from "./my-price"
@@ -21,7 +21,9 @@ const labelLeft = (x: number) => `clamp(2.5rem, ${x}%, calc(100% - 2.5rem))`
  * "내가 본 가격"을 적으면 그 핀. 평소가가 없으면 평소 범위 띠와 눈금을 그리지 않는다.
  */
 export function RangeBar({ detail }: { detail: VarietyDetail }) {
-  const mine = useMyPrice(detail.id)
+  // 견줄 수 없는 품종(평소가 없음 · 품종 · 브랜드 편차)은 예전에 적어 둔 값이 있어도 핀을 꽂지 않는다.
+  const saved = useMyPrice(detail.id)
+  const mine = comparesMyPrice(detail) ? saved : null
   const { range, usual, band } = detail
   const averageOnly = isAverageBasis(detail.basis) && range.min === range.max
   const usualBand = usualRange(usual, band)

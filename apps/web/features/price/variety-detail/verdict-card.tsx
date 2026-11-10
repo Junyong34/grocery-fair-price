@@ -1,9 +1,10 @@
-import { CalendarClock, Info } from "lucide-react"
+import { CalendarClock, Info, Tags } from "lucide-react"
 import { Suspense } from "react"
 
 import { cn } from "@workspace/ui/lib/utils"
 
 import {
+  brandSpreadNote,
   PRICE_COPY,
   VERDICT_WORD,
   verdictTrendDiff,
@@ -20,7 +21,7 @@ const COPY = PRICE_COPY.detail
 /**
  * P3 판정 카드(판정 색 배경): 큰 판정, 평소보다 몇 %, 판정 주의, 지금 시세 · 평소가 두 칸.
  * 판정 전이면 회색 "판정 전"과 평소가 "자료 없음".
- * 판정 주의(데이터 오래됨 · 표본 적음)는 판정 바로 아래 Notice로 모은다. 기호("?")·점선만으로는 뜻이 전해지지 않아 제목 + 설명 글로 쓴다.
+ * 판정 주의(데이터 오래됨 · 표본 적음 · 품종 · 브랜드 편차)는 판정 바로 아래 Notice로 모은다. 기호("?")·점선만으로는 뜻이 전해지지 않아 제목 + 설명 글로 쓴다.
  * 오래됐으면 판정도 흐리게 한다.
  *
  * 글씨는 세 층이다. 판정(44 · 17 · 13px, 판정 색) / 주의(13px semibold ink · 12px caption) / 금액 칸(12 · 22 · 12px).
@@ -31,6 +32,7 @@ export function VerdictCard({ detail }: { detail: VarietyDetail }) {
   const tone = VERDICT_TONE[verdict.kind]
   const none = verdict.kind === "none"
   const few = detail.meetsMinN === false
+  const brandSpread = detail.priceSpread === "brand" ? brandSpreadNote(detail.name) : null
   return (
     <section
       aria-label="판정"
@@ -64,7 +66,7 @@ export function VerdictCard({ detail }: { detail: VarietyDetail }) {
           </p>
         )}
       </div>
-      {(detail.stale || few) && (
+      {(detail.stale || few || brandSpread) && (
         <div className="flex flex-col gap-2">
           {detail.stale && (
             <Notice
@@ -79,6 +81,7 @@ export function VerdictCard({ detail }: { detail: VarietyDetail }) {
             />
           )}
           {few && <Notice icon={<Info aria-hidden size={16} />} title={COPY.fewSamples(detail.sampleSize)} body={COPY.fewSamplesNote(!none)} />}
+          {brandSpread && <Notice icon={<Tags aria-hidden size={16} />} title={brandSpread.title} body={brandSpread.body} />}
         </div>
       )}
       <dl className="grid grid-cols-2 gap-2">

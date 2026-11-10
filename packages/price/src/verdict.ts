@@ -31,3 +31,11 @@ export function usualRange(usual: number | null, band: VerdictBand): { low: numb
   if (usual == null || usual <= 0) return null
   return { low: usual + (usual * (band.lower - 0.5)) / 100, high: usual + (usual * (band.upper + 0.5)) / 100 }
 }
+
+/**
+ * "내가 본 가격"을 이 시세의 평소가와 견줄 수 있는가. 평소가가 있어야 하고,
+ * 품종 · 브랜드 편차가 큰 품종(쌀 등, judgment.md 5-3)은 견주지 않는다. 브랜드 값을 일반 시세에 대면 늘 한쪽으로 나온다.
+ */
+export function comparesMyPrice(variety: { usual: number | null; priceSpread?: "brand" }): boolean {
+  return variety.usual != null && variety.priceSpread !== "brand"
+}
