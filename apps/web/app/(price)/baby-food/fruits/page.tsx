@@ -1,11 +1,7 @@
-import { Suspense } from "react"
-
-import { FruitsDashboard } from "@/features/baby-food/fruits/fruits-dashboard"
 import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
 import { breadcrumb, JsonLd } from "@/shared/seo/json-ld"
 import { babyFoodFruitsSeo } from "@/shared/seo/titles"
-import { getSeoulToday } from "@/shared/today"
 
 const seo = babyFoodFruitsSeo()
 export const metadata = createMetadata({
@@ -13,23 +9,14 @@ export const metadata = createMetadata({
   path: routes.babyFood.fruits,
 })
 
+/** 도감 본문은 layout.tsx가 그린다. 페이지는 메타데이터와 구조화 데이터만 맡는다. */
 export default function Page() {
   return (
-    <>
-      <JsonLd
-        data={breadcrumb([
-          { name: "제철달력", path: routes.seasonal.root },
-          { name: "월령별 과일 도감", path: routes.babyFood.fruits },
-        ])}
-      />
-      <Suspense fallback={<div className="min-h-svh" aria-busy />}>
-        <FruitsContent />
-      </Suspense>
-    </>
+    <JsonLd
+      data={breadcrumb([
+        { name: "제철달력", path: routes.seasonal.root },
+        { name: "월령별 과일 도감", path: routes.babyFood.fruits },
+      ])}
+    />
   )
-}
-
-async function FruitsContent() {
-  const today = await getSeoulToday()
-  return <FruitsDashboard currentMonth={today.month} />
 }

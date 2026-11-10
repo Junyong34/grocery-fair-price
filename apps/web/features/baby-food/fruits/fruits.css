@@ -24,6 +24,11 @@
   margin-bottom: 20px;
 }
 
+.fruits-download {
+  margin-bottom: 20px;
+  max-width: 420px;
+}
+
 .fruits-header h1 {
   font-family: var(--font-heading);
   font-size: clamp(26px, 4vw, 38px);

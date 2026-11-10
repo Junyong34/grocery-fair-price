@@ -9,12 +9,10 @@ import {
   type BabyFruitStageId,
 } from "@workspace/seasonal/data/infant-fruits"
 
-import { FruitsDashboard } from "@/features/baby-food/fruits/fruits-dashboard"
 import { createMetadata } from "@/shared/meta"
 import { routes } from "@/shared/routes"
 import { breadcrumb, JsonLd } from "@/shared/seo/json-ld"
 import { babyFoodFruitsStageSeo } from "@/shared/seo/titles"
-import { getSeoulToday } from "@/shared/today"
 
 type Props = PageProps<"/baby-food/fruits/[stage]">
 
@@ -50,9 +48,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   })
 }
 
+/** 도감 본문은 ../layout.tsx가 그린다. 페이지는 주소 검증과 메타데이터·구조화 데이터만 맡는다. */
 export default function Page(props: Props) {
   return (
-    <Suspense fallback={<div className="min-h-svh" aria-busy />}>
+    <Suspense fallback={null}>
       <StageContent params={props.params} />
     </Suspense>
   )
@@ -68,24 +67,16 @@ async function StageContent({ params }: { params: Props["params"] }) {
   const stageInfo = BABY_FRUIT_STAGES.find((s) => s.id === stage)
   if (!stageInfo) notFound()
 
-  const today = await getSeoulToday()
-
   return (
-    <>
-      <JsonLd
-        data={breadcrumb([
-          { name: "제철달력", path: routes.seasonal.root },
-          { name: "월령별 과일 도감", path: routes.babyFood.fruits },
-          {
-            name: `${stageInfo.name} 아기 과일`,
-            path: routes.babyFood.fruitsStage(stage),
-          },
-        ])}
-      />
-      <FruitsDashboard
-        stageId={stage as BabyFruitStageId}
-        currentMonth={today.month}
-      />
-    </>
+    <JsonLd
+      data={breadcrumb([
+        { name: "제철달력", path: routes.seasonal.root },
+        { name: "월령별 과일 도감", path: routes.babyFood.fruits },
+        {
+          name: `${stageInfo.name} 아기 과일`,
+          path: routes.babyFood.fruitsStage(stage),
+        },
+      ])}
+    />
   )
 }

@@ -13,7 +13,7 @@ export type AnalyticsEvents = {
   /** 인쇄물 상세의 "공유", 받은 뒤 "링크 복사" · "공유하기" */
   print_share: { edition_id: string; method: "copy" | "share" }
   /** 2a · 2b · P1 시세 메인의 "제철 달력 · 포스터 PDF 받기" 카드 */
-  print_entry_click: { placement: "this-month" | "month-timeline" | "price-home" }
+  print_entry_click: { placement: "this-month" | "month-timeline" | "price-home" | "baby-food-pairings" | "baby-food-fruits" }
 }
 
 export type AnalyticsEventName = keyof AnalyticsEvents
