@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Suspense } from "react"
 
 import { FruitsPrint } from "@/features/baby-food/fruits/fruits-print"
 import { routes } from "@/shared/routes"
@@ -10,7 +11,15 @@ type Props = {
   searchParams: Promise<{ orientation?: string }>
 }
 
-export default async function Page({ searchParams }: Props) {
+export default function Page({ searchParams }: Props) {
+  return (
+    <Suspense>
+      <Preview searchParams={searchParams} />
+    </Suspense>
+  )
+}
+
+async function Preview({ searchParams }: Props) {
   const { orientation: paramOrientation } = await searchParams
   const orientation =
     paramOrientation === "landscape" ? "landscape" : "portrait"
@@ -28,7 +37,7 @@ export default async function Page({ searchParams }: Props) {
           월령별 아기 과일 시기 A4 인쇄 미리보기
         </h1>
         <p className="text-sm text-stone">
-          냉장고 문 부착용 A4 1장 · 6단계 과일 및 돌 전 절대 금지 경고 박스를 담았어요.
+          냉장고 문 부착용 A4 1장 · 월령별 처음 줄 수 있는 과일과 금지·주의 식재료를 담았어요.
         </p>
 
         <div className="flex items-center gap-3">
@@ -59,9 +68,8 @@ export default async function Page({ searchParams }: Props) {
           <input type="hidden" name="orientation" value={orientation} />
           <button
             type="submit"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-700 text-white font-semibold text-sm hover:bg-emerald-800 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-forest text-canvas font-semibold text-sm hover:bg-forest/90 transition-colors"
           >
-            <span>📄</span>
             <span>A4 {orientation === "portrait" ? "세로형" : "가로형"} PDF 생성 및 내려받기</span>
           </button>
         </form>

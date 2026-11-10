@@ -10,7 +10,7 @@
 | kit sha | `6806db565e0538c4` |
 | 변형 | `color`, `motion` |
 | 바닥 그림자 | 끔 |
-| 품종 수 | 279 |
+| 품종 수 | 281 |
 
 | id | 이름 | food.mjs sha |
 |---|---|---|
@@ -134,6 +134,7 @@
 | `ixeris-root-greens` | 고들빼기 | `f488fb527bde8b02` |
 | `jaecheop-clam` | 재첩 | `ab4f79837a5e00c5` |
 | `jeju-hanchi` | 제주한치(창꼴뚜기) | `c08cb0cf77b53795` |
+| `jelly` | 젤리 | `f43e11a324c7c0b5` |
 | `jerusalem-artichoke` | 돼지감자 | `c54edee4a2de8259` |
 | `juice` | 생과일주스 | `06bcc8b0f8470914` |
 | `jujube` | 대추 | `53c0fd3dbd355516` |
@@ -225,6 +226,7 @@
 | `roughscale-flounder` | 줄가자미 | `a924af8927679a12` |
 | `rye` | 호밀 | `eea1f8bc67c64af2` |
 | `salmon` | 연어 | `b80e841aab4d7a2b` |
+| `salt` | 소금 | `60296f01aecbb5df` |
 | `samchae` | 삼채 | `0855f807f27e6d62` |
 | `sardinella` | 밴댕이 | `061bfe9e1f906e0c` |
 | `sashimi` | 생선회 | `63f05e14082c8ef3` |

@@ -6,8 +6,14 @@ export const FRUIT_GUIDE_ART: Readonly<
   grape: "/foods/grape/color.svg",
   orange: "/foods/orange/color.svg",
   persimmon: "/foods/persimmon/color.svg",
+  honey: "/foods/honey/color.svg",
+  milk: "/foods/milk/color.svg",
   juice: "/foods/juice/color.svg",
   sashimi: "/foods/sashimi/color.svg",
+  peanut: "/foods/peanut/color.svg",
+  sugar: "/foods/sugar/color.svg",
+  salt: "/foods/salt/color.svg",
+  jelly: "/foods/jelly/color.svg",
 }
 
 // 이름과 품종 범위가 일치하는 기존 그림만 연결한다.

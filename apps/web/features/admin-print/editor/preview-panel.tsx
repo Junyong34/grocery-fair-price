@@ -4,7 +4,7 @@ import { useState } from "react"
 
 import { Segmented } from "@workspace/ui/components/segmented"
 
-import { papersForSpec, type Paper, type PrintSpec } from "@workspace/seasonal/print/spec"
+import { pageCount, papersForSpec, type Paper, type PrintSpec } from "@workspace/seasonal/print/spec"
 
 import { routes } from "@/shared/routes"
 
@@ -20,7 +20,7 @@ export function PreviewPanel({ spec, dirty }: { spec: PrintSpec; dirty: boolean 
         <h2 id="preview-title" className="font-heading text-lg font-bold text-ink">
           미리보기
         </h2>
-        {papers.length === 1 ? <span className="text-sm text-stone">A4 세로 · 3장</span> : <Segmented aria-label="용지" options={papers.map((size) => ({ value: size, label: size }))} value={paper} onValueChange={setPaper} />}
+        {papers.length === 1 ? <span className="text-sm text-stone">A4 {spec.orientation === "landscape" ? "가로" : "세로"} · {pageCount(spec)}장</span> : <Segmented aria-label="용지" options={papers.map((size) => ({ value: size, label: size }))} value={paper} onValueChange={setPaper} />}
       </div>
       <p className="text-sm text-stone">{dirty ? "저장하지 않은 옵션이 반영된 모습이에요. PDF는 저장한 옵션으로 만들어요." : "저장한 옵션 그대로의 모습이에요."}</p>
       <PrintPreview src={routes.print(spec, paper)} paper={paper} orientation={spec.orientation} />

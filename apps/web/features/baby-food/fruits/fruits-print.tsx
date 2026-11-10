@@ -1,110 +1,161 @@
+import { INFANT_FRUIT_PRINT_COPY } from "@workspace/seasonal/data/copy"
 import {
   BABY_FRUIT_STAGES,
-  getFruitsByStage,
+  BABY_FRUITS,
+  PROHIBITED_FOODS,
+  type BabyFruit,
+  type ProhibitedFood,
 } from "@workspace/seasonal/data/infant-fruits"
+
+import { FRUIT_GUIDE_ART } from "../data"
+import { IngredientArt } from "../ingredient-art"
+import { SAFETY_BADGES } from "./fruit-badges"
 
 import "./fruits-print.css"
 
+/** 4~5개월은 과일을 시작하지 않는 단계라 따로 한 줄로 두고, 나머지 단계에 처음 줄 수 있는 과일을 한 번씩 놓는다. */
+const STAGE_ROWS = BABY_FRUIT_STAGES.filter((stage) => stage.id !== "4-5-months").map((stage) => ({
+  stage,
+  fruits: BABY_FRUITS.filter((fruit) => fruit.firstStage === stage.id),
+}))
+
+/** "생우유 (소젖)" → ["생우유", "소젖"] */
+function splitName(name: string): [string, string | undefined] {
+  const match = /^(.+?)\s*\((.+)\)$/.exec(name)
+  return match ? [match[1]!, match[2]] : [name, undefined]
+}
+
+function StageNumber({ name }: { name: string }) {
+  // "9~11개월" → 숫자와 단위를 나눠 숫자만 크게 쓴다. "12개월+"는 "12+".
+  const match = /^([\d~]+)개월(\+?)$/.exec(name)
+  if (!match) return <span className="fp-stage-num">{name}</span>
+  return (
+    <span className="fp-stage-num">
+      {match[1]}
+      {match[2]}
+      <small>개월</small>
+    </span>
+  )
+}
+
+function FruitTile({ fruit }: { fruit: BabyFruit }) {
+  const badge = SAFETY_BADGES[fruit.safetyStatus]
+  return (
+    <li className="fp-fruit" data-tone={badge.tone}>
+      <IngredientArt name={fruit.name} src={FRUIT_GUIDE_ART[fruit.id]} eager />
+      <span className="fp-fruit-name">
+        {fruit.name}
+        {fruit.chokingRisk && <span className="fp-choke">질식</span>}
+      </span>
+      <span className="fp-fruit-tip">{INFANT_FRUIT_PRINT_COPY.tips[fruit.id] ?? ""}</span>
+    </li>
+  )
+}
+
+function HazardItem({ item }: { item: ProhibitedFood }) {
+  const [name, detail] = splitName(item.name)
+  const src = FRUIT_GUIDE_ART[item.iconId]
+  return (
+    <li className="fp-hazard">
+      {src ? <IngredientArt name={name} src={src} eager /> : <span className="pairing-art" aria-hidden />}
+      <span className="fp-hazard-text">
+        <strong>
+          {name}
+          {detail && <small> {detail}</small>}
+        </strong>
+        <span>{INFANT_FRUIT_PRINT_COPY.hazards[item.id] ?? ""}</span>
+      </span>
+    </li>
+  )
+}
+
 export function FruitsPrint({
-  title = "월령별 아기 과일 시기 & 안전 가이드",
+  title = "월령별 아기 과일 도감",
   orientation = "portrait",
 }: {
   title?: string
   orientation?: "portrait" | "landscape"
 }) {
+  const before12 = PROHIBITED_FOODS.filter((item) => item.targetStage === "before-12m")
+  const after12 = PROHIBITED_FOODS.filter((item) => item.targetStage !== "before-12m")
+  const columns = Math.max(...STAGE_ROWS.map(({ fruits }) => fruits.length))
+
   return (
     <div className="fruits-print-document">
       <section
         className="fruits-print-sheet print-sheet"
         data-paper="A4"
         data-orientation={orientation}
+        style={{ "--fp-cols": columns } as React.CSSProperties}
       >
-        <header className="fruits-print-head">
+        <header className="fp-head">
           <div>
-            <p className="fruits-print-brand">장볼날 · 냉장고 부착용 이유식 가이드</p>
-            <h2 className="fruits-print-title">
-              {title}
-            </h2>
+            <p className="fp-brand">장볼날 · 냉장고에 붙여 두는 이유식 노트</p>
+            <h2 className="fp-title">{title}</h2>
+            <p className="fp-subtitle">{INFANT_FRUIT_PRINT_COPY.subtitle}</p>
           </div>
-          <div className="fruits-print-head-sub">
-            <p>소아청소년과 전문의 지침 기반</p>
-            <p>질식 예방 손질법 & 금기 식재료</p>
-          </div>
+          <ul className="fp-legend">
+            {Object.values(SAFETY_BADGES).map((badge) => (
+              <li key={badge.tone} data-tone={badge.tone}>
+                <i aria-hidden />
+                {badge.label}
+              </li>
+            ))}
+            <li>
+              <span className="fp-choke">질식</span>꼭 잘게 잘라요
+            </li>
+          </ul>
         </header>
 
-        {/* 5단계 과일 박스 */}
-        <div className="fruits-print-stages">
-          {BABY_FRUIT_STAGES.map((stage) => {
-            const fruits = getFruitsByStage(stage.id)
-            const displayFruits =
-              stage.id === "12-months" ? fruits.slice(0, 6) : fruits.slice(0, 5)
-            return (
-              <div key={stage.id} className="fruits-print-stage-box">
-                <div className="fruits-print-stage-head">
-                  <h3>
-                    {stage.name} <small>({stage.subTitle})</small>
-                  </h3>
-                  <span>{fruits.length}종</span>
-                </div>
-                <ul className="fruits-print-items-list">
-                  {displayFruits.map((fruit) => (
-                    <li key={fruit.id} className="fruits-print-item-row">
-                      <span className="fruits-print-item-name">
-                        <span
-                          className={`fruits-print-item-tag ${
-                            fruit.safetyStatus === "safe"
-                              ? "tag-safe"
-                              : fruit.safetyStatus === "caution"
-                                ? "tag-caution"
-                                : "tag-conventional"
-                          }`}
-                        >
-                          {fruit.safetyStatus === "safe"
-                            ? "안전"
-                            : fruit.safetyStatus === "caution"
-                              ? "주의"
-                              : "관행"}
-                        </span>
-                        {fruit.name}
-                      </span>
-                      <span className="fruits-print-item-tip">
-                        {fruit.cuttingGuide
-                          ? fruit.cuttingGuide.split("!")[0]
-                          : fruit.prepMethod.split(".")[0]}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )
-          })}
-        </div>
-
-        {/* 하단 돌 전 절대 금지 & 두 돌 주의 경고 */}
-        <div className="fruits-print-danger-box">
-          <p className="fruits-print-danger-title">
-            <span>🚨 영유아기 절대 금지 & 필수 안전 수칙</span>
-          </p>
-          <div className="fruits-print-danger-grid">
-            <div className="fruits-print-danger-item">
-              <strong>돌 전(12개월 미만) 절대 금지:</strong> 꿀(영아 보툴리누스증
-              사망 위험, 가열해도 포자 불사멸), 생우유(신장 과부하·빈혈), 생과일주스(밥 거부·비만),
-              생식류(식중독 위험).
+        <div className="fp-timeline">
+          <div className="fp-row fp-row-note">
+            <div className="fp-stage">
+              <StageNumber name="4~5개월" />
+              <span className="fp-stage-sub">준비기</span>
             </div>
-            <div className="fruits-print-danger-item">
-              <strong>만 4~5세까지 질식 주의:</strong> 통견과류(땅콩/아몬드 통째
-              금지), 통포도/체리/방울토마토 반드시 세로 4등분 컷팅 필수.
-              첨가당(설탕) 두 돌까지 0g 권고.
-            </div>
+            <p>{INFANT_FRUIT_PRINT_COPY.before6}</p>
           </div>
+          {STAGE_ROWS.map(({ stage, fruits }) => (
+            <div key={stage.id} className="fp-row">
+              <div className="fp-stage">
+                <StageNumber name={stage.name} />
+                <span className="fp-stage-sub">{stage.subTitle}</span>
+              </div>
+              <ul className="fp-fruits">
+                {fruits.map((fruit) => (
+                  <FruitTile key={fruit.id} fruit={fruit} />
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        <footer className="fruits-print-foot">
-          <span>
-            * 본 자료는 최신 소아과학 가이드라인(AAP, 대한소아청소년과학회)을
-            반영한 참고용 요약표입니다.
-          </span>
-          <span>장볼날 · jangbol.kr/baby-food/fruits</span>
+        <div className="fp-hazards">
+          <section className="fp-hazard-group" data-tone="danger">
+            <h3>
+              돌 전에는 먹이지 마세요<small>만 12개월 전</small>
+            </h3>
+            <ul>
+              {before12.map((item) => (
+                <HazardItem key={item.id} item={item} />
+              ))}
+            </ul>
+          </section>
+          <section className="fp-hazard-group" data-tone="caution">
+            <h3>
+              두 돌까지 조심하세요<small>통견과류는 만 4~5세까지</small>
+            </h3>
+            <ul>
+              {after12.map((item) => (
+                <HazardItem key={item.id} item={item} />
+              ))}
+            </ul>
+          </section>
+        </div>
+
+        <footer className="fp-foot">
+          <span>{INFANT_FRUIT_PRINT_COPY.footnote}</span>
+          <span className="fp-foot-site">장볼날 · 월령별 과일 도감</span>
         </footer>
       </section>
     </div>

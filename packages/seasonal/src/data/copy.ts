@@ -445,3 +445,45 @@ export const INFANT_PAIRING_COPY = {
       `산도·향미 주의(${names}): 신맛이나 향이 강해 초기·중기 아기 위장에 자극이 될 수 있어요. 후기 이후 익히거나 소량만 사용하세요.`,
   },
 } as const
+
+/** 월령별 과일 도감 A4 인쇄물(냉장고 부착용)의 한 줄 문구. 화면의 긴 손질법(infant-fruits)을 인쇄 칸에 맞게 줄였다. */
+export const INFANT_FRUIT_PRINT_COPY = {
+  subtitle: "처음 줄 수 있는 월령에 과일을 한 번씩 적었어요. 그 뒤 월령에도 계속 줄 수 있어요.",
+  before6: "과일보다 쌀·고기·채소가 먼저예요. 과일은 만 6개월부터 시작하세요.",
+  footnote: "대한소아청소년과학회·AAP 지침을 바탕으로 정리한 참고용 요약이에요. 아이 상태에 따라 소아청소년과와 상담하세요.",
+  /** 과일 id → 한 줄 손질법 */
+  tips: {
+    apple: "쪄서 퓨레 → 얇게 편썰기",
+    pear: "갈아서 살짝 익히기",
+    banana: "완숙을 곱게 으깨기",
+    avocado: "완숙 과육 으깨기",
+    plum: "껍질·씨 빼고 쪄서 퓨레",
+    watermelon: "씨를 모두 발라 으깨기",
+    "oriental-melon": "씨·흰 태좌 빼고 갈기",
+    melon: "가운데 과육만 으깨기",
+    grape: "껍질 벗겨 세로 4등분",
+    blueberry: "으깨거나 4등분",
+    mandarin: "속껍질 벗긴 알갱이만",
+    orange: "속껍질 없이 과육만",
+    persimmon: "홍시 속살만, 흰 심 빼기",
+    strawberry: "꼭지 도려내 세로 4등분",
+    apricot: "씨 빼고 잘게(씨 독성)",
+    kiwi: "골드키위부터 깍둑",
+    peach: "껍질 깎아 얇게 편썰기",
+    pineapple: "심 빼고 얇게, 소량만",
+    mango: "껍질 쪽 살 넉넉히 빼기",
+    cherry: "씨 빼고 세로 4등분",
+    grapefruit: "속껍질 벗겨 소량만",
+  } as Readonly<Partial<Record<string, string>>>,
+  /** 금지·주의 식품 id → 한 줄 이유와 대처 */
+  hazards: {
+    honey: "보툴리누스증 위험. 익혀도 포자가 남아요",
+    milk: "신장 부담·철분 흡수 방해. 마시는 우유는 돌 이후",
+    juice: "밥 거부·충치. 생과일로 주세요",
+    "raw-food": "식중독·기생충. 완전히 익혀서",
+    "whole-nuts": "기도 질식. 곱게 갈거나 페이스트로",
+    "added-sugar": "단맛 습관. 두 돌까지 0g 권고",
+    sodium: "신장 부담. 간하지 않아요",
+    "choking-sweets": "기도에 달라붙어요. 주지 않아요",
+  } as Readonly<Partial<Record<string, string>>>,
+} as const

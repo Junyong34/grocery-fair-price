@@ -1,0 +1,13 @@
+{
+  "id": "baby-food-fruits-1",
+  "title": "ㅇㅇㅇㅇ",
+  "description": "월령별 과일시기 도감",
+  "status": "published",
+  "spec": {
+    "version": 1,
+    "kind": "baby-food-fruits",
+    "orientation": "portrait",
+    "layout": "fridge-sheet",
+    "title": "월령별 과일시기"
+  }
+}
