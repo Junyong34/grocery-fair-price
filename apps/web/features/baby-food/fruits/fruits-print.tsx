@@ -43,10 +43,9 @@ function FruitTile({ fruit }: { fruit: BabyFruit }) {
   return (
     <li className="fp-fruit" data-tone={badge.tone}>
       <IngredientArt name={fruit.name} src={FRUIT_GUIDE_ART[fruit.id]} eager />
-      <span className="fp-fruit-name">
-        {fruit.name}
-        {fruit.chokingRisk && <span className="fp-choke">질식</span>}
-      </span>
+      <span className="fp-fruit-name">{fruit.name}</span>
+      {/* 이름 옆에 두면 이름이 그림 중심에서 밀려 이웃 타일과 줄이 어긋나므로 그림 모서리에 붙인다. */}
+      {fruit.chokingRisk && <span className="fp-choke fp-fruit-choke">질식</span>}
       <span className="fp-fruit-tip">{INFANT_FRUIT_PRINT_COPY.tips[fruit.id] ?? ""}</span>
     </li>
   )

@@ -18,13 +18,14 @@
   --fp-caution-ink: var(--color-pair-gold-foreground);
   --fp-caution-line: color-mix(in oklab, var(--color-gold) 34%, var(--color-canvas));
   --fp-art: 20mm;
-  --fp-row-gap: 2.2mm;
+  /* 섹션 간격(머리·월령·금지·바닥)은 월령 줄 간격의 2배 이상이어야 금지·주의 칸이 월령 줄과 다른 묶음으로 읽힌다. */
+  --fp-row-gap: 2mm;
 
   width: var(--sheet-w);
   height: var(--sheet-h);
   display: flex;
   flex-direction: column;
-  gap: 4mm;
+  gap: 5mm;
   box-sizing: border-box;
   overflow: hidden;
   background: var(--color-surface);
@@ -41,7 +42,7 @@
   --sheet-h: 210mm;
   --fp-art: 11mm;
   --fp-row-gap: 1.6mm;
-  gap: 3mm;
+  gap: 4mm;
 }
 
 /* 공용 print.css의 .print-sheet { padding: var(--safe) }가 덮지 않도록 두 클래스로 지정한다. */
@@ -219,10 +220,19 @@
 }
 
 .fp-fruit {
+  position: relative;
   display: grid;
   justify-items: center;
   gap: 1mm;
   text-align: center;
+}
+
+/* 그림 원의 오른쪽 위 모서리에 걸친다. 타일 가운데(50%)에서 원 반지름만큼 간 자리가 기준. */
+.fp-fruit-choke {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: calc(50% + var(--fp-art) * 0.5 - 5mm);
+  box-shadow: 0 0 0 0.35mm var(--color-surface);
 }
 
 .fp-fruit .pairing-art {
