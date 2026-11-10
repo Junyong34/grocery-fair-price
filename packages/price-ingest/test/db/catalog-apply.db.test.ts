@@ -1,11 +1,11 @@
-// 제안 승인 적용·반려·되돌리기를 로컬 DB에 넣어 본다 (catalog-scale/08). 모두 되돌려 샘플 데이터를 바꾸지 않는다.
+// 제안 결정(decideProposals: 적용·반려·되돌리기)을 로컬 DB에 넣어 본다 (catalog-scale/07·08). 모두 되돌려 샘플 데이터를 바꾸지 않는다.
+// 테스트 트랜잭션(inRollback)을 넘기면 decideProposals는 그 안의 savepoint로 돈다.
 import { afterAll, beforeAll, describe, expect, it } from "vitest"
 
 import { exportSnapshot, importSnapshot } from "../../src/catalog/db.ts"
 import { insertProposals } from "../../src/catalog/pending.ts"
 import { parseProposalFile } from "../../src/catalog/proposal.ts"
-import { applyProposals, rejectProposals, revertProposal } from "../../src/catalog/proposals.ts"
-import { refreshJudgment } from "../../src/catalog/refresh.ts"
+import { decideProposals, type DecisionRequest } from "../../src/catalog/decide.ts"
 import { readSnapshot } from "../../src/catalog/snapshot.ts"
 import type { Sql, Tx } from "../../src/load/db.ts"
 
@@ -46,6 +46,10 @@ async function mackerelMap(tx: Tx) {
   return row
 }
 
+// 판정 묶음은 기본으로 끈다(느리다). 판정을 보는 테스트만 켠다
+const decide = (tx: Tx, action: DecisionRequest["action"], ids: number[], over: Partial<DecisionRequest> = {}) =>
+  decideProposals(tx, { action, ids, judgment: false, dryRun: false, ...over })
+
 async function setup(tx: Tx) {
   await importSnapshot(tx, readSnapshot(), "test")
   await pendingMackerel(tx)
@@ -57,8 +61,9 @@ describe("승인 적용", () => {
     await inRollback(admin, async (tx) => {
       await setup(tx)
       const id = await propose(tx, { kind: "new_spec", proposal: { variety: "mackerel-kr", spec: { slug: "frozen-test", name: "냉동 대" } } })
-      const result = await applyProposals(tx, [id])
-      expect(result.applied).toEqual([id])
+      const result = await decide(tx, "apply", [id])
+      expect(result.ids).toEqual([id])
+      expect(result.snapshot?.varieties.find((v) => v.slug === "mackerel-kr")?.specs.map((sp) => sp.slug)).toContain("frozen-test")
       expect(await mackerelMap(tx)).toEqual({ status: "mapped", variety: "mackerel-kr", spec: "frozen-test" })
       const [log] = await tx<{ target: string; target_key: string; actor: string }[]>`
         select target, target_key, actor from price.catalog_change where proposal_id = ${id}`
@@ -66,7 +71,7 @@ describe("승인 적용", () => {
       const [p] = await tx<{ status: string; decided: boolean }[]>`
         select status, decided_at is not null as decided from price.catalog_proposal where id = ${id}`
       expect(p).toEqual({ status: "applied", decided: true })
-      await expect(applyProposals(tx, [id])).rejects.toThrow(/applied/)
+      await expect(decide(tx, "apply", [id])).rejects.toThrow(/applied/)
     })
   })
 
@@ -74,13 +79,13 @@ describe("승인 적용", () => {
     await inRollback(admin, async (tx) => {
       await setup(tx)
       const id = await propose(tx, { kind: "ignore", proposal: { reason: "더 오지 않는다" } })
-      await applyProposals(tx, [id])
+      await decide(tx, "apply", [id])
       expect((await mackerelMap(tx))?.status).toBe("ignored")
     })
     await inRollback(admin, async (tx) => {
       await setup(tx)
       const id = await propose(tx, { kind: "map", proposal: { variety: "mackerel-kr", spec: "chilled" } })
-      await applyProposals(tx, [id])
+      await decide(tx, "apply", [id])
       expect(await mackerelMap(tx)).toEqual({ status: "mapped", variety: "mackerel-kr", spec: "chilled" })
     })
   })
@@ -89,7 +94,8 @@ describe("승인 적용", () => {
     await inRollback(admin, async (tx) => {
       const before = await setup(tx)
       const id = await propose(tx, { kind: "map", proposal: { variety: "mackerel-kr", spec: "chilled" } })
-      expect(await rejectProposals(tx, [id])).toEqual([id])
+      const result = await decide(tx, "reject", [id])
+      expect(result).toMatchObject({ ids: [id], mappings: null, snapshot: null })
       expect(await exportSnapshot(tx)).toEqual(before)
       expect((await mackerelMap(tx))?.status).toBe("pending")
     })
@@ -99,9 +105,8 @@ describe("승인 적용", () => {
     await inRollback(admin, async (tx) => {
       await setup(tx)
       const id = await propose(tx, { kind: "new_spec", proposal: { variety: "mackerel-kr", spec: { slug: "frozen-test", name: "냉동 대" } } })
-      await applyProposals(tx, [id])
-      const { judgment } = await refreshJudgment(tx)
-      const [batch] = await tx<{ trigger: string }[]>`select trigger from price.judgment_batch where id = ${judgment.batchId}`
+      const { judgment } = await decide(tx, "apply", [id], { judgment: true })
+      const [batch] = await tx<{ trigger: string }[]>`select trigger from price.judgment_batch where id = ${judgment!.batchId}`
       expect(batch?.trigger).toBe("catalog")
     })
   })
@@ -112,7 +117,7 @@ describe("승인 적용", () => {
       const ramen = { slug: "ramen-test", name: "라면(시험)", category: "noodles" }
       const a = await propose(tx, { source: "chamga", key: "1000", kind: "product_item", proposal: { item: ramen } })
       const b = await propose(tx, { source: "chamga", key: "302", kind: "product_item", proposal: { item: ramen } })
-      await applyProposals(tx, [a, b])
+      await decide(tx, "apply", [a, b])
       const rows = await tx<{ item: string }[]>`
         select i.slug as item from price.source_item si
           join price.product_source_key k on k.source_item_id = si.id and k.valid_to is null
@@ -130,8 +135,8 @@ describe("되돌리기", () => {
     await inRollback(admin, async (tx) => {
       const before = await setup(tx)
       const id = await propose(tx, { kind: "new_spec", proposal: { variety: "mackerel-kr", spec: { slug: "frozen-test", name: "냉동 대" } } })
-      await applyProposals(tx, [id])
-      const result = await revertProposal(tx, id)
+      await decide(tx, "apply", [id])
+      const result = await decide(tx, "revert", [id])
       expect(result.droppedSpecs).toEqual(["mackerel-kr/frozen-test"])
       expect(await exportSnapshot(tx)).toEqual(before)
       expect(await mackerelMap(tx)).toEqual({ status: "pending", variety: null, spec: null })
@@ -147,9 +152,9 @@ describe("되돌리기", () => {
         kind: "new_variety",
         proposal: { item: "mackerel", variety: { slug: "mackerel-test", name: "고등어(시험)", unit: "1개" }, spec: { slug: "frozen-test", name: "냉동 대" } },
       })
-      await applyProposals(tx, [id])
+      await decide(tx, "apply", [id])
       expect(await mackerelMap(tx)).toEqual({ status: "mapped", variety: "mackerel-test", spec: "frozen-test" })
-      await revertProposal(tx, id)
+      await decide(tx, "revert", [id])
       const [v] = await tx<{ status: string }[]>`select status from price.variety where slug = 'mackerel-test'`
       expect(v?.status).toBe("hidden")
       expect((await mackerelMap(tx))?.status).toBe("pending")
@@ -167,10 +172,44 @@ describe("되돌리기", () => {
            where si.source_key = 'chamga:1000'`)[0]?.item
       const before = await itemOf()
       const id = await propose(tx, { source: "chamga", key: "1000", kind: "product_item", proposal: { item: "nuts" } })
-      await applyProposals(tx, [id])
+      await decide(tx, "apply", [id])
       expect(await itemOf()).toBe("nuts")
-      await revertProposal(tx, id)
+      await decide(tx, "revert", [id])
       expect(await itemOf()).toBe(before)
     })
   })
+
+  it("여러 건은 적용한 순서의 역순으로 푼다: 같은 키를 두 번 바꿨어도 처음 상태로 돌아간다", async () => {
+    await inRollback(admin, async (tx) => {
+      const before = await setup(tx)
+      // 같은 원천 키를 새 규격에 잇고(first), 다시 기존 규격으로 옮긴다(second)
+      const first = await propose(tx, { kind: "new_spec", proposal: { variety: "mackerel-kr", spec: { slug: "frozen-test", name: "냉동 대" } } })
+      await decide(tx, "apply", [first])
+      await tx`update price.catalog_proposal set decided_at = now() - interval '1 minute' where id = ${first}`
+      const second = await propose(tx, { kind: "map", proposal: { variety: "mackerel-kr", spec: "chilled" } })
+      await decide(tx, "apply", [second])
+      // 받은 순서와 상관없이 나중에 적용한 것부터 푼다
+      const result = await decide(tx, "revert", [first, second])
+      expect(result.ids).toEqual([second, first])
+      expect(result.snapshot).toEqual(before)
+      expect(await mackerelMap(tx)).toEqual({ status: "pending", variety: null, spec: null })
+    })
+  })
 })
+
+describe("dry-run", () => {
+  it("적용한 결과를 돌려주고 모두 되돌린다. 사본은 null이다", async () => {
+    await inRollback(admin, async (tx) => {
+      const before = await setup(tx)
+      const id = await propose(tx, { kind: "map", proposal: { variety: "mackerel-kr", spec: "chilled" } })
+      const result = await decide(tx, "apply", [id], { dryRun: true })
+      expect(result).toMatchObject({ ids: [id], dryRun: true, snapshot: null })
+      expect(result.mappings?.mapped).toBeGreaterThan(0)
+      expect(await exportSnapshot(tx)).toEqual(before)
+      expect((await mackerelMap(tx))?.status).toBe("pending")
+      const [p] = await tx<{ status: string }[]>`select status from price.catalog_proposal where id = ${id}`
+      expect(p?.status).toBe("proposed")
+    })
+  })
+})
+

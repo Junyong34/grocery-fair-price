@@ -24,10 +24,11 @@ import { describeError, redactorFromEnv } from "../secrets.ts"
 import { exportSnapshot, importSnapshot } from "./db.ts"
 import { insertProposals, listPending, type PendingEntry } from "./pending.ts"
 import { parseProposalFile } from "./proposal.ts"
-import { applyProposals, rejectProposals, revertProposal } from "./proposals.ts"
+import { decideProposals } from "./decide.ts"
 import type { Source } from "./rules.ts"
-import { refreshJudgment, refreshMappings } from "./refresh.ts"
+import { refreshMappings } from "./refresh.ts"
 import { formatSnapshot, readSnapshot, SNAPSHOT_PATH } from "./snapshot.ts"
+import type { CatalogSnapshot } from "./types.ts"
 
 const USAGE =
   "사용법: catalog --export|--import|--mappings [--file 경로] [--dry-run]\n" +
@@ -64,12 +65,15 @@ async function run(url: string, dryRun: boolean, fn: (tx: Tx) => Promise<unknown
 async function writeSnapshotFile(url: string, file: string): Promise<void> {
   const sql = connectIngest(url)
   try {
-    const snapshot = await sql.begin("read only", (tx) => exportSnapshot(tx))
-    writeFileSync(file, formatSnapshot(snapshot))
-    console.log(`내보냄: ${file} (카테고리 ${snapshot.categories.length}, 품목 ${snapshot.items.length}, 품종 ${snapshot.varieties.length}, 예외 ${snapshot.exceptions.length}, 출처 분류 ${snapshot.sourceCategories.length})`)
+    writeSnapshot(file, await sql.begin("read only", (tx) => exportSnapshot(tx)))
   } finally {
     await sql.end()
   }
+}
+
+function writeSnapshot(file: string, snapshot: CatalogSnapshot): void {
+  writeFileSync(file, formatSnapshot(snapshot))
+  console.log(`내보냄: ${file} (카테고리 ${snapshot.categories.length}, 품목 ${snapshot.items.length}, 품종 ${snapshot.varieties.length}, 예외 ${snapshot.exceptions.length}, 출처 분류 ${snapshot.sourceCategories.length})`)
 }
 
 // `64,65,70-80` → [64, 65, 70, …, 80]
@@ -85,18 +89,17 @@ export function parseIds(text: string | undefined): number[] {
   return [...new Set(ids)]
 }
 
+// 제안 결정의 CLI adapter. 결정은 decide.ts가 하고(트랜잭션 · dry-run · 판정 · 커밋 뒤 사본), 여기서는 결과를 찍고 사본을 파일에 쓴다
 async function decide(command: "apply" | "reject" | "revert", ids: number[], skipJudgment: boolean, dryRun: boolean): Promise<void> {
-  const url = required("OWNER_DATABASE_URL")
-  const committed = await run(url, dryRun, async (tx) => {
-    if (command === "reject") return { rejected: await rejectProposals(tx, ids) }
-    const results = command === "apply" ? [await applyProposals(tx, ids)] : await ids.reduce(
-      async (acc, id) => [...(await acc), await revertProposal(tx, id)],
-      Promise.resolve([] as Awaited<ReturnType<typeof revertProposal>>[]),
-    )
-    const judgment = skipJudgment ? null : (await refreshJudgment(tx)).judgment
-    return { results, judgment }
-  })
-  if (committed && command !== "reject") await writeSnapshotFile(url, SNAPSHOT_PATH)
+  const sql = connectIngest(required("OWNER_DATABASE_URL"))
+  try {
+    const { snapshot, ...decision } = await decideProposals(sql, { action: command, ids, judgment: !skipJudgment, dryRun })
+    console.log(JSON.stringify(decision, null, 2))
+    if (decision.dryRun) console.log("--dry-run: 되돌렸다")
+    if (snapshot) writeSnapshot(SNAPSHOT_PATH, snapshot)
+  } finally {
+    await sql.end()
+  }
 }
 
 function describePending(e: PendingEntry): string {
