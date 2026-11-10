@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 
+import { explainVerdict } from "@workspace/price/verdict-copy"
 import { FESTIVALS } from "@workspace/seasonal/data/festivals"
 import { findFood, FOODS } from "@workspace/seasonal/data/foods"
 import { findPairing, PAIRINGS } from "@workspace/seasonal/data/infant-pairings"
@@ -63,12 +64,9 @@ describe("페이지 제목·설명", () => {
     )
   })
 
-  it("품종 상세 설명에 그날 시세와 판정을 넣는다", () => {
-    const base = { name: "녹두", baseUnit: "100g", price: 2700, surveyedOn: "2026-11-03", basis: { source: "KAMIS", scope: "전국 조사 시장" } }
-    expect(varietySeo({ ...base, verdict: { kind: "pricey", pct: 9 } }).description).toBe(
-      "녹두(100g) 시세 2,700원, 평소보다 9% 높아 비싸요(11/3 KAMIS 조사). 대형마트·전통시장은 얼마에 파는지도 견줘 보세요."
-    )
-    expect(varietySeo({ ...base, verdict: { kind: "none", pct: null } }).description).toContain("평소가는 아직 쌓이는 중(11/3 KAMIS 조사)")
+  it("품종 상세 설명은 판정 풀이의 검색 설명이다(문장은 verdict-copy.test.ts에서 확인)", () => {
+    const variety = { name: "녹두", baseUnit: "100g", price: 2700, usual: 2480, verdict: { kind: "pricey", pct: 9 }, surveyedOn: "2026-11-03", sampleSize: 40, stale: false, meetsMinN: true, basis: { source: "KAMIS", scope: "전국 조사 시장" } } as const
+    expect(varietySeo(variety).description).toBe(explainVerdict(variety, null).seoDescription)
   })
 
   it("상품 상세는 판정 없이 판매가와 판매처 수를 넣는다", () => {

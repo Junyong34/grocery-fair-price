@@ -1,17 +1,11 @@
 import { describe, expect, it } from "vitest"
 
 import {
-  brandSpreadNote,
   listBasisLine,
   listSourceLine,
-  partOfMonth,
   PRICE_COPY,
-  summaryLine,
-  seasonNote,
-  seasonVerdictNote,
   verdictChip,
   verdictDiff,
-  verdictTrendDiff,
   withJosa,
 } from "./copy"
 
@@ -27,62 +21,6 @@ describe("판정 문구", () => {
     expect(verdictDiff(-15)).toBe("평소보다 15% 낮아요")
     expect(verdictDiff(0)).toBe("평소와 같아요")
   })
-
-  it("수집된 판정의 차이는 당일 가격이 아닌 최근 조사 기준임을 밝힌다", () => {
-    expect(verdictTrendDiff(8)).toBe("최근 조사 결과를 보면 평소보다 8% 높아요")
-    expect(verdictTrendDiff(-15)).toBe("최근 조사 결과를 보면 평소보다 15% 낮아요")
-    expect(verdictTrendDiff(0)).toBe("최근 조사 결과를 보면 평소와 같아요")
-  })
-})
-
-describe("계절 문구", () => {
-  it("날짜를 달의 초 · 중순 · 말로 쓴다", () => {
-    expect(partOfMonth("2026-10-05")).toBe("10월 초")
-    expect(partOfMonth("2026-10-20")).toBe("10월 중순")
-    expect(partOfMonth("2026-10-28")).toBe("10월 말")
-  })
-
-  it("계절비율로 이맘때가 한 해 중 비싼 때인지 싼 때인지 쓴다", () => {
-    expect(seasonNote(1.12, "2026-10-28")).toBe(
-      "10월 말엔 한 해 평소보다 12% 비싼 때예요"
-    )
-    expect(seasonNote(0.85, "2026-06-03")).toBe(
-      "6월 초엔 한 해 평소보다 15% 싼 때예요"
-    )
-    expect(seasonNote(1.03, "2026-03-15")).toBe(
-      "3월 중순엔 한 해 중 가격이 평소와 비슷한 때예요"
-    )
-  })
-
-  it("싸요 · 비싸요는 계절 말고 다른 이유가 있다고 쓰고, 날씨는 단정하지 않는다", () => {
-    expect(seasonVerdictNote({ kind: "pricey", pct: 18 }, 1.1)).toBe(
-      "계절을 감안해도 평소보다 18% 높아요. 날씨 · 작황 · 수입량처럼 계절 말고 다른 이유가 있을 수 있어요"
-    )
-    expect(seasonVerdictNote({ kind: "cheap", pct: -14 }, 0.9)).toBe(
-      "계절을 감안해도 평소보다 14% 낮아요. 물량이 많은 때일 수 있어요"
-    )
-  })
-
-  it("보통이면 계절이 가격을 설명할 때만 한 줄 붙인다", () => {
-    expect(seasonVerdictNote({ kind: "normal", pct: 4 }, 1.12)).toBe(
-      "비싸 보여도 이맘때 오르는 만큼 오른 가격이에요"
-    )
-    expect(seasonVerdictNote({ kind: "normal", pct: -3 }, 0.88)).toBe(
-      "이맘때 내리는 만큼 내린 가격이에요"
-    )
-    expect(seasonVerdictNote({ kind: "normal", pct: 1 }, 1.02)).toBeNull()
-    expect(seasonVerdictNote({ kind: "none", pct: null }, 1.2)).toBeNull()
-  })
-})
-
-describe("브랜드 편차 안내", () => {
-  it("다른 판정 주의처럼 제목과 설명으로 나눠, 판정은 흐름을 보는 참고라고 쓴다", () => {
-    expect(brandSpreadNote("쌀")).toEqual({
-      title: "쌀은 품종 · 브랜드 · 도정일마다 값이 꽤 달라요",
-      body: "판정은 쌀값 흐름을 보는 참고로 봐 주세요",
-    })
-    expect(brandSpreadNote("현미").title).toBe("현미는 품종 · 브랜드 · 도정일마다 값이 꽤 달라요")
-  })
 })
 
 describe("withJosa", () => {
@@ -94,34 +32,6 @@ describe("withJosa", () => {
   it("괄호 앞 글자로 고른다", () => {
     expect(withJosa("삼겹살(국산)", "을/를")).toBe("삼겹살(국산)을")
     expect(withJosa("깐마늘(국산)", "은/는")).toBe("깐마늘(국산)은")
-  })
-})
-
-describe("summaryLine", () => {
-  const kamis = { source: "KAMIS", scope: "전국 조사 시장" }
-  const base = { name: "녹두", baseUnit: "100g", price: 2700, usual: 2480, surveyedOn: "2026-11-03", sampleSize: 40, basis: kamis }
-
-  it("날짜(연도 포함)·출처·표본·시세·평소가·판정을 한 문장으로 쓴다", () => {
-    expect(summaryLine({ ...base, verdict: { kind: "pricey", pct: 9 } })).toBe(
-      "2026년 11월 3일 KAMIS 전국 조사 시장 40곳 중간값 기준, 녹두 100g 시세는 2,700원이에요. 평소가는 2,480원이에요. 최근 조사 결과를 보면 평소보다 9% 높아 비싸요."
-    )
-  })
-
-  it("싸요 · 같은 값", () => {
-    expect(summaryLine({ ...base, verdict: { kind: "cheap", pct: -12 } })).toContain("평소보다 12% 낮아 싸요.")
-    expect(summaryLine({ ...base, verdict: { kind: "normal", pct: 0 } })).toContain("평소와 같아 보통이에요.")
-  })
-
-  it("판정 전이면 평소가가 없다고 쓴다", () => {
-    expect(summaryLine({ ...base, usual: null, verdict: { kind: "none", pct: null } })).toBe(
-      "2026년 11월 3일 KAMIS 전국 조사 시장 40곳 중간값 기준, 녹두 100g 시세는 2,700원이에요. 평소가가 아직 쌓이지 않아 판정 전이에요."
-    )
-  })
-
-  it("전국 평균(축평원)은 곳 수와 중간값을 쓰지 않는다", () => {
-    expect(
-      summaryLine({ ...base, name: "계란", baseUnit: "30구", price: 6998, usual: null, sampleSize: 1, basis: { source: "축평원", scope: "전국 평균" }, verdict: { kind: "none", pct: null } })
-    ).toMatch(/^2026년 11월 3일 축평원 전국 평균 기준, 계란 30구 시세는 6,998원이에요\./)
   })
 })
 
@@ -219,10 +129,3 @@ describe("검색 문구", () => {
   })
 })
 
-describe("summaryLine 이름과 단위", () => {
-  it("이름에 괄호가 있어도 단위를 괄호 밖에 써서 괄호가 겹치지 않는다", () => {
-    expect(
-      summaryLine({ name: "고등어(국산)", baseUnit: "1개", price: 3990, usual: 4562, verdict: { kind: "cheap", pct: -13 }, surveyedOn: "2026-11-04", sampleSize: 37, basis: { source: "KAMIS", scope: "전국 조사 시장" } })
-    ).toContain("고등어(국산) 1개 시세는 3,990원이에요.")
-  })
-})

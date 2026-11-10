@@ -35,64 +35,7 @@ export function verdictDiff(pct: number): string {
   return `평소보다 ${Math.abs(pct)}% ${pct > 0 ? "높아요" : "낮아요"}`
 }
 
-/** 수집된 판정의 편차는 최근 최대 3 조사일의 중앙값이다. 직접 입력 가격의 당일 비교와 구분한다. */
-export function verdictTrendDiff(pct: number): string {
-  return `최근 조사 결과를 보면 ${verdictDiff(pct)}`
-}
-
-/** "10월 말"처럼 날짜를 달의 초 · 중순 · 말로. */
-export function partOfMonth(iso: string): string {
-  const [, month, day] = iso.split("-").map(Number)
-  return `${month}월 ${day! <= 10 ? "초" : day! <= 20 ? "중순" : "말"}`
-}
-
-// 계절비율이 이 범위 안이면 "한 해 평소와 비슷한 때"로 본다 (±5%)
-const SEASON_FLAT = 0.05
-
-/**
- * "왜 이 판정일까?"의 계절 한 줄 (judgment.md 1장). seasonIndex는 그날의 계절비율(이맘때 시세 ÷ 그해 연중앙값)이다.
- * 예: 1.12 → "10월 말엔 한 해 평소보다 12% 비싼 때예요"
- */
-export function seasonNote(seasonIndex: number, iso: string): string {
-  const pct = Math.round((seasonIndex - 1) * 100)
-  if (Math.abs(seasonIndex - 1) < SEASON_FLAT)
-    return `${partOfMonth(iso)}엔 한 해 중 가격이 평소와 비슷한 때예요`
-  return `${partOfMonth(iso)}엔 한 해 평소보다 ${Math.abs(pct)}% ${pct > 0 ? "비싼" : "싼"} 때예요`
-}
-
-/**
- * 계절 한 줄 뒤에 붙이는 판정 풀이. 평소가는 이미 계절을 감안한 값이라, 판정이 싸요 · 비싸요면 계절 말고 다른 이유가 있다.
- * 날씨 · 작황은 데이터로 확인하지 않으므로 "있을 수 있어요"로만 쓴다. 판정 전이면 null.
- */
-export function seasonVerdictNote(
-  verdict: Verdict,
-  seasonIndex: number
-): string | null {
-  if (verdict.kind === "none" || verdict.pct === null) return null
-  if (verdict.kind === "pricey")
-    return `계절을 감안해도 평소보다 ${Math.abs(verdict.pct)}% 높아요. 날씨 · 작황 · 수입량처럼 계절 말고 다른 이유가 있을 수 있어요`
-  if (verdict.kind === "cheap")
-    return `계절을 감안해도 평소보다 ${Math.abs(verdict.pct)}% 낮아요. 물량이 많은 때일 수 있어요`
-  if (seasonIndex - 1 >= SEASON_FLAT)
-    return "비싸 보여도 이맘때 오르는 만큼 오른 가격이에요"
-  if (1 - seasonIndex >= SEASON_FLAT)
-    return "이맘때 내리는 만큼 내린 가격이에요"
-  return null
-}
-
 type Particle = Parameters<typeof josa>[1]
-
-/**
- * 품종 · 브랜드마다 값이 크게 다른 품종(쌀 등)의 판정 아래 한 줄 (judgment.md 5-3).
- * 판정은 그대로 두고, 가격 하나로 이 상품이 싸다 · 비싸다를 정할 필요는 없다는 느낌을 준다.
- * 판정 카드의 다른 판정 주의(오래됨 · 표본 적음)처럼 제목과 설명으로 나눈다.
- */
-export function brandSpreadNote(name: string): { title: string; body: string } {
-  return {
-    title: `${withJosa(name, "은/는")} 품종 · 브랜드 · 도정일마다 값이 꽤 달라요`,
-    body: `판정은 ${name}값 흐름을 보는 참고로 봐 주세요`,
-  }
-}
 
 /** 이름의 받침에 맞는 조사만. "삼겹살(국산)"처럼 괄호가 붙은 이름은 괄호 앞 글자로 고른다. */
 export function josaOf(name: string, particle: Particle): string {
@@ -148,37 +91,6 @@ export function listBasisLine(
     ...new Set(rows.map(({ basis }) => `${basis.source} ${basis.scope}`)),
   ]
   return `조사일 ${dates} · ${sources.join(" · ")}`
-}
-
-/** "2026-11-03" → "2026년 11월 3일" */
-function longDate(iso: string): string {
-  const [year, month, day] = iso.split("-").map(Number)
-  return `${year}년 ${month}월 ${day}일`
-}
-
-/** 판정 낱말에 붙는 끝: "비싸요." / "보통이에요." */
-const VERDICT_END: Record<Exclude<VerdictKind, "none">, string> = { cheap: "싸요.", normal: "보통이에요.", pricey: "비싸요." }
-
-/**
- * P3 품종 상세의 요약 한 문장. 검색 결과·AI 답변이 그대로 인용할 수 있게 날짜(연도 포함)·출처·표본·숫자를 한 문장에 담는다.
- * 단위는 괄호 밖에 쓴다("고등어(국산) 1개"). 이름에 괄호가 있으면 "고등어(국산)(1개)"처럼 겹친다.
- * 판정 차이는 최근 조사 편차의 중간값이라 두 금액의 단순 차이와 다를 수 있다.
- */
-export function summaryLine(v: {
-  name: string
-  baseUnit: string
-  price: number
-  usual: number | null
-  verdict: Verdict
-  surveyedOn: string
-  sampleSize: number
-  basis: QuoteBasis
-}): string {
-  const scope = isAverageBasis(v.basis) ? v.basis.scope : `${v.basis.scope} ${v.sampleSize}곳 중간값`
-  const head = `${longDate(v.surveyedOn)} ${v.basis.source} ${scope} 기준, ${v.name} ${v.baseUnit} 시세는 ${won(v.price)}원이에요.`
-  if (v.usual == null || v.verdict.kind === "none" || v.verdict.pct == null) return `${head} 평소가가 아직 쌓이지 않아 판정 전이에요.`
-  const diff = v.verdict.pct === 0 ? "평소와 같아" : `평소보다 ${Math.abs(v.verdict.pct)}% ${v.verdict.pct > 0 ? "높아" : "낮아"}`
-  return `${head} 평소가는 ${won(v.usual)}원이에요. 최근 조사 결과를 보면 ${diff} ${VERDICT_END[v.verdict.kind]}`
 }
 
 /** 목록 하단은 출처 이름만 표시한다. 조사 범위와 날짜는 안내 popover·행에서 확인한다. */
