@@ -235,7 +235,7 @@ function Plot({
               x2={xs[active]}
               y1="0"
               y2="100"
-              className="stroke-silver"
+              className="stroke-stone"
               vectorEffect="non-scaling-stroke"
             />
             <path
