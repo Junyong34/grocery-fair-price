@@ -17,12 +17,11 @@
   --fp-caution-bg: var(--color-pair-gold);
   --fp-caution-ink: var(--color-pair-gold-foreground);
   --fp-caution-line: color-mix(in oklab, var(--color-gold) 34%, var(--color-canvas));
-  --fp-art: 22mm;
+  --fp-art: 20mm;
   --fp-row-gap: 2.2mm;
 
   width: var(--sheet-w);
   height: var(--sheet-h);
-  padding: 10mm 10mm 8mm;
   display: flex;
   flex-direction: column;
   gap: 4mm;
@@ -42,8 +41,16 @@
   --sheet-h: 210mm;
   --fp-art: 11mm;
   --fp-row-gap: 1.6mm;
-  padding: 8mm 10mm 7mm;
   gap: 3mm;
+}
+
+/* 공용 print.css의 .print-sheet { padding: var(--safe) }가 덮지 않도록 두 클래스로 지정한다. */
+.fruits-print-sheet.print-sheet {
+  padding: 12mm 12mm 10mm;
+}
+
+.fruits-print-sheet.print-sheet[data-orientation="landscape"] {
+  padding: 10mm 12mm 9mm;
 }
 
 @media print {
@@ -157,7 +164,7 @@
 
 .fp-row {
   display: grid;
-  grid-template-columns: 27mm minmax(0, 1fr);
+  grid-template-columns: 25mm minmax(0, 1fr);
   align-items: center;
   gap: 3mm;
   padding: 2mm 3mm;
@@ -182,7 +189,7 @@
 
 .fp-stage-num {
   font-family: var(--font-number, var(--font-heading));
-  font-size: 24pt;
+  font-size: 22pt;
   font-weight: 700;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -207,7 +214,7 @@
 .fp-fruits {
   display: grid;
   grid-template-columns: repeat(var(--fp-cols, 7), minmax(0, 1fr));
-  gap: 1.5mm;
+  gap: 1mm;
   align-items: start;
 }
 
