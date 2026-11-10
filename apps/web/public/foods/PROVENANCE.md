@@ -10,7 +10,7 @@
 | kit sha | `6806db565e0538c4` |
 | 변형 | `color`, `motion` |
 | 바닥 그림자 | 끔 |
-| 품종 수 | 275 |
+| 품종 수 | 279 |
 
 | id | 이름 | food.mjs sha |
 |---|---|---|
@@ -114,6 +114,7 @@
 | `goedorachi` | 괴도라치 | `0b801aaadd6f0134` |
 | `gomchwi` | 곰취 | `b71f8e262796e96a` |
 | `gondeure` | 곤드레 | `8c630dde90537611` |
+| `grape` | 포도 | `c5ff7f48da4aaa57` |
 | `grapefruit` | 자몽 | `b5eedf3a9607e959` |
 | `gray-rockfish` | 볼락 | `a37d77f5d9855e0d` |
 | `green-bean` | 껍질콩(그린빈) | `655460086d8bc0d0` |
@@ -134,6 +135,7 @@
 | `jaecheop-clam` | 재첩 | `ab4f79837a5e00c5` |
 | `jeju-hanchi` | 제주한치(창꼴뚜기) | `c08cb0cf77b53795` |
 | `jerusalem-artichoke` | 돼지감자 | `c54edee4a2de8259` |
+| `juice` | 생과일주스 | `06bcc8b0f8470914` |
 | `jujube` | 대추 | `53c0fd3dbd355516` |
 | `kelp` | 다시마 | `f56e7882bbbec254` |
 | `kidney-bean` | 강낭콩 | `48b83ecfc6a5bbdb` |
@@ -157,6 +159,7 @@
 | `maesaengi` | 매생이 | `dd7f66bad71aa2e2` |
 | `mallow` | 아욱 | `241b9cc86f32eefe` |
 | `mandarin` | 귤 | `41c13780c25f9d15` |
+| `mango` | 망고 | `e08146b92577b653` |
 | `manila-clam` | 바지락 | `a9b14b731dba06f2` |
 | `marbled-rockfish` | 쏨뱅이 | `27cbd1f7e3bda467` |
 | `matsutake` | 송이버섯 | `f6793ef05a57eaf5` |
@@ -178,6 +181,7 @@
 | `olive-oil` | 올리브유 | `085f7f4a371fe5e7` |
 | `omija` | 오미자 | `4e01652edd55e92b` |
 | `onion` | 양파 | `8edd662b58b632d0` |
+| `orange` | 오렌지 | `516fabeabe690653` |
 | `oriental-melon` | 참외 | `073907b78971152f` |
 | `oyster` | 굴 | `e1c4e89a4d262d52` |
 | `paprika` | 파프리카 | `f7b83eb1a89cfe73` |
@@ -221,9 +225,9 @@
 | `roughscale-flounder` | 줄가자미 | `a924af8927679a12` |
 | `rye` | 호밀 | `eea1f8bc67c64af2` |
 | `salmon` | 연어 | `b80e841aab4d7a2b` |
-| `salted-shrimp` | 새우젓 | `427f1c3b4ce6e8a7` |
 | `samchae` | 삼채 | `0855f807f27e6d62` |
 | `sardinella` | 밴댕이 | `061bfe9e1f906e0c` |
+| `sashimi` | 생선회 | `63f05e14082c8ef3` |
 | `saury` | 꽁치 | `abb7e2466042b59b` |
 | `scallion` | 쪽파 | `b5eabcfc962fe205` |
 | `scallop` | 가리비 | `89e88513eb54c80b` |

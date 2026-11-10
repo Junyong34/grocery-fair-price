@@ -9,6 +9,7 @@ import {
 } from "@workspace/seasonal/data/infant-fruits"
 
 import { routes } from "@/shared/routes"
+import { FRUIT_GUIDE_ART } from "../data"
 import { IngredientArt } from "../ingredient-art"
 
 export function FruitDetailSheet({
@@ -38,7 +39,7 @@ export function FruitDetailSheet({
       onClose={onClose}
       title={
         <div className="fruit-sheet-hero">
-          <IngredientArt name={fruit.name} />
+          <IngredientArt name={fruit.name} src={FRUIT_GUIDE_ART[fruit.id]} />
           <div className="fruit-sheet-meta">
             <span className="fruit-sheet-title">{fruit.name}</span>
             <div className="fruit-sheet-badges">

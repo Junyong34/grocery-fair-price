@@ -5,6 +5,7 @@ import {
   type BabyFruit,
 } from "@workspace/seasonal/data/infant-fruits"
 
+import { FRUIT_GUIDE_ART } from "../data"
 import { IngredientArt } from "../ingredient-art"
 
 export function FruitCard({
@@ -43,7 +44,7 @@ export function FruitCard({
       </div>
 
       <div className="fruit-card-art">
-        <IngredientArt name={fruit.name} />
+        <IngredientArt name={fruit.name} src={FRUIT_GUIDE_ART[fruit.id]} />
       </div>
 
       <div className="fruit-card-info">

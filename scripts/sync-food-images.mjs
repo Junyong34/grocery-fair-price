@@ -4,7 +4,7 @@
 //   pnpm foods:sync
 //
 // prototypes/seasonal-food의 kit으로 직접 렌더하므로 대시보드용 build/out/은 건드리지 않는다.
-// 그림체는 STYLE_ID 하나, 변형은 VARIANTS, 바닥 그림자는 끈다. 화면에 나오는 품종(foods.generated.ts)만 복사한다.
+// 그림체는 STYLE_ID 하나, 변형은 VARIANTS, 바닥 그림자는 끈다. 제철·이유식 화면에서 쓰는 그림만 복사한다.
 // 명절 전통 음식(dishes/<id>)도 같은 그림체로, 움직임이 없으니 color 변형만, 화면에 나오는 음식(dish-rows.ts)만 복사한다.
 // 출력: apps/web/public/foods/<id>/<variant>.svg, apps/web/public/foods/PROVENANCE.md,
 //       packages/seasonal/src/data/drawn-foods.generated.ts,
@@ -37,7 +37,7 @@ if (!existsSync(join(prototype, "kit/index.mjs"))) {
 const { renderSvg } = await import(pathToFileURL(join(prototype, "kit/index.mjs")))
 const { FOOD_ROWS } = await import(pathToFileURL(join(root, "packages/seasonal/src/data/foods.generated.ts")))
 const { DISH_ROWS } = await import(pathToFileURL(join(root, "packages/seasonal/src/data/dish-rows.ts")))
-const { PAIRING_ART } = await import(pathToFileURL(join(root, "apps/web/features/baby-food/data.ts")))
+const { FRUIT_GUIDE_ART, PAIRING_ART } = await import(pathToFileURL(join(root, "apps/web/features/baby-food/data.ts")))
 
 const sha = (text) => createHash("sha256").update(text).digest("hex").slice(0, 16)
 const styleFile = join(prototype, "styles", STYLE_ID, "style.json")
@@ -76,13 +76,13 @@ async function copyDrawings(source, shownIds, outDir, variants) {
   return { copied, skipped }
 }
 
-const pairingFoodIds = Object.values(PAIRING_ART).flatMap((path) => {
+const babyFoodIds = [...Object.values(PAIRING_ART), ...Object.values(FRUIT_GUIDE_ART)].flatMap((path) => {
   const match = path?.match(/^\/foods\/([^/]+)\//)
   return match ? [match[1]] : []
 })
 const { copied, skipped } = await copyDrawings(
   "foods",
-  new Set([...FOOD_ROWS.map((food) => food.id), ...pairingFoodIds]),
+  new Set([...FOOD_ROWS.map((food) => food.id), ...babyFoodIds]),
   outDir,
   VARIANTS,
 )

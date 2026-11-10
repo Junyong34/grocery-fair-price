@@ -3,9 +3,10 @@ import Image from "next/image"
 import { PAIRING_ART } from "./data"
 
 /** 재료 그림. "브로콜리/콜리플라워"는 두 그림을 겹쳐 둔다. */
-export function IngredientArt({ name }: { name: string }) {
-  const paths =
-    name === "브로콜리/콜리플라워"
+export function IngredientArt({ name, src }: { name: string; src?: string }) {
+  const paths = src
+    ? [src]
+    : name === "브로콜리/콜리플라워"
       ? [PAIRING_ART["브로콜리"], PAIRING_ART["콜리플라워"]]
       : [PAIRING_ART[name]]
   return (

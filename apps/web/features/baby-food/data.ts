@@ -1,3 +1,14 @@
+// 과일 시기 도감의 과일 id와 주의 식재료 iconId에 전용 그림을 연결한다.
+export const FRUIT_GUIDE_ART: Readonly<
+  Partial<Record<string, `/foods/${string}/color.svg`>>
+> = {
+  mango: "/foods/mango/color.svg",
+  grape: "/foods/grape/color.svg",
+  orange: "/foods/orange/color.svg",
+  juice: "/foods/juice/color.svg",
+  sashimi: "/foods/sashimi/color.svg",
+}
+
 // 이름과 품종 범위가 일치하는 기존 그림만 연결한다.
 export const PAIRING_ART: Readonly<Partial<Record<string, string>>> = {
   감: "/foods/persimmon/color.svg",
