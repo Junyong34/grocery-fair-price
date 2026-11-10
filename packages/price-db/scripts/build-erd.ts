@@ -19,7 +19,7 @@ const GROUPS: { id: number; tables: string[]; hideParents?: string[] }[] = [
   { id: 2, tables: ["obs_place", "store", "market", "region", "region_code_map", "store_seller", "seller", "store_link"] },
   { id: 3, tables: ["observation", "observation_revision", "reference_observation"],
     hideParents: ["unit_rule"] },
-  { id: 4, tables: ["product", "product_source_key", "product_attr_history", "product_variety_map", "al_variety_rule"],
+  { id: 4, tables: ["product", "product_source_key", "product_attr_history", "product_variety_map", "al_variety_rule", "product_classification"],
     hideParents: ["unit_rule", "raw_object"] },
   { id: 5, tables: ["daily_quote", "product_daily_summary", "reference_price", "season_index", "usual_price",
                     "judgment_batch", "judgment_current", "judgment_snapshot", "product_snapshot", "calc_param", "current_judgment", "current_product"] },

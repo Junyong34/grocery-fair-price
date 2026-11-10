@@ -16,7 +16,7 @@ const PERMISSION_DENIED = "42501"
 const READ_ONLY_TRANSACTION = "25006"
 
 describe("마이그레이션 결과", () => {
-  test("price의 표가 모두 RLS를 켜고 있고, 뷰는 current_judgment·current_product뿐이다", async () => {
+  test("price의 표가 모두 RLS를 켜고 있고, 뷰는 current_judgment·current_product·product_classification뿐이다", async () => {
     const rows = await admin<{ relname: string; relkind: string; relrowsecurity: boolean }[]>`
       select c.relname, c.relkind, c.relrowsecurity
       from pg_class c join pg_namespace n on n.oid = c.relnamespace
@@ -24,7 +24,7 @@ describe("마이그레이션 결과", () => {
     const tables = rows.filter((r) => r.relkind === "r")
     expect(tables.map((r) => r.relname).sort()).toEqual([...PRICE_TABLES].sort())
     expect(tables.filter((r) => !r.relrowsecurity)).toEqual([])
-    expect(rows.filter((r) => r.relkind === "v").map((r) => r.relname).sort()).toEqual(["current_judgment", "current_product"])
+    expect(rows.filter((r) => r.relkind === "v").map((r) => r.relname).sort()).toEqual(["current_judgment", "current_product", "product_classification"])
   })
 
   test("롤은 로그인만 되고 superuser·상속·롤 생성이 없으며, web_reader는 읽기 전용이다", async () => {
@@ -52,7 +52,7 @@ describe("(1) web_reader는 읽기 표마다 넣어 둔 행이 보인다", () =>
 })
 
 describe("(2) web_reader는 읽기 표가 아닌 표를 못 읽고 아무 표에도 못 쓴다", () => {
-  test.each(["observation", "source_day", "raw_object"])("%s 읽기는 42501", async (table) => {
+  test.each(["observation", "source_day", "raw_object", "product_classification"])("%s 읽기는 42501", async (table) => {
     expect(await sqlState(() => web.unsafe(`select 1 from price.${table} limit 1`))).toBe(PERMISSION_DENIED)
   })
 
@@ -78,7 +78,7 @@ describe("(2) web_reader는 읽기 표가 아닌 표를 못 읽고 아무 표에
 
 describe("(3) anon·authenticated는 price의 어느 표도 못 읽는다", () => {
   for (const role of ["anon", "authenticated"] as const) {
-    test.each([...PRICE_TABLES, "current_judgment", "current_product"])(`${role}: %s`, async (table) => {
+    test.each([...PRICE_TABLES, "current_judgment", "current_product", "product_classification"])(`${role}: %s`, async (table) => {
       const state = await sqlState(() =>
         inRollback(admin, async (tx) => {
           await tx.unsafe(`set local role ${role}`)
@@ -131,3 +131,12 @@ describe("(5) PUBLIC·anon·authenticated에 새어 나간 권한이 없다 (pip
     expect(row!.n).toBeGreaterThan(0)
   })
 })
+
+describe("상품 분류 뷰 (product_classification)", () => {
+  test("ingest_writer는 읽고, 상품마다 한 행이다", async () => {
+    const [row] = await ingest<{ rows: number; products: number }[]>`
+      select (select count(*)::int from price.product_classification) as rows, (select count(*)::int from price.product) as products`
+    expect(row!.rows).toBe(row!.products)
+  })
+})
+

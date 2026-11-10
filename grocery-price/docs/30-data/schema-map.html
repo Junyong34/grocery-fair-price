@@ -155,7 +155,7 @@ footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--li
     <span class="src c">참가격 생필품 가격</span>
   </div>
   <div class="facts">
-    <span><!-- erd:counts -->스키마 <code>price</code> · 테이블 <b>47</b>개 + 뷰 <b>2</b> · 묶음 <b>6</b>개<!-- /erd:counts --></span>
+    <span><!-- erd:counts -->스키마 <code>price</code> · 테이블 <b>47</b>개 + 뷰 <b>3</b> · 묶음 <b>6</b>개<!-- /erd:counts --></span>
     <span>1년차 DB 실측 기반 <b>465~525MB</b> / 무료 500MB</span>
     <span>1년차 원본 파일 추정 <b>250~330MB</b> / 무료 1GB</span>
     <span>근거 문서 <code>grocery-price/docs/30-data/pipeline.md</code> 3장</span>
@@ -599,6 +599,11 @@ erDiagram
   product ||--o{ product_variety_map : ""
   spec |o--o{ product_variety_map : "(variety_id, spec_id)"
   spec ||--o{ al_variety_rule : "(variety_id, spec_id)"
+  category ||..o{ product_classification : "뷰가 읽음"
+  category_source_map ||..o{ product_classification : "뷰가 읽음"
+  item ||..o{ product_classification : "뷰가 읽음"
+  product ||..o{ product_classification : "뷰가 읽음"
+  product_attr_history ||..o{ product_classification : "뷰가 읽음"
   product {
     int id PK
     text status "surveyed not_surveyed merged"
@@ -629,6 +634,9 @@ erDiagram
     int variety_id FK
     int spec_id FK
     int unit_rule_id FK
+  }
+  product_classification {
+    text _ "뷰 (security_invoker)"
   }
 </pre>
 <!-- /erd:group-4 -->

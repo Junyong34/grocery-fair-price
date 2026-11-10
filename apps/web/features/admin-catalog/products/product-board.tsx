@@ -20,6 +20,7 @@ type StateFilter = "all" | PageState | "no-item"
 const STATE_TONE: Record<PageState, string> = {
   shown: "bg-verdict-cheap-wash text-verdict-cheap-ink",
   stale: "bg-gold-wash text-espresso",
+  unclassified: "bg-verdict-pricey-wash text-verdict-pricey-ink",
   "no-page": "bg-verdict-pricey-wash text-verdict-pricey-ink",
   discontinued: "bg-mat text-stone",
 }
@@ -28,6 +29,9 @@ const STATE_TONE: Record<PageState, string> = {
  * 상품 목록 어드민 (catalog-scale/10의 읽기 화면). 참가격 상품이 어느 카테고리 · 품목에 들어가 상품 화면에 어떻게 나오는지 본다.
  * 고치지 않는다. 품목이 틀리면 상품의 품목 제안(catalog propose → 제안 검토)으로 고친다.
  */
+/** 분류가 없는 상품(뷰의 placed_by none)의 카테고리·품목 칸 */
+const NONE = "분류 없음"
+
 export function ProductBoard({ rows, summary, categories }: ProductCatalog) {
   const [category, setCategory] = useState("all")
   const [item, setItem] = useState("all")
@@ -35,26 +39,27 @@ export function ProductBoard({ rows, summary, categories }: ProductCatalog) {
   const [query, setQuery] = useState("")
   const q = query.trim()
 
-  const inCategory = useMemo(() => rows.filter((r) => category === "all" || r.category === category), [rows, category])
+  const inCategory = useMemo(() => rows.filter((r) => category === "all" || (r.category ?? NONE) === category), [rows, category])
   // 고른 카테고리 안의 품목과 상품 수 (품목을 너무 잘게 · 크게 나눴는지 보기)
   const items = useMemo(() => {
     const n = new Map<string, number>()
-    for (const r of inCategory) n.set(r.item, (n.get(r.item) ?? 0) + 1)
+    for (const r of inCategory) n.set(r.item ?? NONE, (n.get(r.item ?? NONE) ?? 0) + 1)
     return [...n]
   }, [inCategory])
   const visible = inCategory.filter(
     (r) =>
-      (item === "all" || r.item === item) &&
-      (state === "all" || (state === "no-item" ? !r.itemSet : pageStateOf(r) === state)) &&
-      (q === "" || r.name.includes(q) || r.goodId === q || r.item.includes(q)),
+      (item === "all" || (r.item ?? NONE) === item) &&
+      (state === "all" || (state === "no-item" ? r.placedBy !== "item" : pageStateOf(r) === state)) &&
+      (q === "" || r.name.includes(q) || r.goodId === q || (r.item ?? "").includes(q)),
   )
 
   return (
     <section className="flex flex-col gap-6">
-      <dl className="grid grid-cols-6 gap-3">
+      <dl className="grid grid-cols-7 gap-3">
         <Stat label="참가격 상품" value={summary.total} />
         <Stat label={PAGE_STATE_LABEL.shown} value={summary.shown} />
         <Stat label={PAGE_STATE_LABEL.stale} value={summary.stale} />
+        <Stat label={PAGE_STATE_LABEL.unclassified} value={summary.unclassified} />
         <Stat label={PAGE_STATE_LABEL["no-page"]} value={summary.noPage} />
         <Stat label={PAGE_STATE_LABEL.discontinued} value={summary.discontinued} />
         <Stat label="품목 미정" value={summary.noItem} />
@@ -71,7 +76,7 @@ export function ProductBoard({ rows, summary, categories }: ProductCatalog) {
           className="w-44"
         >
           <NativeSelectOption value="all">카테고리 전체</NativeSelectOption>
-          {categories.map((c) => (
+          {[...categories, NONE].map((c) => (
             <NativeSelectOption key={c} value={c}>
               {c}
             </NativeSelectOption>
@@ -90,6 +95,7 @@ export function ProductBoard({ rows, summary, categories }: ProductCatalog) {
             { value: "all", label: "전체" },
             { value: "shown", label: "노출" },
             { value: "stale", label: "오래됨" },
+            { value: "unclassified", label: "분류 없음" },
             { value: "no-page", label: "페이지 없음" },
             { value: "discontinued", label: "조사 중단" },
             { value: "no-item", label: "품목 미정" },
@@ -136,10 +142,10 @@ function Table({ rows }: { rows: readonly ProductRow[] }) {
             const s = pageStateOf(r)
             return (
               <tr key={r.goodId} className="border-b border-mat align-top last:border-0">
-                <td className="px-4 py-3 whitespace-nowrap text-stone">{r.category}</td>
+                <td className="px-4 py-3 whitespace-nowrap text-stone">{r.category ?? NONE}</td>
                 <td className="px-4 py-3 whitespace-nowrap">
-                  {r.item}
-                  {!r.itemSet && <span className="ml-1.5 text-xs text-stone">(소분류)</span>}
+                  {r.item ?? NONE}
+                  {r.placedBy === "source_class" && <span className="ml-1.5 text-xs text-stone">(소분류)</span>}
                 </td>
                 <td className="px-4 py-3 font-semibold text-ink">
                   {r.page ? (

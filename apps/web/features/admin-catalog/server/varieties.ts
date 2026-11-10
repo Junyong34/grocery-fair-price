@@ -61,12 +61,12 @@ export async function getVarietyCatalog(): Promise<VarietyCatalog> {
        order by si.last_seen_on desc, si.source_key`
 
     const pendingProducts = await sql<{ good_id: string; name: string; al_code: string | null; reason: string | null }[]>`
-      select si.key_parts->>'goodId' as good_id, p.name, h.al_code, r.reason
+      select si.key_parts->>'goodId' as good_id, p.name, pc.al_code, r.reason
         from price.product p
         join price.product_variety_map pm on pm.product_id = p.id and pm.valid_to is null and pm.status = 'pending'
         join price.product_source_key k on k.product_id = p.id and k.valid_to is null
         join price.source_item si on si.id = k.source_item_id
-        left join lateral (select al_code from price.product_attr_history x where x.product_id = p.id order by x.valid_from desc limit 1) h on true
+        join price.product_classification pc on pc.product_id = p.id
         left join price.catalog_key_rule r on r.source = 'chamga' and r.key_pattern = si.key_parts->>'goodId'
        order by p.name`
     const [ignored] = await sql<{ n: number }[]>`

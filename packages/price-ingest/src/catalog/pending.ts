@@ -57,8 +57,8 @@ export async function listPending(
       join price.source_code_map m on m.source_item_id = si.id and m.valid_to is null
      where m.status = 'pending'`
   const productRows = await tx<Row[]>`
-    select 'chamga' as source, si.key_parts, p.name as label, h.al_code as source_category, pm.status as map_status, pi.slug as product_item,
-           array[concat_ws(' ', h.total_qty::text, h.total_unit)] as units,
+    select 'chamga' as source, si.key_parts, p.name as label, pc.al_code as source_category, pm.status as map_status, pi.slug as product_item,
+           array[concat_ws(' ', pc.total_qty::text, pc.total_unit)] as units,
            p.registered_on::text as first_seen, coalesce(p.last_price_on, p.registered_on)::text as last_seen,
            (select count(*)::int from price.observation o where o.source_item_id = si.id) as observations
       from price.product p
@@ -66,9 +66,7 @@ export async function listPending(
       left join price.item pi on pi.id = p.item_id
       join price.product_source_key k on k.product_id = p.id and k.valid_to is null
       join price.source_item si on si.id = k.source_item_id
-      left join lateral (
-        select x.al_code, x.total_qty, x.total_unit from price.product_attr_history x where x.product_id = p.id order by x.valid_from desc limit 1
-      ) h on true`
+      join price.product_classification pc on pc.product_id = p.id`
   const open = await tx<{ source: Source; key: string; id: number }[]>`
     select source, key_pattern as key, id::int from price.catalog_proposal where status in ('proposed', 'approved')`
   const varieties = await tx<CatalogVarietyRef[]>`

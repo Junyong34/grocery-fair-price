@@ -226,6 +226,7 @@ create policy web_select on price.<표> for select to web_reader    using (true)
 | 3-4 | `reference_price`, `usual_price` | 평년 등 비교값 / 평소가 | ○ |
 | 3-4 | `judgment_batch`, `judgment_current`, `judgment_snapshot`, 뷰 `current_judgment` | 판정 스냅샷 묶음 / 현재 묶음 포인터 / 품종·규격별 판정 / 현재 묶음의 판정 | ○ (`judgment_batch` 제외) |
 | 3-4 | `product_snapshot`, 뷰 `current_product` | 참가격 상품별 화면 payload (판정 묶음과 같은 묶음, 판정 없음, catalog-scale/09) / 현재 묶음의 상품 payload | ○ |
+| 3-6 | 뷰 `product_classification` | 상품 분류: 상품마다 화면에 쓰는 카테고리·품목(품목 → 출처 분류 대응표 → 없음)과 최신 상품 속성. 상품 payload 빌드와 카탈로그 어드민이 읽는다 (ingest_writer만) | |
 | 3-4 | `calc_param` | 계산 상수 (정해진 값과 ②에서 정할 자리) | |
 | 3-5 | `ingest_run`, `source_day`, `source_day_part`, `backfill_task` | 수집 실행 / 출처 × 대상 날짜 상태 / 부분 누락 단위 / 백필 진행 | |
 | 3-6 | `product`, `product_source_key`, `product_attr_history`, `product_variety_map`, `al_variety_rule` | 상품 / 출처 키 → 상품 / 상품 속성 이력 / 상품 → 품종 / AL 소분류 → 품종 기본값 | ○ (`product`, `product_attr_history`) |
