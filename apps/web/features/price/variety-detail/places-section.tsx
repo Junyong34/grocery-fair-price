@@ -33,8 +33,9 @@ export function PlacesSection({ detail }: { detail: VarietyDetail }) {
       <span className="flex min-w-0 flex-col leading-tight">
         <span className="truncate text-[15px] font-semibold text-ink">{place.name}</span>
         <span className="truncate text-xs text-caption">
-          {place.region ?? COPY.places(place.samples.length)}
-          {sameEverywhere(place) && ` · ${COPY.samePrice}`}
+          {sameEverywhere(place)
+            ? [place.region, COPY.samePrice(place.samples.length)].filter(Boolean).join(" · ")
+            : place.region ?? COPY.places(place.samples.length)}
         </span>
       </span>
       <span aria-hidden className="relative h-2 rounded-full bg-hairline">

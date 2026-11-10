@@ -66,6 +66,7 @@ export function TrendSection({
         {several && (
           <>
             <div className="flex flex-col gap-3 border-t border-hairline pt-4">
+              <h3 className="text-sm font-semibold">{COPY.trendStatsTitle}</h3>
               <p className="flex items-center gap-1.5 text-sm font-semibold">
                 <ChangeIcon
                   aria-hidden

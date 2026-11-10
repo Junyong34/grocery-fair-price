@@ -29,9 +29,9 @@ describe("판정 문구", () => {
   })
 
   it("수집된 판정의 차이는 당일 가격이 아닌 최근 조사 기준임을 밝힌다", () => {
-    expect(verdictTrendDiff(8)).toBe("최근 3회 조사에서 평소보다 8% 높아요")
-    expect(verdictTrendDiff(-15)).toBe("최근 3회 조사에서 평소보다 15% 낮아요")
-    expect(verdictTrendDiff(0)).toBe("최근 3회 조사에서 평소와 같아요")
+    expect(verdictTrendDiff(8)).toBe("최근 조사 결과를 보면 평소보다 8% 높아요")
+    expect(verdictTrendDiff(-15)).toBe("최근 조사 결과를 보면 평소보다 15% 낮아요")
+    expect(verdictTrendDiff(0)).toBe("최근 조사 결과를 보면 평소와 같아요")
   })
 })
 
@@ -104,7 +104,7 @@ describe("summaryLine", () => {
 
   it("날짜(연도 포함)·출처·표본·시세·평소가·판정을 한 문장으로 쓴다", () => {
     expect(summaryLine({ ...base, verdict: { kind: "pricey", pct: 9 } })).toBe(
-      "2026년 11월 3일 KAMIS 전국 조사 시장 40곳 중간값 기준, 녹두 100g 시세는 2,700원이에요. 평소가는 2,480원이고, 최근 3회 조사에서 평소보다 9% 높아 비싸요."
+      "2026년 11월 3일 KAMIS 전국 조사 시장 40곳 중간값 기준, 녹두 100g 시세는 2,700원이에요. 평소가는 2,480원이에요. 최근 조사 결과를 보면 평소보다 9% 높아 비싸요."
     )
   })
 
@@ -136,6 +136,8 @@ describe("nowPriceNote", () => {
     const kamis = { source: "KAMIS", scope: "전국 조사 시장" }
     expect(PRICE_COPY.detail.rangeTitle("2026-11-03", 1, ekape)).toBe("11/3 조사한 전국 평균 가격")
     expect(PRICE_COPY.detail.rangeTitle("2026-11-03", 40, kamis)).toBe("11/3 조사한 40곳의 시세 범위")
+    expect(PRICE_COPY.detail.rangePin("6,998", ekape)).toBe("전국 평균 6,998원")
+    expect(PRICE_COPY.detail.rangePin("827", kamis)).toBe("시세 827원")
     expect(PRICE_COPY.detail.placesNote("6,998", ekape)).toBe("막대의 점선은 전국 평균(6,998원). 매장에서 본 가격을 여기 견주어 보세요.")
     expect(PRICE_COPY.detail.placesNote("827", kamis)).toBe("막대의 점선은 전국 중간값(827원). 매장에서 본 가격을 여기 견주어 보세요.")
   })

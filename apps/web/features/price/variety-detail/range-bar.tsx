@@ -2,7 +2,7 @@
 
 import { cn } from "@workspace/ui/lib/utils"
 
-import { PRICE_COPY } from "@workspace/price/copy"
+import { isAverageBasis, PRICE_COPY } from "@workspace/price/copy"
 import { priceAxis } from "@workspace/price/axis"
 import { won } from "@workspace/price/format"
 import type { VarietyDetail } from "@workspace/price/types"
@@ -23,6 +23,7 @@ const labelLeft = (x: number) => `clamp(2.5rem, ${x}%, calc(100% - 2.5rem))`
 export function RangeBar({ detail }: { detail: VarietyDetail }) {
   const mine = useMyPrice(detail.id)
   const { range, usual, band } = detail
+  const averageOnly = isAverageBasis(detail.basis) && range.min === range.max
   const usualBand = usualRange(usual, band)
   const axis = priceAxis([range.min, range.max, detail.price, ...(usualBand ? [usualBand.low, usualBand.high] : []), ...(mine != null ? [mine] : [])], {
     pad: 0.08,
@@ -50,12 +51,14 @@ export function RangeBar({ detail }: { detail: VarietyDetail }) {
           </>
         )}
         {/* 조사 범위 */}
-        <div
-          className="absolute top-[34px] h-2 rounded-full bg-stone/45"
-          style={{ left: `${x(range.min)}%`, width: `${x(range.max) - x(range.min)}%` }}
-        />
+        {!averageOnly && (
+          <div
+            className="absolute top-[34px] h-2 rounded-full bg-stone/45"
+            style={{ left: `${x(range.min)}%`, width: `${x(range.max) - x(range.min)}%` }}
+          />
+        )}
         {/* 시세 핀 */}
-        <Pin x={x(detail.price)} className={VERDICT_TONE[detail.verdict.kind].fill} label={COPY.rangePin(won(detail.price))} above />
+        <Pin x={x(detail.price)} className={VERDICT_TONE[detail.verdict.kind].fill} label={COPY.rangePin(won(detail.price), detail.basis)} above />
         {mine != null && mineVerdict && (
           <Pin
             x={x(mine)}
@@ -66,15 +69,21 @@ export function RangeBar({ detail }: { detail: VarietyDetail }) {
           />
         )}
       </div>
-      <div className="flex justify-between gap-2 text-xs text-caption tabular-nums">
-        <span>
-          {COPY.rangeLow} <b className="font-semibold text-ink">{won(range.min)}</b>
-        </span>
-        {usual != null && <span className="text-center">┆ {COPY.rangeUsual(won(usual))}</span>}
-        <span>
-          {COPY.rangeHigh} <b className="font-semibold text-ink">{won(range.max)}</b>
-        </span>
-      </div>
+      {(!averageOnly || usual != null) && (
+        <div className={cn("flex gap-2 text-xs text-caption tabular-nums", averageOnly ? "justify-center" : "justify-between")}>
+          {!averageOnly && (
+            <span>
+              {COPY.rangeLow} <b className="font-semibold text-ink">{won(range.min)}</b>
+            </span>
+          )}
+          {usual != null && <span className="text-center">┆ {COPY.rangeUsual(won(usual))}</span>}
+          {!averageOnly && (
+            <span>
+              {COPY.rangeHigh} <b className="font-semibold text-ink">{won(range.max)}</b>
+            </span>
+          )}
+        </div>
+      )}
     </section>
   )
 }

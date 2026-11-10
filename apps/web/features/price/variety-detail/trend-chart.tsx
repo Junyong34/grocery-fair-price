@@ -185,15 +185,18 @@ export function TrendChart({ detail }: { detail: VarietyDetail }) {
           <>
             <Legend swatch={<i className="block h-2.5 w-4 rounded-sm bg-verdict-normal-wash" />}>{COPY.legend.band}</Legend>
             <Legend swatch={<i className="block w-4 border-t-[1.5px] border-dashed border-ash" />}>{COPY.legend.usual}</Legend>
-            <Legend swatch={<i className="block h-2.5 w-4 rounded-sm border border-dashed border-ash bg-[repeating-linear-gradient(45deg,var(--color-ash)_0_1px,transparent_1px_4px)]" />}>
-              {COPY.legend.forecast}
-            </Legend>
+            {forePath && (
+              <Legend swatch={<i className="block h-2.5 w-4 rounded-sm border border-dashed border-ash bg-[repeating-linear-gradient(45deg,var(--color-ash)_0_1px,transparent_1px_4px)]" />}>
+                {COPY.legend.forecast}
+              </Legend>
+            )}
             <Legend swatch={<i className="block size-2.5 rounded-full bg-verdict-pricey" />}>{COPY.legend.pricey}</Legend>
             <Legend swatch={<i className="block size-2.5 rounded-full bg-verdict-cheap" />}>{COPY.legend.cheap}</Legend>
           </>
         )}
       </ul>
-      <p className="text-xs leading-relaxed text-caption">{hasUsual ? COPY.forecastNote : COPY.noUsualTrendNote}</p>
+      {forePath && <p className="text-xs leading-relaxed text-caption">{COPY.forecastNote}</p>}
+      {!hasUsual && <p className="text-xs leading-relaxed text-caption">{COPY.noUsualTrendNote}</p>}
     </div>
   )
 }

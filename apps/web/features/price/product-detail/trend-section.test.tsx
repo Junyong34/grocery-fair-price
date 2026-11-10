@@ -37,6 +37,7 @@ describe("최근 조사 가격", () => {
   it("기간 최고 · 평균 · 최저와 첫 조사 대비 변화를 보여 주고, 평균 기준선을 그린다", () => {
     const text = textOf(renderTrend(points))
     expect(text).toContain("첫 조사보다 200원 올랐어요")
+    expect(text).toContain("전국 판매가 요약")
     expect(text).toContain("기간 최고2,600원10/27")
     expect(text).toContain("기간 평균2,400원")
     expect(text).toContain("기간 최저2,200원9/15")
@@ -46,8 +47,17 @@ describe("최근 조사 가격", () => {
   it("그림을 글로 요약한 대체 텍스트가 있다", () => {
     const html = renderTrend(points)
     expect(html).toMatch(
-      /<figcaption class="sr-only">9\/1부터 10\/27까지 3회 조사한 전국 판매가는 2,400원에서 2,600원이 됐어요\./
+      /<figcaption class="sr-only">9\/1부터 10\/27까지 3회 조사했어요\. 전국 판매가는 첫 조사에서 2,400원, 마지막 조사에서 2,600원이었어요\./
     )
+  })
+
+  it("첫 조사와 마지막 조사의 전국 판매가가 같으면 같다고 설명한다", () => {
+    const text = textOf(
+      renderTrend(points.map((point, index) => (index === 2 ? { ...point, median: 2400 } : point)))
+    )
+    expect(text).toContain("첫 조사와 마지막 조사 모두 전국 판매가는 2,400원이었어요.")
+    expect(text).toContain("전국 판매가의 기간 최고 2,400원, 최저 2,200원")
+    expect(text).toContain("마지막 조사의 최저가는 2,000원이에요.")
   })
 
   it("조사 기록이 하나면 가격을 보여 주고 추이 선은 그리지 않는다", () => {
