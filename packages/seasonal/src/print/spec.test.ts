@@ -249,9 +249,9 @@ describe("쪽 수", () => {
     expect(pageCount(DEFAULT_SPECS["year-sheet"])).toBe(1)
     expect(pageCount(DEFAULT_SPECS["season-poster"])).toBe(1)
     expect(pageCount(DEFAULT_SPECS["month-poster"])).toBe(1)
+    expect(pageCount(DEFAULT_SPECS["baby-food-fruits"])).toBe(1)
   })
 })
-
 
 describe("이유식 궁합표 사양", () => {
   it("이름을 담은 세로 A4 3장 사양을 읽는다", () => {
@@ -260,5 +260,15 @@ describe("이유식 궁합표 사양", () => {
     expect(pageCount(spec)).toBe(3)
     expect(papersForSpec(spec)).toEqual(["A4"])
     expect(parsePrintSpec({ ...spec, orientation: "landscape" })).toBeInstanceOf(Error)
+  })
+})
+
+describe("월령별 과일시기 도감 사양", () => {
+  it("이름을 담은 A4 1장 사양을 읽는다", () => {
+    const spec = { ...DEFAULT_SPECS["baby-food-fruits"], title: "우리 아기 과일 시기 도감" }
+    expect(parsePrintSpec(spec)).toEqual(spec)
+    expect(pageCount(spec)).toBe(1)
+    expect(papersForSpec(spec)).toEqual(["A4"])
+    expect(parsePrintSpec({ ...spec, orientation: "landscape" })).not.toBeInstanceOf(Error)
   })
 })

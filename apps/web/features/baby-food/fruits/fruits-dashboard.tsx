@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { useState } from "react"
 
 import {
@@ -15,7 +14,6 @@ import { SubHeader } from "@/shared/shell/sub-header"
 
 import { FruitCard } from "./fruit-card"
 import { FruitDetailSheet } from "./fruit-detail-sheet"
-import { FruitsNav } from "./fruits-nav"
 import { SafetyGuideSection } from "./safety-guide-section"
 import { StageTabs } from "./stage-tabs"
 import { StageWarningBanner } from "./stage-warning-banner"
@@ -44,8 +42,6 @@ export function FruitsDashboard({
         fallbackHref={routes.babyFood.pairings}
       />
 
-      <FruitsNav current="fruits" />
-
       <header className="fruits-header">
         <h1>
           {currentStageInfo
@@ -57,17 +53,6 @@ export function FruitsDashboard({
             ? currentStageInfo.summary
             : "생후 4~6개월 초기 이유식부터 24개월 완료기까지, 소아청소년과 지침에 맞춘 월령별 추천 과일과 질식 예방 손질법, 돌 전 금기 식품을 한눈에 확인하세요."}
         </p>
-
-        <div>
-          <Link
-            href={routes.admin.babyFoodFruitsPrint}
-            className="fruits-print-cta"
-            title="냉장고 문에 자석으로 부착하는 A4 1장 요약표"
-          >
-            <span aria-hidden="true">📄</span>
-            <span>냉장고 부착용 A4 요약표 인쇄 (PDF)</span>
-          </Link>
-        </div>
       </header>
 
       {/* 월령 탭바 */}

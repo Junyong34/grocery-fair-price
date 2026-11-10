@@ -60,7 +60,7 @@ export function CreateEditionForm({ nextIds, currentYear }: { nextIds: Record<Pr
             <Field>
               <FieldLabel className="sr-only">이름</FieldLabel>
               <FieldControl>
-                <Input name="title" required maxLength={EDITION_LIMITS.title} placeholder={kind === "baby-food-pairings" ? "예: 우리 집 이유식 궁합표" : `예: ${year} 크림 달력`} autoComplete="off" value={title} onChange={(event) => setTitle(event.target.value)} />
+                <Input name="title" required maxLength={EDITION_LIMITS.title} placeholder={kind === "baby-food-pairings" ? "예: 우리 집 이유식 궁합표" : kind === "baby-food-fruits" ? "예: 우리 아기 과일 시기 도감" : `예: ${year} 크림 달력`} autoComplete="off" value={title} onChange={(event) => setTitle(event.target.value)} />
               </FieldControl>
             </Field>
           </FormStep>

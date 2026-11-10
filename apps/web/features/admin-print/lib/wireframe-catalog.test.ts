@@ -14,7 +14,7 @@ describe("WIREFRAMES", () => {
   it("달력·포스터에는 시트 안이 셋 이상이고, 고정 궁합표에는 하나가 있다", () => {
     for (const kind of PRINT_KINDS) {
       const sheets = wireframesOf(kind, "sheet")
-      expect(sheets.length, kind).toBeGreaterThanOrEqual(kind === "baby-food-pairings" ? 1 : 3)
+      expect(sheets.length, kind).toBeGreaterThanOrEqual(kind === "baby-food-pairings" || kind === "baby-food-fruits" ? 1 : 3)
       expect(sheets.some((entry) => entry.availability.status === "available"), kind).toBe(true)
     }
   })

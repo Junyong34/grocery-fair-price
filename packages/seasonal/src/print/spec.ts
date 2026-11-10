@@ -11,7 +11,14 @@ import { MONTH_LABEL_FONTS, MONTH_LABEL_FRAMES, MONTH_LABEL_PALETTES, MONTH_LABE
 // PDF 인쇄 사양(.scratch/calendar-print/spec.md "데이터 모양"). 같은 사양이면 언제나 같은 PDF가 나온다.
 // 종류(kind)마다 쓰는 옵션이 달라 kind로 갈리는 유니언이다. 선택지는 모두 유한한 값이고, 바깥에서 온 값은 parsePrintSpec 하나로 들어온다.
 
-export const PRINT_KINDS = ["monthly", "year-sheet", "season-poster", "month-poster", "baby-food-pairings"] as const
+export const PRINT_KINDS = [
+  "monthly",
+  "year-sheet",
+  "season-poster",
+  "month-poster",
+  "baby-food-pairings",
+  "baby-food-fruits",
+] as const
 export type PrintKind = (typeof PRINT_KINDS)[number]
 
 export const PRINT_KIND_LABELS: Record<PrintKind, string> = {
@@ -20,6 +27,7 @@ export const PRINT_KIND_LABELS: Record<PrintKind, string> = {
   "season-poster": "계절 제철 포스터",
   "month-poster": "월별 제철 포스터",
   "baby-food-pairings": "이유식 재료 궁합표",
+  "baby-food-fruits": "월령별 과일시기 도감",
 }
 
 export const PAPER_SIZES = ["A4", "A3"] as const
@@ -175,6 +183,14 @@ const babyFoodPairingsSchema = z.object({
   title,
 })
 
+const babyFoodFruitsSchema = z.object({
+  version: z.literal(1),
+  kind: z.literal("baby-food-fruits"),
+  orientation: z.enum(["portrait", "landscape"]).default("portrait"),
+  layout: z.literal("fridge-sheet"),
+  title,
+})
+
 /**
  * 1차 구현(2026-10-16) 때 저장된 월간 사양을 지금 모양으로 옮긴다. foodLayout → layout, cover 참·거짓 → "year"·"none".
  * 나머지 종류의 빠진 layout은 스키마의 default가 채운다. 저장된 JSON은 고치지 않고, 다음 저장 때 새 모양으로 써진다.
@@ -189,7 +205,14 @@ function migrateLegacy(value: unknown): unknown {
 
 const printSpecSchema = z.preprocess(
   migrateLegacy,
-  z.discriminatedUnion("kind", [monthlySchema, yearSheetSchema, seasonPosterSchema, monthPosterSchema, babyFoodPairingsSchema]).refine((spec) => !("grid" in spec && spec.grid === "2x6" && spec.orientation === "landscape"), {
+  z.discriminatedUnion("kind", [
+    monthlySchema,
+    yearSheetSchema,
+    seasonPosterSchema,
+    monthPosterSchema,
+    babyFoodPairingsSchema,
+    babyFoodFruitsSchema,
+  ]).refine((spec) => !("grid" in spec && spec.grid === "2x6" && spec.orientation === "landscape"), {
     message: "가로 용지에 2x6 배열은 칸이 너무 작다",
   })
   .refine((spec) => spec.orientation === "portrait" || !layoutDef(spec).portraitOnly, {
@@ -198,7 +221,10 @@ const printSpecSchema = z.preprocess(
 )
 
 export type PrintSpec = z.infer<typeof printSpecSchema>
-export type CalendarPrintSpec = Exclude<PrintSpec, { kind: "baby-food-pairings" }>
+export type CalendarPrintSpec = Exclude<
+  PrintSpec,
+  { kind: "baby-food-pairings" | "baby-food-fruits" }
+>
 export type MonthlySpec = z.infer<typeof monthlySchema>
 export type YearSheetSpec = z.infer<typeof yearSheetSchema>
 export type SeasonPosterSpec = z.infer<typeof seasonPosterSchema>
@@ -274,6 +300,13 @@ export const DEFAULT_SPECS: { [K in PrintKind]: Extract<PrintSpec, { kind: K }> 
     layout: "three-sheets",
     title: "이유식 재료 궁합표",
   },
+  "baby-food-fruits": {
+    version: 1,
+    kind: "baby-food-fruits",
+    orientation: "portrait",
+    layout: "fridge-sheet",
+    title: "월령별 아기 과일 시기 & 안전 가이드",
+  },
 }
 
 export const BABY_FOOD_PAIRING_PAGE_COUNT = 3
@@ -289,9 +322,11 @@ export function pageCount(spec: PrintSpec): number {
   return 1
 }
 
-/** 궁합표는 같은 여백의 A4 세로 3장만 제공한다. */
+/** 궁합표와 과일 도감은 같은 여백의 A4만 제공한다. */
 export function papersForSpec(spec: Pick<PrintSpec, "kind">): readonly Paper[] {
-  return spec.kind === "baby-food-pairings" ? ["A4"] : PAPER_SIZES
+  return spec.kind === "baby-food-pairings" || spec.kind === "baby-food-fruits"
+    ? ["A4"]
+    : PAPER_SIZES
 }
 
 /** URL 쿼리 모양은 spec-codec.ts에 있다. 여기서는 encodeSpec을 다시 내보내고, 디코딩한 값을 검증한다. */

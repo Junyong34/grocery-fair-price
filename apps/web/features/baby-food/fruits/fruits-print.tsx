@@ -6,8 +6,10 @@ import {
 import "./fruits-print.css"
 
 export function FruitsPrint({
+  title = "월령별 아기 과일 시기 & 안전 가이드",
   orientation = "portrait",
 }: {
+  title?: string
   orientation?: "portrait" | "landscape"
 }) {
   return (
@@ -21,7 +23,7 @@ export function FruitsPrint({
           <div>
             <p className="fruits-print-brand">장볼날 · 냉장고 부착용 이유식 가이드</p>
             <h2 className="fruits-print-title">
-              월령별 아기 과일 시기 & 안전 가이드
+              {title}
             </h2>
           </div>
           <div className="fruits-print-head-sub">

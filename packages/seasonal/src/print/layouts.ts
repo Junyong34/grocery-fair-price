@@ -11,6 +11,7 @@ export const LAYOUTS = {
   "season-poster": ["bands", "quarters", "wheel", "per-season"],
   "month-poster": ["cells", "chart", "wheel", "rows-check"],
   "baby-food-pairings": ["three-sheets"],
+  "baby-food-fruits": ["fridge-sheet"],
 } as const satisfies Record<PrintKind, readonly string[]>
 
 /** 구성에 따라 읽거나 읽지 않는 사양 옵션(경로). 읽지 않으면 편집 폼이 숨기고 인쇄도 그 값을 보지 않는다. 값은 사양에 남는다. */
@@ -79,6 +80,9 @@ export const LAYOUT_DEFS: { [K in PrintKind]: Record<(typeof LAYOUTS)[K][number]
   },
   "baby-food-pairings": {
     "three-sheets": { label: "재료별 O·X 표 3장", wireframe: "B-A", portraitOnly: true },
+  },
+  "baby-food-fruits": {
+    "fridge-sheet": { label: "냉장고 부착용 6단계 과일 도감 A4 1장", wireframe: "B-F" },
   },
 }
 

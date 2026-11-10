@@ -4,11 +4,13 @@ import { Suspense } from "react"
 import { decodeSpec, isPaper } from "@workspace/seasonal/print/spec"
 
 import { PairingPrint } from "@/features/baby-food/pairing-print"
+import { FruitsPrint } from "@/features/baby-food/fruits/fruits-print"
 import { PrintDocument } from "@/features/print/print-document"
 import { createMetadata } from "@/shared/meta"
 import { PRINT_SCREEN_GUTTER } from "@/shared/print-screen"
 
 import "@/features/baby-food/pairing.css"
+import "@/features/baby-food/fruits/fruits-print.css"
 
 export const metadata = createMetadata({ title: "인쇄", noIndex: true })
 
@@ -32,6 +34,14 @@ async function Print({ searchParams }: { searchParams: PageProps<"/print">["sear
     return (
       <main className="print-root pairing-edition-print" data-print-ready style={style}>
         <PairingPrint title={spec.title} />
+      </main>
+    )
+  }
+  if (spec.kind === "baby-food-fruits") {
+    const style: React.CSSProperties & { "--print-gutter": string } = { "--print-gutter": `${PRINT_SCREEN_GUTTER}px` }
+    return (
+      <main className="print-root pairing-edition-print" data-print-ready style={style}>
+        <FruitsPrint title={spec.title} orientation={spec.orientation} />
       </main>
     )
   }

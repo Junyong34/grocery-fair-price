@@ -28,7 +28,7 @@ export async function createEdition(_state: FormState, formData: FormData): Prom
   if (!isPrintKind(kind)) return { error: "종류를 고르세요." }
   const title = String(formData.get("title") ?? "")
   let spec: PrintSpec = DEFAULT_SPECS[kind]
-  if (spec.kind === "baby-food-pairings") spec = { ...spec, title }
+  if (spec.kind === "baby-food-pairings" || spec.kind === "baby-food-fruits") spec = { ...spec, title }
   if (kindHasYear(kind)) {
     // 폼은 범위 안 연도만 내놓지만, 자정을 넘겨 범위가 바뀌었거나 값을 손댄 요청도 여기서 막는다.
     const year = Number(formData.get("year"))

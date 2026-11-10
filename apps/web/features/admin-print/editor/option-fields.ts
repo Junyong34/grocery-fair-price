@@ -230,4 +230,7 @@ export const KIND_SECTIONS: Record<PrintKind, readonly OptionSection[]> = {
   "baby-food-pairings": [
     { title: "구성", fields: [layout("baby-food-pairings"), { ...title, label: "인쇄 제목" }] },
   ],
+  "baby-food-fruits": [
+    { title: "구성", fields: [layout("baby-food-fruits"), orientation, { ...title, label: "인쇄 제목" }] },
+  ],
 }

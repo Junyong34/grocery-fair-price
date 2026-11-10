@@ -29,7 +29,7 @@ export async function generatePdfs(edition: Edition, origin: string): Promise<Bu
     for (const paper of papersForSpec(edition.spec)) {
       const url = `${origin}${routes.print(edition.spec, paper)}`
       await loadPrintPage(page, url)
-      if (edition.spec.kind === "baby-food-pairings") await assertPrintFits(page)
+      if (edition.spec.kind === "baby-food-pairings" || edition.spec.kind === "baby-food-fruits") await assertPrintFits(page)
       const file = downloadPath(edition.id, paper)
       const target = path.join(PUBLIC_DIR, file)
       await mkdir(path.dirname(target), { recursive: true })

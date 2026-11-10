@@ -33,6 +33,7 @@ describe("nextIdsByKind", () => {
       "season-poster": "season-poster-1",
       "month-poster": "month-poster-1",
       "baby-food-pairings": "baby-food-pairings-1",
+      "baby-food-fruits": "baby-food-fruits-1",
     })
   })
 })

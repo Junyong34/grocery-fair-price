@@ -10,6 +10,7 @@ export const KIND_DESCRIPTIONS: Record<PrintKind, string> = {
   "season-poster": "봄·여름·가을·겨울 네 띠에 제철 품종",
   "month-poster": "열두 칸에 달마다 제철 품종. 날짜가 없다",
   "baby-food-pairings": "그림과 이름으로 보는 재료별 O·X 목록. A4 세로 3장",
+  "baby-food-fruits": "냉장고 부착용 6단계 과일 시기 및 주의 식재료. A4 1장",
 }
 
 export type KindLook = {
@@ -24,6 +25,7 @@ export const KIND_LOOKS: Record<PrintKind, KindLook> = {
   "season-poster": { shape: "clover-soft", selector: "leaf", tone: "olive" },
   "month-poster": { shape: "daisy-12", selector: "flower", tone: "yellow" },
   "baby-food-pairings": { shape: "clover-soft", selector: "rounded", tone: "olive" },
+  "baby-food-fruits": { shape: "daisy-12", selector: "rounded", tone: "yellow" },
 }
 
 export const EDITION_STATUS_LABELS: Record<EditionStatus, string> = { draft: "초안", published: "공개", withdrawn: "내림" }
