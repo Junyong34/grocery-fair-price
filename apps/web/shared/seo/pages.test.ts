@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest"
 
 import { FESTIVALS } from "@workspace/seasonal/data/festivals"
 import { FOODS, isDrawn } from "@workspace/seasonal/data/foods"
+import { BABY_FRUIT_STAGES } from "@workspace/seasonal/data/infant-fruits"
 import { INDEXABLE_PAIRINGS } from "@workspace/seasonal/data/infant-pairings"
 
 import { DOWNLOADS } from "@/shared/downloads-manifest"
@@ -65,7 +66,25 @@ describe("SEO_PAGES", () => {
   })
 
   it("정적 생성되는 상세 페이지를 모두 담는다", () => {
-    // P1 1 + 2a 1 + 2b 목록 1 + 월 12 + 3a 목록 1 + 계절 4 + 제철 회 12 + 이유식 궁합표 1 + 색인하는 재료별 궁합 + PDF 내려받기 1 + 개인정보 처리방침 1 + 게시된 에디션 + 명절 + 품종
-    expect(paths).toHaveLength(1 + 1 + 1 + 12 + 1 + 4 + 12 + 1 + 1 + 1 + DOWNLOADS.editions.length + FESTIVALS.length + FOODS.length + INDEXABLE_PAIRINGS.length)
+    // P1 1 + 2a 1 + 2b 목록 1 + 월 12 + 3a 목록 1 + 계절 4 + 제철 회 12 + 이유식 궁합표 1 + 색인하는 재료별 궁합 + 과일 시기 1 + 과일 6단계 + PDF 내려받기 1 + 개인정보 처리방침 1 + 상품 목록 1 + 게시된 에디션 + 명절 + 품종
+    expect(paths).toHaveLength(
+      1 +
+        1 +
+        1 +
+        12 +
+        1 +
+        4 +
+        12 +
+        1 +
+        1 +
+        1 +
+        1 +
+        1 +
+        BABY_FRUIT_STAGES.length +
+        DOWNLOADS.editions.length +
+        FESTIVALS.length +
+        FOODS.length +
+        INDEXABLE_PAIRINGS.length,
+    )
   })
 })

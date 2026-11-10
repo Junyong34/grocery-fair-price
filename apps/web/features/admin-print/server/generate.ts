@@ -80,6 +80,15 @@ async function loadPrintPage(page: Page, url: string) {
 
 /** 에디션이나 공개 목록에 넣지 않는 고정 A4 인쇄물. 파일은 브라우저로 바로 돌려준다. */
 export async function generateA4PortraitPdf(url: string, pages: number) {
+  return generateA4CustomPdf(url, pages, "portrait", "이유식 재료 궁합표 A4")
+}
+
+export async function generateA4CustomPdf(
+  url: string,
+  pages: number,
+  orientation: "portrait" | "landscape" = "portrait",
+  label: string = "A4 인쇄물",
+) {
   const { chromium } = await import("playwright-core")
   const browser = await chromium.launch({ channel: "chrome" })
   try {
@@ -88,7 +97,7 @@ export async function generateA4PortraitPdf(url: string, pages: number) {
     await loadPrintPage(page, url)
     await assertPrintFits(page)
     const pdf = await page.pdf({ preferCSSPageSize: true, printBackground: true })
-    checkPdfBoxes(pdf.toString("latin1"), "이유식 재료 궁합표 A4", sheetSize("A4", "portrait"), pages)
+    checkPdfBoxes(pdf.toString("latin1"), label, sheetSize("A4", orientation), pages)
     return Uint8Array.from(pdf)
   } finally {
     await browser.close()

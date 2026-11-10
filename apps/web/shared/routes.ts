@@ -23,8 +23,10 @@ export const routes = {
     variety: (id: string) => `/prices/${id}`,
     /** P4 담은 품종 */
     basket: "/basket",
-    /** 상품 상세의 접두 경로. 페이지가 없고 next.config.ts가 시세 메인으로 보낸다. 링크에 쓰지 않는다. */
+    /** 상품 목록: 상품이 있는 카테고리를 고른다 */
     products: "/products",
+    /** 상품 카테고리 페이지. slug는 price.category.slug */
+    productCategory: (slug: string) => `/products/categories/${slug}`,
     /** 참가격 상품 상세(catalog-scale/10). id는 참가격 상품 번호(goodId) */
     product: (id: string) => `/products/${id}`,
   },
@@ -66,6 +68,10 @@ export const routes = {
     pairings: "/baby-food/pairings",
     /** 기준 재료별 궁합 페이지. id는 PAIRINGS의 영문 id(제철 품종 id와 같다) */
     ingredient: (id: string) => `/baby-food/pairings/${id}`,
+    /** 월령별 과일 시기 및 주의 식재료 메인 허브 */
+    fruits: "/baby-food/fruits",
+    /** 월령 단계별 과일 시기 페이지. stage는 BABY_FRUIT_STAGES의 id */
+    fruitsStage: (stage: string) => `/baby-food/fruits/${stage}`,
     withSelection: (path: "/baby-food" | "/baby-food/result" | "/baby-food/pairings", names: readonly string[]) => {
       const params = new URLSearchParams()
       for (const name of names) params.append("food", name)
@@ -93,6 +99,9 @@ export const routes = {
     /** 고정 A4 세 장 미리보기와 다운로드. */
     babyFoodPrint: "/admin/baby-food/print",
     babyFoodPdf: "/admin/baby-food/pdf",
+    /** 월령별 과일 시기 A4 미리보기와 다운로드 */
+    babyFoodFruitsPrint: "/admin/baby-food/fruits-print",
+    babyFoodFruitsPdf: "/admin/baby-food/fruits-pdf",
     /** 카탈로그 어드민: 카테고리 (ADR 0005, 소유자 접속) */
     catalogCategories: "/admin/catalog/categories",
     /** 카탈로그 어드민: 식재료 목록 (읽기 전용, ingest_writer) */

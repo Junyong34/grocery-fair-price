@@ -45,6 +45,31 @@ export function babyFoodIngredientSeo(row: PairingRow): PageSeo {
   }
 }
 
+/**
+ * 이유식 과일 시기 메인 허브.
+ */
+export function babyFoodFruitsSeo(): PageSeo {
+  return {
+    title: "월령별 아기 과일 시기 도감 · 초기부터 24개월까지 손질법과 주의 식재료",
+    description:
+      "생후 4~6개월 초기 이유식부터 24개월 완료기까지, 월령별 추천 과일과 질식 예방 손질법. 사과·배 퓨레부터 포도·블루베리 커팅 가이드, 돌 전 꿀·생우유 금기 정보를 한눈에 확인하세요.",
+  }
+}
+
+/**
+ * 월령 단계별 과일 시기 페이지.
+ */
+export function babyFoodFruitsStageSeo(
+  monthRange: string,
+  subTitle: string,
+  fruitNames: readonly string[],
+): PageSeo {
+  return {
+    title: `${monthRange} 아기 과일 시기 · ${subTitle} 추천 과일과 안전 손질법`,
+    description: `${monthRange}(${subTitle}) 아기가 먹을 수 있는 ${firstThree(fruitNames)} 등 과일 ${fruitNames.length}가지. 최신 소아과학 지침에 맞춘 조리/손질법과 질식 예방 수칙을 확인하세요.`,
+  }
+}
+
 /** 무료 PDF를 찾는 검색의 입구. 연도는 개별 인쇄물에서 안내한다. */
 export function downloadsSeo(): PageSeo {
   return {
@@ -88,6 +113,22 @@ export function productSeo(product: Pick<ProductDetail, "name" | "price" | "surv
   return {
     title: `${product.name} 가격 비교`,
     description: `${product.name} 전국 판매가 ${won(product.price)}원(${monthDay(product.surveyedOn)} 참가격 조사). 이마트·편의점 등 판매처 ${product.sellers.length}곳 가격을 견줘 보세요.`,
+  }
+}
+
+/** 상품 목록(/products). 상품 카테고리를 고르는 입구다. */
+export function productsSeo(): PageSeo {
+  return {
+    title: "마트 상품 가격 비교 · 카테고리별 판매가",
+    description: "라면·우유·과자·음료 같은 마트 상품의 전국 판매가를 카테고리별로 모았어요. 참가격 조사 기준으로 대형마트·편의점 등 판매처별 가격을 견줘 보세요.",
+  }
+}
+
+/** 상품 카테고리 페이지. 사람들은 "라면 가격 비교", "우유 가격"으로 찾는다. 품목 이름을 앞에서 넷까지 넣는다. */
+export function productCategorySeo(category: { name: string; count: number; items: readonly string[] }): PageSeo {
+  return {
+    title: `${category.name} 가격 비교 · 상품 ${category.count}개 판매가`,
+    description: `${category.items.slice(0, 4).join("·")} 등 ${category.name} 상품 ${category.count}개의 전국 판매가예요. 참가격 조사 기준으로 판매처별 가격을 견줘 보세요.`,
   }
 }
 

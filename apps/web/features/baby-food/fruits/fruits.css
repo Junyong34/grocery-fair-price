@@ -1,0 +1,574 @@
+.fruits-page {
+  max-width: 1152px;
+  margin-inline: auto;
+  padding: clamp(20px, 3.5vw, 40px) clamp(16px, 3.5vw, 32px);
+  color: var(--color-foreground, #1c1917);
+}
+
+.fruits-header {
+  margin-bottom: 24px;
+}
+
+.fruits-subnav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--color-hairline, #e7e5e4);
+  padding-bottom: 12px;
+}
+
+.fruits-nav-tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--color-stone, #78716c);
+  background: transparent;
+  transition: all 0.15s ease;
+}
+
+.fruits-nav-tab:hover {
+  color: var(--color-foreground, #1c1917);
+  background: var(--color-muted, #f5f5f4);
+}
+
+.fruits-nav-tab[data-active="true"] {
+  color: var(--color-foreground, #1c1917);
+  background: var(--color-muted, #f5f5f4);
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.fruits-header h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(26px, 4vw, 38px);
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.fruits-lead {
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-stone, #78716c);
+  word-break: keep-all;
+}
+
+.fruits-print-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-primary-foreground, #fff);
+  background: var(--color-primary, #059669);
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.fruits-print-cta:hover {
+  opacity: 0.9;
+}
+
+/* 월령 단계 탭바 */
+.fruits-stage-tabs-wrap {
+  position: sticky;
+  top: 56px;
+  z-index: 10;
+  background: var(--color-background, #fff);
+  padding-block: 10px;
+  margin-inline: -16px;
+  padding-inline: 16px;
+  border-bottom: 1px solid var(--color-hairline, #f0eeee);
+}
+
+.fruits-stage-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
+
+.fruits-stage-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.fruits-stage-pill {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-height: 48px;
+  padding: 6px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--color-hairline, #e7e5e4);
+  background: var(--color-background, #fff);
+  color: var(--color-stone, #78716c);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.fruits-stage-pill small {
+  font-size: 11px;
+  font-weight: 400;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+.fruits-stage-pill:hover {
+  background: var(--color-muted, #f5f5f4);
+  color: var(--color-foreground, #1c1917);
+}
+
+.fruits-stage-pill[data-active="true"] {
+  background: var(--color-foreground, #1c1917);
+  color: var(--color-background, #fff);
+  border-color: var(--color-foreground, #1c1917);
+}
+
+/* 동적 경고 배너 */
+.fruits-warning-banner {
+  margin-block: 20px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  border: 1px solid #fed7aa;
+  background: #fffbeb;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fruits-warning-banner.banner-danger {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.fruits-warning-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #991b1b;
+}
+
+.fruits-warning-title.title-caution {
+  color: #9a3412;
+}
+
+.fruits-warning-desc {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #4b5563;
+  word-break: keep-all;
+}
+
+.fruits-warning-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.fruits-warning-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #fff;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+}
+
+/* 과일 그리드 */
+.fruits-grid-section {
+  margin-block: 28px;
+}
+
+.fruits-grid-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.fruits-grid-heading h2 {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.fruits-grid-heading span {
+  font-size: 13px;
+  color: var(--color-stone, #78716c);
+}
+
+.fruits-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .fruits-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .fruits-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
+/* 과일 카드 */
+.fruit-card {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  background: var(--color-background, #fff);
+  border: 1px solid var(--color-hairline, #e7e5e4);
+  border-radius: 16px;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  position: relative;
+}
+
+.fruit-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-color: #d6d3d1;
+}
+
+.fruit-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 24px;
+}
+
+.fruit-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.badge-safe {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.badge-conventional {
+  background: #f5f5f4;
+  color: #57534e;
+  border: 1px solid #e7e5e4;
+}
+
+.badge-caution {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.badge-seasonal {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.fruit-card-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 8px;
+  min-height: 100px;
+}
+
+.fruit-card-art img {
+  object-fit: contain;
+  transition: transform 0.2s ease;
+}
+
+.fruit-card:hover .fruit-card-art img {
+  transform: scale(1.05);
+}
+
+.fruit-card-placeholder {
+  width: 64px;
+  height: 64px;
+  border: 1.5px dashed var(--color-hairline, #d6d3d1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-stone, #a8a29e);
+  font-size: 11px;
+}
+
+.fruit-card-info {
+  margin-top: auto;
+}
+
+.fruit-card-name {
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-foreground, #1c1917);
+}
+
+.fruit-card-prep {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-stone, #78716c);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.fruit-card-tag {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #0369a1;
+}
+
+/* 바텀시트 상세 가이드 */
+.fruit-sheet-content {
+  padding: 16px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.fruit-sheet-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.fruit-sheet-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fruit-sheet-title {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.fruit-sheet-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.fruit-sheet-block {
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--color-muted, #f5f5f4);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fruit-sheet-block h4 {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--color-foreground, #1c1917);
+}
+
+.fruit-sheet-block p {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #44403c;
+  word-break: keep-all;
+}
+
+.fruit-sheet-block.block-alert {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+.fruit-sheet-block.block-alert h4 {
+  color: #b91c1c;
+}
+
+.fruit-sheet-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.fruit-sheet-link-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid var(--color-hairline, #e7e5e4);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-foreground, #1c1917);
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.fruit-sheet-link-btn:hover {
+  background: #f5f5f4;
+}
+
+/* 하단 주의/금지 식재료 도감 */
+.safety-section {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--color-hairline, #e7e5e4);
+}
+
+.safety-section-header {
+  margin-bottom: 20px;
+}
+
+.safety-section-header h2 {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.safety-section-header p {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--color-stone, #78716c);
+}
+
+.safety-cards-group {
+  margin-bottom: 24px;
+}
+
+.safety-group-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.safety-group-title.group-danger {
+  color: #b91c1c;
+}
+
+.safety-group-title.group-warning {
+  color: #c2410c;
+}
+
+.safety-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .safety-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.safety-card {
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--color-background, #fff);
+  border: 1px solid var(--color-hairline, #e7e5e4);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.safety-card.card-forbidden {
+  border-color: #fecaca;
+  background: #fffafa;
+}
+
+.safety-card.card-caution {
+  border-color: #fed7aa;
+  background: #fffcf8;
+}
+
+.safety-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.safety-card-name {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.safety-card-badge {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.badge-forbidden-pill {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-caution-pill {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.safety-card-reason {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #374151;
+  word-break: keep-all;
+}
+
+.safety-card-guide {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #6b7280;
+  background: rgba(0, 0, 0, 0.02);
+  padding: 8px 10px;
+  border-radius: 8px;
+  word-break: keep-all;
+}
