@@ -1,22 +1,22 @@
 {
   "editions": [
     {
-      "id": "baby-food-fruits-1",
+      "id": "baby-food-fruits-2",
       "kind": "baby-food-fruits",
-      "title": "ㅇㅇㅇㅇ",
-      "description": "월령별 과일시기 도감",
+      "title": "아기 월령별 과일시기 도감",
+      "description": "아기 월령별 과일시기 도감",
       "orientation": "portrait",
       "pages": 1,
-      "specHash": "130651ca",
-      "generatedAt": "2026-11-10T06:27:24.252Z",
+      "specHash": "5ac06688",
+      "generatedAt": "2026-11-10T07:02:06.804Z",
       "files": {
         "A4": {
-          "bytes": 847736
+          "bytes": 937967
         }
       },
       "thumbnails": [
         {
-          "path": "/downloads/baby-food-fruits-1/thumb-1.webp",
+          "path": "/downloads/baby-food-fruits-2/thumb-1.webp",
           "width": 480,
           "height": 679
         }
