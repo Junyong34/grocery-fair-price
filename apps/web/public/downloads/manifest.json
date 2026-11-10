@@ -1,6 +1,28 @@
 {
   "editions": [
     {
+      "id": "baby-food-fruits-1",
+      "kind": "baby-food-fruits",
+      "title": "ㅇㅇㅇㅇ",
+      "description": "월령별 과일시기 도감",
+      "orientation": "portrait",
+      "pages": 1,
+      "specHash": "130651ca",
+      "generatedAt": "2026-11-10T06:27:24.252Z",
+      "files": {
+        "A4": {
+          "bytes": 847736
+        }
+      },
+      "thumbnails": [
+        {
+          "path": "/downloads/baby-food-fruits-1/thumb-1.webp",
+          "width": 480,
+          "height": 679
+        }
+      ]
+    },
+    {
       "id": "baby-food-pairings-1",
       "kind": "baby-food-pairings",
       "title": "이유식 궁합표",
