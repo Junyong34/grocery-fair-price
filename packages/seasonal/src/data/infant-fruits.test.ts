@@ -14,15 +14,14 @@ import {
 } from "./infant-fruits"
 
 describe("infant-fruits domain", () => {
-  it("6개의 월령 단계가 정의되어 있고 순서가 올바르다", () => {
-    expect(BABY_FRUIT_STAGES).toHaveLength(6)
+  it("5개의 월령 단계가 정의되어 있고 순서가 올바르다", () => {
+    expect(BABY_FRUIT_STAGES).toHaveLength(5)
     const expectedIds: BabyFruitStageId[] = [
       "4-5-months",
       "6-months",
       "7-8-months",
       "9-11-months",
-      "12-23-months",
-      "24-months",
+      "12-months",
     ]
     expect(BABY_FRUIT_STAGES.map((s) => s.id)).toEqual(expectedIds)
   })
@@ -64,13 +63,13 @@ describe("infant-fruits domain", () => {
     expect(grape?.cuttingGuide).toBeDefined()
   })
 
-  it("키위, 복숭아, 파인애플은 12~23개월에 속하고 safetyStatus가 caution이다", () => {
+  it("키위, 복숭아, 파인애플은 12개월 이상에 속하고 safetyStatus가 caution이다", () => {
     const kiwi = findBabyFruit("kiwi")
     const peach = findBabyFruit("peach")
     const pineapple = findBabyFruit("pineapple")
-    expect(kiwi?.stages).toContain("12-23-months")
-    expect(peach?.stages).toContain("12-23-months")
-    expect(pineapple?.stages).toContain("12-23-months")
+    expect(kiwi?.stages).toContain("12-months")
+    expect(peach?.stages).toContain("12-months")
+    expect(pineapple?.stages).toContain("12-months")
     expect(kiwi?.safetyStatus).toBe("caution")
   })
 
@@ -98,8 +97,8 @@ describe("infant-fruits domain", () => {
     expect(ids).toContain("milk")
     expect(ids).toContain("juice")
 
-    // 12~23개월에는 돌 전 금지인 꿀·생우유가 아닌, 견과류·첨가당 등이 주의로 나옴
-    const forStage12 = getProhibitedFoodsForStage("12-23-months")
+    // 12개월 이상에는 돌 전 금지인 꿀·생우유가 아닌, 견과류·첨가당 등이 주의로 나옴
+    const forStage12 = getProhibitedFoodsForStage("12-months")
     const ids12 = forStage12.map((f) => f.id)
     expect(ids12).not.toContain("honey")
     expect(ids12).toContain("whole-nuts")

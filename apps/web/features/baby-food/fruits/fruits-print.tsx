@@ -32,10 +32,12 @@ export function FruitsPrint({
           </div>
         </header>
 
-        {/* 6단계 과일 박스 */}
+        {/* 5단계 과일 박스 */}
         <div className="fruits-print-stages">
           {BABY_FRUIT_STAGES.map((stage) => {
             const fruits = getFruitsByStage(stage.id)
+            const displayFruits =
+              stage.id === "12-months" ? fruits.slice(0, 6) : fruits.slice(0, 5)
             return (
               <div key={stage.id} className="fruits-print-stage-box">
                 <div className="fruits-print-stage-head">
@@ -45,7 +47,7 @@ export function FruitsPrint({
                   <span>{fruits.length}종</span>
                 </div>
                 <ul className="fruits-print-items-list">
-                  {fruits.slice(0, 5).map((fruit) => (
+                  {displayFruits.map((fruit) => (
                     <li key={fruit.id} className="fruits-print-item-row">
                       <span className="fruits-print-item-name">
                         <span

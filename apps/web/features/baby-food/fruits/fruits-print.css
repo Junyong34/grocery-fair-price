@@ -100,8 +100,28 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.fruits-print-sheet[data-orientation="portrait"] .fruits-print-stages .fruits-print-stage-box:last-child {
+  grid-column: span 2;
+}
+
+.fruits-print-sheet[data-orientation="portrait"] .fruits-print-stages .fruits-print-stage-box:last-child .fruits-print-items-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.2mm 4mm;
+}
+
 .fruits-print-sheet[data-orientation="landscape"] .fruits-print-stages {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.fruits-print-sheet[data-orientation="landscape"] .fruits-print-stages .fruits-print-stage-box:last-child {
+  grid-column: span 2;
+}
+
+.fruits-print-sheet[data-orientation="landscape"] .fruits-print-stages .fruits-print-stage-box:last-child .fruits-print-items-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.2mm 4mm;
 }
 
 .fruits-print-stage-box {

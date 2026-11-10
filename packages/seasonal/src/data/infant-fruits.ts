@@ -8,8 +8,7 @@ export type BabyFruitStageId =
   | "6-months"
   | "7-8-months"
   | "9-11-months"
-  | "12-23-months"
-  | "24-months"
+  | "12-months"
 
 export type BabyFruitStage = {
   readonly id: BabyFruitStageId
@@ -59,23 +58,14 @@ export const BABY_FRUIT_STAGES: readonly BabyFruitStage[] = [
       "포도, 블루베리처럼 동그란 과일은 영유아 기도 질식사고 1위 위험군입니다. 절대 통째로 주지 마시고 반드시 4등분 이상 잘게 잘라주세요.",
   },
   {
-    id: "12-23-months",
-    name: "12~23개월",
-    monthRange: "12~23개월",
-    subTitle: "완료기 / 돌 이후",
+    id: "12-months",
+    name: "12개월+",
+    monthRange: "12개월 이상",
+    subTitle: "완료기 / 유아식",
     summary:
-      "대부분의 생과일을 먹을 수 있으나 털·산도 알레르기를 살핍니다.",
+      "돌이 지나면 모든 생과일을 먹을 수 있으나, 어금니 발달과 질식 예방 손질법에 주의합니다.",
     cautionNote:
-      "어금니가 아직 다 나지 않았으므로 단단하거나 질긴 과일은 계속 작게 깍둑썰기해 주어야 안전합니다.",
-  },
-  {
-    id: "24-months",
-    name: "24개월+",
-    monthRange: "24개월 이상",
-    subTitle: "두 돌 이후",
-    summary: "어른과 같은 다양한 제철 생과일을 자유롭게 즐깁니다.",
-    cautionNote:
-      "통견과류나 통포도는 만 4~5세까지 흡인 질식 위험이 지속되므로 각별히 주의하세요.",
+      "키위·복숭아 등 알레르기 유발 과일을 시도할 수 있습니다. 단, 두 돌(24개월) 전까지는 첨가당 0g 원칙을 지키고, 통포도·체리·통견과류는 만 4~5세까지 반드시 4등분해야 안전합니다.",
   },
 ] as const
 
@@ -105,8 +95,7 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
       "6-months",
       "7-8-months",
       "9-11-months",
-      "12-23-months",
-      "24-months",
+      "12-months",
     ],
     firstStage: "6-months",
     safetyStatus: "safe",
@@ -126,8 +115,7 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
       "6-months",
       "7-8-months",
       "9-11-months",
-      "12-23-months",
-      "24-months",
+      "12-months",
     ],
     firstStage: "6-months",
     safetyStatus: "safe",
@@ -146,8 +134,7 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
       "6-months",
       "7-8-months",
       "9-11-months",
-      "12-23-months",
-      "24-months",
+      "12-months",
     ],
     firstStage: "6-months",
     safetyStatus: "safe",
@@ -166,8 +153,7 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
       "6-months",
       "7-8-months",
       "9-11-months",
-      "12-23-months",
-      "24-months",
+      "12-months",
     ],
     firstStage: "6-months",
     safetyStatus: "safe",
@@ -186,8 +172,7 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
       "6-months",
       "7-8-months",
       "9-11-months",
-      "12-23-months",
-      "24-months",
+      "12-months",
     ],
     firstStage: "6-months",
     safetyStatus: "conventional",
@@ -203,7 +188,7 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
   {
     id: "watermelon",
     name: "수박",
-    stages: ["7-8-months", "9-11-months", "12-23-months", "24-months"],
+    stages: ["7-8-months", "9-11-months", "12-months"],
     firstStage: "7-8-months",
     safetyStatus: "conventional",
     prepMethod:
@@ -216,7 +201,7 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
   {
     id: "oriental-melon",
     name: "참외",
-    stages: ["7-8-months", "9-11-months", "12-23-months", "24-months"],
+    stages: ["7-8-months", "9-11-months", "12-months"],
     firstStage: "7-8-months",
     safetyStatus: "conventional",
     prepMethod:
@@ -229,7 +214,7 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
   {
     id: "melon",
     name: "멜론",
-    stages: ["7-8-months", "9-11-months", "12-23-months", "24-months"],
+    stages: ["7-8-months", "9-11-months", "12-months"],
     firstStage: "7-8-months",
     safetyStatus: "conventional",
     prepMethod:
@@ -244,7 +229,7 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
   {
     id: "grape",
     name: "포도",
-    stages: ["9-11-months", "12-23-months", "24-months"],
+    stages: ["9-11-months", "12-months"],
     firstStage: "9-11-months",
     safetyStatus: "caution",
     prepMethod:
@@ -258,7 +243,7 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
   {
     id: "blueberry",
     name: "블루베리",
-    stages: ["9-11-months", "12-23-months", "24-months"],
+    stages: ["9-11-months", "12-months"],
     firstStage: "9-11-months",
     safetyStatus: "caution",
     prepMethod:
@@ -271,7 +256,7 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
   {
     id: "mandarin",
     name: "귤",
-    stages: ["9-11-months", "12-23-months", "24-months"],
+    stages: ["9-11-months", "12-months"],
     firstStage: "9-11-months",
     safetyStatus: "caution",
     prepMethod:
@@ -284,7 +269,7 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
   {
     id: "orange",
     name: "오렌지",
-    stages: ["9-11-months", "12-23-months", "24-months"],
+    stages: ["9-11-months", "12-months"],
     firstStage: "9-11-months",
     safetyStatus: "caution",
     prepMethod:
@@ -297,7 +282,7 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
   {
     id: "persimmon",
     name: "감/홍시",
-    stages: ["9-11-months", "12-23-months", "24-months"],
+    stages: ["9-11-months", "12-months"],
     firstStage: "9-11-months",
     safetyStatus: "conventional",
     prepMethod:
@@ -310,7 +295,7 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
   {
     id: "strawberry",
     name: "딸기",
-    stages: ["9-11-months", "12-23-months", "24-months"],
+    stages: ["9-11-months", "12-months"],
     firstStage: "9-11-months",
     safetyStatus: "caution",
     prepMethod:
@@ -323,7 +308,7 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
   {
     id: "apricot",
     name: "살구",
-    stages: ["9-11-months", "12-23-months", "24-months"],
+    stages: ["9-11-months", "12-months"],
     firstStage: "9-11-months",
     safetyStatus: "conventional",
     prepMethod: "씨와 껍질을 벗겨 부드러운 과육만 잘게 썰어 제공합니다.",
@@ -333,12 +318,12 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
     seasonalFoodId: "apricot",
   },
 
-  // 12~23개월 완료기 / 돌 이후
+  // 12개월 이상 완료기 / 유아식
   {
     id: "kiwi",
     name: "키위",
-    stages: ["12-23-months", "24-months"],
-    firstStage: "12-23-months",
+    stages: ["12-months"],
+    firstStage: "12-months",
     safetyStatus: "caution",
     prepMethod:
       "껍질을 두껍게 벗겨내고 가운데 딱딱하고 검은 씨가 밀집된 부위를 피해 부드러운 과육만 깍둑썰기합니다.",
@@ -350,8 +335,8 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
   {
     id: "peach",
     name: "복숭아",
-    stages: ["12-23-months", "24-months"],
-    firstStage: "12-23-months",
+    stages: ["12-months"],
+    firstStage: "12-months",
     safetyStatus: "caution",
     prepMethod:
       "털 복숭아는 만지기만 해도 두드러기가 날 수 있으므로 천도복숭아나 껍질을 두껍게 깎은 백도/황도를 얇게 편 썰어 줍니다.",
@@ -363,8 +348,8 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
   {
     id: "pineapple",
     name: "파인애플",
-    stages: ["12-23-months", "24-months"],
-    firstStage: "12-23-months",
+    stages: ["12-months"],
+    firstStage: "12-months",
     safetyStatus: "caution",
     prepMethod:
       "가운데 질기고 딱딱한 심지를 완전히 제거하고, 겉껍질 쪽 눈(가시)을 깊게 도려낸 후 과육만 얇게 썹니다.",
@@ -376,8 +361,8 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
   {
     id: "mango",
     name: "망고",
-    stages: ["12-23-months", "24-months"],
-    firstStage: "12-23-months",
+    stages: ["12-months"],
+    firstStage: "12-months",
     safetyStatus: "caution",
     prepMethod:
       "껍질 안쪽에 옻 성분이 잔류할 수 있으므로 껍질 쪽 살을 넉넉히 도려내고 부드러운 속살만 큐브 모양으로 깍둑썰기합니다.",
@@ -389,8 +374,8 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
   {
     id: "cherry",
     name: "체리",
-    stages: ["12-23-months", "24-months"],
-    firstStage: "12-23-months",
+    stages: ["12-months"],
+    firstStage: "12-months",
     safetyStatus: "caution",
     prepMethod:
       "칼로 빙 둘러 씨를 완전히 빼내고, **반드시 4등분 이상 잘게 잘라서** 급여합니다.",
@@ -402,8 +387,8 @@ export const BABY_FRUITS: readonly BabyFruit[] = [
   {
     id: "grapefruit",
     name: "자몽",
-    stages: ["12-23-months", "24-months"],
-    firstStage: "12-23-months",
+    stages: ["12-months"],
+    firstStage: "12-months",
     safetyStatus: "caution",
     prepMethod: "쓴맛과 신맛이 강하므로 속껍질을 완벽히 벗겨 알갱이만 소량 시도합니다.",
     cuttingGuide: "아기가 쓴맛으로 거부할 수 있으니 억지로 먹이지 않습니다.",
@@ -540,11 +525,16 @@ export function getFruitsByStage(
 export function getProhibitedFoodsForStage(
   stageId: BabyFruitStageId,
 ): readonly ProhibitedFood[] {
-  if (stageId === "4-5-months" || stageId === "6-months" || stageId === "7-8-months" || stageId === "9-11-months") {
+  if (
+    stageId === "4-5-months" ||
+    stageId === "6-months" ||
+    stageId === "7-8-months" ||
+    stageId === "9-11-months"
+  ) {
     // 돌 전: before-12m (꿀, 생우유, 주스, 생식)
     return PROHIBITED_FOODS.filter((food) => food.targetStage === "before-12m")
   }
-  // 12~23개월 및 24개월+: before-24m 및 under-5y (통견과류, 첨가당 등)
+  // 12개월 이상: before-24m 및 under-5y (통견과류, 첨가당 등)
   return PROHIBITED_FOODS.filter(
     (food) => food.targetStage === "before-24m" || food.targetStage === "under-5y",
   )

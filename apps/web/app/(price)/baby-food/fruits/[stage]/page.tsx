@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { notFound } from "next/navigation"
+import { notFound, permanentRedirect } from "next/navigation"
 import { Suspense } from "react"
 
 import {
@@ -19,11 +19,16 @@ import { getSeoulToday } from "@/shared/today"
 type Props = PageProps<"/baby-food/fruits/[stage]">
 
 export function generateStaticParams() {
-  return BABY_FRUIT_STAGES.map(({ id }) => ({ stage: id }))
+  return [
+    ...BABY_FRUIT_STAGES.map(({ id }) => ({ stage: id })),
+    { stage: "12-23-months" },
+    { stage: "24-months" },
+  ]
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const { stage } = await props.params
+  if (stage === "12-23-months" || stage === "24-months") return {}
   if (!isStageValid(stage)) return {}
   const stageInfo = BABY_FRUIT_STAGES.find((s) => s.id === stage)
   if (!stageInfo) return {}
@@ -55,6 +60,9 @@ export default function Page(props: Props) {
 
 async function StageContent({ params }: { params: Props["params"] }) {
   const { stage } = await params
+  if (stage === "12-23-months" || stage === "24-months") {
+    permanentRedirect(routes.babyFood.fruitsStage("12-months"))
+  }
   if (!isStageValid(stage)) notFound()
 
   const stageInfo = BABY_FRUIT_STAGES.find((s) => s.id === stage)
