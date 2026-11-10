@@ -55,7 +55,7 @@ export function EditionActions({ edition, placement }: { edition: ManifestEntry;
             </p>
             <p className="text-[13px] text-stone">{DOWNLOADS_COPY.done.where}</p>
           </div>
-          <div className="rounded-xl bg-surface px-4 py-3 text-[13px] leading-relaxed text-stone">
+          <div className="rounded-xl bg-canvas px-4 py-3 text-[13px] leading-relaxed text-stone">
             <p className="font-semibold text-ink">{DOWNLOADS_COPY.done.pcTitle}</p>
             <p>{DOWNLOADS_COPY.done.pcBody}</p>
           </div>

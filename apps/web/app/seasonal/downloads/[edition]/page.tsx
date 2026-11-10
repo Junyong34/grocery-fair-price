@@ -59,7 +59,7 @@ async function Edition({ params }: { params: Params }) {
   if (!edition) notFound()
   const others = DOWNLOADS.editions.filter((other) => other.id !== edition.id)
   return (
-    <article className="mx-auto flex max-w-[560px] flex-col gap-4 pt-6 pb-12 lg:pt-8">
+    <article className="mx-auto flex max-w-[560px] flex-col gap-6 bg-canvas pt-8 pb-16 lg:pt-12">
       <JsonLd data={breadcrumb([{ name: "제철 음식 달력", path: routes.seasonal.root }, { name: DOWNLOADS_COPY.title, path: routes.seasonal.downloads }, { name: editionName(edition), path: routes.seasonal.download(edition.id) }])} />
       {/* 공유는 본문 버튼 줄에 있어 맨 위 줄에는 두지 않는다. */}
       <SubHeader title={edition.title} fallbackHref={routes.seasonal.downloads} />

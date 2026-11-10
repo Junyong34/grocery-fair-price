@@ -13,32 +13,38 @@ import { EditionActions } from "./edition-actions"
 export function EditionDetail({ edition, title, placement }: { edition: ManifestEntry; title?: React.ReactNode; placement: "sheet" | "page" }) {
   const name = editionName(edition)
   return (
-    <div className="flex flex-col gap-4">
-      <ThumbnailMat className="gap-3 p-5">
-        {edition.thumbnails.map((thumbnail, index) => (
-          <EditionThumbnail key={thumbnail.path} thumbnail={thumbnail} name={name} index={index} priority={index === 0} className="w-[140px] min-w-0 lg:w-[160px]" />
-        ))}
-      </ThumbnailMat>
-      <div className="flex flex-col gap-1">
-        <span className="self-start rounded-full bg-surface px-2.5 py-0.5 text-xs text-stone">{PRINT_KIND_LABELS[edition.kind]}</span>
-        {title}
-        <p className="flex flex-wrap gap-x-2 text-[13px] text-stone tabular-nums">
-          {editionMeta(edition).map((part, index) => (
-            <span key={part}>
-              {index > 0 && <span aria-hidden className="me-2 text-caption">·</span>}
-              {part}
-            </span>
+    <div className="flex flex-col gap-5">
+      {edition.thumbnails.length > 0 && (
+        <ThumbnailMat className="gap-4 rounded-2xl bg-surface p-5 sm:p-6">
+          {edition.thumbnails.map((thumbnail, index) => (
+            <EditionThumbnail key={thumbnail.path} thumbnail={thumbnail} name={name} index={index} priority={index === 0} className="w-[140px] min-w-0 lg:w-[160px]" />
           ))}
-        </p>
+        </ThumbnailMat>
+      )}
+      <div className="flex flex-col gap-5 rounded-2xl bg-surface p-5 sm:p-6">
+        <div className="flex flex-col gap-2">
+          <span className="self-start rounded-full bg-gold-wash px-3 py-1 text-xs text-gold-deep">{PRINT_KIND_LABELS[edition.kind]}</span>
+          {title}
+          <p className="flex flex-wrap gap-x-2 text-[13px] text-stone tabular-nums">
+            {editionMeta(edition).map((part, index) => (
+              <span key={part}>
+                {index > 0 && <span aria-hidden className="me-2 text-caption">·</span>}
+                {part}
+              </span>
+            ))}
+          </p>
+        </div>
+        <div className="flex flex-col gap-2">
+          {edition.description && <p className="text-[15px] leading-relaxed text-ink">{edition.description}</p>}
+          <p className="text-sm leading-relaxed text-stone">{DOWNLOADS_COPY.free}</p>
+        </div>
+        <div className="flex flex-col gap-1 rounded-xl bg-canvas p-4 text-[13px] leading-relaxed text-stone">
+          <p className="font-semibold text-ink">{DOWNLOADS_COPY.printTips.title}</p>
+          <p>{DOWNLOADS_COPY.printTips.size}</p>
+          {edition.kind === "monthly" && <p>{DOWNLOADS_COPY.printTips.oneMonth}</p>}
+        </div>
+        <EditionActions edition={edition} placement={placement} />
       </div>
-      {edition.description && <p className="text-[15px] leading-relaxed text-ink">{edition.description}</p>}
-      <p className="text-sm text-stone">{DOWNLOADS_COPY.free}</p>
-      <div className="rounded-xl bg-surface px-4 py-3 text-[13px] leading-relaxed text-stone">
-        <p className="font-semibold text-ink">{DOWNLOADS_COPY.printTips.title}</p>
-        <p>{DOWNLOADS_COPY.printTips.size}</p>
-        {edition.kind === "monthly" && <p>{DOWNLOADS_COPY.printTips.oneMonth}</p>}
-      </div>
-      <EditionActions edition={edition} placement={placement} />
     </div>
   )
 }
