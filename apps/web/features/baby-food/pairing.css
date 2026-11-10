@@ -161,6 +161,7 @@
 .pairing-art img {
   min-width: 0;
   max-width: 100%;
+  width: auto;
   height: 100%;
   object-fit: contain;
 }
@@ -680,4 +681,67 @@ button.pairing-item {
 }
 .pairing-entry-link:hover {
   text-decoration-color: currentColor;
+}
+
+/* 궁합표 검색 결과 */
+.pairing-search-status {
+  min-height: 20px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--color-caption);
+}
+.pairing-search-status:empty {
+  display: none;
+}
+.pairing-inline-button {
+  min-height: 32px;
+  color: var(--color-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--color-silver);
+  text-underline-offset: 4px;
+}
+.pairing-search-mentions {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--color-hairline);
+  background: var(--color-pair-light);
+}
+.pairing-search-mentions h2 {
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-weight: 700;
+}
+.pairing-search-mention {
+  display: grid;
+  gap: 8px;
+}
+.pairing-search-mention h3 {
+  font-size: 15px;
+  font-weight: 700;
+}
+.pairing-search-mention ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pairing-mention-sign {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.pairing-mention-link[data-sign="O"] .pairing-mention-sign {
+  background: var(--color-pair-forest);
+  color: var(--color-pair-forest-foreground);
+}
+.pairing-mention-link[data-sign="X"] .pairing-mention-sign {
+  background: var(--color-pair-gold);
+  color: var(--color-pair-gold-foreground);
 }

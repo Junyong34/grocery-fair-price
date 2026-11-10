@@ -8,6 +8,7 @@ import { Input } from "@workspace/ui/components/input"
 
 import { INFANT_PAIRING_COPY } from "@workspace/seasonal/data/copy"
 import { PAIRING_CATEGORIES, PAIRINGS } from "@workspace/seasonal/data/infant-pairings"
+import { matchPairings } from "@workspace/seasonal/search/match-pairings"
 
 import { routes } from "@/shared/routes"
 import { SubHeader } from "@/shared/shell/sub-header"
@@ -25,11 +26,9 @@ export function IngredientPicker({
   const [category, setCategory] =
     useState<(typeof PAIRING_CATEGORIES)[number]>("전체")
   const search = query.trim()
-  const keyword = search === "달걀" ? "계란" : search
-  const visible = PAIRINGS.filter(
-    (row) =>
-      (category === "전체" || row.category === category) &&
-      row.name.includes(keyword)
+  // 고를 수 있는 것은 기준 재료뿐이라 언급(mentions)은 쓰지 않는다.
+  const visible = matchPairings(PAIRINGS, search).bases.filter(
+    (row) => category === "전체" || row.category === category
   )
 
   function toggle(name: string) {
@@ -93,7 +92,7 @@ export function IngredientPicker({
             variant="cream"
             className="text-base bg-pair-light text-pair-light-foreground [--input:var(--color-pair-light)] [--v-canvas:var(--color-pair-light)]"
             type="search"
-            placeholder="예: 당근"
+            placeholder="예: 당근, ㄷㄱ"
             aria-label="재료 이름으로 찾기"
             value={query}
             onChange={(event) => setQuery(event.target.value)}

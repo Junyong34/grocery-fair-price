@@ -297,6 +297,7 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `layout/scatter.ts` | 흩어진 배치. 시드 난수(LCG)로 같은 입력이면 같은 결과, 0..1 정규화 좌표, 화면 구간(`SCATTER_FRAMES`)별 고정 비율 |
 | `layout/arrangement.ts` | 시드 뒤의 판 위 자리: 저장된 배치 병합(`restingSpots`), 끄는 동안(`moveSpot`)·놓은 뒤(`settleSpots`) 겹침 풀기, 판 위 달력 가두기. 시드와 같은 그림+이름표 겹침 규칙 |
 | `search/match-foods.ts` | 이름·별칭·초성 검색 |
+| `search/match-pairings.ts` | 이유식 궁합표 검색: 기준 재료(이름·별칭·초성)와, 표는 없지만 O·X 목록에 있는 재료가 적힌 표(`mentions`) |
 | `print/layouts.ts` | 인쇄물 구성(layout) 정의 한 곳: 종류별 구성 값(`LAYOUTS`)과 값마다 이름 · 와이어프레임 안 코드 · 세로 전용 · 품종 판 크기 상한 · 읽지 않는 옵션(`LAYOUT_DEFS`), `layoutReads`, `foodsPerCell`. 스키마 · 어드민 편집 폼 · 품종 고르기가 여기서 읽는다. 새 구성은 이 파일과 종류별 화면에 더한다 |
 | `print/spec.ts` | 인쇄 사양 `PrintSpec`(종류별 유니언, zod 파서), `PAPERS`, `sheetSize`(방향 반영 용지 mm), `pageCount`(결과 PDF 쪽 수, 사양·용지마다 파일 하나), 종류별 기본값, URL 인코딩, 해시 |
 | `print/edition.ts` | 에디션, 다운로드 경로, 매니페스트 |
