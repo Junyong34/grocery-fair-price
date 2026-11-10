@@ -5,6 +5,7 @@ export const FRUIT_GUIDE_ART: Readonly<
   mango: "/foods/mango/color.svg",
   grape: "/foods/grape/color.svg",
   orange: "/foods/orange/color.svg",
+  persimmon: "/foods/persimmon/color.svg",
   juice: "/foods/juice/color.svg",
   sashimi: "/foods/sashimi/color.svg",
 }
