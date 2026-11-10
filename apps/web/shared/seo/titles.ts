@@ -63,11 +63,15 @@ function names(foods: readonly Food[]): string {
   return foods.map((food) => food.name).join("·")
 }
 
-/** 서비스 메인(P1 시세 메인) */
+/**
+ * 서비스 메인(P1 시세 메인).
+ * 설명에 드는 품종은 홈의 "자주 사는 식재료"(FEATURED_IDS)에 있는 것만 쓴다.
+ * 조사일은 품종마다 달라 "오늘"이라 하지 않고, 출처는 홈 목록에 나오는 둘을 모두 적는다.
+ */
 export function homeSeo(): PageSeo {
   return {
     title: "오늘 식재료 시세 · 지금 사도 될까",
-    description: "배추·삼겹살·계란, 오늘 조사한 시세를 이맘때 평소 가격과 견줘 싸요·보통·비싸요로 알려 드려요. KAMIS 전국 조사 시장 기준.",
+    description: "삼겹살·계란·대파, 최근 조사한 시세를 이맘때 평소 가격과 견줘 싸요·보통·비싸요로 알려 드려요. KAMIS·축평원 조사 기준.",
   }
 }
 
