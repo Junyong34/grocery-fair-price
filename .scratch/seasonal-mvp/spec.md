@@ -1,5 +1,7 @@
 # 제철달력 MVP 화면 개발
 
+> 완료 (2026-11-05): 티켓 01~11·13 resolved. 남은 것: 12 태블릿 폭·모션 점검(ready-for-agent).
+
 `apps/web`의 제철 화면을 실제 화면으로 만드는 작업이다. 지금은 모든 화면이 `ScreenStub`이다. 화면 명세는 `prototypes/seasonal-food/wireframes/WIREFRAME-SPEC.md`(이하 "명세")이고, 이 문서는 명세와 다르게 정했거나 명세가 비워 둔 결정만 적는다. 두 문서가 다르면 이 문서를 따른다.
 
 결정은 2026-10-14 grilling 세션에서 사용자와 정했다. 용어는 `grocery-price/GLOSSARY.md`를 따른다(품종, 제철, 먹음 기록, 명절, 전통 음식).

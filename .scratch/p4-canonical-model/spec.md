@@ -1,5 +1,7 @@
 # P4. 어댑터 · 통합 데이터 모델 — 작업 분해
 
+> 완료 (2026-10-22): 티켓 01~03 resolved.
+
 로드맵 ① 수집 기반의 일부(이전 번호 P4): 서로 다른 출처를 하나의 통합 데이터로 만드는 규칙을 정한다. 설계 문서는 [pipeline.md](../../grocery-price/docs/30-data/pipeline.md) 3장이고, 실제 기준은 마이그레이션(`supabase/migrations/`)과 수집 패키지의 테스트다. 별도 `canonical-model.md`, `adapters.md`는 만들지 않는다 (2026-10-19).
 
 ## 배경

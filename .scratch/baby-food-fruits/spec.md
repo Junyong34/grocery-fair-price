@@ -1,6 +1,8 @@
 # 이유식 과일 시기 및 주의 식재료 도감
 
-Status: ready-for-agent
+> 완료 (2026-11-10): 티켓 01~06 resolved.
+
+Status: resolved
 
 ## 왜
 

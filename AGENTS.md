@@ -11,33 +11,17 @@ Full map (every route, module, generated file, command, and doc): `docs/project-
 - `supabase/`, `packages/price-db`: the price DB. Migrations (schema `price`, roles `ingest_writer`·`web_reader`, RLS) are the source of truth for tables; `packages/price-db` holds DB tests, sample data and the ERD generator.
 - `grocery-price/`: design docs and public price API research for the price service. Glossary `grocery-price/GLOSSARY.md`, ADRs `grocery-price/docs/adr/` (how skills use them: `docs/agents/domain.md`).
 - `prototypes/`: illustration source, wireframes, brand originals. Gitignored, so a fresh clone lacks it. Keep it out of commits (no force-add).
-- Current work: `.scratch/*/spec.md` (app spec: `.scratch/seasonal-mvp/spec.md`). Price-service stages (① 수집 기반 → ② 판정 설계 → ③ 화면 설계 → ④ 구현): `grocery-price/docs/00-overview/roadmap.md`.
+- Specs and tickets: `.scratch/<feature>/`. A spec whose title is followed by a `> 완료` or `> 종료` line is history, not current work. Price-service stages (① 수집 기반 → ② 판정 설계 → ③ 화면 설계 → ④ 구현): `grocery-price/docs/00-overview/roadmap.md`.
 
 Code comments and docs are written in Korean.
 
 <important if="you need to run commands to build, test, lint, typecheck, start the dev server or DB, or regenerate files">
 
-Run from the repo root unless noted.
+Run from the repo root. Scripts live in the root `package.json`; the full table is `docs/project-structure.md` §9. Regeneration commands are in the generated-file table below. What the scripts don't tell you:
 
-| Command | What it does |
-|---|---|
-| `pnpm dev` | Dev server (`turbo dev`) |
-| `pnpm build` | Build all packages |
-| `pnpm typecheck` | Typecheck all packages |
-| `pnpm lint` | Lint all packages (must be 0 errors) |
-| `pnpm format` | Prettier |
-| `pnpm test` | All vitest tests |
-| `pnpm ui:add <name-or-url>` | Add a cojeev/shadcn component into `packages/ui` (never `shadcn add` directly) |
-| `pnpm db:start` / `pnpm db:stop` | Start / stop local Supabase |
-| `pnpm db:reset` | Reset local DB and reapply migrations |
-| `pnpm db:test` | DB tests (`@workspace/price-db` and `web`) |
-| `pnpm db:erd` | Regenerate ERD blocks in `grocery-price/docs/30-data/schema-map.html` |
-| `pnpm foods:sync` | Sync food illustrations into `apps/web/public/foods/` and regenerate bounds |
-| `pnpm foods:bounds` | Regenerate `food-bounds.generated.ts` only |
-| `pnpm --filter @workspace/seasonal build:foods` | Regenerate `foods.generated.ts` from `prototypes/` |
-| `python3 -I build.py` (in `grocery-price/reference/public-data/samples/viewer/`) | Rebuild `api-explorer.html` |
-| `grocery-price/reference/public-data/samples/viewer/smoke.sh --quick` | Viewer smoke test |
-| `git config core.hooksPath .githooks` | Once per fresh clone; enables the pre-commit secret check (`scripts/check-no-secrets.sh`) |
+- Add UI components with `pnpm ui:add <name-or-url>`, not `shadcn add` (it keeps our edited files and fixes `cojeev.css` imports).
+- `pnpm db:test` needs `pnpm db:start` first.
+- Once per fresh clone: `git config core.hooksPath .githooks` (pre-commit secret check).
 </important>
 
 <important if="you are finishing, verifying, or committing a change">
@@ -59,7 +43,7 @@ Issues and specs are local markdown in `.scratch/<feature>/` (`spec.md`, `issues
 Use the terms in `grocery-price/GLOSSARY.md`.
 </important>
 
-<important if="you are editing a generated file or changing what feeds one (품종 list, illustrations, migrations, viewer samples, print editions)">
+<important if="you are editing a generated file or changing what feeds one (품종 list, illustrations, migrations, any file in grocery-price/reference/public-data/samples/viewer/, print editions)">
 
 Regenerate with the command and commit the output. Hand edits are overwritten.
 
@@ -68,7 +52,7 @@ Regenerate with the command and commit the output. Hand edits are overwritten.
 | `packages/seasonal/src/data/foods.generated.ts` | `pnpm --filter @workspace/seasonal build:foods` | the 품종 list in `prototypes/` changes. A 품종 without an illustration gets its id in `NEW_IDS` in `packages/seasonal/scripts/build-foods.mjs`. |
 | `apps/web/public/foods/<id>/{color,motion}.svg`, `PROVENANCE.md`, `drawn-foods.generated.ts`, `food-bounds.generated.ts` | `pnpm foods:sync` | an illustration is drawn or changed (`/seasonal-food-illustrator`). |
 | ERD blocks in `grocery-price/docs/30-data/schema-map.html` | `pnpm db:erd` (local DB up, migrations applied) | a migration changes tables, keys or checks. `pnpm db:test` fails while they differ. |
-| `grocery-price/reference/public-data/samples/viewer/api-explorer.html` | `python3 -I build.py` in that folder | `template.html`, `build.py` or the saved samples change. Then run `smoke.sh --quick`. |
+| `grocery-price/reference/public-data/samples/viewer/api-explorer.html` | `python3 -I build.py` in that folder | `template.html`, `build.py` or the saved samples change. Then run `smoke.sh --quick` in that folder before finishing. |
 | `food-bounds.generated.ts` alone | `pnpm foods:bounds` | the SVGs changed without a sync. Needs no `prototypes/`. |
 | `apps/web/public/downloads/**` (PDFs, `manifest.json`), `apps/web/print-editions/<id>.build.json` | the admin's "PDF 생성" button at `/admin` (`pnpm dev`, uses local Google Chrome) | an edition's spec changes, or anything a print page draws changes (foods, illustrations, holidays). Saving an edition rewrites `manifest.json`. |
 
@@ -92,10 +76,6 @@ Regenerate with the command and commit the output. Hand edits are overwritten.
 - A new `price` function needs `revoke execute … from public, anon, authenticated` in the same file.
 </important>
 
-<important if="you are changing files in grocery-price/reference/public-data/samples/viewer/">
-Run `grocery-price/reference/public-data/samples/viewer/smoke.sh --quick` before finishing.
-</important>
-
 <important if="you are adding or moving code in apps/web or packages/{seasonal,price,ui}, or adding imports between them">
 
 Each layer may import only from the layers below it:
@@ -103,21 +83,21 @@ Each layer may import only from the layers below it:
 | Layer | Where | What goes there |
 |---|---|---|
 | App routes | `apps/web/app/` | Route files only (`page`, `layout`, `@slot`, route groups), plus `api/og`, `sitemap.ts`, `robots.ts`. Keep routes thin: validate params, set metadata, render a feature component. |
-| Features | `apps/web/features/<feature>/` | One folder per screen (`seasonal/this-month`, `month-timeline`, `seasons`, `festivals`, `my-table`, `food-detail`, `search`; `price/home`, `product-catalog`, `search`, `variety-detail`, `product-detail`, `basket`). `components/` holds parts several screens share; `stores/` holds zustand stores. Features don't import each other; shared code moves down a layer. |
-| App shared | `apps/web/shared/` | App-wide pieces: `routes.ts`, `providers.tsx`, `meta.ts`, `today.ts` + `today-context.tsx`, `eaten-store.ts`, `brand-logo.tsx`. |
-| Domain | `packages/seasonal` | Pure TS: `data/`, `calendar/`, `layout/` (seeded scatter), `search/` (초성 match). No React, Next.js or DOM. |
-| Domain | `packages/price` | Pure TS for price screens: `types`, `verdict` (`verdictOf`), `search`, `format`, `list`, `copy`. No React, Next.js or DOM. |
+| Features | `apps/web/features/<feature>/` | One folder per screen, grouped by area (e.g. `seasonal/this-month`, `price/home`, `baby-food`); the list is the directory itself. `components/` holds parts several screens share; `stores/` holds zustand stores. Features don't import each other; shared code moves down a layer. |
+| App shared | `apps/web/shared/` | App-wide pieces: routes, providers, metadata, today, device stores, the shared shell. |
+| Domain | `packages/seasonal` | Pure TS for 제철, 이유식 and print specs (data, calendar, seeded scatter, 초성 search). No React, Next.js or DOM. |
+| Domain | `packages/price` | Pure TS for price screens (screen schema, verdict, search, format, copy). No React, Next.js or DOM. |
 | Design system | `packages/ui` | Oura tokens, cojeev UI, generic components such as `BottomSheet`. No domain words. |
 
 Import with package paths (`@workspace/ui/components/button`, `@workspace/seasonal/data/months`); inside `apps/web`, `@/features/...` and `@/shared/...`.
 </important>
 
 <important if="you are building or changing a screen in apps/web, or need its spec">
-Screen spec: `prototypes/seasonal-food/wireframes/WIREFRAME-SPEC.md`; where it and `.scratch/seasonal-mvp/spec.md` differ, the `.scratch` spec wins. Name screens by spec code: 2a 이달 (`/seasonal`), 2b 월별, 3a 계절, 1g 명절, 1h 나의 식탁, 1i 품종 상세. Price screens spec: `.scratch/price-screens/spec.md`. The `/examples/*` comparison pages the specs cite were deleted; read them with `git show 22520eb:apps/web/app/examples/<name>/page.tsx`.
+Screen spec: `prototypes/seasonal-food/wireframes/WIREFRAME-SPEC.md`; where it and `.scratch/seasonal-mvp/spec.md` differ, the `.scratch` spec wins. Name screens by spec code: 2a 이달 (`/seasonal`), 2b 월별, 3a 계절, 1g 명절, 1h 나의 식탁, 1i 품종 상세. Price screens spec: `.scratch/price-screens/spec.md` (product pages: `.scratch/catalog-scale/issues/10-product-page-and-search.md`). 이유식 screens: `.scratch/infant-food-pairing/spec.md`, `.scratch/baby-food-ingredient-pages/spec.md`, `.scratch/baby-food-fruits/spec.md`. The `/examples/*` comparison pages the specs cite were deleted; read them with `git show 22520eb:apps/web/app/examples/<name>/page.tsx`.
 </important>
 
-<important if="you are writing longer screen copy (month notes, season or festival text, empty states, toasts)">
-Put it in `packages/seasonal/src/data/copy.ts`.
+<important if="you are writing longer screen copy (month notes, season or festival text, verdict sentences, empty states, toasts)">
+제철 screens: `packages/seasonal/src/data/copy.ts`. Price screens: `packages/price/src/copy.ts` (verdict sentences: `verdict-copy.ts`).
 </important>
 
 <important if="you need a new UI component, effect, or element">
@@ -140,11 +120,11 @@ Add with `pnpm ui:add <name-or-url>`. It answers "no" to overwrites so our edite
 
 <important if="you are adding or changing a route, link, redirect, page metadata, or proxy.ts">
 
-- 제철 screens live under `/seasonal`. `/` is the price main (`app/(price)/page.tsx`); `/`, `/search`, `/prices/[variety]`, `/basket` share route group `(price)`.
+- 제철 screens live under `/seasonal`. `/` is the price main (`app/(price)/page.tsx`); `/`, `/search`, `/prices/[variety]`, `/basket`, `/products/*`, `/baby-food/*`, `/settings/*`, `/privacy` share route group `(price)`.
 - Build every path with `routes` from `apps/web/shared/routes.ts`. `proxy.ts` `matcher` is the one hard-coded path (must be a static literal); keep it in sync.
 - Route groups `(this-month)` and `(season)` both render the one 제철달력 tab row (이달 · 월별 · 계절 · 명절, `SeasonalTabs`) without changing the URL. `(this-month)/months/(detail)` adds the 2b timeline only to `/seasonal/months/[month]`.
 - `/seasonal/festivals` has no page: `proxy.ts` redirects to the upcoming festival by Seoul date.
-- `@sheet/(.)foods/[food]` intercepts `/seasonal/foods/[food]` as a bottom sheet; a direct load renders the full page. `@sheet/[...catchAll]` and `@sheet/page.tsx` render null so the sheet closes on other navigation; new `/seasonal` routes need nothing in `@sheet`.
+- `@sheet/(.)foods/[food]` intercepts `/seasonal/foods/[food]` (and `@sheet/(.)downloads/[edition]` intercepts `/seasonal/downloads/[edition]`) as a bottom sheet; a direct load renders the full page. `@sheet/[...catchAll]` and `@sheet/page.tsx` render null so the sheet closes on other navigation; new `/seasonal` routes need nothing in `@sheet`.
 - Cache Components is on, so `dynamicParams` is a build error. List params with `generateStaticParams` (at least one entry), validate with `notFound()`, read `params` inside `<Suspense>`.
 - Metadata: return `createMetadata({ title, description, path, ogImage })` from `apps/web/shared/meta.ts`.
 - Register every new page in `apps/web/shared/seo/pages.ts` (indexed, noindex, or redirect); `pnpm test` fails otherwise. Checklist and go-live: `apps/web/docs/seo.md`.
@@ -175,7 +155,7 @@ CSS keyframes for small effects, `motion` for drag, spring and layout animation,
 </important>
 
 <important if="you are opening a bottom sheet or dialog">
-Open with `overlay-kit` (`<OverlayProvider>` in `apps/web/shared/providers.tsx`). Bottom sheets: `@workspace/ui/components/bottom-sheet` (`BottomSheet`, `openBottomSheet`). Examples: `features/seasonal/components/detail-sheet.tsx`, `features/seasonal/this-month/settings-panel.tsx`.
+Open with `overlay-kit` (`<OverlayProvider>` in `apps/web/shared/providers.tsx`). Bottom sheets: `@workspace/ui/components/bottom-sheet` (`BottomSheet`, `openBottomSheet`). Examples: `features/seasonal/components/detail-sheet.tsx`, `features/seasonal/my-table/category-filter.tsx`.
 </important>
 
 <important if="you are writing Next.js code (routing, caching, rendering, config)">

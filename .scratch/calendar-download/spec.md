@@ -1,6 +1,8 @@
 # 제철 인쇄물 내려받기
 
-Status: ready-for-agent (04 와이어프레임 확정 2026-10-29: 1-a · 2-C · 3-B · 5-a)
+> 완료 (2026-10-30): 티켓 01~07 resolved, 08·10은 코드 완료. 남은 것: 08 GA 등록·10 처리방침 게시(사람), 09 PDF 크기 조사(needs-triage).
+
+Status: resolved
 Phase: MVP 이후.
 작성일: 2026-10-29 (grill-with-docs 세션)
 

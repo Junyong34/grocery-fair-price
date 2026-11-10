@@ -46,7 +46,7 @@ P0 기획·조사 ✅ ── P1 도메인 모델링 ✅
   - 실행 환경 결정: [ADR 0002](../adr/0002-supabase-and-github-actions.md)
   - Postgres 스키마·마이그레이션·롤·권한 (`supabase/migrations/`). 표는 노출하지 않는 스키마 `price`, 수집은 `ingest_writer` 롤, 웹앱은 `web_reader` 롤로 서버에서만 읽는다 (2026-10-20, [pipeline.md](../30-data/pipeline.md) 3-0)
   - 수집 패키지(API 클라이언트, 계약 테스트, 변환, 적재)와 GitHub Actions 워크플로
-  - KAMIS 5년 이력 백필 (평년 계산 입력)
+  - KAMIS 소매 3년 이력 백필 (계절비율 계산 입력. 2026-10-27에 5년에서 3년으로 줄임, [judgment.md](../30-data/judgment.md) 1장)
 - **완료 기준**
   - 세 출처가 정한 시각에 사람 손 없이 수집·적재된다.
   - 세 출처의 모든 응답 필드가 도메인 개념에 연결되거나 "미사용"이다.

@@ -1,6 +1,6 @@
 # 프로젝트 구조
 
-2026-10-30 기준 저장소 전체 지도. 에이전트가 지킬 규칙은 루트 `AGENTS.md`에 있고, 이 문서는 무엇이 어디에 왜 있는지를 기록한다. 폴더나 라우트, 패키지, 생성 파일이 바뀌면 이 문서도 고친다.
+2026-11-10 기준 저장소 전체 지도. 에이전트가 지킬 규칙은 루트 `AGENTS.md`에 있고, 이 문서는 무엇이 어디에 왜 있는지를 기록한다. 폴더나 라우트, 패키지, 생성 파일이 바뀌면 이 문서도 고친다.
 
 ## 1. 한눈에
 
@@ -21,7 +21,7 @@ pnpm(11) workspace와 Turborepo(2.11)로 묶은 모노레포다. Node 20.9 이�
 
 ```
 grocery-fair-price/
-├─ apps/web/                 Next.js 16.4 앱 (제철달력, 나중에 가격 비교)
+├─ apps/web/                 Next.js 16.4 앱 (시세 · 판정, 제철달력, 이유식)
 ├─ packages/
 │  ├─ seasonal/              @workspace/seasonal: 제철 도메인 (순수 TS, React 없음)
 │  ├─ price/                 @workspace/price: 가격 화면 도메인 (화면 모양, 판정, 검색, 문구. 순수 TS)
@@ -127,8 +127,10 @@ import 경로:
 | `/seasonal/foods/[food]` | 1i 품종 상세 (전체 페이지) | `seasonal/foods/[food]/page.tsx` | `food-detail/food-detail` |
 | `/seasonal/downloads` | 달력·포스터 PDF 내려받기 | `seasonal/downloads/page.tsx` | `downloads/downloads-view`. `public/downloads/manifest.json`을 빌드 때 읽는다 |
 | `/seasonal/downloads/[edition]` | 에디션 상세(직접 열면 페이지, 목록에서 누르면 하단 시트 `@sheet/(.)downloads/[edition]`) | `seasonal/downloads/[edition]/page.tsx` | `downloads/edition-detail`, 매니페스트는 `shared/downloads-manifest` |
-| `/admin`, `/admin/edit?id=`, `/admin/wireframes` | 인쇄물 어드민 (개발 서버 전용, 운영 404). `wireframes`는 인쇄물 구조 안 모음 | `app/admin/` | `features/admin-print/` |
+| `/admin`, `/admin/edit?id=`, `/admin/wireframes` | 인쇄물 어드민 (개발 서버 전용, 운영 404). `wireframes`는 인쇄물 구조 안 모음. 어드민 화면 공통 틀과 메뉴는 `features/admin-shell/` | `app/admin/` | `features/admin-print/` |
 | `/admin/baby-food/print` · `POST /admin/baby-food/pdf` | 이유식 궁합표 A4 세로 3장 미리보기와 로컬 PDF 다운로드. 표 길이 기준으로 열을 나눔 | `app/admin/baby-food/` | `features/baby-food/pairing-print`, `features/admin-print/server/generate` |
+| `/admin/baby-food/fruits-print` · `POST /admin/baby-food/fruits-pdf` | 월령별 과일 도감 A4 미리보기와 로컬 PDF 다운로드 | `app/admin/baby-food/` | `features/baby-food/fruits/fruits-print` |
+| `/admin/catalog/categories`, `/admin/catalog/varieties` | 카테고리 · 품종 목록 (개발 서버 전용, catalog-scale/07) | `app/admin/catalog/` | `features/admin-catalog/categories/category-board`, `varieties/variety-board`, `server/categories` · `category-actions` · `varieties` |
 | `/admin/catalog/products` | 참가격 상품 목록 (catalog-scale/10, 개발 서버 전용, 읽기 전용 `ingest_writer`). 상품마다 카테고리 · 품목(품목 미정이면 참가격 소분류) · 품종 연결 · 상품 화면 상태(노출 · 오래됨 · 페이지 없음 · 조사 중단) · 판매가. 고치지 않고, 품목이 틀리면 상품의 품목 제안으로 고친다 | `app/admin/catalog/products/` | `features/admin-catalog/products`, `features/admin-catalog/server/products`(접속은 `server/reader-db`), `lib/product-view` |
 | `/admin/catalog/proposals` | 카탈로그 제안 검토 (catalog-scale/07, 개발 서버 전용, 운영 DB에 소유자 접속). 제안을 골라 미리보기(되돌림)·적용·반려하고, 적용한 제안을 되돌린다. 결정은 `@workspace/price-ingest/catalog/decide`(`decideProposals`)만 거치고, 돌려받은 사본으로 `snapshot.json`을 다시 쓴다 | `app/admin/catalog/proposals/` | `features/admin-catalog/proposals`, `features/admin-catalog/server/proposal-actions` |
 | `/print?spec=&paper=&page=` | 인쇄 전용 페이지 (개발 서버 전용, 운영 404) | `app/print/page.tsx` | `features/print/print-document` |
@@ -137,6 +139,8 @@ import 경로:
 | `/baby-food` | 이유식 재료 선택 (noindex) | `(price)/baby-food/page.tsx` | `features/baby-food/ingredient-picker` |
 | `/baby-food/result` | 고른 재료 궁합 결과 (noindex) | `(price)/baby-food/result/page.tsx` | `features/baby-food/pairing-result` |
 | `/baby-food/pairings` | 전체 이유식 궁합표. 결과 화면에서 열면 3장 모달 | `(price)/baby-food/pairings/page.tsx`, `result/@pairing/(..)pairings/page.tsx` | `features/baby-food/pairing-catalog`, `pairing-modal` |
+| `/baby-food/pairings/[ingredient]` | 재료별 궁합 페이지 (baby-food-ingredient-pages/02). 관계 수 · 본문 유무로 색인 여부를 정한다 | `(price)/baby-food/pairings/[ingredient]/page.tsx` | `features/baby-food/ingredient-detail` |
+| `/baby-food/fruits`, `/baby-food/fruits/[stage]` | 월령별 과일 시기 · 주의 식재료 도감 (.scratch/baby-food-fruits). 없어진 단계 주소는 `12-months`로 영구 리다이렉트 | `(price)/baby-food/fruits/page.tsx`, `fruits/[stage]/page.tsx` | `features/baby-food/fruits/fruits-dashboard` |
 | `/settings` | 설정: 화면 표시 · 내 기록 · 정보 (noindex) | `(price)/settings/page.tsx` | `features/settings/settings-view`. 제철 · 시세 항목은 라우트가 각 feature에서 넣는다(`seasonal/settings/display-settings`, `price/settings/price-record-settings`) |
 | `/settings/sources` | 데이터 출처 (noindex) | `(price)/settings/sources/page.tsx` | `features/settings/sources-view` |
 | `/privacy` | 개인정보 처리방침 (가격 셸) | `(price)/privacy/page.tsx` | `features/legal/privacy/` (본문 `privacy-content.ts`) |
@@ -146,7 +150,7 @@ import 경로:
 
 라우팅 장치:
 
-- **`app/(price)/layout.tsx`**: 가격 화면(`/`, `/search`, `/prices/*`, `/basket`)의 셸(`features/price/components/price-shell`: 공통 셸 + 가격 메뉴 + 기기 저장 store 불러오기). 데이터는 `features/price/data/price-source.ts`의 `getPriceSource()`로만 읽는다.
+- **`app/(price)/layout.tsx`**: 가격 셸을 쓰는 화면(`/`, `/search`, `/prices/*`, `/products/*`, `/basket`, `/baby-food/*`, `/settings/*`, `/privacy`)의 셸(`features/price/components/price-shell`: 공통 셸 + 가격 메뉴 + 기기 저장 store 불러오기). 데이터는 `features/price/data/price-source.ts`의 `getPriceSource()`로만 읽는다.
 - **`app/seasonal/layout.tsx`**: `TodayProvider`(서울 오늘 Promise)와 `SeasonalShell`(헤더, 하단 Floating Nav, 검색, ⚙(→ `/settings`). 공유 버튼은 헤더가 아니라 월별·계절·명절·품종 상세의 제목 줄과, 이달(모바일)의 월 레일 아래에 있다)을 깐다. `sheet` 슬롯을 받는다.
 - **라우트 그룹** `(this-month)`과 `(season)`: URL을 바꾸지 않고 같은 제철달력 탭 줄(`SeasonalTabs`: 이달 · 월별 · 계절 · 명절, 헤더 아래 고정)을 그린다. `(detail)` 그룹은 2b 타임라인을 그 달 상세에만 붙인다. 타임라인과 명절 칩은 레이아웃에 두어 달·명절을 바꿔도 가로 스크롤 위치가 남는다.
 - **`@sheet` 병렬 슬롯**: `(.)foods/[food]`가 품종 상세를 가로채 시트로 띄운다. `default.tsx`, `page.tsx`, `[...catchAll]`은 null을 그려 다른 곳으로 이동하면 시트가 닫힌다. 새 제철 라우트를 더해도 `@sheet`는 고칠 것이 없다.
@@ -184,9 +188,9 @@ import 경로:
 | `components/` | 공통 | `seasonal-shell`(공통 셸에 제철 메뉴 · 검색 · ⚙를 넣는다), `sub-tabs`, `food-image`(그림 없으면 이름 카드), `detail-sheet`(품종 · 에디션 상세 시트), `scatter-field`·`draggable-scatter`(흩어진 배치와 드래그), `month-calendar`, `month-days-card`(달력 아래 "이달의 절기·명절". 2b는 `MonthDaysCardToday`를 `<Suspense>` 안에), `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-name`(먹은 품종 이름 밑줄), `eaten-count`, `holiday-name`, `screen-stub`, `pill`(고르기 알약 `PillLink`·`PillButton`) |
 | `downloads/` | PDF 내려받기(.scratch/calendar-download) | `downloads-view`(목록: 종류별 가로 줄 `EditionShelf`), `year-filter`(연도 필터), `edition-detail`(상세: 시트 · 페이지 공용), `edition-download-link`(A4 내려받기 주소) |
 | `settings/` | 설정 화면 항목 | `display-settings`(화면 표시 섹션, 먹음 기록 지우기) |
-| `stores/` | 공통 | `settings-store`(표시 설정), `scatter-store`(옮긴 배치와 달력 자리) |
+| `stores/` | 공통 | `settings-store`(표시 설정), `scatter-store`(옮긴 배치와 달력 자리), `a3-request-store`("A3도 원해요"를 누른 에디션) |
 
-`components/seasonal-shell`은 공통 셸(`shared/shell`)의 헤더에 넣으려고 `search/`와 `this-month/settings-panel`을 import한다. 같은 feature 안이라 허용된다.
+`components/seasonal-shell`은 공통 셸(`shared/shell`)의 헤더에 넣으려고 `search/`(같은 feature)와 `shared/shell/settings-link`(⚙ → `/settings`)를 import한다. 예전 2a 설정 시트(`this-month/settings-panel`)는 shell-unify/03에서 `/settings`로 대체되어 없다.
 
 인쇄물(`.scratch/calendar-print/spec.md`)은 feature 둘로 나뉜다.
 
@@ -209,7 +213,7 @@ import 경로:
 | `new-edition/` | 새 에디션 폼(`new-edition-form`, `kind-picker`, `form-step`). 이유식 궁합표도 이름으로 저장하고 편집기에서 A4 세로 3장을 미리보고 생성한다 |
 | `editor/` | `/admin/edit`. `use-edition-editor`(편집본·저장·생성을 들고 있고, 판단은 `lib/flow`의 `editionDraft`)와 화면 조각(`editor-header`, `edition-steps`, `generated-files`, `options-panel`·`option-field`·`option-fields`(종류별 옵션 표. 구성 선택지와 구성별로 숨기는 옵션 · 품종 수 상한은 `print/layouts.ts`에서 읽는다. `option-fields.test`가 표의 값이 사양 스키마와 맞는지 본다), `listing-panel`, `preview-panel`·`print-preview`) |
 
-에디션 원본은 `apps/web/print-editions/<id>.json`, 생성 기록은 `<id>.build.json`, 결과 PDF와 매니페스트는 `apps/web/public/downloads/`에 있다. 에디션 JSON·생성 기록·매니페스트는 커밋하고, PDF는 용량이 커서 `.gitignore`로 뺀다. PDF를 둘 곳을 정하기 전까지는 에디션을 공개하지 않는다(매니페스트가 비어 있어야 운영 링크가 깨지지 않는다).
+에디션 원본은 `apps/web/print-editions/<id>.json`, 생성 기록은 `<id>.build.json`, 결과 PDF와 매니페스트는 `apps/web/public/downloads/`에 있다. 에디션 JSON·생성 기록·매니페스트는 커밋하고, PDF는 용량이 커서 `.gitignore`로 뺀다. 게시한 에디션의 A4 PDF는 비공개 R2 버킷에 올리고 `/seasonal/downloads/[edition]/[paper]` Route Handler가 짧은 서명 링크로 내준다(ADR 0003).
 
 ### 4.3-1 features/price
 
@@ -230,6 +234,20 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `settings/` | 설정 화면 "내 기록"의 담은 품종 · 최근 본 품종 지우기(`price-record-settings`) |
 | `stores/` | `basket-store`(`price:basket`, 담을 때 판정 · 조사일), `recent-store`(`price:recent`) |
 
+### 4.3-2 features/baby-food
+
+이유식 화면(가격 셸 `(price)` 안). 데이터는 `@workspace/seasonal/data/infant-pairings`(궁합) · `infant-fruits`(월령별 과일), 검색은 `@workspace/seasonal/search/match-pairings`. 명세 `.scratch/infant-food-pairing/spec.md`, `.scratch/baby-food-ingredient-pages/spec.md`, `.scratch/baby-food-fruits/spec.md`.
+
+| 파일 | 내용 |
+|---|---|
+| `baby-food-tabs` | 이유식 밑줄 탭(재료 궁합표 · 월령별 과일 도감) |
+| `ingredient-picker`, `selection` | 재료 선택 화면과 선택을 주소 쿼리로 읽고 쓰기 |
+| `pairing-result`, `pairing-catalog`, `pairing-modal`, `pairing-grid`, `pairing-items`, `catalog-filter` | 결과 · 전체 궁합표 · 모달 · 표 · 검색 |
+| `ingredient-detail`, `pairing-evidence`, `pairing-source` | 재료별 궁합 페이지와 근거 · 출처 |
+| `ingredient-art`, `data` | 재료 그림(겹친 그림 포함), 과일 도감 · 주의 식재료의 그림 연결 |
+| `pairing-print`, `print-layout` | 궁합표 A4 인쇄(`/print`, 어드민) |
+| `fruits/` | 월령별 과일 도감: `fruits-dashboard`, `stage-tabs`, `fruit-card`, `fruit-detail-sheet`, `safety-guide-section`, `stage-warning-banner`, `fruits-print`(A4) |
+
 `features/settings/`는 설정 화면 틀(`settings-view`), 데이터 출처(`sources-view`), 문구(`copy.ts`)다. 다른 feature를 import하지 않고, 행 부품(`SettingSection`, `ClearRow`)은 `shared/settings/`에 있다.
 
 ### 4.4 shared
@@ -246,10 +264,14 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `today-context.tsx` | `TodayProvider`, `useToday()`: 서버가 만든 Promise를 클라이언트가 `use()`로 읽는다. `<Suspense>` 안에서만 |
 | `eaten-store.ts` | 먹음 기록: 연도 → 품종 id 목록. localStorage `seasonal:eaten`. `toggleEaten`, `useEatenIds`, `useIsEaten` |
 | `share-button.tsx` | 공유 버튼 `ShareButton`(Web Share API, 없으면 주소 복사 + 토스트)과 `sharePage` · `copyPageLink`. 제철 화면과 이유식 화면이 같이 쓴다 |
-| `shell/` | 가격과 제철이 같이 쓰는 셸: `site-shell`(헤더 + 본문 + 하단 내비), `site-nav`(`SiteHeader`, `FloatingNav`. 내비 칸 72px. 화면별 모바일 헤더 타입은 `HeaderBar`가 헤더의 바 자리에 포털로 그린다), `menus`(어디서나 같은 4칸: 시세 · 제철달력 · 담은 품종 · 나의 식탁, `activeMenuKey`. 품종 상세는 `nextMenuOrigin`이 기억한 출발지의 칸을 따른다), `match-path`(활성 판정 순수 함수), `nav-link`(활성 링크). `screens`(화면별 헤더 타입 root · sub · search와 스크롤 동작 표, `screenOf`), `sub-header`(하위 헤더 ‹ · 제목 · 액션, `HeaderBar` 포털로 그림), `search-link` · `settings-link`(루트 헤더 🔍 · ⚙). `header-scroll`(hide-on-scroll 헤더의 보임 판정 순수 함수: 10px 임계값, 맨 위 8px, 끝 튕김 무시), `scroll-to-top`(지금 탭을 다시 누르면 맨 위로. 하단 내비는 그 탭의 메인에서만, 하위 화면이면 메인으로 이동). `section-row`(구간 줄: 본문의 원래 줄(id)이 화면 위로 지나가면 탭 줄 또는 헤더 아래에 나타나는 40px 고정 줄 `SectionRow`와 칩 `SectionChip`. 2b 달 칩 · 제철 회 달 칩 · 1g 명절 칩 · P3 섹션 칩 · P1 검색 줄이 쓴다. 탭 줄 높이는 CSS 변수 `--tabs-h`). `use-scrolled-past`(본문 줄이 고정 줄 밑으로 지나갔는지. 구간 줄과 하위 헤더 제목 `revealAfter`가 쓴다). 헤더가 숨으면 셸이 `<html>`의 CSS 변수 `--shell-top`을 56px → 0px로 바꾸고, 고정 줄(제철달력 탭 줄 등)은 이 값을 `top`으로 쓴다. 메뉴 배지(담은 개수)는 라우트 레이아웃이 `badges`로 넣는다. 셸 규칙은 `.scratch/shell-unify/spec.md` |
+| `shell/` | 가격과 제철이 같이 쓰는 셸: `site-shell`(헤더 + 본문 + 하단 내비), `site-nav`(`SiteHeader`, `FloatingNav`. 내비 칸 72px. 화면별 모바일 헤더 타입은 `HeaderBar`가 헤더의 바 자리에 포털로 그린다), `menus`(어디서나 같은 4칸: 시세 · 제철달력 · 담은 품종 · 나의 식탁, `activeMenuKey`. 품종 상세는 `nextMenuOrigin`이 기억한 출발지의 칸을 따른다), `match-path`(활성 판정 순수 함수), `nav-link`(활성 링크). `screens`(화면별 헤더 타입 root · sub · search와 스크롤 동작 표, `screenOf`), `sub-header`(하위 헤더 ‹ · 제목 · 액션, `HeaderBar` 포털로 그림), `search-link` · `settings-link`(루트 헤더 🔍 · ⚙). `header-scroll`(hide-on-scroll 헤더의 보임 판정 순수 함수: 10px 임계값, 맨 위 8px, 끝 튕김 무시), `scroll-to-top`(지금 탭을 다시 누르면 맨 위로. 하단 내비는 그 탭의 메인에서만, 하위 화면이면 메인으로 이동). `section-row`(구간 줄: 본문의 원래 줄(id)이 화면 위로 지나가면 탭 줄 또는 헤더 아래에 나타나는 40px 고정 줄 `SectionRow`와 칩 `SectionChip`. 2b 달 칩 · 제철 회 달 칩 · 1g 명절 칩 · P3 섹션 칩 · P1 검색 줄이 쓴다. 탭 줄 높이는 CSS 변수 `--tabs-h`). `use-scrolled-past`(본문 줄이 고정 줄 밑으로 지나갔는지. 구간 줄과 하위 헤더 제목 `revealAfter`가 쓴다). `site-footer`(장볼날 공통 푸터), `public-path`(proxy가 rewrite한 내부 경로 `/seasonal/at/…`를 사용자 주소로 돌려 하이드레이션 불일치를 막음). 헤더가 숨으면 셸이 `<html>`의 CSS 변수 `--shell-top`을 56px → 0px로 바꾸고, 고정 줄(제철달력 탭 줄 등)은 이 값을 `top`으로 쓴다. 메뉴 배지(담은 개수)는 라우트 레이아웃이 `badges`로 넣는다. 셸 규칙은 `.scratch/shell-unify/spec.md` |
 | `analytics/` | GA4(절차: `apps/web/docs/analytics.md`): `events.ts`(이벤트 카탈로그. 이벤트를 더하고 지우는 곳은 여기 하나, `REGISTERED_PARAMS`는 GA에 등록한 매개변수)와 규칙 테스트, `config.ts`(`GA_MEASUREMENT_ID` · `GA_DEBUG`를 읽는 곳), `analytics-tag.tsx`(루트 layout이 그린다), `track.ts`(`track(이름, 매개변수)`, 화면은 이것만 부른다), `tracked-link.tsx`(서버 컴포넌트 링크에 이벤트) |
 | `downloads-manifest.ts` | 게시된 인쇄물 매니페스트(`DOWNLOADS`, `findEdition`, `findWithdrawn`). 내려받기 화면과 sitemap이 같이 읽는다 |
 | `downloads/` | 인쇄물 부품: `edition-thumbnail`(쪽 그림 · 받침), `downloads-card`(내려받기 목록으로 가는 입구 카드. 2a · 2b · P1 시세 메인이 같이 쓴다) |
+| `device/`, `use-device.ts` | 기기 판별. 서버와 첫 하이드레이션은 desktop/unknown이고 확인 뒤에 바뀐다. 설명은 `shared/device/README.md` |
+| `not-found-view.tsx`, `status-view.tsx` | 404 · 오류 화면 본문(아이콘 · 제목 · 설명 · 다음 행동) |
+| `settings/` | 설정 화면 행 부품 `SettingSection`, `ClearRow` |
+| `fonts/` | 큰 숫자 서체 Bricolage Grotesque와 라이선스 |
 | `brand-logo.tsx` | 고운돋움 Regular를 패스로 만든 장볼날 가로 로고. 모바일에서 접힌 헤더는 심볼만 보여준다 |
 
 ## 5. 상태와 "오늘"
@@ -258,10 +280,12 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 |---|---|---|---|
 | 서울 오늘 | `shared/today.ts` → `TodayProvider` → `useToday()` | 없음 (요청마다 서버 계산) | 렌더 중 `new Date()`를 부르지 않는다 |
 | 먹음 기록 | `shared/eaten-store.ts` | localStorage `seasonal:eaten` | 앱 전체가 쓴다 |
-| 담은 품종 · 최근 본 품종 | `features/price/stores/` | localStorage `price:basket` · `price:recent` | |
+| 담은 품종 · 최근 본 시세 · 상품 | `features/price/stores/` | localStorage `price:basket` · `price:recent` | |
 | 표시 설정 (공휴일, 먹은 품종, 달력 모양, 달 이름. `/settings`에서 바꿈) | `features/seasonal/stores/settings-store.ts` | localStorage `seasonal:settings` | |
 | 흩어진 배치·달력 자리 | `features/seasonal/stores/scatter-store.ts` | localStorage `seasonal:scatter` | 키는 `(달, 화면 구간)` |
 | 2b 열 수 | `features/seasonal/month-timeline/view-store.ts` | 없음 | 달을 바꿔도 유지 |
+| A3 요청 | `features/seasonal/stores/a3-request-store.ts` | localStorage `seasonal:a3-requests` | |
+| 설치 안내 숨김 | `shared/shell/install-prompt.tsx` | localStorage `price:install-prompt` | |
 
 저장하는 store는 모두 `shared/device-store.ts`의 `deviceStore`로 만든다(안은 zustand `persist` + `skipHydration`). 서버 HTML과 첫 클라이언트 렌더는 기본값으로 같게 그리고, `Providers`가 마운트 뒤 한 번에 기기 값을 불러온다. 그래서 ✓와 개수는 하이드레이션 뒤에 나타난다. 자식 effect가 `Providers`보다 먼저 돌아 불러오기 전에 쓰는 일(최근 본 품종 넣기)이 있어, 그런 쓰기는 불러온 값 위에 얹는다. store 모듈은 store를 내보내지 않고 훅과 함수만 내보낸다.
 
@@ -302,8 +326,13 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `print/spec.ts` | 인쇄 사양 `PrintSpec`(종류별 유니언, zod 파서), `PAPERS`, `sheetSize`(방향 반영 용지 mm), `pageCount`(결과 PDF 쪽 수, 사양·용지마다 파일 하나), 종류별 기본값, URL 인코딩, 해시 |
 | `print/edition.ts` | 에디션, 다운로드 경로, 매니페스트 |
 | `print/foods.ts` | 인쇄물 칸(달·계절)에 넣을 품종 고르기 |
+| `print/spec-codec.ts`, `listing.ts`, `month-label.ts`, `period-chart.ts`, `wheel.ts` | 인쇄 사양 URL 코덱(번들에서 zod를 빼려고 분리), 내려받기 화면의 종류별 줄 · 연도 규칙, 인쇄물 달 표기, 제철 막대표 배치, 원형 판 배치 |
+| `data/infant-pairings.ts`, `data/infant-fruits.ts` | 이유식 궁합 데이터(역참조 · 색인 함수 포함), 월령별 과일 시기 · 주의 식재료 |
+| `data/eaten-stats.ts`, `food-familiarity.ts`, `renamed-foods.ts` | 1h 범위별 품종 수 · 먹은 수, 품종 친숙도(1~3, 인쇄물 칸 고르기와 제철 회 추천), 바뀐 품종 id(옛 먹음 기록 옮기기) |
+| `calendar/static-years.ts`, `year-month.ts` | 2a를 미리 그릴 해(`STATIC_YEARS`), `2026-11` 같은 (연, 월) 경로 값 |
+| `layout/gesture.ts`, `geometry/` | 흩어진 판의 끌기 제스처 판단(상태 → 효과), 도형 배치(`lloyd`, `relax-shapes`) |
 
-테스트는 `*.test.ts`가 옆에 있다(vitest, 23개 파일). 배치 알고리즘 비교와 명절 전통 음식 조사는 `packages/seasonal/docs/`에 있다. `packages/seasonal/README.md`도 참고한다.
+테스트는 `*.test.ts`가 옆에 있다(vitest, 34개 파일, 2026-11-10). 배치 알고리즘 비교와 명절 전통 음식 조사는 `packages/seasonal/docs/`에 있다. `packages/seasonal/README.md`도 참고한다.
 
 ## 6-1. packages/price
 
@@ -321,6 +350,8 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `places.ts` | 장소를 업태별 · 싼 순으로(`placesByType`), 전국 같은 값(`sameEverywhere`) |
 | `format.ts` | 원 표시, 날짜 문자열("YYYY-MM-DD") 계산, "2주 전" |
 | `copy.ts` | 화면 문구, 판정 칩 · 차이 문구, 받침에 맞는 조사(`withJosa`) |
+| `verdict-copy.ts` | 판정 풀이 `explainVerdict`: 판정 카드 · 요약 문장 · 검색 설명의 판정 문장을 한 곳에서 |
+| `axis.ts` | 가격 그림(범위 막대 · 점 비교 · 추이 · 장소 막대)이 같이 쓰는 가격 축과 눈금 |
 
 테스트는 `*.test.ts`가 옆에 있다(vitest).
 
@@ -406,7 +437,7 @@ packages/seasonal/src/data/drawn-dishes.generated.ts
 | `packages/price-ingest/src/judgment/` | 판정 배치 (pipeline.md 4-1 · 4-3): 판정 한 행 순수 함수(`build.ts`: 시세 · 평소가 행 · 시장 표본 · 판매가 → `VarietyDetail` payload와 목록 열), 명령(`cli.ts`: 활성 품종의 대표 규격마다 `judgment_snapshot`을 새 묶음에 쓰고 검사를 넘으면 `judgment_current`를 바꿈, 묶음은 최근 7개). 같은 묶음에 참가격 상품 payload(`product_snapshot`, catalog-scale/09): 순수 함수 `product.ts`(상품 요약 → `ProductDetail`), 읽기 `product-db.ts` |
 | `packages/price-ingest/src/catalog/` | 카탈로그 (ingest-foundation/08, catalog-scale/04, ADR 0005). 원본은 운영 DB(분류 표 + 원천 키 규칙 `catalog_key_rule`). 저장소 사본 `snapshot.json`(백업이자 로컬 DB 입력, 사람이 읽는 표는 `grocery-price/docs/30-data/variety-list.md`, `test/catalog.test.ts`가 사본·표·실측 코드표가 맞는지 본다), 모양(`types.ts`), 사본 읽기·검사(`snapshot.ts`), 규칙 → 원천 키 찾기·사본 차이(`rules.ts`), DB ↔ 사본(`db.ts`: 내보내기·가져오기·규칙 읽기, 가져오기는 `catalog_change`에 남김), 규칙대로 매핑(`apply.ts`), 명령 진입점(`cli.ts`) |
 
-수집 CLI와 GitHub Actions 워크플로는 `ingest-foundation/03`에서 이 패키지에 더한다.
+수집 워크플로는 `.github/workflows/ingest-{kamis,ekape,chamga}.yml`과 `heartbeat.yml`이다(ingest-schedule). `ingest-foundation/03`에는 빈 날 메우기 · 재등록 복원 · `merge-product` · 원본 삭제만 남아 있다.
 
 ## 9. 명령어
 
@@ -468,7 +499,7 @@ grocery-price/
 
 형식은 `docs/agents/issue-tracker.md`, 라벨은 `docs/agents/triage-labels.md`를 따른다.
 
-시세 카탈로그 확장의 검토 초안은 `.scratch/catalog-evolution/spec.md`에 있다(운영자 1인 전제, 코드 카탈로그 유지). `plans/01`~`06`은 규격별 판정·검색, 코드 카탈로그 변경 흐름, 원천 검토, 제철 연결, 읽기 전용 검토 CLI, 판정 묶음 공개·백업 계획이며 `review.md`는 타당성과 기각한 안(DB 원본·운영 어드민)을 기록한다. 구현 전 확인 단계로, 기존 확정 명세를 대체하지 않는다.
+시세 카탈로그 확장 계획은 `.scratch/catalog-scale/spec.md`가 정본이다(2026-11-09, 카탈로그 원본은 DB, ADR 0005). 그 전 검토 초안 `.scratch/catalog-evolution/`(코드 카탈로그 유지 전제)은 catalog-scale로 대체되었고, `plans/01`·`04`·`06`만 catalog-scale 11·12·09가 근거로 인용한다.
 
 ## 12. 문서 지도
 
@@ -476,7 +507,7 @@ grocery-price/
 |---|---|
 | 에이전트 규칙 | `AGENTS.md` |
 | 제철 화면 명세 | `prototypes/seasonal-food/wireframes/WIREFRAME-SPEC.md` (Git 밖) |
-| 새 수산·제철 회 콘텐츠 자료 | `apps/web/docs/seafood-content/README.md` (Git 관리, 화면 주소·세부 기능 미정) |
+| 새 수산·제철 회 콘텐츠 자료 | `apps/web/docs/seafood-content/README.md` (Git 관리. 화면은 `/seasonal/sashimi/[month]`, 명세 `.scratch/sashimi/spec.md`) |
 | 명세와 다르게 정한 것, MVP 결정 | `.scratch/seasonal-mvp/spec.md` |
 | SEO 결정(색인 정책, 구조화 데이터, 제목 패턴) | `.scratch/seo/spec.md` |
 | 색·서체 | `apps/web/DESIGN.md`, `packages/ui/src/styles/globals.css` |

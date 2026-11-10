@@ -1,5 +1,7 @@
 # 검색 한 번에 보는 가격 — 작업 분해
 
+> 종료 (2026-10-31): 04는 ingest-schedule/12로 옮겨 닫고, 06은 price-screens로 대체(wontfix). 남은 것: 05 정부 화면 재대조 2건, 07 도매 출처 후보를 roadmap E3에 적기.
+
 정부 가격 화면(참가격 생필품 가격정보)을 벤치마킹해, 필터를 고르지 않고 검색 한 번으로 판정·시세·추세가 나오는 화면을 만든다. 조사 근거는 [gov-price-sites.md](../../grocery-price/docs/10-research/gov-price-sites.md)에 있다. 2026-10-19 인터뷰로 정했다.
 
 ## 목표

@@ -1,6 +1,8 @@
 # 이유식 재료 궁합 콘텐츠 시안
 
-Status: needs-triage
+> 완료 (2026-11-09): 화면과 데이터(`packages/seasonal/src/data/infant-pairings.ts`)가 구현됐고, 이어지는 일은 baby-food-ingredient-pages·baby-food-fruits가 맡았다. 남은 것: 01 일러스트(needs-info).
+
+Status: resolved
 
 ## 확정한 방향
 

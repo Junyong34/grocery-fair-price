@@ -1,6 +1,8 @@
 # 시세 카탈로그 확장 계획
 
-Status: needs-triage
+> 종료 (2026-11-09): catalog-scale로 대체. `plans/01`·`04`·`06`은 catalog-scale 11·12·09가 근거로 인용하므로 지우지 않는다.
+
+Status: resolved
 
 > 2026-11-09: [catalog-scale](../catalog-scale/spec.md)로 대체. 카탈로그 원본을 DB로 옮기고 로컬 어드민·AI 제안을 쓰기로 해서 02·03·05는 그 문서가 대신한다. 01·04·06은 catalog-scale 11·12·09가 이어 받는다.
 작성일: 2026-11-05 (같은 날 1인 운영 전제로 개정)
