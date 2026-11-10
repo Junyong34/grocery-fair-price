@@ -29,7 +29,7 @@ import { routes } from "@/shared/routes"
 import { BackButton } from "@/shared/shell/sub-header"
 
 import { AddButton } from "../components/add-button"
-import { useRecentVarieties } from "../components/recent-varieties"
+import { useRecentItems } from "../components/recent-varieties"
 import { PriceHint, VarietyRow } from "../components/variety-row"
 import { Highlighted } from "./highlighted"
 import { ProductResults } from "./product-results"
@@ -163,6 +163,7 @@ function SearchScreen({
             result={result}
             query={query}
             varieties={varieties}
+            products={products}
             matchingVarieties={matchingVarieties}
             matchingProducts={matchingProducts}
             featuredIds={featuredIds}
@@ -179,6 +180,7 @@ function Results({
   result,
   query,
   varieties,
+  products,
   matchingVarieties,
   matchingProducts,
   featuredIds,
@@ -188,13 +190,14 @@ function Results({
   result: SearchResult
   query: string
   varieties: readonly VarietySummary[]
+  products: readonly ProductSummary[]
   matchingVarieties: readonly VarietySummary[]
   matchingProducts: readonly ProductSummary[]
   featuredIds: readonly string[]
   index: SearchIndex
   onQuery: (query: string) => void
 }) {
-  const recent = useRecentVarieties(varieties)
+  const recent = useRecentItems(varieties, products)
   const featured = pickByIds(varieties, featuredIds)
   const varietyHeadingId = useId()
   const productHeadingId = useId()
@@ -302,8 +305,11 @@ function Results({
           {recent.length > 0 && (
             <Group title={PRICE_COPY.home.recent}>
               <ul>
-                {recent.map((variety) => (
-                  <RecentRow key={variety.id} variety={variety} />
+                {recent.map((item) => (
+                  <RecentRow
+                    key={`${item.kind}:${item.kind === "variety" ? item.variety.id : item.product.id}`}
+                    item={item}
+                  />
                 ))}
               </ul>
             </Group>

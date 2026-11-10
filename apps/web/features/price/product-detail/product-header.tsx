@@ -1,11 +1,19 @@
+"use client"
+
+import { useEffect } from "react"
+
 import { routes } from "@/shared/routes"
 import { SearchLink } from "@/shared/shell/search-link"
 import { BackButton, SubHeader } from "@/shared/shell/sub-header"
 
+import { visitProduct } from "../stores/recent-store"
+
 const TITLE_ID = "product-title"
 
-/** 상품 이름과 카테고리 · 품목 · 용량. 데스크톱은 이 줄에 뒤로 버튼을 둔다. */
-export function ProductHeader({ name, sub }: { name: string; sub: string }) {
+/** 상품 이름과 카테고리 · 품목 · 용량. 데스크톱은 이 줄에 뒤로 버튼을 둔다. 연 상품을 최근 본 목록에 넣는다. */
+export function ProductHeader({ id, name, sub }: { id: string; name: string; sub: string }) {
+  useEffect(() => visitProduct(id), [id])
+
   return (
     <header className="flex items-start gap-2">
       <BackButton fallbackHref={routes.home} className="-ms-2 max-lg:hidden" />

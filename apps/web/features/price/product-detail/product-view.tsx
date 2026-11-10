@@ -36,7 +36,7 @@ export function ProductView({
     .join(" · ")
   return (
     <article className="price-page flex flex-col gap-7 pt-3 pb-6 lg:gap-9 lg:pt-8">
-      <ProductHeader name={product.name} sub={sub} />
+      <ProductHeader id={product.id} name={product.name} sub={sub} />
       <ProductHeaderBar name={product.name} />
       <div className="contents lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-x-8 lg:gap-y-9">
         <div className="flex min-w-0 flex-col gap-7 lg:gap-8">

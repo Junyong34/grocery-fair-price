@@ -8,13 +8,25 @@ import type { VarietySummary } from "@workspace/price/types"
 
 import { routes } from "@/shared/routes"
 
-import { clearRecent, useRecentIds } from "../stores/recent-store"
+import { clearRecentVarieties, pickRecentItems, useRecentEntries, type RecentItem } from "../stores/recent-store"
 import { VerdictDot } from "./verdict-chip"
 
-/** 최근 본 품종 id를 목록 행으로. 기기 저장이라 하이드레이션 뒤에 채워진다. */
+import type { ProductSummary } from "@workspace/price/types"
+
+/** 최근 본 품종 id를 목록 행으로(P1 홈 알약). 기기 저장이라 하이드레이션 뒤에 채워진다. */
 export function useRecentVarieties(varieties: readonly VarietySummary[]): VarietySummary[] {
-  const ids = useRecentIds()
+  const entries = useRecentEntries()
+  const ids = entries.filter((entry) => entry.kind === "variety").map((entry) => entry.id)
   return pickByIds(varieties, ids)
+}
+
+/** 최근 본 품종 · 상품을 본 순서대로(P2 검색). 기기 저장이라 하이드레이션 뒤에 채워진다. */
+export function useRecentItems(
+  varieties: readonly VarietySummary[],
+  products: readonly ProductSummary[]
+): RecentItem[] {
+  const entries = useRecentEntries()
+  return pickRecentItems(entries, varieties, products)
 }
 
 /** P1 최근 본 품종: 판정 색 점이 붙은 알약. 본 품종이 없으면 칸째 숨긴다. */
@@ -29,7 +41,7 @@ export function RecentPills({ varieties }: { varieties: readonly VarietySummary[
         </h2>
         <button
           type="button"
-          onClick={clearRecent}
+          onClick={clearRecentVarieties}
           className="text-xs text-caption underline-offset-2 hover:text-ink hover:underline"
         >
           {PRICE_COPY.home.clearRecent}
