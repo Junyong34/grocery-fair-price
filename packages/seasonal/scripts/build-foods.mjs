@@ -20,7 +20,8 @@ const out = resolve(here, "../src/data/foods.generated.ts")
 const NEW_IDS = {}
 
 // 이름이 달라 자동으로 맞지 않지만 같은 품종을 그린 일러스트. 새우 일러스트는 대하 기준으로 그렸다.
-const DRAWN_AS = { 대하: "shrimp" }
+// 하귤은 일러스트가 둘(hagyul·summer-orange)이라 2026-11-11 다시 그린 summer-orange를 쓴다.
+const DRAWN_AS = { 대하: "shrimp", 하귤: "summer-orange" }
 
 const CATEGORIES = ["채소", "과일", "버섯", "곡물·견과", "수산"]
 

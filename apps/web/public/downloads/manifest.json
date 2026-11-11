@@ -217,6 +217,28 @@
       ]
     },
     {
+      "id": "season-poster-3",
+      "kind": "season-poster",
+      "title": "한 장으로 보는 계절 포스터-2",
+      "description": "계절 별 제철 음식 (가로)",
+      "orientation": "landscape",
+      "pages": 1,
+      "specHash": "e83aa8e1",
+      "generatedAt": "2026-11-11T01:32:31.167Z",
+      "files": {
+        "A4": {
+          "bytes": 1937386
+        }
+      },
+      "thumbnails": [
+        {
+          "path": "/downloads/season-poster-3/thumb-1.webp",
+          "width": 480,
+          "height": 339
+        }
+      ]
+    },
+    {
       "id": "year-sheet-1",
       "kind": "year-sheet",
       "title": "2026년 연간 달력 한 장",
@@ -257,6 +279,29 @@
       "thumbnails": [
         {
           "path": "/downloads/year-sheet-2/thumb-1.webp",
+          "width": 480,
+          "height": 679
+        }
+      ]
+    },
+    {
+      "id": "year-sheet-3",
+      "kind": "year-sheet",
+      "title": "2027년 제철 해산물 달력",
+      "description": "제철 해산물",
+      "year": 2027,
+      "orientation": "portrait",
+      "pages": 1,
+      "specHash": "7165194e",
+      "generatedAt": "2026-11-11T01:27:21.509Z",
+      "files": {
+        "A4": {
+          "bytes": 833094
+        }
+      },
+      "thumbnails": [
+        {
+          "path": "/downloads/year-sheet-3/thumb-1.webp",
           "width": 480,
           "height": 679
         }

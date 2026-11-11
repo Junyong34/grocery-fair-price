@@ -1,0 +1,26 @@
+{
+  "id": "season-poster-3",
+  "title": "한 장으로 보는 계절 포스터-2",
+  "description": "계절 별 제철 음식 (가로)",
+  "status": "published",
+  "spec": {
+    "version": 1,
+    "orientation": "landscape",
+    "type": {
+      "heading": "gowun-batang",
+      "number": "pretendard",
+      "scale": 1
+    },
+    "surface": "white",
+    "margin": "none",
+    "foods": {
+      "names": "korean",
+      "max": 30
+    },
+    "kind": "season-poster",
+    "title": "계절별 제철 음식",
+    "layout": "quarters",
+    "seasonLabel": "english-korean",
+    "categories": []
+  }
+}

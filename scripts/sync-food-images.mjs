@@ -20,7 +20,8 @@ const STYLE_ID = "watercolor"
 const VARIANTS = ["color", "motion"]
 const DISH_VARIANTS = ["color"]
 // 제철 월 검증 전에 작도를 마친 후보. 달력 목록에 추가하지 않고 웹용 SVG를 제공한다.
-const CANDIDATE_FOOD_IDS = ["benimadonna", "daejeo-tomato", "kara-mandarin", "kumquat", "summer-orange"]
+// 2026-11-11 후보 16종은 제철을 확인해 foods.json에 올렸고(참홍어는 홍어 그림으로 대체), 지금은 비어 있다.
+const CANDIDATE_FOOD_IDS = []
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..")
 const prototype = join(root, "prototypes/seasonal-food")

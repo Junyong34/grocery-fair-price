@@ -7,8 +7,8 @@
     "version": 1,
     "orientation": "portrait",
     "type": {
-      "heading": "pretendard",
-      "number": "pretendard",
+      "heading": "gowun-batang",
+      "number": "gowun-batang",
       "scale": 1
     },
     "surface": "white",
@@ -19,7 +19,7 @@
     },
     "kind": "year-sheet",
     "year": 2027,
-    "monthLabel": "korean",
+    "monthLabel": "english-full-caps",
     "monthStyle": {
       "palette": "vivid",
       "size": "medium",
@@ -28,7 +28,7 @@
     },
     "calendar": {
       "weekStart": 0,
-      "weekday": "korean",
+      "weekday": "english-initial",
       "holidays": "mark",
       "size": "medium"
     },

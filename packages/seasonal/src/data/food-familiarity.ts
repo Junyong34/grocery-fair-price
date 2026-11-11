@@ -141,7 +141,11 @@ export const FAMILIARITY_4: ReadonlySet<string> = new Set([
   "mulberry", // 오디
   "omija", // 오미자
   "green-mandarin", // 청귤
+  "kara-mandarin", // 카라향
+  "plumcot", // 플럼코트
+  "summer-orange", // 하귤
   // 수산
+  "pointhead-flounder", // 기름가자미
   "pike-conger", // 갯장어
   "rock-bream", // 돌돔
   "east-sea-hanchi", // 동해한치
@@ -163,6 +167,7 @@ export const FAMILIARITY_4: ReadonlySet<string> = new Set([
   "jaecheop-clam", // 재첩
   "horse-mackerel", // 전갱이
   "jeju-hanchi", // 제주한치
+  "fat-greenling", // 쥐노래미
   "yellowfin-flounder", // 참가자미
   "herring", // 청어
   "pen-shell", // 키조개
