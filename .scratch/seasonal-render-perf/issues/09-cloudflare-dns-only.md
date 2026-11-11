@@ -1,6 +1,6 @@
 # 09. Cloudflare 프록시 끄기
 
-Status: ready-for-human
+Status: resolved (2026-11-11, 사용자가 DNS only로 전환, 확인 결과 baseline.md "09")
 Type: task (HITL)
 Blocked by: 없음
 

@@ -103,3 +103,15 @@ curl -s -o /dev/null -H 'accept-encoding: br' -w 'ttfb=%{time_starttransfer} tot
 
 1. `/seasonal` 페이지를 구멍 없는 완전 정적으로 만든다. 일 단위 "오늘"(달력 동그라미, 일별 카드, 먹음 기록 해)을 서버 요청 대신 브라우저에서 마운트 뒤 계산한다. 첫 화면은 지금 fallback과 같은 "오늘 표시 없는" 모양이라 하이드레이션 불일치는 없다. 그러면 RSC 한 벌, TTFB는 CDN 수준이 된다. AGENTS.md "today" 규칙과 `nextjs-16-patterns.md` 5.2를 바꿔야 한다.
 2. RSC 한 벌 자체를 줄인다. 판 그림마다 반복되는 className · style을 줄이거나, 판을 압축된 props를 받는 client 컴포넌트로 되돌린다(드래그 코드는 없이).
+
+## 09 Cloudflare 프록시 끔 (2026-11-11)
+
+DNS: `jangbol.kr` A `216.198.79.1`, `www` CNAME `…vercel-dns-017.com`(Vercel). 이 컴퓨터의 OS DNS 캐시가 아직 Cloudflare IP를 돌려줘서, 아래는 `curl --resolve jangbol.kr:443:216.198.79.1`로 쟀다. 응답 `server: Vercel`, `x-vercel-id: icn1`(서울), `cf-ray` 없음. `www` → `https://jangbol.kr/` 308 유지.
+
+| 경로 | 경유(전, 같은 시각 재측정) TTFB · 완료 | 직결(후) TTFB · 완료 |
+|---|---|---|
+| `/` | 1.57~2.20s · 2.1~3.1s | 0.03~0.56s · 0.04~0.56s |
+| `/seasonal` | 1.36~1.52s · 4.8~7.0s | 0.13~0.50s · 1.37~2.05s |
+| `/seasonal/months/3` | 1.19~2.83s · 1.8~5.2s | 0.04~0.48s · 0.22~0.85s |
+
+첫 회는 연결 · 엣지 캐시 준비로 0.4~0.5s, 이후 0.03~0.15s. `/seasonal` 완료 1.4~2s는 resume 함수 실행과 HTML 3.45MB 때문이며 티켓 10 · 11 몫이다.
