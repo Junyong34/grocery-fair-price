@@ -101,7 +101,7 @@ function SeafoodYearSheet({ spec, paper }: { spec: YearSheetSpec; paper: Paper }
             data-month={month}
             style={{ gap: u(gap), background: spec.surface === "season" ? surfaceColor("season", monthSeason(month)) : undefined }}
           >
-            <CalendarBlock spec={spec} month={month} width={calendarWidth} height={height} label={label} />
+            <CalendarBlock spec={spec} month={month} width={calendarWidth} height={height} label={label} labelGap={1.2} />
             <div className="print-seafood-figures" data-dense={dense || undefined}>
               {foodsByMonth[index]!.map((food) => (
                 <FoodFigure key={food.id} food={food} size={pictureSize} nameSize={dense ? 2.6 : 2.8} showName />
@@ -225,13 +225,21 @@ function MonthCell({ spec, month, foods, width, height, flip }: { spec: YearShee
 }
 
 /** 달 이름(없으면 생략)과 작은 달력. 날짜 크기는 칸에 맞춘다. */
-function CalendarBlock({ spec, month, width, height, label }: { spec: YearSheetSpec; month: Month; width: number; height: number; label: PrintMonthLabel | undefined }) {
+function CalendarBlock({ spec, month, width, height, label, labelGap = 0 }: {
+  spec: YearSheetSpec
+  month: Month
+  width: number
+  height: number
+  label: PrintMonthLabel | undefined
+  labelGap?: number
+}) {
   const labelHeight = label ? LABEL : 0
+  const gap = label ? labelGap : 0
   // 칸에 맞춘 크기에 달력 글자 배율을 곱한다. 키워도 두 자리 날짜가 옆 날짜와 붙지 않게, 인쇄 크기(t()가 type.scale을 곱한 값)가 칸 폭의 절반을 넘지 않는다.
   const fit = Math.min((width / 7) * 0.42, ((height - labelHeight) / (6 + WEEKDAY_ROW_RATIO)) * 0.62)
   const dayFont = Math.min(fit * CALENDAR_TEXT_SCALE[spec.calendar.size], ((width / 7) * 0.5) / spec.type.scale)
   return (
-    <div style={{ width: u(width), height: u(height), padding: `0 ${u(1)}`, boxSizing: "border-box", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+    <div style={{ width: u(width), height: u(height), padding: `0 ${u(1)}`, boxSizing: "border-box", display: "flex", flexDirection: "column", justifyContent: "center", rowGap: u(gap) }}>
       {label && (
         <div style={{ height: u(labelHeight), display: "flex", alignItems: "flex-start" }}>
           <MonthLabel month={month} text={label} style={spec.monthStyle} fontSize={3.6} maxHeight={labelHeight} maxWidth={width - 2} />
@@ -244,7 +252,7 @@ function CalendarBlock({ spec, month, width, height, label }: { spec: YearSheetS
         weekday={spec.calendar.weekday}
         holidays={spec.calendar.holidays}
         dayFont={dayFont}
-        height={height - labelHeight - 2}
+        height={height - labelHeight - gap - 2}
       />
     </div>
   )
