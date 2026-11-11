@@ -1,0 +1,36 @@
+{
+  "id": "month-poster-3",
+  "title": "과일·채소 월별 제출 포스터",
+  "description": "과일,채소 제철",
+  "status": "published",
+  "spec": {
+    "version": 1,
+    "orientation": "portrait",
+    "type": {
+      "heading": "gowun-batang",
+      "number": "pretendard",
+      "scale": 1.1
+    },
+    "surface": "white",
+    "margin": "safe",
+    "foods": {
+      "names": "korean",
+      "max": 24
+    },
+    "kind": "month-poster",
+    "title": "달마다 제철",
+    "layout": "cells",
+    "monthLabel": "korean",
+    "monthStyle": {
+      "palette": "vivid",
+      "size": "medium",
+      "frame": "rule",
+      "font": "auto"
+    },
+    "grid": "3x4",
+    "categories": [
+      "과일",
+      "채소"
+    ]
+  }
+}
