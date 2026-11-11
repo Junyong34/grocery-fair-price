@@ -1,6 +1,6 @@
 # 02. HTML이 2.35MB로 커진 원인
 
-Status: ready-for-agent
+Status: resolved (architecture.md 3장 · baseline.md "RSC 중복 원인"으로 답함, 2026-11-11)
 Type: task (AFK)
 Blocked by: 없음
 

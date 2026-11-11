@@ -1,6 +1,6 @@
 # 03. TTFB 0.55초 원인
 
-Status: ready-for-agent
+Status: resolved (architecture.md 1장 Cloudflare LAX 경유 · 3장 resume 함수 실행으로 답함. 고치는 일은 09 · 10, 2026-11-11)
 Type: task (AFK)
 Blocked by: 없음
 

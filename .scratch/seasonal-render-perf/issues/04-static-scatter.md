@@ -1,6 +1,6 @@
 # 04. 2a 판 드래그 제거
 
-Status: ready-for-agent
+Status: resolved (커밋 e754153)
 Type: task (AFK)
 Blocked by: 01
 

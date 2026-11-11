@@ -1,6 +1,6 @@
 # 07. 수채 필터 병목 판정 (조건부)
 
-Status: needs-info
+Status: wontfix (측정상 Rendering 0.66s로 주원인 아님, architecture.md 5장)
 Type: task (HITL)
 Blocked by: 01, 04, 05
 

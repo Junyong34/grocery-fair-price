@@ -2,7 +2,7 @@
 
 Status: ready-for-agent
 Type: task (HITL)
-Blocked by: 01
+Blocked by: 13 (재설계 뒤로 미룸, 2026-11-11)
 
 ## 목적
 
