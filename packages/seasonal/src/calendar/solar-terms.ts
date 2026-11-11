@@ -1,7 +1,5 @@
-import { TZDate } from "@date-fns/tz"
-
 import type { CalendarDate } from "./month-calendar"
-import { TIME_ZONE } from "./today"
+import { seoulDateOf } from "./date-utils"
 
 // 24절기는 태양의 겉보기 황경이 15°씩 바뀌는 순간이다(춘분 0°, 하지 90°, 추분 180°, 동지 270°).
 // 해마다 표를 손으로 넣지 않으려고 계산한다. 지구 일심 황경은 VSOP87D를 줄인 항(Meeus, Astronomical Algorithms 부록 III),
@@ -214,6 +212,5 @@ export function solarTermInstant(year: number, longitude: number): number {
 
 /** 그 양력 연도의 절기(황경 longitude°)가 드는 서울 날짜. */
 export function solarTermDate(year: number, longitude: number): CalendarDate {
-  const seoul = new TZDate(solarTermInstant(year, longitude), TIME_ZONE)
-  return { year: seoul.getFullYear(), month: seoul.getMonth() + 1, day: seoul.getDate() }
+  return seoulDateOf(solarTermInstant(year, longitude))
 }

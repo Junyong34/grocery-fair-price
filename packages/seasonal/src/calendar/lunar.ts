@@ -1,7 +1,5 @@
-import { TZDate } from "@date-fns/tz"
-
 import type { CalendarDate } from "./month-calendar"
-import { TIME_ZONE } from "./today"
+import { seoulDateOf } from "./date-utils"
 
 // 명절 날짜를 해마다 손으로 넣지 않으려고 계산한다. 음력은 Intl 중국력(한국 음력과 같은 규칙), 동지는 천문 계산이다.
 
@@ -83,10 +81,5 @@ export function winterSolstice(year: number): CalendarDate {
     0
   )
   const jde = jde0 + (0.00001 * s) / dLambda
-  const seoul = new TZDate((jde - 2440587.5) * 86_400_000, TIME_ZONE)
-  return {
-    year: seoul.getFullYear(),
-    month: seoul.getMonth() + 1,
-    day: seoul.getDate(),
-  }
+  return seoulDateOf((jde - 2440587.5) * 86_400_000)
 }
