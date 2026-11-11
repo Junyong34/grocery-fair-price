@@ -43,6 +43,7 @@ export const MENUS: readonly MenuItem[] = [
     also: [
       routes.seasonal.months,
       routes.seasonal.seasons,
+      routes.seasonal.ingredients,
       routes.seasonal.sashimi,
       routes.seasonal.festivals,
       routes.seasonal.downloads,

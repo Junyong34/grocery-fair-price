@@ -5,6 +5,7 @@ import { FESTIVALS } from "@workspace/seasonal/data/festivals"
 import { BABY_FRUIT_STAGES } from "@workspace/seasonal/data/infant-fruits"
 import { INDEXABLE_PAIRINGS } from "@workspace/seasonal/data/infant-pairings"
 import { FOODS, isDrawn } from "@workspace/seasonal/data/foods"
+import { MONTHLY_INGREDIENT_CATEGORIES } from "@workspace/seasonal/data/ingredient-calendar"
 import { MONTHS } from "@workspace/seasonal/data/months"
 import { SEASONS } from "@workspace/seasonal/data/seasons"
 
@@ -49,6 +50,11 @@ export const SEO_PAGES: Readonly<Record<string, () => readonly SitemapEntry[]>> 
   "/seasonal/downloads/[edition]": () =>
     DOWNLOADS.editions.map((edition) => ({ path: routes.seasonal.download(edition.id), images: edition.thumbnails.map((thumbnail) => thumbnail.path) })),
   "/seasonal/seasons/[season]": () => SEASONS.map((season) => ({ path: routes.seasonal.season(season) })),
+  "/seasonal/ingredients": () => [{ path: routes.seasonal.ingredients }],
+  "/seasonal/ingredients/[category]/[month]": () =>
+    MONTHLY_INGREDIENT_CATEGORIES.flatMap(({ slug }) =>
+      MONTHS.map((month) => ({ path: routes.seasonal.ingredientMonth(slug, month) }))
+    ),
   "/seasonal/sashimi/[month]": () => MONTHS.map((month) => ({ path: routes.seasonal.sashimiMonth(month) })),
   "/seasonal/festivals/[festival]": () => FESTIVALS.map(({ slug }) => ({ path: routes.seasonal.festival(slug) })),
   // 그림이 있는 품종은 일러스트를 이미지 sitemap으로 알린다(FoodImage가 그리는 그 파일).

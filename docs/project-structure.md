@@ -119,6 +119,8 @@ import 경로:
 | `/seasonal/months/[month]` | 2b 그 달 상세 (1~12) | `seasonal/(this-month)/months/(detail)/[month]/page.tsx` | `month-timeline/month-view`, 레이아웃에 `month-timeline` |
 | `/seasonal/seasons` | 3a 계절 히어로 | `seasonal/(season)/seasons/page.tsx` | `seasons/seasons-hero` |
 | `/seasonal/seasons/[season]` | 3a 계절 상세 (spring·summer·autumn·winter) | `seasonal/(season)/seasons/[season]/page.tsx` | `seasons/season-detail` |
+| `/seasonal/ingredients` | 식재료별 1~12월 제철 | `seasonal/(season)/ingredients/page.tsx` | `ingredients/ingredient-calendar` |
+| `/seasonal/ingredients/[category]/[month]` | 제철 과일·채소·수산물 월별 상세 | `seasonal/(season)/ingredients/[category]/[month]/page.tsx` | `ingredients/ingredient-month-view` |
 | `/seasonal/sashimi` | (페이지 없음) | `proxy.ts` | 서울 기준 이번 달로 리다이렉트 |
 | `/seasonal/sashimi/[month]` | 제철 회 | `seasonal/(season)/sashimi/[month]/page.tsx` | `sashimi/sashimi-view` |
 | `/seasonal/festivals` | (페이지 없음) | `proxy.ts` | 다가오는 명절로 리다이렉트 |
@@ -180,7 +182,8 @@ import 경로:
 | `this-month/` | 2a | `this-month-view`, `desktop-month-panel`(option-wheel), `month-jump`, `month-scroll-spy`, `active-month`, `settings-scope`(표시 설정을 data 속성으로), `calendar-style-picker` |
 | `month-timeline/` | 2b | `month-timeline`, `month-view`, `months-index`, `food-grid`, `food-card`, `month-food-fold`, `eaten-summary`, `view-store`(열 수, 저장 안 함) |
 | `seasons/` | 3a | `seasons-hero`, `season-card`, `season-detail`, `season-background`, `season-style`, `now-tag` |
-| `sashimi/` | 제철 회 | `sashimi-view`, `sashimi-month-chips`(달 칩), `sashimi-chip-row`(달 칩이 지나가면 나타나는 고정 줄) |
+| `ingredients/` | 제철 식재료 | `ingredient-calendar`(카테고리 필터와 제철 띠), `ingredient-month-view`(달별 식재료 카드), 공용 `seasonal-month-chips`(회·식재료 달 선택) |
+| `sashimi/` | 제철 회 | `sashimi-view`, `sashimi-chip-row`(달 칩이 지나가면 나타나는 고정 줄) |
 | `festivals/` | 1g | `festival-view`, `festival-chips`, `festival-background`, `festival-style`, `festival-date`, `dish-image`(전통 음식 그림 또는 한지 인장) |
 | `my-table/` | 1h | `my-table-view`(시기 × 카테고리 × 검색), `category-filter`(단일 선택 하단 시트), `scope-summary`(시기 기준 요약), `food-row`, `typed-label` |
 | `food-detail/` | 1i | `food-detail`, `eat-toggle`, `festival-link` |
@@ -307,6 +310,7 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `data/dishes.ts` | 전통 음식 `TRADITIONAL_DISHES`(품종과 따로), `DishId`, `findDish`, `dishNames`, `isDishDrawn` |
 | `data/dish-rows.ts` | 전통 음식 행(`id`, `name`). import가 없어 `foods:sync`가 Node로 바로 읽는다 |
 | `data/drawn-dishes.generated.ts` | 생성 파일. 그림이 있는 전통 음식 id |
+| `data/ingredient-calendar.ts` | 제철 식재료 카테고리와 연간 목록 순서 |
 | `data/sashimi.ts` | 제철 회 달별 품종(`SASHIMI_MONTHS`, `ADDED_SASHIMI`, `sashimiInMonth`) |
 | `data/festivals.ts` | `FESTIVALS`(전통 음식 id 포함), `festivalOf`(slug로 찾기), 연도별 날짜, `upcomingFestival`, `festivalsWithFood` |
 | `data/month-days.ts` | 달력 아래 "이달의 절기·명절": 명절 + 이름난 절기 + 세시(복날·한식·단오·칠석)를 달별·날짜 순으로(`monthDays`, 빈 달의 `nextMonthDay`). 설명 문구는 `copy.ts` `MONTH_DAY_NOTES` |

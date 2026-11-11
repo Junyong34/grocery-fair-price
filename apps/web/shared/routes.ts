@@ -1,6 +1,8 @@
 // 앱의 모든 경로를 여기서 만든다. 화면 코드는 경로 문자열을 직접 쓰지 않고 routes를 쓴다.
 // 제철 영역의 접두어(/seasonal)나 메인 경로가 바뀌어도 이 파일과 폴더 이름만 고치면 된다.
 
+import type { FoodCategory } from "@workspace/seasonal/data/foods"
+import type { MONTHLY_INGREDIENT_CATEGORIES } from "@workspace/seasonal/data/ingredient-calendar"
 import type { Festival } from "@workspace/seasonal/data/festivals"
 import type { Season } from "@workspace/seasonal/data/seasons"
 // 인쇄 URL 코덱만 가져온다. print/spec은 zod·품종 데이터를 싣고 있어 여기서 값을 import하면 모든 페이지 번들에 들어간다.
@@ -44,6 +46,11 @@ export const routes = {
     /** 3a 계절 히어로 · 계절 상세 */
     seasons: "/seasonal/seasons",
     season: (season: Season) => `/seasonal/seasons/${season}`,
+    /** 카테고리별 연간 제철과 과일·채소·수산 월별 상세. */
+    ingredients: "/seasonal/ingredients",
+    ingredientsFor: (category: FoodCategory) => `/seasonal/ingredients?${new URLSearchParams({ category })}`,
+    ingredientMonth: (category: (typeof MONTHLY_INGREDIENT_CATEGORIES)[number]["slug"], month: number) =>
+      `/seasonal/ingredients/${category}/${month}`,
     /** 제철 회. 접두 경로만 열면 proxy.ts가 서울 기준 이번 달로 보낸다(.scratch/sashimi/spec.md). */
     sashimi: "/seasonal/sashimi",
     sashimiMonth: (month: number) => `/seasonal/sashimi/${month}`,

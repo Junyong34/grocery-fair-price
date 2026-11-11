@@ -6,16 +6,21 @@ import { useEffect, useRef } from "react"
 import { MONTHS } from "@workspace/seasonal/data/months"
 import { ScrollRow } from "@workspace/ui/components/scroll-row"
 
-import { routes } from "@/shared/routes"
-
-import { PillLink } from "../components/pill"
-import { SASHIMI_MONTHS_ID } from "./sashimi-chip-row"
+import { PillLink } from "./pill"
 
 /**
- * 제철 회 달 칩 12개(.scratch/sashimi/spec.md 3장). 레이아웃에 있어 달을 바꿔도 가로 스크롤 위치가 남는다.
+ * 달 칩 12개. 레이아웃에 두면 달을 바꿔도 가로 스크롤 위치가 남는다.
  * 모바일은 가로 스크롤, 데스크톱(lg)은 12칸 격자로 한 줄에 모두 보인다. 칩은 그 달 주소로 가는 링크다. 고른 달이 줄 가운데 근처에 오게 옮긴다.
  */
-export function SashimiMonthChips() {
+export function SeasonalMonthChips({
+  id,
+  hrefs,
+  preserveScroll = false,
+}: {
+  id?: string
+  hrefs: readonly string[]
+  preserveScroll?: boolean
+}) {
   const pathname = usePathname()
   const scroller = useRef<HTMLDivElement>(null)
 
@@ -32,7 +37,7 @@ export function SashimiMonthChips() {
   }, [pathname])
 
   return (
-    <nav id={SASHIMI_MONTHS_ID} aria-label="달 고르기" className="mx-auto max-w-[720px]">
+    <nav id={id} aria-label="달 고르기" className="mx-auto max-w-[720px]">
       <ScrollRow
         ref={scroller}
         className="gap-1.5 px-[18px] pt-2 pb-3 lg:grid lg:grid-cols-12 lg:px-6"
@@ -40,13 +45,14 @@ export function SashimiMonthChips() {
         nextLabel="다음 달 보기"
       >
         {MONTHS.map((month) => {
-          const href = routes.seasonal.sashimiMonth(month)
+          const href = hrefs[month - 1]
+          if (!href) return null
           const current = pathname === href
           return (
             <PillLink
               key={month}
               href={href}
-              scroll={false}
+              scroll={!preserveScroll}
               current={current}
               className="lg:px-0"
             >
