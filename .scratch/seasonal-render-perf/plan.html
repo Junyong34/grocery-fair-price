@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>제철달력 렌더링 속도 개선</title>
+<link rel="stylesheet" href="htmlplan.css">
+<script src="htmlplan.js" defer></script>
+<body>
+<header>
+  <h1>제철달력 렌더링 속도 개선</h1>
+  <doc-changes new="3" changed="6" deleted="3"></doc-changes>
+  <details class="thread"><summary>질문 흐름 · 2라운드 · 9문항</summary>
+    <h4>라운드 1</h4>
+    <doc-note tone="info"><strong>Q1 · 성공 기준</strong> 무엇으로 빨라졌다고 판단할까요? 추천: 375 모바일 Lighthouse(LCP·TBT) + 스크롤 프레임 드랍, 운영 기준선 대비.</doc-note>
+    <doc-quote via="prompt" from="Q1 답">Q1.  A</doc-quote>
+    <doc-note tone="info"><strong>Q2 · 범위</strong> 2a만 볼까요, 제철 화면 전부 볼까요? 추천: 2a 중심, 이미지 변경은 FoodImage로 전체 적용.</doc-note>
+    <doc-quote via="prompt" from="Q2 답">Q2. A</doc-quote>
+    <doc-note tone="info"><strong>Q3 · 렌더링 방식</strong> 빌드 때 정적 + proxy rewrite + 오늘 구멍 구조를 유지할까요? 추천: 유지.</doc-note>
+    <doc-quote via="prompt" from="Q3 답">Q3. A</doc-quote>
+    <doc-note tone="info"><strong>Q4 · 이미지 포맷</strong> SVG와 래스터를 어떻게 나눌까요? 추천: 작은 자리 래스터, 큰 자리 SVG(B).</doc-note>
+    <doc-quote via="prompt" from="Q4 답">Q4 A</doc-quote>
+    <doc-note tone="info"><strong>Q5 · 화면 밖 달 판</strong> 12개월 판을 어떻게 할까요? 추천: 드래그만 화면 근처에서 켜기(B).</doc-note>
+    <doc-quote via="prompt" from="Q5 답">Q5 드래그는 그냥 제거 할까? 크게 사용자가 조작하지 않을거로 판단돼</doc-quote>
+    <doc-note tone="info"><strong>Q6 · 그 밖의 개선</strong> 캐시 헤더, 거대 SVG 단순화, HTML 증가 원인, TTFB 중 무엇을 넣을까요? 추천: 모두.</doc-note>
+    <doc-quote via="prompt" from="Q6 답">Q6. 어떤걸 선택해야할지 모르게어</doc-quote>
+    <h4>라운드 2</h4>
+    <doc-note tone="info"><strong>Q7 · 드래그 제거 범위</strong> 그림·달력 드래그, "처음 자리로" 버튼, 안내 문구까지 전부 걷어낼까요? 추천: 전부 제거, 탭과 먹음 표시는 남김.</doc-note>
+    <doc-quote via="prompt" from="Q7 답">Q7.  드래이그 기능 자체를 제거하여  사용자에게 그림을 끓이는 기능을 제공안하면 어때 ?</doc-quote>
+    <doc-note tone="info"><strong>Q8 · 필터 비용</strong> 측정에서 수채 필터가 병목이면 어떻게 할까요? 추천: 그때 정한다(필터 뺀 작은 SVG 또는 래스터).</doc-note>
+    <doc-quote via="prompt" from="Q8 답">Q8. 추천안</doc-quote>
+    <doc-note tone="info"><strong>Q9 · 그 밖의 개선</strong> 캐시 헤더 · HTML 증가 원인 · TTFB는 넣고 거대 SVG 단순화는 뺄까요? 추천: 예.</doc-note>
+    <doc-quote via="prompt" from="Q9 답">Q9. 예</doc-quote>
+  </details>
+</header>
+<main>
+<doc-plan>
+
+  <doc-claim id="baseline">
+    <p>모든 개선은 운영 2a의 기준선 측정과 비교해 판정한다.</p>
+    <doc-mock frame="terminal" title="baseline.md" w="470" caption="첫 티켓이 이 표를 채우고, 티켓마다 같은 표를 다시 잰다."><template><span class="dim"># 2a /seasonal · 375 모바일 · 운영</span>
+지표                  기준선      목표
+LCP                   <span class="y">?</span>           ≤ 2.5s
+TBT                   <span class="y">?</span>           ≤ 200ms
+스크롤 긴 프레임      <span class="y">?</span>           기준선 대비 ↓
+HTML(압축 전)         2.35MB      ↓
+TTFB                  0.55s       ≤ 200ms
+<span class="dim"># 필터 래스터(Paint) 비중 → 4번 주장의 갈림길</span></template></doc-mock>
+    <doc-claim>
+      <p>HTML이 6일 만에 1.58MB에서 2.35MB로 늘어난 원인을 찾는다.</p>
+      <doc-code title="조사 · 스케치" lang="bash" caption="11-05 커밋과 지금의 2a를 같은 방식으로 그려 품종 수 · RSC 크기를 비교한다.">
+<script type="text/plain">
+# 11-05(66784fe)과 HEAD에서 각각 빌드 → next start → 같은 주소를 받는다
+curl -s localhost:3000/seasonal/at/2026-11 | wc -c          # HTML
+curl -s -H 'RSC: 1' localhost:3000/seasonal/at/2026-11 | wc -c   # RSC payload
+grep -o '<img' page.html | wc -l                              # 그림 수
+git log --oneline 66784fe..HEAD -- packages/seasonal/src/data  # 품종 데이터 변경
+</script>
+      </doc-code>
+    </doc-claim>
+    <doc-claim>
+      <p>정적 페이지의 TTFB 0.55초가 proxy와 Cloudflare 중 어디서 생기는지 확인한다.</p>
+      <doc-code title="측정 · 스케치" lang="bash" caption="rewrite 대상 주소를 직접 재서 proxy 비용을 떼어 본다.">
+<script type="text/plain">
+for u in /seasonal /seasonal/at/2026-11 /seasonal/months/3; do
+  curl -s -o /dev/null -H 'accept-encoding: br' \
+    -w "$u ttfb=%{time_starttransfer} total=%{time_total}\n" "https://jangbol.kr$u"
+done
+curl -sI https://jangbol.kr/seasonal | grep -i 'cf-cache-status\|x-vercel-cache\|cache-control'
+</script>
+      </doc-code>
+    </doc-claim>
+  </doc-claim>
+
+  <doc-claim id="static-scatter">
+    <p>2a의 그림 판은 끌어 옮길 수 없고, 그림을 누르면 품종 시트가 열린다.</p>
+    <doc-mock frame="none" w="360" caption="점선 테두리, 되돌리기 버튼, 끌기 안내 문구가 사라진다."><template>
+<div style="font:13px/1.4 system-ui;padding:12px;background:#f7f4ee">
+  <div data-ref="field" style="position:relative;height:150px;border-radius:12px;background:radial-gradient(#d9d3c7 1px,transparent 1px) 0 0/16px 16px">
+    <div data-ref="tile" style="position:absolute;left:30px;top:22px;text-align:center"><div style="width:52px;height:52px;border-radius:50%;background:#e9a17a"></div><b>귤</b></div>
+    <div style="position:absolute;left:150px;top:50px;text-align:center"><div style="width:52px;height:52px;border-radius:50%;background:#cbd98a"></div><b>배추</b></div>
+    <div style="position:absolute;left:250px;top:18px;text-align:center"><div style="width:52px;height:52px;border-radius:50%;background:#e7c46b"></div><b>유자</b></div>
+  </div>
+  <div data-ref="copy" style="margin-top:8px;color:#8b857a;font-size:12px">42가지 제철</div>
+</div></template>
+      <doc-pin ref="tile" anchor="tr" title="누르면 1i 시트">먹음 표시도 그대로다.</doc-pin>
+      <doc-pin ref="copy" anchor="r" title="안내 문구 삭제">"그림을 끌어 …" 부분만 지운다.</doc-pin>
+    </doc-mock>
+    <doc-ask id="outline">
+      <p>판의 점선 테두리와 점무늬 배경을 어떻게 할까요?</p>
+      <label><input type="radio" name="outline" value="dots" checked> 점선 테두리만 지우고 점무늬는 둔다 <small>테두리는 끌기 범위 표시였다</small></label>
+      <label><input type="radio" name="outline" value="both"> 둘 다 지운다</label>
+      <label><input type="radio" name="outline" value="keep"> 둘 다 둔다</label>
+    </doc-ask>
+    <doc-claim>
+      <p>판은 서버 컴포넌트가 시드 배치로 그리고, 타일만 작은 client 부분이다.</p>
+      <doc-calls caption="드래그 쪽 사슬이 통째로 빠진다.">
+<script type="text/plain">
+~ <ScatterField/>                         @ apps/web/features/seasonal/components/scatter-field.tsx:13
+    scatterLayout()                       @ apps/web/features/seasonal/components/scatter-field.tsx:29
+-   <DraggableScatter/>                   @ apps/web/features/seasonal/components/draggable-scatter.tsx:73
+-     useDragGesture()                    @ apps/web/features/seasonal/components/draggable-scatter.tsx:125
+-     useSavedSpots() · saveSpots()       @ apps/web/features/seasonal/components/draggable-scatter.tsx:93
+-     resetScatter()                      @ apps/web/features/seasonal/components/draggable-scatter.tsx:327
++   <**ScatterTile/**> (client)           @ apps/web/features/seasonal/components/draggable-scatter.tsx:368  -- FoodTile을 옮겨 온다
+      <IntentLink/> → 1i 시트            @ apps/web/features/seasonal/components/draggable-scatter.tsx:288
+      useIsEaten()                        @ apps/web/features/seasonal/components/draggable-scatter.tsx:381
+</script>
+      </doc-calls>
+      <doc-ask id="saved">
+        <p>기기에 저장된 옮긴 배치(<code>seasonal:scatter</code>)를 어떻게 할까요?</p>
+        <label><input type="radio" name="saved" value="ignore" checked> 읽지 않고 그대로 둔다 <small>키 재사용 금지라 해가 없다</small></label>
+        <label><input type="radio" name="saved" value="clear"> 첫 로드 때 지운다 <small>지우는 코드가 남는다</small></label>
+      </doc-ask>
+      <doc-claim at="apps/web/features/seasonal/components/draggable-scatter.tsx:347">
+        <p><b>draggable-scatter.tsx:347</b> · useCalendarScale()</p>
+        <doc-code src="apps/web/features/seasonal/components/draggable-scatter.tsx" lines="251-258" hl="256">
+          <doc-pin line="256" tone="warn" title="모바일 달력 배율">드래그가 없어도 필요하다. CSS(cqi)나 작은 client 부분으로 옮긴다.</doc-pin>
+        </doc-code>
+      </doc-claim>
+      <doc-claim at="apps/web/features/seasonal/this-month/this-month-view.tsx:81">
+        <p><b>this-month-view.tsx:81, 174</b> · 끌기 안내 문구</p>
+        <doc-code src="apps/web/features/seasonal/this-month/this-month-view.tsx" lines="173-175" hl="174"></doc-code>
+      </doc-claim>
+    </doc-claim>
+  </doc-claim>
+
+  <doc-claim id="svg">
+    <p>그림 SVG는 SVGO로 줄인 파일이고, 재방문 때 재검증 없이 캐시에서 읽는다.</p>
+    <doc-code title="next.config.ts · 스케치" lang="ts" caption="버전 쿼리가 붙은 요청에만 1년 immutable을 준다.">
+<script type="text/plain">
+async headers() {
+  return [{
+    source: "/foods/:path*",
+    has: [{ type: "query", key: "v" }],
+    headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+  }]
+},
+</script>
+    </doc-code>
+    <doc-note tone="warn"><strong>인쇄물</strong> 인쇄 페이지도 같은 SVG를 그린다. SVGO 뒤에 PDF를 다시 생성하고 썸네일을 비교한다(AGENTS.md 생성 파일 표).</doc-note>
+    <doc-claim>
+      <p><code>pnpm foods:sync</code>가 SVGO와 내용 해시 생성까지 이어서 돌린다.</p>
+      <doc-code src="package.json" lines="13-14" hl="13">
+        <doc-pin line="13" title="여기에 이어 붙인다">optimize → bounds 순서.</doc-pin>
+      </doc-code>
+      <doc-claim>
+        <p><b>scripts/optimize-food-svgs.mjs</b> · 새 파일</p>
+        <doc-code title="optimize-food-svgs.mjs · 스케치" lang="js">
+<script type="text/plain">
+// public/foods/*/{color,motion}.svg를 제자리에서 줄인다. prototypes/ 없이 돈다.
+// 필터·style·data-* 속성은 지키고(motion 애니메이션 선택자), 경로 정밀도만 줄인다.
+const config = {
+  floatPrecision: 1,
+  plugins: [{ name: "preset-default", params: { overrides: {
+    removeUnknownsAndDefaults: { keepDataAttrs: true },
+    inlineStyles: false, minifyStyles: false,
+  } } }],
+}
+// 끝나면 내용 해시를 food-versions.generated.ts에 쓴다.
+</script>
+        </doc-code>
+      </doc-claim>
+    </doc-claim>
+    <doc-claim>
+      <p><code>FoodImage</code>는 주소에 품종별 내용 해시를 붙인다.</p>
+      <doc-code src="apps/web/features/seasonal/components/food-image.tsx" lines="40-49" hl="43">
+        <doc-pin line="43" title="?v=해시를 붙인다">food-versions.generated.ts에서 읽는다.</doc-pin>
+      </doc-code>
+    </doc-claim>
+  </doc-claim>
+
+  <doc-claim id="filter">
+    <p>측정에서 수채 필터가 병목이면 작은 자리 그림을 다시 정한다.</p>
+    <doc-code title="food-image.tsx · 후보 스케치" lang="ts" caption="후보 1: 표시 120px 이하는 필터를 뺀 SVG 변형을 쓴다.">
+<script type="text/plain">
+// variant: "color" | "motion" | "small"  (small = color에서 <filter>와 filter= 속성을 뺀 파일)
+const file = variant === "color" && displayPx <= 120 ? "small" : variant
+src={`/foods/${food.id}/${file}.svg?v=${FOOD_VERSIONS[food.id]}`}
+</script>
+    </doc-code>
+    <doc-note tone="info"><strong>조건부</strong> 기준선 trace에서 Paint·Rasterize가 스크롤 긴 프레임의 주원인일 때만 연다. 후보 2는 Q4 B(래스터)다.</doc-note>
+  </doc-claim>
+
+  <doc-claim aux="scope">
+    <p>바꾸지 않는 것: 정적 렌더링 구조, 2a 구성과 스크롤, 큰 자리 SVG.</p>
+    <ul>
+      <li>proxy rewrite와 <code>/seasonal/at/[yearMonth]</code> 정적 생성, 오늘 표시 구멍(Q3).</li>
+      <li>히어로·월 섹션 순서, 레일·점프, 데스크톱 패널, 먹음 기록, 1i 시트.</li>
+      <li>motion SVG와 CSS 애니메이션, 일러스트 다시 그리기(Q9에서 뺌).</li>
+      <li>2b·식재료·명절 화면 구조(Q2). <code>FoodImage</code> 변경만 함께 받는다.</li>
+    </ul>
+  </doc-claim>
+</doc-plan>
+</main>
+</body></html>
