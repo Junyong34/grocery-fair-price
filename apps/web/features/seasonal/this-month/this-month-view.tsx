@@ -20,7 +20,8 @@ import { YearEnd } from "./year-end"
  * 2a 이달 · 12개월 스크롤(명세 3.1). 각 달은 "흩어진 제철 그림 → 달력" 순서다.
  * 모바일은 한 열 + 위 인디케이터 + 오른쪽 월 레일, 데스크톱은 왼쪽 고정 패널(달 이동 휠) + 오른쪽 스크롤.
  * (연, 월)만으로 그려 빌드 때 미리 만든다(.scratch/seasonal-static/spec.md). 일 단위 "오늘" 표시는 브라우저가 첫 그리기 전에 켠다(shared/today-mark).
- * 서버는 이번 달과 다음 달 섹션만 그리고, 나머지 달은 틀만 두었다가 화면 가까이 오면 브라우저가 그린다(LazyMonth).
+ * 서버는 1월(히어로 바로 아래라 첫 화면에 걸린다) · 이번 달 · 다음 달 섹션만 그리고, 나머지 달은 틀만 두었다가 화면 가까이 오면 브라우저가 그린다(LazyMonth).
+ * 1월까지 늦게 그리면 첫 화면의 1월 제목이 JS를 받은 뒤에야 나타나 모바일 LCP가 11초를 넘었다(baseline.md "13").
  * 12개월을 한 번에 그리면 DOM 8천여 개 · HTML 0.8MB였다(.scratch/seasonal-render-perf/spec.md 6.3).
  */
 export function ThisMonthView({ year, month: thisMonth }: { year: number; month: Month }) {
@@ -86,7 +87,7 @@ export function ThisMonthView({ year, month: thisMonth }: { year: number; month:
           </section>
 
           {MONTHS.map((month) =>
-            month === thisMonth || month === thisMonth + 1 ? (
+            month === 1 || month === thisMonth || month === thisMonth + 1 ? (
               <MonthShell key={month} month={month}>
                 <MonthSectionBody year={year} month={month} isThisMonth={month === thisMonth} />
               </MonthShell>
