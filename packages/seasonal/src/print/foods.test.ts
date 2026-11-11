@@ -116,6 +116,17 @@ describe.each([
     expect(new Set(ids).size).toBeLessThan(ids.length)
   })
 
+  it("1·2등급 다음에는 대표 달인 품종부터 넣어, 대표 달이 아닌 3~5등급이 대표 달인 품종을 밀어내지 않는다", () => {
+    yearPictures(withMax(spec, 8)).forEach((foods, index) => {
+      const month = MONTHS[index]!
+      const rest = foods.filter((food) => familiarity(food.id) >= 3)
+      const firstOffPeak = rest.findIndex((food) => !isPeak(food, month))
+      if (firstOffPeak >= 0) expect(rest.slice(firstOffPeak).every((food) => !isPeak(food, month)), `${month}월`).toBe(true)
+      const left = foodsInMonth(month).filter((food) => food.category === category && isDrawn(food.id) && !foods.includes(food))
+      if (left.some((food) => familiarity(food.id) >= 3 && isPeak(food, month))) expect(rest.every((food) => isPeak(food, month)), `${month}월`).toBe(true)
+    })
+  })
+
   it("개수 설정과 월별 포스터의 해당 카테고리 선정 순서를 따른다", () => {
     const monthly = { ...withMax(poster, 2), categories: [category] } satisfies typeof poster
     const months = yearPictures(withMax(spec, 2))
@@ -158,8 +169,8 @@ describe("yearPictures", () => {
         "5월: 오이 양배추 상추 참외 완두콩 갑오징어 쪽파 마늘종",
         "6월: 감자 애호박 방울토마토 블루베리 살구 농어 매실 신비복숭아",
         "7월: 토마토 양파 자두 수박 전복 민어 바다장어 강낭콩",
-        "8월: 오징어 부추 복숭아 옥수수 가지 홍고추 멜론 참나물",
-        "9월: 표고버섯 대하 밤 배 포도 조기 무화과 전어",
+        "8월: 오징어 부추 복숭아 옥수수 포도 가지 홍고추 멜론",
+        "9월: 표고버섯 대하 밤 배 샤인머스캣 조기 무화과 전어",
         "10월: 고구마 사과 쌀 대파 꽃게 갈치 꽁치 우럭",
         "11월: 고등어 무 파프리카 감 단호박 유자 과메기 참돔",
         "12월: 배추 귤 당근 브로콜리 방어 키위 대구 참다랑어",

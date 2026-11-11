@@ -81,8 +81,9 @@ export const FAMILIARITY_2: Readonly<Record<string, number>> = {
   peach: 8, // 복숭아
   eggplant: 8, // 가지
   corn: 8, // 옥수수
+  "green-grape": 8, // 포도
   // 9월
-  "green-grape": 9, // 포도
+  "shine-muscat": 9, // 샤인머스캣
   pear: 9, // 배
   chestnut: 9, // 밤
   shrimp: 9, // 대하
@@ -141,7 +142,6 @@ export const FAMILIARITY_4: ReadonlySet<string> = new Set([
   "mulberry", // 오디
   "omija", // 오미자
   "green-mandarin", // 청귤
-  "kara-mandarin", // 카라향
   "plumcot", // 플럼코트
   "summer-orange", // 하귤
   // 수산

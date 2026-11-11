@@ -49,9 +49,19 @@ const byFocus = (focus: (food: Food) => number) => (a: Food, b: Food) =>
 
 const byMonth = (month: number) => byFocus((food) => Number(isPeak(food, month)))
 
+/**
+ * 카테고리를 고른 인쇄물(과일·해산물 연간 달력, 카테고리를 고른 월별 포스터)의 달 칸 차례.
+ * 1·2등급은 byMonth처럼 먼저 넣고, 3~5등급끼리는 대표 달인 품종을 먼저 넣는다.
+ * 한 카테고리만 모으면 칸이 적어, 친숙도만으로 고르면 대표 달이 아닌 3등급(5월 애플망고)이 대표 달인 4등급(5월 카라향)을 밀어냈다.
+ */
+const byCategoryMonth = (month: number) => (a: Food, b: Food) =>
+  Math.min(familiarity(a.id), 3) - Math.min(familiarity(b.id), 3) ||
+  Number(isPeak(b, month)) - Number(isPeak(a, month)) ||
+  byMonth(month)(a, b)
+
 function inMonth(month: number, pick: Pick): readonly Food[] {
   return FOODS.filter((food) => (food.months as readonly number[]).includes(month) && pickable(pick)(food))
-    .sort(byMonth(month))
+    .sort(pick.categories.length > 0 ? byCategoryMonth(month) : byMonth(month))
     .slice(0, pick.max)
 }
 
