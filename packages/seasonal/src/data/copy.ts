@@ -368,6 +368,12 @@ export const SASHIMI_COPY = {
     "webfoot-octopus": "살짝 데친 숙회로 쫄깃하게",
     croaker: "부드럽고 차진 여름 보양식",
     pomfret: "뼈째 썰어 고소한 회",
+    cuttlefish: "쫀득한 식감의 갑오징어회",
+    "pointhead-flounder": "기름가자미로 즐기는 흰살 회",
+    octopus: "데쳐서 즐기는 문어숙회",
+    trout: "송어로 즐기는 민물 횟감",
+    "fat-greenling": "쥐노래미로 즐기는 흰살 회",
+    "bluefin-tuna": "붉은 살과 뱃살을 즐기는 참치회",
   } satisfies Partial<Record<FoodId, string>> as Readonly<
     Partial<Record<FoodId, string>>
   >,

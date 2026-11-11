@@ -106,13 +106,27 @@ describe("sashimi", () => {
       "cod",
       "red-seabream",
       "spanish-mackerel",
+      "trout",
       "yellowtail",
+      "bluefin-tuna",
       "halfbeak",
       "east-sea-hanchi",
       "atka-mackerel",
       "redlip-mullet",
       "banded-grouper",
     ])
+  })
+
+  it.each([
+    ["bluefin-tuna", [1, 2, 6, 12]],
+    ["cuttlefish", [5]],
+    ["pointhead-flounder", [5]],
+    ["octopus", [7, 8, 9]],
+    ["trout", [1, 2]],
+    ["fat-greenling", [7]],
+  ])("신규 횟감 %s는 등록된 제철 달에만 나온다", (id, expected) => {
+    const listed = MONTHS.filter((month) => sashimiInMonth(month).some((food) => food.id === id))
+    expect(listed).toEqual(expected)
   })
 
   it("1~12 밖의 달은 빈 목록이다", () => {

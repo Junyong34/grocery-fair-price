@@ -119,8 +119,20 @@ export const SASHIMI_MONTHS: Readonly<Record<Month, readonly FoodId[]>> = {
   ],
 }
 
-/** 회 화면에 나오는 품종 전부(첨부 48종 + 추가 7종). 처음 나온 달 순서. */
-export const SASHIMI_IDS: readonly FoodId[] = [...new Set(Object.values(SASHIMI_MONTHS).flat())]
+/** 신규 수산 품종 중 회·숙회로 다루는 품종. 목록은 앱의 제철 범위, 추천은 대표 달을 따른다. */
+const SASHIMI_FROM_FOOD_SEASONS = [
+  "cuttlefish",
+  "pointhead-flounder",
+  "octopus",
+  "trout",
+  "fat-greenling",
+  "bluefin-tuna",
+] as const satisfies readonly FoodId[]
+
+/** 회 화면에 나오는 품종 전부. 기존 추천표 순서 뒤에 앱 제철 범위를 따르는 품종을 더한다. */
+export const SASHIMI_IDS: readonly FoodId[] = [
+  ...new Set([...Object.values(SASHIMI_MONTHS).flat(), ...SASHIMI_FROM_FOOD_SEASONS]),
+]
 
 /**
  * "이달 추천" 표시. 친숙도 1~3(흔히 사 먹는 회) 가운데 그 달이 첨부의 달이거나 앱 대표 달(peak)인 품종.
