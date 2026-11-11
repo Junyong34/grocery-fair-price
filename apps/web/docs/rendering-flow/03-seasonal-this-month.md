@@ -17,7 +17,7 @@
    - 12개월 데이터(`:33`), 히어로는 `months[thisMonth - 1]`(`:34`).
    - `MonthSection`(`:103`)마다 `holidaysInMonth` · `monthCalendar({ today })`(`:117-120`)를 계산한다.
    - `Scatter`(`:170`) → `ScatterField`(`features/seasonal/components/scatter-field.tsx:13`)가 모바일 · 데스크톱 두 판을 그린다. 각 판에서 서버가 `scatterLayout(...)`(`:29`)을 계산한다(`packages/seasonal/src/layout/scatter.ts`, Lloyd `LLOYD_ITERATIONS = 10`).
-   - client 말단: `DraggableScatter`(그림 위치 `deviceStore`), `SettingsScope` · `SettingsCalendar`, `MonthScrollSpy`, `DesktopMonthPanel`, `JumpButton` · `MonthRail`, `YearEndSummary`(먹음 기록 수).
+   - client 말단: 판 그림 링크 `IntentLink` · `EatenName`, 모바일 달력 `CalendarFit`, `SettingsScope` · `SettingsCalendar`, `MonthScrollSpy`, `DesktopMonthPanel`, `JumpButton` · `MonthRail`, `YearEndSummary`(먹음 기록 수).
    - server: `MoreFoods`, `DownloadsCard`(정적 manifest).
 
 ## 2) 정적 셸 / 스트리밍 / 하이드레이션
@@ -26,7 +26,7 @@
 - **응답**: chunk#0이 +518ms에 온다. 셸이고 구멍 B:0 하나가 이달/월별 보기 탭 바로 뒤에 있다(fallback `min-h-svh aria-busy`). 셸에 보이는 것은 `<title>`, 헤더, 2차 탭, 검색, 하단 내비다.
 - **채움**: S:0이 2a 본문 전체다(HTML 918,164자: 히어로 "10월", 12개월, 판 두 벌, 달력). 응답 전체는 1,224,660자(약 1.2MB), RSC payload는 288,203자다.
 - 셸을 프리렌더해 두었는데도 첫 바이트가 +518ms였다(다른 ◐ 라우트는 +45~165ms). resume 렌더 준비에 서버 작업이 걸린 것으로 **추정**한다. 원인은 따로 재지 않았다.
-- **하이드레이션**: 헤더 · 탭 · 검색 · 설정 버튼, 그리고 본문의 client 말단 전부다. 마운트 뒤 `rehydrateDeviceStores()`가 설정(달력 모양 등), 끌어 옮긴 그림 위치, 먹음 기록을 불러와 다시 그린다.
+- **하이드레이션**: 헤더 · 탭 · 검색 · 설정 버튼, 그리고 본문의 client 말단 전부다. 마운트 뒤 `rehydrateDeviceStores()`가 설정(달력 모양 등), 먹음 기록을 불러와 다시 그린다.
 - **프리패치**: `partialPrefetching` 때문에 화면에 들어온 품종 링크마다 `/seasonal/foods/<id>?_rsc=…` 프리패치와 그 `color.svg` 요청이 나간다(브라우저에서 확인).
 
 ## 3) 데이터 조회
@@ -55,7 +55,7 @@ sequenceDiagram
     S->>S: "ThisMonthView: 12개월 · monthCalendar · scatterLayout x2 판"
     S-->>B: "S:0 약 918KB HTML, 전체 약 1.2MB"
     B->>B: "다음 rAF에 B:0을 S:0으로 교체, 히어로 표시"
-    B->>B: "hydrate: 탭 · 검색 · 설정 · DraggableScatter · MonthScrollSpy · DesktopMonthPanel"
+    B->>B: "hydrate: 탭 · 검색 · 설정 · 판 그림 링크 · MonthScrollSpy · DesktopMonthPanel"
     B->>B: "useEffect: deviceStore 복원 → 설정 · 그림 위치 · 먹음 기록"
     B->>S: "보이는 품종 링크 프리패치 ?_rsc"
 ```

@@ -78,7 +78,7 @@ export function ThisMonthView({ year, month: thisMonth }: { year: number; month:
               <div>
                 <Scatter month={thisMonth} foods={current.pictured} year={year} className="mt-6 lg:mt-0" desktopFrame="desktopHero" />
                 <p className="mt-3 text-xs text-caption">
-                  {current.foods.length}가지 제철<span className="hidden lg:inline"> · 그림을 끌어 옮겨 보세요</span>
+                  {current.foods.length}가지 제철
                 </p>
               </div>
               <div className="lg:mt-5 lg:flex lg:items-center lg:gap-5">
@@ -171,7 +171,7 @@ function MonthSection({
           mobileCalendar={calendar()}
         />
         <p className="mt-3 text-xs text-caption">
-          {foods.length}가지 제철<span> · 그림을 끌어 달력 위에도 놓아 꾸며 보세요</span>
+          {foods.length}가지 제철
         </p>
         <MoreFoods year={year} foods={foods.filter((food) => !pictured.includes(food))} />
         {isThisMonth ? (

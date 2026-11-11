@@ -63,12 +63,12 @@ export type ScatterLayout = {
 
 /** 새 그림 하나를 놓을 때 "이미 놓인 그림 하나당" 보는 후보 수. 후보를 개수에 비례해 늘린다(Mitchell 1991, m·n+1). */
 const CANDIDATES_PER_POINT = 10
-/** 그림·이름표 묶음 사이에 남길 틈(프레임 px). 시드 배치와 끌어 옮긴 배치(arrangement)가 같은 값을 쓴다. dense 판은 SCATTER_DENSE_GAP. */
-export const SCATTER_GAP = 8
+/** 그림·이름표 묶음 사이에 남길 틈(프레임 px). dense 판은 SCATTER_DENSE_GAP. */
+const SCATTER_GAP = 8
 const SCATTER_DENSE_GAP = 4
 
 /** 프레임의 묶음 사이 틈(px). */
-export function scatterGap(frame: ScatterFrame): number {
+function scatterGap(frame: ScatterFrame): number {
   return frame.dense ? SCATTER_DENSE_GAP : SCATTER_GAP
 }
 const SEED_RELAX_ITERATIONS = 60
@@ -178,18 +178,18 @@ export function scatterLayout({
 }
 
 /** 프레임 px 기준 원(그림 중심과 반지름). */
-export type PlacedCircle = { x: number; y: number; r: number }
+type PlacedCircle = { x: number; y: number; r: number }
 
 /**
  * 배치 하나에 쓰는 난수열. 같은 달·품종 수·프레임이면 같은 수열이다.
  * salt는 같은 배치 안에서 다른 용도(저장된 배치에 새 품종 넣기)의 수열을 따로 얻을 때 쓴다.
  */
-export function scatterRandom({ month, count, frame, salt = 0 }: { month: number; count: number; frame: ScatterFrame; salt?: number }) {
+function scatterRandom({ month, count, frame, salt = 0 }: { month: number; count: number; frame: ScatterFrame; salt?: number }) {
   return seededRandom((month * 7919 + count * 104729 + frame.width + salt) % 233280)
 }
 
 /** 품종 이름표의 폭·높이(px). 그림 아래 가운데에 놓인다. */
-export function labelBox(id: string, frame: ScatterFrame): { labelW: number; labelH: number } {
+function labelBox(id: string, frame: ScatterFrame): { labelW: number; labelH: number } {
   return { labelW: labelWidth(findFood(id)?.name ?? id, frame), labelH: labelHeight(frame) }
 }
 
@@ -202,7 +202,7 @@ function seededRandom(seed: number): () => number {
   }
 }
 
-/** 이름표 글자 크기(프레임 기준 px). 모든 품종이 같다. 화면(draggable-scatter)과 배치 계산이 같은 값을 쓴다. */
+/** 이름표 글자 크기(프레임 기준 px). 모든 품종이 같다. 화면(scatter-field)과 배치 계산이 같은 값을 쓴다. */
 export function labelFontPx(frame: ScatterFrame): number {
   return frame.big ? 14 : 9.5
 }
@@ -234,7 +234,7 @@ function boxGap(a: Box, b: Box): number {
  * 이미 놓인 그림들과 피할 영역(avoid)에서 가장 멀리 떨어진 자리를 후보 가운데서 고른다(그림 아래 라벨 자리를 남긴다). 후보 수는 놓인 그림 수에 비례한다.
  * 시드 배치와, 저장된 배치에 새 품종을 넣을 때 같이 쓴다.
  */
-export function findOpenSpot({
+function findOpenSpot({
   placed,
   size,
   frame,

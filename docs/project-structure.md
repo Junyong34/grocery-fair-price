@@ -188,10 +188,10 @@ import 경로:
 | `my-table/` | 1h | `my-table-view`(시기 × 카테고리 × 검색), `category-filter`(단일 선택 하단 시트), `scope-summary`(시기 기준 요약), `food-row`, `typed-label` |
 | `food-detail/` | 1i | `food-detail`, `eat-toggle`, `festival-link` |
 | `search/` | 전역 검색 | `food-search`(헤더 버튼), `food-search-dialog`(cojeev command, 초성 검색) |
-| `components/` | 공통 | `seasonal-shell`(공통 셸에 제철 메뉴 · 검색 · ⚙를 넣는다), `sub-tabs`, `food-image`(그림 없으면 이름 카드), `detail-sheet`(품종 · 에디션 상세 시트), `scatter-field`·`draggable-scatter`(흩어진 배치와 드래그), `month-calendar`, `month-days-card`(달력 아래 "이달의 절기·명절". 2b는 `MonthDaysCardToday`를 `<Suspense>` 안에), `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-name`(먹은 품종 이름 밑줄), `eaten-count`, `holiday-name`, `screen-stub`, `pill`(고르기 알약 `PillLink`·`PillButton`) |
+| `components/` | 공통 | `seasonal-shell`(공통 셸에 제철 메뉴 · 검색 · ⚙를 넣는다), `sub-tabs`, `food-image`(그림 없으면 이름 카드), `detail-sheet`(품종 · 에디션 상세 시트), `scatter-field`(흩어진 배치)·`calendar-fit`(모바일 판 달력 폭 맞춤), `month-calendar`, `month-days-card`(달력 아래 "이달의 절기·명절". 2b는 `MonthDaysCardToday`를 `<Suspense>` 안에), `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-name`(먹은 품종 이름 밑줄), `eaten-count`, `holiday-name`, `screen-stub`, `pill`(고르기 알약 `PillLink`·`PillButton`) |
 | `downloads/` | PDF 내려받기(.scratch/calendar-download) | `downloads-view`(목록: 종류별 가로 줄 `EditionShelf`), `year-filter`(연도 필터), `edition-detail`(상세: 시트 · 페이지 공용), `edition-download-link`(A4 내려받기 주소) |
 | `settings/` | 설정 화면 항목 | `display-settings`(화면 표시 섹션, 먹음 기록 지우기) |
-| `stores/` | 공통 | `settings-store`(표시 설정), `scatter-store`(옮긴 배치와 달력 자리), `a3-request-store`("A3도 원해요"를 누른 에디션) |
+| `stores/` | 공통 | `settings-store`(표시 설정), `a3-request-store`("A3도 원해요"를 누른 에디션) |
 
 `components/seasonal-shell`은 공통 셸(`shared/shell`)의 헤더에 넣으려고 `search/`(같은 feature)와 `shared/shell/settings-link`(⚙ → `/settings`)를 import한다. 예전 2a 설정 시트(`this-month/settings-panel`)는 shell-unify/03에서 `/settings`로 대체되어 없다.
 
@@ -285,7 +285,6 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | 먹음 기록 | `shared/eaten-store.ts` | localStorage `seasonal:eaten` | 앱 전체가 쓴다 |
 | 담은 품종 · 최근 본 시세 · 상품 | `features/price/stores/` | localStorage `price:basket` · `price:recent` | |
 | 표시 설정 (공휴일, 먹은 품종, 달력 모양, 달 이름. `/settings`에서 바꿈) | `features/seasonal/stores/settings-store.ts` | localStorage `seasonal:settings` | |
-| 흩어진 배치·달력 자리 | `features/seasonal/stores/scatter-store.ts` | localStorage `seasonal:scatter` | 키는 `(달, 화면 구간)` |
 | 2b 열 수 | `features/seasonal/month-timeline/view-store.ts` | 없음 | 달을 바꿔도 유지 |
 | A3 요청 | `features/seasonal/stores/a3-request-store.ts` | localStorage `seasonal:a3-requests` | |
 | 설치 안내 숨김 | `shared/shell/install-prompt.tsx` | localStorage `price:install-prompt` | |
@@ -323,7 +322,6 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `calendar/solar-terms.ts` | 24절기 시각·서울 날짜(태양 황경, VSOP87 축약) |
 | `calendar/date-utils.ts` | 요일 이름, 달의 날 수 |
 | `layout/scatter.ts` | 흩어진 배치. 시드 난수(LCG)로 같은 입력이면 같은 결과, 0..1 정규화 좌표, 화면 구간(`SCATTER_FRAMES`)별 고정 비율 |
-| `layout/arrangement.ts` | 시드 뒤의 판 위 자리: 저장된 배치 병합(`restingSpots`), 끄는 동안(`moveSpot`)·놓은 뒤(`settleSpots`) 겹침 풀기, 판 위 달력 가두기. 시드와 같은 그림+이름표 겹침 규칙 |
 | `search/match-foods.ts` | 이름·별칭·초성 검색 |
 | `search/match-pairings.ts` | 이유식 궁합표 검색: 기준 재료(이름·별칭·초성)와, 표는 없지만 O·X 목록에 있는 재료가 적힌 표(`mentions`) |
 | `print/layouts.ts` | 인쇄물 구성(layout) 정의 한 곳: 종류별 구성 값(`LAYOUTS`)과 값마다 이름 · 와이어프레임 안 코드 · 세로 전용 · 품종 판 크기 상한 · 읽지 않는 옵션(`LAYOUT_DEFS`), `layoutReads`, `foodsPerCell`. 스키마 · 어드민 편집 폼 · 품종 고르기가 여기서 읽는다. 새 구성은 이 파일과 종류별 화면에 더한다 |

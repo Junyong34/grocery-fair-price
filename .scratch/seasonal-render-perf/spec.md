@@ -54,7 +54,7 @@
 
 ## 3. 구조
 
-- **판 (Features 레이어):** `ScatterField`(서버)가 `scatterLayout()`으로 배치를 계산하고 판·그림을 그대로 그린다. 클라이언트 부분은 그림 한 칸(`ScatterTile`: `IntentLink` + `FoodImage` + `useIsEaten`)과, 필요하면 모바일 달력 배율뿐이다. `DraggableScatter`, `use-drag-gesture.ts`, `stores/scatter-store.ts`는 지운다. `packages/seasonal/src/layout/arrangement.ts`는 인쇄(`features/print/season-poster.tsx`)도 쓰므로 남긴다. 드래그만 쓰던 export가 있으면 그것만 지운다.
+- **판 (Features 레이어):** `ScatterField`(서버)가 `scatterLayout()`으로 배치를 계산하고 판·그림을 그대로 그린다. 클라이언트 부분은 그림 링크(`IntentLink`), 먹음 표시(`EatenName`), 모바일 달력 배율(`CalendarFit`)뿐이다. `DraggableScatter`, `use-drag-gesture.ts`, `stores/scatter-store.ts`는 지운다. `packages/seasonal/src/layout/arrangement.ts`(배치 저장 · 끄는 동안 겹침 풀기)도 드래그 전용이라 테스트와 함께 지운다. `season-poster.tsx`의 `arrangement()`는 이름만 같은 로컬 함수다.
 - **SVG 최적화 (스크립트):** 새 `scripts/optimize-food-svgs.mjs`가 `public/foods`의 SVG를 제자리에서 줄이고 내용 해시 표 `packages/seasonal/src/data/food-versions.generated.ts`(`FOOD_VERSIONS: Record<string, string>`)를 쓴다. `prototypes/` 없이 돈다. 루트 `package.json`의 `foods:sync`를 `sync → optimize → bounds` 순서로 잇고, `foods:optimize`를 따로 둔다.
 - **캐시 헤더:** `apps/web/next.config.ts` `headers()`, `source: "/foods/:path*"`, `has: [{ type: "query", key: "v" }]`.
 - **측정 기록:** `.scratch/seasonal-render-perf/baseline.md`.
