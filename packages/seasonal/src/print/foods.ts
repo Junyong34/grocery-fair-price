@@ -90,13 +90,13 @@ export function stripFoods(spec: MonthlySpec, month: number): { strip: readonly 
 }
 
 /**
- * 열두 달을 한 판에 모을 때의 그림(1월부터 열두 묶음). Y-D는 달마다 수산 품종을 독립적으로 고른다.
+ * 열두 달을 한 판에 모을 때의 그림(1월부터 열두 묶음). Y-D·Y-E는 달마다 해당 카테고리 품종을 독립적으로 고른다.
  * 나머지 구성에서는 한 품종이 최적 달에 한 번만 나온다.
  * 연간 Y-A는 달마다 사양의 max개, Y-B 위 그림 판과 월간 표지 C-1은 하나, C-2는 둘.
  */
 export function yearPictures(spec: YearSheetSpec | MonthlySpec): readonly (readonly Food[])[] {
-  if (spec.kind === "year-sheet" && spec.layout === "seafood") {
-    const pick: Pick = { max: foodsPerCell(spec), categories: ["수산"], drawnOnly: true }
+  if (spec.kind === "year-sheet" && (spec.layout === "seafood" || spec.layout === "fruit")) {
+    const pick: Pick = { max: foodsPerCell(spec), categories: [spec.layout === "fruit" ? "과일" : "수산"], drawnOnly: true }
     return MONTHS.map((month) => inMonth(month, pick))
   }
   const max =

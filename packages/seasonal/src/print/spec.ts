@@ -146,7 +146,7 @@ const yearSheetSchema = z.object({
   monthStyle,
   // 칸이 작아 공휴일 이름은 들어가지 않는다.
   calendar: calendar(z.enum(["hidden", "mark"])),
-  /** 그림·달력 짝 체크무늬(Y-A) / 큰 그림 위, 열두 달 아래(Y-B) / 제철 막대표(Y-C) / 월별 제철 해산물(Y-D) */
+  /** 그림·달력 짝 체크무늬(Y-A) / 큰 그림 위, 열두 달 아래(Y-B) / 제철 막대표(Y-C) / 월별 제철 해산물(Y-D)·과일(Y-E) */
   layout: z.enum(LAYOUTS["year-sheet"]).default("pairs"),
   /** 달 배열(열×행) */
   grid,

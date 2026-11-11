@@ -21,7 +21,7 @@ import {
 
 // 인쇄물 와이어프레임 안 목록. 시장 조사와 안의 근거: .scratch/calendar-print/research/market.md
 // 어드민 옵션 고르기의 미리보기로 쓴다. 지금 사양으로 되는 안(available)과 새 옵션이 있어야 하는 안(needs-option)이 섞여 있다.
-// 폐기한 안(코드는 다시 쓰지 않는다): M-C 이달의 대표 품종, Y-D 달마다 이름 목록.
+// 폐기한 안: M-C 이달의 대표 품종.
 
 export type WireframeEntry = {
   /** 조사 문서·와이어프레임 페이지와 같은 코드(M-A, Y-B, …) */
@@ -244,6 +244,22 @@ const monthly: WireframeEntry[] = [
 
 // ── 연간 달력 한 장 ──
 
+function drawYearFoodSheet(orientation: Orientation): Shape[] {
+  const [header, body] = split(contentBox(orientation), "rows", [18, "*", 6], 2)
+  const columns = orientation === "portrait" ? 2 : 3
+  return [
+    ...yearHeader(header!, 11),
+    ...monthGrid(body!, columns, 12 / columns, 4).flatMap((cell, i): Shape[] => {
+      const [dates, pictures] = split(cell, "cols", ["*", "*"], 4)
+      return [
+        { type: "line", tone: "faint", from: [cell.x, cell.y], to: [cell.x + cell.width, cell.y] },
+        ...labelledMiniCalendar(inset(dates!, 1), MONTHS[i]!),
+        ...monthGrid(inset(pictures!, 1), 4, 2, 0).flatMap((figure) => flow(figure, { count: 1, names: true })),
+      ]
+    }),
+  ]
+}
+
 const yearSheet: WireframeEntry[] = [
   {
     code: "Y-A",
@@ -322,21 +338,18 @@ const yearSheet: WireframeEntry[] = [
     source: "Y-A의 달별 그림·달력 짝",
     availability: { status: "available", options: 'layout: "seafood"' },
     orientations: ["portrait", "landscape"],
-    draw: (orientation) => {
-      const [header, body] = split(contentBox(orientation), "rows", [18, "*", 6], 2)
-      const columns = orientation === "portrait" ? 2 : 3
-      return [
-        ...yearHeader(header!, 11),
-        ...monthGrid(body!, columns, 12 / columns, 4).flatMap((cell, i): Shape[] => {
-          const [dates, pictures] = split(cell, "cols", ["*", "*"], 4)
-          return [
-            { type: "line", tone: "faint", from: [cell.x, cell.y], to: [cell.x + cell.width, cell.y] },
-            ...labelledMiniCalendar(inset(dates!, 1), MONTHS[i]!),
-            ...monthGrid(inset(pictures!, 1), 4, 2, 0).flatMap((figure) => flow(figure, { count: 1, names: true })),
-          ]
-        }),
-      ]
-    },
+    draw: drawYearFoodSheet,
+  },
+  {
+    code: "Y-E",
+    kind: "year-sheet",
+    page: "sheet",
+    title: "월별 제철 과일",
+    summary: "세로 2×6, 가로 3×4. 달마다 날짜와 제철 과일 그림·이름을 최대 여덟 개까지 나란히 놓는다.",
+    source: "Y-D의 달별 그림·달력 짝",
+    availability: { status: "available", options: 'layout: "fruit"' },
+    orientations: ["portrait", "landscape"],
+    draw: drawYearFoodSheet,
   },
 ]
 

@@ -18,7 +18,7 @@ import { innerSize, monthSeason, surfaceColor, t, u } from "./parts/units"
 // pairs(Y-A): 달마다 그림 칸과 작은 달력이 한 쌍이다. 그림은 yearPictures라 한 품종이 한 해에 한 번, 최적 달에만 나온다. 2x6은 한 줄에 두 달이고 그림·달력을 좌우로, 줄마다 순서를 바꿔 체크무늬로 놓는다. 3x4·4x3은 그림 위, 달력 아래.
 // hero-top(Y-B): 위에 1년치 품종을 한 판으로 흩뿌리고, 아래에 작은 달력 열두 개를 3x4로 놓는다(세로 용지만). 달마다 그림 칸이 없어 달력이 커진다.
 // chart(Y-C): 위에 작은 달력 열둘(세로 4x3, 가로 6x2), 아래에 제철 막대표(세로 2단, 가로 3단). 날짜는 달력이, 제철은 막대표가 맡는다.
-// seafood(Y-D): 달마다 날짜 옆에 수산 품종 그림과 이름을 넣는다.
+// seafood(Y-D)·fruit(Y-E): 달마다 날짜 옆에 해당 카테고리의 그림과 이름을 넣는다.
 
 const HEADER = 18
 const GAP = 3
@@ -38,7 +38,7 @@ const CHART = {
 } as const
 
 export function YearSheet({ spec, paper }: { spec: YearSheetSpec; paper: Paper }) {
-  if (spec.layout === "seafood") return <SeafoodYearSheet spec={spec} paper={paper} />
+  if (spec.layout === "seafood" || spec.layout === "fruit") return <YearFoodSheet spec={spec} paper={paper} />
 
   const inner = innerSize(spec)
   const { columns, rows } = gridSize(spec.grid)
@@ -72,7 +72,7 @@ export function YearSheet({ spec, paper }: { spec: YearSheetSpec; paper: Paper }
   )
 }
 
-function SeafoodYearSheet({ spec, paper }: { spec: YearSheetSpec; paper: Paper }) {
+function YearFoodSheet({ spec, paper }: { spec: YearSheetSpec; paper: Paper }) {
   const inner = innerSize(spec)
   const columns = spec.orientation === "portrait" ? 2 : 3
   const rows = MONTHS.length / columns
@@ -84,34 +84,38 @@ function SeafoodYearSheet({ spec, paper }: { spec: YearSheetSpec; paper: Paper }
   // 그림 두 줄과 이름이 가장 낮은 A4 가로 칸에도 들어가도록 높이를 나눈다.
   const pictureSize = (height - 3) / 2 - 5
   const foodsByMonth = yearPictures(spec)
-  const dense = foodsByMonth.some((foods) => foods.length > 4)
+  const foodGroup = spec.layout === "fruit" ? "과일" : "해산물"
   const label = spec.monthLabel === "big-number" ? "korean" : spec.monthLabel
 
   return (
-    <Sheet spec={spec} paper={paper} className="print-seafood" background={surfaceColor(spec.surface)}>
-      <h1 className="print-seafood-title" style={{ height: u(HEADER), gap: u(4) }}>
+    <Sheet spec={spec} paper={paper} className="print-year-food" background={surfaceColor(spec.surface)}>
+      <h1 className="print-year-food-title" style={{ height: u(HEADER), gap: u(4) }}>
         <span className="print-number" style={{ fontSize: t(11) }}>{spec.year}</span>
-        <span className="print-heading" style={{ fontSize: t(5) }}>제철 해산물 달력</span>
+        <span className="print-heading" style={{ fontSize: t(5) }}>제철 {foodGroup} 달력</span>
       </h1>
-      <div className="print-seafood-months" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: u(gap) }}>
-        {MONTHS.map((month, index) => (
-          <div
-            key={month}
-            className="print-seafood-month"
-            data-month={month}
-            style={{ gap: u(gap), background: spec.surface === "season" ? surfaceColor("season", monthSeason(month)) : undefined }}
-          >
-            <CalendarBlock spec={spec} month={month} width={calendarWidth} height={height} label={label} labelGap={1.2} />
-            <div className="print-seafood-figures" data-dense={dense || undefined}>
-              {foodsByMonth[index]!.map((food) => (
-                <FoodFigure key={food.id} food={food} size={pictureSize} nameSize={dense ? 2.6 : 2.8} showName />
-              ))}
+      <div className="print-year-food-months" style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: u(gap) }}>
+        {MONTHS.map((month, index) => {
+          const foods = foodsByMonth[index]!
+          const dense = foods.length > 4
+          return (
+            <div
+              key={month}
+              className="print-year-food-month"
+              data-month={month}
+              style={{ gap: u(gap), background: spec.surface === "season" ? surfaceColor("season", monthSeason(month)) : undefined }}
+            >
+              <CalendarBlock spec={spec} month={month} width={calendarWidth} height={height} label={label} labelGap={1.2} />
+              <div className="print-year-food-figures" data-density={dense ? "dense" : foods.length <= 2 ? "single-row" : undefined}>
+                {foods.map((food) => (
+                  <FoodFigure key={food.id} food={food} size={pictureSize} nameSize={dense ? 2.6 : 2.8} showName />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
-      <footer className="print-seafood-footer">
-        <span>달마다 만나는 대표 해산물</span>
+      <footer className="print-year-food-footer">
+        <span>달마다 만나는 대표 {foodGroup}</span>
         <span>장볼날</span>
       </footer>
     </Sheet>

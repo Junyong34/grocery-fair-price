@@ -98,26 +98,29 @@ describe("stripFoods", () => {
   })
 })
 
-describe("yearPictures 해산물 구성", () => {
-  const seafood = { ...yearSheet, layout: "seafood" } satisfies typeof yearSheet
+describe.each([
+  ["seafood", "수산"],
+  ["fruit", "과일"],
+] as const)("yearPictures %s 구성", (layout, category) => {
+  const spec = { ...yearSheet, layout } satisfies typeof yearSheet
 
-  it("달마다 그 달에 제철인 수산 그림만 최대 여덟 싣고 여러 달이 제철인 품종은 반복한다", () => {
-    const months = yearPictures(withMax(seafood, 12))
+  it("달마다 해당 카테고리의 제철 그림만 최대 여덟 싣고 여러 달이 제철인 품종은 반복한다", () => {
+    const months = yearPictures(withMax(spec, 12))
     MONTHS.forEach((month, index) => {
       const foods = months[index]!
-      expect(foods).toHaveLength(8)
-      expect(foods.every((food) => food.category === "수산" && isDrawn(food.id) && foodsInMonth(month).includes(food))).toBe(true)
+      const available = foodsInMonth(month).filter((food) => food.category === category && isDrawn(food.id))
+      expect(foods).toHaveLength(Math.min(8, available.length))
+      expect(foods.every((food) => available.includes(food))).toBe(true)
     })
     const ids = months.flat().map((food) => food.id)
     expect(new Set(ids).size).toBeLessThan(ids.length)
   })
 
-  it("개수 설정과 월별 포스터의 수산 품종 선정 순서를 따른다", () => {
-    const monthlySeafood = { ...withMax(poster, 2), categories: ["수산"] } satisfies typeof poster
-    const months = yearPictures(withMax(seafood, 2))
+  it("개수 설정과 월별 포스터의 해당 카테고리 선정 순서를 따른다", () => {
+    const monthly = { ...withMax(poster, 2), categories: [category] } satisfies typeof poster
+    const months = yearPictures(withMax(spec, 2))
     MONTHS.forEach((month, index) => {
-      expect(months[index]).toEqual(monthPictures(monthlySeafood, month))
-      expect(months[index]).toHaveLength(2)
+      expect(months[index]).toEqual(monthPictures(monthly, month))
     })
   })
 })

@@ -103,19 +103,19 @@
 .print-flow { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; }
 .print-flow .print-food { position: static; }
 
-/* 연간 해산물 달력(Y-D). 왼쪽 날짜와 오른쪽 그림 묶음을 달마다 같은 위치에 둔다. */
-.print-seafood-title { display: flex; align-items: baseline; margin: 0; color: var(--color-forest); line-height: 1; }
-.print-seafood-months { display: grid; }
-.print-seafood-month { display: flex; border-block-start: var(--line) solid var(--color-hairline); }
-.print-seafood-month .print-month-label {
-  --seafood-month-ink: color-mix(in oklab, var(--month-color) 60%, var(--color-ink));
-  color: var(--seafood-month-ink);
+/* 연간 해산물·과일 달력(Y-D·Y-E). 왼쪽 날짜와 오른쪽 그림 묶음을 달마다 같은 위치에 둔다. */
+.print-year-food-title { display: flex; align-items: baseline; margin: 0; color: var(--color-forest); line-height: 1; }
+.print-year-food-months { display: grid; }
+.print-year-food-month { display: flex; border-block-start: var(--line) solid var(--color-hairline); }
+.print-year-food-month .print-month-label {
+  --year-food-month-ink: color-mix(in oklab, var(--month-color) 60%, var(--color-ink));
+  color: var(--year-food-month-ink);
 }
-.print-seafood-month .print-month-label[data-frame="ribbon"] .main { background: var(--seafood-month-ink); }
-.print-seafood-month .print-month-label[data-frame="outline"] .main { -webkit-text-stroke-color: var(--seafood-month-ink); }
-.print-seafood-month .print-calendar th:not(.is-red) { color: var(--color-stone); }
-.print-seafood-month .print-calendar .is-red { color: color-mix(in oklab, var(--color-holiday) 72%, var(--color-ink)); }
-.print-seafood-figures {
+.print-year-food-month .print-month-label[data-frame="ribbon"] .main { background: var(--year-food-month-ink); }
+.print-year-food-month .print-month-label[data-frame="outline"] .main { -webkit-text-stroke-color: var(--year-food-month-ink); }
+.print-year-food-month .print-calendar th:not(.is-red) { color: var(--color-stone); }
+.print-year-food-month .print-calendar .is-red { color: color-mix(in oklab, var(--color-holiday) 72%, var(--color-ink)); }
+.print-year-food-figures {
   flex: 1;
   min-width: 0;
   display: grid;
@@ -124,19 +124,21 @@
   place-items: center;
   padding-block: calc(var(--u) * 0.8);
 }
-.print-seafood-figures .print-food { position: static; }
-.print-seafood-figures .print-food-name { color: var(--color-ink); }
-.print-seafood-figures[data-dense] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.print-seafood-figures[data-dense] .print-food { max-inline-size: 100%; }
-.print-seafood-figures[data-dense] img { max-inline-size: calc(var(--u) * 9); }
-.print-seafood-figures[data-dense] .print-food-name {
+.print-year-food-figures .print-food { position: static; }
+.print-year-food-figures .print-food-name { color: var(--color-ink); }
+.print-year-food-figures[data-density="single-row"] { grid-template-rows: 1fr; }
+.print-year-food-figures[data-density="single-row"] .print-food:only-child { grid-column: 1 / -1; }
+.print-year-food-figures[data-density="dense"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.print-year-food-figures[data-density="dense"] .print-food { max-inline-size: 100%; }
+.print-year-food-figures[data-density="dense"] img { max-inline-size: calc(var(--u) * 9); }
+.print-year-food-figures[data-density="dense"] .print-food-name {
   max-inline-size: 100%;
   white-space: normal;
   overflow-wrap: anywhere;
   text-align: center;
   line-height: 1.14;
 }
-.print-seafood-footer {
+.print-year-food-footer {
   display: flex;
   justify-content: space-between;
   align-items: end;
