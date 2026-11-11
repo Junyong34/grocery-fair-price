@@ -498,3 +498,21 @@ export const INFANT_FRUIT_PRINT_COPY = {
     "choking-sweets": "기도에 달라붙어요. 주지 않아요",
   } as Readonly<Partial<Record<string, string>>>,
 } as const
+
+/** 제철 식재료 화면(/seasonal/ingredients). */
+export const INGREDIENT_COPY = {
+  pageTitle: "제철 식재료",
+  lede: "1월부터 12월까지, 언제 가장 맛있는지 한눈에 봐요.",
+  /** 이번 달 요약 띠의 제목. label은 카테고리(과일, 수산 ...). */
+  nowTitle: (month: number, label: string) => `${month}월 제철 ${label}`,
+  nowEmpty: "이번 달 제철인 품종이 없어요.",
+  monthlyLink: "월별 보기",
+  more: "더 보기",
+  moreLabel: (n: number) => `월별 보기, ${n}가지 더`,
+  sashimiLink: (month: number) => `${month}월 제철 회 추천 보기`,
+  count: (label: string, n: number) => `${label} ${n}가지`,
+  legendSeason: "제철",
+  inSeasonNow: "지금 제철",
+  showAll: (n: number) => `${n}가지 모두 보기`,
+  collapse: "접기",
+}

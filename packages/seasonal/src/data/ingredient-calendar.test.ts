@@ -5,6 +5,7 @@ import {
   INGREDIENT_CATEGORIES,
   MONTHLY_INGREDIENT_CATEGORIES,
   foodsForIngredientCalendar,
+  seasonRuns,
 } from "./ingredient-calendar"
 import { MONTHS } from "./months"
 
@@ -31,5 +32,27 @@ describe("식재료별 제철", () => {
         ).toBe(true)
       }
     }
+  })
+})
+
+describe("seasonRuns", () => {
+  it("이어진 달을 한 구간으로 묶는다", () => {
+    expect(seasonRuns([5, 6, 7])).toEqual([{ start: 5, end: 7 }])
+  })
+
+  it("해를 넘기는 제철은 12월 끝과 1월 시작의 두 구간이 된다", () => {
+    expect(seasonRuns([10, 11, 12, 1, 2, 3])).toEqual([
+      { start: 1, end: 3 },
+      { start: 10, end: 12 },
+    ])
+  })
+
+  it("떨어진 달은 따로 묶고, 빈 목록은 빈 구간이다", () => {
+    expect(seasonRuns([1, 3, 4, 9])).toEqual([
+      { start: 1, end: 1 },
+      { start: 3, end: 4 },
+      { start: 9, end: 9 },
+    ])
+    expect(seasonRuns([])).toEqual([])
   })
 })

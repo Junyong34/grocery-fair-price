@@ -22,3 +22,17 @@ export function foodsForIngredientCalendar(category: FoodCategory) {
     (a, b) => Number(b.core) - Number(a.core)
   )
 }
+
+/**
+ * 제철 달을 1~12월 안의 이어진 구간으로 묶는다. 달력 막대를 구간마다 하나씩 그린다.
+ * 해를 넘기는 제철(10~3월)은 1월에서 시작하는 구간과 12월에서 끝나는 구간 둘이 된다.
+ */
+export function seasonRuns(months: readonly number[]) {
+  const runs: { start: number; end: number }[] = []
+  for (const month of [...new Set(months)].sort((a, b) => a - b)) {
+    const last = runs.at(-1)
+    if (last && last.end === month - 1) last.end = month
+    else runs.push({ start: month, end: month })
+  }
+  return runs
+}
