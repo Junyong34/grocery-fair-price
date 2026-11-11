@@ -1,13 +1,14 @@
 "use client"
 
-import { Suspense, useMemo } from "react"
+import { useMemo } from "react"
 
 import { holidaysInMonth } from "@workspace/seasonal/calendar/holidays"
+import type { CalendarDate } from "@workspace/seasonal/calendar/month-calendar"
 import { CALENDAR_VARIANT_LABELS, CALENDAR_VARIANTS, type CalendarVariant } from "@workspace/seasonal/calendar/variants"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { SettingWhere } from "@/shared/settings/setting-section"
-import { useToday } from "@/shared/today-context"
+import { useSeoulToday } from "@/shared/today-context"
 
 import { MonthCalendar } from "../components/month-calendar"
 
@@ -18,7 +19,7 @@ const PREVIEW_ZOOM = 0.22
 /**
  * 설정 화면의 달력 모양 고르기. 네 모양을 실제 달력(이번 달)을 줄인 미리보기로 보여 준다.
  * 화살표 키로 옆 모양을 고른다.
- * 서울 오늘은 스트리밍으로 늦게 오므로 미리보기만 <Suspense>로 감싼다. 칸 높이가 고정이라 늦게 그려져도 레이아웃이 밀리지 않는다.
+ * 서울 오늘은 브라우저에서 정하므로 미리보기는 하이드레이션 뒤에 그린다. 칸 높이가 고정이라 늦게 그려져도 레이아웃이 밀리지 않는다.
  */
 export function CalendarStylePicker({
   value,
@@ -69,9 +70,7 @@ export function CalendarStylePicker({
                 )}
               >
                 <span aria-hidden inert style={{ width: PREVIEW_WIDTH, zoom: PREVIEW_ZOOM }}>
-                  <Suspense>
-                    <CalendarPreview variant={variant} />
-                  </Suspense>
+                  <CalendarPreview variant={variant} />
                 </span>
               </span>
               {CALENDAR_VARIANT_LABELS[variant]}
@@ -83,9 +82,14 @@ export function CalendarStylePicker({
   )
 }
 
-/** 서울 기준 이번 달을 그린 미리보기 한 칸. 서버가 계산한 오늘을 받으므로 <Suspense> 안에서 그린다. */
+/** 서울 기준 이번 달을 그린 미리보기 한 칸. 오늘을 브라우저에서 정하므로 하이드레이션 전에는 비어 있다. */
 function CalendarPreview({ variant }: { variant: CalendarVariant }) {
-  const today = useToday()
+  const today = useSeoulToday()
+  if (!today) return null
+  return <Preview variant={variant} today={today} />
+}
+
+function Preview({ variant, today }: { variant: CalendarVariant; today: CalendarDate }) {
   // 설정 화면에만 있어 공휴일 데이터를 여기서 구해도 다른 화면 번들에 들지 않는다.
   const holidays = useMemo(() => holidaysInMonth(today.year, today.month), [today.year, today.month])
   return <MonthCalendar year={today.year} month={today.month} today={today} holidays={holidays} variant={variant} />

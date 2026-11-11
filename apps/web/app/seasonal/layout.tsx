@@ -1,13 +1,8 @@
 import { BasketBadge } from "@/features/price/components/basket-badge"
 import { SeasonalShell } from "@/features/seasonal/components/seasonal-shell"
-import { getSeoulToday } from "@/shared/today"
-import { TodayProvider } from "@/shared/today-context"
 
+// 오늘(서울)은 요청 때 서버가 계산하지 않는다. 그래서 /seasonal 페이지는 구멍 없는 정적 페이지다(.scratch/seasonal-render-perf/spec.md 6.2).
+// 작은 오늘 표시는 shared/today-mark(첫 그리기 전 CSS), 날짜에 따른 내용은 useSeoulToday()(하이드레이션 뒤)로 그린다.
 export default function SeasonalLayout({ children, sheet }: LayoutProps<"/seasonal">) {
-  // 오늘은 await하지 않고 Promise로 넘긴다. 읽는 쪽(먹음 기록 토글 등)만 <Suspense> 안에서 기다린다.
-  return (
-    <TodayProvider today={getSeoulToday()}>
-      <SeasonalShell sheet={sheet} badges={{ basket: <BasketBadge /> }}>{children}</SeasonalShell>
-    </TodayProvider>
-  )
+  return <SeasonalShell sheet={sheet} badges={{ basket: <BasketBadge /> }}>{children}</SeasonalShell>
 }

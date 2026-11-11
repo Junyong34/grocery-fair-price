@@ -1,6 +1,6 @@
 # 12. 큰 숫자 폰트 서브셋
 
-Status: ready-for-agent
+Status: resolved (2026-11-11, LCP는 13)
 Type: task (AFK)
 Blocked by: 없음
 

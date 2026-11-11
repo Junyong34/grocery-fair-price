@@ -1,26 +1,27 @@
 "use client"
 
-import { Suspense, useState } from "react"
+import { useState } from "react"
 
+import type { CalendarDate } from "@workspace/seasonal/calendar/month-calendar"
 import { DOWNLOADS_COPY } from "@workspace/seasonal/data/copy"
 import { defaultDownloadYear, yearChoices } from "@workspace/seasonal/print/listing"
 import { Segmented } from "@workspace/ui/components/segmented"
 
-import { useToday } from "@/shared/today-context"
+import { useSeoulToday } from "@/shared/today-context"
 
 type YearPanel = { year: number; content: React.ReactNode }
 
-/** 포스터와 이유식 자료는 이 필터 밖에서 그린다. */
+/**
+ * 포스터와 이유식 자료는 이 필터 밖에서 그린다.
+ * 기본 연도가 올해(서울)에 달려 브라우저에서 정한다. 하이드레이션 전에는 자리만 잡는다.
+ */
 export function YearFilter({ panels }: { panels: readonly YearPanel[] }) {
-  return (
-    <Suspense fallback={<div className="min-h-10" aria-busy />}>
-      <Filtered panels={panels} />
-    </Suspense>
-  )
+  const today = useSeoulToday()
+  if (!today) return <div className="min-h-10" aria-busy />
+  return <Filtered panels={panels} today={today} />
 }
 
-function Filtered({ panels }: { panels: readonly YearPanel[] }) {
-  const today = useToday()
+function Filtered({ panels, today }: { panels: readonly YearPanel[]; today: CalendarDate }) {
   const publishedYears = panels.map((panel) => panel.year)
   const [picked, setPicked] = useState<number | null>(null)
   const year = picked ?? defaultDownloadYear(today, publishedYears)

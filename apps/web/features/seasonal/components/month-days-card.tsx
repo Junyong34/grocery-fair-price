@@ -1,7 +1,7 @@
 import { ChevronRight } from "lucide-react"
 import Link from "next/link"
 
-import type { CalendarDate } from "@workspace/seasonal/calendar/month-calendar"
+import { STATIC_YEARS } from "@workspace/seasonal/calendar/static-years"
 import { MONTH_DAY_KIND_LABELS, MONTH_DAY_NOTES, UI_COPY } from "@workspace/seasonal/data/copy"
 import { dishNames } from "@workspace/seasonal/data/dishes"
 import { festivalOf } from "@workspace/seasonal/data/festivals"
@@ -9,7 +9,7 @@ import { monthDays, type MonthDay, type MonthDayKind } from "@workspace/seasonal
 import { cn } from "@workspace/ui/lib/utils"
 
 import { routes } from "@/shared/routes"
-import { getSeoulToday } from "@/shared/today"
+import { TodayShow, todayKey } from "@/shared/today-mark"
 
 const KIND_TONE: Record<MonthDayKind, string> = {
   festival: "bg-gold-pale/40 text-gold-deep",
@@ -31,14 +31,14 @@ function noteOf(day: MonthDay): string {
 export function MonthDaysCard({
   month,
   year,
-  today,
+  markToday = false,
   className,
 }: {
   month: number
   /** 일정을 고르는 해 */
   year: number
-  /** 서울 기준 오늘. "오늘" 표시에 쓴다. 미리 그릴 때는 오늘이 없는 날짜(0년 0월 0일)를 넘긴다. */
-  today: CalendarDate
+  /** 오늘인 날에 "오늘"을 붙인다. 브라우저가 첫 그리기 전에 켠다(shared/today-mark). */
+  markToday?: boolean
   className?: string
 }) {
   const days = monthDays(month, year)
@@ -52,7 +52,7 @@ export function MonthDaysCard({
         <ul className="mt-2 divide-y divide-hairline">
           {days.map((day) => (
             <li key={day.id}>
-              <DayRow day={day} isToday={isSameDay(day.date, today)} />
+              <DayRow day={day} markToday={markToday} />
             </li>
           ))}
         </ul>
@@ -63,17 +63,19 @@ export function MonthDaysCard({
   )
 }
 
-/** 정적으로 미리 그리는 화면(2b)용. 오늘은 요청 시점에 읽으므로 <Suspense> 안에 둔다. */
-export async function MonthDaysCardToday({ month, className }: { month: number; className?: string }) {
-  const today = await getSeoulToday()
-  return <MonthDaysCard month={month} year={today.year} today={today} className={className} />
+/**
+ * 연도가 주소에 없는 정적 화면(2b)용. 일정은 해마다 날짜가 바뀌므로 미리 그리는 해마다 한 장씩 그려 두고,
+ * 브라우저가 올해(서울) 것만 켠다. 범위 밖의 해면 카드가 없다.
+ */
+export function ThisYearMonthDaysCard({ month, className }: { month: number; className?: string }) {
+  return STATIC_YEARS.map((year) => (
+    <TodayShow key={year} when={todayKey.year(year)}>
+      <MonthDaysCard month={month} year={year} markToday className={className} />
+    </TodayShow>
+  ))
 }
 
-function isSameDay(a: CalendarDate, b: CalendarDate): boolean {
-  return a.year === b.year && a.month === b.month && a.day === b.day
-}
-
-function DayRow({ day, isToday }: { day: MonthDay; isToday: boolean }) {
+function DayRow({ day, markToday }: { day: MonthDay; markToday: boolean }) {
   const body = (
     <>
       <span className="font-number text-[15px] leading-none tabular-nums text-ink">
@@ -85,7 +87,11 @@ function DayRow({ day, isToday }: { day: MonthDay; isToday: boolean }) {
           <span className={cn("rounded-full px-1.5 py-px text-[10px] leading-4 font-semibold", KIND_TONE[day.kind])}>
             {MONTH_DAY_KIND_LABELS[day.kind]}
           </span>
-          {isToday && <span className="text-[10px] font-semibold text-gold">오늘</span>}
+          {markToday && (
+            <TodayShow when={todayKey.day(day.date)}>
+              <span className="text-[10px] font-semibold text-gold">오늘</span>
+            </TodayShow>
+          )}
         </span>
         <span className="mt-0.5 block text-xs leading-snug break-keep text-stone">{noteOf(day)}</span>
       </span>

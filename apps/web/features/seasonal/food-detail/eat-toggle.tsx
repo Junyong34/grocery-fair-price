@@ -1,13 +1,13 @@
 "use client"
 
-import { Suspense, useState } from "react"
+import { useState } from "react"
 
 import { UI_COPY } from "@workspace/seasonal/data/copy"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { toggleEaten, useIsEaten } from "@/shared/eaten-store"
-import { useToday } from "@/shared/today-context"
+import { useSeoulToday } from "@/shared/today-context"
 
 /**
  * 먹음 기록 토글. 올해(서울 기준)에 기록하고, 켤 때 "+1"이 떠오른다(명세 2.7 pop).
@@ -20,22 +20,18 @@ export function EatToggle({
   foodId: string
   size?: "detail" | "card"
 }) {
-  const fallback = (
-    <Button variant="outline" size="sm" disabled>
-      {UI_COPY.eatToggleOff}
-    </Button>
-  )
-  if (size === "card")
-    return (
-      <Suspense fallback={fallback}>
-        <Toggle foodId={foodId} />
-      </Suspense>
+  // 올해(서울)는 브라우저에서 정한다. 하이드레이션 전에는 누를 수 없는 같은 모양의 버튼이다.
+  const today = useSeoulToday()
+  if (!today) {
+    const disabled = (
+      <Button variant="outline" size="sm" disabled>
+        {UI_COPY.eatToggleOff}
+      </Button>
     )
-  return (
-    <Suspense fallback={<DetailRow eaten={false}>{fallback}</DetailRow>}>
-      <DetailToggle foodId={foodId} />
-    </Suspense>
-  )
+    return size === "card" ? disabled : <DetailRow eaten={false}>{disabled}</DetailRow>
+  }
+  if (size === "card") return <Toggle year={today.year} foodId={foodId} />
+  return <DetailToggle year={today.year} foodId={foodId} />
 }
 
 /** 품종 상세 기록 줄. 버튼은 오른쪽에 작게 두고, 무엇을 하는 버튼인지는 왼쪽 글로 알린다. */
@@ -68,18 +64,16 @@ function DetailRow({
   )
 }
 
-function DetailToggle({ foodId }: { foodId: string }) {
-  const { year } = useToday()
+function DetailToggle({ year, foodId }: { year: number; foodId: string }) {
   const eaten = useIsEaten(year, foodId)
   return (
     <DetailRow eaten={eaten}>
-      <Toggle foodId={foodId} />
+      <Toggle year={year} foodId={foodId} />
     </DetailRow>
   )
 }
 
-function Toggle({ foodId }: { foodId: string }) {
-  const { year } = useToday()
+function Toggle({ year, foodId }: { year: number; foodId: string }) {
   const eaten = useIsEaten(year, foodId)
   // 켤 때마다 key를 바꿔 "+1"을 다시 띄운다.
   const [pops, setPops] = useState(0)

@@ -3,8 +3,6 @@
 import type { MonthHolidays } from "@workspace/seasonal/calendar/holidays"
 import type { CalendarDate } from "@workspace/seasonal/calendar/month-calendar"
 
-import { useToday } from "@/shared/today-context"
-
 import { MonthCalendar } from "../components/month-calendar"
 import { useSettings } from "../stores/settings-store"
 
@@ -23,13 +21,7 @@ export function SettingsScope({ children }: { children: React.ReactNode }) {
 }
 
 /** ⚙에서 고른 모양으로 그리는 달력. 저장값을 불러오기 전(서버 HTML)에는 기본 plain이다. */
-export function SettingsCalendar(props: { year: number; month: number; today: CalendarDate; holidays: MonthHolidays }) {
+export function SettingsCalendar(props: { year: number; month: number; today?: CalendarDate; markToday?: boolean; holidays: MonthHolidays }) {
   const variant = useSettings((state) => state.calendarStyle)
   return <MonthCalendar {...props} variant={variant} />
-}
-
-/** 오늘 동그라미가 있는 달력. 오늘은 요청 시점 값이라 <Suspense> 안에 둔다(fallback은 오늘 없는 SettingsCalendar). */
-export function SettingsCalendarToday(props: { year: number; month: number; holidays: MonthHolidays }) {
-  const today = useToday()
-  return <SettingsCalendar {...props} today={today} />
 }

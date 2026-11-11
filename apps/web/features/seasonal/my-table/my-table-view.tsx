@@ -21,7 +21,7 @@ import { Segmented } from "@workspace/ui/components/segmented"
 import { ScrollRow } from "@workspace/ui/components/scroll-row"
 
 import { useEatenIds } from "@/shared/eaten-store"
-import { useToday } from "@/shared/today-context"
+import { useSeoulToday } from "@/shared/today-context"
 
 import { PillButton } from "../components/pill"
 import { FoodRow } from "./food-row"
@@ -40,7 +40,13 @@ import {
  * 모바일은 한 열, 데스크톱은 왼쪽 요약 + 오른쪽 2열 목록.
  */
 export function MyTableView() {
-  const { year, month: thisMonth } = useToday()
+  // 올해(서울)와 기기의 기록은 브라우저에서 정해진다. 하이드레이션 전에는 빈 자리만 그린다.
+  const today = useSeoulToday()
+  if (!today) return <div className="min-h-svh" aria-busy />
+  return <MyTable year={today.year} thisMonth={today.month} />
+}
+
+function MyTable({ year, thisMonth }: { year: number; thisMonth: number }) {
   const eaten = useEatenIds(year)
 
   const [query, setQuery] = useState("")

@@ -26,6 +26,14 @@
   display: none;
 }
 
+/* 오늘 표시(shared/today-mark.tsx). 기본은 "오늘 아님" 모양이고, <head>의 스크립트가 그날의 키만 뒤집는다. */
+[data-today-show] {
+  display: none;
+}
+[data-today-hide] {
+  display: contents;
+}
+
 /* 한글 줄바꿈. 기본값은 음절 사이에서도 끊어 "기름 / 진 달"처럼 낱말이 갈라지므로 어절 단위로 끊는다.
    한 어절이 칸보다 길 때만 어절 안에서 끊는다(overflow-wrap). 제목은 줄 길이를 고르게, 문단은 끝줄에 한 낱말만 남지 않게 한다. */
 /* 화면 맨 위에서 헤더 아래까지의 높이. 헤더가 숨으면 셸(site-nav)이 0px로 바꾸고, 고정 줄(탭 · 구간 줄)이 이 값을 top으로 쓴다. */

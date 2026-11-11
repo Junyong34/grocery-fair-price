@@ -9,6 +9,7 @@ import { createMetadata, SITE_CONFIG, siteUrl } from "@/shared/meta"
 import { Providers } from "@/shared/providers"
 import { WEB_APP_BACKGROUND } from "@/shared/pwa"
 import { searchVerification } from "@/shared/seo/indexing"
+import { TODAY_MARK_SCRIPT } from "@workspace/seasonal/calendar/today-marks"
 import { cn } from "@workspace/ui/lib/utils"
 
 // 사이트 기본 메타데이터. 페이지는 createMetadata로 덮어쓰고, 탭 제목 꼬리는 여기 template이 붙인다.
@@ -39,6 +40,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" data-mode="light" className={cn("antialiased font-sans", serifKo.variable, displayFont.variable)}>
+      <head>
+        {/* 오늘 표시를 첫 그리기 전에 켠다(shared/today-mark.tsx). 루트 레이아웃이라 클라이언트에서 다시 그려지지 않는다. */}
+        <script dangerouslySetInnerHTML={{ __html: TODAY_MARK_SCRIPT }} />
+      </head>
       <body>
         <Providers>{children}</Providers>
       </body>

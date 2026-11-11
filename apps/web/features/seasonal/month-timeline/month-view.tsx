@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { Suspense } from "react"
 
 import { MONTH_CATEGORY_COPY, MONTH_NOTES } from "@workspace/seasonal/data/copy"
 import {
@@ -12,7 +11,7 @@ import { Button } from "@workspace/ui/components/button"
 import { routes } from "@/shared/routes"
 
 import { DownloadsCard } from "@/shared/downloads/downloads-card"
-import { MonthDaysCardToday } from "../components/month-days-card"
+import { ThisYearMonthDaysCard } from "../components/month-days-card"
 import { ShareButton } from "@/shared/share-button"
 import { EatenInMonth } from "./eaten-summary"
 import { FoodCard } from "./food-card"
@@ -33,12 +32,8 @@ export function MonthView({ month }: { month: Month }) {
   const foods = foodsInMonth(month)
   const groups = foodsInMonthByCategory(month)
   const note = MONTH_NOTES[month]
-  // 절기·명절 카드는 해마다 날짜가 바뀌어 요청 시점의 연도로 그린다. 나머지 본문은 정적이다.
-  const monthDays = (
-    <Suspense fallback={null}>
-      <MonthDaysCardToday month={month} />
-    </Suspense>
-  )
+  // 절기·명절 카드는 해마다 날짜가 바뀐다. 해마다 미리 그려 두고 브라우저가 올해 것을 켠다.
+  const monthDays = <ThisYearMonthDaysCard month={month} />
 
   return (
     <div

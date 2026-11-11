@@ -2,7 +2,7 @@
 
 import { ArrowRight, ChevronDown } from "lucide-react"
 import Link from "next/link"
-import { Suspense, useId, useState } from "react"
+import { useId, useState } from "react"
 
 import { INGREDIENT_COPY as COPY } from "@workspace/seasonal/data/copy"
 import { isDrawn, type Food, type FoodCategory } from "@workspace/seasonal/data/foods"
@@ -15,7 +15,7 @@ import { ScrollRow } from "@workspace/ui/components/scroll-row"
 import { cn } from "@workspace/ui/lib/utils"
 
 import { routes } from "@/shared/routes"
-import { useToday } from "@/shared/today-context"
+import { useSeoulToday } from "@/shared/today-context"
 
 import { FoodImage } from "../components/food-image"
 import { PillButton } from "../components/pill"
@@ -36,7 +36,7 @@ type CalendarGroup = {
 
 /**
  * 제철 식재료 달력. 카테고리 알약 → 이번 달 띠 → 품종별 1~12월 막대 표 순서다.
- * 오늘의 달은 서버 요청마다 정해지므로(useToday) 그 부분만 <Suspense> 안에서 그리고, 기다리는 동안은 달 강조 없이 같은 모양을 보인다.
+ * 오늘의 달은 브라우저에서 정하므로(useSeoulToday) 하이드레이션 전에는 달 강조 없이 같은 모양을 보인다.
  */
 export function IngredientCalendar({
   groups,
@@ -45,6 +45,7 @@ export function IngredientCalendar({
   groups: readonly CalendarGroup[]
   initialCategory: FoodCategory
 }) {
+  const today = useSeoulToday()
   const [category, setCategory] = useState(initialCategory)
   const [expanded, setExpanded] = useState(false)
   const group = groups.find((group) => group.category === category) ?? groups[0]
@@ -85,15 +86,9 @@ export function IngredientCalendar({
         ))}
       </div>
 
-      <Suspense fallback={body(null)}>
-        <WithToday render={body} />
-      </Suspense>
+      {body(today?.month ?? null)}
     </>
   )
-}
-
-function WithToday({ render }: { render: (month: number) => React.ReactNode }) {
-  return render(useToday().month)
 }
 
 function CalendarBody({

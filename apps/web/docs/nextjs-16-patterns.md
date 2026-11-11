@@ -105,11 +105,16 @@
 
 근거: `08-caching.md` "Random values and timestamps", `connection.md`, `02-guides/preventing-flash-before-hydration.md` "Dates and formatting"(서버와 클라이언트의 locale/TZ 차이로 하이드레이션 오류가 나는 예).
 
-구조는 레이아웃에서 오늘 Promise를 한 번 만들어(await하지 않고) Context로 나눠 주는 것이다. (`single-page-applications.md` "Using React's `use` within a Context Provider")
+**/seasonal · /settings 예외: 서버가 오늘을 계산하지 않는다(2026-11-11).** A의 구멍이 있으면 Next 16.4 resume이 RSC 트리 전체를 한 벌 더 인라인하고(2a 1.32MB × 2) 요청마다 함수가 돈다(`.scratch/seasonal-render-perf/baseline.md` "RSC 중복 원인"). 그래서 두 갈래로 나눈다.
+
+- 작은 오늘 표시(달력 동그라미, "오늘" · "이번 달" · "지금 계절", 올해 날짜): 정적 HTML에 `TodayShow` · `TodayHide`(`shared/today-mark.tsx`)로 키(`d2026-11-11`, `ym2026-11`, `m11`, `y2026`)를 달아 숨겨 두고, 루트 레이아웃 `<head>`의 `TODAY_MARK_SCRIPT`(`packages/seasonal/src/calendar/today-marks.ts`)가 HTML을 읽는 도중 서울 날짜로 그날의 키를 켜는 `<style>`을 붙인다. 첫 그리기 전이라 깜빡임이 없고, React가 관리하는 노드를 건드리지 않아 하이드레이션 불일치도 없다. 근거: `02-guides/preventing-flash-before-hydration.md`의 인라인 스크립트 방식.
+- 날짜에 따라 내용이 바뀌는 곳(먹음 기록의 연도, 나의 식탁, 다운로드 연도, 식재료 달력의 이번 달 띠): `useSeoulToday()`(`shared/today-context.tsx`, `useSyncExternalStore`). 하이드레이션 전에는 `null`이고 오늘 없는 모양을 그린다. 기기 기록도 하이드레이션 뒤에 오므로 같은 때에 바뀐다.
+
+아래는 그 밖의 서버 코드(시세, 어드민, 이유식)에 남은 A 방식이다. 구조는 레이아웃에서 오늘 Promise를 한 번 만들어(await하지 않고) Context로 나눠 주는 것이었다. (`single-page-applications.md` "Using React's `use` within a Context Provider")
 
 **2a 예외: 날짜를 proxy에서 정한다(2026-11-05).** 2a는 12개월 전체가 "오늘"의 (연, 월)에 달려 있어 A로 그리면 본문 전체가 요청마다 그려졌다(운영 1.5초). 그래서 `proxy.ts`가 서울 기준 (연, 월)을 계산해 미리 그린 `/seasonal/at/[yearMonth]`로 rewrite하고, 일 단위 오늘 표시만 A로 채운다. 렌더 전에 계산하므로 C의 "달이 바뀔 때 묵은 판" 문제가 없다. rewrite된 페이지를 미리 그릴 때 `usePathname()`은 내부 경로를 돌려주므로, 경로로 현재 메뉴를 고르는 셸은 `usePublicPathname()`(`shared/shell/public-path.ts`)을 쓴다. 안 그러면 `aria-current`가 서버와 브라우저에서 달라 하이드레이션이 깨진다. 근거와 측정: `.scratch/seasonal-static/spec.md`.
 
-실제 코드: `shared/today.ts`의 `getSeoulToday()`(`connection()` 뒤 `seoulToday()`, React `cache()`로 한 요청에 한 번) → `app/seasonal/layout.tsx`의 `TodayProvider`(`shared/today-context.tsx`) → 클라이언트는 `<Suspense>` 안에서 `useToday()`(`use(promise)`)로 읽는다. 클라이언트에서 날짜를 다시 계산하지 않는다. 자정을 넘겨 탭을 열어 둔 경우는 무시한다.
+실제 코드: `shared/today.ts`의 `getSeoulToday()`(`connection()` 뒤 `seoulToday()`, React `cache()`로 한 요청에 한 번)를 `<Suspense>` 안 서버 컴포넌트에서 읽는다. 자정을 넘겨 탭을 열어 둔 경우는 무시한다.
 
 > 로컬 개발에서는 서버와 브라우저의 TZ가 같아 불일치를 놓치기 쉽다. 문서는 `TZ=UTC LANG=ja_JP.UTF-8 next dev`처럼 일부러 다르게 띄워 보라고 권한다. (`preventing-flash-before-hydration.md` "Good to know")
 

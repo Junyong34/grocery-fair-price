@@ -114,7 +114,7 @@ import 경로:
 | `/products` | 상품 목록: 상품이 있는 카테고리 카드. 검색 없이 링크만 따라 상품 상세에 닿는 입구(2026-11-10) | `(price)/products/page.tsx` | `features/price/product-catalog/catalog-view` |
 | `/products/categories/[category]` | 상품 카테고리 페이지 (`price.category.slug`): 그 카테고리의 식재료 시세와 모든 상품을 품목별로, 접지 않고 보인다 | `(price)/products/categories/[category]/page.tsx` | `features/price/product-catalog/category-view`. 카테고리(`listCategories`)와 상품 목록으로 `generateStaticParams` · sitemap(`productCategories`) |
 | `/seasonal` | 2a 이달 · 12개월 스크롤 | `proxy.ts`가 아래 `at/[yearMonth]`로 rewrite. `seasonal/(this-month)/page.tsx`는 proxy가 돌지 않을 때의 대비책(요청 시점 렌더, `@sheet/page.tsx`와 짝) | `this-month/this-month-view` |
-| `/seasonal/at/[yearMonth]` | 2a를 (연, 월)마다 미리 그린 내부 경로(`2026-11`). 해는 `STATIC_YEARS`(2026~공휴일 데이터 마지막 해). 메타데이터는 `/seasonal`의 것 | `seasonal/(this-month)/at/[yearMonth]/page.tsx` | `this-month/this-month-view`. 이번 달 달력·일별 카드의 오늘 표시만 요청 때 채운다(`.scratch/seasonal-static/spec.md`) |
+| `/seasonal/at/[yearMonth]` | 2a를 (연, 월)마다 미리 그린 내부 경로(`2026-11`). 해는 `STATIC_YEARS`(2026~공휴일 데이터 마지막 해). 메타데이터는 `/seasonal`의 것 | `seasonal/(this-month)/at/[yearMonth]/page.tsx` | `this-month/this-month-view`. 완전 정적. 서버는 이번 달 · 다음 달 섹션 내용만 그리고(`month-section`), 나머지 달은 틀(`month-shell`)만 두었다가 화면 가까이 오거나 바로 이동하면 `lazy-month`가 따로 받은 청크로 그린다. 오늘 표시는 `shared/today-mark`(`.scratch/seasonal-render-perf/spec.md` 6.2 · 6.3) |
 | `/seasonal/months` | 2b 열두 달 카드 목록 | `seasonal/(this-month)/months/page.tsx` | `month-timeline/months-index` |
 | `/seasonal/months/[month]` | 2b 그 달 상세 (1~12) | `seasonal/(this-month)/months/(detail)/[month]/page.tsx` | `month-timeline/month-view`, 레이아웃에 `month-timeline` |
 | `/seasonal/seasons` | 3a 계절 히어로 | `seasonal/(season)/seasons/page.tsx` | `seasons/seasons-hero` |
@@ -153,7 +153,7 @@ import 경로:
 라우팅 장치:
 
 - **`app/(price)/layout.tsx`**: 가격 셸을 쓰는 화면(`/`, `/search`, `/prices/*`, `/products/*`, `/basket`, `/baby-food/*`, `/settings/*`, `/privacy`)의 셸(`features/price/components/price-shell`: 공통 셸 + 가격 메뉴 + 기기 저장 store 불러오기). 데이터는 `features/price/data/price-source.ts`의 `getPriceSource()`로만 읽는다.
-- **`app/seasonal/layout.tsx`**: `TodayProvider`(서울 오늘 Promise)와 `SeasonalShell`(헤더, 하단 Floating Nav, 검색, ⚙(→ `/settings`). 공유 버튼은 헤더가 아니라 월별·계절·명절·품종 상세의 제목 줄과, 이달(모바일)의 월 레일 아래에 있다)을 깐다. `sheet` 슬롯을 받는다.
+- **`app/seasonal/layout.tsx`**: `SeasonalShell`(헤더, 하단 Floating Nav, 검색, ⚙(→ `/settings`). 공유 버튼은 헤더가 아니라 월별·계절·명절·품종 상세의 제목 줄과, 이달(모바일)의 월 레일 아래에 있다)을 깐다. `sheet` 슬롯을 받는다.
 - **라우트 그룹** `(this-month)`과 `(season)`: URL을 바꾸지 않고 같은 제철달력 탭 줄(`SeasonalTabs`: 이달 · 월별 · 계절 · 명절, 헤더 아래 고정)을 그린다. `(detail)` 그룹은 2b 타임라인을 그 달 상세에만 붙인다. 타임라인과 명절 칩은 레이아웃에 두어 달·명절을 바꿔도 가로 스크롤 위치가 남는다.
 - **`@sheet` 병렬 슬롯**: `(.)foods/[food]`가 품종 상세를 가로채 시트로 띄운다. `default.tsx`, `page.tsx`, `[...catchAll]`은 null을 그려 다른 곳으로 이동하면 시트가 닫힌다. 새 제철 라우트를 더해도 `@sheet`는 고칠 것이 없다.
 - **정적 생성**: 동적 라우트는 모두 `generateStaticParams`로 전부 만든다(12달, 4계절, 명절, 품종). Cache Components에서는 `dynamicParams`를 못 쓰므로 목록 밖 값은 `notFound()`로 막고, `params`는 `<Suspense>` 안에서 읽는다.
@@ -188,7 +188,7 @@ import 경로:
 | `my-table/` | 1h | `my-table-view`(시기 × 카테고리 × 검색), `category-filter`(단일 선택 하단 시트), `scope-summary`(시기 기준 요약), `food-row`, `typed-label` |
 | `food-detail/` | 1i | `food-detail`, `eat-toggle`, `festival-link` |
 | `search/` | 전역 검색 | `food-search`(헤더 버튼), `food-search-dialog`(cojeev command, 초성 검색) |
-| `components/` | 공통 | `seasonal-shell`(공통 셸에 제철 메뉴 · 검색 · ⚙를 넣는다), `sub-tabs`, `food-image`(그림 없으면 이름 카드), `detail-sheet`(품종 · 에디션 상세 시트), `scatter-field`(흩어진 배치)·`calendar-fit`(모바일 판 달력 폭 맞춤), `month-calendar`, `month-days-card`(달력 아래 "이달의 절기·명절". 2b는 `MonthDaysCardToday`를 `<Suspense>` 안에), `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-name`(먹은 품종 이름 밑줄), `eaten-count`, `holiday-name`, `screen-stub`, `pill`(고르기 알약 `PillLink`·`PillButton`) |
+| `components/` | 공통 | `seasonal-shell`(공통 셸에 제철 메뉴 · 검색 · ⚙를 넣는다), `sub-tabs`, `food-image`(그림 없으면 이름 카드), `detail-sheet`(품종 · 에디션 상세 시트), `scatter-field`(흩어진 배치)·`calendar-fit`(모바일 판 달력 폭 맞춤), `month-calendar`, `month-days-card`(달력 아래 "이달의 절기·명절". 2b는 `ThisYearMonthDaysCard`가 해마다 그려 두고 올해 것만 켬), `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-name`(먹은 품종 이름 밑줄), `eaten-count`, `holiday-name`, `screen-stub`, `pill`(고르기 알약 `PillLink`·`PillButton`) |
 | `downloads/` | PDF 내려받기(.scratch/calendar-download) | `downloads-view`(목록: 종류별 가로 줄 `EditionShelf`), `year-filter`(연도 필터), `edition-detail`(상세: 시트 · 페이지 공용), `edition-download-link`(A4 내려받기 주소) |
 | `settings/` | 설정 화면 항목 | `display-settings`(화면 표시 섹션, 먹음 기록 지우기) |
 | `stores/` | 공통 | `settings-store`(표시 설정), `a3-request-store`("A3도 원해요"를 누른 에디션) |
@@ -264,7 +264,8 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `meta.ts` | `SITE_CONFIG`(사이트 이름 "장볼날"), `siteUrl()`, `absoluteUrl()`, `createMetadata()`, `ogImagePath()` |
 | `seo/` | 검색 색인: `pages.ts`(색인 레지스트리. 품종 상세처럼 목록을 데이터 입구에서 읽는 라우트는 `DATA_SEO_PAGES`에 두고 `app/sitemap.ts`가 펼친다)와 가드 테스트, `indexing.ts`(색인 스위치·소유 확인), `json-ld.tsx`(구조화 데이터), `titles.ts`(검색용 제목·설명), `route-pattern.ts` |
 | `today.ts` | `getSeoulToday()`: `server-only`. `connection()` 뒤에 서울 오늘을 계산하고 React `cache`로 요청당 한 번 |
-| `today-context.tsx` | `TodayProvider`, `useToday()`: 서버가 만든 Promise를 클라이언트가 `use()`로 읽는다. `<Suspense>` 안에서만 |
+| `today-context.tsx` | `useSeoulToday()`: 브라우저에서 읽는 서울 오늘. 하이드레이션 전에는 `null` |
+| `today-mark.tsx` | `TodayShow` · `TodayHide`: 정적 HTML에 숨긴 오늘 표시. `<head>`의 `TODAY_MARK_SCRIPT`가 첫 그리기 전에 그날 키를 켠다 |
 | `eaten-store.ts` | 먹음 기록: 연도 → 품종 id 목록. localStorage `seasonal:eaten`. `toggleEaten`, `useEatenIds`, `useIsEaten` |
 | `share-button.tsx` | 공유 버튼 `ShareButton`(Web Share API, 없으면 주소 복사 + 토스트)과 `sharePage` · `copyPageLink`. 제철 화면과 이유식 화면이 같이 쓴다 |
 | `shell/` | 가격과 제철이 같이 쓰는 셸: `site-shell`(헤더 + 본문 + 하단 내비), `site-nav`(`SiteHeader`, `FloatingNav`. 내비 칸 72px. 화면별 모바일 헤더 타입은 `HeaderBar`가 헤더의 바 자리에 포털로 그린다), `menus`(어디서나 같은 4칸: 시세 · 제철달력 · 담은 품종 · 나의 식탁, `activeMenuKey`. 품종 상세는 `nextMenuOrigin`이 기억한 출발지의 칸을 따른다), `match-path`(활성 판정 순수 함수), `nav-link`(활성 링크). `screens`(화면별 헤더 타입 root · sub · search와 스크롤 동작 표, `screenOf`), `sub-header`(하위 헤더 ‹ · 제목 · 액션, `HeaderBar` 포털로 그림), `search-link` · `settings-link`(루트 헤더 🔍 · ⚙). `header-scroll`(hide-on-scroll 헤더의 보임 판정 순수 함수: 10px 임계값, 맨 위 8px, 끝 튕김 무시), `scroll-to-top`(지금 탭을 다시 누르면 맨 위로. 하단 내비는 그 탭의 메인에서만, 하위 화면이면 메인으로 이동). `section-row`(구간 줄: 본문의 원래 줄(id)이 화면 위로 지나가면 탭 줄 또는 헤더 아래에 나타나는 40px 고정 줄 `SectionRow`와 칩 `SectionChip`. 2b 달 칩 · 제철 회 달 칩 · 1g 명절 칩 · P3 섹션 칩 · P1 검색 줄이 쓴다. 탭 줄 높이는 CSS 변수 `--tabs-h`). `use-scrolled-past`(본문 줄이 고정 줄 밑으로 지나갔는지. 구간 줄과 하위 헤더 제목 `revealAfter`가 쓴다). `site-footer`(장볼날 공통 푸터), `public-path`(proxy가 rewrite한 내부 경로 `/seasonal/at/…`를 사용자 주소로 돌려 하이드레이션 불일치를 막음). 헤더가 숨으면 셸이 `<html>`의 CSS 변수 `--shell-top`을 56px → 0px로 바꾸고, 고정 줄(제철달력 탭 줄 등)은 이 값을 `top`으로 쓴다. 메뉴 배지(담은 개수)는 라우트 레이아웃이 `badges`로 넣는다. 셸 규칙은 `.scratch/shell-unify/spec.md` |
@@ -281,7 +282,7 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 
 | 상태 | 위치 | 저장 | 비고 |
 |---|---|---|---|
-| 서울 오늘 | `shared/today.ts` → `TodayProvider` → `useToday()` | 없음 (요청마다 서버 계산) | 렌더 중 `new Date()`를 부르지 않는다 |
+| 서울 오늘 | 제철 · 설정: `TodayShow`(첫 그리기 전 CSS) · `useSeoulToday()`(하이드레이션 뒤). 그 밖: `shared/today.ts` | 없음 | 렌더 중 `new Date()`를 부르지 않는다 |
 | 먹음 기록 | `shared/eaten-store.ts` | localStorage `seasonal:eaten` | 앱 전체가 쓴다 |
 | 담은 품종 · 최근 본 시세 · 상품 | `features/price/stores/` | localStorage `price:basket` · `price:recent` | |
 | 표시 설정 (공휴일, 먹은 품종, 달력 모양, 달 이름. `/settings`에서 바꿈) | `features/seasonal/stores/settings-store.ts` | localStorage `seasonal:settings` | |
@@ -315,6 +316,7 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `data/month-days.ts` | 달력 아래 "이달의 절기·명절": 명절 + 이름난 절기 + 세시(복날·한식·단오·칠석)를 달별·날짜 순으로(`monthDays`, 빈 달의 `nextMonthDay`). 설명 문구는 `copy.ts` `MONTH_DAY_NOTES` |
 | `data/copy.ts` · `copy.test.ts` | 화면 문구: 달별 문구, 계절 설명, 명절 배경, UI 문구, 먹음 라벨. `MY_TABLE_COPY`는 목록 결과 수·조건별 빈 결과 안내 |
 | `calendar/today.ts` | `TIME_ZONE`(Asia/Seoul), `seoulNow`, `seoulToday`, `currentMonth` |
+| `calendar/today-marks.ts` | `todayKey` · `todayKeys` · `todayMarkCss` · `TODAY_MARK_SCRIPT`: 오늘 표시 키와 `<head>` 인라인 스크립트 |
 | `calendar/month-calendar.ts` | 달력 칸 계산(일·월요일 시작), `CalendarDate` |
 | `calendar/variants.ts` | 달력 모양 4가지(`CALENDAR_VARIANTS`)와 이름. 화면 ⚙와 인쇄물이 같이 쓴다 |
 | `calendar/holidays.ts` | 그 달 공휴일 |

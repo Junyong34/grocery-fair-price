@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useParams } from "next/navigation"
-import { Suspense, useEffect, useRef } from "react"
+import { useEffect, useRef } from "react"
 
 import { foodsInMonth } from "@workspace/seasonal/data/foods"
 import { MONTHS } from "@workspace/seasonal/data/months"
@@ -12,7 +12,8 @@ import { ScrollRow } from "@workspace/ui/components/scroll-row"
 
 import { useEatenIds } from "@/shared/eaten-store"
 import { routes } from "@/shared/routes"
-import { useToday } from "@/shared/today-context"
+import { useSeoulToday } from "@/shared/today-context"
+import { TodayHide, TodayShow, todayKey } from "@/shared/today-mark"
 import { PillLink } from "../components/pill"
 import { MONTH_TIMELINE_ID } from "./month-chip-row"
 
@@ -132,23 +133,12 @@ function DesktopColumns({ selected }: { selected: number }) {
                   .map((food) => food.name)
                   .join(", ")}
               </span>
-              <Suspense
-                fallback={
-                  <FoodBars
-                    ids={foods.map((food) => food.id)}
-                    eaten={new Set()}
-                  />
-                }
-              >
-                <EatenFoodBars ids={foods.map((food) => food.id)} />
-              </Suspense>
-              <Suspense fallback={<span className="h-3.5" />}>
-                <TodayMark
-                  month={month}
-                  className="text-[11px] text-gold-deep"
-                  dot
-                />
-              </Suspense>
+              <EatenFoodBars ids={foods.map((food) => food.id)} />
+              <TodayMark
+                month={month}
+                className="text-[11px] text-gold-deep"
+                dot
+              />
             </Link>
           )
         })}
@@ -157,7 +147,7 @@ function DesktopColumns({ selected }: { selected: number }) {
   )
 }
 
-/** 오늘이 든 달이면 "오늘". 오늘은 요청 시점 값이라 Suspense 안에서 읽는다. */
+/** 오늘이 든 달이면 "오늘". 정적 HTML에 두 모양을 두고 브라우저가 첫 그리기 전에 고른다(shared/today-mark). */
 function TodayMark({
   month,
   className,
@@ -167,18 +157,24 @@ function TodayMark({
   className?: string
   dot?: boolean
 }) {
-  const today = useToday()
-  if (today.month !== month) return <span className={cn("h-3.5", className)} />
   return (
-    <span className={cn("h-3.5 leading-none font-semibold", className)}>
-      {dot ? "● 오늘" : "오늘"}
-    </span>
+    <>
+      <TodayHide when={todayKey.month(month)}>
+        <span className={cn("h-3.5", className)} />
+      </TodayHide>
+      <TodayShow when={todayKey.month(month)}>
+        <span className={cn("h-3.5 leading-none font-semibold", className)}>
+          {dot ? "● 오늘" : "오늘"}
+        </span>
+      </TodayShow>
+    </>
   )
 }
 
 function EatenFoodBars({ ids }: { ids: readonly string[] }) {
-  const { year } = useToday()
-  return <FoodBars ids={ids} eaten={useEatenIds(year)} />
+  // 기록과 연도 모두 브라우저에서 정해진다. 그 전에는 빈 막대다.
+  const today = useSeoulToday()
+  return <FoodBars ids={ids} eaten={useEatenIds(today?.year ?? 0)} />
 }
 
 /** 막대 1칸 = 품종 1가지. 먹은 품종은 gold로 채운다(명세 3.2 ②). */

@@ -1,6 +1,6 @@
 # 11. 2a 첫 HTML은 이번 달 · 다음 달만, 나머지 달은 늦게 그림
 
-Status: ready-for-agent
+Status: resolved (2026-11-11, 운영 확인은 13)
 Type: task (AFK)
 Blocked by: 10
 

@@ -1,6 +1,6 @@
 # 10. 오늘 표시를 브라우저로, /seasonal 완전 정적
 
-Status: ready-for-agent
+Status: resolved (2026-11-11, 운영 확인은 13)
 Type: task (AFK)
 Blocked by: 없음
 

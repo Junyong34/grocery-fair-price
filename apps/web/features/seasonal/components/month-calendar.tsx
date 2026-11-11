@@ -4,30 +4,40 @@ import { monthCalendar, type CalendarDate, type CalendarDay } from "@workspace/s
 import type { CalendarVariant } from "@workspace/seasonal/calendar/variants"
 import { cn } from "@workspace/ui/lib/utils"
 
+import { TodayHide, TodayShow, todayKey } from "@/shared/today-mark"
+
 import { HolidayName } from "./holiday-name"
 
 /** 토요일(6)·일요일(0) */
 const isWeekend = (weekday: number) => weekday === 0 || weekday === 6
 
+/** 오늘 표시가 없는 날짜. 인쇄물처럼 오늘을 그리지 않을 때 넘긴다. */
+export const NO_TODAY: CalendarDate = { year: 0, month: 0, day: 0 }
+
 /**
  * 한 달 달력(명세 5절, 절기 제외). 토·일·공휴일은 빨간 숫자다.
  * 공휴일 표시 설정(data-holidays=off)을 끄면 공휴일 이름과 빨간 표시가 함께 사라진다. 토·일은 그대로 빨간 날짜다.
+ * 오늘 동그라미는 두 방식이다. today로 날짜를 넘기거나(인쇄물은 NO_TODAY), markToday로 날마다 오늘 모양을 숨겨 두고
+ * 브라우저가 첫 그리기 전에 그날 것만 켠다(정적 페이지, shared/today-mark).
  */
 export function MonthCalendar({
   year,
   month,
-  today,
+  today = NO_TODAY,
+  markToday = false,
   holidays,
   variant = "plain",
 }: {
   year: number
   month: number
-  today: CalendarDate
+  today?: CalendarDate
+  /** 날마다 오늘 모양을 숨겨 두고 브라우저가 그날 것을 켠다. today는 무시한다. */
+  markToday?: boolean
   /** 그 달 공휴일. 서버에서 holidaysInMonth로 구해 넘긴다. */
   holidays: MonthHolidays
   variant?: CalendarVariant
 }) {
-  const weeks = monthCalendar({ year, month, today, holidays })
+  const weeks = monthCalendar({ year, month, today: markToday ? NO_TODAY : today, holidays })
   return (
     <table
       className={cn(
@@ -75,7 +85,19 @@ export function MonthCalendar({
                   variant === "tiles" && cell && tileColor(cell),
                 )}
               >
-                {cell && <Day cell={cell} variant={variant} />}
+                {cell &&
+                  (markToday ? (
+                    <>
+                      <TodayHide when={todayKey.day({ year, month, day: cell.day })}>
+                        <Day cell={cell} variant={variant} />
+                      </TodayHide>
+                      <TodayShow when={todayKey.day({ year, month, day: cell.day })}>
+                        <Day cell={{ ...cell, isToday: true }} variant={variant} fillToday />
+                      </TodayShow>
+                    </>
+                  ) : (
+                    <Day cell={cell} variant={variant} />
+                  ))}
               </td>
             ))}
           </tr>
@@ -93,7 +115,15 @@ function tileColor(cell: CalendarDay) {
   return "bg-surface/70"
 }
 
-function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant }) {
+/**
+ * 한 칸의 내용. fillToday면 칸 바탕(grid · tiles의 오늘 색)을 td 대신 이 안에서 깐다.
+ * markToday 달력은 td를 오늘이 아닌 모양으로 그리므로, 오늘 바탕은 숨겨 둔 오늘 모양 쪽이 가져야 한다.
+ */
+function Day({ cell, variant, fillToday = false }: { cell: CalendarDay; variant: CalendarVariant; fillToday?: boolean }) {
+  const fill =
+    fillToday && cell.isToday && (variant === "grid" || variant === "tiles") ? (
+      <span aria-hidden className={cn("absolute -inset-px -z-10", variant === "tiles" ? "rounded-md bg-ink" : "bg-gold-wash")} />
+    ) : null
   const holiday = cell.holidays.length > 0
   const weekend = isWeekend(cell.weekday)
   // 토·일은 늘 빨강, 공휴일만 빨간 날은 설정으로 끄면 먹색으로 돌아간다.
@@ -103,7 +133,8 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
 
   if (variant === "grid")
     return (
-      <div className="flex h-full flex-col items-start gap-0.5 p-1 text-left lg:p-1.5">
+      <div className={cn("flex h-full flex-col items-start gap-0.5 p-1 text-left lg:p-1.5", fill && "relative isolate")}>
+        {fill}
         <span aria-current={current} className={cn("text-[15px] leading-none font-medium tabular-nums lg:text-base", color, cell.isToday && "font-bold")}>
           {cell.day}
         </span>
@@ -135,7 +166,8 @@ function Day({ cell, variant }: { cell: CalendarDay; variant: CalendarVariant })
 
   if (variant === "tiles")
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-0.5">
+      <div className={cn("flex h-full flex-col items-center justify-center gap-0.5", fill && "relative isolate")}>
+        {fill}
         <span aria-current={current} className={cn("text-base font-semibold tabular-nums lg:text-lg", color, cell.isToday && "text-canvas!")}>
           {cell.day}
         </span>

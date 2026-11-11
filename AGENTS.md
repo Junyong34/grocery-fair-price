@@ -54,6 +54,7 @@ Regenerate with the command and commit the output. Hand edits are overwritten.
 | ERD blocks in `grocery-price/docs/30-data/schema-map.html` | `pnpm db:erd` (local DB up, migrations applied) | a migration changes tables, keys or checks. `pnpm db:test` fails while they differ. |
 | `grocery-price/reference/public-data/samples/viewer/api-explorer.html` | `python3 -I build.py` in that folder | `template.html`, `build.py` or the saved samples change. Then run `smoke.sh --quick` in that folder before finishing. |
 | `food-bounds.generated.ts` alone | `pnpm foods:bounds` | the SVGs changed without a sync. Needs no `prototypes/`. |
+| `apps/web/shared/fonts/BricolageGrotesque.woff2` (subset of `BricolageGrotesque-full.woff2`) | `scripts/subset-display-font.sh` (needs `fonttools` + `brotli`) | the font or the glyph range it must cover changes. |
 | `apps/web/public/downloads/**` (PDFs, `manifest.json`), `apps/web/print-editions/<id>.build.json` | the admin's "PDF 생성" button at `/admin` (`pnpm dev`, uses local Google Chrome) | an edition's spec changes, or anything a print page draws changes (foods, illustrations, holidays). Saving an edition rewrites `manifest.json`. |
 
 - The first two read `prototypes/`, so they run only on a machine that has it.
@@ -139,7 +140,10 @@ Server Components by default. Put `'use client'` on interactive leaves and pass 
 </important>
 
 <important if="your code needs today's date">
-"Today" is Seoul time computed once per request: `getSeoulToday()` (`shared/today.ts`) → `TodayProvider` in `app/seasonal/layout.tsx` → `useToday()` inside `<Suspense>`. Never call `new Date()` in rendering code.
+"Today" is Seoul time. Never call `new Date()` in rendering code.
+
+- `/seasonal` and `/settings` are fully static; the server never computes today there. Small today marks (calendar ring, "오늘", "이번 달", "지금 계절", this year's dates) are hidden in the HTML with `TodayShow`/`TodayHide` (`shared/today-mark.tsx`); the `<head>` script `TODAY_MARK_SCRIPT` turns on that day's keys before first paint. Content that depends on today (eaten records' year, my table, year filter) uses `useSeoulToday()` (`shared/today-context.tsx`), which is `null` until hydration.
+- Server code elsewhere (price, admin, baby-food) uses `getSeoulToday()` (`shared/today.ts`) inside `<Suspense>`.
 </important>
 
 <important if="you are saving state on the device or touching localStorage">
