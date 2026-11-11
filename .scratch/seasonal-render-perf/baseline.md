@@ -75,3 +75,31 @@ curl -s -o /dev/null -H 'accept-encoding: br' -w 'ttfb=%{time_starttransfer} tot
 - 기준선 2.35MB도 마크업 약 0.8MB + 인라인 RSC 약 1.55MB였을 것으로 추정한다(중복 여부는 그때 응답을 남기지 않아 확인하지 못했다).
 - TTFB 증가는 resume 쪽 렌더 비용 또는 응답 크기 때문일 수 있다. 티켓 03에서 가린다.
 - Style & Layout(1.3~1.5s)과 DOM 8,279개는 그대로다. 하이드레이션을 줄여도 Script Evaluation이 줄지 않았다.
+
+## RSC 중복 원인 (2026-11-11)
+
+**결론: 요청 때 채우는 구멍(PPR resume)이 있는 페이지는 인라인 RSC가 두 벌 실린다. Next 16.4의 resume 동작이며 2a만의 문제가 아니다.**
+
+운영 HTML의 인라인 RSC(`self.__next_f.push`) 비교:
+
+| 경로 | 구멍 | HTML | 큰 RSC 조각 |
+|---|---|---|---|
+| `/` (시세 메인) | 없음, 완전 정적 | 148KB | 한 벌(작은 조각 26개) |
+| `/seasonal/downloads` | 레이아웃의 오늘 Promise | 156KB | 57.8KB + 57.1KB |
+| `/seasonal/seasons/winter` | 오늘 | 493KB | 176.6KB + 176.0KB |
+| `/seasonal/months/3` | 오늘 | 577KB | 154.4KB + 150.6KB |
+| `/seasonal/at/2026-11` (2a) | 오늘 | 3.45MB | 1.32MB + 1.32MB |
+
+2a 응답 순서: 정적 셸 마크업(0~795KB, 히어로와 1~12월 전부) → RSC 1벌째(1.32MB) → 오늘 구멍 HTML `S:0~S:2`(각 약 7.6KB) → RSC 2벌째(1.32MB, `43:o1,~43:…`로 시작).
+
+근거 코드: `next@16.4.3/dist/server/app-render/app-render.js` 2305~2335행. postponed 상태로 resume할 때 `reactServerResult`(요청 때 새로 그린 **전체** RSC)를 `createNodeInlinedDataStream`으로 HTML 뒤에 인라인한다. 정적 셸에도 프리렌더 RSC가 이미 들어 있어서 두 벌이 된다. 다운로드 화면의 1벌째에 `{"year":2026,"month":11,"day":11}`이 들어 있어, 두 조각이 어떻게 나뉘는지는 소스만으로 다 설명하지 못했다. 로컬 `next build`가 `/products/[product]`(원격 DB `"use cache"` 시간 초과)에서 매번 멈춰 `next start` 재현은 하지 못했다.
+
+함께 설명되는 것:
+
+- **TTFB 0.5~2초(티켓 03):** 셸은 Vercel 캐시 HIT이지만 resume은 매 요청 함수가 2a 전체 RSC를 새로 그린다. 완전 정적인 `/`는 약 20ms다.
+- **04 뒤 HTML 47% 증가:** 판을 서버 컴포넌트로 옮겨 RSC 한 벌이 커졌고(그림마다 className · style이 트리에 들어감), 그것이 두 배로 실렸다.
+
+고칠 방향(결정 필요):
+
+1. `/seasonal` 페이지를 구멍 없는 완전 정적으로 만든다. 일 단위 "오늘"(달력 동그라미, 일별 카드, 먹음 기록 해)을 서버 요청 대신 브라우저에서 마운트 뒤 계산한다. 첫 화면은 지금 fallback과 같은 "오늘 표시 없는" 모양이라 하이드레이션 불일치는 없다. 그러면 RSC 한 벌, TTFB는 CDN 수준이 된다. AGENTS.md "today" 규칙과 `nextjs-16-patterns.md` 5.2를 바꿔야 한다.
+2. RSC 한 벌 자체를 줄인다. 판 그림마다 반복되는 className · style을 줄이거나, 판을 압축된 props를 받는 client 컴포넌트로 되돌린다(드래그 코드는 없이).
