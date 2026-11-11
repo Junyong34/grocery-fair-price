@@ -1,0 +1,38 @@
+{
+  "id": "year-sheet-3",
+  "title": "2027년 제철 해산물 달력",
+  "description": "",
+  "status": "draft",
+  "spec": {
+    "version": 1,
+    "orientation": "portrait",
+    "type": {
+      "heading": "gowun-batang",
+      "number": "pretendard",
+      "scale": 1
+    },
+    "surface": "white",
+    "margin": "safe",
+    "foods": {
+      "names": "hidden",
+      "max": 4
+    },
+    "kind": "year-sheet",
+    "year": 2027,
+    "monthLabel": "big-number",
+    "monthStyle": {
+      "palette": "season",
+      "size": "medium",
+      "frame": "none",
+      "font": "auto"
+    },
+    "calendar": {
+      "weekStart": 0,
+      "weekday": "korean",
+      "holidays": "mark",
+      "size": "medium"
+    },
+    "layout": "seafood",
+    "grid": "2x6"
+  }
+}

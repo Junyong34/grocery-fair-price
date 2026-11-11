@@ -98,6 +98,30 @@ describe("stripFoods", () => {
   })
 })
 
+describe("yearPictures 해산물 구성", () => {
+  const seafood = { ...yearSheet, layout: "seafood" } satisfies typeof yearSheet
+
+  it("달마다 그 달에 제철인 수산 그림만 최대 넷 싣고 여러 달이 제철인 품종은 반복한다", () => {
+    const months = yearPictures(withMax(seafood, 8))
+    MONTHS.forEach((month, index) => {
+      const foods = months[index]!
+      expect(foods).toHaveLength(4)
+      expect(foods.every((food) => food.category === "수산" && isDrawn(food.id) && foodsInMonth(month).includes(food))).toBe(true)
+    })
+    const ids = months.flat().map((food) => food.id)
+    expect(new Set(ids).size).toBeLessThan(ids.length)
+  })
+
+  it("개수 설정과 월별 포스터의 수산 품종 선정 순서를 따른다", () => {
+    const monthlySeafood = { ...withMax(poster, 2), categories: ["수산"] } satisfies typeof poster
+    const months = yearPictures(withMax(seafood, 2))
+    MONTHS.forEach((month, index) => {
+      expect(months[index]).toEqual(monthPictures(monthlySeafood, month))
+      expect(months[index]).toHaveLength(2)
+    })
+  })
+})
+
 describe("yearPictures", () => {
   it("품종을 최적 달(bestMonth)에만 놓고, 그 달 안에서는 친숙한 품종부터 고른다", () => {
     yearPictures(withMax(yearSheet, 8)).forEach((foods, index) => {

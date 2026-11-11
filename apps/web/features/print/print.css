@@ -103,6 +103,39 @@
 .print-flow { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; }
 .print-flow .print-food { position: static; }
 
+/* 연간 해산물 달력(Y-D). 왼쪽 날짜와 오른쪽 그림 묶음을 달마다 같은 위치에 둔다. */
+.print-seafood-title { display: flex; align-items: baseline; margin: 0; color: var(--color-forest); line-height: 1; }
+.print-seafood-months { display: grid; }
+.print-seafood-month { display: flex; border-block-start: var(--line) solid var(--color-hairline); }
+.print-seafood-month .print-month-label {
+  --seafood-month-ink: color-mix(in oklab, var(--month-color) 60%, var(--color-ink));
+  color: var(--seafood-month-ink);
+}
+.print-seafood-month .print-month-label[data-frame="ribbon"] .main { background: var(--seafood-month-ink); }
+.print-seafood-month .print-month-label[data-frame="outline"] .main { -webkit-text-stroke-color: var(--seafood-month-ink); }
+.print-seafood-month .print-calendar th:not(.is-red) { color: var(--color-stone); }
+.print-seafood-month .print-calendar .is-red { color: color-mix(in oklab, var(--color-holiday) 72%, var(--color-ink)); }
+.print-seafood-figures {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, 1fr);
+  place-items: center;
+  padding-block: calc(var(--u) * 0.8);
+}
+.print-seafood-figures .print-food { position: static; }
+.print-seafood-figures .print-food-name { color: var(--color-ink); }
+.print-seafood-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  flex: 1;
+  color: var(--color-caption);
+  font-size: calc(var(--u) * 2.8);
+  line-height: 1.2;
+}
+
 /* 제철 막대표(parts/period-chart.tsx). 왼쪽 이름 칸 + 오른쪽 열두 달. 줄 높이는 grid-auto-rows로 준다. */
 .print-chart { position: relative; display: grid; flex: none; align-items: center; line-height: 1; }
 .print-chart-grid { position: absolute; display: grid; grid-template-columns: repeat(12, 1fr); pointer-events: none; }

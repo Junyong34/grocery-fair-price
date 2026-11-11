@@ -4,7 +4,7 @@ import { CALENDAR_VARIANTS } from "../calendar/variants"
 import { FOODS, type FoodCategory } from "../data/foods"
 import { MONTHS, type Month } from "../data/months"
 import { SEASONS } from "../data/seasons"
-import { layoutDef, LAYOUTS } from "./layouts"
+import { layoutDef, layoutReads, LAYOUTS } from "./layouts"
 import { decodeSpecJson } from "./spec-codec"
 import { MONTH_LABEL_FONTS, MONTH_LABEL_FRAMES, MONTH_LABEL_PALETTES, MONTH_LABEL_SIZES, PRINT_MONTH_LABELS } from "./month-label"
 
@@ -146,7 +146,7 @@ const yearSheetSchema = z.object({
   monthStyle,
   // 칸이 작아 공휴일 이름은 들어가지 않는다.
   calendar: calendar(z.enum(["hidden", "mark"])),
-  /** 그림·달력 짝 체크무늬(Y-A) / 위에 1년치 그림 한 판, 아래 열두 달 3x4(Y-B. 세로 용지만) / 위에 작은 달력 열둘, 아래 제철 막대표(Y-C) */
+  /** 그림·달력 짝 체크무늬(Y-A) / 큰 그림 위, 열두 달 아래(Y-B) / 제철 막대표(Y-C) / 월별 제철 해산물(Y-D) */
   layout: z.enum(LAYOUTS["year-sheet"]).default("pairs"),
   /** 달 배열(열×행) */
   grid,
@@ -212,7 +212,7 @@ const printSpecSchema = z.preprocess(
     monthPosterSchema,
     babyFoodPairingsSchema,
     babyFoodFruitsSchema,
-  ]).refine((spec) => !("grid" in spec && spec.grid === "2x6" && spec.orientation === "landscape"), {
+  ]).refine((spec) => !("grid" in spec && spec.grid === "2x6" && spec.orientation === "landscape" && layoutReads(spec, "grid")), {
     message: "가로 용지에 2x6 배열은 칸이 너무 작다",
   })
   .refine((spec) => spec.orientation === "portrait" || !layoutDef(spec).portraitOnly, {

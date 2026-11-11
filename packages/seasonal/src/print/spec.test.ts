@@ -209,6 +209,11 @@ describe("parsePrintSpec", () => {
     expect(parsePrintSpec({ ...DEFAULT_SPECS["year-sheet"], orientation: "landscape", grid: "2x6" })).toBeInstanceOf(Error)
     expect(parsePrintSpec({ ...DEFAULT_SPECS["year-sheet"], orientation: "portrait", grid: "2x6" })).not.toBeInstanceOf(Error)
   })
+
+  it("해산물 구성은 가로로 바꿔도 저장된 2x6 배열에 막히지 않는다", () => {
+    const parsed = parsePrintSpec({ ...DEFAULT_SPECS["year-sheet"], layout: "seafood", orientation: "landscape", grid: "2x6" })
+    expect(parsed).toMatchObject({ layout: "seafood", orientation: "landscape" })
+  })
 })
 
 describe("encodeSpec · decodeSpec", () => {

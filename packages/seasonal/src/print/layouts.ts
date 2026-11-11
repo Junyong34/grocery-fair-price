@@ -7,7 +7,7 @@ import type { PrintKind } from "./spec"
 /** 종류마다 구성 값. 사양 스키마의 enum이고, LAYOUT_DEFS가 값마다 정의를 빠짐없이 갖는다(타입이 검사한다). */
 export const LAYOUTS = {
   monthly: ["scatter", "grid", "none", "side-check", "strip", "allover"],
-  "year-sheet": ["pairs", "hero-top", "chart"],
+  "year-sheet": ["pairs", "hero-top", "chart", "seafood"],
   "season-poster": ["bands", "quarters", "wheel", "per-season"],
   "month-poster": ["cells", "chart", "wheel", "rows-check"],
   "baby-food-pairings": ["three-sheets"],
@@ -56,6 +56,8 @@ export const LAYOUT_DEFS: { [K in PrintKind]: Record<(typeof LAYOUTS)[K][number]
     "hero-top": { label: "큰 그림 위, 열두 달 아래(세로 용지)", wireframe: "Y-B", portraitOnly: true, ignores: ["grid", "foods.max"] },
     // 달 배열이 방향마다 정해져 있고, 막대표는 달마다 넷을 줄마다 이름과 함께 싣는다(foods.ts chartFoods).
     chart: { label: "열두 달 달력 + 제철 막대표", wireframe: "Y-C", ignores: ["grid", "foods.max", "foods.names"] },
+    // 달마다 날짜 옆에 수산 그림과 이름을 함께 싣는다. 세로 2×6, 가로 3×4.
+    seafood: { label: "월별 제철 해산물", wireframe: "Y-D", foodsCap: 4, ignores: ["grid", "foods.names"] },
   },
   "season-poster": {
     bands: { label: "가로 띠 넷", wireframe: "S-A" },

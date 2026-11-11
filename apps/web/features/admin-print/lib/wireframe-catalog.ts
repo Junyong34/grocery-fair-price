@@ -313,6 +313,31 @@ const yearSheet: WireframeEntry[] = [
       ]
     },
   },
+  {
+    code: "Y-D",
+    kind: "year-sheet",
+    page: "sheet",
+    title: "월별 제철 해산물",
+    summary: "세로 2×6, 가로 3×4. 달마다 날짜와 대표 해산물 그림·이름을 나란히 놓는다. 여러 달이 제철인 해산물은 반복해 실을 수 있다.",
+    source: "Y-A의 달별 그림·달력 짝",
+    availability: { status: "available", options: 'layout: "seafood"' },
+    orientations: ["portrait", "landscape"],
+    draw: (orientation) => {
+      const [header, body] = split(contentBox(orientation), "rows", [18, "*", 6], 2)
+      const columns = orientation === "portrait" ? 2 : 3
+      return [
+        ...yearHeader(header!, 11),
+        ...monthGrid(body!, columns, 12 / columns, 4).flatMap((cell, i): Shape[] => {
+          const [dates, pictures] = split(cell, "cols", ["*", "*"], 4)
+          return [
+            { type: "line", tone: "faint", from: [cell.x, cell.y], to: [cell.x + cell.width, cell.y] },
+            ...labelledMiniCalendar(inset(dates!, 1), MONTHS[i]!),
+            ...monthGrid(inset(pictures!, 1), 2, 2, 0).flatMap((figure) => flow(figure, { count: 1, names: true })),
+          ]
+        }),
+      ]
+    },
+  },
 ]
 
 // ── 계절 포스터 ──
