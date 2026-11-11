@@ -57,7 +57,7 @@ export const LAYOUT_DEFS: { [K in PrintKind]: Record<(typeof LAYOUTS)[K][number]
     // 달 배열이 방향마다 정해져 있고, 막대표는 달마다 넷을 줄마다 이름과 함께 싣는다(foods.ts chartFoods).
     chart: { label: "열두 달 달력 + 제철 막대표", wireframe: "Y-C", ignores: ["grid", "foods.max", "foods.names"] },
     // 달마다 날짜 옆에 수산 그림과 이름을 함께 싣는다. 세로 2×6, 가로 3×4.
-    seafood: { label: "월별 제철 해산물", wireframe: "Y-D", foodsCap: 4, ignores: ["grid", "foods.names"] },
+    seafood: { label: "월별 제철 해산물", wireframe: "Y-D", foodsCap: 8, ignores: ["grid", "foods.names"] },
   },
   "season-poster": {
     bands: { label: "가로 띠 넷", wireframe: "S-A" },

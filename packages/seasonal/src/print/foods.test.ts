@@ -101,11 +101,11 @@ describe("stripFoods", () => {
 describe("yearPictures 해산물 구성", () => {
   const seafood = { ...yearSheet, layout: "seafood" } satisfies typeof yearSheet
 
-  it("달마다 그 달에 제철인 수산 그림만 최대 넷 싣고 여러 달이 제철인 품종은 반복한다", () => {
-    const months = yearPictures(withMax(seafood, 8))
+  it("달마다 그 달에 제철인 수산 그림만 최대 여덟 싣고 여러 달이 제철인 품종은 반복한다", () => {
+    const months = yearPictures(withMax(seafood, 12))
     MONTHS.forEach((month, index) => {
       const foods = months[index]!
-      expect(foods).toHaveLength(4)
+      expect(foods).toHaveLength(8)
       expect(foods.every((food) => food.category === "수산" && isDrawn(food.id) && foodsInMonth(month).includes(food))).toBe(true)
     })
     const ids = months.flat().map((food) => food.id)

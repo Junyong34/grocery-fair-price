@@ -126,6 +126,16 @@
 }
 .print-seafood-figures .print-food { position: static; }
 .print-seafood-figures .print-food-name { color: var(--color-ink); }
+.print-seafood-figures[data-dense] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.print-seafood-figures[data-dense] .print-food { max-inline-size: 100%; }
+.print-seafood-figures[data-dense] img { max-inline-size: calc(var(--u) * 9); }
+.print-seafood-figures[data-dense] .print-food-name {
+  max-inline-size: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+  line-height: 1.14;
+}
 .print-seafood-footer {
   display: flex;
   justify-content: space-between;

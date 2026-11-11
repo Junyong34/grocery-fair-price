@@ -84,6 +84,7 @@ function SeafoodYearSheet({ spec, paper }: { spec: YearSheetSpec; paper: Paper }
   // 그림 두 줄과 이름이 가장 낮은 A4 가로 칸에도 들어가도록 높이를 나눈다.
   const pictureSize = (height - 3) / 2 - 5
   const foodsByMonth = yearPictures(spec)
+  const dense = foodsByMonth.some((foods) => foods.length > 4)
   const label = spec.monthLabel === "big-number" ? "korean" : spec.monthLabel
 
   return (
@@ -101,9 +102,9 @@ function SeafoodYearSheet({ spec, paper }: { spec: YearSheetSpec; paper: Paper }
             style={{ gap: u(gap), background: spec.surface === "season" ? surfaceColor("season", monthSeason(month)) : undefined }}
           >
             <CalendarBlock spec={spec} month={month} width={calendarWidth} height={height} label={label} />
-            <div className="print-seafood-figures">
+            <div className="print-seafood-figures" data-dense={dense || undefined}>
               {foodsByMonth[index]!.map((food) => (
-                <FoodFigure key={food.id} food={food} size={pictureSize} nameSize={2.8} showName />
+                <FoodFigure key={food.id} food={food} size={pictureSize} nameSize={dense ? 2.6 : 2.8} showName />
               ))}
             </div>
           </div>
