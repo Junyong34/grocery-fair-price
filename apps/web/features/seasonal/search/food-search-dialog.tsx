@@ -93,7 +93,7 @@ export function FoodSearchDialog({
                 className="flex! items-center justify-start! gap-3 text-left after:ml-auto"
               >
                 <span className="block size-9 shrink-0">
-                  <FoodImage food={food} sizes="36px" showName={false} />
+                  <FoodImage food={food} showName={false} />
                 </span>
                 <span className="flex min-w-0 flex-col">
                   <span className="truncate font-semibold">{food.name}</span>

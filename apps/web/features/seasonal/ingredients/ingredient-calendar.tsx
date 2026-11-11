@@ -272,7 +272,7 @@ function FoodThumb({ food }: { food: CalendarFood }) {
   }
   return (
     <span aria-hidden className={cn(box, "bg-pair-light p-0.5")}>
-      <FoodImage food={food} sizes="36px" showName={false} />
+      <FoodImage food={food} showName={false} />
     </span>
   )
 }
@@ -390,7 +390,7 @@ function NowThumb({ food, preload }: { food: CalendarFood; preload: boolean }) {
     )
   return (
     <span aria-hidden className={cn(box, "p-1")}>
-      <FoodImage food={food} sizes="48px" showName={false} preload={preload} />
+      <FoodImage food={food} showName={false} preload={preload} />
     </span>
   )
 }

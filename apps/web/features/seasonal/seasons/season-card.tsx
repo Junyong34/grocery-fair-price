@@ -84,7 +84,7 @@ function Collage({
               zIndex: spot.z,
             }}
           >
-            <FoodImage food={food} sizes="200px" showName />
+            <FoodImage food={food} showName />
           </span>
         )
       })}

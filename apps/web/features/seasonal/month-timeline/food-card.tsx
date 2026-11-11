@@ -31,7 +31,6 @@ export function FoodCard({ food }: { food: Food }) {
         <span className="relative block rounded-md bg-surface/60 p-2">
           <FoodImage
             food={food}
-            sizes="(min-width: 1024px) 200px, 45vw"
             showName={false}
           />
           <span className={COMPACT_ONLY}>

@@ -86,3 +86,4 @@ export const FOOD_VERSIONS: Readonly<Record<string, string>> = {
 | 05 | 그림 SVG SVGO 적용과 인쇄물 재생성 | 01 |
 | 06 | 그림 주소 버전과 immutable 캐시 | 05 |
 | 07 | 수채 필터 병목 판정 (조건부) | 01, 04, 05 |
+| 08 | FoodImage를 일반 img로 (구현 중 추가) | 없음 |

@@ -25,7 +25,7 @@ export function SeasonalFoodCard({
       className="group flex h-full items-center gap-3.5 rounded-xl border border-hairline bg-surface/85 p-3 text-ink no-underline transition-colors duration-200 hover:border-gold hover:bg-gold-wash/65 hover:text-ink"
     >
       <span className="block size-16 shrink-0 motion-safe:transition-transform motion-safe:duration-200 motion-safe:group-hover:scale-105">
-        <FoodImage food={food} sizes="64px" preload={preload} />
+        <FoodImage food={food} preload={preload} />
       </span>
       <span className="flex min-w-0 flex-col gap-0.5">
         <span className="flex flex-wrap items-center gap-1.5 text-base leading-snug font-semibold">

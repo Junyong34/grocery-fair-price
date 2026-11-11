@@ -59,7 +59,7 @@ export const FoodRow = memo(function FoodRow({ food, year }: { food: Food; year:
           )}
         >
           {isDrawn(food.id) ? (
-            <FoodImage food={food} sizes="40px" showName={false} />
+            <FoodImage food={food} showName={false} />
           ) : (
             <span
               aria-hidden

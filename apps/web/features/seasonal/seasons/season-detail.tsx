@@ -127,7 +127,6 @@ export function SeasonDetail({ season }: { season: Season }) {
                           <span className="relative block w-full rounded-lg bg-surface/40 p-2 group-hover/food:bg-surface/70 group-focus-visible/food:bg-surface/70">
                             <FoodImage
                               food={food}
-                              sizes="(min-width: 1024px) 110px, (min-width: 640px) 120px, 22vw"
                               showName={false}
                             />
                             <EatenBadgeToday foodId={food.id} />
@@ -193,7 +192,6 @@ function SeasonStep({
             <FoodImage
               key={food.id}
               food={food}
-              sizes="40px"
               showName={false}
             />
           ))}

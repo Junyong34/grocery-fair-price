@@ -98,7 +98,7 @@ export function ScatterField({
             }}
           >
             <span className="block">
-              <FoodImage food={food} sizes={`${Math.round(px * 1.5)}px`} showName={false} />
+              <FoodImage food={food} showName={false} />
             </span>
             <span className="block text-center leading-tight font-semibold whitespace-nowrap" style={{ fontSize, marginTop }}>
               <EatenName year={year} foodId={food.id}>{food.name}</EatenName>

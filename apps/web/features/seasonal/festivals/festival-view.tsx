@@ -154,7 +154,7 @@ export function FestivalView({ slug }: { slug: Festival }) {
                   className="group flex h-full flex-col items-center gap-2 rounded-xl border border-hairline bg-canvas/45 p-3 text-center text-ink no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-gold hover:bg-gold-wash/65 hover:text-ink"
                 >
                   <span className="block size-16 shrink-0 transition-transform duration-200 group-hover:scale-105">
-                    <FoodImage food={food} sizes="64px" showName={false} />
+                    <FoodImage food={food} showName={false} />
                   </span>
                   <span className="flex flex-col gap-0.5">
                     <span className="text-[15px] font-semibold">

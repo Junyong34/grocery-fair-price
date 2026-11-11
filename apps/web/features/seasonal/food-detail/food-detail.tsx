@@ -39,7 +39,7 @@ export function FoodDetail({
   return (
     <div className="flex flex-col gap-6">
       <div className="mx-auto w-full max-w-[240px]">
-        <FoodImage food={food} variant="motion" sizes="240px" preload />
+        <FoodImage food={food} variant="motion" preload />
       </div>
 
       <div className="flex flex-col gap-3">
@@ -114,7 +114,7 @@ export function FoodDetail({
                   scroll={false}
                   className="flex flex-col items-center gap-1 text-center text-xs text-ink no-underline hover:text-ink"
                 >
-                  <FoodImage food={other} sizes="72px" showName={false} />
+                  <FoodImage food={other} showName={false} />
                   <span className="w-full truncate">{other.name}</span>
                 </Link>
               </div>

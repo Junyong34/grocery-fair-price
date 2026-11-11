@@ -36,3 +36,16 @@ curl -s -o /dev/null -H 'accept-encoding: br' -w 'ttfb=%{time_starttransfer} tot
 **판정:** Paint(Rendering)는 0.55~0.78s로 Style & Layout(1.1~1.5s)과 Script(1.4~1.6s)보다 작다. 지금은 DOM 크기와 하이드레이션이 먼저다. 수채 필터(티켓 07)는 04 · 05 뒤에 다시 본다.
 
 ## 변경 후
+
+### 04 + 08 뒤, 로컬 프로덕션 빌드 (2026-11-11)
+
+`apps/web`에서 `next build`, 프리렌더 결과 `.next/server/app/seasonal/at/2026-11.html`. 운영 응답과 같은 정적 셸이지만 운영 측정이 아니다. 빌드는 2a를 만든 뒤 무관한 `/products/[product]`(원격 DB `"use cache"` 시간 초과)에서 멈췄다.
+
+| 지표 | 기준선(운영) | 04 + 08(로컬) |
+|---|---|---|
+| HTML 압축 전 | 2.35MB | 806KB |
+| HTML brotli | 202KB | 40KB |
+| `<img>` | 782 | 782 |
+| 그림마다 붙던 client 컴포넌트 | `DraggableScatter` 판 + `next/image` 782개 | `IntentLink`(판 그림 링크)만 |
+
+Lighthouse · TTFB는 push · 배포 뒤 운영에서 다시 잰다.

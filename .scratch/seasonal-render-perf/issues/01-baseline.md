@@ -1,6 +1,6 @@
 # 01. 운영 기준선 측정
 
-Status: ready-for-agent
+Status: resolved
 Type: task (AFK)
 Blocked by: 없음
 
