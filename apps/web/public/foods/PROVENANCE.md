@@ -10,7 +10,7 @@
 | kit sha | `6806db565e0538c4` |
 | 변형 | `color`, `motion` |
 | 바닥 그림자 | 끔 |
-| 품종 수 | 281 |
+| 품종 수 | 286 |
 
 | id | 이름 | food.mjs sha |
 |---|---|---|
@@ -40,6 +40,7 @@
 | `beet` | 비트 | `e6c672a395bf53e3` |
 | `bell-pepper` | 피망 | `01d3f8f06d9f6bb3` |
 | `bellflower-root` | 도라지 | `2542bde0e7ff7d71` |
+| `benimadonna` | 황금향 | `8db3ba16fd3bd88b` |
 | `bird-clam` | 새조개 | `e57925df8d09d9ac` |
 | `bireum-namul` | 비름나물 | `7e875979376aee60` |
 | `bitter-melon` | 여주(고야) | `5c591ab913357312` |
@@ -92,6 +93,7 @@
 | `croaker` | 민어 | `0db5307f9adabc46` |
 | `crown-daisy` | 쑥갓 | `82313a537f318af9` |
 | `cucumber` | 오이 | `3a4a9b75f1e2581d` |
+| `daejeo-tomato` | 대저토마토 | `51d316ccd04eab78` |
 | `deodeok` | 더덕 | `d70ec8080bdc66f6` |
 | `east-sea-hanchi` | 동해한치(화살꼴뚜기) | `9d61568f45c36210` |
 | `egg` | 계란 | `9c44e2f2b7eb3936` |
@@ -138,6 +140,7 @@
 | `jerusalem-artichoke` | 돼지감자 | `c54edee4a2de8259` |
 | `juice` | 생과일주스 | `06bcc8b0f8470914` |
 | `jujube` | 대추 | `53c0fd3dbd355516` |
+| `kara-mandarin` | 카라향 | `09ac65a22ce1f83d` |
 | `kelp` | 다시마 | `f56e7882bbbec254` |
 | `kidney-bean` | 강낭콩 | `48b83ecfc6a5bbdb` |
 | `king-oyster-mushroom` | 새송이버섯 | `113276f8549571fb` |
@@ -146,6 +149,7 @@
 | `korean-rockfish` | 우럭(조피볼락) | `78314edd3c2bc2cf` |
 | `korean-zucchini` | 애호박 | `601d149ba21867fa` |
 | `kudzu-root` | 칡 | `9e2384bb21bedd82` |
+| `kumquat` | 금귤 | `8f14becd2b4b8be1` |
 | `laver` | 김 | `97d0b01626e358e2` |
 | `lettuce` | 상추 | `58a733c4ecd5ba34` |
 | `lions-mane` | 노루궁뎅이버섯 | `3b6e68a30992befe` |
@@ -265,6 +269,7 @@
 | `strawberry` | 딸기(시설) | `7ce2e60592da75ea` |
 | `stringy-stonecrop` | 돌나물 | `3e29a0dfe4ec2a19` |
 | `sugar` | 설탕 | `6026bec9c48f5380` |
+| `summer-orange` | 하귤 | `2c9d8d649d989e48` |
 | `sweet-potato` | 고구마 | `e441dcd3f3626d46` |
 | `sweet-potato-stem` | 고구마순 | `b29104acdd903888` |
 | `sweet-pumpkin` | 단호박 | `34d29af65a64863c` |

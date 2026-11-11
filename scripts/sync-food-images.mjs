@@ -19,6 +19,8 @@ import { fileURLToPath, pathToFileURL } from "node:url"
 const STYLE_ID = "watercolor"
 const VARIANTS = ["color", "motion"]
 const DISH_VARIANTS = ["color"]
+// 제철 월 검증 전에 작도를 마친 후보. 달력 목록에 추가하지 않고 웹용 SVG를 제공한다.
+const CANDIDATE_FOOD_IDS = ["benimadonna", "daejeo-tomato", "kara-mandarin", "kumquat", "summer-orange"]
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..")
 const prototype = join(root, "prototypes/seasonal-food")
@@ -82,7 +84,7 @@ const babyFoodIds = [...Object.values(PAIRING_ART), ...Object.values(FRUIT_GUIDE
 })
 const { copied, skipped } = await copyDrawings(
   "foods",
-  new Set([...FOOD_ROWS.map((food) => food.id), ...babyFoodIds]),
+  new Set([...FOOD_ROWS.map((food) => food.id), ...babyFoodIds, ...CANDIDATE_FOOD_IDS]),
   outDir,
   VARIANTS,
 )

@@ -398,6 +398,7 @@ packages/seasonal/src/data/drawn-dishes.generated.ts
 - 출력은 모두 커밋한다. 원천이 `prototypes/`(Git 밖)에 있어 새 클론에서는 다시 만들 수 없기 때문이다.
 - 일러스트가 없는 품종의 id는 `build-foods.mjs`의 `NEW_IDS`에서 정한다. 그림이 없으면 화면은 이름 카드를 보인다.
 - 그림체는 `watercolor`, 변형은 `color`(모든 화면)와 `motion`(1i 큰 그림, SVG 안 CSS 키프레임), 바닥 그림자는 끈다.
+- 제철 월 검증 전의 확장 후보 5종(금귤·카라향·하귤·황금향·대저토마토)은 `sync-food-images.mjs`의 `CANDIDATE_FOOD_IDS`로 SVG만 동기화한다. 달력 목록 등록은 제철 검증 후 별도로 진행한다.
 - 전통 음식(`prototypes/seasonal-food/dishes/<id>`)은 움직임이 없어 `color`만 만든다. 그림 폴더 이름이 `dish-rows.ts`의 id와 같아야 나온다. sync가 그림이 없는 음식을 로그로 알려 준다. 그릴 목록과 체크리스트는 `prototypes/seasonal-food/scripts/build_seasonal_lists.py`의 `DISHES`다.
 - 새 일러스트는 프로젝트 스킬 `/seasonal-food-illustrator`로 그린다.
 - 브랜드 파일(`apps/web/public/images/brand/`, `app/favicon.ico`, `app/icon.svg`, `app/apple-icon.png`)은 `prototypes/branding/`에서 손으로 복사한다(`apps/web/docs/brand-assets.md`). `logo-lockup.svg`·`logo-lockup-ivory.svg`는 고운돋움 Regular의 글자 윤곽을 포함한 가로 로고이며, `GowunDodum-OFL.txt`는 서체 라이선스다.
