@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import { DOWNLOADS_COPY } from "../data/copy"
 import type { ManifestEntry } from "./edition"
-import { attachmentDisposition, downloadFileName, editionMeta, editionName, editionsOfYear, editionYears, featuredEdition, megabytes, replacementFor, resolveDownload, shelvesOf, yearChoices, yearlessEditions } from "./listing"
+import { attachmentDisposition, defaultDownloadYear, downloadFileName, editionMeta, editionName, editionsOfYear, editionYears, featuredEdition, megabytes, replacementFor, resolveDownload, shelvesOf, yearChoices, yearlessEditions } from "./listing"
 
 const entry = (id: string, kind: ManifestEntry["kind"], extra: Partial<ManifestEntry> = {}): ManifestEntry => ({
   id,
@@ -54,6 +54,22 @@ describe("yearChoices", () => {
 
   it("에디션 연도가 없어도 현재 연도 하나는 있다", () => {
     expect(yearChoices([], 2026)).toEqual([2026])
+  })
+})
+
+describe("defaultDownloadYear", () => {
+  it.each([
+    { today: { year: 2026, month: 10, day: 31 }, expected: 2026 },
+    { today: { year: 2026, month: 11, day: 1 }, expected: 2027 },
+    { today: { year: 2026, month: 12, day: 31 }, expected: 2027 },
+    { today: { year: 2027, month: 1, day: 1 }, expected: 2027 },
+    { today: { year: 2027, month: 11, day: 1 }, expected: 2028 },
+  ])("$today 기준으로 $expected 달력을 먼저 고른다", ({ today, expected }) => {
+    expect(defaultDownloadYear(today, [2028, 2027, 2026])).toBe(expected)
+  })
+
+  it("11월이 되어도 다음 해 달력이 아직 게시되지 않았으면 올해를 고른다", () => {
+    expect(defaultDownloadYear({ year: 2026, month: 11, day: 1 }, [2028, 2026])).toBe(2026)
   })
 })
 

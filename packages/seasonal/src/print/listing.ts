@@ -1,3 +1,4 @@
+import type { CalendarDate } from "../calendar/month-calendar"
 import type { DownloadManifest, ManifestEntry } from "./edition"
 import { PRINT_KIND_LABELS, PRINT_KINDS, PUBLISHED_PAPERS, type PrintKind, type PublishedPaper } from "./spec"
 
@@ -23,6 +24,14 @@ export function editionYears(editions: readonly ManifestEntry[]): number[] {
 /** 연도 필터의 선택지: 주어진 연도들과 현재 연도(있으면)의 합집합, 최신순. */
 export function yearChoices(years: readonly number[], currentYear?: number): number[] {
   return [...new Set(currentYear === undefined ? years : [...years, currentYear])].sort((a, b) => b - a)
+}
+
+const NEXT_YEAR_PREVIEW_MONTH = 11
+
+/** 서울 기준 11월부터 다음 해 달력이 게시되어 있으면 먼저 보여 준다. */
+export function defaultDownloadYear(today: CalendarDate, publishedYears: readonly number[]): number {
+  const nextYear = today.year + 1
+  return today.month >= NEXT_YEAR_PREVIEW_MONTH && publishedYears.includes(nextYear) ? nextYear : today.year
 }
 
 /** 연도가 없는 에디션(포스터). 어느 연도를 골라도 보인다. */
