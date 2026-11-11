@@ -53,7 +53,7 @@ describe("sashimi", () => {
     }
   })
 
-  it("추천(첨부 달·대표 달)과 나머지 묶음 안에서는 친숙도 1→3 순서다", () => {
+  it("추천(첨부 달·대표 달)과 나머지 묶음 안에서는 친숙도 1→5 순서다", () => {
     for (const month of MONTHS) {
       const rank = (id: FoodId) => (!isSashimiPick(id, month) ? 2 : SASHIMI_MONTHS[month].includes(id) ? 0 : 1)
       for (const group of [0, 1, 2]) {
@@ -79,11 +79,11 @@ describe("sashimi", () => {
     expect(ids).toContain("longtooth-grouper")
   })
 
-  it("이달 추천은 친숙도 1~2 품종 가운데 그 달이 첨부 달이거나 대표 달(peak)인 것이다", () => {
+  it("이달 추천은 친숙도 1~3 품종 가운데 그 달이 첨부 달이거나 대표 달(peak)인 것이다", () => {
     for (const month of MONTHS) {
       for (const food of sashimiInMonth(month)) {
         const expected =
-          familiarity(food.id) <= 2 &&
+          familiarity(food.id) <= 3 &&
           (SASHIMI_MONTHS[month].includes(food.id) || (food.peak as readonly number[]).includes(month))
         expect(isSashimiPick(food.id, month), `${month}월 ${food.id}`).toBe(expected)
       }
@@ -95,23 +95,23 @@ describe("sashimi", () => {
     expect(isSashimiPick("red-spotted-grouper", 11)).toBe(false)
     expect(isSashimiPick("olive-flounder", 11)).toBe(true)
     expect(isSashimiPick("yellowtail", 12)).toBe(true)
-    expect(sashimiInMonth(12).slice(0, 3).map((food) => food.id)).toEqual(["pufferfish", "black-seabream", "yellowtail"])
+    expect(sashimiInMonth(12).slice(0, 3).map((food) => food.id)).toEqual(["yellowtail", "black-seabream", "olive-flounder"])
     const ids = sashimiInMonth(11).map((food) => food.id)
     expect(ids.indexOf("olive-flounder")).toBeLessThan(ids.indexOf("longtooth-grouper"))
   })
 
-  it("그 달 추천 품종이 앞이고, 각 묶음 안은 친숙도 1→3, 추천은 첨부 달 품종이 대표 달 품종보다 먼저다", () => {
+  it("그 달 추천 품종이 앞이고, 각 묶음 안은 친숙도 1→5, 추천은 첨부 달 품종이 대표 달 품종보다 먼저다", () => {
     expect(sashimiInMonth(2).map((food) => food.id)).toEqual([
       "olive-flounder",
       "cod",
       "red-seabream",
       "spanish-mackerel",
-      "atka-mackerel",
       "yellowtail",
       "halfbeak",
+      "east-sea-hanchi",
+      "atka-mackerel",
       "redlip-mullet",
       "banded-grouper",
-      "east-sea-hanchi",
     ])
   })
 

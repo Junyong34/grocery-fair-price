@@ -328,7 +328,7 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `print/foods.ts` | 인쇄물 칸(달·계절)에 넣을 품종 고르기 |
 | `print/spec-codec.ts`, `listing.ts`, `month-label.ts`, `period-chart.ts`, `wheel.ts` | 인쇄 사양 URL 코덱(번들에서 zod를 빼려고 분리), 내려받기 화면의 종류별 줄 · 연도 규칙, 인쇄물 달 표기, 제철 막대표 배치, 원형 판 배치 |
 | `data/infant-pairings.ts`, `data/infant-fruits.ts` | 이유식 궁합 데이터(역참조 · 색인 함수 포함), 월령별 과일 시기 · 주의 식재료 |
-| `data/eaten-stats.ts`, `food-familiarity.ts`, `renamed-foods.ts` | 1h 범위별 품종 수 · 먹은 수, 품종 친숙도(1~3, 인쇄물 칸 고르기와 제철 회 추천), 바뀐 품종 id(옛 먹음 기록 옮기기) |
+| `data/eaten-stats.ts`, `food-familiarity.ts`, `renamed-foods.ts` | 1h 범위별 품종 수 · 먹은 수, 품종 친숙도(1~5, 인쇄물 칸 고르기와 제철 회 추천), 바뀐 품종 id(옛 먹음 기록 옮기기) |
 | `calendar/static-years.ts`, `year-month.ts` | 2a를 미리 그릴 해(`STATIC_YEARS`), `2026-11` 같은 (연, 월) 경로 값 |
 | `layout/gesture.ts`, `geometry/` | 흩어진 판의 끌기 제스처 판단(상태 → 효과), 도형 배치(`lloyd`, `relax-shapes`) |
 

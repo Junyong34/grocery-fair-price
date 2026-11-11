@@ -36,10 +36,13 @@ const categoriesOf = (spec: object): readonly FoodCategory[] => ("categories" in
 const pickable = ({ categories, drawnOnly }: Pick) => (food: Food) =>
   (!drawnOnly || isDrawn(food.id)) && (categories.length === 0 || categories.includes(food.category))
 
-/** 칸의 주제(달·계절)에 대표 달이 걸리는 정도가 큰 품종부터, 친숙한 품종(familiarity), 처음부터 검증한 품종(core), 더 특별한(제철이 짧은) 품종, 이름순. */
+/**
+ * 친숙한 품종(familiarity)부터, 같은 등급이면 칸의 주제(달·계절)에 대표 달이 걸리는 정도가 큰 품종, 처음부터 검증한 품종(core), 더 특별한(제철이 짧은) 품종, 이름순.
+ * 친숙도가 대표 달보다 먼저라, 대표 달인 낯선 품종이 제철인 흔한 품종을 밀어내지 않는다(.scratch/food-familiarity/spec.md).
+ */
 const byFocus = (focus: (food: Food) => number) => (a: Food, b: Food) =>
-  focus(b) - focus(a) ||
   familiarity(a.id) - familiarity(b.id) ||
+  focus(b) - focus(a) ||
   Number(b.core) - Number(a.core) ||
   a.months.length - b.months.length ||
   a.name.localeCompare(b.name, "ko")
@@ -109,7 +112,7 @@ export function chartFoods(spec: YearSheetSpec | MonthlySpec | MonthPosterSpec):
 }
 
 /**
- * 계절 포스터의 계절 하나. 그 계절에 대표 달(peak)이 시작하는 품종을 고른다. 많으면 그 계절에 대표 달이 많은 것부터 byFocus 차례로 max개를 고르고,
+ * 계절 포스터의 계절 하나. 그 계절에 대표 달(peak)이 시작하는 품종을 고른다. 많으면 byFocus 차례(친숙도, 그 계절에 대표 달이 많은 것)로 max개를 고르고,
  * 놓는 차례는 시작 달 순서, 같으면 이름순이다. 대표 달로 나누므로 시장 범위가 넓어도 한 품종은 한 계절에만 나온다.
  */
 export function seasonPictures(spec: SeasonPosterSpec, season: Season): readonly Food[] {

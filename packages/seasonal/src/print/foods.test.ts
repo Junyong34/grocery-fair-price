@@ -28,17 +28,17 @@ describe("monthPictures", () => {
     expect(foods.every((food) => isDrawn(food.id) && (food.months as readonly number[]).includes(10))).toBe(true)
   })
 
-  it("대표 달(peak) 품종 먼저, 그 안에서는 친숙한(등급이 낮은) 품종부터", () => {
+  it("친숙한(등급이 낮은) 품종 먼저, 같은 등급 안에서는 대표 달(peak) 품종부터", () => {
     for (const month of MONTHS) {
       const foods = monthPictures(withMax(monthly, 40), month)
-      const keys = foods.map((food) => [Number(!isPeak(food, month)), familiarity(food.id)] as const)
+      const keys = foods.map((food) => [familiarity(food.id), Number(!isPeak(food, month))] as const)
       expect(keys, `${month}월`).toEqual([...keys].sort((a, b) => a[0] - b[0] || a[1] - b[1]))
     }
   })
 
-  it("1월 그림 칸 여덟에 딸기·굴·시금치처럼 흔한 품종이 들어간다", () => {
+  it("1월 그림 칸 여덟에 딸기·시금치·광어처럼 흔한 품종이 들어간다", () => {
     const names = monthPictures(withMax(monthly, 8), 1).map((food) => food.name)
-    expect(names).toEqual(expect.arrayContaining(["딸기", "굴", "시금치", "광어"]))
+    expect(names).toEqual(expect.arrayContaining(["딸기", "시금치", "광어"]))
     expect(names).not.toContain("매생이")
   })
 
@@ -124,18 +124,18 @@ describe("yearPictures", () => {
     const table = yearPictures(withMax(yearSheet, 8)).map((foods, index) => `${index + 1}월: ${foods.map((food) => food.name).join(" ")}`)
     expect(table).toMatchInlineSnapshot(`
       [
-        "1월: 시금치 굴 딸기 우엉 레드향 방울양배추 홍어 매생이",
-        "2월: 홍합 광어 한라봉 봄동 유채나물 천혜향 연근 동해한치",
-        "3월: 바지락 냉이 달래 미나리 봄 도다리 쑥 주꾸미 취나물",
-        "4월: 마늘 낙지 두릅 아스파라거스 멍게 머위 멸치 씀바귀",
-        "5월: 참외 양배추 상추 완두콩 쪽파 마늘종 쑥갓 죽순",
-        "6월: 블루베리 오이 감자 애호박 방울토마토 살구 농어 매실",
-        "7월: 자두 수박 옥수수 토마토 전복 양파 민어 바다장어",
-        "8월: 오징어 복숭아 포도 가지 부추 참나물 홍고추 치커리",
-        "9월: 대하 표고버섯 밤 배 조기 무화과 전어 대추",
-        "10월: 고구마 사과 꽃게 무 갈치 대파 꽁치 우럭",
-        "11월: 배추 감 고등어 단호박 파프리카 유자 과메기 참돔",
-        "12월: 귤 당근 키위 브로콜리 명태 방어 대게 복어",
+        "1월: 시금치 딸기 명태 굴 우엉 레드향 매생이 아귀",
+        "2월: 홍합 광어 한라봉 봄동 천혜향 연근 동해한치 학꽁치",
+        "3월: 냉이 주꾸미 바지락 대게 달래 봄 도다리 쑥 취나물",
+        "4월: 마늘 미나리 낙지 두릅 아스파라거스 멍게 멸치 고사리",
+        "5월: 오이 양배추 상추 참외 완두콩 쪽파 마늘종 쑥갓",
+        "6월: 감자 애호박 방울토마토 블루베리 살구 농어 매실 체리",
+        "7월: 토마토 양파 자두 수박 전복 민어 바다장어 강낭콩",
+        "8월: 오징어 부추 복숭아 옥수수 가지 홍고추 멜론 참나물",
+        "9월: 표고버섯 대하 밤 배 포도 조기 무화과 전어",
+        "10월: 고구마 사과 쌀 대파 꽃게 갈치 꽁치 우럭",
+        "11월: 고등어 무 파프리카 감 단호박 유자 과메기 참돔",
+        "12월: 배추 귤 당근 브로콜리 방어 키위 대구 돼지감자",
       ]
     `)
   })
@@ -168,13 +168,15 @@ describe("seasonPictures", () => {
     expect(seasonPictures(withMax(seasonPoster, 40), "summer")).not.toContain(pear)
   })
 
-  it("품종이 max보다 많으면 그 계절에 대표 달이 많은 품종을 남기고, 시작 달 순으로 놓는다", () => {
+  it("품종이 max보다 많으면 친숙한 품종, 같은 등급이면 그 계절에 대표 달이 많은 품종을 남기고, 시작 달 순으로 놓는다", () => {
     const all = seasonPictures(withMax(seasonPoster, 40), "autumn")
     const few = seasonPictures(withMax(seasonPoster, 8), "autumn")
     expect(few).toHaveLength(8)
     const peaksIn = (food: (typeof all)[number]) => food.peak.filter((month) => [9, 10, 11].includes(month)).length
-    const cut = Math.min(...few.map(peaksIn))
-    expect(all.filter((food) => !few.includes(food)).every((food) => peaksIn(food) <= cut)).toBe(true)
+    // 친숙도 오름차순, 같으면 대표 달 수 내림차순으로 비교하는 키. 남긴 품종의 가장 나쁜 키보다 뺀 품종이 앞서면 안 된다.
+    const key = (food: (typeof all)[number]) => familiarity(food.id) * 100 - peaksIn(food)
+    const cut = Math.max(...few.map(key))
+    expect(all.filter((food) => !few.includes(food)).every((food) => key(food) >= cut)).toBe(true)
     const starts = few.map((food) => Math.min(...food.peak.filter((month) => [9, 10, 11].includes(month))))
     expect(starts).toEqual([...starts].sort((a, b) => a - b))
   })
