@@ -117,6 +117,10 @@ export const routes = {
     catalogProducts: "/admin/catalog/products",
     /** 카탈로그 어드민: 제안 검토 (catalog-scale/07, 소유자 접속) */
     catalogProposals: "/admin/catalog/proposals",
+    /** 그림 어드민: 그림 목록과 그림 검수 (ADR 0006, prototypes/가 있는 기기에서) */
+    foods: "/admin/foods",
+    /** 그림 원본에서 그린 미리보기 SVG. 웹에 나가기 전의 그림도 보여 준다. */
+    foodPreview: (art: string, variant: "color" | "motion") => `/admin/foods/preview?art=${encodeURIComponent(art)}&variant=${variant}`,
   },
 
   /** 인쇄 전용 페이지. 어드민 미리보기와 PDF 생성기가 연다. */
