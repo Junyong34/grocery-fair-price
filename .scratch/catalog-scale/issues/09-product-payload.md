@@ -1,6 +1,6 @@
 # 09. 가공식품 상품 payload와 공개
 
-Status: done
+Status: resolved
 Type: task
 Blocked by: 01, 05
 

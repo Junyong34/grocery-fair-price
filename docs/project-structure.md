@@ -92,7 +92,7 @@ import 경로:
 | `shared/shell/install-prompt-state.ts` · `.test.ts` | 설치 안내의 만료 판정. 설치 완료는 계속 숨기고 닫기는 7일 뒤 만료 |
 | `app/globals.css` | `@workspace/ui/globals.css`와 `cojeev.css`를 불러오고, ViewTransition 키프레임과 reduced-motion 처리 |
 | `components.json` | shadcn 설정. 실제 설치는 `packages/ui`에서 한다(`pnpm ui:add`) |
-| `DESIGN.md` | Oura 디자인 언어 분석(색, 서체, 간격, 컴포넌트) |
+| `DESIGN.md` | 장볼날 색 · 배치 규칙 네 절("장볼날 공통 색상 조합"부터 "가격 화면의 데스크톱 배치"까지)과 Oura 디자인 언어 분석(참고 자료). 파일 머리의 "읽는 법"이 둘을 가른다 |
 | `docs/nextjs-16-patterns.md` | Next 16 렌더링·캐시 판단 근거(2026-10-14 조사, 2026-10-31 실제 코드에 맞춰 줄임) |
 | `docs/brand-assets.md` | 로고·파비콘 파일과 교체 방법 |
 | `docs/seafood-content/` | 새 수산·제철 회 화면의 콘텐츠 자료. `README.md`(문서 안내·화면 기획의 출발점), `monthly-content.md`(월별 설명), `species-review.md`(48종 이름 대응·근거·미확인 사항), `illustration-briefs.md`(최초 29종 외형 요청), `reference.json`(첨부 원문). Git 관리 대상이며 프로토타입 없이 읽을 수 있다 |

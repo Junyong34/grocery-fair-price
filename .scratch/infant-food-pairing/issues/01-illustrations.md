@@ -10,7 +10,7 @@ Status: needs-info
 ## 조사 기준과 출처
 
 - 조사일: 2026-11-08. 현재 작업 디렉터리의 파일을 직접 확인했다.
-- 목록 출처: `docs/food-pairing-image-analysis.md` 2절. 기준 음식뿐 아니라 모든 O·X 상대 음식을 포함하며 `브로콜리/콜리플라워`는 두 이름으로 나눴다.
+- 목록 출처: `.scratch/infant-food-pairing/image-analysis.md` 2절. 기준 음식뿐 아니라 모든 O·X 상대 음식을 포함하며 `브로콜리/콜리플라워`는 두 이름으로 나눴다.
 - 이름 대응: `packages/seasonal/src/data/foods.generated.ts`의 `id`, `name`, `aliases`. 음식 궁합의 대표 이름 통일은 원본 분석 문서의 4절을 따른다.
 - 실제 배포 에셋 확인: `apps/web/public/foods/<id>/color.svg`의 파일 존재. 디렉터리 이름이나 제철 목록 등록만으로 보유 판정하지 않았다.
 - 기존 그림 출처 기록: `apps/web/public/foods/PROVENANCE.md`. 원본 후보는 `prototypes/seasonal-food/foods/<id>/food.mjs`의 존재를 확인했다.
@@ -157,3 +157,7 @@ Status: needs-info
 - 재사용 49개 + 검토 12개 + 배포 그림 없음 28개 = 89개로 대조했다.
 - 1절과 2절에 적힌 모든 `color.svg` 파일 존재를 확인했다. 3절의 명시된 `food.mjs` 원본도 확인했다.
 - SVG·생성 파일·앱 코드·원본 그림은 수정하지 않았다.
+
+## Comments
+
+2026-11-12: 궁합표에 나오는 재료 이름 97개(브로콜리 · 콜리플라워를 나눈 수)가 지금은 모두 그림에 연결돼 있다(`packages/seasonal/src/data/infant-art.json`의 `pairings`). 아래 집계의 "바로 대응하는 그림 없음 28개"는 그 뒤 모두 그려졌다. 남은 것은 "범위 · 부위 · 형태 검토 필요 12개"의 시각적 적합성 판단이고, 그림 어드민(`/admin/foods`)에서 그림마다 이유식 연결을 보고 바꿀 수 있다.

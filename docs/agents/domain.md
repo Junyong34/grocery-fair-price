@@ -9,7 +9,7 @@ How the engineering skills should consume this repo's domain documentation when 
 
 This repo is single-context, but its domain docs live under `grocery-price/` rather than the repo root. Wherever the rules below say `GLOSSARY.md` or `docs/adr/`, use the `grocery-price/` paths.
 
-If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/improve-codebase-architecture`) creates them lazily when terms or decisions actually get resolved.
+If any of these files don't exist, **proceed silently**. Don't flag their absence; don't suggest creating them upfront. The `/domain-modeling` skill (reached via `/grill-with-docs` and `/codebase-design`) creates them lazily when terms or decisions actually get resolved.
 
 ## File structure
 

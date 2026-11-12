@@ -1,6 +1,6 @@
 # 02 재료별 궁합 페이지 `/baby-food/pairings/[ingredient]`
 
-Status: done (2026-11-09)
+Status: resolved (2026-11-09)
 Blocked by: 01
 
 스펙: `../spec.md` "페이지 구성", "검색 메타", "라우팅·레이어"

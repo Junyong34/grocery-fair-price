@@ -1,6 +1,6 @@
 # 07. 로컬 카탈로그 어드민 `/admin/catalog`
 
-Status: in-progress (제안 목록 완료 2026-11-09. pending 직접 연결·카탈로그 탐색·묶기·변경 기록은 남음)
+Status: claimed (제안 목록 완료 2026-11-09. pending 직접 연결·카탈로그 탐색·묶기·변경 기록은 남음)
 Type: task
 Blocked by: 04
 

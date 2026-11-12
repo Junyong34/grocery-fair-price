@@ -1,6 +1,6 @@
 # 10. 상품 페이지·검색·카테고리 둘러보기
 
-Status: done
+Status: resolved
 Type: task
 Blocked by: 09
 

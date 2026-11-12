@@ -1,6 +1,6 @@
 # 03 전체 궁합표와 제철 품종 상세에서 재료별 페이지로 연결
 
-Status: done (2026-11-09)
+Status: resolved (2026-11-09)
 Blocked by: 02
 
 ## 할 일

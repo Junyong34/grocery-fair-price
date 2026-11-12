@@ -1,6 +1,6 @@
 # 11. P2 마무리 점검
 
-Status: ready-for-agent
+Status: wontfix
 Type: task
 Blocked by: 02, 03, 04, 06, 07, 13
 
@@ -18,3 +18,7 @@ Blocked by: 02, 03, 04, 06, 07, 13
 ## 완료 기준
 
 - 로드맵 P2 완료 기준을 모두 충족하고, README 상태가 P3 시작으로 바뀌었다.
+
+## Comments
+
+2026-11-12: 닫는다. 로드맵이 4단계로 바뀌어(`grocery-price/docs/00-overview/roadmap.md`) P2라는 묶음의 마무리 점검은 할 대상이 없다. 이 분해의 다른 열린 티켓은 명세 머리말대로 필요할 때 따로 연다.

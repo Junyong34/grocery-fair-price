@@ -92,26 +92,32 @@ Status: ready-for-agent
 
 ## 문서 정리표
 
-09가 실행한다. "확인 필요"는 09에서 참조를 찾은 뒤 조치를 확정한다. 근거의 "감사"는 `.scratch/docs-audit/report.md`다.
+09가 실행했다(2026-11-12). 근거의 "감사"는 `.scratch/docs-audit/report.md`다. 삭제는 세 조건(대체 문서 있음, 고유한 결정·출처 없음, 참조 정리 가능)을 모두 채운 것만 했다.
 
-| 현재 경로 | 조치 | 근거 | 대체 경로 |
-|---|---|---|---|
-| `prototypes/seasonal-food/docs/seasonal-lists/foods.json` | 원본에서 내림(파일은 둠) | 결정 1·3 | `packages/seasonal/src/data/food-registry.json` |
-| `packages/seasonal/src/data/food-season-corrections.json` | 삭제 | 결정 3. 값과 근거를 모두 옮긴 뒤 | 품종 원본의 근거 필드 |
-| `packages/seasonal/scripts/build-foods.mjs` | 통합 | 결정 10. `DRAWN_AS`·`NEW_IDS`·`--refresh-seasons`가 필요 없어진다 | `foods:sync` |
-| `apps/web/features/baby-food/data.ts`의 `FRUIT_GUIDE_ART`·`PAIRING_ART` | 이동 | 결정 8. 루트 스크립트가 앱 계층을 import한다 | `packages/seasonal` 이유식 데이터 옆 JSON |
-| `.scratch/sashimi/issues/07-dageumbari-alias.md` | 고침 | 할 일이 `foods.json`과 `build:foods`를 가리킨다 | 품종 원본에 별칭 추가(어드민 07 이후는 어드민) |
-| `.scratch/food-months/` | 유지 | `renamed-foods.ts`가 인용한다(감사 3장) | 없음 |
-| `docs/food-pairing-image-analysis.md` | 이동 | 판독 원자료이고 데이터는 `infant-pairings.ts`로 옮겨졌다(감사 2장). 없는 첨부 경로를 가리킨다 | `.scratch/infant-food-pairing/` |
-| `apps/web/DESIGN.md`의 Oura 사이트 분석 부분 | 이동(확인 필요) | 장볼날 규칙은 352~530행뿐이고 분석 부분은 다크 표면을 설명한다(감사 2장) | `apps/web/docs/reference/oura-analysis.md` |
-| `.scratch/catalog-evolution/` | 유지 | catalog-scale 11·12·09가 `plans/01`·`04`·`06`을 인용한다 | 없음 |
-| `.scratch/p2-data-source-spec/issues/11` | 닫기(`wontfix`) | 로드맵이 4단계로 바뀌어 의미가 없다(감사 3장) | 없음 |
-| `docs/agents/issue-tracker.md`, `domain.md` | 고침 | 없는 스킬 이름(`/wayfinder`, `/grill-with-docs`, `/improve-codebase-architecture`)과 규칙 밖 티켓 상태(`done`, `in-progress`, `open`)(감사 2장) | 같은 파일 |
-| `grocery-price/README.md`, `roadmap.md`의 현재 단계 | 고침(확인 필요) | "운영 배포가 남음"이 실제와 다르다(감사 2장) | 같은 파일 |
-| 루트 `AGENTS.md`의 완료 기준·커밋 블록 | 이동 | 결정 29 | `docs/rules/` |
-| 루트 `AGENTS.md`의 영역별 블록 | 이동 | 결정 28 | 하위 `AGENTS.md` 다섯 곳 |
-| 루트 `AGENTS.md`의 생성 파일 표 중 품종·그림 행 | 고침 | 결정 10. 두 명령이 하나가 된다 | `packages/seasonal/AGENTS.md` |
-| `.claude/skills/seasonal-food-illustrator/` | 고침 | 결정 19~21 | 같은 폴더 |
+| 현재 경로 | 조치 | 근거 | 대체 경로 | 결과 |
+|---|---|---|---|---|
+| `prototypes/seasonal-food/docs/seasonal-lists/foods.json` | 원본에서 내림(파일은 둠) | 결정 1·3 | `packages/seasonal/src/data/food-registry.json` | 함(02). `prototypes/` README에 더는 원본이 아니라고 적음 |
+| `packages/seasonal/src/data/food-season-corrections.json` | 삭제 | 결정 3. 값과 근거를 모두 옮김 | 품종 원본의 근거 필드 | 함(02). 보정 7종의 사유 · 출처 · 확인일이 품종 원본에 있는지 테스트가 본다 |
+| `packages/seasonal/scripts/build-foods.mjs` | 통합 | 결정 10 | `pnpm foods:sync` | 함(02 · 04). `DRAWN_AS`·`NEW_IDS`·`--refresh-seasons`를 없앴고, 품종 목록만 만드는 명령으로 남김 |
+| `scripts/sync-food-images.mjs` | 삭제 | 결정 10·11 | `scripts/sync-foods.mjs` | 함(04) |
+| `apps/web/features/baby-food/data.ts`의 `FRUIT_GUIDE_ART`·`PAIRING_ART` | 이동 | 결정 8 | `packages/seasonal/src/data/infant-art.json` | 함(03). 앱은 그림 ID를 경로로 바꿔 쓴다 |
+| `.scratch/sashimi/issues/07-dageumbari-alias.md` | 고침 | 할 일이 `foods.json`을 가리켰다 | 품종 원본 | 함(02), 이어서 어드민으로 끝냄(07) |
+| `.scratch/seo/issues/08-food-content-depth.md` | 고침 | 품종별 출처를 `foods.json`의 필드로 적었다 | 품종 원본의 `evidence` | 함(02) |
+| `.scratch/food-months/` | 유지 | `renamed-foods.ts`가 인용한다(감사 3장) | 없음 | 그대로 |
+| `docs/food-pairing-image-analysis.md` | 이동 | 판독 원자료이고 데이터는 `infant-pairings.ts`에 있다(감사 2장) | `.scratch/infant-food-pairing/image-analysis.md` | 함. `infant-pairings.ts` 주석과 infant-food-pairing 명세 · 티켓 01의 경로를 고침. 문서가 가리키는 첨부(`.codex-attachments/…jpg`)는 저장소에 없다고 머리에 적음 |
+| `apps/web/DESIGN.md`의 Oura 사이트 분석 부분 | 이동 → **안 함**, 안내를 더함 | 장볼날 규칙은 네 절뿐이고 분석 부분은 다크 표면을 설명한다(감사 2장) | 같은 파일 | 옮기지 않았다. `globals.css` 주석 2곳, 가격 화면 주석 2곳, 명세 2곳이 `DESIGN.md`를 규칙의 자리로 가리키고, 머리의 YAML(`name: Oura Analysis`)이 분석과 한 묶음이라 떼면 형식이 깨진다. 대신 머리에 "읽는 법"을 달아 어느 절이 규칙인지 밝혔다 |
+| `.scratch/catalog-evolution/` | 유지 | catalog-scale 11·12·09가 `plans/01`·`04`·`06`을 인용한다 | 없음 | 그대로 |
+| `.scratch/p2-data-source-spec/issues/11` | 닫기(`wontfix`) | 로드맵이 4단계로 바뀌었다(감사 3장) | 없음 | 함 |
+| `docs/agents/issue-tracker.md`, `domain.md` | 고침 | 없는 스킬 이름과 규칙 밖 티켓 상태(감사 2장) | 같은 파일 | 함. `/improve-codebase-architecture` → `/codebase-design`. `/grill-with-docs`는 지금 설치돼 있어 그대로. `/wayfinder`는 설치돼 있지 않다고 적고 배치 규칙은 남김(두 폴더가 쓴다). 상태 값은 다섯 역할 + `claimed` · `resolved` · `open`(wayfinder)으로 적음 |
+| 티켓의 `Status: done` 7건, `in-progress` 2건 | 고침 | 위와 같음 | 같은 파일 | 함. `done` → `resolved`(baby-food-ingredient-pages 01~03, catalog-scale 05·08·09·10), `in-progress` → `claimed`(catalog-scale 06·07). `open` 12건은 wayfinder 티켓이라 그대로 |
+| `.scratch/infant-food-pairing/issues/01` | 유지 | `needs-info`. 그림이 없던 이름 28개는 그 뒤 모두 그려져 궁합 재료 97개가 전부 그림에 연결됐다. "범위 · 부위 · 형태 검토 필요 12개"는 사람의 판단이 남아 있다 | 없음 | 그대로. 현재 상태를 Comments에 적음 |
+| `grocery-price/README.md`, `roadmap.md`의 현재 단계 | 고침 → **안 함** | "운영 배포가 남음"이 실제와 다르다(감사 2장) | 같은 파일 | 하지 않았다. "운영 배포"가 색인 켜기 · sitemap 제출을 뜻하는지, 축평원 백필 실패 3묶음을 어떻게 적을지 사용자의 확인이 필요하다 |
+| 루트 `AGENTS.md`의 완료 기준 · 커밋 블록 | 이동 | 결정 29 | `docs/rules/` | 10에서 |
+| 루트 `AGENTS.md`의 영역별 블록 | 이동 | 결정 28 | 하위 `AGENTS.md` 다섯 곳 | 12에서 |
+| 루트 `AGENTS.md`의 생성 파일 표 중 품종 · 그림 행 | 고침 | 결정 10 | 같은 표 | 함(04). 12에서 `packages/seasonal/AGENTS.md`로 옮긴다 |
+| `.claude/skills/seasonal-food-illustrator/` | 고침 | 결정 19~21 | 같은 폴더 | 함(08). Git에 없다 |
+
+옛 경로(`seasonal-lists/foods.json`, `sync-food-images`, `CANDIDATE_FOOD_IDS`, `NEW_IDS`, `DRAWN_AS`, `food-season-corrections`, `--refresh-seasons`, `food-pairing-image-analysis`)를 `.ts` · `.tsx` · `.mjs` · `.md` · `.json`에서 찾아 남은 곳은 다음뿐이다: 이 명세와 티켓, 감사 보고서, ADR 0006(이전 방식 설명), `docs/project-structure.md`의 이관 경위 한 줄, 끝난 티켓의 기록(seasonal-mvp 01·02와 명세, sashimi 06). 끝난 티켓은 그때의 사실이라 고치지 않았다.
 
 ## 완료 기준
 

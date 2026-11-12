@@ -1,6 +1,6 @@
 # 05. 카테고리 확장과 출처 분류 대응표
 
-Status: done (2026-11-09, 운영 적용은 사용자 승인 뒤)
+Status: resolved (2026-11-09, 운영 적용은 사용자 승인 뒤)
 Type: task
 Blocked by: 01, 04
 

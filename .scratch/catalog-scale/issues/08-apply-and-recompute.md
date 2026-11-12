@@ -1,6 +1,6 @@
 # 08. 승인 적용과 재계산
 
-Status: done (2026-11-09)
+Status: resolved (2026-11-09)
 Type: task
 Blocked by: 04
 
