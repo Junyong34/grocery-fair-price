@@ -16,7 +16,7 @@ grep -rlE "^Status: (ready-for-agent|ready-for-human|needs-triage|needs-info|cla
 
 | 폴더 | 무엇 | 열린 티켓 |
 |---|---|---|
-| `docs-and-illustration-cleanup/` | 품종 원본 · 그림 어드민 · 문서 정리 | 11 · 12 `ready-for-agent` |
+| `docs-and-illustration-cleanup/` | 품종 원본 · 그림 어드민 · 문서 정리 | 12 `ready-for-agent` |
 | `catalog-scale/` | 시세 카탈로그를 수천 개 항목으로 넓히기 (ADR 0005) | 03 · 04 · 06 · 07 `claimed`, 02 `ready-for-human`, 11 · 12 · 13 `needs-triage` |
 | `ingest-foundation/` | ① 수집 기반 | 03 · 04 · 05 `ready-for-agent`, 01 `ready-for-human` |
 | `ingest-schedule/` | 수집 일정과 감시 (wayfinder, `map.md`) | 08 · 09 `open` |
