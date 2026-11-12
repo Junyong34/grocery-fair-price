@@ -1,6 +1,6 @@
 # 08. 스킬: 새 그림 한 장 절차
 
-Status: ready-for-agent
+Status: resolved
 Type: task (prototypes/와 .claude/skills/가 있는 기기에서)
 Blocked by: 06 (resolved)
 
@@ -12,15 +12,28 @@ Blocked by: 06 (resolved)
 
 ## 할 일
 
-- [ ] `writing-for-agents` 스킬로 `.claude/skills/seasonal-food-illustrator/SKILL.md`에 "새 그림 한 장 끝까지" 절을 쓴다.
+- [x] `writing-for-agents` 스킬로 `.claude/skills/seasonal-food-illustrator/SKILL.md`에 "새 그림 한 장 끝까지" 절을 쓴다.
   - 시작할 때 확인할 곳: 기존 그림(`foods/<id>/`), 진행 중인 작업(미검수 `art.json`), 출처와 검수 기록(`NOTES.md`, `art.json`, `PROVENANCE.md`), 품종 원본.
   - 차례: 그림 ID 발번(기존 ID·옛 ID와 겹치지 않게) → `NOTES.md`에 특징과 체크리스트 → 작도 → `art.json` 미검수 → 미리보기 렌더 → 어드민 주소 안내.
   - 중간에 멈추지 않는다. 그림 검수, 용도 지정, 웹 반영은 사용자가 어드민에서 한다.
   - 제철은 조사하거나 등록하지 않는다. 끝에 남은 절차를 제안한다.
-- [ ] "웹 동기화까지"라는 요청을 받아도 미검수 그림은 웹에 나가지 않는다는 점과 그 이유를 적는다.
-- [ ] `references/`의 기록 위치 설명(`provenance.md`, `request-template.md`)을 `art.json` 기준으로 맞춘다.
-- [ ] 실제로 품종 하나를 골라 프롬프트를 그대로 넣어 끝까지 돌려 본다.
+- [x] "웹 동기화까지"라는 요청을 받아도 미검수 그림은 웹에 나가지 않는다는 점과 그 이유를 적는다.
+- [x] `references/`의 기록 위치 설명(`provenance.md`, `request-template.md`)을 `art.json` 기준으로 맞춘다.
+- [ ] (하지 않음, 아래 Comments) 실제로 품종 하나를 골라 프롬프트를 그대로 넣어 끝까지 돌려 본다.
 
 ## 완료 기준
 
 새 세션에서 대상 프롬프트만으로 미리보기와 미검수 `art.json`이 생기고, 어드민에서 검수와 용도 지정을 마치면 웹에 나온다.
+
+## Comments
+
+2026-11-12: 스킬을 고쳤다. `.claude/skills/`는 Git에 없어 이 커밋에는 티켓만 들어간다.
+
+- `SKILL.md`에 **기록이 있는 곳** 표(기존 그림, 그림 검수 상태, 관찰 기록, 진행 중인 작업, 품종 원본, 웹에 나간 그림)와 **새 그림 한 장 끝까지** 절(그림 ID 발번 → `NOTES.md` → 작도 → `art.json` 미검수 → 미리보기와 검사 → 어드민 안내)을 더했다. 요청 종류 표에 이 요청을 한 줄 더했다.
+- 제철은 조사하지 않게 했다. `food.mjs`의 `season`은 빌드가 요구하는 필드라 `{ months: [], status: 'draft', … }`로 두고, 요청에 제철 달이나 출처가 있으면 `NOTES.md`에 옮겨 사용자가 어드민에서 쓰게 한다.
+- "웹 동기화까지"의 끝은 미리보기와 `pnpm foods:sync --check`라고 적고 이유(검수하지 않은 그림이 운영에 나가지 않게)를 달았다. 사용자가 그 대화에서 검수했다고 직접 말한 그림만 예외다.
+- `references/`의 `request-template.md`(제철 칸의 쓰임), `provenance.md`(`art.json`), `authoring.md`(`season`은 메모)를 맞췄다.
+
+**확인한 것**: 시험 폴더(`foods/zz-trial`, 사과 `food.mjs` 복사)로 4~5단계를 돌렸다. `render-art-previews.mjs zz-trial` 종료 코드 0, `foods:sync --check` 통과하고 미검수 목록에 나옴, 어드민 미리보기 주소 200. `art.json`을 빼면 `--check`가 그 그림을 짚는다. 끝난 뒤 시험 폴더를 지웠다.
+
+**하지 않은 것**: 실제 품종을 새로 그리는 것까지 포함해 새 세션에서 대상 프롬프트를 그대로 돌려 보지는 않았다. 그림을 그리는 창작 작업이라 사용자가 다음에 그릴 품종으로 처음 쓸 때 확인한다. 그때 절차가 막히는 곳이 있으면 이 티켓에 이어 적는다.
