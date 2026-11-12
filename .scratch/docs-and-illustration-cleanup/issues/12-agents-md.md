@@ -2,7 +2,7 @@
 
 Status: ready-for-agent
 Type: task
-Blocked by: 08 (resolved), 10
+Blocked by: 08 (resolved), 10 (resolved)
 
 ## 목적
 

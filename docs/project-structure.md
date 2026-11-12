@@ -505,9 +505,9 @@ grocery-price/
 
 ## 11. 작업 관리 (.scratch)
 
-기능마다 `.scratch/<기능>/`에 `spec.md`와 `issues/NN-*.md`를 둔다. 상태는 각 티켓의 `Status:` 줄이 원본이다. 한눈에 보려면 `grep -H '^Status' .scratch/*/issues/*.md`.
+기능마다 `.scratch/<기능>/`에 `spec.md`와 `issues/NN-*.md`를 둔다. 상태는 각 티켓의 `Status:` 줄이 원본이다. 명세별 상태와 열린 티켓은 `.scratch/README.md`에 모아 두었다(끝난 명세에도 열린 티켓이 남을 수 있다).
 
-형식은 `docs/agents/issue-tracker.md`, 라벨은 `docs/agents/triage-labels.md`를 따른다.
+형식은 `docs/agents/issue-tracker.md`, 라벨은 `docs/agents/triage-labels.md`를 따른다. 티켓 하나를 끝내는 기준과 커밋 규칙은 `docs/rules/ticket-workflow.md`에 있다.
 
 시세 카탈로그 확장 계획은 `.scratch/catalog-scale/spec.md`가 정본이다(2026-11-09, 카탈로그 원본은 DB, ADR 0005). 그 전 검토 초안 `.scratch/catalog-evolution/`(코드 카탈로그 유지 전제)은 catalog-scale로 대체되었고, `plans/01`·`04`·`06`만 catalog-scale 11·12·09가 근거로 인용한다.
 
