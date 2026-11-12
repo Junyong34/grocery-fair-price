@@ -196,7 +196,7 @@ export const FOOD_ROWS = [
   { id: "atka-mackerel", name: "임연수어", aliases: [], category: "수산", months: [1,2,3,4,5,12], peak: [3,4], core: false },
   { id: "plum", name: "자두", aliases: [], category: "과일", months: [7,8], peak: [7,8], core: true },
   { id: "pearl-spot-chromis", name: "자리돔", aliases: [], category: "수산", months: [5,6], peak: [5,6], core: false },
-  { id: "longtooth-grouper", name: "자바리", aliases: [], category: "수산", months: [11], peak: [11], core: false },
+  { id: "longtooth-grouper", name: "자바리", aliases: ["다금바리"], category: "수산", months: [11], peak: [11], core: false },
   { id: "pine-nut", name: "잣", aliases: [], category: "곡물·견과", months: [8,9,10,11,12], peak: [11], core: false },
   { id: "jaecheop-clam", name: "재첩", aliases: [], category: "수산", months: [4,5,6,9,10,11], peak: [4,5,6,9,10,11], core: true },
   { id: "red-cabbage", name: "적채", aliases: [], category: "채소", months: [3,4,5,6], peak: [6], core: false },

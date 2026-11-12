@@ -2024,7 +2024,9 @@
   },
   "longtooth-grouper": {
     "name": "자바리",
-    "aliases": [],
+    "aliases": [
+      "다금바리"
+    ],
     "category": "수산",
     "months": [11],
     "peak": [11],
