@@ -9,8 +9,10 @@ import { routes } from "@/shared/routes"
 
 import { filterArts, isShown, type ArtFilter, type ArtRow } from "../lib/art-view"
 import { readArtNotes, setArtReview } from "../server/art-actions"
+import { publishFoods, type PublishResult } from "../server/use-actions"
+import { ArtUses, type UseOptions } from "./art-uses"
 
-type Props = { rows: readonly ArtRow[]; broken: readonly string[]; failed: readonly string[] }
+type Props = { rows: readonly ArtRow[]; broken: readonly string[]; failed: readonly string[] } & UseOptions
 
 const FILTERS: readonly { value: ArtFilter; label: string }[] = [
   { value: "unreviewed", label: "미검수" },
@@ -21,7 +23,7 @@ const FILTERS: readonly { value: ArtFilter; label: string }[] = [
 const CARD = "rounded-2xl bg-surface shadow-[inset_0_0_0_1px_var(--color-hairline)]"
 
 // 그림 목록(왼쪽)과 고른 그림의 상세 · 판정(오른쪽). 판정은 그림 폴더의 art.json만 바꾼다.
-export function ArtBoard({ rows, broken, failed }: Props) {
+export function ArtBoard({ rows, broken, failed, foods, infantKeys }: Props) {
   const [filter, setFilter] = useState<ArtFilter>(rows.some((art) => art.review === "unreviewed") ? "unreviewed" : "all")
   const [query, setQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -37,6 +39,8 @@ export function ArtBoard({ rows, broken, failed }: Props) {
       {failed.length > 0 && (
         <p className="rounded-xl bg-gold-wash px-4 py-3 text-sm text-espresso">미리보기를 그리지 못한 그림 {failed.length}개: {failed.join(" / ")}</p>
       )}
+
+      <Publish />
 
       <div className="flex flex-wrap items-center gap-3">
         <div role="group" aria-label="검수 상태" className="flex gap-1.5">
@@ -75,13 +79,54 @@ export function ArtBoard({ rows, broken, failed }: Props) {
             ))}
           </ul>
         )}
-        {selected && <ArtDetail key={selected.id} art={selected} />}
+        {selected && <ArtDetail key={selected.id} art={selected} foods={foods} infantKeys={infantKeys} />}
       </div>
     </section>
   )
 }
 
-function ArtDetail({ art }: { art: ArtRow }) {
+// 웹에 반영: pnpm foods:sync와 같은 검사와 생성. 문제가 있으면 아무것도 바뀌지 않고 고칠 항목이 나온다.
+function Publish() {
+  const [pending, start] = useTransition()
+  const [result, setResult] = useState<PublishResult | null>(null)
+  return (
+    <div className={`${CARD} flex flex-col gap-3 p-4`}>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button disabled={pending} onClick={() => start(async () => setResult(await publishFoods()))}>
+          {pending ? "반영하는 중…" : "웹에 반영"}
+        </Button>
+        <p className="text-sm text-stone">검수를 마쳤고 용도가 정해진 그림과 품종 목록을 웹 파일로 만들어요. 커밋은 하지 않아요.</p>
+      </div>
+      {result && (
+        <div role="status" aria-live="polite" className="flex flex-col gap-2 text-sm">
+          {result.problems.length > 0 ? (
+            <>
+              <p className="font-semibold text-error">고칠 것 {result.problems.length}건. 웹 파일은 그대로 두었어요.</p>
+              <ul className="list-disc pl-5 text-error">
+                {result.problems.map((problem) => (
+                  <li key={problem}>{problem}</li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p className="font-semibold">{result.changed.length ? `반영했어요. 바뀐 것: ${result.changed.join(", ")}` : "반영할 변경이 없어요."}</p>
+          )}
+          {result.notes.length > 0 && (
+            <ul className="list-disc pl-5 text-stone">
+              {result.notes.map((note) => (
+                <li key={note} className="break-words">
+                  {note}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ArtDetail({ art, foods, infantKeys }: { art: ArtRow } & UseOptions) {
   const [pending, start] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [notes, setNotes] = useState<string | null>(null)
@@ -136,16 +181,7 @@ function ArtDetail({ art }: { art: ArtRow }) {
         </p>
       </div>
 
-      <section className="flex flex-col gap-1.5 text-sm">
-        <h3 className="font-semibold">가리키는 화면</h3>
-        {art.uses.seasonal.length === 0 && art.uses.infant.length === 0 && <p className="text-stone">아직 어느 화면도 쓰지 않아요. 검수를 마쳐도 웹에는 나가지 않아요.</p>}
-        {art.uses.seasonal.map((food) => (
-          <p key={food.id}>
-            {food.verified ? "제철달력" : "제철 미검증(달력에 안 나옴)"} · {food.name} <code className="text-stone">{food.id}</code>
-          </p>
-        ))}
-        {art.uses.infant.length > 0 && <p>이유식 · {art.uses.infant.join(", ")}</p>}
-      </section>
+      <ArtUses art={art} foods={foods} infantKeys={infantKeys} />
 
       {art.references.length > 0 && (
         <section className="flex flex-col gap-1.5 text-sm">

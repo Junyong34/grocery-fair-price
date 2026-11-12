@@ -2,7 +2,7 @@
 
 Status: ready-for-agent
 Type: task (prototypes/와 .claude/skills/가 있는 기기에서)
-Blocked by: 06
+Blocked by: 06 (resolved)
 
 ## 목적
 

@@ -32,16 +32,19 @@ describe("artUses", () => {
   it("이유식은 과일 도감과 궁합 재료를 한 목록으로 모으고 겹치면 한 번만 적는다", () => {
     const uses = artUses({}, { fruits: { mango: "mango", peanut: "peanut" }, pairings: { 땅콩: "peanut", 참개: "sesame-seed", 참깨: "sesame-seed" } })
 
-    expect(uses.get("mango")?.infant).toEqual(["과일 도감 mango"])
-    expect(uses.get("peanut")?.infant).toEqual(["과일 도감 peanut", "궁합 땅콩"])
-    expect(uses.get("sesame-seed")?.infant).toEqual(["궁합 참개", "궁합 참깨"])
+    expect(uses.get("mango")?.infant).toEqual([{ kind: "fruits", key: "mango" }])
+    expect(uses.get("peanut")?.infant).toEqual([
+      { kind: "fruits", key: "peanut" },
+      { kind: "pairings", key: "땅콩" },
+    ])
+    expect(uses.get("sesame-seed")?.infant.map((use) => use.key)).toEqual(["참개", "참깨"])
   })
 })
 
 describe("isShown", () => {
   it("제철 검증 품종이나 이유식이 쓰는 그림만 화면에 나온다", () => {
     expect(isShown({ seasonal: [{ id: "radish", name: "무", verified: true }], infant: [] })).toBe(true)
-    expect(isShown({ seasonal: [], infant: ["궁합 두부"] })).toBe(true)
+    expect(isShown({ seasonal: [], infant: [{ kind: "pairings", key: "두부" }] })).toBe(true)
     expect(isShown({ seasonal: [{ id: "lemon", name: "레몬", verified: false }], infant: [] })).toBe(false)
     expect(isShown(NONE)).toBe(false)
   })

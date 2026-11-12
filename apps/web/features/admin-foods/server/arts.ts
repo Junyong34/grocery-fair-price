@@ -10,6 +10,7 @@ import { parseArtMeta } from "@workspace/seasonal/data/art-meta"
 import { parseFoodRegistry } from "@workspace/seasonal/data/food-registry"
 
 import { artUses, type ArtRow } from "../lib/art-view"
+import { infantKeys } from "../lib/food-edit"
 import { ART_DIR, artFile, INFANT_ART_FILE, REGISTRY_FILE, REPO } from "./paths"
 
 const run = promisify(execFile)
@@ -17,7 +18,18 @@ const NONE = { seasonal: [], infant: [] }
 
 export type ArtList =
   | { available: false }
-  | { available: true; rows: ArtRow[]; /** 형식이 틀려 읽지 못한 그림 메타. */ broken: string[]; /** 미리보기를 그리지 못한 그림. */ failed: string[] }
+  | {
+      available: true
+      rows: ArtRow[]
+      /** 형식이 틀려 읽지 못한 그림 메타. */
+      broken: string[]
+      /** 미리보기를 그리지 못한 그림. */
+      failed: string[]
+      /** 그림을 연결할 수 있는 기존 품종. */
+      foods: { id: string; name: string }[]
+      /** 그림을 연결할 수 있는 이유식 항목. */
+      infantKeys: { fruits: string[]; pairings: string[] }
+    }
 
 /** 그림 원본이 이 기기에 있는지. prototypes/는 Git에 없다. */
 export function hasArtSource(): boolean {
@@ -55,5 +67,8 @@ export async function listArts(): Promise<ArtList> {
       broken.push(id)
     }
   }
-  return { available: true, rows, broken: broken.sort(), failed }
+  const foods = Object.entries(registry)
+    .map(([id, food]) => ({ id, name: food.name }))
+    .sort((a, b) => a.name.localeCompare(b.name, "ko"))
+  return { available: true, rows, broken: broken.sort(), failed, foods, infantKeys: infantKeys() }
 }

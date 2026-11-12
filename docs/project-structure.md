@@ -135,7 +135,7 @@ import 경로:
 | `/admin/catalog/categories`, `/admin/catalog/varieties` | 카테고리 · 품종 목록 (개발 서버 전용, catalog-scale/07) | `app/admin/catalog/` | `features/admin-catalog/categories/category-board`, `varieties/variety-board`, `server/categories` · `category-actions` · `varieties` |
 | `/admin/catalog/products` | 참가격 상품 목록 (catalog-scale/10, 개발 서버 전용, 읽기 전용 `ingest_writer`). 상품마다 카테고리 · 품목(품목 미정이면 참가격 소분류) · 품종 연결 · 상품 화면 상태(노출 · 오래됨 · 페이지 없음 · 조사 중단) · 판매가. 고치지 않고, 품목이 틀리면 상품의 품목 제안으로 고친다 | `app/admin/catalog/products/` | `features/admin-catalog/products`, `features/admin-catalog/server/products`(접속은 `server/reader-db`), `lib/product-view` |
 | `/admin/catalog/proposals` | 카탈로그 제안 검토 (catalog-scale/07, 개발 서버 전용, 운영 DB에 소유자 접속). 제안을 골라 미리보기(되돌림)·적용·반려하고, 적용한 제안을 되돌린다. 결정은 `@workspace/price-ingest/catalog/decide`(`decideProposals`)만 거치고, 돌려받은 사본으로 `snapshot.json`을 다시 쓴다 | `app/admin/catalog/proposals/` | `features/admin-catalog/proposals`, `features/admin-catalog/server/proposal-actions` |
-| `/admin/foods` · `GET /admin/foods/preview?art=&variant=` | 그림 검수 (docs-and-illustration-cleanup/05, 개발 서버 전용, `prototypes/`가 있는 기기에서). 그림 원본에서 그린 미리보기(`scripts/render-art-previews.mjs` → `node_modules/.cache/art-preview`)를 보고 검수를 판정한다. 판정은 그림 폴더의 `art.json`만 바꾸고 웹 반영은 `pnpm foods:sync`가 한다 | `app/admin/foods/` | `features/admin-foods/arts/art-board`, `server/arts` · `art-actions` · `paths`, `lib/art-view` |
+| `/admin/foods` · `GET /admin/foods/preview?art=&variant=` | 그림 검수 (docs-and-illustration-cleanup/05, 개발 서버 전용, `prototypes/`가 있는 기기에서). 그림 원본에서 그린 미리보기(`scripts/render-art-previews.mjs` → `node_modules/.cache/art-preview`)를 보고 검수를 판정하고(`art.json`), 그림의 용도를 정한다: 제철(새 품종을 만들거나 기존 품종에 연결. 근거 출처와 확인일이 비면 제철 미검증으로 저장) · 이유식(그림 연결만). 저장은 품종 원본과 `infant-art.json`만 고치고, "웹에 반영" 버튼이 `pnpm foods:sync --json`을 실행해 결과와 고칠 항목을 보여 준다. 커밋은 하지 않는다 | `app/admin/foods/` | `features/admin-foods/arts/art-board` · `art-uses`, `server/arts` · `art-actions` · `use-actions` · `paths`, `lib/art-view` · `food-edit` |
 | `/print?spec=&paper=&page=` | 인쇄 전용 페이지 (개발 서버 전용, 운영 404) | `app/print/page.tsx` | `features/print/print-document` |
 | (제철 화면 안에서 이동) | 1i 품종 상세 (하단 시트) | `seasonal/@sheet/(.)foods/[food]/page.tsx` | `components/detail-sheet` + `food-detail` |
 | `/api/og` | 공유 미리보기 이미지 1200×630 | `app/api/og/route.tsx` | 쿼리 `title`, `subtitle`, `badge`, `season` |
@@ -202,7 +202,7 @@ import 경로:
 |---|---|
 | `features/print/` | `/print` 화면. `print-document`(달력·포스터 종류 → 컴포넌트 표), 궁합표는 `app/print/page.tsx`에서 `features/baby-food/pairing-print`를 렌더링, 종류별 `monthly`·`year-sheet`·`season-poster`·`month-poster`, `parts/`(시트, 인쇄 달력, 품종 그림 판), `print.css`(A4·A3 `@page`. 용지 단위 `--u`는 `Sheet`가 `PAPERS` 배율로 넣는다) |
 | `features/admin-print/` | 어드민. 아래 표 |
-| `features/admin-foods/` | 그림 어드민(ADR 0006). `lib/art-view`(그림을 가리키는 화면 데이터 모으기, 목록 거르기), `server/`(`prototypes/`와 품종 원본 읽기, `art.json` 쓰기. 저장소 루트 경로를 만들고 읽는 곳마다 `turbopackIgnore`를 단다), `arts/art-board`(목록과 판정) |
+| `features/admin-foods/` | 그림 어드민(ADR 0006). `lib/art-view`(그림을 가리키는 화면 데이터 모으기, 목록 거르기), `lib/food-edit`(품종 원본에 새 품종 더하기 · 그림 연결, 이유식 그림 연결. 파일을 쓰지 않는 계산), `server/`(`prototypes/`와 품종 원본 읽기, `art.json` 쓰기. 저장소 루트 경로를 만들고 읽는 곳마다 `turbopackIgnore`를 단다), `arts/art-board`(목록과 판정) |
 
 `features/admin-print/`는 한 파일이 한 가지 일만 하도록 나눈다. 아래 칸은 위 칸만 import한다(`server/`는 화면 쪽에서 `actions`·`queries`만 부른다).
 

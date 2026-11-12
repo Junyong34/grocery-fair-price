@@ -7,8 +7,8 @@ import type { FoodRegistry } from "@workspace/seasonal/data/food-registry"
 export type ArtUse = {
   /** 이 그림을 쓰는 품종. verified가 false면 제철 미검증이라 제철달력에 나오지 않는다. */
   seasonal: { id: string; name: string; verified: boolean }[]
-  /** 이 그림을 쓰는 이유식 항목("과일 도감 mango", "궁합 두부"). */
-  infant: string[]
+  /** 이 그림을 쓰는 이유식 항목. fruits는 과일 도감(과일 id · 주의 식재료 iconId), pairings는 궁합표의 재료 이름이다. */
+  infant: { kind: "fruits" | "pairings"; key: string }[]
 }
 
 export type ArtRow = ArtMeta & { uses: ArtUse }
@@ -25,10 +25,13 @@ export function artUses(registry: FoodRegistry, infant: InfantArt): Map<string, 
     return uses.get(artId)!
   }
   for (const [id, food] of Object.entries(registry)) of(food.art ?? id).seasonal.push({ id, name: food.name, verified: food.season === "verified" })
-  for (const [key, artId] of Object.entries(infant.fruits)) of(artId).infant.push(`과일 도감 ${key}`)
-  for (const [key, artId] of Object.entries(infant.pairings)) of(artId).infant.push(`궁합 ${key}`)
+  for (const [key, artId] of Object.entries(infant.fruits)) of(artId).infant.push({ kind: "fruits", key })
+  for (const [key, artId] of Object.entries(infant.pairings)) of(artId).infant.push({ kind: "pairings", key })
   return uses
 }
+
+/** 이유식 항목의 갈래 이름. */
+export const INFANT_KIND_LABEL = { fruits: "과일 도감", pairings: "궁합" } as const
 
 /** 화면에 나오는 그림인지. pnpm foods:sync가 웹에 내보내는 조건과 같다(검수 상태는 따로 본다). */
 export function isShown(uses: ArtUse): boolean {
