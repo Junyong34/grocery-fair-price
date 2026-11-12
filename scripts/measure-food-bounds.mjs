@@ -1,4 +1,4 @@
-/* global console */
+/* global console, process */
 // 일러스트가 상자(정사각형) 안에서 차지하는 세로 범위를 잰다. 이름표를 그림 바로 아래에 붙이는 데 쓴다.
 //
 //   pnpm foods:bounds   (pnpm foods:sync가 끝에 자동으로 돌린다)
@@ -9,47 +9,54 @@
 import { readdirSync, writeFileSync } from "node:fs"
 import { dirname, join, resolve } from "node:path"
 import sharp from "sharp"
-import { fileURLToPath } from "node:url"
+import { fileURLToPath, pathToFileURL } from "node:url"
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..")
-const foodsDir = join(root, "apps/web/public/foods")
-const outFile = join(root, "packages/seasonal/src/data/food-bounds.generated.ts")
 
 const SIZE = 256
 const ALPHA = 12
 
-const ids = readdirSync(foodsDir, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name)
-  .sort()
+/** foodsDir/<id>/color.svg를 재서 food-bounds.generated.ts의 글을 만든다. */
+export async function foodBoundsSource(foodsDir) {
+  const ids = readdirSync(foodsDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort()
 
-const rows = []
-for (const id of ids) {
-  const { data, info } = await sharp(join(foodsDir, id, "color.svg"), { density: 144 })
-    .resize(SIZE, SIZE, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
-    .ensureAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true })
-  let bottom = 0
-  for (let y = info.height - 1; y >= 0 && !bottom; y--) {
-    for (let x = 0; x < info.width; x++) {
-      if (data[(y * info.width + x) * info.channels + 3] > ALPHA) {
-        bottom = y + 1
-        break
+  const rows = []
+  for (const id of ids) {
+    const { data, info } = await sharp(join(foodsDir, id, "color.svg"), { density: 144 })
+      .resize(SIZE, SIZE, { fit: "contain", background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true })
+    let bottom = 0
+    for (let y = info.height - 1; y >= 0 && !bottom; y--) {
+      for (let x = 0; x < info.width; x++) {
+        if (data[(y * info.width + x) * info.channels + 3] > ALPHA) {
+          bottom = y + 1
+          break
+        }
       }
     }
+    rows.push([id, Math.round((bottom / info.height) * 100) / 100])
   }
-  rows.push([id, Math.round((bottom / info.height) * 100) / 100])
-}
 
-writeFileSync(
-  outFile,
-  `// 생성 파일. 직접 고치지 않는다. \`pnpm foods:bounds\`로 다시 만든다.
+  return {
+    count: rows.length,
+    text: `// 생성 파일. 직접 고치지 않는다. \`pnpm foods:bounds\`로 다시 만든다.
 // 일러스트가 상자 안에서 아래로 어디까지 그려지는지(상자 높이 대비 0..1). 이름표를 그림에 붙이는 데 쓴다.
 
 export const FOOD_BOTTOM: Readonly<Record<string, number>> = {
 ${rows.map(([id, bottom]) => `  ${JSON.stringify(id)}: ${bottom},`).join("\n")}
 }
 `,
-)
-console.log(`${rows.length}개 품종의 그림 아래 끝을 잼 → packages/seasonal/src/data/food-bounds.generated.ts`)
+  }
+}
+
+// pnpm foods:bounds로 직접 돌릴 때만 파일을 쓴다. pnpm foods:sync는 foodBoundsSource를 가져다 쓴다.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const { count, text } = await foodBoundsSource(join(root, "apps/web/public/foods"))
+  writeFileSync(join(root, "packages/seasonal/src/data/food-bounds.generated.ts"), text)
+  console.log(`${count}개 품종의 그림 아래 끝을 잼 → packages/seasonal/src/data/food-bounds.generated.ts`)
+}

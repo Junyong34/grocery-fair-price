@@ -49,15 +49,15 @@ Regenerate with the command and commit the output. Hand edits are overwritten.
 
 | Output | Command | Run it when |
 |---|---|---|
-| `packages/seasonal/src/data/foods.generated.ts` | `pnpm --filter @workspace/seasonal build:foods` | the 품종 source `packages/seasonal/src/data/food-registry.json` changes (name, aliases, months, 제철 검증 status, evidence). Edit 품종 there, never in the generated file. Runs without `prototypes/`. |
-| `apps/web/public/foods/<id>/{color,motion}.svg`, `PROVENANCE.md`, `drawn-foods.generated.ts`, `food-bounds.generated.ts` | `pnpm foods:sync` | an illustration is drawn or changed (`/seasonal-food-illustrator`). |
+| `packages/seasonal/src/data/{foods,drawn-foods,drawn-dishes,food-bounds}.generated.ts`, `apps/web/public/foods/<id>/{color,motion}.svg`, `apps/web/public/dishes/<id>/color.svg`, both `PROVENANCE.md` | `pnpm foods:sync` | the 품종 source `packages/seasonal/src/data/food-registry.json` changes (name, aliases, months, 제철 검증 status, evidence, `art`), `infant-art.json` changes, or an illustration is drawn, changed or reviewed (`/seasonal-food-illustrator`). It checks first and replaces nothing if it finds a problem; fix the items it lists. `--check` only checks. |
 | ERD blocks in `grocery-price/docs/30-data/schema-map.html` | `pnpm db:erd` (local DB up, migrations applied) | a migration changes tables, keys or checks. `pnpm db:test` fails while they differ. |
 | `grocery-price/reference/public-data/samples/viewer/api-explorer.html` | `python3 -I build.py` in that folder | `template.html`, `build.py` or the saved samples change. Then run `smoke.sh --quick` in that folder before finishing. |
 | `food-bounds.generated.ts` alone | `pnpm foods:bounds` | the SVGs changed without a sync. Needs no `prototypes/`. |
 | `apps/web/shared/fonts/BricolageGrotesque.woff2` (subset of `BricolageGrotesque-full.woff2`) | `scripts/subset-display-font.sh` (needs `fonttools` + `brotli`) | the font or the glyph range it must cover changes. |
 | `apps/web/public/downloads/**` (PDFs, `manifest.json`), `apps/web/print-editions/<id>.build.json` | the admin's "PDF 생성" button at `/admin` (`pnpm dev`, uses local Google Chrome) | an edition's spec changes, or anything a print page draws changes (foods, illustrations, holidays). Saving an edition rewrites `manifest.json`. |
 
-- `pnpm foods:sync` reads `prototypes/`, so it runs only on a machine that has it.
+- Without `prototypes/`, `pnpm foods:sync` regenerates only the 품종 list and leaves the committed illustrations as they are.
+- Edit 품종 only in `food-registry.json`. An illustration is exported when its `art.json` says `reviewed` and some screen data points at it (verified 품종, `infant-art.json`).
 - Print PDFs are gitignored (too large); commit `manifest.json`, the thumbnails and the edition files. Publishing an edition uploads its A4 PDF to the private R2 bucket (ADR 0003, write keys in root `.env`); withdrawing or deleting leaves the object, and the admin's "R2 정리" button removes unlisted objects once the deploy is live.
 - Per-품종 drawing scale (`FOOD_SCALE` in `packages/seasonal/src/data/food-sizes.ts`) is hand-tuned. Brand files are copied by hand: `apps/web/docs/brand-assets.md`.
 </important>

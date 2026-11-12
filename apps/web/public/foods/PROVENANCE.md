@@ -1,6 +1,6 @@
 # 제철 일러스트 출처 기록
 
-생성 파일. `pnpm foods:sync`(scripts/sync-food-images.mjs)가 덮어쓴다.
+생성 파일. `pnpm foods:sync`(scripts/sync-foods.mjs)가 덮어쓴다.
 
 이 폴더의 SVG는 이 프로젝트에서 직접 만든 제철 일러스트다. 원본(품종별 그리기 코드와 그림체 수치)은 저장소 밖 `prototypes/seasonal-food`에 있다.
 

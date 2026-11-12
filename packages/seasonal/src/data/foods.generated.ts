@@ -1,4 +1,4 @@
-// 생성 파일. 직접 고치지 않는다. 품종 원본 food-registry.json을 고치고 packages/seasonal/scripts/build-foods.mjs로 다시 만든다.
+// 생성 파일. 직접 고치지 않는다. 품종 원본 food-registry.json을 고치고 `pnpm foods:sync`로 다시 만든다.
 // 품종 원본 286개 가운데 제철 검증된 255개.
 
 export const FOOD_ROWS = [

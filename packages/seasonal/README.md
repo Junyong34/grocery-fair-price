@@ -14,7 +14,7 @@
 | `scripts/` | 생성 스크립트 |
 | `docs/` | 조사 기록: 흩어진 배치 알고리즘 비교(`scatter-layout-algorithms.md`, `layout/`과 `geometry/`의 근거), 명절 전통 음식(`traditional-foods.md`) |
 
-품종의 표시명·별칭·카테고리·제철 달·근거는 품종 원본 `src/data/food-registry.json` 한 곳에서 고친다(형식: `src/data/food-registry.ts`). 품종 목록 `src/data/foods.generated.ts`는 생성 파일이라 직접 고치지 않고, 원본을 고친 뒤 `pnpm --filter @workspace/seasonal build:foods`로 다시 만든다. 제철 검증된 품종(`season: "verified"`)만 목록에 들어간다. 품종 ID와 그림 ID가 다르면 원본의 `art`에 그림 ID를 적는다.
+품종의 표시명·별칭·카테고리·제철 달·근거는 품종 원본 `src/data/food-registry.json` 한 곳에서 고친다(형식: `src/data/food-registry.ts`). 품종 목록 `src/data/foods.generated.ts`는 생성 파일이라 직접 고치지 않고, 원본을 고친 뒤 루트에서 `pnpm foods:sync`로 다시 만든다(검사 후 품종 목록과 그림 산출물을 함께 교체한다. 품종 목록만 필요하면 `pnpm --filter @workspace/seasonal build:foods`). 제철 검증된 품종(`season: "verified"`)만 목록에 들어간다. 품종 ID와 그림 ID가 다르면 원본의 `art`에 그림 ID를 적는다.
 
 화면 문구는 `src/data/copy.ts` 한 곳에 둔다. 화면 코드에 문구를 직접 쓰지 않는다.
 

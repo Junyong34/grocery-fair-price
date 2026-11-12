@@ -308,7 +308,7 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `data/months.ts` | `MONTHS`, `isMonth`, `formatSeasonMonths`, `orderSeasonMonths` |
 | `data/seasons.ts` | `SEASONS`, `SEASON_MONTHS`, `isSeason`, `seasonOfMonth` |
 | `data/dishes.ts` | 전통 음식 `TRADITIONAL_DISHES`(품종과 따로), `DishId`, `findDish`, `dishNames`, `isDishDrawn` |
-| `data/dish-rows.ts` | 전통 음식 행(`id`, `name`). import가 없어 `foods:sync`가 Node로 바로 읽는다 |
+| `data/dish-rows.ts` | 전통 음식 행(`id`, `name`). import가 없어 `foods:sync`(`scripts/sync-foods.mjs`)가 Node로 바로 읽는다 |
 | `data/drawn-dishes.generated.ts` | 생성 파일. 그림이 있는 전통 음식 id |
 | `data/ingredient-calendar.ts` | 제철 식재료 카테고리와 연간 목록 순서 |
 | `data/sashimi.ts` | 제철 회 달별 품종(`SASHIMI_MONTHS`, `ADDED_SASHIMI`, `sashimiInMonth`) |
@@ -382,14 +382,14 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 ## 8. 생성 파일과 파이프라인
 
 ```
-packages/seasonal/src/data/food-registry.json (품종 원본. season: verified만 목록에 넣는다)
-        │  pnpm --filter @workspace/seasonal build:foods  (packages/seasonal/scripts/build-foods.mjs)
+packages/seasonal/src/data/food-registry.json   품종 원본 (season: verified만 제철달력에)
+packages/seasonal/src/data/infant-art.json      이유식 화면이 쓰는 그림 ID
+prototypes/seasonal-food/foods/<그림 ID>/{food.mjs, art.json}   그림 원본과 그림 검수 상태
+prototypes/seasonal-food/{dishes,styles/watercolor,kit}
+        │  pnpm foods:sync  (scripts/sync-foods.mjs)
+        │  검사 → 임시 폴더에 생성 → 한 번에 교체. 문제가 있으면 고칠 항목을 보여 주고 아무것도 바꾸지 않는다
         ▼
 packages/seasonal/src/data/foods.generated.ts
-        │
-prototypes/seasonal-food/{foods,dishes,styles/watercolor,kit}
-        │  pnpm foods:sync  (scripts/sync-food-images.mjs, 끝에 measure-food-bounds.mjs)
-        ▼
 apps/web/public/foods/<id>/color.svg, motion.svg
 apps/web/public/foods/PROVENANCE.md         그림체 버전·sha·품종 목록
 packages/seasonal/src/data/drawn-foods.generated.ts
@@ -403,7 +403,8 @@ packages/seasonal/src/data/drawn-dishes.generated.ts
 - 출력은 모두 커밋한다. 그림의 원천이 `prototypes/`(Git 밖)에 있어 새 클론에서는 다시 만들 수 없기 때문이다.
 - 품종 ID와 그림 ID가 다른 품종은 품종 원본의 `art`에 그림 ID를 적는다(예: 새우류 `shrimp-kinds` → 그림 `shrimp`). 그림이 없으면 화면은 이름 카드를 보인다.
 - 그림체는 `watercolor`, 변형은 `color`(모든 화면)와 `motion`(1i 큰 그림, SVG 안 CSS 키프레임), 바닥 그림자는 끈다.
-- 제철 월 검증 전의 확장 후보 5종(금귤·카라향·하귤·황금향·대저토마토)은 `sync-food-images.mjs`의 `CANDIDATE_FOOD_IDS`로 SVG만 동기화한다. 달력 목록 등록은 제철 검증 후 별도로 진행한다.
+- 웹에 내보내는 그림은 **그림 검수를 마쳤고(`art.json`의 `review: "reviewed"`) 어느 화면 데이터든 가리키는 그림**이다. 제철 검증 품종은 품종 ID 폴더에(화면이 품종 ID로 그림을 찾는다), 이유식 그림은 그림 ID 폴더에 낸다. 무엇을 내보내고 무엇을 문제로 볼지는 `packages/seasonal/src/data/food-sync-plan.ts`가 정한다: 겹친 품종 ID, 옛 품종 ID(`renamed-foods.ts`) 재사용, 가리키는 그림의 원본 누락, 미검수 그림 참조. 근거 출처가 빈 제철 검증 품종과 쓰이지 않는 그림은 알림으로만 낸다.
+- `pnpm foods:sync --check`는 검사만 하고, `--json`은 결과(`problems`, `notes`, `changed`)를 JSON 한 줄로 낸다. `prototypes/`가 없는 기기에서는 품종 목록만 다시 만들고 그림 산출물은 그대로 둔다.
 - 전통 음식(`prototypes/seasonal-food/dishes/<id>`)은 움직임이 없어 `color`만 만든다. 그림 폴더 이름이 `dish-rows.ts`의 id와 같아야 나온다. sync가 그림이 없는 음식을 로그로 알려 준다. 그릴 목록과 체크리스트는 `prototypes/seasonal-food/scripts/build_seasonal_lists.py`의 `DISHES`다.
 - 새 일러스트는 프로젝트 스킬 `/seasonal-food-illustrator`로 그린다.
 - 브랜드 파일(`apps/web/public/images/brand/`, `app/favicon.ico`, `app/icon.svg`, `app/apple-icon.png`)은 `prototypes/branding/`에서 손으로 복사한다(`apps/web/docs/brand-assets.md`). `logo-lockup.svg`·`logo-lockup-ivory.svg`는 고운돋움 Regular의 글자 윤곽을 포함한 가로 로고이며, `GowunDodum-OFL.txt`는 서체 라이선스다.
@@ -458,8 +459,8 @@ packages/seasonal/src/data/drawn-dishes.generated.ts
 | `pnpm test` | vitest: `packages/seasonal`, `packages/price`, `packages/ui`, `packages/price-ingest`(오프라인), `apps/web`(SEO 가드 포함) |
 | `pnpm format` | Prettier |
 | `pnpm ui:add <name-or-url>` | cojeev·shadcn 컴포넌트를 `packages/ui`에 설치 |
-| `pnpm foods:sync` / `pnpm foods:bounds` | 일러스트 동기화 / 그림 아래 끝 재측정 |
-| `pnpm --filter @workspace/seasonal build:foods` | 품종 목록 생성 |
+| `pnpm foods:sync` / `pnpm foods:bounds` | 품종 목록 · 웹 그림 · 그림 목록 · 경계값 · 출처 기록을 한 번에(`--check`는 검사만) / 그림 아래 끝만 재측정 |
+| `pnpm --filter @workspace/seasonal build:foods` | 품종 목록만 생성(검사와 그림 없이. 보통은 `pnpm foods:sync`를 쓴다) |
 | `pnpm db:start` / `pnpm db:stop` | 로컬 Supabase (Docker). 쓰지 않는 서비스는 끄고 띄운다. DB 어드민은 Studio http://127.0.0.1:55323 (Table Editor에서 schema `price`) |
 | `pnpm db:reset` | 로컬 DB를 지우고 마이그레이션·시드를 다시 적용 |
 | `pnpm db:test` | DB 테스트 (`db reset` → 샘플 적재 → 권한·RLS·적재 검사, 이어서 `apps/web`의 가격 읽기 module 테스트 `pnpm --filter web test:db`). `pnpm db:start` 뒤에 |
