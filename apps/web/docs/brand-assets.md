@@ -60,7 +60,7 @@
 | Next.js 파일         | 원본 파일               | 용도                         |
 | -------------------- | ----------------------- | ---------------------------- |
 | `app/favicon.ico`    | `favicon.ico`           | 초록 바탕 16·32·48px 브라우저 파비콘 |
-| `app/icon.svg`       | `favicon.svg`           | 초록 바탕 축약형 SVG 아이콘 |
+| `app/icon.png`       | `favicon-green-192.png` | 초록 바탕 192×192 브라우저·검색 파비콘 |
 | `app/apple-icon.png` | `favicon-green-180.png` | 초록 바탕 180×180 Apple 홈 화면 아이콘 |
 
 ## 홈 화면 웹 앱

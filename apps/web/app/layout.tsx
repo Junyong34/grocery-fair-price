@@ -13,7 +13,7 @@ import { TODAY_MARK_SCRIPT } from "@workspace/seasonal/calendar/today-marks"
 import { cn } from "@workspace/ui/lib/utils"
 
 // 사이트 기본 메타데이터. 페이지는 createMetadata로 덮어쓰고, 탭 제목 꼬리는 여기 template이 붙인다.
-// 파비콘(favicon.ico, icon.svg, apple-icon.png)은 app/ 파일 규칙으로 Next가 넣는다.
+// 파비콘(favicon.ico, icon.png, apple-icon.png)은 app/ 파일 규칙으로 Next가 넣는다.
 export const metadata: Metadata = {
   ...createMetadata(),
   metadataBase: new URL(siteUrl()),

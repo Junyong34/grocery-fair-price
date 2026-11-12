@@ -410,7 +410,7 @@ packages/seasonal/src/data/drawn-dishes.generated.ts
 - `pnpm foods:sync --check`는 검사만 하고, `--json`은 결과(`problems`, `notes`, `changed`)를 JSON 한 줄로 낸다. `prototypes/`가 없는 기기에서는 품종 목록만 다시 만들고 그림 산출물은 그대로 둔다.
 - 전통 음식(`prototypes/seasonal-food/dishes/<id>`)은 움직임이 없어 `color`만 만든다. 그림 폴더 이름이 `dish-rows.ts`의 id와 같아야 나온다. sync가 그림이 없는 음식을 로그로 알려 준다. 그릴 목록과 체크리스트는 `prototypes/seasonal-food/scripts/build_seasonal_lists.py`의 `DISHES`다.
 - 새 일러스트는 프로젝트 스킬 `/seasonal-food-illustrator`로 그린다.
-- 브랜드 파일(`apps/web/public/images/brand/`, `app/favicon.ico`, `app/icon.svg`, `app/apple-icon.png`)은 `prototypes/branding/`에서 손으로 복사한다(`apps/web/docs/brand-assets.md`). `logo-lockup.svg`·`logo-lockup-ivory.svg`는 고운돋움 Regular의 글자 윤곽을 포함한 가로 로고이며, `GowunDodum-OFL.txt`는 서체 라이선스다.
+- 브랜드 파일(`apps/web/public/images/brand/`, `app/favicon.ico`, `app/icon.png`, `app/apple-icon.png`)은 `prototypes/branding/`에서 손으로 복사한다(`apps/web/docs/brand-assets.md`). `logo-lockup.svg`·`logo-lockup-ivory.svg`는 고운돋움 Regular의 글자 윤곽을 포함한 가로 로고이며, `GowunDodum-OFL.txt`는 서체 라이선스다.
 
 ## 8-1. 가격 DB (supabase/, packages/price-db)
 
