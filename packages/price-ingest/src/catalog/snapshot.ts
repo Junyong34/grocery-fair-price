@@ -59,7 +59,8 @@ export function parseSnapshot(text: string): CatalogSnapshot {
 }
 
 export function readSnapshot(path = SNAPSHOT_PATH): CatalogSnapshot {
-  return parseSnapshot(readFileSync(path, "utf8"))
+  // 어드민이 formatSnapshot만 쓰려고 이 모듈을 가져와도, 인자 경로 때문에 Turbopack이 저장소 전체를 서버 번들에 추적해 Vercel 빌드가 실패한다
+  return parseSnapshot(readFileSync(/*turbopackIgnore: true*/ path, "utf8"))
 }
 
 export function formatSnapshot(snapshot: CatalogSnapshot): string {
