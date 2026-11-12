@@ -1,6 +1,8 @@
 # 품종 원본 · 그림 어드민 · 문서 정리
 
-Status: ready-for-agent
+> 완료 (2026-11-12): 티켓 01~12 resolved. 남은 것: 새 품종을 실제로 그리며 스킬 절차를 처음 돌려 보기(08의 Comments), `grocery-price/README.md` · `roadmap.md`의 현재 단계 문구 확인(정리표), 근거 출처가 빈 제철 검증 품종 110종(02의 Comments).
+
+Status: resolved
 
 2026-11-12 질문 라운드(Q1~Q30)로 정한 계획이다. 용어는 `grocery-price/GLOSSARY.md`의 **그림**, **그림 검수**, **제철 검증**을 쓴다. 그림을 품종과 따로 두는 결정은 ADR 0006(`grocery-price/docs/adr/0006-illustration-is-separate-from-variety.md`)에 있다.
 
@@ -112,9 +114,9 @@ Status: ready-for-agent
 | 티켓의 `Status: done` 7건, `in-progress` 2건 | 고침 | 위와 같음 | 같은 파일 | 함. `done` → `resolved`(baby-food-ingredient-pages 01~03, catalog-scale 05·08·09·10), `in-progress` → `claimed`(catalog-scale 06·07). `open` 12건은 wayfinder 티켓이라 그대로 |
 | `.scratch/infant-food-pairing/issues/01` | 유지 | `needs-info`. 그림이 없던 이름 28개는 그 뒤 모두 그려져 궁합 재료 97개가 전부 그림에 연결됐다. "범위 · 부위 · 형태 검토 필요 12개"는 사람의 판단이 남아 있다 | 없음 | 그대로. 현재 상태를 Comments에 적음 |
 | `grocery-price/README.md`, `roadmap.md`의 현재 단계 | 고침 → **안 함** | "운영 배포가 남음"이 실제와 다르다(감사 2장) | 같은 파일 | 하지 않았다. "운영 배포"가 색인 켜기 · sitemap 제출을 뜻하는지, 축평원 백필 실패 3묶음을 어떻게 적을지 사용자의 확인이 필요하다 |
-| 루트 `AGENTS.md`의 완료 기준 · 커밋 블록 | 이동 | 결정 29 | `docs/rules/` | 10에서 |
-| 루트 `AGENTS.md`의 영역별 블록 | 이동 | 결정 28 | 하위 `AGENTS.md` 다섯 곳 | 12에서 |
-| 루트 `AGENTS.md`의 생성 파일 표 중 품종 · 그림 행 | 고침 | 결정 10 | 같은 표 | 함(04). 12에서 `packages/seasonal/AGENTS.md`로 옮긴다 |
+| 루트 `AGENTS.md`의 완료 기준 · 커밋 블록 | 이동 | 결정 29 | `docs/rules/ticket-workflow.md` | 함(10 · 12) |
+| 루트 `AGENTS.md`의 영역별 블록 | 이동 | 결정 28 | 하위 `AGENTS.md` 다섯 곳 | 함(12). 블록 22개 미배치 0 |
+| 루트 `AGENTS.md`의 생성 파일 표 중 품종 · 그림 행 | 고침 | 결정 10 | 같은 표 | 함(04 · 12). `packages/seasonal/AGENTS.md`에 있다 |
 | `.claude/skills/seasonal-food-illustrator/` | 고침 | 결정 19~21 | 같은 폴더 | 함(08). Git에 없다 |
 
 옛 경로(`seasonal-lists/foods.json`, `sync-food-images`, `CANDIDATE_FOOD_IDS`, `NEW_IDS`, `DRAWN_AS`, `food-season-corrections`, `--refresh-seasons`, `food-pairing-image-analysis`)를 `.ts` · `.tsx` · `.mjs` · `.md` · `.json`에서 찾아 남은 곳은 다음뿐이다: 이 명세와 티켓, 감사 보고서, ADR 0006(이전 방식 설명), `docs/project-structure.md`의 이관 경위 한 줄, 끝난 티켓의 기록(seasonal-mvp 01·02와 명세, sashimi 06). 끝난 티켓은 그때의 사실이라 고치지 않았다.

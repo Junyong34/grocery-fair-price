@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
   // 두 옵션은 다음 메이저에서 항상 켜진다 (node_modules/next/dist/docs/.../cacheComponents.md).
   cacheComponents: true,
   partialPrefetching: true,
-  // 에이전트 지침은 루트 AGENTS.md 하나로 관리한다. 켜 두면 next dev가 apps/web/AGENTS.md를 다시 만든다.
+  // apps/web/AGENTS.md는 손으로 쓴 파일이다(루트 AGENTS.md가 가리킨다). 켜 두면 next dev가 그 파일을 덮어쓴다.
   agentRules: false,
   // 전체 품종 목록(/prices)은 품종이 늘면 한 페이지가 끝없이 길어져 뺐다. 이미 알려진 주소는 시세 메인으로 보낸다.
   // shared/routes.ts의 routes.price.varieties와 맞춰 둔다(설정 파일이라 routes를 import하지 않는다).

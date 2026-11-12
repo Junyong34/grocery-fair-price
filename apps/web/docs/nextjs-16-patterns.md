@@ -122,7 +122,7 @@
 
 - 설정 없이 쓸 수 있다. `import { ViewTransition } from 'react'`. 라우트 이동은 Transition이므로 자동으로 발동한다. 그냥 `setState`로는 발동하지 않는다(`startTransition`, `<Suspense>`, `useDeferredValue`만 발동한다). (`02-guides/view-transitions.md`, https://react.dev/reference/react/ViewTransition)
 
-이 앱은 명세에 있는 두 곳에만 쓴다(AGENTS.md "Motion", CSS는 `app/globals.css`): 3a 카드 → 계절 상세의 제목 morph(`seasons/season-card.tsx`, 이름은 `season-title-${season}`처럼 앱 전체에서 고유), 계절 상세의 이전/다음 방향 슬라이드(`seasons/season-detail.tsx`, `season-next` · `season-prev`). 2b 달 바꾸기는 쓰지 않는다. 스냅샷이 고정 줄과 내비를 덮고 스크롤한 자리에서 두 달의 격자가 겹쳐 깜빡여 CSS 페이드인으로 바꿨다.
+이 앱은 명세에 있는 두 곳에만 쓴다(`apps/web/AGENTS.md`의 animation 블록, CSS는 `app/globals.css`): 3a 카드 → 계절 상세의 제목 morph(`seasons/season-card.tsx`, 이름은 `season-title-${season}`처럼 앱 전체에서 고유), 계절 상세의 이전/다음 방향 슬라이드(`seasons/season-detail.tsx`, `season-next` · `season-prev`). 2b 달 바꾸기는 쓰지 않는다. 스냅샷이 고정 줄과 내비를 덮고 스크롤한 자리에서 두 달의 격자가 겹쳐 깜빡여 CSS 페이드인으로 바꿨다.
 
 - 주의할 점: `<ViewTransition>`은 DOM 노드보다 **앞**에 있어야 한다. 브라우저 뒤로 가기(popstate)는 애니메이션하지 않는다. reduced motion은 CSS로 직접 처리해야 한다. 클릭이 씹히지 않게 `::view-transition { pointer-events: none }`을 둔다. (react.dev ViewTransition caveats, `view-transitions.md` "Keeping the page interactive", "Respecting reduced motion")
 - 2a 월 점프는 명세대로 **즉시 이동 + 도착 섹션 `fadeIn`** 이다. ViewTransition 대상이 아니다. 16부터 Next가 `scroll-behavior`를 덮어쓰지 않으므로 전역에 `smooth`를 두지 않는다(2b 칩 영역에만 둔다). (`version-16.md` "Scroll Behavior Override")

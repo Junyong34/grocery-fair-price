@@ -3853,14 +3853,18 @@
     "name": "강황",
     "aliases": [],
     "category": "채소",
-    "months": [11],
+    "months": [11, 12],
     "peak": [11],
-    "season": "unverified",
+    "season": "verified",
     "basis": "foodnuri",
     "evidence": {
       "sources": [
+        "수확시기 검색",
+        "일반적인 수확시기",
         "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219946&menuNo=300063"
       ],
+      "checkedAt": "2026-11-12",
+      "reason": "조사일",
       "market": "정보누리 생산시기 10월~11월"
     }
   },

@@ -278,6 +278,7 @@ export const FOOD_BOTTOM: Readonly<Record<string, number>> = {
   "tomato": 0.79,
   "tongue-sole": 0.66,
   "trout": 0.85,
+  "turmeric": 0.87,
   "turnip": 0.87,
   "uloe-melon": 0.87,
   "wakame": 0.88,

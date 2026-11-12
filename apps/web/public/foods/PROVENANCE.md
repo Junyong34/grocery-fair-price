@@ -10,7 +10,7 @@
 | kit sha | `6806db565e0538c4` |
 | 변형 | `color`, `motion` |
 | 바닥 그림자 | 끔 |
-| 품종 수 | 296 |
+| 품종 수 | 297 |
 
 | id | 이름 | food.mjs sha |
 |---|---|---|
@@ -290,6 +290,7 @@
 | `tomato` | 토마토 | `118cb32c4ef1bf1e` |
 | `tongue-sole` | 서대 | `735a8f8b3211e69c` |
 | `trout` | 송어 | `33c4f4f1e368e56f` |
+| `turmeric` | 강황 | `4adedca0778e86c7` |
 | `turnip` | 순무 | `3318a0533a121a5b` |
 | `uloe-melon` | 울외 | `0a5eb8dfdffa99df` |
 | `wakame` | 미역 | `e7034259855fe370` |

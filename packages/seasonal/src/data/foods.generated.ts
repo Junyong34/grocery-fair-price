@@ -1,5 +1,5 @@
 // 생성 파일. 직접 고치지 않는다. 품종 원본 food-registry.json을 고치고 `pnpm foods:sync`로 다시 만든다.
-// 품종 원본 286개 가운데 제철 검증된 255개.
+// 품종 원본 286개 가운데 제철 검증된 256개.
 
 export const FOOD_ROWS = [
   { id: "redlip-mullet", name: "가숭어", aliases: [], category: "수산", months: [2], peak: [2], core: false },
@@ -13,6 +13,7 @@ export const FOOD_ROWS = [
   { id: "cuttlefish", name: "갑오징어", aliases: [], category: "수산", months: [5], peak: [5], core: false },
   { id: "mustard-greens", name: "갓", aliases: [], category: "채소", months: [9,10,11,12], peak: [10], core: false },
   { id: "kidney-bean", name: "강낭콩", aliases: [], category: "곡물·견과", months: [6,7], peak: [7], core: false },
+  { id: "turmeric", name: "강황", aliases: [], category: "채소", months: [11,12], peak: [11], core: false },
   { id: "pike-conger", name: "갯장어", aliases: [], category: "수산", months: [8], peak: [8], core: false },
   { id: "sweet-potato", name: "고구마", aliases: [], category: "채소", months: [9,10], peak: [9,10], core: true },
   { id: "sweet-potato-stem", name: "고구마순", aliases: [], category: "채소", months: [5,6], peak: [5], core: false },

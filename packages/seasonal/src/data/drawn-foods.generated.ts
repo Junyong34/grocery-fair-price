@@ -278,6 +278,7 @@ export const DRAWN_FOOD_IDS = [
   "tomato",
   "tongue-sole",
   "trout",
+  "turmeric",
   "turnip",
   "uloe-melon",
   "wakame",

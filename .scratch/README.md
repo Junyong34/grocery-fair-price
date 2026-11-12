@@ -8,7 +8,7 @@
 grep -rlE "^Status: (ready-for-agent|ready-for-human|needs-triage|needs-info|claimed|open)" .scratch/*/issues
 ```
 
-명세 맨 위의 `> 완료` · `> 종료` 줄은 그 명세의 큰 일이 끝났다는 뜻이다. **그래도 열린 티켓이 남아 있을 수 있으니** 아래 둘째 표를 함께 본다. 끝난 명세도 옮기지 않는다. 화면 명세로 계속 인용되기 때문이다(`AGENTS.md`).
+명세 맨 위의 `> 완료` · `> 종료` 줄은 그 명세의 큰 일이 끝났다는 뜻이다. **그래도 열린 티켓이 남아 있을 수 있으니** 아래 둘째 표를 함께 본다. 끝난 명세도 옮기지 않는다. 화면 명세로 계속 인용되기 때문이다(`apps/web/AGENTS.md`).
 
 티켓 상태: `ready-for-agent`(에이전트가 바로 할 수 있음), `ready-for-human`(사람이 해야 함), `needs-triage`(할지 말지 정해야 함), `needs-info`(정보를 기다림), `claimed`(하는 중), `open`(wayfinder 티켓, 시작 전).
 
@@ -16,7 +16,6 @@ grep -rlE "^Status: (ready-for-agent|ready-for-human|needs-triage|needs-info|cla
 
 | 폴더 | 무엇 | 열린 티켓 |
 |---|---|---|
-| `docs-and-illustration-cleanup/` | 품종 원본 · 그림 어드민 · 문서 정리 | 12 `ready-for-agent` |
 | `catalog-scale/` | 시세 카탈로그를 수천 개 항목으로 넓히기 (ADR 0005) | 03 · 04 · 06 · 07 `claimed`, 02 `ready-for-human`, 11 · 12 · 13 `needs-triage` |
 | `ingest-foundation/` | ① 수집 기반 | 03 · 04 · 05 `ready-for-agent`, 01 `ready-for-human` |
 | `ingest-schedule/` | 수집 일정과 감시 (wayfinder, `map.md`) | 08 · 09 `open` |
@@ -42,6 +41,7 @@ grep -rlE "^Status: (ready-for-agent|ready-for-human|needs-triage|needs-info|cla
 
 | 폴더 | 무엇 | 지금 쓰임 |
 |---|---|---|
+| `docs-and-illustration-cleanup/` | 품종 원본 · 그림 어드민 · 문서 정리(2026-11-12). 정리표에 하지 않은 두 행의 이유가 있다 | 품종 원본과 그림 어드민의 근거 (ADR 0006) |
 | `price-screens/` | 가격 화면(시세 · 판정) 1차 구현 | **가격 화면 명세.** 상품 화면은 `catalog-scale/issues/10`이 이어 받음 |
 | `price-db-read/` | 가격 화면을 실제 DB로 읽기 | 가격 데이터 읽기 경로의 근거 |
 | `shell-unify/` | 헤더 · 하단 내비 · 설정 통일 | 셸 규칙의 근거 |

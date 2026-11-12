@@ -1,6 +1,6 @@
 # 프로젝트 구조
 
-2026-11-10 기준 저장소 전체 지도. 에이전트가 지킬 규칙은 루트 `AGENTS.md`에 있고, 이 문서는 무엇이 어디에 왜 있는지를 기록한다. 폴더나 라우트, 패키지, 생성 파일이 바뀌면 이 문서도 고친다.
+2026-11-12 기준 저장소 전체 지도. 에이전트가 지킬 규칙은 루트 `AGENTS.md`(공통 규칙과 요청별 첫 탐색 경로)와 영역별 `AGENTS.md`(`apps/web`, `packages/seasonal`, `supabase`, `packages/price-ingest`, `grocery-price`)에 있고, 이 문서는 무엇이 어디에 왜 있는지를 기록한다. 폴더나 라우트, 패키지, 생성 파일이 바뀌면 이 문서도 고친다.
 
 ## 1. 한눈에
 
@@ -39,7 +39,7 @@ grocery-fair-price/
 ├─ .scratch/<feature>/       스펙(spec.md)과 티켓(issues/NN-slug.md)
 ├─ .githooks/pre-commit      scripts/check-no-secrets.sh 실행
 ├─ prototypes/               (Git 밖) 일러스트 원본, 와이어프레임, 브랜드 원본
-├─ AGENTS.md                 에이전트 지침 (CLAUDE.md는 @AGENTS.md 한 줄)
+├─ AGENTS.md                 에이전트 지침: 공통 규칙과 요청별 첫 탐색 경로. 영역 규칙은 그 폴더의 AGENTS.md (CLAUDE.md는 어디서나 @AGENTS.md 한 줄)
 ├─ turbo.json, pnpm-workspace.yaml, package.json
 └─ .mcp.json                 next-devtools-mcp (dev 서버의 /_next/mcp 연결)
 ```
@@ -81,7 +81,7 @@ import 경로:
 
 | 파일 | 내용 |
 |---|---|
-| `next.config.ts` | `cacheComponents: true`, `partialPrefetching: true`, `agentRules: false`(AGENTS.md를 루트 하나로) |
+| `next.config.ts` | `cacheComponents: true`, `partialPrefetching: true`, `agentRules: false`(손으로 쓴 `apps/web/AGENTS.md`를 next dev가 덮어쓰지 않게) |
 | `vercel.json` | 서버 함수 지역 `hnd1`(도쿄). 가격 DB(Supabase `ap-northeast-1`) 옆에서 돌게 한다. 지정하지 않으면 기본 `iad1`(미국 동부)이라 동적 영역이 매 요청 미국을 왕복한다(.scratch/bundle-audit 이후 운영 측정, 2026-11-05). Vercel Root Directory가 `apps/web`라 여기 둔다 |
 | `proxy.ts` | `/seasonal` → 서울 기준 이번 (연, 월)의 `/seasonal/at/[yearMonth]`로 rewrite(주소는 그대로). `/seasonal/festivals` → 서울 날짜 기준 다가오는 명절로, `/seasonal/sashimi` → 이번 달 제철 회로 리다이렉트. `matcher`는 정적 문자열이어야 해서 경로를 직접 쓴다 |
 | `app/layout.tsx` | `<html lang="ko" data-mode="light">`, Pretendard(본문), Gowun Batang(`--font-serif-ko`, 제목), 사이트 기본 메타데이터, `Providers` |
@@ -515,7 +515,7 @@ grocery-price/
 
 | 알고 싶은 것 | 문서 |
 |---|---|
-| 에이전트 규칙 | `AGENTS.md` |
+| 에이전트 규칙 | 루트 `AGENTS.md`, 영역별 `AGENTS.md` 다섯 곳, 작업 규칙 `docs/rules/ticket-workflow.md` |
 | 제철 화면 명세 | `prototypes/seasonal-food/wireframes/WIREFRAME-SPEC.md` (Git 밖) |
 | 새 수산·제철 회 콘텐츠 자료 | `apps/web/docs/seafood-content/README.md` (Git 관리. 화면은 `/seasonal/sashimi/[month]`, 명세 `.scratch/sashimi/spec.md`) |
 | 명세와 다르게 정한 것, MVP 결정 | `.scratch/seasonal-mvp/spec.md` |
