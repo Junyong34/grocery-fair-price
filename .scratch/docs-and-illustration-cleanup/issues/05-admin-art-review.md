@@ -2,7 +2,7 @@
 
 Status: ready-for-agent
 Type: task (prototypes/가 있는 기기에서)
-Blocked by: 03
+Blocked by: 03 (resolved)
 
 ## 목적
 

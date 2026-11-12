@@ -40,7 +40,8 @@ if (!existsSync(join(prototype, "kit/index.mjs"))) {
 const { renderSvg } = await import(pathToFileURL(join(prototype, "kit/index.mjs")))
 const { FOOD_ROWS } = await import(pathToFileURL(join(root, "packages/seasonal/src/data/foods.generated.ts")))
 const { DISH_ROWS } = await import(pathToFileURL(join(root, "packages/seasonal/src/data/dish-rows.ts")))
-const { FRUIT_GUIDE_ART, PAIRING_ART } = await import(pathToFileURL(join(root, "apps/web/features/baby-food/data.ts")))
+// 이유식 화면이 쓰는 그림 ID. 값이 그림 ID다.
+const infantArt = JSON.parse(readFileSync(join(root, "packages/seasonal/src/data/infant-art.json"), "utf8"))
 
 const sha = (text) => createHash("sha256").update(text).digest("hex").slice(0, 16)
 const styleFile = join(prototype, "styles", STYLE_ID, "style.json")
@@ -79,10 +80,7 @@ async function copyDrawings(source, shownIds, outDir, variants) {
   return { copied, skipped }
 }
 
-const babyFoodIds = [...Object.values(PAIRING_ART), ...Object.values(FRUIT_GUIDE_ART)].flatMap((path) => {
-  const match = path?.match(/^\/foods\/([^/]+)\//)
-  return match ? [match[1]] : []
-})
+const babyFoodIds = [...Object.values(infantArt.pairings), ...Object.values(infantArt.fruits)]
 const { copied, skipped } = await copyDrawings(
   "foods",
   new Set([...FOOD_ROWS.map((food) => food.id), ...babyFoodIds, ...CANDIDATE_FOOD_IDS]),

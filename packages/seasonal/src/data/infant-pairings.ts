@@ -1,5 +1,5 @@
 // 이유식 재료 궁합표. docs/food-pairing-image-analysis.md 2절의 전사다. O·X는 원본의 분류이고, 의학적 사실로 쓰지 않는다.
-// 앱의 그림 경로(PAIRING_ART)와 참고 링크(PAIRING_REFERENCES)는 apps/web/features/baby-food/data.ts에 있다.
+// 재료가 쓰는 그림 ID는 infant-art.json(PAIRING_ART_IDS)에, 참고 링크(PAIRING_REFERENCES)는 apps/web/features/baby-food/data.ts에 있다.
 
 import { INFANT_PAIRING_COPY } from "./copy"
 

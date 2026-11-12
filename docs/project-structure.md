@@ -332,11 +332,13 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `print/foods.ts` | 인쇄물 칸(달·계절)에 넣을 품종 고르기 |
 | `print/spec-codec.ts`, `listing.ts`, `month-label.ts`, `period-chart.ts`, `wheel.ts` | 인쇄 사양 URL 코덱(번들에서 zod를 빼려고 분리), 내려받기 화면의 종류별 줄 · 연도 규칙, 인쇄물 달 표기, 제철 막대표 배치, 원형 판 배치 |
 | `data/infant-pairings.ts`, `data/infant-fruits.ts` | 이유식 궁합 데이터(역참조 · 색인 함수 포함), 월령별 과일 시기 · 주의 식재료 |
+| `data/food-registry.json`, `food-registry.ts` | 품종 원본(표시명 · 별칭 · 제철 달 · 제철 검증 상태 · 근거)과 그 형식 · 검사, 제철달력 목록을 뽑는 `seasonalRows` (ADR 0006) |
+| `data/infant-art.json`, `infant-art.ts`, `art-meta.ts` | 이유식 화면이 쓰는 그림 ID 목록, 그림 메타(`prototypes/`의 `art.json`, 그림 검수 상태) 형식 |
 | `data/eaten-stats.ts`, `food-familiarity.ts`, `renamed-foods.ts` | 1h 범위별 품종 수 · 먹은 수, 품종 친숙도(1~5, 인쇄물 칸 고르기와 제철 회 추천), 바뀐 품종 id(옛 먹음 기록 옮기기) |
 | `calendar/static-years.ts`, `year-month.ts` | 2a를 미리 그릴 해(`STATIC_YEARS`), `2026-11` 같은 (연, 월) 경로 값 |
 | `layout/gesture.ts`, `geometry/` | 흩어진 판의 끌기 제스처 판단(상태 → 효과), 도형 배치(`lloyd`, `relax-shapes`) |
 
-테스트는 `*.test.ts`가 옆에 있다(vitest, 34개 파일, 2026-11-10). 배치 알고리즘 비교와 명절 전통 음식 조사는 `packages/seasonal/docs/`에 있다. `packages/seasonal/README.md`도 참고한다.
+테스트는 `*.test.ts`가 옆에 있다(vitest, 39개 파일, 2026-11-12). 배치 알고리즘 비교와 명절 전통 음식 조사는 `packages/seasonal/docs/`에 있다. `packages/seasonal/README.md`도 참고한다.
 
 ## 6-1. packages/price
 
