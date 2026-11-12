@@ -49,7 +49,7 @@ Regenerate with the command and commit the output. Hand edits are overwritten.
 
 | Output | Command | Run it when |
 |---|---|---|
-| `packages/seasonal/src/data/foods.generated.ts` | `pnpm --filter @workspace/seasonal build:foods` | the 품종 list in `prototypes/` changes. A 품종 without an illustration gets its id in `NEW_IDS` in `packages/seasonal/scripts/build-foods.mjs`. |
+| `packages/seasonal/src/data/foods.generated.ts` | `pnpm --filter @workspace/seasonal build:foods` | the 품종 source `packages/seasonal/src/data/food-registry.json` changes (name, aliases, months, 제철 검증 status, evidence). Edit 품종 there, never in the generated file. Runs without `prototypes/`. |
 | `apps/web/public/foods/<id>/{color,motion}.svg`, `PROVENANCE.md`, `drawn-foods.generated.ts`, `food-bounds.generated.ts` | `pnpm foods:sync` | an illustration is drawn or changed (`/seasonal-food-illustrator`). |
 | ERD blocks in `grocery-price/docs/30-data/schema-map.html` | `pnpm db:erd` (local DB up, migrations applied) | a migration changes tables, keys or checks. `pnpm db:test` fails while they differ. |
 | `grocery-price/reference/public-data/samples/viewer/api-explorer.html` | `python3 -I build.py` in that folder | `template.html`, `build.py` or the saved samples change. Then run `smoke.sh --quick` in that folder before finishing. |
@@ -57,7 +57,7 @@ Regenerate with the command and commit the output. Hand edits are overwritten.
 | `apps/web/shared/fonts/BricolageGrotesque.woff2` (subset of `BricolageGrotesque-full.woff2`) | `scripts/subset-display-font.sh` (needs `fonttools` + `brotli`) | the font or the glyph range it must cover changes. |
 | `apps/web/public/downloads/**` (PDFs, `manifest.json`), `apps/web/print-editions/<id>.build.json` | the admin's "PDF 생성" button at `/admin` (`pnpm dev`, uses local Google Chrome) | an edition's spec changes, or anything a print page draws changes (foods, illustrations, holidays). Saving an edition rewrites `manifest.json`. |
 
-- The first two read `prototypes/`, so they run only on a machine that has it.
+- `pnpm foods:sync` reads `prototypes/`, so it runs only on a machine that has it.
 - Print PDFs are gitignored (too large); commit `manifest.json`, the thumbnails and the edition files. Publishing an edition uploads its A4 PDF to the private R2 bucket (ADR 0003, write keys in root `.env`); withdrawing or deleting leaves the object, and the admin's "R2 정리" button removes unlisted objects once the deploy is live.
 - Per-품종 drawing scale (`FOOD_SCALE` in `packages/seasonal/src/data/food-sizes.ts`) is hand-tuned. Brand files are copied by hand: `apps/web/docs/brand-assets.md`.
 </important>

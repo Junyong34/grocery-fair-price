@@ -59,15 +59,4 @@ node .scratch/docs-and-illustration-cleanup/baseline.mjs
 
 ## 검증 명령의 현재 상태
 
-루트 `pnpm typecheck` · `pnpm lint` · `pnpm test`는 **실행되지 않는다.** pnpm이 `node_modules`를 지우고 다시 설치하려다 TTY가 없어 중단한다(`ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY`). 셸의 Node가 v25.9.0이고 저장소는 24.x를 요구한다. 터미널에서 `pnpm install`을 한 번 돌려야 한다.
-
-pnpm 없이 직접 돌린 결과:
-
-| 명령 | 결과 |
-|---|---|
-| `packages/price-ingest`에서 `tsc --noEmit` | 통과 |
-| `packages/price-ingest`에서 `vitest run` | 28개 파일, 361개 통과 |
-| `apps/web`에서 `tsc --noEmit` | 통과 |
-| 린트, 나머지 패키지 테스트 | 돌리지 못함 |
-
-02를 시작하기 전에 루트 세 명령이 통과하는지 다시 확인하고 이 표를 고친다.
+루트에서 `CI=true pnpm typecheck` · `CI=true pnpm lint` · `CI=true pnpm test` 모두 통과한다(2026-11-12). 에이전트 셸은 TTY가 없어 `CI=true` 없이 돌리면 pnpm이 모듈 재설치를 물으며 멈춘다(`ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY`). 재설치는 필요 없었다.

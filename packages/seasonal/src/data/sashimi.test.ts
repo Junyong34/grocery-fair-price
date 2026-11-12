@@ -5,7 +5,7 @@ import { findFood, type FoodId } from "./foods"
 import { MONTHS } from "./months"
 import { ADDED_SASHIMI, isSashimiPick, SASHIMI_IDS, SASHIMI_MONTHS, sashimiInMonth } from "./sashimi"
 
-// .scratch/sashimi/issues/06: food-season-corrections.json에 2026-11-03 더한 품종
+// .scratch/sashimi/issues/06: 2026-11-03 제철 보정으로 달을 고친 품종(food-registry.json의 근거)
 const SEASON_CORRECTED = [
   "black-scraper",
   "goby",

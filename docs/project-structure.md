@@ -380,8 +380,7 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 ## 8. 생성 파일과 파이프라인
 
 ```
-prototypes/seasonal-food/docs/seasonal-lists/foods.json (tier: verified)
-prototypes/seasonal-food/build/catalog.json (일러스트 id)
+packages/seasonal/src/data/food-registry.json (품종 원본. season: verified만 목록에 넣는다)
         │  pnpm --filter @workspace/seasonal build:foods  (packages/seasonal/scripts/build-foods.mjs)
         ▼
 packages/seasonal/src/data/foods.generated.ts
@@ -398,9 +397,9 @@ apps/web/public/dishes/PROVENANCE.md
 packages/seasonal/src/data/drawn-dishes.generated.ts
 ```
 
-- `packages/seasonal/src/data/food-season-corrections.json`은 재조사한 제철 기간과 출처를 보관한다. 품종 생성 시 원본 위에 적용한다. `prototypes/` 없이 이 보정만 반영할 때는 `pnpm --filter @workspace/seasonal build:foods --refresh-seasons`로 기존 생성 목록을 읽어 재생성한다. 새 품종 추가에는 원본이 필요하다.
-- 출력은 모두 커밋한다. 원천이 `prototypes/`(Git 밖)에 있어 새 클론에서는 다시 만들 수 없기 때문이다.
-- 일러스트가 없는 품종의 id는 `build-foods.mjs`의 `NEW_IDS`에서 정한다. 그림이 없으면 화면은 이름 카드를 보인다.
+- 품종 원본 `packages/seasonal/src/data/food-registry.json`이 품종의 표시명·별칭·카테고리·제철 달·제철 검증 상태·근거(출처, 확인일, 사유)를 지닌다(형식과 검사: `food-registry.ts`, ADR 0006). 제철 미검증 품종 31종도 여기 있고 목록에는 나오지 않는다. 2026-11-12에 `prototypes/`의 `foods.json`과 `food-season-corrections.json`을 이 파일로 옮겼다. `build:foods`는 `prototypes/` 없이 돌아간다.
+- 출력은 모두 커밋한다. 그림의 원천이 `prototypes/`(Git 밖)에 있어 새 클론에서는 다시 만들 수 없기 때문이다.
+- 품종 ID와 그림 ID가 다른 품종은 품종 원본의 `art`에 그림 ID를 적는다(예: 새우류 `shrimp-kinds` → 그림 `shrimp`). 그림이 없으면 화면은 이름 카드를 보인다.
 - 그림체는 `watercolor`, 변형은 `color`(모든 화면)와 `motion`(1i 큰 그림, SVG 안 CSS 키프레임), 바닥 그림자는 끈다.
 - 제철 월 검증 전의 확장 후보 5종(금귤·카라향·하귤·황금향·대저토마토)은 `sync-food-images.mjs`의 `CANDIDATE_FOOD_IDS`로 SVG만 동기화한다. 달력 목록 등록은 제철 검증 후 별도로 진행한다.
 - 전통 음식(`prototypes/seasonal-food/dishes/<id>`)은 움직임이 없어 `color`만 만든다. 그림 폴더 이름이 `dish-rows.ts`의 id와 같아야 나온다. sync가 그림이 없는 음식을 로그로 알려 준다. 그릴 목록과 체크리스트는 `prototypes/seasonal-food/scripts/build_seasonal_lists.py`의 `DISHES`다.

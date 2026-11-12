@@ -1,6 +1,5 @@
-// 생성 파일. 직접 고치지 않는다. packages/seasonal/scripts/build-foods.mjs로 다시 만든다.
-// 원천: prototypes/seasonal-food/docs/seasonal-lists/foods.json의 검증 품종 255개.
-// 제철 보정: food-season-corrections.json (조사 근거 포함).
+// 생성 파일. 직접 고치지 않는다. 품종 원본 food-registry.json을 고치고 packages/seasonal/scripts/build-foods.mjs로 다시 만든다.
+// 품종 원본 286개 가운데 제철 검증된 255개.
 
 export const FOOD_ROWS = [
   { id: "redlip-mullet", name: "가숭어", aliases: [], category: "수산", months: [2], peak: [2], core: false },

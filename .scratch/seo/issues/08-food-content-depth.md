@@ -43,7 +43,7 @@ Blocked by: —
 - **제철 근거**: `prototypes/seasonal-food/docs/SEASONAL-FOODS.md`(Git 밖)
   - 품종별로 제철 달을 정한 근거가 출처 번호(`[S04]`, `[F02]` 등)로 이미 정리되어 있다. 해양수산부 이달의 수산물, 농식품정보누리 등이다.
   - 화면에 "제철 기준: 해양수산부 이달의 수산물 외" 같은 출처를 다는 것은 새 조사 없이 할 수 있다.
-  - 다만 품종별 출처를 기계가 읽을 수 있는 형태(`foods.json`의 필드)로 뽑는 작업이 필요하다.
+  - 다만 품종별 출처를 기계가 읽을 수 있는 형태(품종 원본 `packages/seasonal/src/data/food-registry.json`의 `evidence`. 2026-11-12에 옮겼다)로 뽑는 작업이 필요하다.
 - **공공데이터**(`grocery-price/docs/10-research/content-and-taxonomy.md` 2장)
 
 | 자료 | 내용 | 상업 이용 |
@@ -66,7 +66,7 @@ Blocked by: —
 3. **79개를 한 번에 할지, 나눠서 할지**
    - 추천: 그림이 있는 49개부터 한다. sitemap 이미지가 붙는 페이지이고, 이달·계절 화면에 먼저 노출된다.
 4. **데이터를 둘 곳**
-   - 현재 품종 목록은 `foods.json`에서 생성된다(`pnpm --filter @workspace/seasonal build:foods`).
+   - 현재 품종 목록은 품종 원본 `food-registry.json`에서 생성된다(`pnpm --filter @workspace/seasonal build:foods`).
    - 본문을 같은 원천에 넣을지, `packages/seasonal/src/data/` 아래 품종별 파일(예: `food-notes.ts`)로 따로 둘지 정한다.
    - 추천은 따로 두는 것이다. 생성 파일과 손으로 쓴 문장을 섞지 않기 위해서다.
 5. **출처 표기 방식**

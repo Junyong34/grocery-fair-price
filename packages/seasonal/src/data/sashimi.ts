@@ -21,7 +21,7 @@ export const ADDED_SASHIMI = [
 /**
  * 달 → 회 품종 id(첨부의 달). "이달 추천" 표시는 이 목록과 친숙도·대표 달로 정한다(isSashimiPick). 적은 순서는 첨부 순서이고, 추가 품종이 뒤에 온다.
  * 화면의 그 달 목록은 sashimiInMonth가 제철 범위까지 넓혀 만든다.
- * 말쥐치·망둥어·밴댕이·능성어·불볼락은 첨부 달이 아니라 고친 앱 제철(food-season-corrections.json, 2026-11-03)을 따른다.
+ * 말쥐치·망둥어·밴댕이·능성어·불볼락은 첨부 달이 아니라 고친 앱 제철(food-registry.json의 근거, 2026-11-03)을 따른다.
  */
 export const SASHIMI_MONTHS: Readonly<Record<Month, readonly FoodId[]>> = {
   1: [

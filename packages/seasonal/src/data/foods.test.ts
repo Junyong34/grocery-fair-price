@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import { findFood, foodsInMonth, foodsInMonthByCategory, foodsInSeason, foodsInSeasonWith, isDrawn, monthHighlights, seasonHighlights, seasonsOf } from "./foods"
 
-// 예상값은 prototypes/seasonal-food/docs/seasonal-lists/foods.json(검증 품종)에서 셌다.
+// 예상값은 품종 원본 food-registry.json의 제철 검증 품종에서 셌다.
 describe("foodsInMonth", () => {
   it("무는 월동 수확기, 열무는 7월 식재료 조사로 확인한 달을 포함한다", () => {
     for (const month of [12, 1, 2, 3]) expect(foodsInMonth(month).map((food) => food.id)).toContain("radish")
