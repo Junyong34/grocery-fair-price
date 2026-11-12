@@ -6,6 +6,7 @@ import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { NativeSelect, NativeSelectOption } from "@workspace/ui/components/native-select"
 
+import { CATEGORIES, FIELD, lines, MonthPicker } from "../components/month-picker"
 import { INFANT_KIND_LABEL, type ArtRow } from "../lib/art-view"
 import { addSeasonalFood, linkFoodArt, setInfantUse, type UseResult } from "../server/use-actions"
 
@@ -16,10 +17,6 @@ export type UseOptions = {
   infantKeys: { fruits: readonly string[]; pairings: readonly string[] }
 }
 
-const CATEGORIES = ["채소", "과일", "버섯", "곡물·견과", "수산"] as const
-const MONTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const
-const FIELD = "grid gap-1.5 text-sm"
-const lines = (text: string) => text.split(/[\n,]/).map((line) => line.trim()).filter(Boolean)
 
 // 그림의 용도: 이 그림을 가리키는 화면 데이터와, 제철 · 이유식 용도를 새로 정하는 폼.
 // 저장은 품종 원본과 이유식 그림 목록 파일만 고친다. 화면에 나오려면 "웹에 반영"을 누른다.
@@ -76,31 +73,6 @@ export function ArtUses({ art, foods, infantKeys }: { art: ArtRow } & UseOptions
         {message?.text}
       </p>
     </section>
-  )
-}
-
-function MonthPicker({ label, value, allowed, onChange }: { label: string; value: readonly number[]; allowed?: readonly number[]; onChange: (months: number[]) => void }) {
-  return (
-    <fieldset className={FIELD}>
-      <legend className="mb-1.5 text-stone">{label}</legend>
-      <div className="grid grid-cols-6 gap-1">
-        {MONTHS.map((month) => {
-          const on = value.includes(month)
-          return (
-            <button
-              key={month}
-              type="button"
-              aria-pressed={on}
-              disabled={allowed !== undefined && !allowed.includes(month)}
-              onClick={() => onChange(on ? value.filter((m) => m !== month) : [...value, month])}
-              className="h-9 rounded-lg bg-canvas text-sm tabular-nums shadow-[inset_0_0_0_1px_var(--color-hairline)] aria-pressed:bg-gold-wash aria-pressed:font-semibold disabled:opacity-30"
-            >
-              {month}
-            </button>
-          )
-        })}
-      </div>
-    </fieldset>
   )
 }
 

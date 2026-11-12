@@ -78,6 +78,72 @@ export function createFood(registry: FoodRegistry, input: NewFood, renamedIds: r
   return checked({ ...registry, [input.foodId]: food }, input.foodId)
 }
 
+export type FoodEdit = {
+  name: string
+  aliases: readonly string[]
+  category: FoodEntry["category"]
+  months: readonly number[]
+  peak: readonly number[]
+  /** 제철 검증 상태. unverified로 내리면 제철달력에서 빠진다. */
+  season: FoodEntry["season"]
+  /** 이 품종이 쓰는 그림의 ID. 품종 ID와 같으면 따로 적지 않는다. */
+  art: string
+  /** 이번에 더하는 근거 출처. 이전 출처 앞에 붙고, 이전 출처는 남는다. */
+  newSources: readonly string[]
+  /** 출처를 확인한 날. 비우면 이전 확인일을 그대로 둔다. */
+  checkedAt: string
+  /** 달을 그렇게 정한 사유. 비우면 이전 사유를 그대로 둔다. */
+  reason: string
+}
+
+const sameMonths = (a: readonly number[], b: readonly number[]) => a.length === b.length && a.every((month, i) => month === b[i])
+
+/**
+ * 기존 품종을 고친다. 품종 ID는 바꾸지 않고 품종을 지우지도 않는다. 달력에서 빼려면 season을 unverified로 내린다.
+ * 제철 달이나 대표 달을 바꾸거나 제철 검증으로 올릴 때는 이번에 확인한 근거 출처와 확인일이 있어야 한다.
+ */
+export function editFood(registry: FoodRegistry, foodId: string, edit: FoodEdit): RegistryResult {
+  const food = registry[foodId]
+  if (!food) return { ok: false, error: `없는 품종이에요: ${foodId}` }
+  const name = edit.name.trim()
+  if (!name) return { ok: false, error: "표시명을 적어요." }
+  const sameName = Object.entries(registry).find(([id, other]) => id !== foodId && other.name === name)
+  if (sameName) return { ok: false, error: `표시명이 다른 품종과 겹쳐요: ${name} (${sameName[0]})` }
+
+  const months = sortedMonths(edit.months)
+  const peak = edit.peak.length ? sortedMonths(edit.peak) : months
+  if (peak.some((month) => !months.includes(month))) return { ok: false, error: "대표 달은 제철 달 가운데서 골라요." }
+  const newSources = trimmed(edit.newSources)
+  const checkedAt = edit.checkedAt.trim()
+  if (checkedAt && !DATE.test(checkedAt)) return { ok: false, error: "확인일은 YYYY-MM-DD로 적어요." }
+  const hasNewEvidence = newSources.length > 0 && checkedAt !== ""
+  if ((!sameMonths(months, food.months) || !sameMonths(peak, food.peak)) && !hasNewEvidence) return { ok: false, error: "제철 달이나 대표 달을 바꾸려면 근거 출처와 확인일을 적어요." }
+  if (edit.season === "verified" && food.season !== "verified" && !hasNewEvidence) return { ok: false, error: "제철 검증으로 올리려면 근거 출처와 확인일을 적어요." }
+  if (edit.season === "verified" && months.length === 0) return { ok: false, error: "제철 검증된 품종은 제철 달이 하나 이상 있어야 해요." }
+
+  const reason = edit.reason.trim()
+  const next: FoodEntry = {
+    name,
+    aliases: trimmed(edit.aliases).filter((alias) => alias !== name),
+    category: edit.category,
+    months,
+    peak,
+    season: edit.season,
+    // 근거 갈래(basis)는 그대로 둔다. 대표 품종을 고르는 core가 편집으로 바뀌지 않게 한다.
+    basis: food.basis,
+    ...(edit.art && edit.art !== foodId && { art: edit.art }),
+    ...(food.conditional && { conditional: true as const }),
+    evidence: {
+      sources: [...new Set([...newSources, ...food.evidence.sources])],
+      ...((checkedAt || food.evidence.checkedAt) && { checkedAt: checkedAt || food.evidence.checkedAt }),
+      ...((reason || food.evidence.reason) && { reason: reason || food.evidence.reason }),
+      ...(food.evidence.market && { market: food.evidence.market }),
+      ...(food.evidence.note && { note: food.evidence.note }),
+    },
+  }
+  return checked({ ...registry, [foodId]: next }, foodId)
+}
+
 /** 기존 품종이 이 그림을 쓰게 한다. 품종 ID는 그대로다. */
 export function linkArt(registry: FoodRegistry, foodId: string, artId: string): RegistryResult {
   const food = registry[foodId]

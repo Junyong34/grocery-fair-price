@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import type { FoodEntry, FoodRegistry } from "@workspace/seasonal/data/food-registry"
 
-import { createFood, infantKeys, linkArt, setInfantArt, type NewFood } from "./food-edit"
+import { createFood, editFood, infantKeys, linkArt, setInfantArt, type FoodEdit, type NewFood } from "./food-edit"
 
 const radish: FoodEntry = { name: "무", aliases: [], category: "채소", months: [10, 11], peak: [10], season: "verified", basis: "survey", evidence: { sources: [] } }
 const registry: FoodRegistry = { radish }
@@ -113,5 +113,78 @@ describe("infantKeys", () => {
     expect(keys.pairings).not.toContain("브로콜리/콜리플라워")
     expect(keys.fruits).toContain("honey")
     expect(new Set(keys.pairings).size).toBe(keys.pairings.length)
+  })
+})
+
+describe("editFood", () => {
+  const base: FoodRegistry = {
+    radish: { ...radish, evidence: { sources: ["https://old.example/radish"], market: "가을무" } },
+    lemon: { name: "레몬", aliases: [], category: "과일", months: [12], peak: [12], season: "unverified", basis: "foodnuri", evidence: { sources: [] } },
+  }
+  const edit = (over: Partial<FoodEdit> = {}): FoodEdit => ({
+    name: "무",
+    aliases: [],
+    category: "채소",
+    months: [10, 11],
+    peak: [10],
+    season: "verified",
+    art: "radish",
+    newSources: [],
+    checkedAt: "",
+    reason: "",
+    ...over,
+  })
+
+  it("표시명 · 별칭 · 카테고리는 근거 없이 고친다", () => {
+    const result = editFood(base, "radish", edit({ name: "가을무", aliases: ["무", "조선무"], category: "채소" }))
+
+    expect(result.ok && result.registry.radish).toMatchObject({ name: "가을무", aliases: ["무", "조선무"], evidence: { sources: ["https://old.example/radish"], market: "가을무" } })
+  })
+
+  it("제철 달을 바꾸면 새 근거 출처와 확인일이 있어야 한다", () => {
+    expect(editFood(base, "radish", edit({ months: [10, 11, 12] }))).toEqual({ ok: false, error: "제철 달이나 대표 달을 바꾸려면 근거 출처와 확인일을 적어요." })
+    expect(editFood(base, "radish", edit({ peak: [11] }))).toEqual({ ok: false, error: "제철 달이나 대표 달을 바꾸려면 근거 출처와 확인일을 적어요." })
+  })
+
+  it("새 근거는 앞에 더하고 이전 출처와 메모는 남긴다", () => {
+    const result = editFood(base, "radish", edit({ months: [10, 11, 12], newSources: ["https://new.example"], checkedAt: "2026-11-12", reason: "월동무 수확기를 더한다" }))
+
+    expect(result.ok && result.registry.radish).toMatchObject({
+      months: [10, 11, 12],
+      evidence: { sources: ["https://new.example", "https://old.example/radish"], checkedAt: "2026-11-12", reason: "월동무 수확기를 더한다", market: "가을무" },
+    })
+  })
+
+  it("제철 미검증으로 내리면 달력에서 빠지고 근거는 남는다", () => {
+    const result = editFood(base, "radish", edit({ season: "unverified" }))
+
+    expect(result).toMatchObject({ ok: true, verified: false })
+    expect(result.ok && result.registry.radish?.evidence.sources).toEqual(["https://old.example/radish"])
+  })
+
+  it("제철 검증으로 올리려면 근거 출처와 확인일이 있어야 한다", () => {
+    const lemon = edit({ name: "레몬", category: "과일", months: [12], peak: [12], art: "lemon" })
+
+    expect(editFood(base, "lemon", lemon)).toEqual({ ok: false, error: "제철 검증으로 올리려면 근거 출처와 확인일을 적어요." })
+    expect(editFood(base, "lemon", { ...lemon, newSources: ["https://example.com"], checkedAt: "2026-11-12" })).toMatchObject({ ok: true, verified: true })
+  })
+
+  it("연결된 그림을 바꾸고, 품종 ID와 같으면 art를 지운다", () => {
+    const linked = editFood(base, "radish", edit({ art: "daikon" }))
+
+    expect(linked.ok && linked.registry.radish?.art).toBe("daikon")
+    expect(linked.ok && editFood(linked.registry, "radish", edit()).ok && editFood(linked.registry, "radish", edit())).toMatchObject({ registry: { radish: expect.not.objectContaining({ art: expect.anything() }) } })
+  })
+
+  it("없는 품종, 겹치는 표시명, 달 밖의 대표 달을 막는다", () => {
+    expect(editFood(base, "nope", edit())).toEqual({ ok: false, error: "없는 품종이에요: nope" })
+    expect(editFood(base, "radish", edit({ name: "레몬" }))).toEqual({ ok: false, error: "표시명이 다른 품종과 겹쳐요: 레몬 (lemon)" })
+    expect(editFood(base, "radish", edit({ peak: [3], newSources: ["a"], checkedAt: "2026-11-12" }))).toEqual({ ok: false, error: "대표 달은 제철 달 가운데서 골라요." })
+  })
+
+  it("다른 품종은 건드리지 않는다", () => {
+    const result = editFood(base, "radish", edit({ name: "가을무" }))
+
+    expect(result.ok && result.registry.lemon).toEqual(base.lemon)
   })
 })

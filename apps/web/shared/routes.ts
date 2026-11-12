@@ -119,6 +119,8 @@ export const routes = {
     catalogProposals: "/admin/catalog/proposals",
     /** 그림 어드민: 그림 목록과 그림 검수 (ADR 0006, prototypes/가 있는 기기에서) */
     foods: "/admin/foods",
+    /** 그림 어드민: 기존 품종 편집 (표시명 · 별칭 · 제철 달 · 근거 · 연결된 그림) */
+    foodVarieties: "/admin/foods/varieties",
     /** 그림 원본에서 그린 미리보기 SVG. 웹에 나가기 전의 그림도 보여 준다. */
     foodPreview: (art: string, variant: "color" | "motion") => `/admin/foods/preview?art=${encodeURIComponent(art)}&variant=${variant}`,
   },

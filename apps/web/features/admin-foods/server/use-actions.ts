@@ -12,7 +12,7 @@ import { RENAMED_FOOD_IDS } from "@workspace/seasonal/data/renamed-foods"
 
 import { assertAdmin } from "@/features/admin-print/server/guard"
 
-import { createFood, infantKeys, linkArt, setInfantArt, type InfantArt, type NewFood, type RegistryResult } from "../lib/food-edit"
+import { createFood, editFood, infantKeys, linkArt, setInfantArt, type FoodEdit, type InfantArt, type NewFood, type RegistryResult } from "../lib/food-edit"
 import { ART_ID, INFANT_ART_FILE, REGISTRY_FILE, REPO } from "./paths"
 
 // 그림의 용도를 정해 품종 원본(food-registry.json)과 이유식 그림 목록(infant-art.json)에 쓰고, 웹에 반영한다 (ADR 0006).
@@ -39,6 +39,19 @@ export async function addSeasonalFood(input: NewFood): Promise<UseResult> {
     if (!ART_ID.test(input.artId)) throw new Error("그림 ID 형식이 아니에요.")
     return await saveRegistry(createFood(await readRegistry(), input, Object.keys(RENAMED_FOOD_IDS)), (verified) =>
       verified ? `${input.name.trim()}을(를) 제철 검증된 품종으로 저장했어요. 웹에 반영하면 제철달력에 나와요.` : `${input.name.trim()}을(를) 제철 미검증으로 저장했어요. 근거 출처와 확인일을 채우기 전에는 제철달력에 나오지 않아요.`,
+    )
+  } catch (error) {
+    return failure(error)
+  }
+}
+
+/** 기존 품종을 고친다. 품종 ID는 바꾸지 않고 품종을 지우지 않는다. */
+export async function saveFood(foodId: string, edit: FoodEdit): Promise<UseResult> {
+  assertAdmin()
+  try {
+    if (edit.art && !ART_ID.test(edit.art)) throw new Error("그림 ID 형식이 아니에요.")
+    return await saveRegistry(editFood(await readRegistry(), foodId, edit), (verified) =>
+      verified ? `${edit.name.trim()}을(를) 저장했어요. 웹에 반영하면 화면에 나와요.` : `${edit.name.trim()}을(를) 제철 미검증으로 저장했어요. 웹에 반영하면 제철달력에서 빠져요.`,
     )
   } catch (error) {
     return failure(error)
