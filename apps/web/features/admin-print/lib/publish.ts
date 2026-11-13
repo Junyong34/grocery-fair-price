@@ -14,7 +14,7 @@ export function savePlan(
 ): SavePlan {
   if (next.status !== "published" || saved.status === "published") return { storage: "none" }
   if (!build) return { error: "PDF를 만든 뒤 공개하세요." }
-  if (!isBuildCurrent(next.spec, build)) return { error: "지금 옵션으로 PDF를 다시 만든 뒤 공개하세요." }
+  if (!isBuildCurrent(next.spec, build)) return { error: "지금 옵션과 품종 데이터로 PDF를 다시 만든 뒤 공개하세요." }
   if (!storageReady) return { error: "R2 쓰기 키(R2_WRITE_*)가 없어 공개할 수 없어요." }
   return { storage: "upload" }
 }

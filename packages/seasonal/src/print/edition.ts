@@ -127,10 +127,19 @@ export function foodDataHash(): string {
 /** 이유식 인쇄물은 제철 품종 데이터를 그리지 않는다. */
 const usesFoodData = (spec: PrintSpec) => spec.kind !== "baby-food-pairings" && spec.kind !== "baby-food-fruits"
 
+/** 만든 PDF가 옛것이 된 이유. options: 저장한 옵션(사양)이 바뀌었다. foods: 사양은 같고 제철 품종 데이터가 바뀌었다. */
+export type StaleReason = "options" | "foods"
+
+/** 생성 기록이 옛것이면 그 이유, 지금 것이면 null. 사양과 데이터가 함께 바뀌었으면 옵션을 먼저 알린다. */
+export function buildStaleReason(spec: PrintSpec, build: BuildRecord): StaleReason | null {
+  if (build.specHash !== specHash(spec)) return "options"
+  if (usesFoodData(spec) && build.foodHash !== foodDataHash()) return "foods"
+  return null
+}
+
 /** 이 생성 기록이 지금 사양과 지금 품종 데이터로 만든 것인가. 없거나, 사양이 바뀌었거나, 제철 인쇄물의 품종 데이터가 바뀌었으면 false. */
 export function isBuildCurrent(spec: PrintSpec, build: BuildRecord | undefined): build is BuildRecord {
-  if (build === undefined || build.specHash !== specHash(spec)) return false
-  return !usesFoodData(spec) || build.foodHash === foodDataHash()
+  return build !== undefined && buildStaleReason(spec, build) === null
 }
 
 const yearOf = (spec: PrintSpec) => ("year" in spec ? spec.year : undefined)

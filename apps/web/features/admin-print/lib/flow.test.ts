@@ -29,9 +29,17 @@ describe("editionFlow", () => {
   })
 
   it("저장한 옵션이 만든 PDF와 다르면 다시 만들기가 지금 할 일이다", () => {
-    const flow = editionFlow({ ...base, build: "stale" })
+    const flow = editionFlow({ ...base, build: "stale", staleBy: "options" })
     expect(flow.phase).toBe("outdated")
     expect(flow.pdf).toEqual({ state: "current", action: "regenerate" })
+    expect(flow.hint).toContain("옵션")
+  })
+
+  it("품종 데이터가 바뀌어 옛 PDF가 되면 데이터 때문이라고 안내한다", () => {
+    const flow = editionFlow({ ...base, build: "stale", staleBy: "foods" })
+    expect(flow.phase).toBe("outdated")
+    expect(flow.hint).toContain("품종 데이터")
+    expect(flow.hint).not.toContain("옵션")
   })
 
   it("저장한 옵션으로 만든 PDF가 있으면 모두 끝이다", () => {
@@ -81,6 +89,13 @@ describe("editionDraft", () => {
     const draft = { ...edition, spec: old }
     expect(editionDraft({ saved: edition, draft, build: buildOf(edition.spec) }).buildState).toBe("current")
   })
+
+  it("옛 PDF가 된 이유를 함께 돌려준다", () => {
+    const old = { ...edition.spec, cover: "none" as const }
+    expect(editionDraft({ saved: edition, draft: edition, build: buildOf(old) }).staleBy).toBe("options")
+    expect(editionDraft({ saved: edition, draft: edition, build: { ...buildOf(edition.spec), foodHash: "00000000" } }).staleBy).toBe("foods")
+    expect(editionDraft({ saved: edition, draft: edition, build: buildOf(edition.spec) }).staleBy).toBeUndefined()
+  })
 })
 
 describe("stepNotes", () => {
@@ -91,5 +106,10 @@ describe("stepNotes", () => {
   it("끝났으면 생성 시각을, 저장 전이면 잠긴 이유를 쓴다", () => {
     expect(stepNotes(editionFlow(base), { generating: false, generatedLabel: "10월 20일" })).toEqual({ save: "저장됨", pdf: "10월 20일 생성" })
     expect(stepNotes(editionFlow({ ...base, dirty: true }), { generating: false })).toEqual({ save: "저장 안 됨", pdf: "먼저 저장하세요" })
+  })
+
+  it("옛 PDF면 옵션 때문인지 품종 데이터 때문인지 쓴다", () => {
+    expect(stepNotes(editionFlow({ ...base, build: "stale", staleBy: "options" }), { generating: false }).pdf).toBe("옛 옵션으로 만든 PDF예요")
+    expect(stepNotes(editionFlow({ ...base, build: "stale", staleBy: "foods" }), { generating: false }).pdf).toBe("옛 품종 데이터로 만든 PDF예요")
   })
 })

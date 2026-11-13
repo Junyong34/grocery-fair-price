@@ -19,7 +19,7 @@ describe("savePlan", () => {
 
   it("처음 공개할 때 PDF가 없거나 옛 옵션으로 만든 것이면 막는다", () => {
     expect(savePlan(edition("draft"), edition("published"), { ...ready, build: undefined })).toEqual({ error: "PDF를 만든 뒤 공개하세요." })
-    expect(savePlan(edition("draft"), edition("published", 2030), ready)).toEqual({ error: "지금 옵션으로 PDF를 다시 만든 뒤 공개하세요." })
+    expect(savePlan(edition("draft"), edition("published", 2030), ready)).toEqual({ error: "지금 옵션과 품종 데이터로 PDF를 다시 만든 뒤 공개하세요." })
   })
 
   it("공개 중인 에디션은 옵션 · 설명을 바꿔도 저장만 한다(다시 만들 때 올린다)", () => {

@@ -41,7 +41,7 @@ export function EditionEditor({ saved, build, storageReady, currentYear }: Props
         <p role="alert" className="text-sm text-error empty:hidden">
           {editor.error}
         </p>
-        {editor.build && <GeneratedFiles edition={editor.saved} build={editor.build} stale={editor.buildState === "stale"} />}
+        {editor.build && <GeneratedFiles edition={editor.saved} build={editor.build} staleBy={editor.staleBy} />}
       </header>
 
       <div className="grid items-start gap-8 lg:grid-cols-[400px_minmax(0,1fr)]">

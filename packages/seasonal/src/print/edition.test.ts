@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { buildManifest, downloadPath, EDITION_LIMITS, foodDataHash, isBuildCurrent, nextEditionId, objectKey, parseEdition, staleObjectKeys, thumbnailPages, thumbnailPath, type BuildRecord, type Edition } from "./edition"
+import { buildManifest, buildStaleReason, downloadPath, EDITION_LIMITS, foodDataHash, isBuildCurrent, nextEditionId, objectKey, parseEdition, staleObjectKeys, thumbnailPages, thumbnailPath, type BuildRecord, type Edition } from "./edition"
 import { DEFAULT_SPECS, specHash } from "./spec"
 
 const edition = (id: string, status: Edition["status"]): Edition => ({
@@ -58,6 +58,24 @@ describe("isBuildCurrent", () => {
 
   it("기록이 없으면 최신이 아니다", () => {
     expect(isBuildCurrent(spec, undefined)).toBe(false)
+  })
+})
+
+describe("buildStaleReason", () => {
+  const spec = DEFAULT_SPECS.monthly
+  const build = { specHash: specHash(spec), foodHash: foodDataHash(), generatedAt: "2026-10-16T12:00:00.000Z", bytes: {}, thumbnails: [] }
+
+  it("최신이면 이유가 없다", () => {
+    expect(buildStaleReason(spec, build)).toBeNull()
+  })
+
+  it("사양이 바뀌었으면 options, 사양은 같고 품종 데이터가 바뀌었으면 foods다", () => {
+    expect(buildStaleReason({ ...spec, year: spec.year + 1 }, build)).toBe("options")
+    expect(buildStaleReason(spec, { ...build, foodHash: "00000000" })).toBe("foods")
+  })
+
+  it("사양과 데이터가 함께 바뀌면 옵션을 먼저 알린다", () => {
+    expect(buildStaleReason({ ...spec, year: spec.year + 1 }, { ...build, foodHash: "00000000" })).toBe("options")
   })
 })
 

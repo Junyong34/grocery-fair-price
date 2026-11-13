@@ -1,4 +1,4 @@
-import { isBuildCurrent, type BuildRecord, type Edition } from "@workspace/seasonal/print/edition"
+import { buildStaleReason, type BuildRecord, type Edition, type StaleReason } from "@workspace/seasonal/print/edition"
 import { parsePrintSpec, type PrintSpec } from "@workspace/seasonal/print/spec"
 
 // 에디션 편집기의 판단. 훅(use-edition-editor)은 값을 들고만 있고, 무엇이 바뀌었는지·무엇을 미리 볼지·다음에 할 일은 여기서 정한다.
@@ -9,6 +9,8 @@ export type EditionFlowInput = {
   dirty: boolean
   invalid: boolean
   build: BuildState
+  /** build가 stale일 때 그 이유. */
+  staleBy?: StaleReason
 }
 
 export type StepState =
@@ -23,9 +25,23 @@ export type EditionFlow = {
   save: StepState
   pdf: StepState
   hint: string
+  /** outdated일 때 옛 PDF가 된 이유. */
+  staleBy?: StaleReason
 }
 
-export function editionFlow({ dirty, invalid, build }: EditionFlowInput): EditionFlow {
+/** 옛 PDF 안내. 옵션을 바꿨는지, 제철 품종 데이터(달력)가 바뀌었는지에 따라 할 말이 다르다. */
+const STALE_COPY: Record<StaleReason, { hint: string; note: string }> = {
+  options: {
+    hint: "만들어 둔 PDF는 이전 옵션으로 만든 거예요. 다시 만들면 같은 주소의 파일이 새 옵션으로 바뀌어요.",
+    note: "옛 옵션으로 만든 PDF예요",
+  },
+  foods: {
+    hint: "제철 품종 데이터가 바뀌어 만들어 둔 PDF에는 옛 달력이 남아 있어요. 다시 만들면 같은 주소의 파일이 새 데이터로 바뀌어요.",
+    note: "옛 품종 데이터로 만든 PDF예요",
+  },
+}
+
+export function editionFlow({ dirty, invalid, build, staleBy = "options" }: EditionFlowInput): EditionFlow {
   if (dirty)
     return {
       phase: "unsaved",
@@ -39,7 +55,8 @@ export function editionFlow({ dirty, invalid, build }: EditionFlowInput): Editio
       phase: "outdated",
       save: { state: "done" },
       pdf: { state: "current", action: "regenerate" },
-      hint: "만들어 둔 PDF는 이전 옵션으로 만든 거예요. 다시 만들면 같은 주소의 파일이 새 옵션으로 바뀌어요.",
+      hint: STALE_COPY[staleBy].hint,
+      staleBy,
     }
   return { phase: "done", save: { state: "done" }, pdf: { state: "done" }, hint: "끝났어요. 아래 주소로 링크를 걸면 돼요." }
 }
@@ -52,6 +69,8 @@ export type EditionDraft = {
   /** 미리보기에 쓸 사양. 편집 중인 사양이 틀렸으면 저장한 사양을 보여 준다. */
   previewSpec: PrintSpec
   buildState: BuildState
+  /** buildState가 stale일 때 그 이유. */
+  staleBy: StaleReason | undefined
   flow: EditionFlow
 }
 
@@ -60,13 +79,15 @@ export function editionDraft({ saved, draft, build }: { saved: Edition; draft: E
   const checked = parsePrintSpec(draft.spec)
   const invalid = checked instanceof Error
   const dirty = JSON.stringify(draft) !== JSON.stringify(saved)
-  const buildState: BuildState = !build ? "none" : isBuildCurrent(saved.spec, build) ? "current" : "stale"
+  const staleBy = build ? (buildStaleReason(saved.spec, build) ?? undefined) : undefined
+  const buildState: BuildState = !build ? "none" : staleBy ? "stale" : "current"
   return {
     dirty,
     specError: invalid ? checked.message : undefined,
     previewSpec: invalid ? saved.spec : checked,
     buildState,
-    flow: editionFlow({ dirty, invalid, build: buildState }),
+    staleBy,
+    flow: editionFlow({ dirty, invalid, build: buildState, staleBy }),
   }
 }
 
@@ -80,7 +101,7 @@ export function stepNotes(flow: EditionFlow, { generating, generatedLabel }: { g
       : flow.pdf.state === "locked"
         ? flow.pdf.reason
         : flow.pdf.action === "regenerate"
-          ? "옛 옵션으로 만든 PDF예요"
+          ? STALE_COPY[flow.staleBy ?? "options"].note
           : "아직 만들지 않았어요"
   return { save, pdf }
 }
