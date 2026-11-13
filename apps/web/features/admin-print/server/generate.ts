@@ -5,7 +5,7 @@ import path from "node:path"
 
 import type { Page } from "playwright-core"
 
-import { downloadDir, downloadPath, thumbnailPages, thumbnailPath, type BuildRecord, type Edition, type Thumbnail } from "@workspace/seasonal/print/edition"
+import { downloadDir, downloadPath, foodDataHash, thumbnailPages, thumbnailPath, type BuildRecord, type Edition, type Thumbnail } from "@workspace/seasonal/print/edition"
 import { pageCount, papersForSpec, sheetSize, specHash, type Paper } from "@workspace/seasonal/print/spec"
 
 import { routes } from "@/shared/routes"
@@ -41,7 +41,7 @@ export async function generatePdfs(edition: Edition, origin: string): Promise<Bu
     await browser.close()
   }
   await removeUnused(edition.id, new Set([...Object.keys(bytes), ...thumbnails.map((thumbnail) => thumbnail.path)]))
-  return { specHash: specHash(edition.spec), generatedAt: new Date().toISOString(), bytes, thumbnails }
+  return { specHash: specHash(edition.spec), foodHash: foodDataHash(), generatedAt: new Date().toISOString(), bytes, thumbnails }
 }
 
 /** 화면에 그린 인쇄 페이지의 시트를 찍어 WebP로 줄인다. 목록 · 상세의 미리보기다. */

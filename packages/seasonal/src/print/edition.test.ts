@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { buildManifest, downloadPath, EDITION_LIMITS, isBuildCurrent, nextEditionId, objectKey, parseEdition, staleObjectKeys, thumbnailPages, thumbnailPath, type BuildRecord, type Edition } from "./edition"
+import { buildManifest, downloadPath, EDITION_LIMITS, foodDataHash, isBuildCurrent, nextEditionId, objectKey, parseEdition, staleObjectKeys, thumbnailPages, thumbnailPath, type BuildRecord, type Edition } from "./edition"
 import { DEFAULT_SPECS, specHash } from "./spec"
 
 const edition = (id: string, status: Edition["status"]): Edition => ({
@@ -38,15 +38,33 @@ describe("parseEdition 글자 수", () => {
 
 describe("isBuildCurrent", () => {
   const spec = DEFAULT_SPECS.monthly
-  const build = { specHash: specHash(spec), generatedAt: "2026-10-16T12:00:00.000Z", bytes: {}, thumbnails: [] }
+  const build = { specHash: specHash(spec), foodHash: foodDataHash(), generatedAt: "2026-10-16T12:00:00.000Z", bytes: {}, thumbnails: [] }
 
   it("같은 사양으로 만든 기록만 최신이다", () => {
     expect(isBuildCurrent(spec, build)).toBe(true)
     expect(isBuildCurrent({ ...spec, year: spec.year + 1 }, build)).toBe(false)
   })
 
+  it("품종 데이터가 바뀌었거나 데이터 해시가 없는 제철 인쇄물 기록은 최신이 아니다", () => {
+    expect(isBuildCurrent(spec, { ...build, foodHash: "00000000" })).toBe(false)
+    const { foodHash: _foodHash, ...old } = build
+    expect(isBuildCurrent(spec, old)).toBe(false)
+  })
+
+  it("이유식 인쇄물은 제철 품종 데이터와 상관없이 사양만 본다", () => {
+    const pairings = DEFAULT_SPECS["baby-food-pairings"]
+    expect(isBuildCurrent(pairings, { specHash: specHash(pairings), generatedAt: build.generatedAt, bytes: {}, thumbnails: [] })).toBe(true)
+  })
+
   it("기록이 없으면 최신이 아니다", () => {
     expect(isBuildCurrent(spec, undefined)).toBe(false)
+  })
+})
+
+describe("foodDataHash", () => {
+  it("같은 데이터면 같은 8자리 16진수다", () => {
+    expect(foodDataHash()).toMatch(/^[0-9a-f]{8}$/)
+    expect(foodDataHash()).toBe(foodDataHash())
   })
 })
 

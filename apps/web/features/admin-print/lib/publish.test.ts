@@ -1,13 +1,14 @@
 import { describe, expect, it } from "vitest"
 
 import type { BuildRecord, Edition, EditionStatus } from "@workspace/seasonal/print/edition"
+import { foodDataHash } from "@workspace/seasonal/print/edition"
 import { DEFAULT_SPECS, specHash } from "@workspace/seasonal/print/spec"
 
 import { savePlan } from "./publish"
 
 const spec = DEFAULT_SPECS.monthly
 const edition = (status: EditionStatus, year = spec.year): Edition => ({ id: "monthly-1", title: "t", description: "d", status, spec: { ...spec, year } })
-const build: BuildRecord = { specHash: specHash(spec), generatedAt: "2026-10-30T00:00:00.000Z", bytes: {}, thumbnails: [] }
+const build: BuildRecord = { specHash: specHash(spec), foodHash: foodDataHash(), generatedAt: "2026-10-30T00:00:00.000Z", bytes: {}, thumbnails: [] }
 const ready = { build, storageReady: true }
 
 describe("savePlan", () => {

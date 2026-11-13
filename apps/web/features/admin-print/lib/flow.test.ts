@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import type { BuildRecord, Edition } from "@workspace/seasonal/print/edition"
+import { foodDataHash } from "@workspace/seasonal/print/edition"
 import { DEFAULT_SPECS, specHash, type PrintSpec } from "@workspace/seasonal/print/spec"
 
 import { editionDraft, editionFlow, stepNotes } from "./flow"
@@ -48,7 +49,7 @@ describe("editionFlow", () => {
 })
 
 const edition: Edition = { id: "monthly-1", title: "2027 달력", description: "", status: "draft", spec: DEFAULT_SPECS.monthly }
-const buildOf = (spec: PrintSpec): BuildRecord => ({ specHash: specHash(spec), generatedAt: "2026-10-20T00:00:00.000Z", bytes: {}, thumbnails: [] })
+const buildOf = (spec: PrintSpec): BuildRecord => ({ specHash: specHash(spec), foodHash: foodDataHash(), generatedAt: "2026-10-20T00:00:00.000Z", bytes: {}, thumbnails: [] })
 
 describe("editionDraft", () => {
   it("편집본이 저장본과 같으면 바뀐 게 없다", () => {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import type { Edition } from "@workspace/seasonal/print/edition"
+import { foodDataHash } from "@workspace/seasonal/print/edition"
 import { DEFAULT_SPECS, specHash } from "@workspace/seasonal/print/spec"
 
 import { nextIdsByKind, toEditionSummary } from "./summary"
@@ -9,7 +10,7 @@ const edition: Edition = { id: "monthly-1", title: "크림 달력", description:
 
 describe("toEditionSummary", () => {
   it("지금 사양으로 만든 PDF가 있으면 생성일을 서울 날짜로 적는다", () => {
-    const build = { specHash: specHash(edition.spec), generatedAt: "2026-10-16T16:30:00.000Z", bytes: {}, thumbnails: [] }
+    const build = { specHash: specHash(edition.spec), foodHash: foodDataHash(), generatedAt: "2026-10-16T16:30:00.000Z", bytes: {}, thumbnails: [] }
     expect(toEditionSummary(edition, build)).toEqual({ id: "monthly-1", kind: "monthly", title: "크림 달력", status: "draft", currentBuildDate: "2026-10-17", year: DEFAULT_SPECS.monthly.year })
   })
 

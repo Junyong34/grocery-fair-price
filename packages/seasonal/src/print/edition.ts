@@ -1,6 +1,9 @@
 import { z } from "zod"
 
-import { pageCount, parsePrintSpec, PUBLISHED_PAPERS, specHash, type Orientation, type Paper, type PrintKind, type PrintSpec, type PublishedPaper } from "./spec"
+import { DRAWN_FOOD_IDS } from "../data/drawn-foods.generated"
+import { FAMILIARITY_1, FAMILIARITY_2, FAMILIARITY_4, FAMILIARITY_5 } from "../data/food-familiarity"
+import { FOODS } from "../data/foods"
+import { pageCount, parsePrintSpec, PUBLISHED_PAPERS, specHash, stableHash, type Orientation, type Paper, type PrintKind, type PrintSpec, type PublishedPaper } from "./spec"
 
 // 에디션: 이름이 붙은 인쇄 사양 하나. 원본은 apps/web/print-editions/<id>.json(git), 결과 PDF·썸네일은 public/downloads/<id>/.
 // 사용자 다운로드 화면은 생성기가 쓰는 public/downloads/manifest.json만 읽는다(.scratch/calendar-download/spec.md).
@@ -103,12 +106,31 @@ export type WithdrawnEntry = Pick<ManifestEntry, "id" | "kind" | "title" | "year
 
 export type DownloadManifest = { editions: ManifestEntry[]; withdrawn: WithdrawnEntry[] }
 
-/** 생성 기록. 생성기가 에디션마다 남긴다. bytes 키는 downloadPath다. */
-export type BuildRecord = { specHash: string; generatedAt: string; bytes: Record<string, number>; thumbnails: Thumbnail[] }
+/**
+ * 생성 기록. 생성기가 에디션마다 남긴다. bytes 키는 downloadPath다.
+ * foodHash는 만들 때의 제철 품종 데이터 해시다(foodDataHash). 이 필드가 생기기 전 기록에는 없다.
+ */
+export type BuildRecord = { specHash: string; foodHash?: string; generatedAt: string; bytes: Record<string, number>; thumbnails: Thumbnail[] }
 
-/** 이 생성 기록이 지금 사양으로 만든 것인가. 없거나 사양이 바뀌었으면 false. */
+/**
+ * 제철 인쇄물이 그리는 품종 데이터의 해시. 품종(제철 달·대표 달·이름), 친숙도 등급, 그림 유무가 바뀌면 달라진다.
+ * 사양이 같아도 이 값이 바뀌면 이미 만든 PDF에는 옛 달력이 남아 있다.
+ */
+export function foodDataHash(): string {
+  return stableHash({
+    foods: FOODS,
+    familiarity: [FAMILIARITY_1, FAMILIARITY_2, [...FAMILIARITY_4].sort(), [...FAMILIARITY_5].sort()],
+    drawn: [...DRAWN_FOOD_IDS].sort(),
+  })
+}
+
+/** 이유식 인쇄물은 제철 품종 데이터를 그리지 않는다. */
+const usesFoodData = (spec: PrintSpec) => spec.kind !== "baby-food-pairings" && spec.kind !== "baby-food-fruits"
+
+/** 이 생성 기록이 지금 사양과 지금 품종 데이터로 만든 것인가. 없거나, 사양이 바뀌었거나, 제철 인쇄물의 품종 데이터가 바뀌었으면 false. */
 export function isBuildCurrent(spec: PrintSpec, build: BuildRecord | undefined): build is BuildRecord {
-  return build !== undefined && build.specHash === specHash(spec)
+  if (build === undefined || build.specHash !== specHash(spec)) return false
+  return !usesFoodData(spec) || build.foodHash === foodDataHash()
 }
 
 const yearOf = (spec: PrintSpec) => ("year" in spec ? spec.year : undefined)

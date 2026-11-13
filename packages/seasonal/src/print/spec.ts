@@ -342,8 +342,13 @@ export function decodeSpec(encoded: string): PrintSpec | Error {
 
 /** 키 순서와 상관없는 사양 해시(FNV-1a 32비트). 결과 파일이 지금 사양으로 만든 것인지 가린다. */
 export function specHash(spec: PrintSpec): string {
+  return stableHash(spec)
+}
+
+/** 키 순서와 상관없는 값 해시(FNV-1a 32비트, 8자리 16진수). */
+export function stableHash(value: unknown): string {
   let hash = 0x811c9dc5
-  for (const char of stableJson(spec)) {
+  for (const char of stableJson(value)) {
     hash ^= char.charCodeAt(0)
     hash = Math.imul(hash, 0x01000193)
   }
