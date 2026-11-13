@@ -118,7 +118,7 @@ describe("sashimi", () => {
   })
 
   it.each([
-    ["bluefin-tuna", [1, 2, 6, 12]],
+    ["bluefin-tuna", [1, 2, 12]],
     ["cuttlefish", [5]],
     ["pointhead-flounder", [5]],
     ["octopus", [7, 8, 9]],

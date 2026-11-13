@@ -76,9 +76,9 @@ export const FAMILIARITY_2: Readonly<Record<string, number>> = {
   // 7월
   watermelon: 7, // 수박
   plum: 7, // 자두
-  abalone: 7, // 전복
+  peach: 7, // 복숭아
   // 8월
-  peach: 8, // 복숭아
+  abalone: 8, // 전복
   eggplant: 8, // 가지
   corn: 8, // 옥수수
   "green-grape": 8, // 포도

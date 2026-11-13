@@ -3,14 +3,18 @@
     "name": "전복",
     "aliases": [],
     "category": "수산",
-    "months": [5, 6, 7, 8],
-    "peak": [7, 8],
+    "months": [5, 6, 7, 8, 9, 10],
+    "peak": [8, 9, 10],
     "season": "verified",
     "basis": "survey",
     "conditional": true,
     "evidence": {
-      "sources": [],
-      "market": "해수부 5~7월 제철, 여름 대표 7~8월"
+      "sources": [
+        "https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=25483&select_list_no=84",
+        "https://www.mof.go.kr/doc/ko/selectDoc.do?bbsSeq=10&docSeq=1175&menuSeq=971"
+      ],
+      "checkedAt": "2026-11-13",
+      "market": "해수부 5~7월 제철·여름 보양식, 수품원은 산란 전 8~10월이 가장 맛있다고 적는다"
     }
   },
   "adlay": {
@@ -538,13 +542,17 @@
       "참치"
     ],
     "category": "수산",
-    "months": [1, 2, 6, 12],
+    "months": [1, 2, 12],
     "peak": [1, 12],
     "season": "verified",
-    "basis": "foodnuri",
+    "basis": "user",
     "evidence": {
-      "sources": [],
-      "market": "겨울(12~2월) 지방이 오르는 시기 + 동해안 정치망 6월 집중 어획(뉴시스·매일신문). 축양·수입으로 연중 유통, 2026-11-11 확인"
+      "sources": [
+        "https://www.fsis.go.kr/front/contents/cmsView.do?cate_id=0301&cnts_id=26786&select_list_no=78"
+      ],
+      "checkedAt": "2026-11-13",
+      "reason": "사용자 판단(2026-11-13): 시중 참다랑어는 수입·냉동이 많고 회로 겨울에 주로 먹으니 겨울(12~2월)로 둔다. 장보기 제철보다 제철 회 기준이다. 6월 동해안 정치망 어획은 뺐다.",
+      "market": "수품원은 3·4월 수산물로 소개할 뿐 제철 달을 말하지 않는다. 축양·수입으로 연중 유통"
     }
   },
   "bok-choy": {
@@ -714,15 +722,16 @@
     "name": "양송이버섯",
     "aliases": [],
     "category": "버섯",
-    "months": [10],
-    "peak": [10],
+    "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    "peak": [],
     "season": "unverified",
     "basis": "foodnuri",
     "evidence": {
       "sources": [
         "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219827&menuNo=300063"
       ],
-      "market": "정보누리 생산시기 1월~12월"
+      "market": "정보누리 생산시기 1월~12월",
+      "note": "시설 재배로 연중 생산(2026-11-13). 특정 제철 달이 없어 미검증으로 둔다."
     }
   },
   "cabbage": {
@@ -1177,15 +1186,16 @@
     "name": "팽이버섯",
     "aliases": [],
     "category": "버섯",
-    "months": [1],
-    "peak": [1],
+    "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    "peak": [],
     "season": "unverified",
     "basis": "foodnuri",
     "evidence": {
       "sources": [
         "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219931&menuNo=300063"
       ],
-      "market": "정보누리 생산시기 1월~12월"
+      "market": "정보누리 생산시기 1월~12월",
+      "note": "시설 재배로 연중 생산(2026-11-13). 특정 제철 달이 없어 미검증으로 둔다."
     }
   },
   "eolgari-cabbage": {
@@ -1554,12 +1564,17 @@
     "name": "완두콩",
     "aliases": [],
     "category": "곡물·견과",
-    "months": [5, 6],
+    "months": [4, 5, 6],
     "peak": [5, 6],
     "season": "verified",
     "basis": "survey",
     "evidence": {
-      "sources": []
+      "sources": [
+        "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219848&menuNo=300063",
+        "https://www.rda.go.kr/webzine/2021/04/sub4-2.html"
+      ],
+      "checkedAt": "2026-11-13",
+      "market": "정보누리 생산시기 11월~이듬해 4월(시설 출하 포함, 대표 달 4월), 노지 수확은 5~6월(농진청 웹진 파종·수확 간격)"
     }
   },
   "green-plum": {
@@ -1821,15 +1836,16 @@
     "name": "새송이버섯",
     "aliases": [],
     "category": "버섯",
-    "months": [10],
-    "peak": [10],
+    "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    "peak": [],
     "season": "unverified",
     "basis": "foodnuri",
     "evidence": {
       "sources": [
         "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219925&menuNo=300063"
       ],
-      "market": "정보누리 생산시기 1월~12월"
+      "market": "정보누리 생산시기 1월~12월",
+      "note": "시설 재배로 연중 생산(2026-11-13). 특정 제철 달이 없어 미검증으로 둔다."
     }
   },
   "kiwi": {
@@ -2485,15 +2501,16 @@
     "name": "느타리버섯",
     "aliases": [],
     "category": "버섯",
-    "months": [10],
-    "peak": [10],
+    "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    "peak": [],
     "season": "unverified",
     "basis": "foodnuri",
     "evidence": {
       "sources": [
         "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219932&menuNo=300063"
       ],
-      "market": "정보누리 생산시기 1월~12월"
+      "market": "정보누리 생산시기 1월~12월",
+      "note": "시설 재배로 연중 생산(2026-11-13). 특정 제철 달이 없어 미검증으로 둔다."
     }
   },
   "paprika": {
@@ -2586,15 +2603,16 @@
     "name": "깻잎",
     "aliases": [],
     "category": "채소",
-    "months": [7],
-    "peak": [7],
+    "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    "peak": [],
     "season": "unverified",
     "basis": "foodnuri",
     "evidence": {
       "sources": [
         "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219945&menuNo=300063"
       ],
-      "market": "정보누리 생산시기 1월~12월"
+      "market": "정보누리 생산시기 1월~12월",
+      "note": "시설 재배로 연중 생산(2026-11-13). 특정 제철 달이 없어 미검증으로 둔다."
     }
   },
   "perilla-seed": {
@@ -3493,9 +3511,11 @@
   },
   "sixbar-sandperch": {
     "name": "쌍동가리",
-    "aliases": [],
+    "aliases": [
+      "도토래미"
+    ],
     "category": "수산",
-    "months": [5],
+    "months": [5, 6, 7, 8, 9],
     "peak": [5],
     "season": "verified",
     "basis": "user",
@@ -3505,7 +3525,9 @@
         "prototypes/seasonal-food/docs/data/user-seafood-calendar-2026-11-02.json"
       ],
       "market": "사용자 첨부 월별 제철 회 추천 월 5월",
-      "note": "쌍동가리(Parapercis sexfasciata)를 대상으로 한다. 열쌍동가리·흰동가리와 혼동하지 않는다."
+      "note": "쌍동가리(Parapercis sexfasciata)를 대상으로 한다. 열쌍동가리·흰동가리와 혼동하지 않는다.",
+      "checkedAt": "2026-11-13",
+      "reason": "사용자 판단(2026-11-13): 남해안·제주 자연산 횟감으로 5~9월이 주 제철, 대표 달은 회 추천표의 5월. 공공 근거는 없고 수과원 산란기(2~6월·10~11월)와 일부 겹친다. 별칭 도토래미는 통영 지역명(국제신문 2022-08)."
     }
   },
   "skate": {
