@@ -92,7 +92,7 @@ def check_entry(food_id, name, body):
         if word in shown:
             problems.append(f"금지어 '{word}'")
     # 작업 메모가 본문에 섞이면 화면에 그대로 나간다.
-    for phrase in re.findall(r"[^.\n]*(?:출처 자료에는|출처에는|출처에 없|원 자료에는|원 자료에 없)[^.\n]*", shown):
+    for phrase in re.findall(r"[^.\n]*(?:출처 자료에는|출처에는|출처에 없|원 자료에는|원 자료에 없|찾지 못했|자료가 없|확인하지 못했)[^.\n]*", shown):
         problems.append(f"본문에 작업 메모: {phrase.strip()[:40]}")
     if re.search(r"^### \d\. .*\([A-Za-z]", body, re.M):
         problems.append("제목에 영어 병기")
