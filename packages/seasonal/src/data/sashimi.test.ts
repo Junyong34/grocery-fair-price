@@ -111,6 +111,7 @@ describe("sashimi", () => {
       "bluefin-tuna",
       "halfbeak",
       "east-sea-hanchi",
+      "skate",
       "atka-mackerel",
       "redlip-mullet",
       "banded-grouper",

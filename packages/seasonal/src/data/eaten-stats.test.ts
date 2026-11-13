@@ -47,7 +47,7 @@ describe("scopeFoods", () => {
 
 describe("tally", () => {
   it("품종 수와 그 가운데 먹은 수를 센다", () => {
-    expect(tally(foodsInMonth(10), eaten)).toEqual({ eaten: 3, total: foodsInMonth(10).length })
+    expect(tally(foodsInMonth(10), eaten)).toEqual({ eaten: 2, total: foodsInMonth(10).length })
     expect(tally(FOODS, new Set())).toEqual({ eaten: 0, total: FOODS.length })
   })
 })
@@ -57,7 +57,7 @@ describe("monthTallies", () => {
     const tallies = monthTallies(eaten)
     expect(tallies).toHaveLength(12)
     MONTHS.forEach((month, i) => expect(tallies[i]!.total).toBe(foodsInMonth(month).length))
-    expect(tallies.map((t) => t.eaten)).toEqual([1, 1, 0, 0, 0, 0, 0, 1, 2, 3, 2, 1])
+    expect(tallies.map((t) => t.eaten)).toEqual([1, 1, 1, 0, 0, 0, 0, 1, 2, 2, 2, 1])
   })
 })
 
@@ -65,8 +65,8 @@ describe("seasonTallies", () => {
   it("계절마다 제철 수와 먹은 수. 한 품종이 두 계절에 걸치면 양쪽에 센다", () => {
     const tallies = seasonTallies(eaten)
     SEASONS.forEach((season) => expect(tallies[season].total).toBe(foodsInSeason(season).length))
-    expect(tallies.autumn.eaten).toBe(3) // 감·전어·굴(10·11월)
+    expect(tallies.autumn.eaten).toBe(3) // 감·전어·굴(11월)
     expect(tallies.winter.eaten).toBe(1) // 굴
-    expect(tallies.spring.eaten).toBe(0)
+    expect(tallies.spring.eaten).toBe(1) // 굴(3월)
   })
 })

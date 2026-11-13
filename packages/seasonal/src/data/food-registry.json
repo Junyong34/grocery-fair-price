@@ -138,7 +138,7 @@
     "aliases": [],
     "category": "과일",
     "months": [5, 6, 7, 8, 9, 10],
-    "peak": [6, 7],
+    "peak": [6],
     "season": "verified",
     "basis": "foodnuri",
     "conditional": true,
@@ -146,7 +146,9 @@
       "sources": [
         "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219870&menuNo=300063"
       ],
-      "market": "정보누리 생산시기 5월~10월"
+      "market": "정보누리 생산시기 5월~10월",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 정보누리: 6월 수확분 당도가 가장 좋음."
     }
   },
   "apricot": {
@@ -377,13 +379,15 @@
     "name": "황금향",
     "aliases": [],
     "category": "과일",
-    "months": [9, 10, 11, 12],
+    "months": [8, 9, 10, 11, 12],
     "peak": [9, 10],
     "season": "verified",
     "basis": "foodnuri",
     "evidence": {
       "sources": [],
-      "market": "제주 노지·시설 출하 9월~12월(가온 하우스는 8월 하순), 농협·제주도 자료 2026-11-11 확인"
+      "market": "제주 노지·시설 출하 9월~12월(가온 하우스는 8월 하순), 농협·제주도 자료 2026-11-11 확인",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 제주농업기술원: 하우스 8월 하순 첫 수확, 노지 12월 수확."
     }
   },
   "bird-clam": {
@@ -514,13 +518,15 @@
     "name": "꽃게",
     "aliases": [],
     "category": "수산",
-    "months": [4, 5, 6, 9, 10, 11],
+    "months": [3, 4, 5, 6, 9, 10, 11, 12],
     "peak": [10],
     "season": "verified",
     "basis": "survey",
     "evidence": {
       "sources": [],
-      "market": "FSIS 봄 암게·가을 수게, 여름 금어기 제외"
+      "market": "FSIS 봄 암게·가을 수게, 여름 금어기 제외",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 수산물안전정보: 주 생산 3~6월, 9~12월."
     }
   },
   "blueberry": {
@@ -559,7 +565,7 @@
     "name": "청경채",
     "aliases": [],
     "category": "채소",
-    "months": [10],
+    "months": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
     "peak": [10],
     "season": "unverified",
     "basis": "foodnuri",
@@ -567,7 +573,9 @@
       "sources": [
         "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=227350&menuNo=300063"
       ],
-      "market": "정보누리 생산시기 10월~연중"
+      "market": "정보누리 생산시기 10월~연중",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 정보누리 생산시기 10월~연중."
     }
   },
   "bomdong": {
@@ -768,7 +776,7 @@
     "name": "결명자",
     "aliases": [],
     "category": "곡물·견과",
-    "months": [11],
+    "months": [9, 10, 11],
     "peak": [11],
     "season": "unverified",
     "basis": "foodnuri",
@@ -776,7 +784,9 @@
       "sources": [
         "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219958&menuNo=300063"
       ],
-      "market": "정보누리 생산시기 9월~11월"
+      "market": "정보누리 생산시기 9월~11월",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 정보누리 생산시기 9~11월."
     }
   },
   "catfish": {
@@ -1017,13 +1027,15 @@
     "name": "대구",
     "aliases": [],
     "category": "수산",
-    "months": [1, 2, 12],
+    "months": [1, 2, 11, 12],
     "peak": [12],
     "season": "verified",
     "basis": "foodnuri",
     "evidence": {
       "sources": [],
-      "market": "산란기(12~2월)와 일치하는 겨울이 제철"
+      "market": "산란기(12~2월)와 일치하는 겨울이 제철",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 수산물안전정보: 산란기 12~1월에 맛이 좋음, 해수부 11월 이달의 수산물."
     }
   },
   "conger-eel": {
@@ -1141,7 +1153,7 @@
     "name": "용과",
     "aliases": [],
     "category": "과일",
-    "months": [7],
+    "months": [7, 8, 9, 10],
     "peak": [7],
     "season": "unverified",
     "basis": "foodnuri",
@@ -1150,7 +1162,9 @@
       "sources": [
         "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219871&menuNo=300063"
       ],
-      "market": "정보누리 생산시기 7월~10월"
+      "market": "정보누리 생산시기 7월~10월",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 정보누리 생산시기 7~10월."
     }
   },
   "east-sea-hanchi": {
@@ -1442,7 +1456,7 @@
     "name": "구기자",
     "aliases": [],
     "category": "과일",
-    "months": [7],
+    "months": [7, 8, 9, 10, 11],
     "peak": [7],
     "season": "unverified",
     "basis": "foodnuri",
@@ -1450,7 +1464,9 @@
       "sources": [
         "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=227344&menuNo=300063"
       ],
-      "market": "정보누리 생산시기 7~11월"
+      "market": "정보누리 생산시기 7~11월",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 정보누리 생산시기 7~11월."
     }
   },
   "gomchwi": {
@@ -1638,12 +1654,14 @@
     "aliases": [],
     "category": "과일",
     "months": [1, 2, 3, 12],
-    "peak": [1, 2, 3],
+    "peak": [2, 3],
     "season": "verified",
     "basis": "survey",
     "evidence": {
       "sources": [],
-      "market": "정보누리 생산시기 12월~3월"
+      "market": "정보누리 생산시기 12월~3월",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 정보누리: 2~3월에 가장 맛있음."
     }
   },
   "herring": {
@@ -1668,12 +1686,14 @@
     "aliases": [],
     "category": "수산",
     "months": [6, 7, 8, 9],
-    "peak": [6],
+    "peak": [9],
     "season": "verified",
     "basis": "foodnuri",
     "evidence": {
       "sources": [],
-      "market": "제철은 여름, 7월부터 기름이 올라 9월에 절정"
+      "market": "제철은 여름, 7월부터 기름이 올라 9월에 절정",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 수산물안전정보: 7월부터 기름이 올라 9월에 가장 맛있음."
     }
   },
   "hyang-carp": {
@@ -1941,19 +1961,21 @@
     "name": "김",
     "aliases": [],
     "category": "수산",
-    "months": [1, 2],
+    "months": [1, 2, 3, 12],
     "peak": [1, 2],
     "season": "unverified",
     "basis": "mof",
     "evidence": {
-      "sources": []
+      "sources": [],
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 수산물안전정보: 맛이 좋은 때 12~3월(채취 10월 하순~이듬해 4월 초)."
     }
   },
   "lemon": {
     "name": "레몬",
     "aliases": [],
     "category": "과일",
-    "months": [1],
+    "months": [1, 10, 11, 12],
     "peak": [1],
     "season": "unverified",
     "basis": "foodnuri",
@@ -1962,7 +1984,9 @@
       "sources": [
         "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219818&menuNo=300063"
       ],
-      "market": "정보누리 생산시기 10월~1월"
+      "market": "정보누리 생산시기 10월~1월",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 정보누리 생산시기 10월~이듬해 1월."
     }
   },
   "lettuce": {
@@ -2120,13 +2144,15 @@
     "name": "매생이",
     "aliases": [],
     "category": "수산",
-    "months": [1, 12],
+    "months": [1, 2, 12],
     "peak": [1],
     "season": "verified",
     "basis": "survey",
     "evidence": {
       "sources": [],
-      "market": "해수부 1월 선정, 12월 겨울 범위"
+      "market": "해수부 1월 선정, 12월 겨울 범위",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 수산물안전정보: 생산 12월 중순~2월 말."
     }
   },
   "mallow": {
@@ -2289,12 +2315,14 @@
     "aliases": [],
     "category": "수산",
     "months": [3, 4, 5],
-    "peak": [3, 4],
+    "peak": [4, 5],
     "season": "verified",
     "basis": "foodnuri",
     "evidence": {
       "sources": [],
-      "market": "4~5월에 주로 잡히는 보리숭어(해수부 3·4월 선정)"
+      "market": "4~5월에 주로 잡히는 보리숭어(해수부 3·4월 선정)",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 수산물안전정보: 숭어 제철 4~5월."
     }
   },
   "mung-bean": {
@@ -2373,7 +2401,7 @@
     "name": "능이버섯",
     "aliases": [],
     "category": "버섯",
-    "months": [9],
+    "months": [9, 10],
     "peak": [9],
     "season": "unverified",
     "basis": "foodnuri",
@@ -2381,7 +2409,9 @@
       "sources": [
         "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219929&menuNo=300063"
       ],
-      "market": "정보누리 생산시기 1월~12월"
+      "market": "정보누리 생산시기 1월~12월",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 산림청 자연산 출회기 9월 초~10월 초."
     }
   },
   "oat": {
@@ -2488,13 +2518,15 @@
     "name": "굴",
     "aliases": [],
     "category": "수산",
-    "months": [1, 2, 10, 11, 12],
+    "months": [1, 2, 3, 11, 12],
     "peak": [1, 12],
     "season": "verified",
     "basis": "survey",
     "evidence": {
       "sources": [],
-      "market": "5~8월 산란 뒤 가을에 살이 차오르고 겨울에 가장 풍부"
+      "market": "5~8월 산란 뒤 가을에 살이 차오르고 겨울에 가장 풍부",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 수산물안전정보: 생산·판매 11월~이듬해 3월, 해수부 생굴 11월~이듬해 4월."
     }
   },
   "oyster-mushroom": {
@@ -2694,7 +2726,7 @@
     "name": "파인애플",
     "aliases": [],
     "category": "과일",
-    "months": [4],
+    "months": [3, 4, 5, 6, 7, 8, 9],
     "peak": [4],
     "season": "unverified",
     "basis": "foodnuri",
@@ -2703,7 +2735,9 @@
       "sources": [
         "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219954&menuNo=300063"
       ],
-      "market": "정보누리 생산시기 3월~9월"
+      "market": "정보누리 생산시기 3월~9월",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 정보누리 생산시기 3~9월."
     }
   },
   "plum": {
@@ -3534,13 +3568,15 @@
     "name": "홍어",
     "aliases": [],
     "category": "수산",
-    "months": [1, 4],
+    "months": [1, 2, 3, 4, 12],
     "peak": [1, 4],
     "season": "verified",
     "basis": "foodnuri",
     "evidence": {
       "sources": [],
-      "market": "사용자 첨부 월별 제철 회 추천 월 1월, 4월"
+      "market": "사용자 첨부 월별 제철 회 추천 월 1월, 4월",
+      "checkedAt": "2026-11-13",
+      "note": "2026-11-13 콘텐츠 조사 반영: 수산물안전정보: 겨울~이른 봄 제철, 3·4월 수산물."
     }
   },
   "snailfish": {
