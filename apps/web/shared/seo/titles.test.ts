@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import { explainVerdict } from "@workspace/price/verdict-copy"
 import { FESTIVALS } from "@workspace/seasonal/data/festivals"
+import { FOOD_CONTENT } from "@workspace/seasonal/data/food-content.generated"
 import { findFood, FOODS } from "@workspace/seasonal/data/foods"
 import { findPairing, PAIRINGS } from "@workspace/seasonal/data/infant-pairings"
 import { MONTHS } from "@workspace/seasonal/data/months"
@@ -110,21 +111,19 @@ describe("페이지 제목·설명", () => {
       expect(description.length).toBeLessThanOrEqual(120)
   })
 
-  it("품종 설명에 제철 달과 다른 이름을 넣는다", () => {
-    expect(foodSeo(findFood("snow-crab")!).description).toContain(
-      "제철은 12~5월이에요"
-    )
-    expect(foodSeo(findFood("olive-flounder")!).description).toContain(
-      "광어(넙치)"
-    )
+  it("품종 설명은 조사 원고의 한 줄 소개를 쓰고, 다른 이름을 첫 품종명 뒤에 붙인다", () => {
+    expect(foodSeo(findFood("persimmon")!).description).toBe(FOOD_CONTENT.persimmon!.summary)
+    // 소개문에 다른 이름이 없으면 붙이고, 이미 있으면(광어 소개의 "표준명 넙치") 그대로 둔다.
+    const ashitaba = foodSeo(findFood("ashitaba")!).description
+    expect(ashitaba).toMatch(/^신선초\(명일엽\)는 /)
+    expect(ashitaba.replace("신선초(명일엽)", "신선초")).toBe(FOOD_CONTENT.ashitaba!.summary)
+    expect(foodSeo(findFood("olive-flounder")!).description).toBe(FOOD_CONTENT["olive-flounder"]!.summary)
   })
 
-  it("품종 설명은 관련 명절이 있을 때만 명절 이름을 넣는다", () => {
-    // 설날이 대게를 그 무렵 제철 품종으로 꼽는다(festivals.ts).
-    expect(foodSeo(findFood("snow-crab")!).description).toContain("설날 무렵")
-    expect(foodSeo(findFood("olive-flounder")!).description).not.toContain(
-      "무렵"
-    )
+  it("원고가 없는 품종은 제철 달과 같은 때 제철 품종으로 설명을 만든다", () => {
+    const goedorachi = findFood("goedorachi")!
+    expect(FOOD_CONTENT[goedorachi.id]).toBeUndefined()
+    expect(foodSeo(goedorachi).description).toMatch(/^괴도라치 제철은 \d+월이에요\./)
   })
 
   it("달·계절 설명에 대표 품종 이름을 넣는다", () => {

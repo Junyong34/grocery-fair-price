@@ -21,6 +21,7 @@ Regenerate with the command and commit the output. Hand edits are overwritten.
 |---|---|---|
 | `packages/seasonal/src/data/{foods,drawn-foods,drawn-dishes,food-bounds}.generated.ts`, `apps/web/public/foods/<id>/{color,motion}.svg`, `apps/web/public/dishes/<id>/color.svg`, both `PROVENANCE.md` | `pnpm foods:sync` | the 품종 source `packages/seasonal/src/data/food-registry.json` changes (name, aliases, months, 제철 검증 status, evidence, `art`), `infant-art.json` changes, or an illustration is drawn, changed or reviewed (`/seasonal-food-illustrator`). It checks first and replaces nothing if it finds a problem; fix the items it lists. `--check` only checks. |
 | `food-bounds.generated.ts` alone | `pnpm foods:bounds` | the SVGs changed without a sync. Needs no `prototypes/`. |
+| `packages/seasonal/src/data/food-content.generated.ts` | `pnpm foods:content` | a 품종 상세 원고 in `content/foods/*.md` changes. Writing rules: `.scratch/seasonal-content-assignments/rewrite-criteria.md`; format check: `python3 -I .scratch/seasonal-content-assignments/check-chunk.py packages/seasonal/content/foods/*.md`. When you change a 품종's months, fix its 원고 table and 한 줄 소개 too. |
 
 - `pnpm foods:sync` exports an illustration when its `art.json` says `reviewed` and some screen data points at it (a verified 품종, `infant-art.json`). What counts as a problem is decided in `src/data/food-sync-plan.ts`.
 - Without `prototypes/`, `pnpm foods:sync` regenerates only the 품종 list and leaves the committed illustrations as they are.

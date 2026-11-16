@@ -8,6 +8,7 @@ import { explainVerdict, type VerdictSubject } from "@workspace/price/verdict-co
 import { SEASON_COPY } from "@workspace/seasonal/data/copy"
 import { dishNames } from "@workspace/seasonal/data/dishes"
 import { type Festival, festivalOf, festivalsWithFood } from "@workspace/seasonal/data/festivals"
+import { FOOD_CONTENT } from "@workspace/seasonal/data/food-content.generated"
 import { type Food, foodsInMonth, foodsInSeasonWith, monthHighlights, seasonHighlights } from "@workspace/seasonal/data/foods"
 import { type PairingRow, pairingDisplayName } from "@workspace/seasonal/data/infant-pairings"
 import { sashimiInMonth } from "@workspace/seasonal/data/sashimi"
@@ -189,21 +190,39 @@ export function sashimiSeo(month: number): PageSeo {
   }
 }
 
+/** 검색 결과 설명문이 잘리지 않는 길이. titles.test.ts가 모든 페이지에 같은 한도를 건다. */
+const DESCRIPTION_LIMIT = 120
+
 export function foodSeo(food: Food): PageSeo {
   // 다른 이름으로도 검색되도록 붙인다. 광어 → "광어(넙치)"
   const label = food.aliases.length > 0 ? `${food.name}(${food.aliases.join("·")})` : food.name
   // formatSeasonMonths는 "제철 12·1·2·3월"처럼 앞에 "제철"을 붙인다.
   const months = formatSeasonMonths(food.months).replace(/^제철 /, "")
+  return {
+    // "언제부터 언제까지"를 찾는 검색이라 제철 달을 제목에 바로 보인다. 화면의 "제철 12~5월"과 같은 표기다.
+    title: `${food.name} 제철 시기 · ${months}`,
+    description: contentDescription(food, label) ?? generatedDescription(food, label, months),
+  }
+}
+
+/** 조사 원고의 한 줄 소개. 다른 이름이 없으면 첫 품종명 뒤에 괄호로 붙인다(한도를 넘으면 붙이지 않는다). */
+function contentDescription(food: Food, label: string): string | null {
+  const summary = FOOD_CONTENT[food.id]?.summary
+  if (!summary) return null
+  if (label === food.name || food.aliases.some((alias) => summary.includes(alias))) return summary
+  const withAliases = summary.replace(food.name, label)
+  return withAliases.length <= DESCRIPTION_LIMIT ? withAliases : summary
+}
+
+/** 원고가 없는 품종(괴도라치)의 설명. 제철 달, 관련 명절, 같은 때 제철 품종으로 만든다. */
+function generatedDescription(food: Food, label: string, months: string): string {
   const together = foodsInSeasonWith(food).slice(0, 2)
   const festivals = festivalsWithFood(food.id).map((festival) => festival.name)
-  const parts = [
+  return [
     `${label} 제철은 ${months}이에요.`,
     festivals.length > 0 && `${festivals.join("·")} 무렵 제철 식재료예요.`,
     together.length > 0 && `같은 때 제철인 ${names(together)}도 함께 확인해 보세요.`,
   ]
-  return {
-    // "언제부터 언제까지"를 찾는 검색이라 제철 달을 제목에 바로 보인다. 화면의 "제철 12~5월"과 같은 표기다.
-    title: `${food.name} 제철 시기 · ${months}`,
-    description: parts.filter(Boolean).join(" "),
-  }
+    .filter(Boolean)
+    .join(" ")
 }

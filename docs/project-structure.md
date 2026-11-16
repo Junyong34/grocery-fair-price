@@ -188,7 +188,7 @@ import 경로:
 | `sashimi/` | 제철 회 | `sashimi-view`, `sashimi-chip-row`(달 칩이 지나가면 나타나는 고정 줄) |
 | `festivals/` | 1g | `festival-view`, `festival-chips`, `festival-background`, `festival-style`, `festival-date`, `dish-image`(전통 음식 그림 또는 한지 인장) |
 | `my-table/` | 1h | `my-table-view`(시기 × 카테고리 × 검색), `category-filter`(단일 선택 하단 시트), `scope-summary`(시기 기준 요약), `food-row`, `typed-label` |
-| `food-detail/` | 1i | `food-detail`, `eat-toggle`, `festival-link` |
+| `food-detail/` | 1i | `food-detail`, `food-content`(조사 원고 본문과 출처), `eat-toggle`, `festival-link` |
 | `search/` | 전역 검색 | `food-search`(헤더 버튼), `food-search-dialog`(cojeev command, 초성 검색) |
 | `components/` | 공통 | `seasonal-shell`(공통 셸에 제철 메뉴 · 검색 · ⚙를 넣는다), `sub-tabs`, `food-image`(그림 없으면 이름 카드), `detail-sheet`(품종 · 에디션 상세 시트), `scatter-field`(흩어진 배치)·`calendar-fit`(모바일 판 달력 폭 맞춤), `month-calendar`, `month-days-card`(달력 아래 "이달의 절기·명절". 2b는 `ThisYearMonthDaysCard`가 해마다 그려 두고 올해 것만 켬), `season-tag`, `season-months-bar`, `eaten-badge`, `eaten-name`(먹은 품종 이름 밑줄), `eaten-count`, `holiday-name`, `screen-stub`, `pill`(고르기 알약 `PillLink`·`PillButton`) |
 | `downloads/` | PDF 내려받기(.scratch/calendar-download) | `downloads-view`(목록: 종류별 가로 줄 `EditionShelf`), `year-filter`(연도 필터), `edition-detail`(상세: 시트 · 페이지 공용), `edition-download-link`(A4 내려받기 주소) |
@@ -336,6 +336,7 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `print/spec-codec.ts`, `listing.ts`, `month-label.ts`, `period-chart.ts`, `wheel.ts` | 인쇄 사양 URL 코덱(번들에서 zod를 빼려고 분리), 내려받기 화면의 종류별 줄 · 연도 규칙, 인쇄물 달 표기, 제철 막대표 배치, 원형 판 배치 |
 | `data/infant-pairings.ts`, `data/infant-fruits.ts` | 이유식 궁합 데이터(역참조 · 색인 함수 포함), 월령별 과일 시기 · 주의 식재료 |
 | `data/food-registry.json`, `food-registry.ts` | 품종 원본(표시명 · 별칭 · 제철 달 · 제철 검증 상태 · 근거)과 그 형식 · 검사, 제철달력 목록을 뽑는 `seasonalRows` (ADR 0006) |
+| `data/food-content.ts`, `food-content.generated.ts` | 품종 상세 원고(`content/foods/*.md`)의 형식과 파서 `parseFoodContent`, 생성 파일 `FOOD_CONTENT`(품종 ID별 한 줄 소개 · 대표 산지 · 섹션 · 출처). 1i 본문과 검색 설명문(`foodSeo`)이 쓴다 |
 | `data/infant-art.json`, `infant-art.ts`, `art-meta.ts` | 이유식 화면이 쓰는 그림 ID 목록, 그림 메타(`prototypes/`의 `art.json`, 그림 검수 상태) 형식 |
 | `data/eaten-stats.ts`, `food-familiarity.ts`, `renamed-foods.ts` | 1h 범위별 품종 수 · 먹은 수, 품종 친숙도(1~5, 인쇄물 칸 고르기와 제철 회 추천), 바뀐 품종 id(옛 먹음 기록 옮기기) |
 | `calendar/static-years.ts`, `year-month.ts` | 2a를 미리 그릴 해(`STATIC_YEARS`), `2026-11` 같은 (연, 월) 경로 값 |
@@ -400,6 +401,11 @@ packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따�
 apps/web/public/dishes/<id>/color.svg        명절 전통 음식 (dish-rows.ts에 있는 것만)
 apps/web/public/dishes/PROVENANCE.md
 packages/seasonal/src/data/drawn-dishes.generated.ts
+
+packages/seasonal/content/foods/*.md           품종 상세 원고 (카테고리별 묶음, 작성 기준: .scratch/seasonal-content-assignments/rewrite-criteria.md)
+        │  pnpm foods:content  (packages/seasonal/scripts/build-food-content.mjs, --check는 비교만)
+        ▼
+packages/seasonal/src/data/food-content.generated.ts
 ```
 
 - 품종 원본 `packages/seasonal/src/data/food-registry.json`이 품종의 표시명·별칭·카테고리·제철 달·제철 검증 상태·근거(출처, 확인일, 사유)를 지닌다(형식과 검사: `food-registry.ts`, ADR 0006). 제철 미검증 품종 31종도 여기 있고 목록에는 나오지 않는다. 2026-11-12에 `prototypes/`의 `foods.json`과 `food-season-corrections.json`을 이 파일로 옮겼다. `build:foods`는 `prototypes/` 없이 돌아간다.
@@ -463,6 +469,7 @@ packages/seasonal/src/data/drawn-dishes.generated.ts
 | `pnpm format` | Prettier |
 | `pnpm ui:add <name-or-url>` | cojeev·shadcn 컴포넌트를 `packages/ui`에 설치 |
 | `pnpm foods:sync` / `pnpm foods:bounds` | 품종 목록 · 웹 그림 · 그림 목록 · 경계값 · 출처 기록을 한 번에(`--check`는 검사만) / 그림 아래 끝만 재측정 |
+| `pnpm foods:content` | 품종 상세 원고를 화면 데이터로(`--check`는 생성 파일이 원고와 같은지만) |
 | `pnpm --filter @workspace/seasonal build:foods` | 품종 목록만 생성(검사와 그림 없이. 보통은 `pnpm foods:sync`를 쓴다) |
 | `pnpm db:start` / `pnpm db:stop` | 로컬 Supabase (Docker). 쓰지 않는 서비스는 끄고 띄운다. DB 어드민은 Studio http://127.0.0.1:55323 (Table Editor에서 schema `price`) |
 | `pnpm db:reset` | 로컬 DB를 지우고 마이그레이션·시드를 다시 적용 |

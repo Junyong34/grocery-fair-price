@@ -3,7 +3,7 @@
 2026-11-13 작성, 2026-11-16 달력 불일치 항목 갱신. 기준은 [rewrite-criteria.md](rewrite-criteria.md), 형식 검사는 `check-chunk.py`입니다.
 
 ```bash
-python3 -I .scratch/seasonal-content-assignments/check-chunk.py .scratch/chunks/*.md
+python3 -I .scratch/seasonal-content-assignments/check-chunk.py packages/seasonal/content/foods/*.md
 ```
 
 ## 숫자
@@ -74,4 +74,4 @@ python3 -I .scratch/seasonal-content-assignments/check-chunk.py .scratch/chunks/
 ## 다음 단계
 
 1. 「차이가 작거나 해석 문제」 품목은 필요할 때 하나씩 판단합니다.
-2. 원고를 품종 상세 화면과 검색 설명문(`foodSeo()`)에 연결합니다(2026-11-16 사용자 결정). 내용이 `—`인 「맛과 식감」은 화면에서 뺍니다.
+2. (완료, 2026-11-16) 원고를 `packages/seasonal/content/foods/`로 옮기고 품종 상세 화면과 검색 설명문(`foodSeo()`)에 연결했습니다. 내용이 `—`인 「맛과 식감」은 화면에서 뺍니다. 원고를 고치면 `pnpm foods:content`로 다시 만듭니다.

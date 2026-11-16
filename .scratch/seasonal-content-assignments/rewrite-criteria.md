@@ -1,6 +1,6 @@
 # 제철 상세 콘텐츠 재작성 기준
 
-2026-11-12 `.scratch/chunks/` 검토 결과를 바탕으로 정리했습니다. 이 문서를 작성 프롬프트에 그대로 붙이고, 청크 파일과 부록 목록을 함께 넘기세요.
+2026-11-12 `packages/seasonal/content/foods/` 검토 결과를 바탕으로 정리했습니다. 이 문서를 작성 프롬프트에 그대로 붙이고, 청크 파일과 부록 목록을 함께 넘기세요.
 
 ## 왜 다시 쓰나
 
@@ -17,7 +17,7 @@
 
 B 형식은 A 형식으로 새로 씁니다. 기존 B 본문은 사실을 찾는 단서로만 쓰고, 문장은 옮기지 않습니다. 출처 링크가 달린 사실만 남깁니다.
 
-배정 범위 밖 미검증 품목 30개(`.scratch/chunks/unverified-season-drafts.md`)도 같은 기준을 따릅니다. 작성된 25개가 B 형식이라 함께 다시 씁니다. 보류 5개(알로에, 숙주나물, 고추냉이, 새우류, 동죽)는 보류로 둡니다.
+배정 범위 밖 미검증 품목 30개(`packages/seasonal/content/foods/unverified-season-drafts.md`)도 같은 기준을 따릅니다. 작성된 25개가 B 형식이라 함께 다시 씁니다. 보류 5개(알로에, 숙주나물, 고추냉이, 새우류, 동죽)는 보류로 둡니다.
 
 | 대상 | 작업 |
 | --- | --- |
@@ -170,10 +170,10 @@ B 형식은 A 형식으로 새로 씁니다. 기존 B 본문은 사실을 찾는
 형식 검사는 스크립트로 합니다. 모든 항목이 `OK`가 나와야 끝입니다.
 
 ```bash
-python3 -I .scratch/seasonal-content-assignments/check-chunk.py .scratch/chunks/<청크ID>.md
+python3 -I .scratch/seasonal-content-assignments/check-chunk.py packages/seasonal/content/foods/<청크ID>.md
 ```
 
-스크립트가 보지 못하는 것: 문장이 출처에 실제로 있는지, 다른 품목과 같은 틀을 반복하는지. 이 두 가지는 직접 확인합니다. 기준 예시는 시범으로 다시 쓴 `.scratch/chunks/fruit-02.md`입니다.
+스크립트가 보지 못하는 것: 문장이 출처에 실제로 있는지, 다른 품목과 같은 틀을 반복하는지. 이 두 가지는 직접 확인합니다. 기준 예시는 시범으로 다시 쓴 `packages/seasonal/content/foods/fruit-02.md`입니다.
 
 ## 유지할 항목(A 형식)의 보완
 

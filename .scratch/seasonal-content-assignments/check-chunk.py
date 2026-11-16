@@ -1,6 +1,6 @@
 """재작성 기준(rewrite-criteria.md) 형식 검사.
 
-사용: python3 -I .scratch/seasonal-content-assignments/check-chunk.py .scratch/chunks/fruit-02.md [...]
+사용: python3 -I .scratch/seasonal-content-assignments/check-chunk.py packages/seasonal/content/foods/fruit-02.md [...]
 문제가 없으면 항목마다 OK, 있으면 이유를 출력하고 종료 코드 1을 돌려준다.
 """
 import json

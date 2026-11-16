@@ -1,6 +1,7 @@
 import Link from "next/link"
 
 import { INFANT_PAIRING_COPY, UI_COPY } from "@workspace/seasonal/data/copy"
+import { FOOD_CONTENT } from "@workspace/seasonal/data/food-content.generated"
 import { festivalsWithFood } from "@workspace/seasonal/data/festivals"
 import { foodsInSeasonWith, seasonsOf, type Food } from "@workspace/seasonal/data/foods"
 import { findPairing } from "@workspace/seasonal/data/infant-pairings"
@@ -14,6 +15,7 @@ import { SeasonMonthsBar } from "../components/season-months-bar"
 import { SeasonTag } from "../components/season-tag"
 import { EatToggle } from "./eat-toggle"
 import { FestivalLink } from "./festival-link"
+import { FoodContentBody, FoodContentSources } from "./food-content"
 
 /** 같은 때 제철 목록에 보일 개수 */
 const SAME_SEASON_LIMIT = 12
@@ -35,6 +37,8 @@ export function FoodDetail({
   const seasons = seasonsOf(food)
   const festivals = festivalsWithFood(food.id)
   const sameSeason = foodsInSeasonWith(food).slice(0, SAME_SEASON_LIMIT)
+  // 조사 원고. 원고를 보류한 품종(괴도라치)은 없어서 원고 부분을 건너뛴다.
+  const content = FOOD_CONTENT[food.id]
 
   return (
     <div className="flex flex-col gap-6">
@@ -72,13 +76,15 @@ export function FoodDetail({
 
       <EatToggle foodId={food.id} />
 
+      {content && <FoodContentBody content={content} />}
+
       <section
         aria-labelledby="related-festivals"
         className="flex flex-col gap-2"
       >
-        <h3 id="related-festivals" className="text-sm font-semibold text-stone">
+        <h2 id="related-festivals" className="text-sm font-semibold text-stone">
           관련 명절
-        </h3>
+        </h2>
         {festivals.length ? (
           <ul className="flex flex-wrap gap-2">
             {festivals.map((festival) => (
@@ -97,9 +103,9 @@ export function FoodDetail({
 
       {sameSeason.length > 0 && (
         <section aria-labelledby="same-season" className="flex flex-col gap-2">
-          <h3 id="same-season" className="text-sm font-semibold text-stone">
+          <h2 id="same-season" className="text-sm font-semibold text-stone">
             같은 때 제철
-          </h3>
+          </h2>
           {/* 시트 본문은 overflow-y-auto라 가로로도 스크롤된다. 음수 여백을 주면 그만큼 본문 전체가 옆으로 움직이니 쓰지 않는다. */}
           <ScrollRow role="list" className="snap-x gap-3 pb-2">
             {sameSeason.map((other) => (
@@ -153,6 +159,8 @@ export function FoodDetail({
           <span aria-hidden className="text-stone">›</span>
         </Link>
       )}
+
+      {content && <FoodContentSources sources={content.sources} />}
     </div>
   )
 }
