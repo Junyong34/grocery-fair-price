@@ -10,8 +10,8 @@ import { cn } from "@workspace/ui/lib/utils"
 
 import { PRICE_COPY, verdictChip, verdictDiff } from "@workspace/price/copy"
 import { won } from "@workspace/price/format"
+import { detailPicture } from "@workspace/price/detail-picture"
 import type { VarietyDetail, Verdict } from "@workspace/price/types"
-import { verdictOf } from "@workspace/price/verdict"
 
 import { VERDICT_TONE } from "../components/verdict-tone"
 
@@ -37,7 +37,8 @@ export function MyPriceSection({ detail, id }: { detail: VarietyDetail; id: stri
     const price = await openMyPriceSheet(detail, mine)
     if (price != null) useMyPriceStore.setState({ id: detail.id, price })
   }
-  const verdict = mine == null ? null : verdictOf(mine, detail.usual, detail.band)
+  // 판정과 "견줄 수 있는가"는 범위 막대의 핀과 같은 값(detailPicture)을 쓴다.
+  const compared = detailPicture(detail, mine).mine
   return (
     <section id={id} aria-labelledby={`${id}-title`} className="flex flex-col gap-3">
       {/* 지우기는 카드 밖 제목 줄 오른쪽에 둔다(최근 본 품종과 같은 자리). 카드 안 "다시 적기" 옆에 두면 너무 붙어 잘못 누르기 쉽다. */}
@@ -56,13 +57,13 @@ export function MyPriceSection({ detail, id }: { detail: VarietyDetail; id: stri
           </button>
         )}
       </div>
-      {verdict?.pct != null && mine != null && detail.usual != null ? (
+      {compared ? (
         <MyPriceCard
           // 값을 바꿀 때마다 다시 떠오르게
-          key={mine}
-          price={mine}
-          verdict={verdict}
-          usual={detail.usual}
+          key={compared.price}
+          price={compared.price}
+          verdict={compared.verdict}
+          usual={compared.usual}
           unit={detail.baseUnit}
           onEdit={ask}
         />

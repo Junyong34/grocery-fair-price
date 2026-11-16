@@ -3,10 +3,9 @@
 import { cn } from "@workspace/ui/lib/utils"
 
 import { isAverageBasis, PRICE_COPY } from "@workspace/price/copy"
-import { priceAxis } from "@workspace/price/axis"
+import { detailPicture } from "@workspace/price/detail-picture"
 import { won } from "@workspace/price/format"
 import type { VarietyDetail } from "@workspace/price/types"
-import { comparesMyPrice, usualRange, verdictOf } from "@workspace/price/verdict"
 
 import { VERDICT_TONE } from "../components/verdict-tone"
 import { useMyPrice } from "./my-price"
@@ -21,17 +20,12 @@ const labelLeft = (x: number) => `clamp(2.5rem, ${x}%, calc(100% - 2.5rem))`
  * "내가 본 가격"을 적으면 그 핀. 평소가가 없으면 평소 범위 띠와 눈금을 그리지 않는다.
  */
 export function RangeBar({ detail }: { detail: VarietyDetail }) {
-  // 견줄 수 없는 품종(평소가 없음 · 품종 · 브랜드 편차)은 예전에 적어 둔 값이 있어도 핀을 꽂지 않는다.
-  const saved = useMyPrice(detail.id)
-  const mine = comparesMyPrice(detail) ? saved : null
-  const { range, usual, band } = detail
+  // 견줄 수 없는 품종(평소가 없음 · 품종 · 브랜드 편차)은 예전에 적어 둔 값이 있어도 핀을 꽂지 않는다(detailPicture가 버린다).
+  const picture = detailPicture(detail, useMyPrice(detail.id))
+  const { band, usualAt, survey, quote, mine } = picture
+  const { range, usual } = detail
   const averageOnly = isAverageBasis(detail.basis) && range.min === range.max
-  const usualBand = usualRange(usual, band)
-  const axis = priceAxis([range.min, range.max, detail.price, ...(usualBand ? [usualBand.low, usualBand.high] : []), ...(mine != null ? [mine] : [])], {
-    pad: 0.08,
-  })
-  const x = (v: number) => axis.at(v) * 100
-  const mineVerdict = mine == null ? null : verdictOf(mine, usual, band)
+  const x = (at: number) => at * 100
 
   return (
     <section aria-label={COPY.rangeTitle(detail.surveyedOn, range.n, detail.basis)} className="flex flex-col gap-2">
@@ -43,31 +37,31 @@ export function RangeBar({ detail }: { detail: VarietyDetail }) {
         {/* 바탕 줄 */}
         <div className="absolute inset-x-0 top-8 h-3 rounded-full bg-hairline" />
         {/* 평소 범위 띠와 평소가 눈금 */}
-        {usualBand && usual != null && (
+        {band && usualAt != null && (
           <>
             <div
               className="absolute top-7 h-5 rounded-md border border-verdict-normal/40 bg-verdict-normal-wash"
-              style={{ left: `${x(usualBand.low)}%`, width: `${x(usualBand.high) - x(usualBand.low)}%` }}
+              style={{ left: `${x(band.from)}%`, width: `${x(band.to) - x(band.from)}%` }}
             />
-            <div className="absolute top-6 h-7 border-l-2 border-dashed border-stone" style={{ left: `${x(usual)}%` }} />
+            <div className="absolute top-6 h-7 border-l-2 border-dashed border-stone" style={{ left: `${x(usualAt)}%` }} />
           </>
         )}
         {/* 조사 범위 */}
         {!averageOnly && (
           <div
             className="absolute top-[34px] h-2 rounded-full bg-stone/45"
-            style={{ left: `${x(range.min)}%`, width: `${x(range.max) - x(range.min)}%` }}
+            style={{ left: `${x(survey.from)}%`, width: `${x(survey.to) - x(survey.from)}%` }}
           />
         )}
         {/* 시세 핀 */}
-        <Pin x={x(detail.price)} className={VERDICT_TONE[detail.verdict.kind].fill} label={COPY.rangePin(won(detail.price), detail.basis)} above />
-        {mine != null && mineVerdict && (
+        <Pin x={x(quote.at)} className={VERDICT_TONE[quote.tone].fill} label={COPY.rangePin(won(detail.price), detail.basis)} above />
+        {mine && (
           <Pin
-            x={x(mine)}
+            x={x(mine.at)}
             ring
-            className={VERDICT_TONE[mineVerdict.kind].border}
-            labelClassName={VERDICT_TONE[mineVerdict.kind].solid}
-            label={COPY.rangeMine(won(mine))}
+            className={VERDICT_TONE[mine.verdict.kind].border}
+            labelClassName={VERDICT_TONE[mine.verdict.kind].solid}
+            label={COPY.rangeMine(won(mine.price))}
           />
         )}
       </div>

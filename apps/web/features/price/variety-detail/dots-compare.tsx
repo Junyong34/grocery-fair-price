@@ -1,11 +1,10 @@
 import { cn } from "@workspace/ui/lib/utils"
 
-import { priceAxis } from "@workspace/price/axis"
 import { MARKET_TYPE_NAME, PRICE_COPY } from "@workspace/price/copy"
+import { dotsPicture } from "@workspace/price/detail-picture"
 import { daysBetween, won } from "@workspace/price/format"
 import { placesByType } from "@workspace/price/places"
 import type { VarietyDetail } from "@workspace/price/types"
-import { usualRange } from "@workspace/price/verdict"
 
 const COPY = PRICE_COPY.detail
 
@@ -49,8 +48,7 @@ export function DotsCompare({ detail }: { detail: VarietyDetail }) {
       })()
 
   const usual = detail.usual
-  const usualBand = usualRange(usual, detail.band)
-  const axis = priceAxis([...groups.flatMap((g) => g.rows.flatMap((r) => r.values)), ...(usualBand ? [usualBand.low, usualBand.high] : [])], { pad: 0.06 })
+  const { axis, band, usualAt } = dotsPicture(detail, groups.flatMap((g) => g.rows.flatMap((r) => r.values)))
   const x = (v: number) => axis.at(v) * 100
 
   return (
@@ -72,13 +70,13 @@ export function DotsCompare({ detail }: { detail: VarietyDetail }) {
                   {row.sub && <small className="ml-1 text-[11px] text-caption">{row.sub}</small>}
                 </span>
                 <span aria-hidden className="relative h-full">
-                  {usualBand && (
+                  {band && (
                     <span
                       className="absolute inset-y-0 bg-verdict-normal-wash"
-                      style={{ left: `${x(usualBand.low)}%`, width: `${x(usualBand.high) - x(usualBand.low)}%` }}
+                      style={{ left: `${band.from * 100}%`, width: `${band.to * 100 - band.from * 100}%` }}
                     />
                   )}
-                  {usual != null && <span className="absolute inset-y-0 border-l border-dashed border-ash" style={{ left: `${x(usual)}%` }} />}
+                  {usualAt != null && <span className="absolute inset-y-0 border-l border-dashed border-ash" style={{ left: `${usualAt * 100}%` }} />}
                   <span className="absolute inset-x-0 top-1/2 border-t border-hairline" />
                   {row.values.map((v, i) => (
                     <span

@@ -2,7 +2,7 @@ import Link from "next/link"
 
 import { PRICE_COPY } from "@workspace/price/copy"
 import type { ProductSummary, VarietyDetail, VarietySummary } from "@workspace/price/types"
-import { comparesMyPrice } from "@workspace/price/verdict"
+import { comparesMyPrice } from "@workspace/price/detail-picture"
 import { explainVerdict } from "@workspace/price/verdict-copy"
 import { findFood } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"

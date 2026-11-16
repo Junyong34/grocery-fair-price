@@ -364,6 +364,7 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `copy.ts` | 화면 문구, 판정 칩 · 차이 문구, 받침에 맞는 조사(`withJosa`) |
 | `verdict-copy.ts` | 판정 풀이 `explainVerdict`: 판정 카드 · 요약 문장 · 검색 설명의 판정 문장을 한 곳에서 |
 | `axis.ts` | 가격 그림(범위 막대 · 점 비교 · 추이 · 장소 막대)이 같이 쓰는 가격 축과 눈금 |
+| `detail-picture.ts` | 시세 상세 그림: `detailPicture(detail, 내가 본 가격)`이 범위 막대와 "내가 본 가격"에 쓸 값(견줄 수 있는가, 내가 본 가격의 판정, 평소 범위 띠를 넣은 축, 띠 · 평소가 · 조사 범위 · 핀의 자리와 색)을 한 번에 낸다. `dotsPicture`는 점 비교의 축과 띠, `comparesMyPrice`는 "견줄 수 있는가" 규칙(평소가 있음, 품종 · 브랜드 편차 없음) |
 
 테스트는 `*.test.ts`가 옆에 있다(vitest).
 
