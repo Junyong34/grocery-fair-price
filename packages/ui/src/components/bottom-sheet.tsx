@@ -40,7 +40,9 @@ function useDragToClose(onClose: () => void) {
   const settle = () => {
     const sheet = sheetRef.current
     if (!sheet) return
-    sheet.style.transition = "translate 220ms cubic-bezier(.2,.8,.2,1)"
+    sheet.style.transition = window.matchMedia("(prefers-reduced-motion: no-preference)").matches
+      ? "translate 220ms cubic-bezier(.2,.8,.2,1)"
+      : "none"
     sheet.style.translate = ""
   }
 

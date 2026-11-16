@@ -8,7 +8,7 @@ export function FoodContentBody({ content }: { content: FoodContent }) {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <p className="text-[15px] leading-7 text-ink">{content.summary}</p>
+        <p className="text-base leading-relaxed text-ink">{content.summary}</p>
         {content.origin && (
           <p className="text-sm text-stone">
             대표 산지 <span className="text-ink">{content.origin}</span>
@@ -30,12 +30,12 @@ export function FoodContentBody({ content }: { content: FoodContent }) {
 }
 
 function Block({ block }: { block: FoodContentBlock }) {
-  if (block.kind === "paragraph") return <p className="text-[15px] leading-7 text-ink">{block.text}</p>
+  if (block.kind === "paragraph") return <p className="text-base leading-relaxed text-ink">{block.text}</p>
   return (
-    <ul className="flex list-disc flex-col gap-1.5 pl-5 text-[15px] leading-7 text-ink marker:text-caption">
+    <ul className="flex list-disc flex-col gap-1.5 ps-5 text-base leading-relaxed text-ink marker:text-caption">
       {block.items.map((item, index) => (
         <li key={index}>
-          {item.label && <strong className="mr-1.5 font-semibold">{item.label}</strong>}
+          {item.label && <strong className="me-1.5 font-semibold">{item.label}</strong>}
           {item.text}
         </li>
       ))}
