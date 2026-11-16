@@ -303,7 +303,8 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 
 | 모듈 | 내용 |
 |---|---|
-| `data/foods.ts` | `Food` 타입, `FOODS`(검증 품종 전체, 가나다순), `foodsInMonth`, `foodsInSeason`, `findFood`, `isDrawn`, `seasonsOf`, 대표 품종 `monthHighlights`·`seasonHighlights`(인쇄물용 고르기는 `print/foods.ts`) |
+| `data/foods.ts` | `Food` 타입, `FOODS`(검증 품종 전체, 가나다순), `foodsInMonth`, `foodsInSeason`, `findFood`, `isDrawn`, `isPeak`, `seasonsOf` |
+| `data/featured-foods.ts` | 대표 품종 고르기 한 곳: 정렬 기준 조각과 쓰는 곳별 차례 `RANKINGS`(이달 판·계절 카드·인쇄물 달 칸·카테고리 달 칸·계절 포스터), `rankFoods`, 화면용 `monthHighlights`·`seasonHighlights`·`foodsInMonthByCategory`, 월별 문구에 나오는 품종 `MONTH_NOTE_FOODS`(문구와 맞는지 테스트가 본다). 인쇄물 칸의 개수·거르기는 `print/foods.ts` |
 | `data/foods.generated.ts` | 생성 파일. 품종 행 (`id`, `name`, `aliases`, `category`, `months`) |
 | `data/drawn-foods.generated.ts` | 생성 파일. 일러스트가 있는 품종 id |
 | `data/food-bounds.generated.ts` | 생성 파일. 그림이 상자 안에서 아래로 어디까지 그려지는지 (이름표 위치) |

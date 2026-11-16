@@ -39,7 +39,7 @@ export const MONTH_CATEGORY_COPY = {
     `${month}월에 제철인 ${CATEGORY_WORDS[category].topic} ${names.join("·")}${n > names.length ? ` 등 ${n}가지예요.` : ` ${n}가지예요.`}`,
 } as const
 
-/** 달마다 한 줄 문구(2a 월 섹션, 2b 제목). */
+/** 달마다 한 줄 문구(2a 월 섹션, 2b 제목). 문구에 나오는 품종은 featured-foods.ts의 MONTH_NOTE_FOODS에 함께 적는다. */
 export const MONTH_NOTES: Record<Month, string> = {
   1: "굴 넣고 떡국 끓여 차리는 새해 첫 밥상",
   2: "봄동 한 포기 무쳐 놓고 기다리는 봄",

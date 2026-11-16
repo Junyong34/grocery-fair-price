@@ -1,11 +1,8 @@
 import { ViewTransition } from "react"
 
 import { SEASON_COPY } from "@workspace/seasonal/data/copy"
-import {
-  foodsInSeason,
-  seasonHighlights,
-  type Food,
-} from "@workspace/seasonal/data/foods"
+import { foodsInSeason, type Food } from "@workspace/seasonal/data/foods"
+import { seasonHighlights } from "@workspace/seasonal/data/featured-foods"
 import { SEASON_MONTHS, type Season } from "@workspace/seasonal/data/seasons"
 import { cn } from "@workspace/ui/lib/utils"
 

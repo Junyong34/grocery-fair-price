@@ -1,10 +1,8 @@
 import Link from "next/link"
 
 import { MONTH_CATEGORY_COPY, MONTH_NOTES } from "@workspace/seasonal/data/copy"
-import {
-  foodsInMonth,
-  foodsInMonthByCategory,
-} from "@workspace/seasonal/data/foods"
+import { foodsInMonth } from "@workspace/seasonal/data/foods"
+import { foodsInMonthByCategory } from "@workspace/seasonal/data/featured-foods"
 import type { Month } from "@workspace/seasonal/data/months"
 import { Button } from "@workspace/ui/components/button"
 

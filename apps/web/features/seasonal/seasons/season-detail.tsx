@@ -3,11 +3,8 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 import { ViewTransition } from "react"
 
 import { MONTH_NOTES, SEASON_COPY } from "@workspace/seasonal/data/copy"
-import {
-  foodsInMonth,
-  foodsInSeason,
-  seasonHighlights,
-} from "@workspace/seasonal/data/foods"
+import { foodsInMonth, foodsInSeason } from "@workspace/seasonal/data/foods"
+import { seasonHighlights } from "@workspace/seasonal/data/featured-foods"
 import type { Month } from "@workspace/seasonal/data/months"
 import {
   SEASONS,

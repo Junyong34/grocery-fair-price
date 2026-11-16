@@ -1,8 +1,9 @@
 import { monthCalendar } from "../calendar/month-calendar"
-import { bestMonth, familiarity } from "../data/food-familiarity"
-import { FOODS, isDrawn, isPeak, type Food, type FoodCategory } from "../data/foods"
+import { RANKINGS, rankFoods } from "../data/featured-foods"
+import { bestMonth } from "../data/food-familiarity"
+import { FOODS, isDrawn, type Food, type FoodCategory } from "../data/foods"
 import { MONTHS, orderSeasonMonths } from "../data/months"
-import { seasonOfMonth, startSeason, type Season } from "../data/seasons"
+import { startSeason, type Season } from "../data/seasons"
 import { foodsPerCell } from "./layouts"
 import type { MonthlySpec, MonthPosterSpec, SeasonPosterSpec, YearSheetSpec } from "./spec"
 
@@ -36,41 +37,17 @@ const categoriesOf = (spec: object): readonly FoodCategory[] => ("categories" in
 const pickable = ({ categories, drawnOnly }: Pick) => (food: Food) =>
   (!drawnOnly || isDrawn(food.id)) && (categories.length === 0 || categories.includes(food.category))
 
-/**
- * 친숙한 품종(familiarity)부터, 같은 등급이면 칸의 주제(달·계절)에 대표 달이 걸리는 정도가 큰 품종, 처음부터 검증한 품종(core), 더 특별한(제철이 짧은) 품종, 이름순.
- * 친숙도가 대표 달보다 먼저라, 대표 달인 낯선 품종이 제철인 흔한 품종을 밀어내지 않는다(.scratch/food-familiarity/spec.md).
- */
-const byFocus = (focus: (food: Food) => number) => (a: Food, b: Food) =>
-  familiarity(a.id) - familiarity(b.id) ||
-  focus(b) - focus(a) ||
-  Number(b.core) - Number(a.core) ||
-  a.months.length - b.months.length ||
-  a.name.localeCompare(b.name, "ko")
-
-const byMonth = (month: number) => byFocus((food) => Number(isPeak(food, month)))
-
-/**
- * 카테고리를 고른 인쇄물(과일·해산물 연간 달력, 카테고리를 고른 월별 포스터)의 달 칸 차례.
- * 1·2등급은 byMonth처럼 먼저 넣고, 3~5등급끼리는 대표 달인 품종을 먼저 넣는다.
- * 한 카테고리만 모으면 칸이 적어, 친숙도만으로 고르면 대표 달이 아닌 3등급(5월 애플망고)이 대표 달인 4등급(5월 카라향)을 밀어냈다.
- */
-const byCategoryMonth = (month: number) => (a: Food, b: Food) =>
-  Math.min(familiarity(a.id), 3) - Math.min(familiarity(b.id), 3) ||
-  Number(isPeak(b, month)) - Number(isPeak(a, month)) ||
-  byMonth(month)(a, b)
-
 function inMonth(month: number, pick: Pick): readonly Food[] {
-  return FOODS.filter((food) => (food.months as readonly number[]).includes(month) && pickable(pick)(food))
-    .sort(pick.categories.length > 0 ? byCategoryMonth(month) : byMonth(month))
-    .slice(0, pick.max)
+  return rankFoods(
+    FOODS.filter((food) => (food.months as readonly number[]).includes(month) && pickable(pick)(food)),
+    pick.categories.length > 0 ? RANKINGS.printCategoryMonth(month) : RANKINGS.printMonth(month),
+  ).slice(0, pick.max)
 }
 
-/** 품종마다 최적 달(bestMonth) 한 곳에만 놓아 한 해에 한 번 나오고, 달마다 byMonth로 max개까지 고른다. 넘치는 품종은 싣지 않는다. */
+/** 품종마다 최적 달(bestMonth) 한 곳에만 놓아 한 해에 한 번 나오고, 달마다 RANKINGS.printMonth로 max개까지 고른다. 넘치는 품종은 싣지 않는다. */
 function byBestMonth(pick: Pick): readonly (readonly Food[])[] {
   return MONTHS.map((month) =>
-    FOODS.filter((food) => bestMonth(food) === month && pickable(pick)(food))
-      .sort(byMonth(month))
-      .slice(0, pick.max),
+    rankFoods(FOODS.filter((food) => bestMonth(food) === month && pickable(pick)(food)), RANKINGS.printMonth(month)).slice(0, pick.max),
   )
 }
 
@@ -127,16 +104,14 @@ export function chartFoods(spec: YearSheetSpec | MonthlySpec | MonthPosterSpec):
 }
 
 /**
- * 계절 포스터의 계절 하나. 그 계절에 대표 달(peak)이 시작하는 품종을 고른다. 많으면 byFocus 차례(친숙도, 그 계절에 대표 달이 많은 것)로 max개를 고르고,
+ * 계절 포스터의 계절 하나. 그 계절에 대표 달(peak)이 시작하는 품종을 고른다. 많으면 RANKINGS.printSeason 차례(친숙도, 그 계절에 대표 달이 많은 것)로 max개를 고르고,
  * 놓는 차례는 시작 달 순서, 같으면 이름순이다. 대표 달로 나누므로 시장 범위가 넓어도 한 품종은 한 계절에만 나온다.
  */
 export function seasonPictures(spec: SeasonPosterSpec, season: Season): readonly Food[] {
   const pick: Pick = { max: spec.foods.max, categories: spec.categories, drawnOnly: true }
   const start = (food: Food) => orderSeasonMonths(food.peak)[0]!
   const order = (month: number) => (month - (season === "winter" ? 12 : 0) + 12) % 12
-  const peaksIn = (food: Food) => food.peak.filter((month) => seasonOfMonth(month) === season).length
-  return FOODS.filter((food) => startSeason(food.peak) === season && pickable(pick)(food))
-    .sort(byFocus(peaksIn))
+  return rankFoods(FOODS.filter((food) => startSeason(food.peak) === season && pickable(pick)(food)), RANKINGS.printSeason(season))
     .slice(0, pick.max)
     .sort((a, b) => order(start(a)) - order(start(b)) || a.name.localeCompare(b.name, "ko"))
 }

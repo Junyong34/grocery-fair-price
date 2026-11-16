@@ -1,4 +1,4 @@
-import { foodsInMonthByCategory } from "@workspace/seasonal/data/foods"
+import { foodsInMonthByCategory } from "@workspace/seasonal/data/featured-foods"
 import type { MONTHLY_INGREDIENT_CATEGORIES } from "@workspace/seasonal/data/ingredient-calendar"
 import { formatSeasonMonths, type Month } from "@workspace/seasonal/data/months"
 

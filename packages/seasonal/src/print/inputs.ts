@@ -7,6 +7,7 @@
 import * as holidays from "../calendar/holidays"
 import * as copy from "../data/copy"
 import * as drawnFoods from "../data/drawn-foods.generated"
+import * as featuredFoods from "../data/featured-foods"
 import * as familiarity from "../data/food-familiarity"
 import * as foodSizes from "../data/food-sizes"
 import * as foods from "../data/foods"
@@ -22,6 +23,7 @@ import { stableHash, type PrintKind, type PrintSpec } from "./spec"
 const MODULES = {
   "data/copy": copy,
   "data/drawn-foods.generated": drawnFoods,
+  "data/featured-foods": featuredFoods,
   "data/food-familiarity": familiarity,
   "data/food-sizes": foodSizes,
   "data/foods": foods,
@@ -41,6 +43,7 @@ export type PrintDataModule = keyof typeof MODULES | typeof HOLIDAYS
 const SEASONAL: readonly PrintDataModule[] = [
   HOLIDAYS,
   "data/drawn-foods.generated",
+  "data/featured-foods",
   "data/food-familiarity",
   "data/food-sizes",
   "data/foods",

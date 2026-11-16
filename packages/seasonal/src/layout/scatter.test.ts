@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { monthHighlights } from "../data/foods"
+import { monthHighlights } from "../data/featured-foods"
 import { labelHeight, labelWidth, SCATTER_FRAMES, SCATTER_MAX_FOODS, scatterLayout, type ScatterFrame } from "./scatter"
 
 const ids = (n: number) => Array.from({ length: n }, (_, i) => `food-${i}`)

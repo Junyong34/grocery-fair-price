@@ -46,69 +46,7 @@ export function seasonsOf(food: Food): readonly Season[] {
   return SEASONS.filter((season) => food.months.some((month) => SEASON_MONTHS[season].includes(month)))
 }
 
-// 대표 품종 고르기 규칙은 쓰는 곳마다 조금씩 다르다. 화면·검색 설명용은 여기, 인쇄물용(그림 있는 품종만)은 print/foods.ts에 있다.
+// 대표 품종 고르기(이달 판, 계절 카드, 검색 설명, 인쇄물 칸)는 featured-foods.ts에 모았다.
 
 /** 그 달이 품종의 대표 달(peak)인지. months는 시장에 많이 나오는 범위이고, peak는 그 안에서 조사가 대표로 고른 달이다. */
 export const isPeak = (food: Food, month: number): boolean => (food.peak as readonly number[]).includes(month)
-
-// MONTH_NOTES에 등장하는 품종. 문구와 그림이 어긋나지 않게 대표 품종 안에 먼저 넣는다.
-// 제철 범위는 foodsInMonth를 그대로 따르며, 문구를 바꿀 때 이 목록도 함께 맞춘다.
-const MONTH_NOTE_FOODS: Partial<Record<number, readonly FoodId[]>> = {
-  1: ["oyster"],
-  2: ["bomdong"],
-  3: ["shepherds-purse", "wild-chive"],
-  4: ["aralia-shoot"],
-  5: ["green-pea"],
-  6: ["green-plum", "potato"],
-  7: ["young-radish", "watermelon"],
-  8: ["peach"],
-  10: ["chestnut", "sweet-potato"],
-  11: ["napa-cabbage", "radish"],
-  12: ["mandarin"],
-}
-
-/**
- * 그 달을 대표하는 품종(2a 흩뿌리기 판, 검색 설명). 월별 문구에 등장하는 품종, 그림이 있는 것, 그 달이 대표 달인 것, 처음부터 검증한 품종(core), 그 달에만 가까운(제철 달이 적은) 것, 이름 순.
- * 그 달 제철 품종이 많아(최대 92) 판에는 앞에서 몇 개만 그리고 나머지는 이름 목록으로 둔다.
- */
-export function monthHighlights(month: number, count: number): readonly Food[] {
-  const mentioned = new Set<FoodId>(MONTH_NOTE_FOODS[month] ?? [])
-  return [...foodsInMonth(month)]
-    .sort(
-      (a, b) =>
-        Number(mentioned.has(b.id)) - Number(mentioned.has(a.id)) ||
-        Number(isDrawn(b.id)) - Number(isDrawn(a.id)) ||
-        Number(isPeak(b, month)) - Number(isPeak(a, month)) ||
-        Number(b.core) - Number(a.core) ||
-        a.months.length - b.months.length ||
-        a.name.localeCompare(b.name, "ko"),
-    )
-    .slice(0, count)
-}
-
-/**
- * 계절 대표 품종(3a 계절 카드). 카드에 크게 그리므로 그림이 있는 품종을 먼저, 그 안에서는 그 계절에 대표 달(peak)이 많은 품종, 제철인 달이 많은 품종부터 고른다.
- * 그림이 모자라면 그림 없는 품종으로 채운다. 그림 목록이 늘면 결과도 바뀐다.
- */
-export function seasonHighlights(season: Season, count: number): readonly Food[] {
-  const monthsIn = (months: readonly number[]) => months.filter((month) => SEASON_MONTHS[season].includes(month)).length
-  return [...foodsInSeason(season)]
-    .sort((a, b) => Number(isDrawn(b.id)) - Number(isDrawn(a.id)) || monthsIn(b.peak) - monthsIn(a.peak) || monthsIn(b.months) - monthsIn(a.months))
-    .slice(0, count)
-}
-
-/** 월별 화면(2b)에서 카테고리를 늘어놓는 순서. 장보기 동선(채소·과일 → 수산 → 나머지). */
-export const MONTH_CATEGORY_ORDER = ["채소", "과일", "수산", "버섯", "곡물·견과"] as const satisfies readonly FoodCategory[]
-
-/**
- * 그 달 품종을 카테고리별로 묶는다(2b 월별 화면의 소제목, "11월 제철 생선" 같은 검색에 답하는 묶음).
- * 묶음 안은 monthHighlights 순서(그 달 문구에 나온 품종 · 그림 있는 품종 · 절정 순)라 대표 품종이 앞에 온다.
- */
-export function foodsInMonthByCategory(month: number): { category: FoodCategory; foods: readonly Food[] }[] {
-  const ordered = monthHighlights(month, foodsInMonth(month).length)
-  const order: readonly FoodCategory[] = MONTH_CATEGORY_ORDER
-  const rest = [...new Set(ordered.map((food) => food.category))].filter((category) => !order.includes(category))
-  return [...order, ...rest]
-    .map((category) => ({ category, foods: ordered.filter((food) => food.category === category) }))
-    .filter((group) => group.foods.length > 0)
-}
