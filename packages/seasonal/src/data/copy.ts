@@ -41,7 +41,7 @@ export const MONTH_CATEGORY_COPY = {
 
 /** 달마다 한 줄 문구(2a 월 섹션, 2b 제목). */
 export const MONTH_NOTES: Record<Month, string> = {
-  1: "무를 푹 끓여 차리는 새해 첫 밥상",
+  1: "굴 넣고 떡국 끓여 차리는 새해 첫 밥상",
   2: "봄동 한 포기 무쳐 놓고 기다리는 봄",
   3: "냉이와 달래를 다듬는 손끝에 봄 향기",
   4: "살짝 데친 두릅을 나눠 먹는 봄날",

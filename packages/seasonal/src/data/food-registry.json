@@ -533,12 +533,16 @@
     "name": "블루베리",
     "aliases": [],
     "category": "과일",
-    "months": [6, 7, 8, 9],
+    "months": [6, 7, 8],
     "peak": [6, 7],
     "season": "verified",
     "basis": "survey",
     "evidence": {
-      "sources": [],
+      "sources": [
+        "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219953&menuNo=300063"
+      ],
+      "checkedAt": "2026-11-16",
+      "reason": "사용자 판단(2026-11-16): 제철 6~8월. 국내산 출하가 몰리는 여름 석 달로 두고 정보누리의 9월은 뺀다.",
       "market": "정보누리 생산시기 7월~9월"
     }
   },
@@ -2928,16 +2932,17 @@
     "name": "무",
     "aliases": [],
     "category": "채소",
-    "months": [1, 2, 3, 10, 11, 12],
+    "months": [10, 11, 12],
     "peak": [10, 11],
     "season": "verified",
     "basis": "survey",
     "evidence": {
       "sources": [
-        "https://jasdc.or.kr/info/intro/crops.htm"
+        "https://www.foodnuri.go.kr/portal/bbs/B0000283/view.do?nttId=219879&menuNo=300063",
+        "https://www.nongsaro.go.kr/portal/ps/psb/psbl/workScheduleDtl.ps?menuId=PS00087&cntntsNo=30614"
       ],
-      "checkedAt": "2026-11-02",
-      "reason": "기존 가을무에 제주 월동무의 12월 상순~3월 하순 수확기를 합친다. 수확 기간을 최성기로 단정하지 않고 기존 대표 달은 유지한다.",
+      "checkedAt": "2026-11-16",
+      "reason": "사용자 판단(2026-11-16): 제철은 가을무·겨울무가 나는 10~12월. 정보누리 10~11월, 농사로 가을무 수확 9월 상순~12월 중순에 맞고 1~3월(제주 월동무)은 뺀다.",
       "market": "정보누리 생산시기 10월~11월"
     }
   },

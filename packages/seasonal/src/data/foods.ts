@@ -54,7 +54,7 @@ export const isPeak = (food: Food, month: number): boolean => (food.peak as read
 // MONTH_NOTES에 등장하는 품종. 문구와 그림이 어긋나지 않게 대표 품종 안에 먼저 넣는다.
 // 제철 범위는 foodsInMonth를 그대로 따르며, 문구를 바꿀 때 이 목록도 함께 맞춘다.
 const MONTH_NOTE_FOODS: Partial<Record<number, readonly FoodId[]>> = {
-  1: ["radish"],
+  1: ["oyster"],
   2: ["bomdong"],
   3: ["shepherds-purse", "wild-chive"],
   4: ["aralia-shoot"],
