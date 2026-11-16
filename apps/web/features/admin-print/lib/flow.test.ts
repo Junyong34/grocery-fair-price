@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import type { BuildRecord, Edition } from "@workspace/seasonal/print/edition"
-import { foodDataHash } from "@workspace/seasonal/print/edition"
+import { printDataHash } from "@workspace/seasonal/print/inputs"
 import { DEFAULT_SPECS, specHash, type PrintSpec } from "@workspace/seasonal/print/spec"
 
 import { editionDraft, editionFlow, stepNotes } from "./flow"
@@ -35,10 +35,10 @@ describe("editionFlow", () => {
     expect(flow.hint).toContain("옵션")
   })
 
-  it("품종 데이터가 바뀌어 옛 PDF가 되면 데이터 때문이라고 안내한다", () => {
-    const flow = editionFlow({ ...base, build: "stale", staleBy: "foods" })
+  it("그리는 데이터가 바뀌어 옛 PDF가 되면 데이터 때문이라고 안내한다", () => {
+    const flow = editionFlow({ ...base, build: "stale", staleBy: "data" })
     expect(flow.phase).toBe("outdated")
-    expect(flow.hint).toContain("품종 데이터")
+    expect(flow.hint).toContain("데이터(품종·그림·공휴일·문구 등)")
     expect(flow.hint).not.toContain("옵션")
   })
 
@@ -57,7 +57,7 @@ describe("editionFlow", () => {
 })
 
 const edition: Edition = { id: "monthly-1", title: "2027 달력", description: "", status: "draft", spec: DEFAULT_SPECS.monthly }
-const buildOf = (spec: PrintSpec): BuildRecord => ({ specHash: specHash(spec), foodHash: foodDataHash(), generatedAt: "2026-10-20T00:00:00.000Z", bytes: {}, thumbnails: [] })
+const buildOf = (spec: PrintSpec): BuildRecord => ({ specHash: specHash(spec), dataHash: printDataHash(spec), generatedAt: "2026-10-20T00:00:00.000Z", bytes: {}, thumbnails: [] })
 
 describe("editionDraft", () => {
   it("편집본이 저장본과 같으면 바뀐 게 없다", () => {
@@ -93,7 +93,7 @@ describe("editionDraft", () => {
   it("옛 PDF가 된 이유를 함께 돌려준다", () => {
     const old = { ...edition.spec, cover: "none" as const }
     expect(editionDraft({ saved: edition, draft: edition, build: buildOf(old) }).staleBy).toBe("options")
-    expect(editionDraft({ saved: edition, draft: edition, build: { ...buildOf(edition.spec), foodHash: "00000000" } }).staleBy).toBe("foods")
+    expect(editionDraft({ saved: edition, draft: edition, build: { ...buildOf(edition.spec), dataHash: "00000000" } }).staleBy).toBe("data")
     expect(editionDraft({ saved: edition, draft: edition, build: buildOf(edition.spec) }).staleBy).toBeUndefined()
   })
 })
@@ -108,8 +108,8 @@ describe("stepNotes", () => {
     expect(stepNotes(editionFlow({ ...base, dirty: true }), { generating: false })).toEqual({ save: "저장 안 됨", pdf: "먼저 저장하세요" })
   })
 
-  it("옛 PDF면 옵션 때문인지 품종 데이터 때문인지 쓴다", () => {
+  it("옛 PDF면 옵션 때문인지 데이터 때문인지 쓴다", () => {
     expect(stepNotes(editionFlow({ ...base, build: "stale", staleBy: "options" }), { generating: false }).pdf).toBe("옛 옵션으로 만든 PDF예요")
-    expect(stepNotes(editionFlow({ ...base, build: "stale", staleBy: "foods" }), { generating: false }).pdf).toBe("옛 품종 데이터로 만든 PDF예요")
+    expect(stepNotes(editionFlow({ ...base, build: "stale", staleBy: "data" }), { generating: false }).pdf).toBe("옛 데이터로 만든 PDF예요")
   })
 })

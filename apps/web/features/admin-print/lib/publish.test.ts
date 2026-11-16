@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest"
 
 import type { BuildRecord, Edition, EditionStatus } from "@workspace/seasonal/print/edition"
-import { foodDataHash } from "@workspace/seasonal/print/edition"
+import { printDataHash } from "@workspace/seasonal/print/inputs"
 import { DEFAULT_SPECS, specHash } from "@workspace/seasonal/print/spec"
 
 import { savePlan } from "./publish"
 
 const spec = DEFAULT_SPECS.monthly
 const edition = (status: EditionStatus, year = spec.year): Edition => ({ id: "monthly-1", title: "t", description: "d", status, spec: { ...spec, year } })
-const build: BuildRecord = { specHash: specHash(spec), foodHash: foodDataHash(), generatedAt: "2026-10-30T00:00:00.000Z", bytes: {}, thumbnails: [] }
+const build: BuildRecord = { specHash: specHash(spec), dataHash: printDataHash(spec), generatedAt: "2026-10-30T00:00:00.000Z", bytes: {}, thumbnails: [] }
 const ready = { build, storageReady: true }
 
 describe("savePlan", () => {
@@ -19,7 +19,7 @@ describe("savePlan", () => {
 
   it("처음 공개할 때 PDF가 없거나 옛 옵션으로 만든 것이면 막는다", () => {
     expect(savePlan(edition("draft"), edition("published"), { ...ready, build: undefined })).toEqual({ error: "PDF를 만든 뒤 공개하세요." })
-    expect(savePlan(edition("draft"), edition("published", 2030), ready)).toEqual({ error: "지금 옵션과 품종 데이터로 PDF를 다시 만든 뒤 공개하세요." })
+    expect(savePlan(edition("draft"), edition("published", 2030), ready)).toEqual({ error: "지금 옵션과 데이터로 PDF를 다시 만든 뒤 공개하세요." })
   })
 
   it("공개 중인 에디션은 옵션 · 설명을 바꿔도 저장만 한다(다시 만들 때 올린다)", () => {

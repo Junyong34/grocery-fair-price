@@ -12,7 +12,7 @@ import { formatBuildTime } from "../lib/format"
 
 const STALE_LABEL: Record<StaleReason, { badge: string; note: string }> = {
   options: { badge: "옛 옵션", note: "이전 옵션으로 만든 파일이고" },
-  foods: { badge: "옛 데이터", note: "바뀌기 전 품종 데이터로 만든 파일이고" },
+  data: { badge: "옛 데이터", note: "바뀌기 전 데이터로 만든 파일이고" },
 }
 
 /** staleBy가 있으면 옛 PDF다. 이유에 따라 배지와 설명을 고른다. */

@@ -1,8 +1,6 @@
 import { z } from "zod"
 
-import { DRAWN_FOOD_IDS } from "../data/drawn-foods.generated"
-import { FAMILIARITY_1, FAMILIARITY_2, FAMILIARITY_4, FAMILIARITY_5 } from "../data/food-familiarity"
-import { FOODS } from "../data/foods"
+import { printDataHash } from "./inputs"
 import { pageCount, parsePrintSpec, PUBLISHED_PAPERS, specHash, stableHash, type Orientation, type Paper, type PrintKind, type PrintSpec, type PublishedPaper } from "./spec"
 
 // 에디션: 이름이 붙은 인쇄 사양 하나. 원본은 apps/web/print-editions/<id>.json(git), 결과 PDF·썸네일은 public/downloads/<id>/.
@@ -108,36 +106,21 @@ export type DownloadManifest = { editions: ManifestEntry[]; withdrawn: Withdrawn
 
 /**
  * 생성 기록. 생성기가 에디션마다 남긴다. bytes 키는 downloadPath다.
- * foodHash는 만들 때의 제철 품종 데이터 해시다(foodDataHash). 이 필드가 생기기 전 기록에는 없다.
+ * dataHash는 만들 때 인쇄물이 그린 데이터의 해시다(printDataHash, print/inputs.ts). 이 필드가 생기기 전 기록에는 없다(옛 foodHash는 읽지 않는다).
  */
-export type BuildRecord = { specHash: string; foodHash?: string; generatedAt: string; bytes: Record<string, number>; thumbnails: Thumbnail[] }
+export type BuildRecord = { specHash: string; dataHash?: string; generatedAt: string; bytes: Record<string, number>; thumbnails: Thumbnail[] }
 
-/**
- * 제철 인쇄물이 그리는 품종 데이터의 해시. 품종(제철 달·대표 달·이름), 친숙도 등급, 그림 유무가 바뀌면 달라진다.
- * 사양이 같아도 이 값이 바뀌면 이미 만든 PDF에는 옛 달력이 남아 있다.
- */
-export function foodDataHash(): string {
-  return stableHash({
-    foods: FOODS,
-    familiarity: [FAMILIARITY_1, FAMILIARITY_2, [...FAMILIARITY_4].sort(), [...FAMILIARITY_5].sort()],
-    drawn: [...DRAWN_FOOD_IDS].sort(),
-  })
-}
-
-/** 이유식 인쇄물은 제철 품종 데이터를 그리지 않는다. */
-const usesFoodData = (spec: PrintSpec) => spec.kind !== "baby-food-pairings" && spec.kind !== "baby-food-fruits"
-
-/** 만든 PDF가 옛것이 된 이유. options: 저장한 옵션(사양)이 바뀌었다. foods: 사양은 같고 제철 품종 데이터가 바뀌었다. */
-export type StaleReason = "options" | "foods"
+/** 만든 PDF가 옛것이 된 이유. options: 저장한 옵션(사양)이 바뀌었다. data: 사양은 같고 인쇄물이 그리는 데이터(품종·그림·공휴일·문구 등)가 바뀌었다. */
+export type StaleReason = "options" | "data"
 
 /** 생성 기록이 옛것이면 그 이유, 지금 것이면 null. 사양과 데이터가 함께 바뀌었으면 옵션을 먼저 알린다. */
 export function buildStaleReason(spec: PrintSpec, build: BuildRecord): StaleReason | null {
   if (build.specHash !== specHash(spec)) return "options"
-  if (usesFoodData(spec) && build.foodHash !== foodDataHash()) return "foods"
+  if (build.dataHash !== printDataHash(spec)) return "data"
   return null
 }
 
-/** 이 생성 기록이 지금 사양과 지금 품종 데이터로 만든 것인가. 없거나, 사양이 바뀌었거나, 제철 인쇄물의 품종 데이터가 바뀌었으면 false. */
+/** 이 생성 기록이 지금 사양과 지금 데이터로 만든 것인가. 없거나, 사양이 바뀌었거나, 그리는 데이터가 바뀌었으면 false. */
 export function isBuildCurrent(spec: PrintSpec, build: BuildRecord | undefined): build is BuildRecord {
   return build !== undefined && buildStaleReason(spec, build) === null
 }

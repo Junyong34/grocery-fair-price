@@ -331,7 +331,8 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `search/match-pairings.ts` | 이유식 궁합표 검색: 기준 재료(이름·별칭·초성)와, 표는 없지만 O·X 목록에 있는 재료가 적힌 표(`mentions`) |
 | `print/layouts.ts` | 인쇄물 구성(layout) 정의 한 곳: 종류별 구성 값(`LAYOUTS`)과 값마다 이름 · 와이어프레임 안 코드 · 세로 전용 · 품종 판 크기 상한 · 읽지 않는 옵션(`LAYOUT_DEFS`), `layoutReads`, `foodsPerCell`. 스키마 · 어드민 편집 폼 · 품종 고르기가 여기서 읽는다. 새 구성은 이 파일과 종류별 화면에 더한다 |
 | `print/spec.ts` | 인쇄 사양 `PrintSpec`(종류별 유니언, zod 파서), `PAPERS`, `sheetSize`(방향 반영 용지 mm), `pageCount`(결과 PDF 쪽 수, 사양·용지마다 파일 하나), 종류별 기본값, URL 인코딩, 해시 |
-| `print/edition.ts` | 에디션, 다운로드 경로, 매니페스트 |
+| `print/edition.ts` | 에디션, 다운로드 경로, 매니페스트, 만든 PDF가 옛것인지(`buildStaleReason`: 옵션 또는 데이터) |
+| `print/inputs.ts` | 인쇄물 종류마다 렌더러가 읽는 데이터 모듈(`PRINT_DATA_MODULES`)과 그 해시 `printDataHash`. 생성 기록의 `dataHash`가 된다. 렌더러가 새 데이터 모듈을 읽으면 `apps/web/features/print/print-inputs.test.ts`가 빠진 모듈을 알려 준다 |
 | `print/foods.ts` | 인쇄물 칸(달·계절)에 넣을 품종 고르기 |
 | `print/spec-codec.ts`, `listing.ts`, `month-label.ts`, `period-chart.ts`, `wheel.ts` | 인쇄 사양 URL 코덱(번들에서 zod를 빼려고 분리), 내려받기 화면의 종류별 줄 · 연도 규칙, 인쇄물 달 표기, 제철 막대표 배치, 원형 판 배치 |
 | `data/infant-pairings.ts`, `data/infant-fruits.ts` | 이유식 궁합 데이터(역참조 · 색인 함수 포함), 월령별 과일 시기 · 주의 식재료 |
