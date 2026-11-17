@@ -14,8 +14,10 @@ import {
 
 // cojeev Drawer는 화면 아래에 떠 있는 어두운 트레이다. 와이어프레임의 하단 시트
 // (크림 바탕, 위쪽만 둥근 모서리, 손잡이)로 쓰도록 위치와 색만 덮어쓴다.
+// drawer.css는 시트 전체를 스크롤시켜 손잡이·제목 줄이 같이 밀려 올라간다. 시트는 세로 flex로 두고 본문만 스크롤한다.
+// drawer.css는 utilities보다 뒤 레이어(cojeev-states)라 display·overflow는 !로 덮어쓴다.
 const sheetClass =
-  "outline-none [left:0] [right:0] [bottom:0] [max-height:88dvh] [border-radius:var(--r-sheet)_var(--r-sheet)_0_0] [background:var(--color-canvas)] [color:var(--color-ink)] [padding:var(--s-3)_var(--s-5)_calc(var(--s-6)_+_env(safe-area-inset-bottom))]"
+  "outline-none [display:flex]! [flex-direction:column] [overflow:hidden]! [left:0] [right:0] [bottom:0] [max-height:88dvh] [border-radius:var(--r-sheet)_var(--r-sheet)_0_0] [background:var(--color-canvas)] [color:var(--color-ink)] [padding:var(--s-3)_var(--s-5)_calc(var(--s-6)_+_env(safe-area-inset-bottom))]"
 
 /** 이만큼(px) 끌어내리거나, 이보다 빠르게(px/ms) 튕겨 내리면 닫는다. */
 const CLOSE_DISTANCE = 96
@@ -40,7 +42,9 @@ function useDragToClose(onClose: () => void) {
   const settle = () => {
     const sheet = sheetRef.current
     if (!sheet) return
-    sheet.style.transition = "translate 220ms cubic-bezier(.2,.8,.2,1)"
+    sheet.style.transition = window.matchMedia("(prefers-reduced-motion: no-preference)").matches
+      ? "translate 220ms cubic-bezier(.2,.8,.2,1)"
+      : "none"
     sheet.style.translate = ""
   }
 
@@ -128,7 +132,7 @@ export function BottomSheet({
         {/* 손잡이·제목 줄: 아래로 끌어 닫는다(touch-none: 끄는 동안 페이지가 스크롤되지 않게). */}
         <div
           {...handlers}
-          className="-mx-5 -mt-3 cursor-grab touch-none px-5 pt-3 select-none active:cursor-grabbing"
+          className="-mx-5 -mt-3 shrink-0 cursor-grab touch-none px-5 pt-3 select-none active:cursor-grabbing"
         >
           <div
             aria-hidden="true"
@@ -147,8 +151,11 @@ export function BottomSheet({
             )}
           </DrawerHeader>
         </div>
-        {children}
-        {footer && <DrawerFooter>{footer}</DrawerFooter>}
+        {/* 본문만 스크롤한다. 손잡이·제목 줄과 footer는 제자리에 남는다. */}
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          {children}
+        </div>
+        {footer && <DrawerFooter className="shrink-0">{footer}</DrawerFooter>}
       </DrawerContent>
     </Drawer>
   )

@@ -1,3 +1,4 @@
+import { ChevronRight } from "lucide-react"
 import Link from "next/link"
 
 import { INFANT_PAIRING_COPY, UI_COPY } from "@workspace/seasonal/data/copy"
@@ -145,7 +146,7 @@ export function FoodDetail({
             <span className="text-sm font-semibold">{UI_COPY.priceHubLink}</span>
             <span className="text-xs text-caption">{UI_COPY.priceUnavailable(food.name)}</span>
           </span>
-          <span aria-hidden className="text-stone">›</span>
+          <ChevronRight aria-hidden size={16} className="shrink-0 text-stone rtl:rotate-180" />
         </Link>
       )}
 
@@ -156,7 +157,7 @@ export function FoodDetail({
           className="flex items-center justify-between gap-3 rounded-md border border-hairline px-4 py-3 text-sm font-semibold text-ink no-underline hover:text-ink"
         >
           {INFANT_PAIRING_COPY.foodLink}
-          <span aria-hidden className="text-stone">›</span>
+          <ChevronRight aria-hidden size={16} className="shrink-0 text-stone rtl:rotate-180" />
         </Link>
       )}
 

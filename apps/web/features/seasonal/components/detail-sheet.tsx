@@ -75,7 +75,7 @@ export function DetailSheet({ title, action = <ShareButton />, children }: { tit
         </div>
       }
     >
-      <div className="overflow-y-auto pb-4">{children}</div>
+      <div className="pb-4">{children}</div>
     </BottomSheet>
   )
 }
