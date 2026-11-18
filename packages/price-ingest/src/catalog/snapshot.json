@@ -168,6 +168,11 @@
       "category": "fruit"
     },
     {
+      "slug": "strawberry",
+      "name": "딸기",
+      "category": "fruit"
+    },
+    {
       "slug": "beef",
       "name": "소고기",
       "category": "meat"
@@ -3813,6 +3818,24 @@
           "name": "기본",
           "kamis": [
             "652-00-30"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "strawberry",
+      "name": "딸기",
+      "item": "strawberry",
+      "unit": "100g",
+      "seasonal": [
+        "strawberry"
+      ],
+      "specs": [
+        {
+          "slug": "top",
+          "name": "상품",
+          "kamis": [
+            "226-00-04"
           ]
         }
       ]

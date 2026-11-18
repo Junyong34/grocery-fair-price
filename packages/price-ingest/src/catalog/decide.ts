@@ -124,8 +124,10 @@ async function decideIn(tx: Tx, request: DecisionRequest): Promise<Omit<Decision
 
 // dry-run에서 결과를 들고 트랜잭션을 빠져나오는 표시. 던져서 되돌리고, 잡아서 결과를 돌려준다
 class RolledBack extends Error {
-  constructor(readonly result: Omit<Decision, "snapshot" | "dryRun">) {
+  readonly result: Omit<Decision, "snapshot" | "dryRun">
+  constructor(result: Omit<Decision, "snapshot" | "dryRun">) {
     super("dry-run: 되돌렸다")
+    this.result = result
   }
 }
 
