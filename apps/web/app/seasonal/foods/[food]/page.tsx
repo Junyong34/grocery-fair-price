@@ -3,16 +3,17 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
-import { FOODS, findFood } from "@workspace/seasonal/data/foods"
+import { FOODS, findFood, isDrawn } from "@workspace/seasonal/data/foods"
 import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 
 import { ShareButton } from "@/shared/share-button"
 import { priceVarietyPath } from "@/features/price/data/price-source"
+import { foodImageSrc } from "@/features/seasonal/components/food-image"
 import { FoodDetail } from "@/features/seasonal/food-detail/food-detail"
 import { createMetadata } from "@/shared/meta"
 import { SubHeader } from "@/shared/shell/sub-header"
 import { routes } from "@/shared/routes"
-import { breadcrumb, JsonLd } from "@/shared/seo/json-ld"
+import { breadcrumb, JsonLd, webPageWithPrimaryImage } from "@/shared/seo/json-ld"
 import { foodSeo } from "@/shared/seo/titles"
 
 type Params = PageProps<"/seasonal/foods/[food]">["params"]
@@ -52,6 +53,7 @@ async function Food({ params }: { params: Params }) {
     <article className="mx-auto flex max-w-[560px] flex-col gap-4 px-[18px] pt-6 lg:pt-8">
       {/* 시트(@sheet)에는 넣지 않는다. 크롤러는 주소를 직접 열어 이 전체 페이지를 본다. */}
       <JsonLd data={breadcrumb([{ name: foodSeo(food).title, path: routes.seasonal.food(food.id) }])} />
+      {isDrawn(food.id) && <JsonLd data={webPageWithPrimaryImage(routes.seasonal.food(food.id), foodImageSrc(food.id, "motion"))} />}
       <SubHeader title={food.name} fallbackHref={routes.seasonal.root} actions={<ShareButton className="size-10" />} />
       {/* 데스크톱 맨 위 줄. 모바일은 하위 헤더가 뒤로 · 공유를 맡는다. */}
       <div className="flex items-center justify-between gap-3 max-lg:hidden">

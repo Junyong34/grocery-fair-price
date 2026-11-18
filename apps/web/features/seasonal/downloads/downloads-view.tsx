@@ -3,7 +3,7 @@ import Link from "next/link"
 
 import { DOWNLOADS_COPY } from "@workspace/seasonal/data/copy"
 import type { ManifestEntry } from "@workspace/seasonal/print/edition"
-import { editionMeta, editionName, editionsOfYear, editionYears, shelvesOf, yearlessEditions } from "@workspace/seasonal/print/listing"
+import { editionMeta, editionName, editionsOfYear, editionYears, shelvesOf, yearlessEditions, type CalendarPreview } from "@workspace/seasonal/print/listing"
 
 import { EditionThumbnail, ThumbnailMat } from "@/shared/downloads/edition-thumbnail"
 import { DOWNLOADS } from "@/shared/downloads-manifest"
@@ -13,7 +13,7 @@ import { SubHeader } from "@/shared/shell/sub-header"
 import { YearFilter } from "./year-filter"
 
 /** 달력만 연도별로 고른다. 포스터와 이유식 자료는 모든 연도에서 그대로 보인다. */
-export function DownloadsView() {
+export function DownloadsView({ preview }: { preview: CalendarPreview | undefined }) {
   const { editions } = DOWNLOADS
   const calendars = editions.filter((edition) => edition.year !== undefined)
   const yearless = yearlessEditions(editions)
@@ -34,6 +34,24 @@ export function DownloadsView() {
         {editions.length === 0 && <p className="text-sm text-caption">{DOWNLOADS_COPY.empty}</p>}
         {calendars.length > 0 && (
           <DownloadSection id="calendars" copy={DOWNLOADS_COPY.sections.calendars}>
+            {preview && (
+              <Link
+                href={routes.seasonal.download(preview.edition.id)}
+                className="group grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)] items-center gap-4 rounded-2xl border border-hairline bg-surface p-4 text-ink no-underline hover:border-gold-pale focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-deep sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-6 sm:p-6"
+              >
+                <ThumbnailMat className="p-2 sm:p-3">
+                  <EditionThumbnail thumbnail={preview.thumbnail} name={preview.edition.title} index={preview.index} priority />
+                </ThumbnailMat>
+                <div className="flex min-w-0 flex-col gap-2 [overflow-wrap:anywhere]">
+                  <h3 className="text-base leading-snug font-semibold sm:text-lg">{preview.edition.title}</h3>
+                  <p className="text-sm leading-relaxed text-stone">{preview.edition.description}</p>
+                  <span className="flex items-center gap-1 text-sm font-semibold text-gold-deep group-hover:underline">
+                    {DOWNLOADS_COPY.previewDownload}
+                    <ChevronRight aria-hidden size={14} strokeWidth={2} className="shrink-0" />
+                  </span>
+                </div>
+              </Link>
+            )}
             <YearFilter panels={editionYears(calendars).map((year) => ({
               year,
               content: <EditionCards editions={editionsOfYear(calendars, year)} eagerThumbnails />,

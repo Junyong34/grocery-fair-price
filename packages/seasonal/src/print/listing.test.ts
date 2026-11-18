@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import { DOWNLOADS_COPY } from "../data/copy"
 import type { ManifestEntry } from "./edition"
-import { attachmentDisposition, defaultDownloadYear, downloadFileName, editionMeta, editionName, editionsOfYear, editionYears, featuredEdition, megabytes, replacementFor, resolveDownload, shelvesOf, yearChoices, yearlessEditions } from "./listing"
+import { attachmentDisposition, calendarPreview, defaultDownloadYear, downloadFileName, editionMeta, editionName, editionsOfYear, editionYears, featuredEdition, megabytes, replacementFor, resolveDownload, shelvesOf, yearChoices, yearlessEditions } from "./listing"
 
 const entry = (id: string, kind: ManifestEntry["kind"], extra: Partial<ManifestEntry> = {}): ManifestEntry => ({
   id,
@@ -109,6 +109,32 @@ describe("editionName", () => {
 
   it("제목이 모두 종류 이름과 겹쳐도 종류 이름은 남는다", () => {
     expect(editionName({ kind: "monthly", title: "월간 달력" })).toBe("월간 달력")
+  })
+})
+
+describe("calendarPreview", () => {
+  const thumbnail = { path: "/downloads/preview.webp", width: 480, height: 679 }
+  const older = entry("older", "year-sheet", { year: 2026, thumbnails: [thumbnail] })
+  const annual = entry("annual", "year-sheet", { year: 2027, thumbnails: [thumbnail] })
+  const monthly = entry("monthly", "monthly", { year: 2027, thumbnails: [thumbnail] })
+
+  it("최신 게시 연도의 연간 달력과 그 미리보기를 고른다", () => {
+    expect(calendarPreview([monthly, older, annual])).toEqual({ edition: annual, thumbnail, index: 0 })
+  })
+
+  it("같은 연도에 연간 달력 미리보기가 없으면 월간 달력을 고른다", () => {
+    expect(calendarPreview([older, { ...annual, thumbnails: [] }, monthly])).toEqual({ edition: monthly, thumbnail, index: 0 })
+  })
+
+  it("월간 달력의 본문 미리보기가 있으면 표지 대신 사용한다", () => {
+    const monthPage = { ...thumbnail, path: "/downloads/month.webp" }
+    const withMonthPage = { ...monthly, thumbnails: [thumbnail, monthPage] }
+    expect(calendarPreview([withMonthPage])).toEqual({ edition: withMonthPage, thumbnail: monthPage, index: 1 })
+  })
+
+  it("최신 연도에 사용할 그림이 없거나 달력이 없으면 미리보기를 생략한다", () => {
+    expect(calendarPreview([older, { ...annual, thumbnails: [] }])).toBeUndefined()
+    expect(calendarPreview([entry("poster", "month-poster", { thumbnails: [thumbnail] })])).toBeUndefined()
   })
 })
 

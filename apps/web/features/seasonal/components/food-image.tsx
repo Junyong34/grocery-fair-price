@@ -3,6 +3,10 @@ import { preload as preloadResource } from "react-dom"
 import { isDrawn, type Food } from "@workspace/seasonal/data/foods"
 import { cn } from "@workspace/ui/lib/utils"
 
+export function foodImageSrc(id: Food["id"], variant: "color" | "motion") {
+  return `/foods/${id}/${variant}.svg`
+}
+
 /**
  * 품종 일러스트 자리. 일러스트를 바꾸거나 늘릴 때 고칠 곳은 이 컴포넌트 하나다.
  * 그림이 있으면 public/foods/<id>/<variant>.svg(pnpm foods:sync), 없으면 이름 카드(옅은 베이지 원)로 대신한다.
@@ -37,7 +41,7 @@ export function FoodImage({
       </div>
     )
   }
-  const src = `/foods/${food.id}/${variant}.svg`
+  const src = foodImageSrc(food.id, variant)
   if (preload) preloadResource(src, { as: "image", fetchPriority: "high" })
   return (
     <div className={cn("relative aspect-square w-full", className)}>

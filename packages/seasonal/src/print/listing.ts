@@ -1,5 +1,5 @@
 import type { CalendarDate } from "../calendar/month-calendar"
-import type { DownloadManifest, ManifestEntry } from "./edition"
+import type { DownloadManifest, ManifestEntry, Thumbnail } from "./edition"
 import { PRINT_KIND_LABELS, PRINT_KINDS, PUBLISHED_PAPERS, type PrintKind, type PublishedPaper } from "./spec"
 
 // 내려받기 화면(목록 2-C, 상세 3-B)이 매니페스트를 보여 주는 규칙. .scratch/calendar-download/spec.md
@@ -97,4 +97,22 @@ export function attachmentDisposition(edition: Pick<ManifestEntry, "id" | "kind"
 /** 2a · 2b 입구 카드의 대표 에디션. 첫 줄(월간 달력이 있으면 그 줄)의 첫째. */
 export function featuredEdition(editions: readonly ManifestEntry[]): ManifestEntry | undefined {
   return shelvesOf(editions)[0]?.editions[0]
+}
+
+export type CalendarPreview = { edition: ManifestEntry; thumbnail: Thumbnail; index: number }
+
+/** 다운로드 목록에서는 최신 게시 연도의 연간 달력, 월간 달력 순으로 실제 쪽을 보여 준다. */
+export function calendarPreview(editions: readonly ManifestEntry[]): CalendarPreview | undefined {
+  const [latestYear] = editionYears(editions)
+  if (latestYear === undefined) return undefined
+
+  const shelves = shelvesOf(editions.filter((edition) => edition.year === latestYear && edition.thumbnails.length > 0))
+  const edition = shelves.find(({ kind }) => kind === "year-sheet")?.editions[0]
+    ?? shelves.find(({ kind }) => kind === "monthly")?.editions[0]
+  if (!edition) return undefined
+
+  // 월간 달력에 두 번째 이미지가 있으면 표지 대신 본문 쪽을 보여 준다.
+  const index = edition.kind === "monthly" && edition.thumbnails[1] ? 1 : 0
+  const thumbnail = edition.thumbnails[index]
+  if (thumbnail) return { edition, thumbnail, index }
 }

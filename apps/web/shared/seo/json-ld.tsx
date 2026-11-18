@@ -1,4 +1,4 @@
-import type { BreadcrumbList, Organization, Thing, WebSite, WithContext } from "schema-dts"
+import type { BreadcrumbList, Organization, Thing, WebPage, WebSite, WithContext } from "schema-dts"
 
 import { absoluteUrl, SITE_CONFIG } from "@/shared/meta"
 import { routes } from "@/shared/routes"
@@ -16,6 +16,16 @@ export function serializeJsonLd(data: JsonLdData): string {
 /** 페이지에 구조화 데이터를 넣는다. 크롤러가 HTML 원문에서 읽도록 정적으로 그려지는 자리에 둔다. */
 export function JsonLd({ data }: { data: JsonLdData }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(data) }} />
+}
+
+/** 본문에서 보여 주는 그림을 페이지의 대표 이미지로 지정한다. */
+export function webPageWithPrimaryImage(path: string, imagePath: string): WithContext<WebPage> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    url: absoluteUrl(path),
+    primaryImageOfPage: { "@type": "ImageObject", contentUrl: absoluteUrl(imagePath) },
+  }
 }
 
 /** 사이트 이름. 구글은 도메인 루트의 홈에서만 읽으므로 routes.home 페이지만 넣는다. */
