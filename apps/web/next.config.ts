@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   // apps/web/AGENTS.md는 손으로 쓴 파일이다(루트 AGENTS.md가 가리킨다). 켜 두면 next dev가 그 파일을 덮어쓴다.
   agentRules: false,
+  // 휴대폰에서 같은 와이파이의 PC IP(http://192.168.x.x:3000 등)로 dev 서버를 열 때 쓴다. 없으면 Next가 IP 주소에서 오는
+  // dev 자원(JS · HMR) 요청을 막아 하이드레이션이 안 되고, 스티키 하위 헤더 · 섹션 칩 줄 같은 클라이언트 동작이 모두 멈춘다.
+  // 사설 IP 대역만 연다. dev 서버에서만 쓰이는 값이다.
+  allowedDevOrigins: ["10.*.*.*", "172.*.*.*", "192.168.*.*"],
   // 전체 품종 목록(/prices)은 품종이 늘면 한 페이지가 끝없이 길어져 뺐다. 이미 알려진 주소는 시세 메인으로 보낸다.
   // shared/routes.ts의 routes.price.varieties와 맞춰 둔다(설정 파일이라 routes를 import하지 않는다).
   async redirects() {
