@@ -18,7 +18,7 @@ const COPY = PRICE_COPY.detail
  * 최근 시세 흐름 카드: 여러 조사일 기준 판정과 최신 조사 시세 · 평소가를 함께 보여 준다.
  * 판정 전이면 회색 "판정 전"과 평소가 "자료 없음".
  * 문장은 모두 판정 풀이(explainVerdict)에서 온다. 판정 주의(오래됨 · 표본 적음 · 품종 · 브랜드 편차)는 판정 바로 아래 Notice로 모은다. 기호("?")·점선만으로는 뜻이 전해지지 않아 제목 + 설명 글로 쓴다.
- * 오래됐으면 판정도 흐리게 한다.
+ * 오래됐어도 판정은 흐리게 하지 않는다. 조사일과 "지금과 다를 수 있어요"는 판정 주의(stale)가 알린다.
  *
  * 글씨는 세 층이다. 판정(44 · 17 · 13px, 판정 색) / 주의(13px semibold ink · 12px caption) / 금액 칸(12 · 22 · 12px).
  * 주의와 금액 칸은 같은 크림 면(bg-canvas/80)을 써서 판정 색 위의 글씨 색을 판정 블록 하나로 줄인다.
@@ -40,12 +40,7 @@ export function VerdictCard({ detail }: { detail: VarietyDetail }) {
       <h2 id="recent-price-flow" className={cn("text-sm font-semibold", tone.ink)}>
         {COPY.recentFlow}
       </h2>
-      <div
-        className={cn(
-          "flex flex-col gap-1",
-          detail.stale && "opacity-45"
-        )}
-      >
+      <div className="flex flex-col gap-1">
         <p
           className={cn(
             "flex items-center gap-2.5 font-heading leading-none font-bold",
