@@ -7,14 +7,7 @@ import type { FoodContent, FoodContentBlock } from "@workspace/seasonal/data/foo
 export function FoodContentBody({ content }: { content: FoodContent }) {
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-2">
-        <p className="text-base leading-relaxed text-ink">{content.summary}</p>
-        {content.origin && (
-          <p className="text-sm text-stone">
-            대표 산지 <span className="text-ink">{content.origin}</span>
-          </p>
-        )}
-      </div>
+      <p className="text-base leading-relaxed text-ink">{content.summary}</p>
       {content.sections.map((section, index) => (
         <section key={section.title} aria-labelledby={`food-content-${index}`} className="flex flex-col gap-2">
           <h2 id={`food-content-${index}`} className="font-heading text-lg font-bold text-ink">
@@ -40,6 +33,18 @@ function Block({ block }: { block: FoodContentBlock }) {
         </li>
       ))}
     </ul>
+  )
+}
+
+/** 원고의 대표 산지. 관련 명절 근처에 둔다. */
+export function FoodContentOrigin({ origin }: { origin: string }) {
+  return (
+    <section aria-labelledby="food-content-origin" className="flex flex-col gap-2">
+      <h2 id="food-content-origin" className="text-sm font-semibold text-stone">
+        대표 산지
+      </h2>
+      <p className="text-sm text-ink">{origin}</p>
+    </section>
   )
 }
 

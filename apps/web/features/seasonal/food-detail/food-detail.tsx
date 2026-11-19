@@ -16,7 +16,7 @@ import { SeasonMonthsBar } from "../components/season-months-bar"
 import { SeasonTag } from "../components/season-tag"
 import { EatToggle } from "./eat-toggle"
 import { FestivalLink } from "./festival-link"
-import { FoodContentBody, FoodContentSources } from "./food-content"
+import { FoodContentBody, FoodContentOrigin, FoodContentSources } from "./food-content"
 
 /** 같은 때 제철 목록에 보일 개수 */
 const SAME_SEASON_LIMIT = 12
@@ -78,6 +78,8 @@ export function FoodDetail({
       <EatToggle foodId={food.id} />
 
       {content && <FoodContentBody content={content} />}
+
+      {content?.origin && <FoodContentOrigin origin={content.origin} />}
 
       <section
         aria-labelledby="related-festivals"
