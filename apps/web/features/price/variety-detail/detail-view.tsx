@@ -10,6 +10,7 @@ import { formatSeasonMonths } from "@workspace/seasonal/data/months"
 import { routes } from "@/shared/routes"
 
 import { ProductRow } from "../components/product-row"
+import type { VarietySpecQuote } from "../data/price-source"
 
 import { DetailHeader, DetailHeaderBar } from "./detail-header"
 import { DotsCompare } from "./dots-compare"
@@ -18,14 +19,9 @@ import { PlacesSection } from "./places-section"
 import { RangeBar } from "./range-bar"
 import { SectionChips } from "./section-chips"
 import { P3_SECTIONS } from "./section-ids"
+import { SpecQuotesSection } from "./spec-quotes-section"
 import { VerdictCard } from "./verdict-card"
 import { WhySection } from "./why-section"
-
-const SECTIONS = [
-  { id: P3_SECTIONS.price, label: "시세" },
-  { id: P3_SECTIONS.places, label: "어디서" },
-  { id: P3_SECTIONS.why, label: "추이" },
-] as const
 
 /**
  * 품종 상세는 내가 본 가격의 평소가 비교, 최근 시세 흐름, 조사 범위 순으로 보여 준다.
@@ -33,11 +29,13 @@ const SECTIONS = [
  */
 export function DetailView({
   detail,
+  specQuotes,
   related = [],
   products = [],
   categoryPath = null,
 }: {
   detail: VarietyDetail
+  specQuotes: readonly VarietySpecQuote[]
   related?: readonly VarietySummary[]
   /** 이 품종의 시세로 쓰이는 참가격 상품. 없으면 묶음을 뺀다 */
   products?: readonly ProductSummary[]
@@ -46,12 +44,19 @@ export function DetailView({
 }) {
   // 제철달력에 같은 id 품종이 있으면 제철 시기로 잇는다.
   const food = findFood(detail.id)
+  const hasSpecQuotes = specQuotes.length > 1
+  const sections = [
+    { id: P3_SECTIONS.price, label: "시세" },
+    ...(hasSpecQuotes ? [{ id: P3_SECTIONS.specs, label: "규격별" }] : []),
+    { id: P3_SECTIONS.places, label: "어디서" },
+    { id: P3_SECTIONS.why, label: "추이" },
+  ]
   return (
     <article className="price-page flex flex-col gap-7 pt-3 lg:pt-8">
       <DetailHeader variety={detail} />
       <DetailHeaderBar variety={detail} />
       <div className="contents lg:hidden">
-        <SectionChips sections={SECTIONS} />
+        <SectionChips sections={sections} />
       </div>
       <div className="contents lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-x-10 lg:gap-y-8">
         {/* 섹션 칩이 이 id로 이동한다. scroll-mt는 헤더(56) + 섹션 칩 줄(40) 아래로 맞춘다. */}
@@ -64,6 +69,7 @@ export function DetailView({
           )}
           <VerdictCard detail={detail} />
           <RangeBar detail={detail} />
+          {hasSpecQuotes && <SpecQuotesSection quotes={specQuotes} unit={detail.baseUnit} />}
         </div>
         <div id={P3_SECTIONS.places} className="min-w-0 scroll-mt-28">
           <PlacesSection detail={detail} />

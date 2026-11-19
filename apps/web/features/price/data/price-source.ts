@@ -5,6 +5,9 @@ import type { Category, ProductDetail, ProductSummary, SearchIndex, VarietyDetai
 import { routes } from "@/shared/routes"
 
 import { dbSource } from "./db-source"
+import type { VarietySpecQuote } from "./queries/list-variety-spec-quotes"
+
+export type { VarietySpecQuote }
 
 // 가격 화면이 데이터를 읽는 유일한 입구. 화면 · 컴포넌트는 서버 컴포넌트에서 getPriceSource()를 부르고
 // 결과를 props로 내린다(.scratch/price-db-read/spec.md 3장).
@@ -20,6 +23,8 @@ export interface PriceSource {
   listVarieties(): Promise<readonly VarietySummary[]>
   /** 품종 상세. 없는 품종이면 null */
   getVariety(id: string): Promise<VarietyDetail | null>
+  /** 공개 대상 품종의 규격별 최신 전국 소매 시세 */
+  listVarietySpecQuotes(id: string): Promise<readonly VarietySpecQuote[]>
   /** 검색 재료: 품종 · 품목 · 별칭 · 카테고리 */
   searchIndex(): Promise<SearchIndex>
   /** 자주 사는 품종(운영자가 정한 목록) */

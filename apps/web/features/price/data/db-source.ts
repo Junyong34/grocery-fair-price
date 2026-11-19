@@ -11,6 +11,7 @@ import { readProduct } from "./queries/get-product"
 import { readVariety } from "./queries/get-variety"
 import { readCategories } from "./queries/list-categories"
 import { readProducts } from "./queries/list-products"
+import { readVarietySpecQuotes } from "./queries/list-variety-spec-quotes"
 import { readVarieties } from "./queries/list-varieties"
 import { readSearchExtras } from "./queries/search-index"
 
@@ -56,6 +57,24 @@ async function getVariety(id: string): Promise<VarietyDetail | null> {
   return readVariety(db(), id)
 }
 
+// 먼저 공개하기로 한 한우 부위, 육계, 계란, 척아이롤의 품종 ID.
+const SPEC_QUOTE_VARIETIES = new Set([
+  "hanwoo-tenderloin", "hanwoo-sirloin", "hanwoo-round", "hanwoo-brisket",
+  "hanwoo-ribs", "hanwoo-bulgogi", "broiler", "egg", "us-chuck-eye-roll", "au-chuck-eye-roll",
+])
+
+async function listVarietySpecQuotes(id: string) {
+  "use cache"
+  cacheLife("hours")
+  if (!SPEC_QUOTE_VARIETIES.has(id)) return []
+  const quotes = await readVarietySpecQuotes(db(), id)
+  if (id !== "broiler") return quotes
+  // KAMIS 육계 호수별 원천 금액과 kg 단위 표기가 일치하는지 확인할 때까지 금액을 비운다.
+  return quotes.map((quote) =>
+    quote.slug.startsWith("size-") && quote.sources.includes("kamis") ? { ...quote, price: null } : quote,
+  )
+}
+
 // 상품(price.current_product)도 판정과 같은 묶음이라 같은 수명으로 캐시한다. 참가격은 2주마다 조사하지만 묶음은 날마다 바뀐다.
 async function listProducts(): Promise<readonly ProductSummary[]> {
   "use cache"
@@ -75,6 +94,7 @@ export const dbSource: PriceSource = {
   getProduct,
   listVarieties,
   getVariety,
+  listVarietySpecQuotes,
   searchIndex,
   async featuredIds() {
     return FEATURED_IDS

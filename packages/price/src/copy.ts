@@ -250,6 +250,12 @@ export const PRICE_COPY = {
     added: "✓ 담음",
     recentFlow: "최근 시세 흐름",
     latestQuote: "최신 조사 시세",
+    specQuotes: {
+      title: "규격별 시세",
+      spec: "규격",
+      price: (unit: string) => `최신 전국 소매 시세 · ${unit} 기준`,
+      unitPending: "가격 단위 확인 중",
+    },
     nowPriceNote: (surveyedOn: string, n: number, basis: QuoteBasis) =>
       isAverageBasis(basis)
         ? `${monthDay(surveyedOn)} 조사한 ${basis.scope} 가격`

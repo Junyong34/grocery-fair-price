@@ -3,6 +3,7 @@
 export const P3_SECTIONS = {
   title: "p3-title",
   price: "p3-price",
+  specs: "p3-specs",
   places: "p3-places",
   why: "p3-why",
   myPrice: "p3-my-price",

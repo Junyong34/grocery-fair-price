@@ -15,3 +15,8 @@ Blocked by: 04
 ## 완료 기준
 
 - catalog-evolution/01의 완료 기준.
+
+## Comments
+
+- 2026-11-19. 한우 부위·육계·계란·미국산/호주산 척아이롤의 품종 상세에 규격별 전국 소매 시세를 추가했다. 규격별 마지막 조사일·출처와 기준 단위 가격을 같이 보여 준다. 검색·개별 규격 경로·규격별 판정은 이 티켓의 후속 범위다.
+- 육계 9~12호의 금액은 원천 단위 확인 중이다. KAMIS의 11/17 전국 10~12호 원천은 534·516·551원에 단위 `1 kg`으로 오며, 같은 날 kg 단위 육계는 KAMIS·축평원 양쪽에서 5,292원이다. 호수별 값은 단위를 확인할 때까지 웹 표에서 조사일·출처만 보여 준다. [KAMIS 조사요령](https://www.kamis.or.kr/customer/price/knowhow/knowhow.do?action=standardList) · [축평원 육계 유통가격](https://www.ekapepia.com/v3/price/livestock/chicken/distrPrice.do)

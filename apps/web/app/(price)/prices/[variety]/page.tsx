@@ -29,7 +29,7 @@ export async function generateMetadata(props: PageProps<"/prices/[variety]">): P
   return createMetadata({
     ...varietySeo(variety),
     path: routes.price.variety(variety.id),
-    ogImage: { title: variety.name, subtitle: "오늘 시세와 평소 가격", badge: "시세" },
+    ogImage: { title: variety.name, subtitle: "최근 조사 시세와 평소 가격", badge: "시세" },
   })
 }
 
@@ -46,11 +46,12 @@ async function Variety({ params }: { params: Params }) {
   const source = getPriceSource()
   const id = (await params).variety
   // 목록은 sitemap과 같은 캐시 읽기라 상세마다 DB를 다시 읽지 않는다.
-  const [detail, varieties, products, categories] = await Promise.all([
+  const [detail, varieties, products, categories, specQuotes] = await Promise.all([
     source.getVariety(id),
     source.listVarieties(),
     source.listProducts(),
     source.listCategories(),
+    source.listVarietySpecQuotes(id),
   ])
   if (!detail) notFound()
   // 상품이 있는 카테고리만 페이지가 있다(과일처럼 상품이 없는 카테고리는 잇지 않는다).
@@ -60,6 +61,7 @@ async function Variety({ params }: { params: Params }) {
       <JsonLd data={breadcrumb([{ name: varietySeo(detail).title, path: routes.price.variety(detail.id) }])} />
       <DetailView
         detail={detail}
+        specQuotes={specQuotes}
         related={relatedInCategory(varieties, detail.id, RELATED_COUNT)}
         products={products.filter((product) => product.varietyId === detail.id)}
         categoryPath={category ? routes.price.productCategory(category.slug) : null}
