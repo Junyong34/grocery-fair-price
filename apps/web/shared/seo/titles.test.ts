@@ -78,11 +78,11 @@ describe("페이지 제목·설명", () => {
     expect(varietySeo(variety).description).toBe(explainVerdict(variety, null).seoDescription)
   })
 
-  it("상품 상세는 판정 없이 판매가와 판매처 수를 넣는다", () => {
-    const seo = productSeo({ name: "비비고 사골곰탕(500g)", price: 1980, surveyedOn: "2026-10-23", sellers: [{}, {}, {}] })
+  it("상품 상세는 조사일과 점포 수, 대표가와 조사 범위를 넣는다", () => {
+    const seo = productSeo({ name: "비비고 사골곰탕(500g)", price: 1980, surveyedOn: "2026-10-23", range: { stores: 3, min: 1500, max: 2300 } })
     expect(seo.title).toBe("비비고 사골곰탕(500g) 가격 비교")
     expect(seo.description).toBe(
-      "비비고 사골곰탕(500g) 전국 판매가 1,980원(10/23 참가격 조사). 이마트·편의점 등 판매처 3곳 가격을 견줘 보세요."
+      "비비고 사골곰탕(500g) 10/23 참가격 조사. 전국 조사 점포 3곳의 중간값 1,980원, 최저 1,500원, 최고 2,300원."
     )
   })
 

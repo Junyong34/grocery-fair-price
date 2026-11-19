@@ -27,7 +27,7 @@ describe("explainVerdict: 판정 카드", () => {
     const v = explainVerdict(PRICEY, null)
     expect(v.word).toBe("비싸요")
     expect(v.diffLine).toBe("최근 조사 결과를 보면 평소보다 9% 높아요")
-    expect(v.basisLine).toBe("최근 조사 최대 세 건을 각각 그날의 평소가와 비교해요. 그 차이의 중간값으로 판정해요.")
+    expect(v.basisLine).toBe("최근 최대 3개 조사일의 시세를 각각 그날의 평소가와 비교해요. 그 차이의 중간값으로 판정해요.")
     expect(v.notices).toEqual([])
   })
 
@@ -108,11 +108,11 @@ describe("explainVerdict: 요약 문장", () => {
 describe("explainVerdict: 검색 설명", () => {
   it("그날 시세와 판정을 넣어 검색 결과에서 바로 답이 보이게 한다", () => {
     expect(explainVerdict(PRICEY, null).seoDescription).toBe(
-      "녹두(100g) 시세 2,700원, 평소보다 9% 높아 비싸요(11/3 KAMIS 조사). 대형마트·전통시장은 얼마에 파는지도 견줘 보세요."
+      "녹두(100g) 시세 2,700원(11/3 KAMIS 조사). 최근 최대 3개 조사일 기준 평소보다 9% 높아 비싸요."
     )
   })
 
   it("판정 전이면 평소가가 쌓이는 중이라고 쓴다", () => {
-    expect(explainVerdict(NONE, null).seoDescription).toContain("평소가는 아직 쌓이는 중(11/3 KAMIS 조사)")
+    expect(explainVerdict(NONE, null).seoDescription).toBe("녹두(100g) 시세 2,700원(11/3 KAMIS 조사). 평소가는 아직 쌓이는 중이에요.")
   })
 })

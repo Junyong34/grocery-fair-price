@@ -15,7 +15,7 @@ import { VERDICT_TONE } from "../components/verdict-tone"
 const COPY = PRICE_COPY.detail
 
 /**
- * P3 판정 카드(판정 색 배경): 큰 판정, 평소보다 몇 %, 판정 주의, 지금 시세 · 평소가 두 칸.
+ * 최근 시세 흐름 카드: 여러 조사일 기준 판정과 최신 조사 시세 · 평소가를 함께 보여 준다.
  * 판정 전이면 회색 "판정 전"과 평소가 "자료 없음".
  * 문장은 모두 판정 풀이(explainVerdict)에서 온다. 판정 주의(오래됨 · 표본 적음 · 품종 · 브랜드 편차)는 판정 바로 아래 Notice로 모은다. 기호("?")·점선만으로는 뜻이 전해지지 않아 제목 + 설명 글로 쓴다.
  * 오래됐으면 판정도 흐리게 한다.
@@ -31,12 +31,15 @@ export function VerdictCard({ detail }: { detail: VarietyDetail }) {
   const explained = explainVerdict(detail, null)
   return (
     <section
-      aria-label="판정"
+      aria-labelledby="recent-price-flow"
       className={cn(
         "flex flex-col gap-4 rounded-[24px] px-5 pt-5 pb-4",
         tone.wash
       )}
     >
+      <h2 id="recent-price-flow" className={cn("text-sm font-semibold", tone.ink)}>
+        {COPY.recentFlow}
+      </h2>
       <div
         className={cn(
           "flex flex-col gap-1",
@@ -85,7 +88,7 @@ export function VerdictCard({ detail }: { detail: VarietyDetail }) {
       )}
       <dl className="grid grid-cols-2 gap-2">
         <PriceCell
-          term={COPY.nowPrice}
+          term={COPY.latestQuote}
           value={`${won(detail.price)}원`}
           unit={detail.baseUnit}
           note={COPY.nowPriceNote(detail.surveyedOn, detail.sampleSize, detail.basis)}

@@ -114,10 +114,10 @@ export function varietySeo(variety: VerdictSubject): PageSeo {
 }
 
 /** 상품 상세(catalog-scale/10). 판정이 없어 판매가와 판매처 비교로 쓴다. 사람들은 "상품명 가격", "상품명 최저가"로 찾는다. */
-export function productSeo(product: Pick<ProductDetail, "name" | "price" | "surveyedOn"> & { sellers: readonly unknown[] }): PageSeo {
+export function productSeo(product: Pick<ProductDetail, "name" | "price" | "surveyedOn" | "range">): PageSeo {
   return {
     title: `${product.name} 가격 비교`,
-    description: `${product.name} 전국 판매가 ${won(product.price)}원(${monthDay(product.surveyedOn)} 참가격 조사). 이마트·편의점 등 판매처 ${product.sellers.length}곳 가격을 견줘 보세요.`,
+    description: `${product.name} ${monthDay(product.surveyedOn)} 참가격 조사. 전국 조사 점포 ${product.range.stores}곳의 중간값 ${won(product.price)}원, 최저 ${won(product.range.min)}원, 최고 ${won(product.range.max)}원.`,
   }
 }
 

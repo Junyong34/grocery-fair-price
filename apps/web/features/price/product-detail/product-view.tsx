@@ -110,19 +110,20 @@ function PriceCard({
           </p>
         )}
         <p className="text-[13px] leading-relaxed text-stone tabular-nums">
-          {COPY.nationalNote(product.surveyedOn, product.range.stores)}
+          {COPY.latestSurvey} <time dateTime={product.surveyedOn}>{monthDay(product.surveyedOn)}</time>
+          {" · "}{COPY.surveyedStores(product.range.stores)}
         </p>
       </div>
 
       <div className="rounded-lg bg-pair-base px-3 py-2.5 text-pair-base-foreground">
-        <p className="text-[13px] font-semibold text-caption">조사 가격 범위</p>
+        <p className="text-[13px] font-semibold text-caption">{COPY.surveyRangeTitle}</p>
         <dl className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm leading-relaxed tabular-nums">
           <div className="flex items-baseline gap-1.5">
-            <dt className="text-caption">최저</dt>
+            <dt className="text-caption">{COPY.surveyMin}</dt>
             <dd className="font-semibold">{won(product.range.min)}원</dd>
           </div>
           <div className="flex items-baseline gap-1.5">
-            <dt className="text-caption">최고</dt>
+            <dt className="text-caption">{COPY.surveyMax}</dt>
             <dd className="font-semibold">{won(product.range.max)}원</dd>
           </div>
         </dl>

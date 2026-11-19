@@ -27,7 +27,7 @@ export function useMyPrice(id: string): number | null {
 }
 
 /**
- * 본문 "내가 본 가격" 섹션(.scratch/shell-unify/spec.md 6장). 하단 내비와 겹치지 않게 떠 있는 바 대신 본문의 범위 막대 바로 아래에 둔다.
+ * 본문 "내가 본 가격" 섹션. 품종 상세에서 시세 흐름보다 먼저 보여 준다.
  * 버튼을 누르면 바텀 시트에서 가격을 적고, 같은 자리에 비교 카드가 뜬다. 시세 구간 안에 있어 섹션 칩 "시세"가 이 자리로 데려온다.
  * 카드는 흰 바탕 · 판정 색 띠 · 꽉 찬 판정 칩으로 배경(크림)과 확실히 구분한다.
  */
@@ -57,6 +57,9 @@ export function MyPriceSection({ detail, id }: { detail: VarietyDetail; id: stri
           </button>
         )}
       </div>
+      <p className="text-[13px] leading-relaxed text-caption">
+        {COPY.myPriceBasis(detail.surveyedOn)}
+      </p>
       {compared ? (
         <MyPriceCard
           // 값을 바꿀 때마다 다시 떠오르게

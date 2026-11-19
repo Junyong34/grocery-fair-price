@@ -119,7 +119,7 @@ export const UI_COPY = {
   priceUnavailable: (name: string) => `${name} 시세는 아직 준비 중이에요`,
   priceHubLink: "다른 식재료 시세 보기",
   /** 1i 품종 상세에서 같은 품종의 시세 화면(/prices/<id>)으로 가는 버튼 */
-  priceLink: (name: string) => `${name} 오늘 시세 보기`,
+  priceLink: (name: string) => `${name} 시세 보기`,
   noRelatedFestival: "연결된 명절 없음",
   /** 나의 식탁 요약의 범위 제목(전체·달·계절 이름을 받는다) */
   scopeTitle: (name: string | null) =>

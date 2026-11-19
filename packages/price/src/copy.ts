@@ -17,7 +17,7 @@ export const VERDICT_WORD: Record<VerdictKind, string> = {
 
 /** P4 판정별 묶음 제목. 이 순서로 늘어놓는다. */
 export const VERDICT_GROUPS: readonly { kind: VerdictKind; title: string }[] = [
-  { kind: "cheap", title: "지금 싸요" },
+  { kind: "cheap", title: "평소보다 싸요" },
   { kind: "normal", title: "보통이에요" },
   { kind: "pricey", title: "평소보다 비싸요" },
   { kind: "none", title: "판정 전" },
@@ -182,8 +182,12 @@ export const PRICE_COPY = {
   },
   // 참가격 상품 상세 (catalog-scale/10). 판정이 없다: 지금이 비싼 시기인지가 아니라 어디서 싸게 파는지를 견준다
   product: {
-    nationalPrice: "전국 판매가",
-    nationalNote: (surveyedOn: string, stores: number) => `${monthDay(surveyedOn)} 조사한 ${stores}곳 가격의 중간값`,
+    nationalPrice: "전국 조사 판매가",
+    latestSurvey: "최신 조사일",
+    surveyedStores: (stores: number) => `조사 점포 ${stores}곳 가격의 중간값`,
+    surveyRangeTitle: "같은 날 조사한 점포의 판매가 범위",
+    surveyMin: "최저",
+    surveyMax: "최고",
     perUnit: (unit: string, price: number) => `${unit}당 ${won(price)}원`,
     range: (min: number, max: number) => `최저 ${won(min)}원 ~ 최고 ${won(max)}원`,
     noVerdict: "이 상품은 판매처별 가격을 비교할 수 있어요.",
@@ -199,7 +203,7 @@ export const PRICE_COPY = {
     sellersSub: (surveyedOn: string) => `${monthDay(surveyedOn)} 조사 · 싼 순`,
     stores: (n: number) => `${n}곳`,
     storesRange: (min: number, max: number) => `점포마다 ${won(min)}~${won(max)}원`,
-    promo: "행사",
+    promo: "행사 확인",
     sellersNote: "점 = 이 판매처 중간값, 점선 = 전국 판매가",
     trendTitle: "최근 조사 가격",
     trendLegend: { median: "전국 판매가", min: "조사 최저가" },
@@ -244,7 +248,8 @@ export const PRICE_COPY = {
     sourcesLink: "데이터 출처",
     add: "+ 담기",
     added: "✓ 담음",
-    nowPrice: "지금 시세",
+    recentFlow: "최근 시세 흐름",
+    latestQuote: "최신 조사 시세",
     nowPriceNote: (surveyedOn: string, n: number, basis: QuoteBasis) =>
       isAverageBasis(basis)
         ? `${monthDay(surveyedOn)} 조사한 ${basis.scope} 가격`
@@ -253,7 +258,7 @@ export const PRICE_COPY = {
     usualNote: "이맘때 보통 이 정도예요",
     noUsual: "평소가가 없어 시세만 보여드려요",
     verdictBasis:
-      "최근 조사 최대 세 건을 각각 그날의 평소가와 비교해요. 그 차이의 중간값으로 판정해요.",
+      "최근 최대 3개 조사일의 시세를 각각 그날의 평소가와 비교해요. 그 차이의 중간값으로 판정해요.",
     usualPending: "자료 없음",
     usualPendingNote: "조사된 시세와 가격 흐름은 볼 수 있어요",
     stale: (surveyedOn: string, ago: string) =>
@@ -269,8 +274,8 @@ export const PRICE_COPY = {
       isAverageBasis(basis)
         ? `${monthDay(surveyedOn)} 조사한 ${basis.scope} 가격`
         : `${monthDay(surveyedOn)} 조사한 ${n}곳의 시세 범위`,
-    rangeLow: "싼 곳",
-    rangeHigh: "비싼 곳",
+    rangeLow: "조사 최저",
+    rangeHigh: "조사 최고",
     rangeUsual: (usual: string) => `평소가 ${usual} · 평소 범위`,
     rangePin: (price: string, basis: QuoteBasis) => `${isAverageBasis(basis) ? basis.scope : "시세"} ${price}원`,
     rangeMine: (price: string) => `내가 본 ${price}`,
@@ -331,6 +336,7 @@ export const PRICE_COPY = {
     myPrice: "내가 본 가격 적기",
     myPriceUnit: (unit: string) => `${unit} 기준`,
     myPriceTitle: "내가 본 가격",
+    myPriceBasis: (surveyedOn: string) => `${monthDay(surveyedOn)} 기준 평소가와 비교해요.`,
     myPricePlaceholder: (example: string) => `예: ${example}`,
     myPriceWon: "원",
     myPriceHint:
@@ -351,7 +357,7 @@ export const PRICE_COPY = {
     changed: (n: number, names: string) =>
       `담은 뒤 판정이 바뀐 식재료 ${n}개 · ${names}`,
     changedRow: (date: string, before: string, now: string) =>
-      `${monthDay(date)}에 담을 때 ${before} → 지금 ${now}`,
+      `${monthDay(date)}에 담을 때 ${before} → 최근 시세 흐름 ${now}`,
     columns: ["식재료", "판정", "시세 · 평소"],
     addMore: "+ 더 담기",
     emptyTitle: "장바구니가 비어 있어요",

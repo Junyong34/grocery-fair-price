@@ -95,10 +95,11 @@ function summary(subject: VerdictSubject, judged: boolean): string {
   return `${head} 평소가는 ${won(subject.usual!)}원이에요. 최근 조사 결과를 보면 ${diffClause(subject.verdict.pct!)} ${VERDICT_END[kind]}`
 }
 
-/** 판정은 하루 1~2번 바뀌므로 그날 시세와 판정을 넣어 검색 결과에서 바로 답이 보이게 한다. */
+/** 최신 조사 시세와 여러 조사일을 비교한 판정을 각각 설명한다. */
 function seoDescription(subject: VerdictSubject, judged: boolean): string {
-  const verdict = judged ? `${diffClause(subject.verdict.pct!)} ${VERDICT_WORD[subject.verdict.kind]}` : "평소가는 아직 쌓이는 중"
-  return `${subject.name}(${subject.baseUnit}) 시세 ${won(subject.price)}원, ${verdict}(${monthDay(subject.surveyedOn)} ${subject.basis.source} 조사). 대형마트·전통시장은 얼마에 파는지도 견줘 보세요.`
+  const quote = `${subject.name}(${subject.baseUnit}) 시세 ${won(subject.price)}원(${monthDay(subject.surveyedOn)} ${subject.basis.source} 조사).`
+  if (!judged) return `${quote} 평소가는 아직 쌓이는 중이에요.`
+  return `${quote} 최근 최대 3개 조사일 기준 ${diffClause(subject.verdict.pct!)} ${VERDICT_WORD[subject.verdict.kind]}.`
 }
 
 /** "2026-11-03" → "2026년 11월 3일" */
