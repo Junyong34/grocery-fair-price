@@ -41,3 +41,24 @@ export function priceAxis(values: readonly number[], { pad = 0, ticks }: { pad?:
   }
   return { min: lo, max: hi, ticks: marks, at: (value) => Math.min(1, Math.max(0, (value - lo) / (hi - lo))) }
 }
+
+export type GapSide = "lower" | "same" | "higher"
+
+export type GapAxis = {
+  /** 값 → 기준과의 차이 자리(-1 = 가장 많이 낮음, 0 = 기준, 1 = 가장 많이 높음). */
+  at: (value: number) => number
+  side: (value: number) => GapSide
+}
+
+/**
+ * 기준값(전국 판매가 · 시세)을 가운데에 두는 차이 축. "어디서 얼마에 팔까"의 막대가 쓴다.
+ * 범위 축(priceAxis)은 점의 자리만 보여 줘 얼마 대비인지 읽히지 않아, 기준에서 뻗는 길이로 차이를 그린다.
+ * 기준에서 가장 먼 값이 끝(±1)에 닿는다.
+ */
+export function gapAxis(values: readonly number[], reference: number): GapAxis {
+  const far = Math.max(0, ...values.map((value) => Math.abs(value - reference)))
+  return {
+    at: (value) => (far === 0 ? 0 : (value - reference) / far),
+    side: (value) => (value < reference ? "lower" : value > reference ? "higher" : "same"),
+  }
+}

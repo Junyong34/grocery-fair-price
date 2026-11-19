@@ -2,30 +2,30 @@
 
 import { useState } from "react"
 
-import { priceAxis } from "@workspace/price/axis"
+import { gapAxis } from "@workspace/price/axis"
 import { MARKET_TYPE_NAME, PRICE_COPY } from "@workspace/price/copy"
 import { won } from "@workspace/price/format"
 import { placesByType, sameEverywhere } from "@workspace/price/places"
 import type { PlaceQuote, VarietyDetail } from "@workspace/price/types"
+
+import { GapAxisLabels, GapBar, GapDiff, GapReference } from "../components/gap-bar"
 
 const COPY = PRICE_COPY.detail
 
 /** 전통시장은 이만큼만 먼저 보이고 "모두 보기"로 편다. */
 const MARKETS_SHOWN = 5
 
-const PLACE_COLUMNS = "grid grid-cols-[minmax(0,1fr)_minmax(4.5rem,7rem)_5.25rem] items-center gap-x-3"
+const PLACE_COLUMNS = "grid grid-cols-[minmax(0,1fr)_minmax(4.5rem,7rem)_6rem] items-center gap-x-3"
 
 /**
  * P3 "어디서 얼마에 팔까": 업태별 중간값 두 칸, 대형마트 체인별 · 전통시장별 시세(싼 순).
  * 이 가게가 비싸게 파는지(judgment.md 0장 ①)를 사용자가 직접 견주게 하는 자리라 판정 색을 쓰지 않는다.
- * 각 행의 위치 막대: 점 = 이 곳 가격, 점선 = 전국 중간값(시세).
+ * 기준 줄에 전국 중간값(시세) 금액을 쓰고, 행마다 기준에서 뻗는 차이 막대와 차이 글(↓ 120원 낮음)을 둔다(gap-bar).
  */
 export function PlacesSection({ detail }: { detail: VarietyDetail }) {
   const [allMarkets, setAllMarkets] = useState(false)
   const { large_retail: marts, traditional: markets } = placesByType(detail.places)
-  const axis = priceAxis([...detail.places.map((place) => place.price), detail.price])
-  const x = (v: number) => axis.at(v) * 100
-  const national = x(detail.price)
+  const axis = gapAxis(detail.places.map((place) => place.price), detail.price)
   const shownMarkets = allMarkets ? markets : markets.slice(0, MARKETS_SHOWN)
 
   const row = (place: PlaceQuote) => (
@@ -38,11 +38,11 @@ export function PlacesSection({ detail }: { detail: VarietyDetail }) {
             : place.region ?? COPY.places(place.samples.length)}
         </span>
       </span>
-      <span aria-hidden className="relative h-2 rounded-full bg-hairline">
-        <span className="absolute -top-1 -bottom-1 border-l border-dashed border-stone" style={{ left: `${national}%` }} />
-        <span className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink" style={{ left: `${x(place.price)}%` }} />
+      <GapBar axis={axis} value={place.price} />
+      <span className="flex flex-col items-end justify-self-end">
+        <span className="text-[15px] font-semibold text-ink tabular-nums">{won(place.price)}원</span>
+        <GapDiff axis={axis} value={place.price} reference={detail.price} />
       </span>
-      <span className="justify-self-end text-[15px] font-semibold text-ink tabular-nums">{won(place.price)}원</span>
     </li>
   )
 
@@ -65,6 +65,7 @@ export function PlacesSection({ detail }: { detail: VarietyDetail }) {
           </div>
         ))}
       </dl>
+      {detail.places.length > 0 && <GapReference label={COPY.placesReference(detail.basis)} price={detail.price} />}
       {marts.length > 0 && <PlaceGroup title={COPY.martsTitle}>{marts.map(row)}</PlaceGroup>}
       {markets.length > 0 && (
         <PlaceGroup title={COPY.marketsTitle}>
@@ -83,7 +84,7 @@ export function PlacesSection({ detail }: { detail: VarietyDetail }) {
           )}
         </PlaceGroup>
       )}
-      <p className="text-xs text-caption">{COPY.placesNote(won(detail.price), detail.basis)}</p>
+      {detail.places.length > 0 && <p className="text-xs text-caption">{COPY.placesNote}</p>}
     </section>
   )
 }
@@ -91,10 +92,17 @@ export function PlacesSection({ detail }: { detail: VarietyDetail }) {
 function PlaceGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col">
-      <h3 className="flex items-baseline gap-1.5 border-b border-hairline pb-1.5 text-[13px] font-semibold text-stone">
-        {title}
-        <small className="font-normal text-caption">{COPY.cheapFirst}</small>
-      </h3>
+      <div className="flex flex-col gap-1.5 border-b border-hairline pb-1.5">
+        <h3 className="flex items-baseline gap-1.5 text-[13px] font-semibold text-stone">
+          {title}
+          <small className="font-normal text-caption">{COPY.cheapFirst}</small>
+        </h3>
+        {/* 막대 칸 위 눈금(낮음 · 기준 · 높음). 그룹 제목이 375 폭 이름 칸에 안 들어가 줄을 따로 둔다. */}
+        <div className={PLACE_COLUMNS}>
+          <span />
+          <GapAxisLabels />
+        </div>
+      </div>
       <ul>{children}</ul>
     </div>
   )

@@ -136,6 +136,17 @@ export const PRICE_COPY = {
     categoryLink: (category: string) => `${category} 상품 판매가 보기`,
   },
   /** P3 품종 상세 아래, 같은 id의 제철 품종 상세로 가는 링크 */
+  /**
+   * "어디서 얼마에 팔까"의 차이 막대(상품 · 품종 시세 공통). 판정이 아니어서 싸요 · 비싸요 대신 낮음 · 높음으로 쓴다.
+   * 기준 금액은 목록 위 기준 줄에 한 번 쓰고, 줄마다는 차이만 쓴다(375 폭 한 줄).
+   */
+  gap: {
+    reference: (label: string, price: number) => `기준 · ${label} ${won(price)}원`,
+    axisCenter: "기준",
+    lower: "낮음",
+    higher: "높음",
+    diff: (diff: number) => (diff === 0 ? "기준과 같음" : `${won(Math.abs(diff))}원 ${diff < 0 ? "낮음" : "높음"}`),
+  },
   seasonLink: (name: string) => `${name} 제철 시기 보기`,
   /** 목록 위 설명 한 줄 */
   hint: [
@@ -204,7 +215,6 @@ export const PRICE_COPY = {
     stores: (n: number) => `${n}곳`,
     storesRange: (min: number, max: number) => `점포마다 ${won(min)}~${won(max)}원`,
     promo: "행사 확인",
-    sellersNote: "점 = 이 판매처 중간값, 점선 = 전국 판매가",
     trendTitle: "최근 조사 가격",
     trendLegend: { median: "전국 판매가", min: "조사 최저가" },
     basis: (stores: number, surveyedOn: string) => `참가격 전국 판매점 ${stores}곳 · ${monthDay(surveyedOn)} 조사`,
@@ -295,8 +305,9 @@ export const PRICE_COPY = {
     places: (n: number) => `${n}곳`,
     showAllMarkets: (n: number) => `전통시장 ${n}곳 모두 보기`,
     showFewerMarkets: "접기",
-    placesNote: (national: string, basis: QuoteBasis) =>
-      `막대의 점선은 ${isAverageBasis(basis) ? basis.scope : "전국 중간값"}(${national}원). 매장에서 본 가격을 여기 견주어 보세요.`,
+    /** 차이 막대의 기준 이름: 출처가 낸 평균이면 그 이름(전국 평균), 아니면 전국 중간값 */
+    placesReference: (basis: QuoteBasis) => (isAverageBasis(basis) ? basis.scope : "전국 중간값"),
+    placesNote: "매장에서 본 가격을 기준과 견주어 보세요.",
     why: "왜 이 판정일까?",
     whyNoUsual: "가격 흐름 보기",
     trendTitle: "가격 추이",

@@ -1,19 +1,22 @@
-import { priceAxis } from "@workspace/price/axis"
+import { gapAxis } from "@workspace/price/axis"
 import { CHANNEL_NAME, PRICE_COPY } from "@workspace/price/copy"
 import { won } from "@workspace/price/format"
 import type { ProductDetail } from "@workspace/price/types"
 
+import { GapAxisLabels, GapBar, GapDiff, GapReference } from "../components/gap-bar"
+
 const COPY = PRICE_COPY.product
 
-/** 판매처별 중간값(싼 순). 점은 판매처 중간값, 점선은 전국 판매가다. */
+const ROW = "grid grid-cols-[minmax(0,1fr)_minmax(6.5rem,36%)] gap-x-3"
+
+/**
+ * 판매처별 중간값(싼 순)을 전국 판매가와 견준다. 기준 줄에 전국 판매가 금액을 쓰고,
+ * 줄마다 차이(↓ 1,780원 낮음)와 기준에서 뻗는 차이 막대(gap-bar)를 둔다.
+ */
 export function SellersSection({ product }: { product: ProductDetail }) {
   if (product.sellers.length === 0) return null
 
-  const axis = priceAxis(
-    [...product.sellers.map((seller) => seller.price), product.price],
-    { pad: 0.08 }
-  )
-  const reference = `${axis.at(product.price) * 100}%`
+  const axis = gapAxis(product.sellers.map((seller) => seller.price), product.price)
 
   return (
     <section
@@ -32,25 +35,13 @@ export function SellersSection({ product }: { product: ProductDetail }) {
         </p>
       </div>
       <div className="rounded-3xl bg-pair-muted px-4 text-pair-muted-foreground">
-        <div className="flex flex-wrap gap-x-4 gap-y-1 border-b border-hairline py-2.5 text-[13px] leading-relaxed text-stone">
-          <span className="flex items-center gap-1.5">
-            <span aria-hidden className="size-2 rounded-full bg-ink" />
-            판매처 중간값
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span
-              aria-hidden
-              className="h-3 border-s border-dashed border-stone"
-            />
-            {COPY.nationalPrice}
-          </span>
+        <div className={`${ROW} items-end border-b border-hairline py-2.5`}>
+          <GapReference label={COPY.nationalPrice} price={product.price} />
+          <GapAxisLabels className="mx-1 mb-0.5" />
         </div>
         <ul className="divide-y divide-hairline">
           {product.sellers.map((seller) => (
-            <li
-              key={seller.seller}
-              className="grid grid-cols-[minmax(0,1fr)_minmax(5rem,32%)] items-start gap-x-3 py-3"
-            >
+            <li key={seller.seller} className={`${ROW} items-start py-3`}>
               <div className="flex min-w-0 flex-col gap-0.5">
                 <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
                   <p className="text-base leading-snug font-semibold [overflow-wrap:anywhere] break-keep">
@@ -71,25 +62,12 @@ export function SellersSection({ product }: { product: ProductDetail }) {
                   </p>
                 )}
               </div>
-              <div className="flex min-w-0 flex-col gap-2">
-                <p className="text-end text-base leading-snug font-semibold tabular-nums">
+              <div className="flex min-w-0 flex-col items-end gap-1.5">
+                <p className="text-base leading-snug font-semibold tabular-nums">
                   {won(seller.price)}원
                 </p>
-                <div
-                  aria-hidden
-                  className="relative mx-1 h-1.5 rounded-full bg-hairline"
-                >
-                  <span
-                    className="absolute -inset-y-0.5 border-s border-dashed border-stone"
-                    style={{ insetInlineStart: reference }}
-                  />
-                  <span
-                    className="absolute top-1/2 -ms-1 size-2 -translate-y-1/2 rounded-full bg-ink"
-                    style={{
-                      insetInlineStart: `${axis.at(seller.price) * 100}%`,
-                    }}
-                  />
-                </div>
+                <GapDiff axis={axis} value={seller.price} reference={product.price} />
+                <GapBar axis={axis} value={seller.price} className="mt-0.5 w-[calc(100%-0.5rem)] self-center" />
               </div>
             </li>
           ))}

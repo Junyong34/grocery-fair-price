@@ -47,8 +47,9 @@ describe("nowPriceNote", () => {
     expect(PRICE_COPY.detail.rangeTitle("2026-11-03", 40, kamis)).toBe("11/3 조사한 40곳의 시세 범위")
     expect(PRICE_COPY.detail.rangePin("6,998", ekape)).toBe("전국 평균 6,998원")
     expect(PRICE_COPY.detail.rangePin("827", kamis)).toBe("시세 827원")
-    expect(PRICE_COPY.detail.placesNote("6,998", ekape)).toBe("막대의 점선은 전국 평균(6,998원). 매장에서 본 가격을 여기 견주어 보세요.")
-    expect(PRICE_COPY.detail.placesNote("827", kamis)).toBe("막대의 점선은 전국 중간값(827원). 매장에서 본 가격을 여기 견주어 보세요.")
+    expect(PRICE_COPY.detail.placesReference(ekape)).toBe("전국 평균")
+    expect(PRICE_COPY.detail.placesReference(kamis)).toBe("전국 중간값")
+    expect(PRICE_COPY.gap.reference("전국 평균", 6998)).toBe("기준 · 전국 평균 6,998원")
   })
 
   it("전국 평균 한 건은 중간값이라 하지 않는다", () => {

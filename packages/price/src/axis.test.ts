@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { priceAxis } from "./axis"
+import { gapAxis, priceAxis } from "./axis"
 
 describe("priceAxis", () => {
   it("가장 싼 값이 0, 가장 비싼 값이 1", () => {
@@ -40,5 +40,21 @@ describe("priceAxis", () => {
 
   it("눈금을 청하지 않으면 눈금이 없다", () => {
     expect(priceAxis([100, 200]).ticks).toEqual([])
+  })
+})
+
+describe("gapAxis", () => {
+  it("기준과의 차이를 -1(가장 많이 낮음) ~ 1(가장 많이 높음)로 옮긴다", () => {
+    const gap = gapAxis([8200, 8980, 9980, 11480], 9980)
+    expect(gap.at(8200)).toBe(-1)
+    expect(gap.at(9980)).toBe(0)
+    expect(gap.at(11480)).toBeCloseTo(1500 / 1780)
+  })
+  it("차이 방향을 낮음 · 같음 · 높음으로 나눈다", () => {
+    const gap = gapAxis([900, 1100], 1000)
+    expect([gap.side(900), gap.side(1000), gap.side(1100)]).toEqual(["lower", "same", "higher"])
+  })
+  it("모든 값이 기준과 같으면 0에 둔다", () => {
+    expect(gapAxis([1000, 1000], 1000).at(1000)).toBe(0)
   })
 })
