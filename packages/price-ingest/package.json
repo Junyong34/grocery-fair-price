@@ -11,6 +11,7 @@
     "test:db": "vitest run --config vitest.db.config.ts",
     "contract:baseline": "node scripts/capture-baseline.ts",
     "probe:runner": "node scripts/probe-runner.ts",
+    "check:spec-prices": "node scripts/check-spec-prices.ts",
     "ingest": "node src/cli.ts",
     "backfill": "node src/backfill/cli.ts",
     "catalog": "node src/catalog/cli.ts",

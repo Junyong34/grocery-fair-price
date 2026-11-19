@@ -37,7 +37,7 @@ grocery-fair-price/
 │  ├─ agents/                에이전트 스킬이 읽는 이슈 트래커·라벨·도메인 문서 규칙
 │  └─ project-structure.md   이 문서
 ├─ .scratch/<feature>/       스펙(spec.md)과 티켓(issues/NN-slug.md)
-├─ .githooks/pre-commit      scripts/check-no-secrets.sh 실행
+├─ .githooks/pre-commit      비밀값 검사와 카탈로그 변경 검사
 ├─ prototypes/               (Git 밖) 일러스트 원본, 와이어프레임, 브랜드 원본
 ├─ AGENTS.md                 에이전트 지침: 공통 규칙과 요청별 첫 탐색 경로. 영역 규칙은 그 폴더의 AGENTS.md (CLAUDE.md는 어디서나 @AGENTS.md 한 줄)
 ├─ turbo.json, pnpm-workspace.yaml, package.json
@@ -492,6 +492,7 @@ packages/seasonal/src/data/food-content.generated.ts
 | `pnpm --filter @workspace/price-ingest usual [--to YYYY-MM-DD] [--days N] [--dry-run]` | 평소가와 계절비율 (`INGEST_DATABASE_URL`). 기본은 시세가 있는 마지막 날까지 7일. KAMIS 워크플로가 수집 뒤에 부른다. 6개월을 처음 채울 때 `--days 182` |
 | `pnpm --filter @workspace/price-ingest judgment [--trigger 이름] [--dry-run]` | 판정 묶음(참가격 상품 payload 포함)을 만들고 포인터를 바꾼다 (`INGEST_DATABASE_URL`). 판정 행이 없거나, 판정 행·상품 행이 지금 묶음보다 20% 넘게 줄면 `failed`로 두고 종료 코드 1. 세 수집 워크플로가 부른다 |
 | `pnpm --filter @workspace/price-ingest probe:runner` | 접속 실측 (루트 `.env`를 읽는다. API 3회) |
+| `pnpm --filter @workspace/price-ingest check:spec-prices <품종 slug> [비교 규격 slug]` | 운영 DB 소매 관측값의 원천 단위·환산가·전국 시세 대조. 루트 `.env`의 `INGEST_DATABASE_URL`로 읽기 전용 조회 |
 | `scripts/check-no-secrets.sh [--tree]` | `.env` 값이 커밋 대상에 들어갔는지 검사 (pre-commit) |
 
 처음 클론하면 `git config core.hooksPath .githooks`를 한 번 실행한다.

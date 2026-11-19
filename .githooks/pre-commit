@@ -1,2 +1,26 @@
 #!/usr/bin/env bash
-exec "$(git rev-parse --show-toplevel)/scripts/check-no-secrets.sh"
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+scripts/check-no-secrets.sh
+
+catalog_inputs=(
+  packages/price-ingest/src/catalog
+  packages/price-ingest/test/catalog.test.ts
+  grocery-price/docs/30-data/variety-list.md
+  grocery-price/reference/public-data/samples/inventory
+  packages/seasonal/src/data/foods.generated.ts
+)
+
+if git diff --cached --quiet -- "${catalog_inputs[@]}"; then
+  exit 0
+fi
+
+# Vitest가 읽는 작업 트리의 카탈로그 입력은 커밋에 들어갈 내용과 같아야 한다.
+if ! git diff --quiet -- "${catalog_inputs[@]}"; then
+  echo "카탈로그 검사에 쓰는 파일에 스테이징하지 않은 변경이 있습니다. 커밋할 버전과 작업 트리를 맞춰 주세요." >&2
+  exit 1
+fi
+
+CI=true pnpm_config_verify_deps_before_run=error \
+  exec pnpm --filter @workspace/price-ingest test catalog.test.ts
