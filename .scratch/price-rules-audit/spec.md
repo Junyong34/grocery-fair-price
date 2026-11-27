@@ -47,3 +47,10 @@
 | **6/10** | 공식 평년, 중도매 시세의 흐름 | 축평원 원천 평년은 저장 중이다. KAMIS 공식 평년은 자체 API, 중도매는 `perDay` `02` 수집이 필요하다. 조사 단계·단위·범위가 확인된 품종부터 설명 자료로 검증한다. [KAMIS 공식 API](https://www.kamis.or.kr/customer/reference/openapi_list.do) · [도입 검토](../../grocery-price/docs/00-overview/price-content-plan.md#L40) |
 
 참가격의 월간 공개 CSV는 제조사·판매업소·행사 항목을 제공한다. 상품 메타데이터와 행사 이력의 보완에 쓸 수 있는지 조사일·상품·점포 단위로 대조할 후보다. [한국소비자원 공개 CSV](https://www.data.go.kr/data/15083256/fileData.do)
+
+## jangbol-growth/09에서 옮긴 질문 (2026-11-27)
+
+[시세 요약과 판정 설명에서 보장할 사실](../jangbol-growth/issues/09-price-trust.md)의 대부분은 위 "합의한 기준"이 답한다. 남은 것:
+
+- 평소가 정의 · 판정 경계 · 표본 규칙 · 출처 · 운영자를 어디까지 공개할지, 방법론 · 소개 페이지의 최소 범위.
+- 메타 설명과 본문 문구가 같은 사실을 말하는지, 캐시가 언제 갱신되는지의 기준. 가격 `lastmod`를 실제 조사일에 맞출지.

@@ -4,7 +4,7 @@ Parent: ../map.md
 Label: wayfinder:grilling
 Type: grilling
 Mode: HITL
-Status: open
+Status: wontfix (2026-11-27 지도를 닫음. 남은 질문 → sashimi/08)
 Assignee: —
 Blocked by: —
 

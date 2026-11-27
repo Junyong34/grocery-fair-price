@@ -4,7 +4,7 @@ Parent: ../map.md
 Label: wayfinder:prototype
 Type: prototype
 Mode: HITL
-Status: open
+Status: wontfix (2026-11-27 지도를 닫음. 남은 질문 → calendar-download/11 질문 4)
 Assignee: —
 Blocked by: 03, 04
 

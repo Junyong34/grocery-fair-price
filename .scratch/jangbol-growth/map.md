@@ -1,6 +1,8 @@
 # PDF 유입을 가격 확인으로 연결하기 — 결정 지도
 
 Label: wayfinder:map
+
+> 종료 (2026-11-27): 01만 resolved, 02~11은 wontfix. 남은 질문은 calendar-download/11, catalog-scale/12, sashimi/08, seasonal-render-perf/14, price-rules-audit/spec.md로 옮겼다.
 만든 날: 2026-11-04
 
 ## Destination
@@ -29,7 +31,7 @@ Label: wayfinder:map
 ## 2026-11-27 대조
 
 - 11-04 뒤로 이 지도의 결정 티켓은 하나도 닫히지 않았다. 대신 같은 주제의 일이 개별 명세로 진행됐다: 성능은 `seasonal-render-perf`, 가격 문구는 `price-rules-audit`, 본문은 `seasonal-content-assignments`·`seo/08`, 제철↔시세 연결은 `catalog-scale/12`. 각 티켓의 `## Comments`에 대조 내용을 적었다.
-- 이 지도를 계속 쓸지, 남은 질문만 개별 명세로 옮기고 wontfix로 닫을지 운영자가 정한다.
+- 2026-11-27 운영자 결정: 남은 질문을 개별 명세로 옮기고 지도를 닫는다.
 
 ## Not yet specified
 

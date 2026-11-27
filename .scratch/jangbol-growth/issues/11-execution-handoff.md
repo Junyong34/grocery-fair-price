@@ -4,7 +4,7 @@ Parent: ../map.md
 Label: wayfinder:grilling
 Type: grilling
 Mode: HITL
-Status: open
+Status: wontfix (2026-11-27 지도를 닫음. 남은 질문 → 옮기지 않음. 실행 순서는 각 명세가 소유함)
 Assignee: —
 Blocked by: 04, 06, 07, 08, 09, 10
 

@@ -4,7 +4,7 @@ Parent: ../map.md
 Label: wayfinder:grilling
 Type: grilling
 Mode: HITL
-Status: open
+Status: wontfix (2026-11-27 지도를 닫음. 남은 질문 → seasonal-render-perf/14(가격 화면). 제철 화면은 seasonal-render-perf 01~13이 답함)
 Assignee: —
 Blocked by: 01, 02, 05
 
