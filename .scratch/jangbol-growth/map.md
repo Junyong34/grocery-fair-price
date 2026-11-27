@@ -26,6 +26,11 @@ Label: wayfinder:map
 
 - [공개 운영 상태와 기존 주장의 기준선 확인](issues/01-public-baseline.md): 공개 표본 OG500·없는 slug200·사이트맵408을 확인하고 전체 장애·실제 색인·cold 성능·운영 원인은 미확인으로 분리했다.
 
+## 2026-11-27 대조
+
+- 11-04 뒤로 이 지도의 결정 티켓은 하나도 닫히지 않았다. 대신 같은 주제의 일이 개별 명세로 진행됐다: 성능은 `seasonal-render-perf`, 가격 문구는 `price-rules-audit`, 본문은 `seasonal-content-assignments`·`seo/08`, 제철↔시세 연결은 `catalog-scale/12`. 각 티켓의 `## Comments`에 대조 내용을 적었다.
+- 이 지도를 계속 쓸지, 남은 질문만 개별 명세로 옮기고 wontfix로 닫을지 운영자가 정한다.
+
 ## Not yet specified
 
 - 실제 유입과 전환의 이탈 위치가 드러나면 다음 실험의 형태·규모를 구체화한다. 아직 문구 실험, 배포 채널 확대, 가격 재방문 유도 중 어느 실험인지 정하지 않는다.

@@ -24,3 +24,7 @@ Blocked by: 01, 02
 
 - [공개 운영 상태와 기존 주장의 기준선 확인](01-public-baseline.md)
 - [운영 로그와 검색·분석 관측 공백 확보](02-private-observations.md)
+
+## Comments
+
+- 2026-11-27 대조: GA4 이벤트 4개(print_*)가 운영에 붙었다(calendar-download/08). PDF → 가격 상세 도달을 재는 지표·이벤트는 아직 정하지 않았다.

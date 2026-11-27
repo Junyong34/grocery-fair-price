@@ -29,3 +29,7 @@ Blocked by: 04, 06, 07, 08, 09, 10
 - [리전과 제철 화면 성능의 투자 기준](08-performance.md)
 - [시세 요약과 판정 설명에서 보장할 사실](09-price-trust.md)
 - [콘텐츠와 외부 배포에 쓸 최소 실험 예산](10-content-distribution.md)
+
+## Comments
+
+- 2026-11-27 대조: 선행 결정이 하나도 닫히지 않아 시작할 수 없다. 지도를 만든 11-04 뒤 실제 작업은 이 지도를 거치지 않고 개별 명세(seasonal-render-perf, price-rules-audit, seasonal-content-assignments, catalog-scale)로 진행됐다.

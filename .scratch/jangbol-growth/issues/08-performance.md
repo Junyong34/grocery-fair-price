@@ -24,3 +24,7 @@ Blocked by: 01, 02, 05
 - [공개 운영 상태와 기존 주장의 기준선 확인](01-public-baseline.md)
 - [운영 로그와 검색·분석 관측 공백 확보](02-private-observations.md)
 - [PDF 방문자를 가격 확인으로 이끄는 최소 동선](05-conversion-path.md)
+
+## Comments
+
+- 2026-11-27 대조: 제철 화면 쪽은 [seasonal-render-perf](../../seasonal-render-perf/spec.md)가 사용자와 문답으로 정하고 실행했다(완전 정적화, Cloudflare 직결, 재측정 13 resolved, 남은 05 SVGO·06 immutable). 가격 첫 요청과 리전(`hnd1`) 판단은 남았다.

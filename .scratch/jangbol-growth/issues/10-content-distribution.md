@@ -26,3 +26,7 @@ Blocked by: 03, 06, 07, 09
 - [제철·가격 대응과 가격 허브의 연결 범위](06-link-coverage.md)
 - [제철 회 목록의 월별 포함 기준과 근거](07-sashimi-consistency.md)
 - [시세 요약과 판정 설명에서 보장할 사실](09-price-trust.md)
+
+## Comments
+
+- 2026-11-27 대조: 제철 상세 본문 281개를 다시 썼고(seasonal-content-assignments) 278개를 품종 상세와 검색 설명문에 연결했다(seo/08). 외부 배포 채널·실험 예산은 정하지 않았다. 김장 시즌(11~12월)은 거의 지났다.

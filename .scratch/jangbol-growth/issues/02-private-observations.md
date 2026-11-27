@@ -21,3 +21,7 @@ Blocked by: —
 - 연결 도구나 기존 계정으로 읽을 수 있는 내용은 에이전트가 먼저 확인한다. 계정 조작·신규 등록·환경 변수 변경은 별도 실행 인계다. 접근 권한이 없으면 필요한 화면·최소 관측값·담당을 남기고 증거 확보 전에는 resolved로 닫지 않는다.
 
 완료 산출물: 관측값 또는 민감정보를 제거한 증거 링크, 확인 시각, 계정 담당, 남은 차단 조건. 이 작업은 등록·배포 자체를 납품하기 위한 티켓이 아니다.
+
+## Comments
+
+- 2026-11-27 대조: GA4는 연결됐다(사용자 확인, calendar-download/08 resolved). Vercel 함수 리전은 `apps/web/vercel.json`의 `hnd1`, 응답 엣지는 `icn1`(seasonal-render-perf/09). Search Console·네이버 소유 확인 값은 `GOOGLE_SITE_VERIFICATION`·`NAVER_SITE_VERIFICATION` 환경 변수로 넣는 경로가 있다. 등록·제출 상태와 실제 GA 관측값은 아직 이 티켓에 증거로 남기지 않았다.

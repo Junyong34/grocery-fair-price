@@ -23,7 +23,7 @@ grep -rlE "^Status: (ready-for-agent|ready-for-human|needs-triage|needs-info|cla
 | `baby-food-ingredient-pages/` | 이유식 재료별 궁합 페이지 | 04 `ready-for-human`(재료 본문) |
 | `p3-variety-catalog/` | 표현 가능 값 카탈로그 | 02 `ready-for-human`(시세 없는 품종 대응 결정) |
 | `dev-workflow/` | 개발 → 배포 절차 (spec만, 티켓 없음) | spec `ready-for-human`(PR 템플릿 · 커밋 type 초안 확인) |
-| `jangbol-growth/` | 성장 과제 결정 지도 (wayfinder, `map.md`) | 02~11 `open`. 2026-11-04 이후 손대지 않았고, 그 사이 끝난 항목이 있는지 대조하지 않았다 |
+| `jangbol-growth/` | 성장 과제 결정 지도 (wayfinder, `map.md`) | 02~11 `open`. 2026-11-27 대조: 닫힌 결정은 없고 같은 주제가 개별 명세로 진행됨(각 티켓 Comments). 계속 쓸지 정해야 한다 |
 
 ## 끝났지만 열린 티켓이 남은 것
 

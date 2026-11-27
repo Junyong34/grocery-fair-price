@@ -24,3 +24,7 @@ Blocked by: 01, 05
 
 - [공개 운영 상태와 기존 주장의 기준선 확인](01-public-baseline.md)
 - [PDF 방문자를 가격 확인으로 이끄는 최소 동선](05-conversion-path.md)
+
+## Comments
+
+- 2026-11-27 대조: 같은 질문의 데이터 쪽이 [catalog-scale/12 제철 품종과 시세의 다대다 연결](../../catalog-scale/issues/12-seasonal-many-to-many.md)(needs-triage)이다. 둘 중 하나로 합칠지 정해야 한다.
