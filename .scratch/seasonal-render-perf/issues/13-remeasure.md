@@ -1,6 +1,6 @@
 # 13. 재설계 뒤 운영 재측정
 
-Status: ready-for-agent
+Status: resolved (2026-11-11 재측정·baseline.md 기록. LCP·TBT는 측정 PC 부하로 판정 못 함, 부하 없을 때 다시 잼)
 Type: task (AFK)
 Blocked by: 09, 10, 11, 12
 

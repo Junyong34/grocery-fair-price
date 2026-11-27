@@ -1,6 +1,6 @@
 # 07. 로컬 카탈로그 어드민 `/admin/catalog`
 
-Status: claimed (제안 목록 완료 2026-11-09. pending 직접 연결·카탈로그 탐색·묶기·변경 기록은 남음)
+Status: ready-for-agent (제안 검토·카테고리·식재료·상품 목록 완료. 남은 것: pending 직접 연결, 묶기, 변경 기록 화면)
 Type: task
 Blocked by: 04
 

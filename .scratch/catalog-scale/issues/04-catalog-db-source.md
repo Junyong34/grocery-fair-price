@@ -1,6 +1,6 @@
 # 04. 카탈로그 DB 원본 전환
 
-Status: claimed
+Status: resolved (2026-11-09 운영 적용. 11-10 이후 KAMIS·축평원·참가격 정기 수집이 DB 규칙으로 매일 성공, 2026-11-27 확인)
 Type: task
 Blocked by: 01
 

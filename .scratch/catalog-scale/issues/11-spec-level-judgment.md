@@ -1,6 +1,6 @@
 # 11. 식재료 규격별 판정
 
-Status: needs-triage
+Status: ready-for-agent (2026-11-19 품종 상세에 규격별 소매 시세 표시까지. 남은 것: 검색 규격 행, 규격 경로, 규격별 판정, 육계 호수 단위 확인)
 Type: task
 Blocked by: 04
 

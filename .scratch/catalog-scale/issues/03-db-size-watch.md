@@ -1,6 +1,6 @@
 # 03. DB 크기 감시
 
-Status: claimed
+Status: resolved (2026-11-09 운영 적용, heartbeat가 price.db_size로 400MB 문턱 감시)
 Type: task
 Blocked by: 없음
 

@@ -1,6 +1,6 @@
 # 04. KAMIS 3년 백필과 계절비율 계산 입력
 
-Status: ready-for-agent
+Status: ready-for-agent (KAMIS 364개·축평원 326개 묶음 완료. 남은 것: 축평원 2023-01 묶음 3개 실패, 품목별 이력 시작일)
 Type: task
 Blocked by: 03
 

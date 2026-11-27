@@ -1,6 +1,6 @@
 # 03. 수집 패키지와 GitHub Actions 워크플로
 
-Status: ready-for-agent
+Status: resolved (packages/price-ingest와 ingest-*.yml·heartbeat가 매일 돎, 2026-11-27 확인. 빈 날 메우기는 ingest-schedule/08)
 Type: task
 Blocked by: 01, 02, p2-data-source-spec/12
 

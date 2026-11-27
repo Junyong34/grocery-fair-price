@@ -1,6 +1,6 @@
 # 06. AI 제안 흐름 (로컬 에이전트)
 
-Status: claimed (pending 63개 제안·적용 완료, 가공식품 388개 제안 #515~902 넣음 2026-11-09. 적용은 어드민 검토 뒤)
+Status: resolved (pending 63개·가공식품 388개 제안 모두 적용 2026-11-09. 틀린 유형은 쓰이며 드러나면 Answer에 더함)
 Type: task
 Blocked by: 04, 05 (둘 다 끝남)
 

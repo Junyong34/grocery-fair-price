@@ -2,7 +2,7 @@
 
 진행 중인 일을 찾는 입구다. 기능마다 폴더 하나(`spec.md`, `issues/NN-이름.md`)이고, 규칙은 `docs/agents/issue-tracker.md`와 `docs/agents/triage-labels.md`에 있다.
 
-**상태의 원본은 각 티켓의 `Status:` 줄이다.** 이 표는 2026-11-12에 그 줄을 모은 것이라 어긋날 수 있다. 지금 열린 티켓은 저장소 루트에서 이 명령으로 다시 찾는다.
+**상태의 원본은 각 티켓의 `Status:` 줄이다.** 이 표는 2026-11-27에 그 줄을 모은 것이라 어긋날 수 있다. 지금 열린 티켓은 저장소 루트에서 이 명령으로 다시 찾는다.
 
 ```bash
 grep -rlE "^Status: (ready-for-agent|ready-for-human|needs-triage|needs-info|claimed|open)" .scratch/*/issues
@@ -16,12 +16,13 @@ grep -rlE "^Status: (ready-for-agent|ready-for-human|needs-triage|needs-info|cla
 
 | 폴더 | 무엇 | 열린 티켓 |
 |---|---|---|
-| `catalog-scale/` | 시세 카탈로그를 수천 개 항목으로 넓히기 (ADR 0005) | 03 · 04 · 06 · 07 `claimed`, 02 `ready-for-human`, 11 · 12 · 13 `needs-triage` |
-| `ingest-foundation/` | ① 수집 기반 | 03 · 04 · 05 `ready-for-agent`, 01 `ready-for-human` |
+| `catalog-scale/` | 시세 카탈로그를 수천 개 항목으로 넓히기 (ADR 0005) | 07 · 11 `ready-for-agent`(어드민 남은 화면, 규격별 판정 후속), 02 `ready-for-human`, 12 · 13 `needs-triage` |
+| `ingest-foundation/` | ① 수집 기반 | 04 · 05 `ready-for-agent`(축평원 실패 묶음 3개, 장애 처리 남은 칸), 01 `ready-for-human` |
 | `ingest-schedule/` | 수집 일정과 감시 (wayfinder, `map.md`) | 08 · 09 `open` |
-| `seasonal-render-perf/` | 제철달력 렌더링 속도 | 05 · 06 · 13 `ready-for-agent` |
+| `seasonal-render-perf/` | 제철달력 렌더링 속도 | 05 · 06 `ready-for-agent` |
 | `baby-food-ingredient-pages/` | 이유식 재료별 궁합 페이지 | 04 `ready-for-human`(재료 본문) |
 | `p3-variety-catalog/` | 표현 가능 값 카탈로그 | 02 `ready-for-human`(시세 없는 품종 대응 결정) |
+| `dev-workflow/` | 개발 → 배포 절차 (spec만, 티켓 없음) | spec `ready-for-human`(PR 템플릿 · 커밋 type 초안 확인) |
 | `jangbol-growth/` | 성장 과제 결정 지도 (wayfinder, `map.md`) | 02~11 `open`. 2026-11-04 이후 손대지 않았고, 그 사이 끝난 항목이 있는지 대조하지 않았다 |
 
 ## 끝났지만 열린 티켓이 남은 것
@@ -29,8 +30,7 @@ grep -rlE "^Status: (ready-for-agent|ready-for-human|needs-triage|needs-info|cla
 | 폴더 | 무엇 | 남은 티켓 |
 |---|---|---|
 | `seasonal-mvp/` | 제철달력 MVP 화면. **제철 화면 명세로 쓴다** | 12 `ready-for-agent`(태블릿 폭 · 모션 점검) |
-| `calendar-download/` | 제철 인쇄물 내려받기 | 08 · 10 `ready-for-human`(GA 등록, 처리방침 게시), 09 `needs-triage`(PDF 크기) |
-| `seo/` | 검색 색인 기반 | 08 `needs-triage`(품종 본문 보강) |
+| `calendar-download/` | 제철 인쇄물 내려받기 | 10 `ready-for-human`(처리방침 문구 승인), 09 `needs-triage`(PDF 크기) |
 | `infant-food-pairing/` | 이유식 재료 궁합 시안. 판독 원자료 `image-analysis.md` | 01 `needs-info`(그림의 범위 · 형태 적합성 검토) |
 | `search-first-view/` (종료) | 검색 한 번에 보는 가격 | 05 · 07 `ready-for-agent` |
 | `p2-data-source-spec/` (종료) | 데이터 소스 명세 | 03 · 07 · 08 · 09 `ready-for-agent`, 06 `ready-for-human`. 필요할 때 따로 다시 연다 |
@@ -41,6 +41,7 @@ grep -rlE "^Status: (ready-for-agent|ready-for-human|needs-triage|needs-info|cla
 
 | 폴더 | 무엇 | 지금 쓰임 |
 |---|---|---|
+| `seo/` | 검색 색인 기반. 08 품종 본문 · 09 대표 이미지까지 끝남 | 검색 메타의 근거 |
 | `docs-and-illustration-cleanup/` | 품종 원본 · 그림 어드민 · 문서 정리(2026-11-12). 정리표에 하지 않은 두 행의 이유가 있다 | 품종 원본과 그림 어드민의 근거 (ADR 0006) |
 | `price-screens/` | 가격 화면(시세 · 판정) 1차 구현 | **가격 화면 명세.** 상품 화면은 `catalog-scale/issues/10`이 이어 받음 |
 | `price-db-read/` | 가격 화면을 실제 DB로 읽기 | 가격 데이터 읽기 경로의 근거 |
