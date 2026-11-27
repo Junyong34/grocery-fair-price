@@ -19,7 +19,7 @@ grep -rlE "^Status: (ready-for-agent|ready-for-human|needs-triage|needs-info|cla
 | `catalog-scale/` | 시세 카탈로그를 수천 개 항목으로 넓히기 (ADR 0005) | 11 `ready-for-agent`(규격별 판정 후속), 02 `ready-for-human`, 12 · 13 `needs-triage`(12에 제철↔시세 링크 범위를 합침) |
 | `ingest-foundation/` | ① 수집 기반 | 04 · 05 `ready-for-agent`(축평원 실패 묶음 3개, 장애 처리 남은 칸) |
 | `ingest-schedule/` | 수집 일정과 감시 (wayfinder, `map.md`) | 08 · 09 `open` |
-| `seasonal-render-perf/` | 제철달력 렌더링 속도 | 06 `ready-for-agent`, 14 `needs-triage`(가격 화면 첫 요청) |
+| `seasonal-render-perf/` | 제철달력 렌더링 속도 | 14 `needs-triage`(가격 화면 첫 요청) |
 | `baby-food-ingredient-pages/` | 이유식 재료별 궁합 페이지 | 04 `ready-for-human`(재료 본문) |
 | `p3-variety-catalog/` | 표현 가능 값 카탈로그 | 02 `ready-for-human`(시세 없는 품종 대응 결정) |
 | `dev-workflow/` | 개발 → 배포 절차 (spec만, 티켓 없음) | spec `ready-for-human`(PR 템플릿 · 커밋 type 초안 확인) |

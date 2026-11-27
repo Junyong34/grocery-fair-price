@@ -1,6 +1,6 @@
 # 06. 그림 주소 버전과 immutable 캐시
 
-Status: claimed (구현·로컬 헤더 확인 2026-11-27. 남은 것: 운영 배포 뒤 헤더 확인)
+Status: resolved (2026-11-27 운영 확인: /seasonal 그림 주소에 ?v=, 응답 public, max-age=31536000, immutable)
 Type: task (AFK)
 Blocked by: 05
 
