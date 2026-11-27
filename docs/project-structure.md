@@ -308,6 +308,9 @@ P1~P4는 `components/price-layout.css`의 `.price-page`로 폭을 공유한다. 
 | `data/foods.generated.ts` | 생성 파일. 품종 행 (`id`, `name`, `aliases`, `category`, `months`) |
 | `data/drawn-foods.generated.ts` | 생성 파일. 일러스트가 있는 품종 id |
 | `data/food-bounds.generated.ts` | 생성 파일. 그림이 상자 안에서 아래로 어디까지 그려지는지 (이름표 위치) |
+| `data/food-versions.ts` | 그림 주소 버전을 만드는 순수 함수(`foodVersion`: color·motion SHA-256 앞 8자, `foodVersionsText`). `scripts/hash-food-svgs.mjs`가 Node로 바로 읽는다 |
+| `data/food-versions.generated.ts` | 생성 파일. 웹 그림 폴더 → 내용 해시(`FOOD_VERSIONS`) |
+| `data/food-art.ts` | `foodArtSrc`: 화면 `<img>`용 그림 주소. 해시가 있으면 `?v=`를 붙여 1년 immutable 캐시를 받는다(`apps/web/next.config.ts` `headers()`) |
 | `data/food-sizes.ts` | `FOOD_SCALE`: 작아 보이는 품종의 그림 배율. 손으로 조정 |
 | `data/months.ts` | `MONTHS`, `isMonth`, `formatSeasonMonths`, `orderSeasonMonths` |
 | `data/seasons.ts` | `SEASONS`, `SEASON_MONTHS`, `isSeason`, `seasonOfMonth` |
@@ -401,6 +404,7 @@ apps/web/public/foods/<id>/color.svg, motion.svg
 apps/web/public/foods/PROVENANCE.md         그림체 버전·sha·품종 목록
 packages/seasonal/src/data/drawn-foods.generated.ts
 packages/seasonal/src/data/food-bounds.generated.ts   (pnpm foods:bounds로 따로도)
+packages/seasonal/src/data/food-versions.generated.ts   그림 주소 ?v= 해시 (pnpm foods:versions로 따로도)
 apps/web/public/dishes/<id>/color.svg        명절 전통 음식 (dish-rows.ts에 있는 것만)
 apps/web/public/dishes/PROVENANCE.md
 packages/seasonal/src/data/drawn-dishes.generated.ts
@@ -471,7 +475,8 @@ packages/seasonal/src/data/food-content.generated.ts
 | `pnpm test` | vitest: `packages/seasonal`, `packages/price`, `packages/ui`, `packages/price-ingest`(오프라인), `apps/web`(SEO 가드 포함) |
 | `pnpm format` | Prettier |
 | `pnpm ui:add <name-or-url>` | cojeev·shadcn 컴포넌트를 `packages/ui`에 설치 |
-| `pnpm foods:sync` / `pnpm foods:bounds` | 품종 목록 · 웹 그림 · 그림 목록 · 경계값 · 출처 기록을 한 번에(`--check`는 검사만) / 그림 아래 끝만 재측정 |
+| `pnpm foods:sync` / `pnpm foods:bounds` | 품종 목록 · 웹 그림 · 그림 목록 · 경계값 · 그림 주소 해시 · 출처 기록을 한 번에(`--check`는 검사만) / 그림 아래 끝만 재측정 |
+| `pnpm foods:versions` | `public/foods`의 SVG 내용 해시만 다시 만든다(`food-versions.generated.ts`, SVG는 고치지 않는다) |
 | `pnpm foods:content` | 품종 상세 원고를 화면 데이터로(`--check`는 생성 파일이 원고와 같은지만) |
 | `pnpm --filter @workspace/seasonal build:foods` | 품종 목록만 생성(검사와 그림 없이. 보통은 `pnpm foods:sync`를 쓴다) |
 | `pnpm db:start` / `pnpm db:stop` | 로컬 Supabase (Docker). 쓰지 않는 서비스는 끄고 띄운다. DB 어드민은 Studio http://127.0.0.1:55323 (Table Editor에서 schema `price`) |

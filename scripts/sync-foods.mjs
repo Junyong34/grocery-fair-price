@@ -7,7 +7,7 @@
 //
 // 입력: packages/seasonal/src/data/food-registry.json(품종 원본), infant-art.json(이유식 그림), dish-rows.ts(전통 음식),
 //       prototypes/seasonal-food의 foods/<그림 ID>/{food.mjs, art.json}, dishes/<id>/food.mjs, kit, styles/watercolor.
-// 출력: packages/seasonal/src/data/{foods,drawn-foods,drawn-dishes,food-bounds}.generated.ts,
+// 출력: packages/seasonal/src/data/{foods,drawn-foods,drawn-dishes,food-bounds,food-versions}.generated.ts,
 //       apps/web/public/foods/<웹 폴더>/{color,motion}.svg와 PROVENANCE.md, apps/web/public/dishes/<id>/color.svg와 PROVENANCE.md.
 //
 // 내보내는 그림은 "그림 검수를 마쳤고 어느 화면 데이터든 가리키는 그림"이다(planFoodSync).
@@ -25,6 +25,7 @@ import { DISH_ROWS } from "../packages/seasonal/src/data/dish-rows.ts"
 import { parseFoodRegistry } from "../packages/seasonal/src/data/food-registry.ts"
 import { duplicateFoodIds, planFoodSync } from "../packages/seasonal/src/data/food-sync-plan.ts"
 import { RENAMED_FOOD_IDS } from "../packages/seasonal/src/data/renamed-foods.ts"
+import { foodVersionsSource } from "./hash-food-svgs.mjs"
 import { foodBoundsSource } from "./measure-food-bounds.mjs"
 
 const STYLE_ID = "watercolor"
@@ -225,6 +226,8 @@ ${drawn.map((item) => `  ${JSON.stringify(item.id)},`).join("\n")}
 
   const bounds = await foodBoundsSource(join(work, "foods"))
   stage("food-bounds.generated.ts", "packages/seasonal/src/data/food-bounds.generated.ts", bounds.text)
+  const versions = await foodVersionsSource(join(work, "foods"))
+  stage("food-versions.generated.ts", "packages/seasonal/src/data/food-versions.generated.ts", versions.text)
 
   say(`${style.id} v${style.version}: 그림 ${foods.length}개 → apps/web/public/foods/, 전통 음식 ${dishes.length}개 → apps/web/public/dishes/`)
   const skippedDishes = dishDirs.filter((id) => !shownDishes.includes(id))

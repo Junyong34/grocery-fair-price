@@ -29,6 +29,18 @@ const nextConfig: NextConfig = {
       { source: "/prices", destination: "/", permanent: true },
     ]
   },
+  // 그림 SVG는 주소에 내용 해시(?v=)가 붙은 요청만 1년 immutable로 캐시한다. 그림이 바뀌면 foods:sync가 해시를 바꿔 주소가 바뀐다
+  // (packages/seasonal/src/data/food-art.ts). 버전 없는 요청은 기본 헤더 그대로다. headers는 /public 파일보다 먼저 적용된다
+  // (node_modules/next/dist/docs/01-app/03-api-reference/05-config/01-next-config-js/headers.md).
+  async headers() {
+    return [
+      {
+        source: "/foods/:path*",
+        has: [{ type: "query", key: "v" }],
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+    ]
+  },
   experimental: {
     // next dev · build가 설치된 버전의 보안 권고를 확인해 안전한 버전을 알린다(기본값과 같다). 자동으로 올리지는 않는다.
     agentUpgrade: "security",

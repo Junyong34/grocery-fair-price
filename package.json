@@ -12,6 +12,7 @@
     "test": "turbo test",
     "foods:sync": "node scripts/sync-foods.mjs",
     "foods:bounds": "node scripts/measure-food-bounds.mjs",
+    "foods:versions": "node scripts/hash-food-svgs.mjs",
     "foods:content": "node packages/seasonal/scripts/build-food-content.mjs",
     "db:start": "supabase start -x realtime,edge-runtime,logflare,vector,imgproxy,mailpit",
     "db:stop": "supabase stop",
