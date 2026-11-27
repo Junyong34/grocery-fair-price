@@ -49,6 +49,7 @@ import {
 import { lockSource, mergeObservations, stageObservations, type MergeResult, type ObservationRow } from "./observation.ts"
 import type { Json, RawFile } from "./raw-file.ts"
 import type { DbSource } from "./types.ts"
+import { splitByRetention } from "./restore-rules.ts"
 import { mapStagedObservations } from "./variety.ts"
 import { kstDateOf } from "./window.ts"
 
@@ -311,6 +312,12 @@ async function observationRowsOf(
   return { ids, rows, rejected }
 }
 
+// 원본 파일 하나의 관측값 행 (DB 번호까지). 관측값 표는 건드리지 않는다. 보존 기간 밖 재등록 복원이 쓴다 (restore.ts).
+// 원천 키·위치가 없으면 만든다. 트랜잭션 안에서 부른다
+export async function rawFileObservationRows(tx: Tx, rawObjectId: number, file: RawFile): Promise<ObservationRow[]> {
+  return (await observationRowsOf(tx, file.header.source, rawObjectId, file, prepare(file))).rows
+}
+
 // 참가격 가격 원본 여러 개를 관측값 모양의 임시 표 table에 담는다. 관측값 표는 건드리지 않는다.
 // files는 받은 순서대로 준다: 같은 키는 뒤의 것이 남는다 (적재의 병합과 같은 결과). 트랜잭션 안에서 부른다
 export async function stageRawPriceFiles(
@@ -369,12 +376,15 @@ export type LoadStatus = "loaded" | "partially_rejected" | "rejected"
 
 export type LoadOutcome = {
   rawObjectId: number
+  job: RawFile["header"]["job"] // 원본을 받은 작업 (재등록 감시는 바뀐 날만 일자 요약을 다시 낸다)
   status: LoadStatus
   rejected: RejectedRow[] // 사유에 값은 넣지 않는다
   observations: MergeResult
   references: number // 새로 생기거나 고쳐 쓴 평년 행
   createdMasters: number // 참가격 마스터 파일이 새로 만든 점포·상품
   backfill: StagedQuoteResult | null // 백필 원본이면 임시 표에서 바로 낸 시세 요약
+  // KAMIS 정기 원본(재등록 감시)에 온 보존 기간(90일) 밖의 행. 관측값에 넣지 않았다. 원본에서 다시 만든다 (restore.ts, 09)
+  outdated: ObservationRow[]
   sellers?: SellerOutcome // 참가격 점포 마스터면 판매처 연결 결과
 }
 
@@ -393,7 +403,7 @@ async function markLoaded(tx: Tx, rawObjectId: number, status: LoadStatus, rejec
      where id = ${rawObjectId}`
 }
 
-const NO_CHANGE: MergeResult = { inserted: 0, changed: 0, corrections: 0 }
+const NO_CHANGE: MergeResult = { inserted: 0, changed: 0, corrections: 0, dates: [] }
 
 // 참가격 마스터 파일 (점포·상품). 관측값은 만들지 않는다.
 function loadChamgaMaster(sql: Sql | Tx, rawObjectId: number, file: RawFile): Promise<LoadOutcome> {
@@ -415,12 +425,14 @@ function loadChamgaMaster(sql: Sql | Tx, rawObjectId: number, file: RawFile): Pr
     await markLoaded(tx, rawObjectId, status, outcome.rejected)
     return {
       rawObjectId,
+      job: file.header.job,
       status,
       rejected: outcome.rejected,
       observations: NO_CHANGE,
       references: 0,
       createdMasters: outcome.created,
       backfill: null,
+      outdated: [],
       ...(sellers && { sellers }),
     }
   })
@@ -441,7 +453,15 @@ export async function loadRawFile(sql: Sql | Tx, rawObjectId: number, file: RawF
 
   return transaction(sql, async (tx) => {
     await lockSource(tx, source)
-    const { ids, rows, rejected } = await observationRowsOf(tx, source, rawObjectId, file, prepared)
+    const prepared_ = await observationRowsOf(tx, source, rawObjectId, file, prepared)
+    const { ids, rejected } = prepared_
+    // KAMIS 정기 원본의 90일 밖 행은 관측값에 넣지 않는다 (pipeline 3-3 "보존 기간이 지난 행이 다시 등록되어 오면" 1).
+    // 비교할 관측값이 없어 넣으면 그날 표본이 그 행 하나가 된다. 오늘을 모르면(직접 부른 테스트) 나누지 않는다
+    const split =
+      source === "kamis" && backfillToday === null && options.today !== undefined
+        ? splitByRetention(prepared_.rows, addDays(options.today, -KAMIS_KEEP_DAYS))
+        : { kept: prepared_.rows, outdated: [] }
+    const rows = split.kept
 
     // 처음 본 원천 키·상품이 카탈로그에 있으면 바로 잇는다. 없으면 pending으로 남아 운영자가 본다 (09)
     await applyMappings(tx, { onLoad: true })
@@ -462,6 +482,6 @@ export async function loadRawFile(sql: Sql | Tx, rawObjectId: number, file: RawF
     rejected.sort((a, b) => a.index - b.index)
     const status = statusOf(file.rows.length, rejected.length)
     await markLoaded(tx, rawObjectId, status, rejected)
-    return { rawObjectId, status, rejected, observations, references, createdMasters: 0, backfill }
+    return { rawObjectId, job: file.header.job, status, rejected, observations, references, createdMasters: 0, backfill, outdated: split.outdated }
   })
 }

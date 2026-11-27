@@ -136,8 +136,9 @@ class FileBuilder {
 // recheckDays를 주면 D-N~D-1을 다시 받는다 (주간 14일 다시 받기, pipeline 5-1). 라벨이 달라 매일 파일과 따로 중복 판정한다
 export const KAMIS_DAILY_DAYS = 3
 
-export async function collectKamis(ctx: CollectContext, day: string, recheckDays?: number): Promise<Collected> {
-  const from = addDays(day, -(recheckDays ?? KAMIS_DAILY_DAYS))
+// extraDays: 빈 날 메우기가 더한 날 (fill-gaps.ts). 기간 호출이라 시작일만 앞당긴다 (품목당 호출 수는 그대로, 축산은 페이지가 는다)
+export async function collectKamis(ctx: CollectContext, day: string, recheckDays?: number, extraDays: readonly string[] = []): Promise<Collected> {
+  const from = [addDays(day, -(recheckDays ?? KAMIS_DAILY_DAYS)), ...extraDays].sort()[0]!
   const to = addDays(day, -1)
   const label = recheckDays === undefined ? "daily" : "recheck"
   const builder = new FileBuilder(ctx, { endpoint: KAMIS_ENDPOINT, label, targetFrom: from, targetTo: to })
@@ -148,8 +149,31 @@ export async function collectKamis(ctx: CollectContext, day: string, recheckDays
   return builder.result()
 }
 
-function fetchKamisRetail(call: CallOptions, item: KamisItem, from: string, to: string) {
-  return fetchKamisPerDayAll(call, { fromYmd: compact(from), toYmd: compact(to), ctgryCd: item.ctgryCd, itemCd: item.itemCd, seCd: "01" })
+function fetchKamisRetail(call: CallOptions, item: KamisItem, from: string, to: string, regSince?: string) {
+  return fetchKamisPerDayAll(call, {
+    fromYmd: compact(from),
+    toYmd: compact(to),
+    ctgryCd: item.ctgryCd,
+    itemCd: item.itemCd,
+    seCd: "01",
+    ...(regSince === undefined ? {} : { regSince }),
+  })
+}
+
+// 재등록 감시가 보는 조사일 기간. KAMIS 원본을 1년 두고(3-9 보관 5) 재등록은 최대 249일 뒤였다 (kamis.md 6-1)
+export const KAMIS_WATCH_DAYS = 365
+
+// KAMIS 재등록 감시 (ingest-schedule/09, kamis.md 6-3의 2): 품목마다 D-365~D-1 중 regSince 이후 등록된 행만 받는다.
+// 재등록된 행만 와서 대개 품목당 1회다. 축산은 등록 시각이 null이라 잡히지 않는다 (매일·주간 범위와 축평원이 맡는다)
+export async function collectKamisWatch(ctx: CollectContext, day: string, regSince: string): Promise<Collected> {
+  const from = addDays(day, -KAMIS_WATCH_DAYS)
+  const to = addDays(day, -1)
+  const builder = new FileBuilder(ctx, { endpoint: KAMIS_ENDPOINT, label: "reregistration", targetFrom: from, targetTo: to })
+  for (const item of KAMIS_ITEMS) {
+    await builder.add((call) => fetchKamisRetail(call, item, from, to, regSince))
+    if (builder.stop) break
+  }
+  return builder.result()
 }
 
 // KAMIS 백필 묶음 하나: 품목 하나의 from~to를 기간 호출 한 번(모든 페이지)으로 받는다 (ingest-foundation/04).
@@ -163,17 +187,18 @@ export async function collectKamisRange(ctx: CollectContext, item: KamisItem, ra
 // 축평원 축종 7개 (ekape.md 2장). itemCd 없이 축종 단위로 부른다 (ekape.md 1장)
 export const EKAPE_JUDGE_KINDS = ["4301", "4304", "4401", "4402", "9901", "9903", "9908"] as const
 
-// 축평원: 기준일 D의 D-1, D-2, D-3 × 축종 7개 (하루 21회)
-export async function collectEkape(ctx: CollectContext, day: string): Promise<Collected> {
+// 축평원: 기준일 D의 D-1, D-2, D-3 × 축종 7개 (하루 21회). extraDays: 빈 날 메우기가 더한 날 (날마다 7회 더)
+export async function collectEkape(ctx: CollectContext, day: string, extraDays: readonly string[] = []): Promise<Collected> {
+  const days = [...[-1, -2, -3].map((offset) => addDays(day, offset)), ...extraDays.filter((d) => d < addDays(day, -3)).sort()]
   const builder = new FileBuilder(ctx, {
     endpoint: EKAPE_ENDPOINT,
     label: "daily",
-    targetFrom: addDays(day, -3),
+    targetFrom: [...days].sort()[0]!,
     targetTo: addDays(day, -1),
   })
-  for (const offset of [-1, -2, -3]) {
+  for (const target of days) {
     for (const judgeKind of EKAPE_JUDGE_KINDS) {
-      await builder.add((call) => fetchEkapeConsumerPrice(call, { standYmd: compact(addDays(day, offset)), judgeKind }))
+      await builder.add((call) => fetchEkapeConsumerPrice(call, { standYmd: compact(target), judgeKind }))
       if (builder.stop) return builder.result()
     }
   }
@@ -241,17 +266,31 @@ export async function detectChamgaSurvey(ctx: CollectContext, surveyDay: string)
 
 // 참가격: surveyDays를 주면 그 조사일들을 받는다(과거분 채우기 12). 주지 않으면 자동 모드(감지·완료 규칙, 10)
 // KAMIS recheckDays: 주간 다시 받기의 날 수 (없으면 매일 수집)
+// fillGaps: D-14~D-4의 끝나지 않은 날도 받는다 (08). extraDays는 run.ts가 source_day를 읽어 채운다
 export type CollectRequest =
-  | { source: "kamis"; day: string; recheckDays?: number }
-  | { source: "ekape"; day: string }
+  // job reregistration_watch: 재등록 감시 (09). regSince는 run.ts가 직전 성공 감시의 시작 시각으로 채운다
+  | {
+      source: "kamis"
+      day: string
+      recheckDays?: number
+      fillGaps?: boolean
+      extraDays?: readonly string[]
+      job?: "reregistration_watch"
+      regSince?: string
+    }
+  | { source: "ekape"; day: string; fillGaps?: boolean; extraDays?: readonly string[] }
   | { source: "chamga"; surveyDays?: readonly string[] }
 
 export function collect(ctx: CollectContext, request: CollectRequest): Promise<Collected> {
   switch (request.source) {
     case "kamis":
-      return collectKamis(ctx, request.day, request.recheckDays)
+      if (request.job === "reregistration_watch") {
+        if (request.regSince === undefined) throw new Error("재등록 감시에는 기준 시각(regSince)이 있어야 한다")
+        return collectKamisWatch(ctx, request.day, request.regSince)
+      }
+      return collectKamis(ctx, request.day, request.recheckDays, request.extraDays)
     case "ekape":
-      return collectEkape(ctx, request.day)
+      return collectEkape(ctx, request.day, request.extraDays)
     case "chamga":
       return collectChamga(ctx, request.surveyDays ?? [])
   }

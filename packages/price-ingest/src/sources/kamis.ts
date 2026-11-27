@@ -21,7 +21,11 @@ export type KamisPerDayQuery = {
   itemCd: string
   seCd: "01" | "02"
   pageNo?: number
+  // 이 시각 이후 등록(재등록)된 행만 (cond[orgnl_reg_dt::GTE], 명세 밖. 재등록 감시 ingest-schedule/09). YYYY-MM-DDTHH:MM:SSZ
+  regSince?: string
 }
+
+const REG_SINCE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/
 
 // 요청 주소. 필수 조건을 빼면 KAMIS는 오류 없이 0건을 주므로 여기서 막는다 (kamis.md 1장).
 export function kamisPerDayUrl(serviceKey: string, query: KamisPerDayQuery): string {
@@ -29,6 +33,7 @@ export function kamisPerDayUrl(serviceKey: string, query: KamisPerDayQuery): str
   assertYmd("fromYmd", query.fromYmd)
   assertYmd("toYmd", query.toYmd)
   if (query.seCd !== "01" && query.seCd !== "02") throw new Error("seCd는 01 또는 02여야 한다")
+  if (query.regSince !== undefined && !REG_SINCE.test(query.regSince)) throw new Error("regSince는 YYYY-MM-DDTHH:MM:SSZ여야 한다")
   const url = new URL(BASE_URL)
   url.search = new URLSearchParams([
     ["serviceKey", serviceKey],
@@ -40,6 +45,7 @@ export function kamisPerDayUrl(serviceKey: string, query: KamisPerDayQuery): str
     ["cond[ctgry_cd::EQ]", query.ctgryCd],
     ["cond[item_cd::EQ]", query.itemCd],
     ["cond[se_cd::EQ]", query.seCd],
+    ...(query.regSince === undefined ? [] : [["cond[orgnl_reg_dt::GTE]", query.regSince]]),
   ]).toString()
   return url.toString()
 }
@@ -156,6 +162,13 @@ export async function fetchKamisPerDayAll(
   }
   if (rows.length !== total) {
     throw new ApiContractError("kamis", [`받은 행 수 ${rows.length}가 totalCount ${total}와 다르다`])
+  }
+  // 등록 시각 조건은 명세 밖이다. 조건이 무시되면 기간 안의 모든 행이 온다. 그때는 계약 오류로 끊는다
+  // (감시가 실패로 남고 기준 시각이 그대로라 다음 감시가 이어 받는다. 막히면 주간 14일 다시 받기로 되돌린다, kamis.md 1장)
+  const since = query.regSince
+  if (since !== undefined) {
+    const older = rows.filter((row) => row.orgnl_reg_dt !== null && row.orgnl_reg_dt < since).length
+    if (older > 0) throw new ApiContractError("kamis", [`등록 시각 조건(${since}) 이전 행 ${older}개가 왔다. cond[orgnl_reg_dt::GTE]가 동작하지 않는다`])
   }
   return rows
 }

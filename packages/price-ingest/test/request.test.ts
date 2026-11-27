@@ -34,6 +34,13 @@ describe("KAMIS perDay 요청 주소", () => {
     expect(() => kamisPerDayUrl(FAKE_KEY, { ...query, fromYmd: "2026-09-28" })).toThrow("YYYYMMDD")
   })
 
+  it("재등록 감시: 등록 시각 조건을 인코딩해 넣고, 형식이 틀리면 막는다 (kamis.md 1장, ingest-schedule/09)", () => {
+    expect(kamisPerDayUrl(FAKE_KEY, query)).not.toContain("orgnl_reg_dt")
+    const url = kamisPerDayUrl(FAKE_KEY, { ...query, regSince: "2026-11-26T00:30:00Z" })
+    expect(url).toContain("cond%5Borgnl_reg_dt%3A%3AGTE%5D=2026-11-26T00%3A30%3A00Z")
+    expect(() => kamisPerDayUrl(FAKE_KEY, { ...query, regSince: "2026-11-26T00:30:00.000Z" })).toThrow("regSince")
+  })
+
   it("구분 코드는 01 또는 02만 받는다", () => {
     expect(() => kamisPerDayUrl(FAKE_KEY, { ...query, seCd: "07" as "01" })).toThrow("seCd")
   })

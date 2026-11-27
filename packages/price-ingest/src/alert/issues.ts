@@ -3,7 +3,7 @@
 // 본문에는 출처·원인·종료 코드·실행 주소·시각만 넣는다. 키·접속 주소·원본 응답 본문·로그는 넣지 않는다.
 // GitHub 작업은 gh CLI로 한다. 테스트는 Gh를 바꿔 끼운다.
 
-export type AlertSource = "kamis" | "ekape" | "chamga" | "supabase"
+export type AlertSource = "kamis" | "ekape" | "chamga" | "supabase" | "data_go_kr"
 
 export type Cause =
   | "key_invalid" // 인증키 오류. 다시 불러도 안 된다
@@ -14,6 +14,8 @@ export type Cause =
   | "stale" // 출처의 마지막 수집이 기대보다 오래 멈췄다 (heartbeat)
   | "workflow_disabled" // 수집 워크플로가 꺼져 있었다 (heartbeat가 다시 켰다)
   | "db_size" // DB 크기가 문턱(calc_param db.size_alert_mb) 이상이다 (heartbeat, catalog-scale/03)
+  | "empty_unexpected" // 3번 다시 받아도 행이 없는 날이 있다 (heartbeat, ingest-schedule/08)
+  | "account_expiry" // data.go.kr 개발계정 활용기간 종료 30일 전 (heartbeat, ingest-foundation/05)
 
 export type Alert = { source: AlertSource; cause: Cause; summary: string; runUrl: string | null; at: string }
 
@@ -36,6 +38,8 @@ const CAUSE_TEXT: Record<Cause, string> = {
   stale: "수집이 멈춤",
   workflow_disabled: "수집 워크플로가 꺼져 있었음",
   db_size: "DB 크기 문턱 넘음",
+  empty_unexpected: "와야 하는데 빈 날",
+  account_expiry: "개발계정 활용기간 종료 임박",
 }
 
 const CAUSE_HINT: Record<Cause, string> = {
@@ -46,6 +50,10 @@ const CAUSE_HINT: Record<Cause, string> = {
   unexpected: "실행 로그의 마지막 오류를 본다. 코드 오류면 고칠 때까지 계속 실패한다.",
   stale: "수집 워크플로가 도는지, 실패가 이어지는지 Actions에서 본다.",
   db_size: "price.db_size 최근 행에서 큰 표를 본다. Free 500MB를 넘으면 DB가 읽기 전용이 되어 수집이 멈춘다. 플랜을 바꿨으면 calc_param db.size_alert_mb를 고친다.",
+  empty_unexpected:
+    "그날 출처 API를 직접 불러(수집 시각 앞뒤는 피한다) 정말 비었는지 본다. 행이 나중에 오면 주간 다시 받기나 재등록 감시가 ok로 바꾼다. 휴일처럼 비는 게 맞으면 그날 source_day를 empty_expected로 고친다.",
+  account_expiry:
+    "data.go.kr 마이페이지에서 세 개발계정(KAMIS, 축평원, 참가격)의 활용기간 연장을 신청하거나 운영계정으로 전환한다. 키가 바뀌면 Actions Secret `DATA_GO_KR_SERVICE_KEY`와 루트 `.env`를 바꾸고, 바꾼 뒤 종료일을 `alert/heartbeat.ts` `DEV_ACCOUNT_END`에 고친다 (ingest-foundation/05 Answer).",
   workflow_disabled: "저장소 활동이 60일 없으면 GitHub이 예약 워크플로를 끈다. heartbeat가 다시 켰다. 꺼져 있던 동안 빠진 날을 확인한다.",
 }
 

@@ -3,6 +3,8 @@
 //   2. 출처별 마지막 수집이 기대보다 오래 멈췄으면 알린다 (source_day)
 //   3. Supabase가 일시정지됐는지 Storage 조회·DB 접속으로 본다 (04 Answer). 닿으면 열린 supabase 알림을 닫는다
 //   4. DB 크기가 문턱(calc_param db.size_alert_mb) 이상이면 알린다 (catalog-scale/03). 넘은 동안은 supabase 알림을 닫지 않는다
+//   5. 최근 14일에 와야 하는데 빈 날(empty_unexpected)이 있으면 출처마다 알린다 (ingest-schedule/08, 5-2)
+//   6. data.go.kr 개발계정 활용기간 종료 30일 전부터 알린다 (ingest-foundation/05, 5-2). 주 1회라 30일·7일 전 창에 한 번 이상 걸린다
 //   pnpm --filter @workspace/price-ingest heartbeat
 // 환경변수: GH_TOKEN(actions: write, issues: write), GH_REPO, INGEST_DATABASE_URL, SUPABASE_URL, SUPABASE_SECRET_KEY.
 // .env를 스스로 읽지 않는다. heartbeat 자신도 60일 규칙으로 꺼질 수 있다: 사람이 확인할 날은 14 Answer에 적는다.
@@ -69,6 +71,36 @@ export function staleSources(progress: readonly SourceProgress[], now: Date): { 
   return stale
 }
 
+// data.go.kr 개발계정 활용기간 종료일 (ingest-schedule/01 Answer, 2026-10-29 운영자 확인. 세 개발계정이 같은 날)
+export const DEV_ACCOUNT_END = "2028-10-08"
+export const ACCOUNT_WARN_DAYS = 30
+export const ACCOUNT_URGENT_DAYS = 7
+
+// 종료일까지 남은 날이 30일 이하면 알릴 문장. today: KST 오늘
+export function accountExpiryOf(today: string, end: string = DEV_ACCOUNT_END): string | null {
+  const left = Math.round((Date.parse(`${end}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86_400_000)
+  if (left > ACCOUNT_WARN_DAYS) return null
+  if (left < 0) return `data.go.kr 개발계정 활용기간 종료일(${end})이 이미 지났다. 수집이 인증키 오류로 멈춘다`
+  const text = `data.go.kr 개발계정 활용기간이 ${left}일 남았다 (종료 ${end}). 연장 신청 또는 운영계정 전환`
+  return left <= ACCOUNT_URGENT_DAYS ? `서둘러야 한다: ${text}` : text
+}
+
+// 와야 하는데 빈 날을 출처마다 한 줄로 묶는다 (들어온 순서, 날짜는 오름차순으로 준다)
+export function emptyDayAlerts(rows: readonly { source: "kamis" | "ekape" | "chamga"; day: string }[]): { source: "kamis" | "ekape" | "chamga"; summary: string }[] {
+  const by = new Map<"kamis" | "ekape" | "chamga", string[]>()
+  for (const r of rows) by.set(r.source, [...(by.get(r.source) ?? []), r.day])
+  return [...by].map(([source, days]) => ({ source, summary: `3번 다시 받아도 행이 없는 날 ${days.length}일: ${days.join(", ")}` }))
+}
+
+export const EMPTY_LOOKBACK_DAYS = 14
+
+async function readEmptyDays(sql: Sql, today: string): Promise<{ source: "kamis" | "ekape" | "chamga"; day: string }[]> {
+  return sql<{ source: "kamis" | "ekape" | "chamga"; day: string }[]>`
+    select source, target_date::text as day from price.source_day
+     where status = 'empty_unexpected' and target_date >= ${addDays(today, -EMPTY_LOOKBACK_DAYS)}::date
+     order by source, target_date`
+}
+
 async function readProgress(sql: Sql): Promise<SourceProgress[]> {
   const rows = await sql<{ source: SourceProgress["source"]; last_ok: string | null; last_checked: string | null }[]>`
     select s.source,
@@ -101,6 +133,12 @@ export async function runHeartbeat(gh: Gh, now = new Date()): Promise<string[]> 
   }
   if (log.length === 0) log.push("수집 워크플로: 모두 켜져 있다")
 
+  const expiry = accountExpiryOf(kstDateOf(now.toISOString()))
+  if (expiry) {
+    log.push(`개발계정: ${expiry}`)
+    await alert({ source: "data_go_kr", cause: "account_expiry", summary: expiry })
+  }
+
   let supabaseOk = true
   let sizeOver = false
   try {
@@ -119,6 +157,15 @@ export async function runHeartbeat(gh: Gh, now = new Date()): Promise<string[]> 
     for (const s of staleSources(progress, now)) {
       log.push(`멈춤: ${s.source} ${s.summary}`)
       await alert({ source: s.source, cause: "stale", summary: s.summary })
+    }
+    // 빈 날 알림(05)은 로컬 DB 테스트 전이라 실패해도 DB 접속 실패로 보지 않고 로그만 남긴다 (2026-11-27)
+    try {
+      for (const e of emptyDayAlerts(await readEmptyDays(sql, kstDateOf(now.toISOString())))) {
+        log.push(`빈 날: ${e.source} ${e.summary}`)
+        await alert({ source: e.source, cause: "empty_unexpected", summary: e.summary })
+      }
+    } catch (error) {
+      log.push(`빈 날 조회 실패: ${reasonOf(error)}`)
     }
     const [db] = await sql<{ bytes: string }[]>`select pg_database_size(current_database())::text as bytes`
     const limit = await readSizeLimitMb(sql)

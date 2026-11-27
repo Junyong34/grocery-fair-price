@@ -57,7 +57,8 @@ export async function ensureSourceDays(tx: Tx, source: DbSource, table: string, 
 }
 
 // inserted: 새로 생긴 행, changed: 새로 생기거나 고쳐 쓴 행, corrections: 가격·행사가 바뀐 행 (정정)
-export type MergeResult = { inserted: number; changed: number; corrections: number }
+// dates: 새로 생기거나 고쳐 쓴 행의 날 (재등록 감시는 이 날만 일자 요약을 다시 낸다, ingest-schedule/09)
+export type MergeResult = { inserted: number; changed: number; corrections: number; dates: string[] }
 
 // 정정 비교 → 정정 이력과 source_day 정정 표시 → 바뀐 행만 덮는 병합 → source_day 갱신.
 // sourceDaysFrom: 이보다 오래된 날은 source_day를 만들지 않는다. 축평원 백필은 축종 묶음 하나로 그날을 ok로 둘 수 없다
@@ -135,6 +136,7 @@ export async function mergeObservations(
     inserted: merged.filter((row) => row.inserted).length,
     changed: merged.length,
     corrections: revised?.revisions ?? 0,
+    dates: [...byDate.keys()].sort(),
   }
 }
 

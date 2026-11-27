@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 
 import { runAlert } from "../src/alert/cli.ts"
 import { decideAlert } from "../src/alert/decide.ts"
-import { enableWorkflows, staleSources, type SourceProgress } from "../src/alert/heartbeat.ts"
+import { accountExpiryOf, DEV_ACCOUNT_END, emptyDayAlerts, enableWorkflows, staleSources, type SourceProgress } from "../src/alert/heartbeat.ts"
 import { bodyOf, raiseAlert, resolveAlerts, type Gh } from "../src/alert/issues.ts"
 import { sizeAlertOf, sizeLimitMbOf } from "../src/db-size.ts"
 import { EXIT } from "../src/ingest/run.ts"
@@ -162,6 +162,38 @@ describe("heartbeat", () => {
     expect(stale.map((s) => s.source)).toEqual(["kamis", "ekape", "chamga"])
     expect(staleSources([{ ...fresh[2]!, lastOk: "2026-09-23" }], now)).toEqual([
       { source: "chamga", summary: "받은 조사일이 35일 넘게 없다 (마지막 2026-09-23)" },
+    ])
+  })
+})
+
+describe("개발계정 활용기간 (ingest-foundation/05, pipeline 5-2)", () => {
+  it("종료 30일 전부터 알리고, 7일 전부터는 서두르라고 쓴다", () => {
+    expect(DEV_ACCOUNT_END).toBe("2028-10-08")
+    expect(accountExpiryOf("2028-09-07")).toBeNull() // 31일 전
+    expect(accountExpiryOf("2028-09-08")).toBe("data.go.kr 개발계정 활용기간이 30일 남았다 (종료 2028-10-08). 연장 신청 또는 운영계정 전환")
+    expect(accountExpiryOf("2028-10-01")).toMatch(/^서둘러야 한다: .*7일 남았다/)
+    expect(accountExpiryOf("2028-10-09")).toMatch(/이미 지났다/)
+  })
+
+  it("data_go_kr 출처의 이슈로 연다", async () => {
+    const { gh, issues } = fakeGh()
+    await raiseAlert(gh, { source: "data_go_kr", cause: "account_expiry", summary: accountExpiryOf("2028-09-10")!, runUrl: null, at: "2028-09-10T00:00:00.000Z" })
+    expect(issues[0]!.title).toBe("[수집 알림] data_go_kr: 개발계정 활용기간 종료 임박")
+  })
+})
+
+describe("와야 하는데 빈 날 (ingest-schedule/08, pipeline 5-2)", () => {
+  it("출처마다 empty_unexpected인 날을 모아 한 줄로 알린다", () => {
+    expect(emptyDayAlerts([])).toEqual([])
+    expect(
+      emptyDayAlerts([
+        { source: "kamis", day: "2026-11-10" },
+        { source: "kamis", day: "2026-11-12" },
+        { source: "ekape", day: "2026-11-11" },
+      ]),
+    ).toEqual([
+      { source: "kamis", summary: "3번 다시 받아도 행이 없는 날 2일: 2026-11-10, 2026-11-12" },
+      { source: "ekape", summary: "3번 다시 받아도 행이 없는 날 1일: 2026-11-11" },
     ])
   })
 })

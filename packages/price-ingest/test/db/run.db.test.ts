@@ -8,7 +8,7 @@ import { connectIngest, type Sql } from "../../src/load/db.ts"
 import { objectKeyOf } from "../../src/load/raw-file.ts"
 import { dayPrefix } from "../../src/load/window.ts"
 import { FAKE_KEY } from "../helpers.ts"
-import { fakeKamis, KEY_ERROR_BODY, syntheticKamisRows } from "../fixtures/fake-api.ts"
+import { fakeKamis, kamisBody, KEY_ERROR_BODY, syntheticKamisRows, type FakeCall } from "../fixtures/fake-api.ts"
 import { connectLocalAdmin, connectLocalIngest, localStore } from "./local.ts"
 
 const INGEST_URL = "postgresql://ingest_writer:local-only-password@127.0.0.1:55322/postgres"
@@ -140,5 +140,76 @@ describe("수집 실행 (커밋, 순서대로)", () => {
        where r.storage_path = ${down.uploaded[0]!}`
     expect(raw).toEqual({ load_status: "loaded", status: "failed", error_code: "db_unreachable" })
     expect(next.exitCode).toBe(EXIT.ok)
+  })
+})
+
+// 빈 날 메우기 (ingest-schedule/08). 가짜 KAMIS가 요청 기간 안의 "온 날" 행만 준다. 시각은 1997-11-21~25 KST
+describe("빈 날 메우기와 source_day 상태 (커밋, 순서대로)", () => {
+  const base = syntheticKamisRows({ year: "1997", itemCd: "8211" })
+  const firstDay = base[0]!.exmn_ymd
+  const oneDay = base.filter((row) => row.exmn_ymd === firstDay)
+  const arrived = new Set<string>()
+  const calls: FakeCall[] = []
+  const compact = (day: string) => day.replaceAll("-", "")
+  const fetch = fakeKamis(() => [], calls)
+  const filtered: typeof fetch = async (url, init) => {
+    const params = new URL(url).searchParams
+    if (params.get("cond[item_cd::EQ]") !== "8211" && params.get("cond[item_cd::EQ]") !== "211") return fetch(url, init)
+    const from = params.get("cond[exmn_ymd::GTE]")!
+    const to = params.get("cond[exmn_ymd::LTE]")!
+    const data = [...arrived].filter((d) => compact(d) >= from && compact(d) <= to).flatMap((d) => oneDay.map((row) => ({ ...row, exmn_ymd: compact(d) })))
+    calls.push({ endpoint: "perDay/price", params })
+    return new Response(kamisBody(data), { status: 200 })
+  }
+  const at = (day: string) => {
+    let tick = 0
+    return () => new Date(Date.parse(`${day}T00:00:00+09:00`) + 3_600_000 + 1000 * tick++)
+  }
+  const gapRun = async (day: string) => {
+    calls.length = 0
+    const result = await runIngest({ source: "kamis", day, fillGaps: true }, { ...deps({ startMinute: 0, fetch: filtered }), now: at(day) })
+    if (result.runId !== null) runIds.push(result.runId)
+    return result
+  }
+  const state = async (day: string) => {
+    const [row] = await sql<{ status: string; attempts: number }[]>`
+      select status, attempts from price.source_day where source = 'kamis' and target_date = ${day}`
+    return row
+  }
+  const firstGte = () => calls.find((c) => c.params.get("cond[item_cd::EQ]") === "211")?.params.get("cond[exmn_ymd::GTE]")
+
+  afterAll(async () => {
+    const keys = []
+    for (const d of ["1997-11-21", "1997-11-23", "1997-11-24", "1997-11-25"]) keys.push(...(await store.list(dayPrefix("kamis", d))))
+    await store.remove(keys)
+  })
+
+  it("행이 온 날은 ok, 안 온 날은 아직 안 옴으로 기록한다", async () => {
+    arrived.add("1997-11-18").add("1997-11-20")
+    const result = await gapRun("1997-11-21")
+    expect(result.exitCode).toBe(EXIT.ok)
+    expect(firstGte()).toBe("19971107") // D-14부터 (기록이 없는 날을 모두 다시 받는다)
+    expect(await state("1997-11-18")).toEqual({ status: "ok", attempts: 1 })
+    expect(await state("1997-11-19")).toEqual({ status: "pending", attempts: 1 })
+    expect(await state("1997-11-10")).toEqual({ status: "pending", attempts: 1 })
+  })
+
+  it("하루 빠진 실행 뒤: 다음 실행이 매일 범위 밖의 빈 날을 채운다", async () => {
+    arrived.add("1997-11-19") // 11-22 실행은 빠졌다
+    await gapRun("1997-11-23")
+    expect(await state("1997-11-19")).toMatchObject({ status: "ok" })
+  })
+
+  it("3번 확인하고 3일이 지나도 없으면 와야 하는데 빔으로 닫는다", async () => {
+    await gapRun("1997-11-24")
+    expect(await state("1997-11-10")).toEqual({ status: "empty_unexpected", attempts: 3 })
+    expect(await state("1997-11-23")).toEqual({ status: "pending", attempts: 1 })
+  })
+
+  it("닫힌 빈 날과 휴일(empty_expected)은 다시 받지 않는다", async () => {
+    await admin`update price.source_day set status = 'empty_expected' where source = 'kamis' and target_date = '1997-11-21'`
+    await gapRun("1997-11-25")
+    expect(firstGte()).toBe("19971122") // D-3. 11-21 휴일, 11-10~17 닫힌 빈 날, 11-18~20 ok
+    expect(await state("1997-11-21")).toMatchObject({ status: "empty_expected" })
   })
 })

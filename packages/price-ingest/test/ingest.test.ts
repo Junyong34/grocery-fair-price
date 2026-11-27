@@ -4,8 +4,9 @@ import { describe, expect, it } from "vitest"
 import { parseRequest } from "../src/cli.ts"
 import { ApiContractError, ApiGatewayError, ApiHttpError, ApiTransportError } from "../src/errors.ts"
 import { callWithPolicy, CallBudget, classify, SourceStopped } from "../src/ingest/calls.ts"
-import { addDays, collectChamga, collectEkape, collectKamis, EKAPE_JUDGE_KINDS } from "../src/ingest/collect.ts"
+import { addDays, collectChamga, collectEkape, collectKamis, collectKamisWatch, EKAPE_JUDGE_KINDS } from "../src/ingest/collect.ts"
 import { KAMIS_ITEMS } from "../src/ingest/kamis-items.ts"
+import { checkedDaysOf, watchSinceOf } from "../src/ingest/run.ts"
 import type { FetchLike } from "../src/http.ts"
 import { readKamisPerDay } from "../src/sources/kamis.ts"
 import { FAKE_KEY, readSampleText } from "./helpers.ts"
@@ -180,6 +181,42 @@ describe("출처별 호출 계획 (pipeline 5-1)", () => {
     expect(result.files[0]).toMatchObject({ targetFrom: "2026-10-24", targetTo: "2026-10-26" })
   })
 
+  it("빈 날 메우기: KAMIS는 기간 시작일만 앞당기고 품목당 한 번 부른다 (08)", async () => {
+    const calls: FakeCall[] = []
+    const result = await collectKamis(ctx(fakeKamis(() => [], calls)), "2026-10-27", undefined, ["2026-10-20", "2026-10-16"])
+    expect(calls).toHaveLength(KAMIS_ITEMS.length)
+    expect(calls[0]!.params.get("cond[exmn_ymd::GTE]")).toBe("20261016")
+    expect(result.files[0]).toMatchObject({ label: "daily", targetFrom: "2026-10-16", targetTo: "2026-10-26" })
+    expect(checkedDaysOf({ source: "kamis", day: "2026-10-27", extraDays: ["2026-10-20", "2026-10-16"] })).toHaveLength(11)
+  })
+
+  it("빈 날 메우기: 축평원은 더한 날마다 축종 7개를 더 부른다 (08)", async () => {
+    const calls: URL[] = []
+    const body = readSampleText("ekape/pork-all-items.xml")
+    const fetch: FetchLike = async (url) => {
+      calls.push(new URL(url))
+      return new Response(body, { status: 200 })
+    }
+    const result = await collectEkape(ctx(fetch), "2026-10-27", ["2026-10-18"])
+    expect(calls).toHaveLength(28)
+    expect(calls.filter((u) => u.searchParams.get("standYmd") === "20261018")).toHaveLength(7)
+    expect(result.files[0]).toMatchObject({ targetFrom: "2026-10-18", targetTo: "2026-10-26" })
+    expect(checkedDaysOf({ source: "ekape", day: "2026-10-27", extraDays: ["2026-10-18"] })).toEqual([
+      "2026-10-18", "2026-10-24", "2026-10-25", "2026-10-26",
+    ])
+  })
+
+  it("재등록 감시: 품목마다 D-365~D-1을 등록 시각 조건과 함께 한 번, 라벨 reregistration (09)", async () => {
+    const calls: FakeCall[] = []
+    const result = await collectKamisWatch(ctx(fakeKamis(() => [], calls)), "2026-11-27", "2026-11-26T00:30:00Z")
+    expect(calls).toHaveLength(KAMIS_ITEMS.length)
+    expect(calls[0]!.params.get("cond[exmn_ymd::GTE]")).toBe("20251127")
+    expect(calls[0]!.params.get("cond[exmn_ymd::LTE]")).toBe("20261126")
+    expect(calls[0]!.params.get("cond[orgnl_reg_dt::GTE]")).toBe("2026-11-26T00:30:00Z")
+    expect(result.files[0]).toMatchObject({ label: "reregistration", targetFrom: "2025-11-27", targetTo: "2026-11-26" })
+    expect(checkedDaysOf({ source: "kamis", day: "2026-11-27", job: "reregistration_watch" })).toEqual([])
+  })
+
   it("참가격: 점포 마스터 → 상품 마스터 → 식품 상품 457개 가격, 파일 셋", async () => {
     const paths: string[] = []
     const fetch: FetchLike = async (url) => {
@@ -216,6 +253,22 @@ describe("명령 인자", () => {
     expect(parseRequest(["--source", "kamis", "--recheck-days", "14"], "2026-10-27")).toEqual({ source: "kamis", day: "2026-10-27", recheckDays: 14 })
     expect(() => parseRequest(["--source", "ekape", "--recheck-days", "14"], "2026-10-27")).toThrow(/recheck-days/)
     expect(() => parseRequest(["--source", "kamis", "--recheck-days", "0"], "2026-10-27")).toThrow(/recheck-days/)
+    expect(parseRequest(["--source", "ekape", "--fill-gaps"], "2026-10-27")).toEqual({ source: "ekape", day: "2026-10-27", fillGaps: true })
+    expect(() => parseRequest(["--source", "kamis", "--fill-gaps", "--recheck-days", "14"], "2026-10-27")).toThrow(/fill-gaps/)
+    expect(() => parseRequest(["--source", "chamga", "--fill-gaps"], "2026-10-27")).toThrow(/fill-gaps/)
+    expect(parseRequest(["--source", "kamis", "--job", "reregistration_watch"], "2026-10-27")).toEqual({
+      source: "kamis",
+      day: "2026-10-27",
+      job: "reregistration_watch",
+    })
+    expect(() => parseRequest(["--source", "ekape", "--job", "reregistration_watch"], "2026-10-27")).toThrow(/--job/)
+    expect(() => parseRequest(["--source", "kamis", "--job", "x"], "2026-10-27")).toThrow(/--job/)
+    expect(() => parseRequest(["--source", "kamis", "--job", "reregistration_watch", "--fill-gaps"], "2026-10-27")).toThrow(/--job/)
+  })
+
+  it("재등록 감시 기준 시각: 직전 성공 감시의 시작 시각(초 아래 버림), 없으면 7일 전", () => {
+    expect(watchSinceOf("2026-11-26T00:31:12.345Z", new Date("2026-11-27T01:00:00Z"))).toBe("2026-11-26T00:31:12Z")
+    expect(watchSinceOf(null, new Date("2026-11-27T01:00:00.900Z"))).toBe("2026-11-20T01:00:00Z")
   })
 
   it("날짜 더하기", () => {

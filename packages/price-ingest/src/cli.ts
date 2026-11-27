@@ -1,6 +1,8 @@
 // 수집 명령 (ingest-schedule/07). 워크플로와 사람이 이것만 부른다.
 //   pnpm --filter @workspace/price-ingest ingest --source kamis|ekape [--date YYYY-MM-DD]
+//   pnpm --filter @workspace/price-ingest ingest --source kamis|ekape --fill-gaps   (D-14~D-4의 끝나지 않은 날도 받는다, 08)
 //   pnpm --filter @workspace/price-ingest ingest --source kamis --recheck-days 14   (주간 다시 받기: D-14~D-1)
+//   pnpm --filter @workspace/price-ingest ingest --source kamis --job reregistration_watch   (재등록 감시: 직전 성공 감시 뒤 등록된 1년 안의 행, 09)
 //   pnpm --filter @workspace/price-ingest ingest --source chamga [--survey-day YYYY-MM-DD ...]
 // --date는 기준일(KST, 기본 오늘)이다. KAMIS·축평원은 기준일의 D-3~D-1을 받는다 (pipeline 5-1).
 // 참가격은 --survey-day가 없으면 자동 모드(최근 금요일 2개를 감지·완료 규칙대로, 10), 있으면 그 조사일들을 받는다
@@ -15,7 +17,7 @@ import { seoulToday } from "./load/window.ts"
 import { actionsMaskCommands, describeError, redactorFromEnv, SECRET_ENV } from "./secrets.ts"
 
 const USAGE =
-  "사용법: ingest --source kamis|ekape [--date YYYY-MM-DD] [--recheck-days N (kamis)] | ingest --source chamga [--survey-day YYYY-MM-DD ...]"
+  "사용법: ingest --source kamis|ekape [--date YYYY-MM-DD] [--fill-gaps] [--recheck-days N (kamis)] | ingest --source kamis --job reregistration_watch [--date YYYY-MM-DD] | ingest --source chamga [--survey-day YYYY-MM-DD ...]"
 // 형식과 실제 날짜를 함께 본다. 2026-13-40 같은 날을 받으면 날짜 계산이 Invalid Date가 되어 수집이 시간 초과까지 멈춘다 (2026-10-29)
 export function isYmd(day: string): boolean {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return false
@@ -30,6 +32,8 @@ export function parseRequest(argv: readonly string[], today: string): CollectReq
       source: { type: "string" },
       date: { type: "string" },
       "recheck-days": { type: "string" },
+      "fill-gaps": { type: "boolean" },
+      job: { type: "string" },
       "survey-day": { type: "string", multiple: true },
     },
     strict: true,
@@ -39,13 +43,23 @@ export function parseRequest(argv: readonly string[], today: string): CollectReq
     const day = values.date ?? today
     if (!isYmd(day)) throw new Error(`--date는 YYYY-MM-DD다. ${USAGE}`)
     const recheck = values["recheck-days"]
-    if (recheck === undefined) return { source, day }
+    const fillGaps = values["fill-gaps"] === true
+    if (values.job !== undefined) {
+      if (source !== "kamis" || values.job !== "reregistration_watch" || recheck !== undefined || fillGaps) {
+        throw new Error(`--job은 KAMIS의 reregistration_watch만, --recheck-days·--fill-gaps 없이 준다. ${USAGE}`)
+      }
+      return { source, day, job: "reregistration_watch" }
+    }
+    if (recheck === undefined) return fillGaps ? { source, day, fillGaps } : { source, day }
+    if (fillGaps) throw new Error(`--fill-gaps는 매일 수집에만 준다 (주간 다시 받기가 14일을 모두 받는다). ${USAGE}`)
     // 기간이 길면 축산 품목이 여러 페이지가 된다(소 14일 약 4회). 실행 예산(8,000) 안에 들게 31일까지만
     if (source !== "kamis" || !/^\d+$/.test(recheck) || Number(recheck) < 1 || Number(recheck) > 31) {
       throw new Error(`--recheck-days는 KAMIS에만, 1~31이다. ${USAGE}`)
     }
     return { source, day, recheckDays: Number(recheck) }
   }
+  if (values["fill-gaps"]) throw new Error(`--fill-gaps는 KAMIS·축평원에만 준다. ${USAGE}`)
+  if (values.job !== undefined) throw new Error(`--job은 KAMIS에만 준다. ${USAGE}`)
   if (source === "chamga") {
     const surveyDays = values["survey-day"]
     if (surveyDays === undefined) return { source }

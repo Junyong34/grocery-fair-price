@@ -244,6 +244,21 @@ describe("KAMIS 모든 페이지 받기", () => {
     expect(error).toBeInstanceOf(ApiContractError)
     expect(String((error as Error).message)).toContain("totalCount")
   })
+
+  // 재등록 감시 (ingest-schedule/09). 명세 밖 조건이라 응답이 조건을 지켰는지 본다
+  it("등록 시각 조건을 주면 그 시각 이후 행만 받는다 (template 등록 시각 이후면 통과)", async () => {
+    const since = template.orgnl_reg_dt!
+    const rows = await fetchKamisPerDayAll({ serviceKey: FAKE_KEY, fetch: paged(2, () => 2) }, { ...query, regSince: since })
+    expect(rows).toHaveLength(2)
+  })
+
+  it("등록 시각 조건보다 이전 행이 오면 조건이 무시된 것이라 계약 오류다", async () => {
+    const error = await errorOf(
+      fetchKamisPerDayAll({ serviceKey: FAKE_KEY, fetch: paged(2, () => 2) }, { ...query, regSince: "2099-01-01T00:00:00Z" }),
+    )
+    expect(error).toBeInstanceOf(ApiContractError)
+    expect(String((error as Error).message)).toContain("orgnl_reg_dt")
+  })
 })
 
 describe("축평원 성공 판정: resultCode 00 그리고 당일 행 1개 이상 (pipeline 3-11)", () => {

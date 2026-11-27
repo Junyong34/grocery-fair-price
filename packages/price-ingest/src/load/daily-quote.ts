@@ -15,6 +15,7 @@
 import { addDays } from "../ingest/collect.ts"
 
 import type { Sql, Tx } from "./db.ts"
+import { rebuildVerdict, type QuoteCell } from "./restore-rules.ts"
 
 export const CALC_VERSION = "median-1"
 
@@ -224,4 +225,67 @@ export async function datesOfRawObjects(tx: Sql | Tx, rawObjectIds: readonly num
      where r.id = any(${rawObjectIds as number[]}) and r.target_from is not null
      order by 1`
   return rows.map((r) => r.day)
+}
+
+export type QuoteGroup = { variety_id: number; spec_id: number; obs_date: string }
+export type GroupRebuild = QuoteGroup & { result: "rebuilt" | "kept"; changed: boolean }
+
+const groupKey = (g: { variety_id: number; spec_id: number; obs_date: string }) => `${g.variety_id}|${g.spec_id}|${g.obs_date}`
+
+// 보존 기간 밖 재등록 (pipeline 3-3 "보존 기간이 지난 행이 다시 등록되어 오면" 3·4, ingest-schedule/09).
+// table: 원본에서 다시 만든 그날 표본 전체(관측값 모양, 축평원은 관측값에서 더한 것). 정기 수집과 같은 표본·집계로 groups의 모든 범위를 낸다.
+// 완전할 때만 바꾼다: complete가 false거나(원본이 지워졌거나 못 읽었다) 지금 칸 중 하나라도 표본이 줄면 그 묶음은 그대로 둔다(kept).
+// 바꾸는 묶음은 지금 행을 지우고 새로 넣는다. today: KST 오늘. 트랜잭션 안에서 부른다
+export async function rebuildStagedQuotes(
+  tx: Tx,
+  table: string,
+  groups: readonly QuoteGroup[],
+  today: string,
+  complete: boolean,
+): Promise<GroupRebuild[]> {
+  if (groups.length === 0) return []
+  await tx`select pg_advisory_xact_lock(hashtext('recompute:quote'))`
+  const days = [...new Set(groups.map((g) => g.obs_date))].sort()
+  const allScopesFrom = addDays(today, -QUOTE_ALL_SCOPES_DAYS)
+  await stageNewQuotes(tx, quoteSamples(table, "o.obs_date = any($1::date[])"), "s.scope_key = 'national' or s.obs_date >= $2::date", [days, allScopesFrom])
+  const wanted = tx.json(groups.map((g) => ({ variety_id: g.variety_id, spec_id: g.spec_id, obs_date: g.obs_date })))
+  // 다른 묶음의 새 집계는 버린다 (그날 다른 품종은 바뀌지 않았다)
+  await tx`
+    delete from dq_new n
+     where not exists (select 1 from jsonb_to_recordset(${wanted}) as g (variety_id int, spec_id int, obs_date date)
+                        where (g.variety_id, g.spec_id, g.obs_date) = (n.variety_id, n.spec_id, n.obs_date))`
+  const cells = async (from: "now" | "new") => {
+    const rows =
+      from === "now"
+        ? await tx<(QuoteCell & QuoteGroup)[]>`
+            select q.variety_id, q.spec_id, q.obs_date::text, q.price_tier, q.scope_key, q.n, q.value::float8 as value
+              from price.daily_quote q
+              join jsonb_to_recordset(${wanted}) as g (variety_id int, spec_id int, obs_date date)
+                on (g.variety_id, g.spec_id, g.obs_date) = (q.variety_id, q.spec_id, q.obs_date)
+             where q.basis = 'quote'`
+        : await tx<(QuoteCell & QuoteGroup)[]>`
+            select variety_id, spec_id, obs_date::text, price_tier, scope_key, n, round(median::numeric, 2)::float8 as value from dq_new`
+    const by = new Map<string, QuoteCell[]>()
+    for (const r of rows) by.set(groupKey(r), [...(by.get(groupKey(r)) ?? []), r])
+    return by
+  }
+  const now = await cells("now")
+  const next = await cells("new")
+  const results: GroupRebuild[] = groups.map((g) => {
+    const verdict = complete ? rebuildVerdict(now.get(groupKey(g)) ?? [], next.get(groupKey(g)) ?? []) : { result: "kept" as const, changed: false }
+    return { ...g, ...verdict }
+  })
+  const rebuilt = tx.json(results.filter((r) => r.result === "rebuilt").map(({ variety_id, spec_id, obs_date }) => ({ variety_id, spec_id, obs_date })))
+  await tx`
+    delete from dq_new n
+     where not exists (select 1 from jsonb_to_recordset(${rebuilt}) as g (variety_id int, spec_id int, obs_date date)
+                        where (g.variety_id, g.spec_id, g.obs_date) = (n.variety_id, n.spec_id, n.obs_date))`
+  await tx`
+    delete from price.daily_quote q
+     using jsonb_to_recordset(${rebuilt}) as g (variety_id int, spec_id int, obs_date date)
+     where q.basis = 'quote' and (g.variety_id, g.spec_id, g.obs_date) = (q.variety_id, q.spec_id, q.obs_date)`
+  await upsertNewQuotes(tx, "quote")
+  await tx.unsafe(`drop table dq_new`)
+  await refreshQuoteQuality(tx, "quote", [...new Set(results.filter((r) => r.result === "rebuilt").map((r) => r.obs_date))])
+  return results
 }

@@ -117,6 +117,8 @@ export const routes = {
     catalogProducts: "/admin/catalog/products",
     /** 카탈로그 어드민: 제안 검토 (catalog-scale/07, 소유자 접속) */
     catalogProposals: "/admin/catalog/proposals",
+    /** 수집 상태: 출처별 마지막 정상 날짜, source_day 상태, 최근 실패 (ingest-foundation/05, 읽기 전용, ingest_writer) */
+    ingestStatus: "/admin/ingest",
     /** 그림 어드민: 그림 목록과 그림 검수 (ADR 0006, prototypes/가 있는 기기에서) */
     foods: "/admin/foods",
     /** 그림 어드민: 기존 품종 편집 (표시명 · 별칭 · 제철 달 · 근거 · 연결된 그림) */

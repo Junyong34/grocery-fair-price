@@ -124,3 +124,10 @@ export async function finishRun(sql: Sql | Tx, runId: number, finish: RunFinish)
            error_code = ${finish.errorCode}, error_detail = ${finish.errorDetail}, git_sha = ${finish.gitSha}
      where id = ${runId}`
 }
+
+// 그 출처·작업에서 마지막으로 성공(ok)한 실행의 시작 시각 (ISO). 재등록 감시의 기준 시각이다 (ingest-schedule/09)
+export async function lastOkRunStart(sql: Sql | Tx, source: DbSource, job: RunJob): Promise<string | null> {
+  const [row] = await sql<{ started_at: Date | null }[]>`
+    select max(started_at) as started_at from price.ingest_run where source = ${source} and job = ${job} and status = 'ok'`
+  return row?.started_at ? row.started_at.toISOString() : null
+}

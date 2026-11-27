@@ -9,17 +9,20 @@ import type { FetchLike } from "../http.ts"
 import { datesOfRawObjects, recomputeDailyQuote } from "../load/daily-quote.ts"
 import { recomputeProductSummary, surveyDaysWithoutSummary } from "../load/product-summary.ts"
 import { connectIngest, transaction, type Sql } from "../load/db.ts"
-import { finishRun, previousRawFile, registerDuplicate, registerPending, registerRun } from "../load/ledger.ts"
+import { finishRun, lastOkRunStart, previousRawFile, registerDuplicate, registerPending, registerRun } from "../load/ledger.ts"
 import { loadPendingFiles } from "../load/load-pending.ts"
 import { buildRawFile, callKeyOf, rawObjectKey, storagePathOf } from "../load/raw-file.ts"
 import { reconcileRawFiles } from "../load/reconcile.ts"
 import { closeEmpty, markNotYet, readSurveyDays, recordFetch, rowCountOf } from "../load/survey-day.ts"
+import { restoreOutdatedRows } from "../load/restore.ts"
+import { judgeKamisItemParts, readDayStates, settleCheckedDays } from "../load/source-day.ts"
 import { createObjectStore, type ObjectStore } from "../load/storage.ts"
 import { kstDateOf } from "../load/window.ts"
 import { createRedactor, errorSummary } from "../secrets.ts"
 import { CALL_BUDGET, CALL_TIME_LIMIT_MS, CallBudget, realSleep, type Sleep, type StopReason } from "./calls.ts"
 import { backlogFridays, nextStableChecks, planChamga, recentFridays, type ChamgaPlan, type SurveyDayState } from "./chamga-schedule.ts"
-import { collect, type CollectContext, type CollectRequest } from "./collect.ts"
+import { addDays, collect, KAMIS_DAILY_DAYS, type CollectContext, type CollectRequest } from "./collect.ts"
+import { EKAPE_GAP_DAYS_PER_RUN, FILL_GAP_DAYS, gapDays, windowDays } from "./fill-gaps.ts"
 
 // 종료 코드. 알림(ingest-schedule/13)이 이것과 ingest_run.error_code로 알림을 고른다.
 export const EXIT = {
@@ -81,8 +84,31 @@ function decide(input: {
 }
 
 function describeTarget(request: CollectRequest): string {
-  if (request.source !== "chamga") return `기준일 ${request.day}`
+  if (request.source !== "chamga") {
+    if (request.source === "kamis" && request.job === "reregistration_watch") return `재등록 감시: 기준일 ${request.day}, ${request.regSince} 이후 등록`
+    const extra = request.extraDays?.length ? `, 빈 날 ${request.extraDays.join(", ")}` : ""
+    return `기준일 ${request.day}${extra}`
+  }
   return `조사일 ${request.surveyDays?.join(", ") || "없음"}`
+}
+
+// 이번 실행이 확인한 날 (KAMIS는 기간 호출이라 시작일~D-1 전부, 축평원은 부른 날만). source_day 상태를 쓴다 (08)
+export function checkedDaysOf(request: CollectRequest): string[] {
+  if (request.source === "chamga") return []
+  if (request.source === "kamis" && request.job === "reregistration_watch") return [] // 날짜 범위가 아니라 등록 시각으로 받는다
+  const extra = request.extraDays ?? []
+  if (request.source === "ekape") return windowDays(request.day, 3, extra)
+  const from = [addDays(request.day, -(request.recheckDays ?? KAMIS_DAILY_DAYS)), ...extra].sort()[0]!
+  const days: string[] = []
+  for (let day = from; day < request.day; day = addDays(day, 1)) days.push(day)
+  return days
+}
+
+// 재등록 감시 기준 시각: 직전 성공 감시의 시작 시각(초 아래 버림). 없으면 7일 전 (처음 켤 때. 그 앞은 매일·주간 범위가 받았다)
+export const WATCH_FIRST_DAYS = 7
+export function watchSinceOf(lastOk: string | null, now: Date): string {
+  const at = lastOk === null ? new Date(now.getTime() - WATCH_FIRST_DAYS * 86_400_000) : new Date(lastOk)
+  return `${at.toISOString().slice(0, 19)}Z`
 }
 
 // 받은 조사일의 행 수가 받기 전과 같으면 stable_checks를 올린다. 호출이 하나라도 실패한 실행은 세지 않는다
@@ -103,7 +129,12 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
   const say = (line: string) => log(redact(line))
   const source = request.source
   const startedAt = now().toISOString()
-  const job = request.source === "kamis" && request.recheckDays !== undefined ? "recheck" : "daily"
+  const job =
+    request.source === "kamis" && request.job === "reregistration_watch"
+      ? "reregistration_watch"
+      : request.source === "kamis" && request.recheckDays !== undefined
+        ? "recheck"
+        : "daily"
   const budget = new CallBudget(CALL_BUDGET[source])
   const store = deps.store ?? createObjectStore({ url: deps.env.supabaseUrl, secretKey: deps.env.secretKey })
 
@@ -159,6 +190,30 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
         `, 아직 없음 ${plan.notYet.join(", ") || "-"}, 빈 조사일로 닫음 ${plan.closeEmpty.join(", ") || "-"}`,
     )
     target = { source: "chamga", surveyDays: plan.fetch.map((f) => f.day) }
+  }
+  // 빈 날 메우기: D-14~D-4 중 끝나지 않은 날을 함께 받는다 (08). DB를 못 읽으면 매일 범위만 받는다
+  if (request.source !== "chamga" && request.fillGaps && sql) {
+    try {
+      const from = addDays(request.day, -FILL_GAP_DAYS)
+      const span = Array.from({ length: FILL_GAP_DAYS }, (_, i) => addDays(from, i))
+      const states = await readDayStates(sql, request.source, span)
+      const extraDays = gapDays(request.day, states, { max: request.source === "ekape" ? EKAPE_GAP_DAYS_PER_RUN : undefined })
+      target = { ...request, extraDays }
+    } catch (error) {
+      await dbDown("빈 날 상태", error)
+    }
+  }
+  // 재등록 감시: 기준 시각은 직전에 성공한 감시의 시작 시각 (09). 없거나 DB를 못 읽으면 7일 전
+  if (request.source === "kamis" && request.job === "reregistration_watch") {
+    let since: string | null = null
+    if (sql) {
+      try {
+        since = await lastOkRunStart(sql, "kamis", "reregistration_watch")
+      } catch (error) {
+        await dbDown("감시 기준 시각", error)
+      }
+    }
+    target = { ...request, regSince: watchSinceOf(since, now()) }
   }
   say(`수집 시작: ${source} ${describeTarget(target)}, 실행 ${runId ?? "기록 없음"}`)
 
@@ -230,6 +285,7 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
   let loaded = 0
   let loadFailed = 0
   const loadedIds: number[] = []
+  const watchDates = new Set<string>() // 재등록 감시 원본은 1년 범위라 바뀐 날만 다시 낸다
   if (sql && !storageFailed) {
     try {
       const reconciled = await reconcileRawFiles({ sql, store, source, today: kstDateOf(now().toISOString()) })
@@ -237,7 +293,10 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
       const result = await loadPendingFiles({ sql, store, source, today })
       loaded = result.loaded.length
       loadFailed = result.failed.length
-      loadedIds.push(...result.loaded.map((o) => o.rawObjectId))
+      for (const o of result.loaded) {
+        if (o.job === "reregistration_watch") o.observations.dates.forEach((d) => watchDates.add(d))
+        else loadedIds.push(o.rawObjectId)
+      }
       for (const outcome of result.loaded) {
         const o = outcome.observations
         say(
@@ -249,6 +308,21 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
           say(`경고: 판매처에 잇지 못한 점포 ${outcome.sellers.unassigned}곳. seller에 판매처를 더한다 (ingest-foundation/07)`)
         }
       }
+      // 보존 기간 밖 재등록: 원본에서 그날 집계를 다시 만든다 (09). 실패하면 부분으로 끝낸다
+      for (const outcome of result.loaded) {
+        if (outcome.outdated.length === 0) continue
+        try {
+          const r = await restoreOutdatedRows({ sql, store, rawObjectId: outcome.rawObjectId, rows: outcome.outdated, today })
+          say(
+            `보존 기간 밖 재등록: 원본 ${outcome.rawObjectId} ${outcome.outdated.length}행, 값 같음 ${r.unchanged}, 다시 만듦 ${r.rebuilt}` +
+              `, 그대로 둠 ${r.kept}, 집계 밖 ${r.notAggregated}${r.complete ? "" : ", 원본 일부 없음"}`,
+          )
+          if (r.kept > 0) say(`경고: 보존 기간 밖 정정 ${r.kept}행의 집계를 원본으로 다시 만들지 못해 그대로 두었다 (pipeline 3-3 4)`)
+        } catch (error) {
+          say(`보존 기간 밖 재등록 실패: 원본 ${outcome.rawObjectId} ${errorSummary(error, redact)}`)
+          loadFailed += 1
+        }
+      }
       for (const failure of result.failed) say(`적재 실패: ${failure.storagePath} ${redact(failure.error).slice(0, 160)}`)
     } catch (error) {
       await dbDown("대조·적재", error)
@@ -256,10 +330,10 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
   }
 
   // 적재한 원본이 담은 날의 일자 요약을 다시 계산한다 (ingest-foundation/10). 실패하면 부분으로 끝내고 다음 실행이 다시 한다
-  if (sql && loadedIds.length > 0) {
+  if (sql && (loadedIds.length > 0 || watchDates.size > 0)) {
     try {
       const basis = source === "chamga" ? "shelf_price" : "quote"
-      const days = await datesOfRawObjects(sql, loadedIds)
+      const days = [...new Set([...(await datesOfRawObjects(sql, loadedIds)), ...watchDates])].sort()
       const quotes = await transaction(sql, (tx) => recomputeDailyQuote(tx, basis, days, today))
       say(`일자 요약: ${basis} ${days.length}일, 고친 행 ${quotes.written}, 지운 행 ${quotes.removed}`)
     } catch (error) {
@@ -289,6 +363,26 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
       await settleChamga(sql, plan, { clean: failedCalls === 0 && stop === null && loadFailed === 0 })
     } catch (error) {
       await dbDown("조사일 상태 기록", error)
+    }
+  }
+
+  // KAMIS·축평원: 확인한 날마다 source_day 상태를 남긴다. 행이 없는 날은 아직 안 옴 → 3번·3일 뒤 와야 하는데 빔 (08)
+  // --fill-gaps일 때만 돈다. 로컬 DB 테스트 전이라 워크플로에서 아직 켜지 않았다 (2026-11-27)
+  if (target.source !== "chamga" && request.fillGaps && sql && !storageFailed) {
+    try {
+      const clean = failedCalls === 0 && stop === null && loadFailed === 0
+      const errorCode = stop ?? (failedCalls > 0 ? "calls_failed" : loadFailed > 0 ? "load_failed" : null)
+      const settled = await settleCheckedDays(sql, target.source, checkedDaysOf(target), { today, clean, errorCode })
+      const empty = settled.filter((d) => d.status !== "ok")
+      if (empty.length > 0) say(`빈 날: ${empty.map((d) => `${d.day} ${d.status}(${d.attempts})`).join(", ")}`)
+      // KAMIS 일부만 옴: 품목별 건수를 최근 4주 같은 요일과 비교한다 (ingest-foundation/05)
+      if (target.source === "kamis") {
+        for (const p of await judgeKamisItemParts(sql, settled.map((d) => d.day))) {
+          if (p.short.length > 0) say(`일부만 옴: ${p.day} 품목 ${p.short.length}개 (${p.short.slice(0, 10).join(", ")}${p.short.length > 10 ? " …" : ""})`)
+        }
+      }
+    } catch (error) {
+      await dbDown("날짜 상태 기록", error)
     }
   }
 
