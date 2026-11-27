@@ -20,6 +20,14 @@ export function SourcesView() {
             <span className="text-sm text-ink">
               {source.what} · {source.when}
             </span>
+            {"href" in source ? (
+              <span className="text-[13px] text-stone">
+                {source.license} ·{" "}
+                <a href={source.href} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
+                  {source.href.replace("https://", "")}
+                </a>
+              </span>
+            ) : null}
           </li>
         ))}
       </ul>
