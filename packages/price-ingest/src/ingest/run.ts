@@ -368,7 +368,7 @@ export async function runIngest(request: CollectRequest, deps: IngestDeps): Prom
 
   // KAMIS·축평원: 확인한 날마다 source_day 상태를 남긴다. 행이 없는 날은 아직 안 옴 → 3번·3일 뒤 와야 하는데 빔 (08)
   // --fill-gaps일 때만 돈다. 로컬 DB 테스트 전이라 워크플로에서 아직 켜지 않았다 (2026-11-27)
-  if (target.source !== "chamga" && request.fillGaps && sql && !storageFailed) {
+  if (request.source !== "chamga" && request.fillGaps && target.source !== "chamga" && sql && !storageFailed) {
     try {
       const clean = failedCalls === 0 && stop === null && loadFailed === 0
       const errorCode = stop ?? (failedCalls > 0 ? "calls_failed" : loadFailed > 0 ? "load_failed" : null)
