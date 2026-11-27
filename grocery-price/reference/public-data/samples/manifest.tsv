@@ -19,6 +19,8 @@ ekape/chicken-all-items.xml	200	1714	2026-10-12T02:27:09Z	http://data.ekape.or.k
 ekape/egg-all-items.xml	200	1714	2026-10-12T02:27:09Z	http://data.ekape.or.kr/openapi-data/service/user/grade/consumerPriceDaily?serviceKey=<REDACTED>&standYmd=20261011&judgeKind=9903
 ekape/milk-all-items.xml	200	1718	2026-10-12T02:27:09Z	http://data.ekape.or.kr/openapi-data/service/user/grade/consumerPriceDaily?serviceKey=<REDACTED>&standYmd=20261011&judgeKind=9908
 ekape/error-bad-date.xml	200	359	2026-10-12T02:27:09Z	http://data.ekape.or.kr/openapi-data/service/user/grade/consumerPriceDaily?serviceKey=<REDACTED>&standYmd=INVALID&judgeKind=4304&itemCd=27
+ekape/beef-all-items-20230101.xml	200	10257	2026-11-27T06:22:48Z	http://data.ekape.or.kr/openapi-data/service/user/grade/consumerPriceDaily?serviceKey=<REDACTED>&standYmd=20230101&judgeKind=4301
+ekape/beef-import-all-items-20230101.xml	200	3942	2026-11-27T06:22:48Z	http://data.ekape.or.kr/openapi-data/service/user/grade/consumerPriceDaily?serviceKey=<REDACTED>&standYmd=20230101&judgeKind=4401
 chamgagyeok/price-by-entp-100.xml	200	100119	2026-10-12T02:27:09Z	https://apis.data.go.kr/B551919/ProductPriceInfoService/getProductPriceInfoSvc?serviceKey=<REDACTED>&goodInspectDay=20260925&entpId=100
 chamgagyeok/price-by-good-1000.xml	200	114050	2026-10-12T02:27:09Z	https://apis.data.go.kr/B551919/ProductPriceInfoService/getProductPriceInfoSvc?serviceKey=<REDACTED>&goodInspectDay=20260925&goodId=1000
 chamgagyeok/price-non-survey-day.xml	200	130	2026-10-12T02:27:09Z	https://apis.data.go.kr/B551919/ProductPriceInfoService/getProductPriceInfoSvc?serviceKey=<REDACTED>&goodInspectDay=20260926&entpId=100

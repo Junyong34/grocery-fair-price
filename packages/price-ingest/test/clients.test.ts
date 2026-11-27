@@ -8,7 +8,7 @@ import {
   ApiHttpError,
   ApiTransportError,
 } from "../src/errors.ts"
-import { ekapeHasDayRows, fetchEkapeConsumerPrice, parseEkapeConsumerPrice } from "../src/sources/ekape.ts"
+import { ekapeHasDayRows, fetchEkapeConsumerPrice, parseEkapeConsumerPrice, readEkapeConsumerPrice } from "../src/sources/ekape.ts"
 import { fetchChamgaPrice, fetchChamgaStandard } from "../src/sources/chamgagyeok.ts"
 import { fetchKamisPerDay, fetchKamisPerDayAll } from "../src/sources/kamis.ts"
 import { FAKE_KEY, readSampleText } from "./helpers.ts"
@@ -259,5 +259,47 @@ describe("축평원 성공 판정: resultCode 00 그리고 당일 행 1개 이�
 
   it("0건이면 성공이 아니다", () => {
     expect(ekapeHasDayRows([])).toBe(false)
+  })
+})
+
+// 2023-01-01·02는 소 갈비 1+등급, 수입 소 갈비·양지·갈비살의 평년 행이 가격 세 필드 없이 온다.
+// 예전 신정에 조사가 없어 평년(지난 해들의 같은 날)을 낼 표본이 없던 것으로 본다 (ekape.md 6장)
+describe("축평원 가격 없는 평년 행", () => {
+  type RawItems = { response: { body: { items: { item: Record<string, unknown>[] } } } }
+  const sample = () => readEkapeConsumerPrice(200, readSampleText("ekape/beef-all-items-20230101.xml")) as RawItems
+  const toText = (raw: unknown) => {
+    const items = (raw as RawItems).response.body.items.item
+    const tags = items.map((item) => `<item>${Object.entries(item).map(([k, v]) => `<${k}>${String(v)}</${k}>`).join("")}</item>`)
+    return `<response><header><resultCode>00</resultCode><resultMsg>NORMAL SERVICE.</resultMsg></header><body><items>${tags.join("")}</items></body></response>`
+  }
+
+  it("계약을 통과하고, 당일 행이 있으니 성공이다", () => {
+    const rows = parseEkapeConsumerPrice(200, readSampleText("ekape/beef-all-items-20230101.xml"))
+    const noPrice = rows.filter((row) => row.ntslPrc === undefined)
+    expect(noPrice).toHaveLength(1)
+    expect(noPrice[0]).toMatchObject({ standYmd: "평년", judgeKind: "4301", itemCd: "50", grdNm: "1+등급" })
+    expect(ekapeHasDayRows(rows)).toBe(true)
+  })
+
+  it("당일 행에 가격이 없으면 여전히 계약 오류다", () => {
+    const raw = sample()
+    const day = raw.response.body.items.item.find((item) => item.standYmd === "20230101")!
+    delete day.ntslPrc
+    const error = (() => {
+      try {
+        parseEkapeConsumerPrice(200, toText(raw))
+      } catch (caught) {
+        return caught
+      }
+    })()
+    expect(error).toBeInstanceOf(ApiContractError)
+    expect(String((error as Error).message)).toContain("ntslPrc")
+  })
+
+  it("평년 행에 가격이 일부만 있으면 계약 오류다", () => {
+    const raw = sample()
+    const reference = raw.response.body.items.item.find((item) => item.standYmd === "평년" && item.ntslPrc !== undefined)!
+    delete reference.ntslPrc
+    expect(() => parseEkapeConsumerPrice(200, toText(raw))).toThrow(ApiContractError)
   })
 })

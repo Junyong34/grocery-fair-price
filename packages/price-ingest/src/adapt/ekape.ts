@@ -37,6 +37,8 @@ function parseEkapeUnit(unit: string): { qty: number; unitText: string } | undef
 // 행 단위 거부 사유 (pipeline 3-11: 가격 정수, judgeKind = 요청). 거부할 이유가 없으면 null.
 export function ekapeRowRejection(row: EkapeRow, request?: { judgeKind: string }): string | null {
   if (request && row.judgeKind !== request.judgeKind) return "축종 코드가 요청과 다르다"
+  // 계약상 가격이 빠질 수 있는 것은 평년 행뿐이다 (ekapeRowSchema)
+  if (row.ntslPrc === undefined) return "평년 가격이 없다"
   if (!isPositiveInt(row.ntslPrc)) return "가격이 양의 정수가 아니다"
   return null
 }

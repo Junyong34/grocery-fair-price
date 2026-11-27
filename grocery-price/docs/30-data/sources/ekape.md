@@ -155,6 +155,7 @@ response.body.items.item[]                   (0건이면 <items/>)
 | 정상 | 200 | `resultCode 00` + item | |
 | 해당 날짜 데이터 없음 (2010-01-15 등) | 200 | `resultCode 00` + `<items/>` | 0건. 당일 행이 없으면 실패로 보고 다시 받기 |
 | 아직 안 올라온 날 (기준일 당일 오전) | 200 | `resultCode 00` + **평년 행만** | 위와 같음 (4장) |
+| 평년을 낼 표본이 없는 품목 (2023-01-01·02의 소 갈비 1+등급, 수입 소 갈비·양지·갈비살) | 200 | `resultCode 00` + 당일 행은 정상, 그 품목의 **평년 행에 `maxPrc`·`minPrc`·`ntslPrc`가 함께 빠짐** (수입 소는 `grdNm`이 `00`) | 계약은 받고 그 평년 행만 거부(`평년 가격이 없다`). 당일 행이나 일부 필드만 빠지면 계약 오류 (`samples/ekape/*-20230101.xml`, 2026-11-27 실측) |
 | 날짜 형식 오류 (`standYmd=INVALID`) | 200 | `resultCode 99` + Oracle 오류 문구(`ORA-01841`, `OPENAPI.PKG_RTSAL`) | `resultMsg`를 로그·화면에 그대로 내보내지 않는다. 코드만 남긴다 (`samples/ekape/error-bad-date.xml`) |
 | 인증키 오류 | 403 | 공공데이터포털 공통 오류 (`api-spec.md` 공통 사항) | |
 

@@ -80,6 +80,13 @@ describe("축평원 어댑터", () => {
     expect(() => adaptEkapeRow(row, ctx)).toThrow(RowRejectedError)
   })
 
+  it("가격 없는 평년 행은 평년 기준 값으로 넘기지 않는다 (2023-01-01 수입 소 갈비 등)", () => {
+    const { ntslPrc: _n, maxPrc: _x, minPrc: _m, ...rest } = ekapePorkRows()[1]!
+    const row = { ...rest, standYmd: "평년" }
+    expect(ekapeRowRejection(row)).toBe("평년 가격이 없다")
+    expect(() => adaptEkapeRow(row, ctx)).toThrow(RowRejectedError)
+  })
+
   it("축종 코드가 요청과 다르면 거부한다 (3-11)", () => {
     const row = first(ekapePorkRows())
     expect(ekapeRowRejection(row, { judgeKind: "4304" })).toBeNull()

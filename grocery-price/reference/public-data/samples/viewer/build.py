@@ -188,6 +188,8 @@ EKAPE = {
         ("ekape/beef-deungsim", "소 등심 (itemCd=22)", "1+등급, 1등급 × (기준일, 평년) = 4건"),
         ("ekape/beef-all-items", "소 · 전 품목", "부위 × 등급 × (기준일, 평년)"),
         ("ekape/beef-import-all-items", "수입 소고기 · 전 품목", "등급 대신 원산지(호주산, 미국산)가 grdNm에 들어간다"),
+        ("ekape/beef-all-items-20230101", "소 · 전 품목 (2023-01-01)", "갈비 1+등급 평년 행이 가격 세 필드 없이 온다"),
+        ("ekape/beef-import-all-items-20230101", "수입 소고기 · 전 품목 (2023-01-01)", "평년 행 3개가 가격 없이, grdNm 00으로 온다"),
         ("ekape/pork-import-samgyeopsal", "수입 돼지 삼겹살", ""),
         ("ekape/chicken-all-items", "닭 (육계)", "단위가 원/Kg"),
         ("ekape/egg-all-items", "계란", "단위가 원/30구"),

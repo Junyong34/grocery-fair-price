@@ -28,6 +28,9 @@ const EKAPE_OK_SAMPLES = [
   "ekape/beef-all-items.xml",
   "ekape/beef-deungsim.xml",
   "ekape/beef-import-all-items.xml",
+  // 2023-01-01: 평년 행 몇 개가 가격 없이 온다 (ekape.md 6장, ingest-foundation/04)
+  "ekape/beef-all-items-20230101.xml",
+  "ekape/beef-import-all-items-20230101.xml",
   "ekape/chicken-all-items.xml",
   "ekape/egg-all-items.xml",
   "ekape/milk-all-items.xml",
