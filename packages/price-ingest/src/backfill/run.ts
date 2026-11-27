@@ -17,6 +17,7 @@ import { loadRawFile } from "../load/load-file.ts"
 import { buildRawFile, callKeyOf, rawObjectKey, storagePathOf } from "../load/raw-file.ts"
 import { createObjectStore, type ObjectStore } from "../load/storage.ts"
 import { kstDateOf } from "../load/window.ts"
+import { MB, readSizeLimitMb } from "../db-size.ts"
 import { createRedactor, errorSummary } from "../secrets.ts"
 import { readRules } from "../catalog/db.ts"
 import { CatalogIndex } from "../catalog/rules.ts"
@@ -28,8 +29,8 @@ export type BackfillSource = "kamis" | "ekape"
 // KAMIS 10,000 − (KAMIS 약 150~300, 참가격 최대 1,500). 축평원 1,000 − (매일 21과 다시 부르기 여유)
 export const BACKFILL_BUDGET: Record<BackfillSource, number> = { kamis: 6_000, ekape: 900 }
 
-// 묶음을 시작하기 전에 이보다 크면 멈춘다. 무료 500MB를 넘으면 DB가 읽기 전용이 된다 (pipeline 3-9 보관 1, MB = 10⁶B)
-export const MAX_DB_BYTES = 400_000_000
+// 묶음을 시작하기 전에 DB가 문턱(calc_param db.size_alert_mb, MiB)을 넘으면 멈춘다. 무료 500MB를 넘으면 DB가 읽기 전용이 된다.
+// 크기 알림(heartbeat)과 같은 값·단위를 쓴다. 전에는 10⁶B 상수(약 381MiB)라 알림보다 먼저 멈췄다 (2026-11-27)
 
 export type BackfillRequest = {
   source?: BackfillSource // 없으면 kamis
@@ -168,7 +169,7 @@ export async function runBackfill(request: BackfillRequest, deps: BackfillDeps):
     now: () => now().getTime(),
   }
   const baseline = contractBaselineVersion()
-  const maxDbBytes = deps.maxDbBytes ?? MAX_DB_BYTES
+  const maxDbBytes = deps.maxDbBytes ?? (await readSizeLimitMb(sql)) * MB
   let stop: Stop | null = null
   let dbFailed = false
 
@@ -176,7 +177,7 @@ export async function runBackfill(request: BackfillRequest, deps: BackfillDeps):
     try {
       const [size] = await sql<{ bytes: string }[]>`select pg_database_size(current_database())::text as bytes`
       if (Number(size!.bytes) > maxDbBytes) {
-        say(`DB 크기 ${Math.round(Number(size!.bytes) / 1e6)}MB가 ${maxDbBytes / 1e6}MB를 넘어 멈춘다. 보존 정리나 용량을 먼저 본다`)
+        say(`DB 크기 ${Math.round(Number(size!.bytes) / MB)}MB가 문턱 ${Math.round(maxDbBytes / MB)}MB를 넘어 멈춘다. 보존 정리나 용량을 먼저 본다`)
         stop = "db_size_limit"
         break
       }

@@ -7,7 +7,7 @@
 import { connectIngest, type Sql, type Tx } from "./load/db.ts"
 import { actionsMaskCommands, describeError, redactorFromEnv, SECRET_ENV } from "./secrets.ts"
 
-const MB = 1024 * 1024
+export const MB = 1024 * 1024 // 문턱과 표시는 모두 MiB (pg_size_pretty와 같은 단위)
 export const SIZE_LIMIT_KEY = "db.size_alert_mb"
 
 export type DbSize = { dbBytes: number; tables: Record<string, { bytes: number; rows: number }> }
