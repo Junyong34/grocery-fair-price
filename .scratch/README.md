@@ -16,10 +16,10 @@ grep -rlE "^Status: (ready-for-agent|ready-for-human|needs-triage|needs-info|cla
 
 | 폴더 | 무엇 | 열린 티켓 |
 |---|---|---|
-| `catalog-scale/` | 시세 카탈로그를 수천 개 항목으로 넓히기 (ADR 0005) | 07 · 11 `ready-for-agent`(어드민 남은 화면, 규격별 판정 후속), 02 `ready-for-human`, 12 · 13 `needs-triage`(12에 제철↔시세 링크 범위를 합침) |
-| `ingest-foundation/` | ① 수집 기반 | 04 · 05 `ready-for-agent`(축평원 실패 묶음 3개, 장애 처리 남은 칸), 01 `ready-for-human` |
+| `catalog-scale/` | 시세 카탈로그를 수천 개 항목으로 넓히기 (ADR 0005) | 11 `ready-for-agent`(규격별 판정 후속), 02 `ready-for-human`, 12 · 13 `needs-triage`(12에 제철↔시세 링크 범위를 합침) |
+| `ingest-foundation/` | ① 수집 기반 | 04 · 05 `ready-for-agent`(축평원 실패 묶음 3개, 장애 처리 남은 칸) |
 | `ingest-schedule/` | 수집 일정과 감시 (wayfinder, `map.md`) | 08 · 09 `open` |
-| `seasonal-render-perf/` | 제철달력 렌더링 속도 | 05 · 06 `ready-for-agent`, 14 `needs-triage`(가격 화면 첫 요청) |
+| `seasonal-render-perf/` | 제철달력 렌더링 속도 | 06 `ready-for-agent`, 14 `needs-triage`(가격 화면 첫 요청) |
 | `baby-food-ingredient-pages/` | 이유식 재료별 궁합 페이지 | 04 `ready-for-human`(재료 본문) |
 | `p3-variety-catalog/` | 표현 가능 값 카탈로그 | 02 `ready-for-human`(시세 없는 품종 대응 결정) |
 | `dev-workflow/` | 개발 → 배포 절차 (spec만, 티켓 없음) | spec `ready-for-human`(PR 템플릿 · 커밋 type 초안 확인) |
@@ -32,8 +32,8 @@ grep -rlE "^Status: (ready-for-agent|ready-for-human|needs-triage|needs-info|cla
 | `calendar-download/` | 제철 인쇄물 내려받기 | 10 `ready-for-human`(처리방침 문구 승인), 09 · 11 `needs-triage`(PDF 크기, 유입 측정 · 출시 기준) |
 | `infant-food-pairing/` | 이유식 재료 궁합 시안. 판독 원자료 `image-analysis.md` | 01 `needs-info`(그림의 범위 · 형태 적합성 검토) |
 | `sashimi/` | 제철 회 화면. `research-months.md`는 제철 보정의 출처 | 08 `needs-triage`(월별 포함 규칙) |
-| `search-first-view/` (종료) | 검색 한 번에 보는 가격 | 05 · 07 `ready-for-agent` |
-| `p2-data-source-spec/` (종료) | 데이터 소스 명세 | 03 · 07 · 08 · 09 `ready-for-agent`, 06 `ready-for-human`. 필요할 때 따로 다시 연다 |
+| `search-first-view/` (종료) | 검색 한 번에 보는 가격 | 05 `ready-for-agent` |
+| `p2-data-source-spec/` (종료) | 데이터 소스 명세 | 03 · 07 · 08 · 09 `ready-for-agent`. 필요할 때 따로 다시 연다 |
 
 ## 끝난 것
 

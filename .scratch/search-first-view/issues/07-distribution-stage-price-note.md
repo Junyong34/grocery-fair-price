@@ -1,6 +1,6 @@
 # 07. 도매 시세 출처 후보를 MVP 이후로 기록
 
-Status: ready-for-agent
+Status: wontfix (2026-11-27 사용자 결정: 하지 않음)
 Type: task
 
 ## 목적

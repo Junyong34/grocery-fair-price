@@ -1,6 +1,6 @@
 # 06. 참가격 제조사 코드 처리 방침 결정
 
-Status: ready-for-human
+Status: wontfix (2026-11-27 사용자 결정: 하지 않음)
 Type: grilling
 Blocked by: 04
 

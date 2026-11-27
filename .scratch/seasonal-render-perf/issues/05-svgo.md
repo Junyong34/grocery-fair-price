@@ -1,6 +1,6 @@
 # 05. 그림 SVG SVGO 적용과 인쇄물 재생성
 
-Status: ready-for-agent
+Status: wontfix (2026-11-27 사용자 결정: 하지 않음)
 Type: task (HITL)
 Blocked by: 13 (재설계 뒤로 미룸, 2026-11-11)
 

@@ -22,3 +22,7 @@ Blocked by: 05
 - `?v=`가 붙은 요청만 1년 immutable이고, 버전 없는 요청은 지금 헤더 그대로다
 - 재방문 때 그림 요청이 네트워크 탭에서 `(disk cache)` 또는 `(memory cache)`로 나온다
 - `pnpm typecheck`, `pnpm lint`, `pnpm test` 통과. 2a를 375 · 1280에서 확인, 콘솔 오류 없음
+
+## Comments
+
+- 2026-11-27: 05(SVGO)를 wontfix로 닫았다. `food-versions.generated.ts`를 쓰는 일은 `optimize-food-svgs.mjs` 대신 해시만 만드는 작은 스크립트(또는 `foods:sync`의 마지막 단계)가 맡는다.

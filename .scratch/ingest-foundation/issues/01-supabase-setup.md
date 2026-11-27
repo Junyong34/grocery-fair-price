@@ -1,6 +1,6 @@
 # 01. Supabase 계정·연결 정보 설정
 
-Status: ready-for-human
+Status: wontfix (2026-11-27 사용자 결정: 하지 않음)
 Type: task
 
 ## 목적

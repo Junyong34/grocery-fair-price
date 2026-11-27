@@ -1,6 +1,6 @@
 # 07. 로컬 카탈로그 어드민 `/admin/catalog`
 
-Status: ready-for-agent (제안 검토·카테고리·식재료·상품 목록 완료. 남은 것: pending 직접 연결, 묶기, 변경 기록 화면)
+Status: wontfix (2026-11-27 사용자 결정: 하지 않음)
 Type: task
 Blocked by: 04
 
