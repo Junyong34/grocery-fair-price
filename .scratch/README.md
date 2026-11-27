@@ -33,7 +33,7 @@ grep -rlE "^Status: (ready-for-agent|ready-for-human|needs-triage|needs-info|cla
 | `infant-food-pairing/` | 이유식 재료 궁합 시안. 판독 원자료 `image-analysis.md` | 01 `needs-info`(그림의 범위 · 형태 적합성 검토) |
 | `sashimi/` | 제철 회 화면. `research-months.md`는 제철 보정의 출처 | 08 `needs-triage`(월별 포함 규칙) |
 | `search-first-view/` (종료) | 검색 한 번에 보는 가격 | 05 `ready-for-agent` |
-| `p2-data-source-spec/` (종료) | 데이터 소스 명세 | 03 · 07 · 08 · 09 `ready-for-agent`. 필요할 때 따로 다시 연다 |
+| `p2-data-source-spec/` (종료) | 데이터 소스 명세 | 03 `ready-for-agent`(축평원 갱신 시각 남음). 필요할 때 따로 다시 연다 |
 
 ## 끝난 것
 

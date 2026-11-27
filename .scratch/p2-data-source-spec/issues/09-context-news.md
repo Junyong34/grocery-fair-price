@@ -1,6 +1,6 @@
 # 09. 보조 출처: 뉴스 수집 경로와 약관
 
-Status: ready-for-agent
+Status: wontfix (2026-11-27 사용자 결정: 하지 않음)
 Type: research
 Blocked by: -
 

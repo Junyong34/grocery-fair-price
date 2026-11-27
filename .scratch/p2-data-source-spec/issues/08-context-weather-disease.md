@@ -1,6 +1,6 @@
 # 08. 보조 출처: 기상·가축 질병
 
-Status: ready-for-agent
+Status: wontfix (2026-11-27 사용자 결정: 하지 않음)
 Type: research
 Blocked by: -
 
